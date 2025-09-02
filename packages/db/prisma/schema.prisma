@@ -47,8 +47,16 @@ model Character {
   
   // Character Stats
   level    Int    @default(1)
-  race     String
-  class    String
+  
+  // Race/Class as foreign keys (new system)
+  raceId   Int?   // Nullable for transition
+  race     RaceData? @relation(fields: [raceId], references: [id])
+  classId  Int?   // Nullable for transition  
+  class    Class? @relation(fields: [classId], references: [id])
+  
+  // Legacy race field (keep during transition)
+  raceLegacy Race? @default(HUMAN) @map("race_legacy")
+  
   alignment Int   @default(0)
   
   // Attributes
@@ -73,6 +81,10 @@ model Character {
   // Relations
   userId    String
   user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // New progression systems
+  skills    CharacterSkill[]
+  spells    CharacterSpell[]
   
   // Metadata
   createdAt DateTime @default(now())
@@ -116,7 +128,7 @@ model Room {
   name        String
   description String @db.Text
   sector      Sector @default(STRUCTURE)
-  flags       String[] // RoomFlags as array
+  flags       RoomFlag[] // RoomFlags as array
   
   // Relations
   zoneId      Int
@@ -173,8 +185,8 @@ model Mob {
   shortDesc       String
   longDesc        String @db.Text
   desc            String @db.Text
-  mobFlags        String[] // MobFlags as array
-  effectFlags     String[] // EffectFlags as array
+  mobFlags        MobFlag[] // MobFlags as array
+  effectFlags     EffectFlag[] // EffectFlags as array
   
   // Combat Stats
   alignment       Int    @default(0)
@@ -200,12 +212,21 @@ model Mob {
   platinum        Int    @default(0)
   
   // Attributes
-  position        Int    @default(3) // Standing
-  defaultPosition Int    @default(3)
-  gender          Int    @default(0) // Neutral
-  race            Int    @default(0) // Human
+  position        Position @default(STANDING)
+  defaultPosition Position @default(STANDING)
+  gender          Gender @default(NEUTRAL)
+  
+  // Race/Class as foreign keys (new system)
+  raceId   Int?   // Nullable for transition
+  race     RaceData? @relation(fields: [raceId], references: [id])
+  classId  Int?   // Nullable for transition  
+  class    Class? @relation(fields: [classId], references: [id])
+  
+  // Legacy race field (keep during transition)
+  raceLegacy Race? @default(HUMAN) @map("race_legacy")
+  
   raceAlign       Int    @default(0)
-  size            Int    @default(2) // Medium
+  size            Size @default(MEDIUM)
   
   // Stats
   strength        Int    @default(13)
@@ -220,10 +241,14 @@ model Mob {
   concealment     Int    @default(0)
   
   // Essence
-  lifeForce       String @default("Life")
-  composition     String @default("Flesh")
-  stance          String @default("Alert")
-  damageType      String @default("HIT")
+  lifeForce       LifeForce @default(LIFE)
+  composition     Composition @default(FLESH)
+  stance          Stance @default(ALERT)
+  damageType      DamageType @default(HIT)
+  
+  // Progression Systems
+  skills    MobSkill[]
+  spells    MobSpell[]
   
   // Relations
   zoneId          Int
@@ -239,6 +264,35 @@ model Mob {
   updatedBy       String?
   
   @@map("mobs")
+}
+
+// ============================================================================
+// Mob Progression Models
+// ============================================================================
+
+model MobSkill {
+  id       Int  @id @default(autoincrement())
+  mobId    Int
+  mob      Mob  @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  skillId  Int
+  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  level    Int  @default(1)
+  
+  @@unique([mobId, skillId])
+  @@map("mob_skills")
+}
+
+model MobSpell {
+  id       Int  @id @default(autoincrement())
+  mobId    Int
+  mob      Mob  @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  spellId  Int
+  spell    Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  circle   Int  @default(1)
+  known    Boolean @default(true)
+  
+  @@unique([mobId, spellId])
+  @@map("mob_spells")
 }
 
 model MobReset {
@@ -301,9 +355,9 @@ model Object {
   shortDesc       String
   description     String   @db.Text
   actionDesc      String?  @db.Text
-  flags           String[] // ObjectFlags as array
-  effectFlags     String[] // EffectFlags as array
-  wearFlags       String[] // WearFlags as array
+  flags           ObjectFlag[] // ObjectFlags as array
+  effectFlags     EffectFlag[] // EffectFlags as array
+  wearFlags       WearFlag[] // WearFlags as array
   
   // Properties
   weight          Float    @default(0.0)
@@ -381,8 +435,8 @@ model Shop {
   buyProfit      Float   @default(1.0)
   sellProfit     Float   @default(1.0)
   temper1        Int     @default(0)
-  flags          String[] // ShopFlags as array
-  tradesWithFlags String[] // ShopTradesWith as array
+  flags          ShopFlag[] // ShopFlags as array
+  tradesWithFlags ShopTradesWith[] // ShopTradesWith as array
   
   // Messages
   noSuchItem1    String?
@@ -471,7 +525,7 @@ model Trigger {
   id               String      @id @default(cuid())
   name             String
   attachType       ScriptType
-  flags            String[]    // TriggerFlags as array
+  flags            TriggerFlag[]    // TriggerFlags as array
   numArgs          Int         @default(0)
   argList          String?
   commands         String      @db.Text
@@ -622,3 +676,794 @@ enum ScriptType {
   OBJECT
   WORLD
 }
+
+enum MobFlag {
+  SPEC
+  SENTINEL
+  SCAVENGER
+  ISNPC
+  AWARE
+  AGGRESSIVE
+  STAY_ZONE
+  WIMPY
+  AGGRO_EVIL
+  AGGRO_GOOD
+  AGGRO_NEUTRAL
+  MEMORY
+  HELPER
+  NO_CHARM
+  NO_SUMMOM
+  NO_SLEEP
+  NO_BASH
+  NO_BLIND
+  MOUNT
+  STAY_SECT
+  HATES_SUN
+  NO_KILL
+  TRACK
+  ILLUSION
+  POISON_BITE
+  THIEF
+  WARRIOR
+  SORCERER
+  CLERIC
+  PALADIN
+  ANTI_PALADIN
+  RANGER
+  DRUID
+  SHAMAN
+  ASSASSIN
+  MERCENARY
+  NECROMANCER
+  CONJURER
+  MONK
+  BERSERKER
+  DIABOLIST
+}
+
+enum EffectFlag {
+  BLIND
+  INVISIBLE
+  DETECT_ALIGN
+  DETECT_INVIS
+  DETECT_MAGIC
+  SENSE_LIFE
+  WATERWALK
+  SANCTUARY
+  GROUP
+  CURSE
+  INFRAVISION
+  POISON
+  PROTECT_EVIL
+  PROTECT_GOOD
+  SLEEP
+  NO_TRACK
+  SNEAK
+  HIDE
+  CHARM
+  FLYING
+  WATERBREATH
+  ANGELIC_AURA
+  ETHEREAL
+  MAGICONLY
+  NEXTPARTIAL
+  NEXTNOATTACK
+  SPELL_TURNING
+  COMPREHEND_LANG
+  FIRESHIELD
+  DEATH_FIELD
+  MAJOR_PARALYSIS
+  MINOR_PARALYSIS
+  DRAGON_RIDE
+  COSMIC_TRAVEL
+  MENTAL_BARRIER
+  VITALITY
+  HASTE
+  SLOW
+  CONFUSION
+  MIST_WALK
+  BURNING_HANDS
+  FAERIE_FIRE
+  DARKNESS
+  INVISIBLE_STALKER
+  FEBLEMIND
+  FLUORESCENCE
+  RESTLESS
+  ASH_EYES
+  DILATE_PUPILS
+  FLAME_SHROUD
+  BARKSKIN
+  ULTRA_DAMAGE
+  SHILLELAGH
+  SUN_RAY
+  WITHER_LIMB
+  PETRIFY
+  DISEASE
+  PLAGUE
+  SCOURGE
+  VAMPIRIC_DRAIN
+  MOON_BEAM
+  TORNADO
+  EARTHMAW
+  CYCLONE
+  FLOOD
+  METEOR
+  FIRESTORM
+  SILENCE
+  CALM
+  ENTANGLE
+  ANIMAL_KIN
+}
+
+enum RoomFlag {
+  DARK
+  DEATH
+  NOMOB
+  INDOORS
+  PEACEFUL
+  SOUNDPROOF
+  NOTRACK
+  NOMAGIC
+  TUNNEL
+  PRIVATE
+  GODROOM
+  HOUSE
+  HOUSECRASH
+  ATRIUM
+  OLC
+  BFS_MARK
+  WORLDMAP
+  FERRY_DEST
+  ISOLATED
+  ARENA
+  LARGE
+  MEDIUM_LARGE
+  MEDIUM
+  MEDIUM_SMALL
+  SMALL
+  VERY_SMALL
+  ONE_PERSON
+  EFFECTS_NEXT
+}
+
+enum TriggerFlag {
+  Global
+  Random
+  Command
+  Speech
+  Act
+  Death
+  Greet
+  GreetAll
+  Entry
+  Receive
+  Fight
+  HitPrcnt
+  Bribe
+  Load
+  Memory
+  Cast
+  Leave
+  Door
+  Time
+  Auto
+}
+
+enum ShopFlag {
+  WILL_FIGHT
+  USES_BANK
+}
+
+enum ShopTradesWith {
+  ALIGNMENT
+  RACE
+  CLASS
+}
+
+enum Gender {
+  NEUTRAL
+  MALE
+  FEMALE
+  NON_BINARY
+}
+
+enum Race {
+  HUMAN
+  ELF
+  GNOME
+  DWARF
+  TROLL
+  DROW
+  DUERGAR
+  OGRE
+  ORC
+  HALF_ELF
+  BARBARIAN
+  HALFLING
+  PLANT
+  HUMANOID
+  ANIMAL
+  DRAGON_GENERAL
+  GIANT
+  OTHER
+  GOBLIN
+  DEMON
+  BROWNIE
+  DRAGON_FIRE
+  DRAGON_FROST
+  DRAGON_ACID
+  DRAGON_LIGHTNING
+  DRAGON_GAS
+  DRAGONBORN_FIRE
+  DRAGONBORN_FROST
+  DRAGONBORN_ACID
+  DRAGONBORN_LIGHTNING
+  DRAGONBORN_GAS
+  SVERFNEBLIN
+  FAERIE_SEELIE
+  FAERIE_UNSEELIE
+  NYMPH
+  ARBOREAN
+}
+
+enum Position {
+  PRONE
+  SITTING
+  KNEELING
+  STANDING
+  FLYING
+}
+
+enum LifeForce {
+  LIFE
+  UNDEAD
+  MAGIC
+  CELESTIAL
+  DEMONIC
+  ELEMENTAL
+}
+
+enum Composition {
+  FLESH
+  EARTH
+  AIR
+  FIRE
+  WATER
+  ICE
+  MIST
+  ETHER
+  METAL
+  STONE
+  BONE
+  LAVA
+  PLANT
+}
+
+enum Stance {
+  DEAD
+  MORT
+  INCAPACITATED
+  STUNNED
+  SLEEPING
+  RESTING
+  ALERT
+  FIGHTING
+}
+
+enum DamageType {
+  HIT
+  STING
+  WHIP
+  SLASH
+  BITE
+  BLUDGEON
+  CRUSH
+  POUND
+  CLAW
+  MAUL
+  THRASH
+  PIERCE
+  BLAST
+  PUNCH
+  STAB
+  FIRE
+  COLD
+  ACID
+  SHOCK
+  POISON
+  ALIGN
+}
+
+enum Size {
+  TINY
+  SMALL
+  MEDIUM
+  LARGE
+  HUGE
+  GIANT
+  GARGANTUAN
+  COLOSSAL
+  TITANIC
+  MOUNTAINOUS
+}
+
+enum ObjectFlag {
+  GLOW
+  HUM
+  NO_RENT
+  ANTI_BERSERKER
+  NO_INVISIBLE
+  INVISIBLE
+  MAGIC
+  NO_DROP
+  PERMANENT
+  ANTI_GOOD
+  ANTI_EVIL
+  ANTI_NEUTRAL
+  ANTI_SORCERER
+  ANTI_CLERIC
+  ANTI_ROGUE
+  ANTI_WARRIOR
+  NO_SELL
+  ANTI_PALADIN
+  ANTI_ANTI_PALADIN
+  ANTI_RANGER
+  ANTI_DRUID
+  ANTI_SHAMAN
+  ANTI_ASSASSIN
+  ANTI_MERCENARY
+  ANTI_NECROMANCER
+  ANTI_CONJURER
+  NO_BURN
+  NO_LOCATE
+  DECOMPOSING
+  FLOAT
+  NO_FALL
+  WAS_DISARMED
+  ANTI_MONK
+  ANTI_BARD
+  ELVEN
+  DWARVEN
+  ANTI_THIEF
+  ANTI_PYROMANCER
+  ANTI_CRYOMANCER
+  ANTI_ILLUSIONIST
+  ANTI_PRIEST
+  ANTI_DIABOLIST
+  ANTI_TINY
+  ANTI_SMALL
+  ANTI_MEDIUM
+  ANTI_LARGE
+  ANTI_HUGE
+  ANTI_GIANT
+  ANTI_GARGANTUAN
+  ANTI_COLOSSAL
+  ANTI_TITANIC
+  ANTI_MOUNTAINOUS
+  ANTI_ARBOREAN
+}
+
+enum WearFlag {
+  TAKE
+  FINGER
+  NECK
+  BODY
+  HEAD
+  LEGS
+  FEET
+  HANDS
+  ARMS
+  SHIELD
+  ABOUT
+  WAIST
+  WRIST
+  WIELD
+  HOLD
+  TWO_HAND_WIELD
+  EYES
+  FACE
+  EAR
+  BADGE
+  BELT
+  HOVER
+}
+
+// =============================================================================
+// SPELL SYSTEM ENUMS (Circle-Based, No Mana)
+// =============================================================================
+
+enum TargetScope {
+  SINGLE
+  ROOM 
+  GROUP
+  AREA
+  CHAIN
+  CONE
+  LINE
+}
+
+enum SpellRange {
+  SELF
+  TOUCH
+  ROOM
+  ADJACENT_ROOM
+  WORLD
+}
+
+enum SaveType {
+  SPELL
+  POISON
+  BREATH
+  PARALYSIS
+  WAND
+}
+
+enum SaveResult {
+  NONE
+  HALF
+  NEGATE
+  REDUCE25
+  CUSTOM
+}
+
+enum EffectType {
+  DAMAGE
+  HEAL
+  STAT_MOD
+  AFFECT_FLAG
+  DISPEL
+  TELEPORT
+  SUMMON
+  CREATE_OBJECT
+  RESOURCE
+  OBJ_AFFECT
+  ROOM_AFFECT
+  CLEANSE
+  REMOVE_CURSE
+  SCRIPT
+}
+
+enum EffectTrigger {
+  ON_CAST
+  ON_HIT
+  ON_KILL
+  ON_SAVE
+  ON_FAIL
+}
+
+enum StackingRule {
+  REFRESH
+  STACK
+  IGNORE
+  MAX_ONLY
+}
+
+enum SkillType {
+  WEAPON      // Weapon proficiencies
+  COMBAT      // Combat techniques
+  MAGIC       // Magical skills
+  STEALTH     // Sneaking, hiding
+  SOCIAL      // Persuasion, intimidation
+  CRAFTING    // Creating items
+  SURVIVAL    // Wilderness skills
+  KNOWLEDGE   // Lore, identification
+  UTILITY     // General utility
+}
+
+enum SkillCategory {
+  PRIMARY     // Core class skill
+  SECONDARY   // Available to class
+  RESTRICTED  // Special requirements
+  FORBIDDEN   // Cannot learn
+}
+
+// =============================================================================
+// RACE SYSTEM (Converting from Enum to Table)
+// =============================================================================
+
+model RaceData {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?  @db.Text
+  
+  // Racial traits
+  size        Size     @default(MEDIUM)
+  lifespan    Int?     // Average lifespan
+  
+  // Stat modifiers (JSON for flexibility)
+  statBonuses Json?    // {"strength": 2, "dexterity": -1}
+  
+  // Relationships
+  characters  Character[]
+  mobs        Mob[]
+  skills      RaceSkill[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("races")
+}
+
+// =============================================================================
+// CLASS SYSTEM
+// =============================================================================
+
+model Class {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique
+  description     String?  @db.Text
+  hitDice         String   @default("1d8") // "1d10", "1d6+2"
+  primaryStat     String?  // "STR", "INT", "WIS"
+  
+  // Relationships
+  spellCircles    SpellClassCircle[]
+  skillAccess     ClassSkill[]
+  characters      Character[]
+  mobs            Mob[]
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("classes")
+}
+
+// =============================================================================
+// SPELL SYSTEM (Circle-Based, No Mana)
+// =============================================================================
+
+model Spell {
+  id                Int      @id @default(autoincrement())
+  name              String   @unique
+  schoolId          Int?     // Optional spell school
+  school            SpellSchool? @relation(fields: [schoolId], references: [id])
+  
+  // Casting requirements
+  minPosition       Position @default(STANDING)
+  violent           Boolean  @default(false)
+  castTimeRounds    Int      @default(1)
+  cooldownMs        Int      @default(0)
+  inCombatOnly      Boolean  @default(false)
+  isArea            Boolean  @default(false)
+  
+  notes             String?  @db.Text
+  
+  // Relationships
+  classCircles      SpellClassCircle[]
+  targeting         SpellTargeting?
+  savingThrows      SpellSavingThrow[]
+  messages          SpellMessage?
+  components        SpellComponent[]
+  restrictions      SpellRestriction?
+  effects           SpellEffect[]
+  
+  // Relations
+  characterSpells   CharacterSpell[]
+  mobSpells         MobSpell[]
+  
+  // Metadata
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("spells")
+}
+
+model SpellSchool {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique // evocation, necromancy, etc.
+  description String? @db.Text
+  
+  spells      Spell[]
+  
+  @@map("spell_schools")
+}
+
+// Circle-based spell access per class
+model SpellClassCircle {
+  id              Int   @id @default(autoincrement())
+  spellId         Int
+  spell           Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  classId         Int
+  class           Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  
+  circle          Int   // 1..N (replaces mana costs)
+  minLevel        Int?  // Optional level requirement
+  proficiencyGain Int?  // How much proficiency gained per cast
+  
+  @@unique([spellId, classId])
+  @@map("spell_class_circles")
+}
+
+// =============================================================================
+// SPELL MECHANICS
+// =============================================================================
+
+model SpellTargeting {
+  id                    Int      @id @default(autoincrement())
+  spellId               Int      @unique
+  spell                 Spell    @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  allowedTargetsMask    Int      // Bitmask: self|ally|enemy|npc|pc|object|room|corpse
+  targetScope           TargetScope @default(SINGLE)
+  maxTargets            Int      @default(1)
+  range                 SpellRange @default(ROOM)
+  requireLos            Boolean  @default(false)
+  filtersMask           Int?     // undead_only|living_only|summoned|same_group
+  
+  @@map("spell_targeting")
+}
+
+model SpellSavingThrow {
+  id               Int       @id @default(autoincrement())
+  spellId          Int
+  spell            Spell     @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  saveType         SaveType  @default(SPELL)
+  onSave           SaveResult @default(NEGATE)
+  dcFormula        String    // "10 + caster_level/2"
+  saveModifierMask Int?      // Optional modifiers
+  
+  @@map("spell_saving_throws")
+}
+
+model SpellMessage {
+  id                Int    @id @default(autoincrement())
+  spellId           Int    @unique
+  spell             Spell  @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  startToCaster     String? @db.Text
+  startToVictim     String? @db.Text
+  startToRoom       String? @db.Text
+  successToCaster   String? @db.Text
+  successToVictim   String? @db.Text
+  successToRoom     String? @db.Text
+  failToCaster      String? @db.Text
+  failToVictim      String? @db.Text
+  failToRoom        String? @db.Text
+  wearoffToTarget   String? @db.Text
+  wearoffToRoom     String? @db.Text
+  
+  @@map("spell_messages")
+}
+
+model SpellComponent {
+  id        Int     @id @default(autoincrement())
+  spellId   Int
+  spell     Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  objectId  Int     // Required object/component
+  consumed  Boolean @default(false)
+  required  Boolean @default(true)
+  
+  @@map("spell_components")
+}
+
+model SpellRestriction {
+  id                     Int     @id @default(autoincrement())
+  spellId                Int     @unique
+  spell                  Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  indoorsOnly            Boolean @default(false)
+  outdoorsOnly           Boolean @default(false)
+  noSafeRooms            Boolean @default(false)
+  noTeleportFlagsMask    Int?    // Room flags that block
+  terrainMask            Int?    // Required terrain types
+  disallowStatesMask     Int?    // Blocked character states
+  
+  @@map("spell_restrictions")
+}
+
+// =============================================================================
+// UNIFIED EFFECTS SYSTEM (JSONB-based)
+// =============================================================================
+
+model SpellEffect {
+  id              Int         @id @default(autoincrement())
+  spellId         Int
+  spell           Spell       @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  effectType      EffectType
+  order           Int         @default(0)
+  chancePct       Int         @default(100)
+  trigger         EffectTrigger? @default(ON_CAST)
+  durationFormula String?     // Formula for duration
+  stackingRule    StackingRule @default(REFRESH)
+  conditionFilter Json?       // JSONB conditions
+  params          Json        // JSONB effect parameters
+  
+  @@index([spellId, order])
+  @@map("spell_effects")
+}
+
+// =============================================================================
+// SKILLS SYSTEM
+// =============================================================================
+
+model Skill {
+  id          Int      @id @default(autoincrement())
+  name        String   @unique
+  description String?  @db.Text
+  type        SkillType
+  category    SkillCategory @default(SECONDARY)
+  maxLevel    Int      @default(100)
+  
+  // Relationships
+  classSkills     ClassSkill[]
+  raceSkills      RaceSkill[]
+  characterSkills CharacterSkill[]
+  mobSkills       MobSkill[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@map("skills")
+}
+
+model ClassSkill {
+  id       Int   @id @default(autoincrement())
+  classId  Int
+  class    Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  skillId  Int
+  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  category SkillCategory @default(SECONDARY)
+  minLevel Int           @default(1)
+  maxLevel Int           @default(100)
+  
+  @@unique([classId, skillId])
+  @@map("class_skills")
+}
+
+model RaceSkill {
+  id       Int   @id @default(autoincrement())
+  raceId   Int
+  race     RaceData @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  skillId  Int
+  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  category SkillCategory @default(SECONDARY)
+  bonus    Int           @default(0) // Racial bonus to skill
+  
+  @@unique([raceId, skillId])
+  @@map("race_skills")
+}
+
+// =============================================================================
+// CHARACTER PROGRESSION
+// =============================================================================
+
+model CharacterSkill {
+  id          String @id @default(cuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  skillId     Int
+  skill       Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  
+  level       Int @default(0)
+  experience  Int @default(0)
+  lastUsed    DateTime?
+  
+  @@unique([characterId, skillId])
+  @@map("character_skills")
+}
+
+model CharacterSpell {
+  id          String @id @default(cuid())
+  characterId String
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  spellId     Int
+  spell       Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  
+  known       Boolean @default(false)
+  proficiency Int     @default(0)
+  lastCast    DateTime?
+  
+  @@unique([characterId, spellId])
+  @@map("character_spells")
+}
+
+// =============================================================================
+// REFERENCE DATA TABLES
+// =============================================================================
