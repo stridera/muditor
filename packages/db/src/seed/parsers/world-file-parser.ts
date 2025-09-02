@@ -353,11 +353,16 @@ export class WorldFileParser {
       },
     };
 
-    // Connect keeper if it exists
+    // Connect keeper if it exists (check if mob exists first)
     if (shop.keeper) {
-      shopData.keeper = {
-        connect: { id: shop.keeper }
-      };
+      const keeperExists = await this.prisma.mob.findUnique({
+        where: { id: shop.keeper }
+      });
+      if (keeperExists) {
+        shopData.keeper = {
+          connect: { id: shop.keeper }
+        };
+      }
     }
 
     const createdShop = await this.prisma.shop.upsert({
@@ -369,13 +374,31 @@ export class WorldFileParser {
     // Parse shop items
     if (shop.selling && typeof shop.selling === 'object') {
       for (const [objectId, amount] of Object.entries(shop.selling)) {
-        await this.prisma.shopItem.create({
-          data: {
+        // Check if object exists before creating shop item
+        const objectExists = await this.prisma.object.findUnique({
+          where: { id: parseInt(objectId) }
+        });
+        
+        if (objectExists) {
+          await this.prisma.shopItem.upsert({
+          where: {
+            shopId_objectId: {
+              shopId: createdShop.id,
+              objectId: parseInt(objectId),
+            }
+          },
+          update: {
+            amount: amount as number,
+          },
+          create: {
             amount: amount as number,
             shopId: createdShop.id,
             objectId: parseInt(objectId),
           },
         });
+        } else {
+          console.log(`⚠️  Object ${objectId} not found for shop ${createdShop.id} in zone ${zoneId}`);
+        }
       }
     }
 
@@ -395,11 +418,18 @@ export class WorldFileParser {
     // Parse shop rooms
     if (shop.rooms && Array.isArray(shop.rooms)) {
       for (const roomId of shop.rooms) {
-        await this.prisma.shopRoom.create({
-          data: {
+        await this.prisma.shopRoom.upsert({
+          where: {
+            shopId_roomId: {
+              shopId: createdShop.id,
+              roomId: parseInt(roomId.toString()),
+            }
+          },
+          create: {
             roomId: parseInt(roomId.toString()),
             shopId: createdShop.id,
           },
+          update: {}
         });
       }
     }
@@ -459,29 +489,47 @@ export class WorldFileParser {
     // Parse carrying items
     if (mobReset.carrying && Array.isArray(mobReset.carrying)) {
       for (const item of mobReset.carrying) {
-        await this.prisma.mobCarrying.create({
-          data: {
-            max: item.max || 1,
-            name: item.name || null,
-            resetId: createdReset.id,
-            objectId: item.id,
-          },
+        // Check if object exists before creating the carrying relationship
+        const objectExists = await this.prisma.object.findUnique({
+          where: { id: item.id }
         });
+        
+        if (objectExists) {
+          await this.prisma.mobCarrying.create({
+            data: {
+              max: item.max || 1,
+              name: item.name || null,
+              resetId: createdReset.id,
+              objectId: item.id,
+            },
+          });
+        } else {
+          console.log(`⚠️  Object ${item.id} not found for mob carrying in zone ${zoneId}`);
+        }
       }
     }
 
     // Parse equipped items
     if (mobReset.equipped && Array.isArray(mobReset.equipped)) {
       for (const item of mobReset.equipped) {
-        await this.prisma.mobEquipped.create({
-          data: {
-            max: item.max || 1,
-            location: item.location,
-            name: item.name || null,
-            resetId: createdReset.id,
-            objectId: item.id,
-          },
+        // Check if object exists before creating the equipped relationship
+        const objectExists = await this.prisma.object.findUnique({
+          where: { id: item.id }
         });
+        
+        if (objectExists) {
+          await this.prisma.mobEquipped.create({
+            data: {
+              max: item.max || 1,
+              location: String(item.location), // Convert to string
+              name: item.name || null,
+              resetId: createdReset.id,
+              objectId: item.id,
+            },
+          });
+        } else {
+          console.log(`⚠️  Object ${item.id} not found for mob equipped in zone ${zoneId}`);
+        }
       }
     }
   }
