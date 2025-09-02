@@ -1,0 +1,624 @@
+// This is your Prisma schema file.
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================================================
+// User Management & Authentication
+// ============================================================================
+
+model User {
+  id          String   @id @default(cuid())
+  email       String   @unique
+  username    String   @unique
+  passwordHash String
+  role        UserRole @default(PLAYER)
+  godLevel    Int      @default(0)
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  lastLoginAt DateTime?
+  
+  // Relations
+  characters  Character[]
+  auditLogs   AuditLog[]
+  
+  @@map("users")
+}
+
+enum UserRole {
+  PLAYER
+  IMMORTAL
+  CODER
+  GOD
+}
+
+model Character {
+  id       String @id @default(cuid())
+  name     String @unique
+  
+  // Character Stats
+  level    Int    @default(1)
+  race     String
+  class    String
+  alignment Int   @default(0)
+  
+  // Attributes
+  strength     Int @default(13)
+  intelligence Int @default(13)
+  wisdom       Int @default(13)
+  dexterity    Int @default(13)
+  constitution Int @default(13)
+  charisma     Int @default(13)
+  
+  // Resources
+  hitPoints    Int @default(100)
+  mana         Int @default(100)
+  movement     Int @default(100)
+  
+  // Currency
+  copper   Int @default(0)
+  silver   Int @default(0)
+  gold     Int @default(0)
+  platinum Int @default(0)
+  
+  // Relations
+  userId    String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("characters")
+}
+
+// ============================================================================
+// World Structure
+// ============================================================================
+
+model Zone {
+  id          Int     @id
+  name        String
+  top         Int     // Highest room number in zone
+  lifespan    Int     @default(30) // Minutes between resets
+  resetMode   ResetMode @default(NORMAL)
+  hemisphere  Hemisphere @default(NORTHWEST)
+  climate     Climate @default(NONE)
+  
+  // Relations
+  rooms       Room[]
+  mobs        Mob[]
+  objects     Object[]
+  shops       Shop[]
+  triggers    Trigger[]
+  mobResets   MobReset[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  
+  @@map("zones")
+}
+
+model Room {
+  id          Int    @id
+  name        String
+  description String @db.Text
+  sector      Sector @default(STRUCTURE)
+  flags       String[] // RoomFlags as array
+  
+  // Relations
+  zoneId      Int
+  zone        Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  exits       RoomExit[]
+  extraDescs  RoomExtraDescription[]
+  mobResets   MobReset[]
+  
+  // Metadata
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  
+  @@map("rooms")
+}
+
+model RoomExit {
+  id          String @id @default(cuid())
+  direction   Direction
+  description String?
+  keyword     String?
+  key         String? // Key ID for locked exits
+  destination Int?    // Target room ID
+  
+  // Relations
+  roomId      Int
+  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@unique([roomId, direction])
+  @@map("room_exits")
+}
+
+model RoomExtraDescription {
+  id       String @id @default(cuid())
+  keyword  String
+  description String @db.Text
+  
+  // Relations
+  roomId   Int
+  room     Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  
+  @@map("room_extra_descriptions")
+}
+
+// ============================================================================
+// Mobs (NPCs)
+// ============================================================================
+
+model Mob {
+  id              Int    @id
+  keywords        String
+  mobClass        String
+  shortDesc       String
+  longDesc        String @db.Text
+  desc            String @db.Text
+  mobFlags        String[] // MobFlags as array
+  effectFlags     String[] // EffectFlags as array
+  
+  // Combat Stats
+  alignment       Int    @default(0)
+  level           Int    @default(1)
+  armorClass      Int    @default(0)
+  hitRoll         Int    @default(0)
+  move            Int    @default(0)
+  
+  // Hit Points (dice-based)
+  hpDiceNum       Int    @default(0)
+  hpDiceSize      Int    @default(0)
+  hpDiceBonus     Int    @default(0)
+  
+  // Damage (dice-based)
+  damageDiceNum   Int    @default(0)
+  damageDiceSize  Int    @default(0)
+  damageDiceBonus Int    @default(0)
+  
+  // Currency
+  copper          Int    @default(0)
+  silver          Int    @default(0)
+  gold            Int    @default(0)
+  platinum        Int    @default(0)
+  
+  // Attributes
+  position        Int    @default(3) // Standing
+  defaultPosition Int    @default(3)
+  gender          Int    @default(0) // Neutral
+  race            Int    @default(0) // Human
+  raceAlign       Int    @default(0)
+  size            Int    @default(2) // Medium
+  
+  // Stats
+  strength        Int    @default(13)
+  intelligence    Int    @default(13)
+  wisdom          Int    @default(13)
+  dexterity       Int    @default(13)
+  constitution    Int    @default(13)
+  charisma        Int    @default(13)
+  
+  // Skills
+  perception      Int    @default(0)
+  concealment     Int    @default(0)
+  
+  // Essence
+  lifeForce       String @default("Life")
+  composition     String @default("Flesh")
+  stance          String @default("Alert")
+  damageType      String @default("HIT")
+  
+  // Relations
+  zoneId          Int
+  zone            Zone         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  resets          MobReset[]
+  shops           Shop[]       // Mobs can be shopkeepers
+  triggers        Trigger[]
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+  
+  @@map("mobs")
+}
+
+model MobReset {
+  id       String @id @default(cuid())
+  max      Int    @default(1)    // Maximum instances to spawn
+  name     String?               // Human-readable name
+  
+  // Relations
+  mobId    Int
+  mob      Mob    @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  roomId   Int
+  room     Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  zoneId   Int
+  zone     Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  
+  // Equipment and Inventory
+  carrying MobCarrying[]
+  equipped MobEquipped[]
+  
+  @@map("mob_resets")
+}
+
+model MobCarrying {
+  id       String @id @default(cuid())
+  max      Int    @default(1)
+  name     String?
+  
+  // Relations
+  resetId  String
+  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
+  objectId Int
+  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@map("mob_carrying")
+}
+
+model MobEquipped {
+  id       String @id @default(cuid())
+  max      Int    @default(1)
+  location String // Equipment slot
+  name     String?
+  
+  // Relations
+  resetId  String
+  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
+  objectId Int
+  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@map("mob_equipped")
+}
+
+// ============================================================================
+// Objects (Items)
+// ============================================================================
+
+model Object {
+  id              Int      @id
+  type            ObjectType @default(NOTHING)
+  keywords        String
+  shortDesc       String
+  description     String   @db.Text
+  actionDesc      String?  @db.Text
+  flags           String[] // ObjectFlags as array
+  effectFlags     String[] // EffectFlags as array
+  wearFlags       String[] // WearFlags as array
+  
+  // Properties
+  weight          Float    @default(0.0)
+  cost            Int      @default(0)
+  timer           Int      @default(0)
+  decomposeTimer  Int      @default(0)
+  level           Int      @default(1)
+  concealment     Int      @default(0)
+  
+  // Type-specific values (stored as JSON for flexibility)
+  values          Json     @default("{}")
+  
+  // Relations
+  zoneId          Int
+  zone            Zone             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  extraDescs      ObjectExtraDescription[]
+  affects         ObjectAffect[]
+  spells          ObjectSpell[]
+  triggers        Trigger[]
+  shopItems       ShopItem[]
+  mobCarrying     MobCarrying[]
+  mobEquipped     MobEquipped[]
+  
+  // Metadata
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  createdBy       String?
+  updatedBy       String?
+  
+  @@map("objects")
+}
+
+model ObjectExtraDescription {
+  id          String @id @default(cuid())
+  keyword     String
+  description String @db.Text
+  
+  // Relations
+  objectId    Int
+  object      Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@map("object_extra_descriptions")
+}
+
+model ObjectAffect {
+  id       String @id @default(cuid())
+  location String // Apply location (e.g., "STRENGTH", "HIT_ROLL")
+  modifier Int    // Modifier value
+  
+  // Relations
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@map("object_affects")
+}
+
+model ObjectSpell {
+  id       String @id @default(cuid())
+  spell    String
+  level    Int    @default(1)
+  
+  // Relations
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@map("object_spells")
+}
+
+// ============================================================================
+// Shops
+// ============================================================================
+
+model Shop {
+  id             Int     @id
+  buyProfit      Float   @default(1.0)
+  sellProfit     Float   @default(1.0)
+  temper1        Int     @default(0)
+  flags          String[] // ShopFlags as array
+  tradesWithFlags String[] // ShopTradesWith as array
+  
+  // Messages
+  noSuchItem1    String?
+  noSuchItem2    String?
+  doNotBuy       String?
+  missingCash1   String?
+  missingCash2   String?
+  messageBuy     String?
+  messageSell    String?
+  
+  // Relations
+  keeperId       Int?
+  keeper         Mob?    @relation(fields: [keeperId], references: [id], onDelete: SetNull)
+  zoneId         Int
+  zone           Zone    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  
+  items          ShopItem[]
+  accepts        ShopAccept[]
+  rooms          ShopRoom[]
+  hours          ShopHour[]
+  
+  // Metadata
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+  createdBy      String?
+  updatedBy      String?
+  
+  @@map("shops")
+}
+
+model ShopItem {
+  id       String @id @default(cuid())
+  amount   Int    @default(0) // 0 = infinite
+  
+  // Relations
+  shopId   Int
+  shop     Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  @@unique([shopId, objectId])
+  @@map("shop_items")
+}
+
+model ShopAccept {
+  id       String @id @default(cuid())
+  type     String
+  keywords String?
+  
+  // Relations
+  shopId   Int
+  shop     Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  
+  @@map("shop_accepts")
+}
+
+model ShopRoom {
+  id     String @id @default(cuid())
+  roomId Int
+  
+  // Relations
+  shopId Int
+  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  
+  @@unique([shopId, roomId])
+  @@map("shop_rooms")
+}
+
+model ShopHour {
+  id    String @id @default(cuid())
+  open  Int
+  close Int
+  
+  // Relations
+  shopId Int
+  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  
+  @@map("shop_hours")
+}
+
+// ============================================================================
+// Scripts & Triggers
+// ============================================================================
+
+model Trigger {
+  id               String      @id @default(cuid())
+  name             String
+  attachType       ScriptType
+  flags            String[]    // TriggerFlags as array
+  numArgs          Int         @default(0)
+  argList          String?
+  commands         String      @db.Text
+  
+  // Relations - polymorphic association
+  zoneId           Int?
+  zone             Zone?       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  mobId            Int?
+  mob              Mob?        @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  objectId         Int?
+  object           Object?     @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  
+  // Script Variables (JSON for flexibility)
+  variables        Json        @default("{}")
+  
+  // Metadata
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+  createdBy        String?
+  updatedBy        String?
+  
+  @@map("triggers")
+}
+
+// ============================================================================
+// Audit & Logging
+// ============================================================================
+
+model AuditLog {
+  id        String    @id @default(cuid())
+  action    String    // Action type (CREATE, UPDATE, DELETE)
+  entityType String   // Entity type (Zone, Room, Mob, etc.)
+  entityId  String    // Entity ID
+  oldValues Json?     // Previous values (for updates)
+  newValues Json?     // New values
+  
+  // Relations
+  userId    String
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Metadata
+  createdAt DateTime  @default(now())
+  
+  @@map("audit_logs")
+}
+
+// ============================================================================
+// Enums
+// ============================================================================
+
+enum ResetMode {
+  NEVER
+  EMPTY
+  NORMAL
+}
+
+enum Hemisphere {
+  NORTHWEST
+  NORTHEAST
+  SOUTHWEST
+  SOUTHEAST
+}
+
+enum Climate {
+  NONE
+  SEMIARID
+  ARID
+  OCEANIC
+  TEMPERATE
+  SUBTROPICAL
+  TROPICAL
+  SUBARCTIC
+  ARCTIC
+  ALPINE
+}
+
+enum Sector {
+  STRUCTURE
+  CITY
+  FIELD
+  FOREST
+  HILLS
+  MOUNTAIN
+  SHALLOWS
+  WATER
+  UNDERWATER
+  AIR
+  ROAD
+  GRASSLANDS
+  CAVE
+  RUINS
+  SWAMP
+  BEACH
+  UNDERDARK
+  ASTRALPLANE
+  AIRPLANE
+  FIREPLANE
+  EARTHPLANE
+  ETHEREALPLANE
+  AVERNUS
+}
+
+enum Direction {
+  NORTH
+  EAST
+  SOUTH
+  WEST
+  UP
+  DOWN
+}
+
+enum ObjectType {
+  NOTHING
+  LIGHT
+  SCROLL
+  WAND
+  STAFF
+  WEAPON
+  FIREWEAPON
+  MISSILE
+  TREASURE
+  ARMOR
+  POTION
+  WORN
+  OTHER
+  TRASH
+  TRAP
+  CONTAINER
+  NOTE
+  DRINKCONTAINER
+  KEY
+  FOOD
+  MONEY
+  PEN
+  BOAT
+  FOUNTAIN
+  PORTAL
+  ROPE
+  SPELLBOOK
+  WALL
+  TOUCHSTONE
+  BOARD
+  INSTRUMENT
+}
+
+enum ScriptType {
+  MOB
+  OBJECT
+  WORLD
+}
