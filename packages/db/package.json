@@ -11,7 +11,7 @@
     "migrate:dev": "prisma migrate dev",
     "migrate:reset": "prisma migrate reset",
     "migrate:deploy": "prisma migrate deploy",
-    "seed": "tsx src/seed.ts",
+    "seed": "tsx src/seed/index.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf node_modules/.prisma"
   },
