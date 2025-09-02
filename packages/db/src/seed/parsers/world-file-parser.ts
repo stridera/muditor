@@ -468,6 +468,26 @@ export class WorldFileParser {
   }
 
   private async parseMobReset(mobReset: any, zoneId: number) {
+    // Check if mob exists before creating the reset
+    const mobExists = await this.prisma.mob.findUnique({
+      where: { id: mobReset.id }
+    });
+    
+    if (!mobExists) {
+      console.warn(`⚠️  Mob ${mobReset.id} not found for mob reset in zone ${zoneId}, skipping`);
+      return;
+    }
+    
+    // Check if room exists before creating the reset
+    const roomExists = await this.prisma.room.findUnique({
+      where: { id: mobReset.room }
+    });
+    
+    if (!roomExists) {
+      console.warn(`⚠️  Room ${mobReset.room} not found for mob reset in zone ${zoneId}, skipping`);
+      return;
+    }
+
     const resetData: Prisma.MobResetCreateInput = {
       max: mobReset.max || 1,
       name: mobReset.name || null,

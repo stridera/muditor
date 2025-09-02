@@ -1,0 +1,100 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type AuthPayload {
+  accessToken: String!
+  user: User!
+}
+
+input CreateZoneInput {
+  climate: String! = "NONE"
+  hemisphere: String! = "NORTHWEST"
+  id: Int!
+  lifespan: Int! = 30
+  name: String!
+  resetMode: String! = "NORMAL"
+  top: Int!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+input LoginInput {
+  identifier: String!
+  password: String!
+}
+
+type Mutation {
+  createZone(data: CreateZoneInput!): ZoneDto!
+  deleteZone(id: Int!): ZoneDto!
+  login(input: LoginInput!): AuthPayload!
+  refreshToken: String!
+  register(input: RegisterInput!): AuthPayload!
+  updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
+}
+
+type Query {
+  me: User!
+  user(id: ID!): User!
+  users: [User!]!
+  zone(id: Int!): ZoneDto!
+  zones(skip: Int, take: Int): [ZoneDto!]!
+  zonesCount: Int!
+}
+
+input RegisterInput {
+  email: String!
+  password: String!
+  username: String!
+}
+
+input UpdateZoneInput {
+  climate: String
+  hemisphere: String
+  lifespan: Int
+  name: String
+  resetMode: String
+  top: Int
+}
+
+type User {
+  createdAt: DateTime!
+  email: String!
+  godLevel: Float!
+  id: ID!
+  lastLoginAt: DateTime
+  role: UserRole!
+  updatedAt: DateTime!
+  username: String!
+}
+
+"""User role in the MUD system"""
+enum UserRole {
+  CODER
+  GOD
+  IMMORTAL
+  PLAYER
+}
+
+type ZoneCountsDto {
+  mobs: Int!
+  objects: Int!
+  rooms: Int!
+  shops: Int!
+}
+
+type ZoneDto {
+  _count: ZoneCountsDto
+  climate: String!
+  createdAt: DateTime!
+  hemisphere: String!
+  id: Int!
+  lifespan: Int!
+  name: String!
+  resetMode: String!
+  top: Int!
+  updatedAt: DateTime!
+}
