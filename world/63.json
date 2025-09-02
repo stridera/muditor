@@ -1,0 +1,894 @@
+{
+    "zone": {
+        "id": "63",
+        "name": "Quest Zone",
+        "top": 6399,
+        "lifespan": 30,
+        "reset_mode": "Never",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 6300,
+                    "max": 1,
+                    "room": 6300,
+                    "name": "(a quietly humming blob)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 6300,
+            "keywords": "blob scripting ai helper scriptingaihelper",
+            "mob_class": "Berserker",
+            "short_desc": "a quietly humming blob",
+            "long_desc": "A small blob sits by itself, humming quietly.",
+            "desc": "It looks like a little blob, contented with its lot in life.",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOSILENCE",
+                "NOVICIOUS",
+                "PEACEFUL",
+                "NO_CLASS_AI"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 94,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 1,
+            "default_position": 1,
+            "gender": 0,
+            "race": 18,
+            "race_align": 1,
+            "size": 1,
+            "stats": {
+                "strength": 85,
+                "intelligence": 73,
+                "wisdom": 78,
+                "dexterity": 76,
+                "constitution": 74,
+                "charisma": 67
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 6390,
+            "keywords": "warrior herlequin-warrior demonic-knight demon",
+            "mob_class": "AntiPaladin",
+            "short_desc": "a herlequin warrior",
+            "long_desc": "A Demonic Knight rides high upon a sleek nightmare.",
+            "desc": "Dressed all in black armor and riding upon a sleek nightmare, this shrouded warrior is an imposing force.  His glowing red eyes burn brightly, scanning the area for victims.  The black armor is engraved with an unholy symbol that resembles the sky god.  The warrior's long black hair flows out from beneath his full helm.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "HELPER",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "FAST_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "DETECT_INVIS",
+                "DETECT_MAGIC",
+                "SENSE_LIFE",
+                "PROTECT_GOOD"
+            ],
+            "alignment": -1000,
+            "level": 80,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 30000,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 10,
+                "size": 15,
+                "bonus": 30
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 19,
+            "race_align": 1,
+            "size": 5,
+            "stats": {
+                "strength": 93,
+                "intelligence": 67,
+                "wisdom": 69,
+                "dexterity": 84,
+                "constitution": 75,
+                "charisma": 67
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "WHIP"
+        },
+        {
+            "id": 6391,
+            "keywords": "leader herlequin-leader massive-demonic-knight demon",
+            "mob_class": "Monk",
+            "short_desc": "the herlequin leader",
+            "long_desc": "A massive Demonic Knight rides proudly upon a sleek knightmare.",
+            "desc": "Almost twice the size of the average herlequin warrior, the herlequin leader towers above all around him.  His pitch black armor proudly displays the insignia of the sky god, and his long black hair protrudes wildly from his full helm.  A large black sword glows reddish as the herlequin knight swings it around himself, threatening those nearby.",
+            "mob_flags": [
+                "ISNPC",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "HELPER",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "FAST_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "DETECT_INVIS",
+                "DETECT_MAGIC",
+                "SENSE_LIFE",
+                "PROTECT_GOOD",
+                "HASTE"
+            ],
+            "alignment": -1000,
+            "level": 90,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 30000,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 14,
+                "size": 18,
+                "bonus": 35
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 19,
+            "race_align": 1,
+            "size": 5,
+            "stats": {
+                "strength": 89,
+                "intelligence": 66,
+                "wisdom": 74,
+                "dexterity": 84,
+                "constitution": 80,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "WHIP"
+        },
+        {
+            "id": 6392,
+            "keywords": "sorcerer herlequin-sorcerer powerful-mage demon",
+            "mob_class": "Sorcerer",
+            "short_desc": "a herlequin sorcerer",
+            "long_desc": "A powerful-looking mage rides smugly upon a sleek nightmare.",
+            "desc": "A large, ominous figure, the sorcerer exudes power from within his flowing ebony robes.  He rides calmly upon a large black nightmare, hardly taking notice of passers-by.  A long black staff is clutched in his hand, veins of red glowing along its length.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGRESSIVE",
+                "WIMPY",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "DETECT_INVIS",
+                "DETECT_MAGIC",
+                "SENSE_LIFE",
+                "PROTECT_GOOD",
+                "FLY",
+                "STONE_SKIN"
+            ],
+            "alignment": -1000,
+            "level": 85,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 25000,
+            "ac": 0,
+            "hit_roll": 10,
+            "damage_dice": {
+                "num": 20,
+                "size": 20,
+                "bonus": 10
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 19,
+            "race_align": 1,
+            "size": 3,
+            "stats": {
+                "strength": 73,
+                "intelligence": 94,
+                "wisdom": 92,
+                "dexterity": 66,
+                "constitution": 72,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "THRASH"
+        },
+        {
+            "id": 6393,
+            "keywords": "assassin herlequin-assassin demonic-shadow demon",
+            "mob_class": "Assassin",
+            "short_desc": "a herlequin assassin",
+            "long_desc": "a demonic shadow lunges at you!",
+            "desc": "Nearly completely cloaked in darkness, only glimpses of a shadowy body can be seen: the soft glow of red eyes, slight patches that are darker than others, and the gleam of a dagger lunging towards a victim.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "SLOW_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "DETECT_INVIS",
+                "SENSE_LIFE",
+                "PROTECT_GOOD",
+                "SNEAK",
+                "HASTE"
+            ],
+            "alignment": -1000,
+            "level": 80,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 25000,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 20,
+                "size": 20,
+                "bonus": 25
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 10,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 19,
+            "race_align": 1,
+            "size": 3,
+            "stats": {
+                "strength": 82,
+                "intelligence": 88,
+                "wisdom": 90,
+                "dexterity": 78,
+                "constitution": 74,
+                "charisma": 70
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "THRASH"
+        }
+    ],
+    "objects": [
+        {
+            "id": 6308,
+            "type": "ARMOR",
+            "keywords": [
+                "a-pair-of-dragonhide-gloves"
+            ],
+            "short": "a pair of dragonhide gloves",
+            "ground": "A pair of dragonhide gloves lay neatly folded upon the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "gloves",
+                        "dragon",
+                        "hide",
+                        "dragon-hide",
+                        "pair",
+                        "a-pair-of-dragon-hide-gloves",
+                        "venath"
+                    ],
+                    "text": "Though they are indeed solid brown leather, these gloves appear to be covered in thick smoke which eminates from the pores of the leathery surface.  The effect of the distortion from the smoke is akin to a heatwave passing through the desert.  Although by appearances they should offer little in the way of protection, these gloves boast the strength and resiliance of the dragon whose skin they were crafted from.  There appears to be an inscription on the inside of the right hand glove."
+                },
+                {
+                    "keywords": [
+                        "inscription"
+                    ],
+                    "text": "Emblazoned in the leather on the inside of the cuff reads: Specially crafted for the legendary assassin Kresselack, may his stiletto's forever haunt his foes."
+                }
+            ],
+            "values": {
+                "AC": 15
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 2.0,
+            "cost": 96903,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HANDS"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 4
+                },
+                {
+                    "location": "DAMROLL",
+                    "modifier": 4
+                },
+                {
+                    "location": "SIZE",
+                    "modifier": 1
+                },
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 60
+                }
+            ],
+            "triggers": [
+                18888
+            ],
+            "effects": [
+                "DETECT_MAGIC",
+                "SENSE_LIFE",
+                "HURT_THROAT",
+                "PROT_FIRE"
+            ]
+        },
+        {
+            "id": 6330,
+            "type": "FOOD",
+            "keywords": [
+                "puff",
+                "delicious-cream-puff",
+                "food"
+            ],
+            "short": "a cream puff",
+            "ground": "A delicious cream puff is sitting here.  Five second rule!",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "delicious-cream-puff"
+                    ],
+                    "text": "The choux pastry is light and fluffy.  A filling of whipped cream peeks out from a little hole on one side of the puff."
+                }
+            ],
+            "values": {
+                "Filling": 6,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.02,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6331,
+            "type": "POTION",
+            "keywords": [
+                "potion",
+                "bubbly-green-potion",
+                "health"
+            ],
+            "short": "a potion of health",
+            "ground": "A bubbly green potion fizzles here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bubbly-green-potion",
+                        "health"
+                    ],
+                    "text": "The potion is in a little cork-stopped vial."
+                }
+            ],
+            "values": {
+                "Level": 40,
+                "Spells": [
+                    "FULL_HEAL",
+                    "HEAL",
+                    "CURE_CRITIC"
+                ]
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 0.05,
+            "cost": 10000,
+            "timer": 0,
+            "level": 50,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6332,
+            "type": "SCROLL",
+            "keywords": [
+                "scroll",
+                "gleaming-white-scroll",
+                "blindingly-white-scroll",
+                "resurrect"
+            ],
+            "short": "a gleaming white scroll",
+            "ground": "A blindingly white scroll gleams here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "gleaming-white-scroll",
+                        "blindingly-white-scroll",
+                        "resurrect"
+                    ],
+                    "text": "This scroll is made from top quality bleached paper.  The whiteness makes your eyes hurt.  The interior of the scroll is covered in arcane runes.  On the outside, however, some words in plain common read: \"DO NOT USE ON SELF\""
+                }
+            ],
+            "values": {
+                "Level": 100,
+                "Spells": [
+                    "SHIFT_CORPSE",
+                    "RESURRECT"
+                ]
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 0.01,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6333,
+            "type": "SCROLL",
+            "keywords": [
+                "scroll",
+                "misty-scroll",
+                "blue-scroll"
+            ],
+            "short": "a misty scroll",
+            "ground": "A blue scroll sublimates into existence on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "misty-scroll",
+                        "blue-scroll"
+                    ],
+                    "text": "It's made from strange blue paper that's cold to the touch.  Water is condensing on the scroll, threatening to dissolve it."
+                }
+            ],
+            "values": {
+                "Level": 90,
+                "Spells": [
+                    "VAPORFORM"
+                ]
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 0.02,
+            "cost": 0,
+            "timer": 0,
+            "level": 75,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6334,
+            "type": "POTION",
+            "keywords": [
+                "jelly",
+                "little-red-jelly",
+                "little-squishy-jelly"
+            ],
+            "short": "a little red jelly",
+            "ground": "A little squishy jelly sits here waiting to be quaffed.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "little-red-jelly",
+                        "little-squishy-jelly"
+                    ],
+                    "text": "It's a little gummy jelly made from some kind of red food paste."
+                }
+            ],
+            "values": {
+                "Level": 100,
+                "Spells": [
+                    "MAJOR_GLOBE"
+                ]
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 0.01,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6380,
+            "type": "TREASURE",
+            "keywords": [
+                "bauble",
+                "shiny-bauble",
+                "little-glint-light"
+            ],
+            "short": "a shiny bauble",
+            "ground": "A little glint of light flashes from the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "shiny-bauble",
+                        "little-glint-light"
+                    ],
+                    "text": "Mostly spherical, this tiny bauble looks like a melted silver droplet left over from a larger silver treasure.  Nonetheless, it is polished to a shine and has a tiny hook on one side, allowing it to be affixed to any number of surfaces."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "NOINVIS"
+            ],
+            "weight": 0.3,
+            "cost": 1000,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "EAR",
+                "BADGE",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 50
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6382,
+            "type": "POTION",
+            "keywords": [
+                "vial",
+                "violet-vial-viscous-fluid",
+                "vial-vengeance"
+            ],
+            "short": "a vial of vengeance",
+            "ground": "A violet vial of viscous fluid is visible here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "vial",
+                        "violet-vial-viscous-fluid",
+                        "vial-vengeance"
+                    ],
+                    "text": "Vivid violet light wafts from the vial like a veil of vibrant velvet, evoking thoughts of vertigo and vengeance.  Visions of vaniloquence vanish as the vial vaticinates a revelation of a venator vigorously vitiating a once vivacious victim."
+                }
+            ],
+            "values": {
+                "Level": 25,
+                "Spells": [
+                    "VITALITY",
+                    "VIGORIZE_CRITIC",
+                    "INVISIBLE"
+                ]
+            },
+            "flags": [
+                "GLOW",
+                "FLOAT"
+            ],
+            "weight": 0.3,
+            "cost": 3400,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6383,
+            "type": "FOOD",
+            "keywords": [
+                "grapesicle",
+                "everlasting-grapesicle",
+                "large-grape-icicle",
+                "food"
+            ],
+            "short": "an everlasting grapesicle",
+            "ground": "A large grape icicle lies here, melting.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "grapesicle",
+                        "everlasting-grapesicle",
+                        "large-grape-icicle",
+                        "food"
+                    ],
+                    "text": "It's an icy popsicle of grape juice."
+                }
+            ],
+            "values": {
+                "Filling": 1000,
+                "Poisoned": false
+            },
+            "flags": [
+                "NODROP",
+                "FLOAT"
+            ],
+            "weight": 10.0,
+            "cost": 1000,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 6391,
+            "type": "TREASURE",
+            "keywords": [
+                "volcano",
+                "flaming"
+            ],
+            "short": "a flaming volcano",
+            "ground": "A MASSIVE &1&bFlaming&0&9&b Volcano&0 shoots outs boulders",
+            "action_desc": "",
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "NOINVIS",
+                "NOBURN"
+            ],
+            "weight": 9999.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [],
+            "triggers": [
+                6391,
+                6392
+            ],
+            "effects": []
+        },
+        {
+            "id": 6392,
+            "type": "TREASURE",
+            "keywords": [
+                "vial",
+                "flood"
+            ],
+            "short": "metamorpho's vial",
+            "ground": "A vial full of clear liquid gives off great sounds of crashing waves.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "vial"
+                    ],
+                    "text": "A clear crystal vial containing what appears to be a clear liquid similar to water. When listening closely the sound of great crashing waves, similar to the ocean, can be heard coming from within."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "NORENT",
+                "NOINVIS",
+                "MAGIC",
+                "NOBURN"
+            ],
+            "weight": 2.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 6302,
+            "name": "frozen ice mask",
+            "attach_type": "Room",
+            "flags": [
+                "HitPercentage"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "osend %actor% You can't pull it off!  It's frozen itself to your skin! "
+        },
+        {
+            "id": 6390,
+            "name": "Herlequin vial trigger",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 2,
+            "argument_list": "pour vial volcano",
+            "commands": "wait 5 osend %actor% Metamorpho's vial is ripped from your hands. oechoaround %actor% Metamorpho's vial is ripped from %actor.name%'s hands! wait 6 oecho Metamorpho's vial hovers above the massive volcano before turning upside $ wait 2 oecho The top of the vial pops open unleashing a &6&bFLOOD&0 of water! wait 2 oecho The massive volcano slowly burns itself out with a puff of smoke! opurge volcano oload obj 75 oload obj 75 oload obj 75 oload obj 75 opurge %self% "
+        },
+        {
+            "id": 6391,
+            "name": "Herlequin volcano trigger 1",
+            "attach_type": "Room",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "oecho A blast of &9&bsmoke&0 and a burst of &1&bflame&0 charges into the air! wait 5 oecho As the smoke clears a figure appears. wait 5 set val %random.10% switch %val% case 1 case 2 case 3 oecho A herlequin warrior lets off a horrible screech! oload mob 6390 break case 4 case 5 oecho A herlequin assassin finds a shadow to hide in. case 6 case 7 oload mob 6393 oload obj 3020 oforce assassin get dagger oforce assassin wield dagger break oecho A herlequin mage begins to chant a demonic mantra. case 8 case 9 oload mob 6392 default done "
+        },
+        {
+            "id": 6392,
+            "name": "Herlequin volcano trigger 2",
+            "attach_type": "Room",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "set dice1 %random.100% set dice2 %random.100% eval damage %dice1% + %dice2% set victim %random.char% oecho A massive volcano shoots out a &1&bflaming rock&0! wait 2 odamage %victim% %damage% crush if %damdone% == 0 oechoaround %victim% A &1&bflaming&0 rock falls right next to %victim.name%! osend %victim% A &1&bflaming&0 rock falls right next to you! else oechoaround %victim% A &1&bflaming&0 rock falls from the sky, smashing %victim.name% right on the head! (&1&b%damdone%&0) osend %victim% A &1&bflaming rock&0 slams you directly on the head! OUCH! (&1&b%damdone%&0) end "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "6300",
+            "name": "Quest Nexus",
+            "description": "This isn't so much a room as a space between dimensions.  You feel entirely out of place. ",
+            "flags": [
+                "INDOORS",
+                "PEACEFUL",
+                "PRIVATE",
+                "NOWELL",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE"
+        }
+    ]
+}

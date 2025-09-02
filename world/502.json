@@ -1,0 +1,4085 @@
+{
+    "zone": {
+        "id": "502",
+        "name": "The Bayou",
+        "top": 50299,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "TEMPERATE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 50212,
+                    "max": 1,
+                    "room": 50227,
+                    "name": "(a bedraggled macaw)",
+                    "carrying": [
+                        {
+                            "id": 50224,
+                            "max": 1,
+                            "name": "(a &2&bparrot's&0 tailfeather)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50213,
+                    "max": 3,
+                    "room": 50210,
+                    "name": "(a blood eel)"
+                },
+                {
+                    "id": 50219,
+                    "max": 1,
+                    "room": 50210,
+                    "name": "(a swamp troll)"
+                },
+                {
+                    "id": 50205,
+                    "max": 4,
+                    "room": 50221,
+                    "name": "(a zombie pirate)",
+                    "equipped": [
+                        {
+                            "id": 50214,
+                            "max": 10,
+                            "location": "Eyes",
+                            "name": "(a tarnished cutlass)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50205,
+                    "max": 4,
+                    "room": 50218,
+                    "name": "(a zombie pirate)",
+                    "equipped": [
+                        {
+                            "id": 50214,
+                            "max": 10,
+                            "location": "Eyes",
+                            "name": "(a tarnished cutlass)"
+                        },
+                        {
+                            "id": 50205,
+                            "max": 10,
+                            "location": "Legs",
+                            "name": "(a loose linen shirt)"
+                        },
+                        {
+                            "id": 50206,
+                            "max": 10,
+                            "location": "Hands",
+                            "name": "(brown leather breeches)"
+                        },
+                        {
+                            "id": 50219,
+                            "max": 2,
+                            "location": 26,
+                            "name": "(a sharpening stone)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50205,
+                    "max": 4,
+                    "room": 50218,
+                    "name": "(a zombie pirate)",
+                    "equipped": [
+                        {
+                            "id": 50214,
+                            "max": 10,
+                            "location": "Eyes",
+                            "name": "(a tarnished cutlass)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50205,
+                    "max": 4,
+                    "room": 50220,
+                    "name": "(a zombie pirate)",
+                    "equipped": [
+                        {
+                            "id": 50214,
+                            "max": 10,
+                            "location": "Eyes",
+                            "name": "(a tarnished cutlass)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50202,
+                    "max": 3,
+                    "room": 50223,
+                    "name": "(the zombie of a slave)"
+                },
+                {
+                    "id": 50201,
+                    "max": 1,
+                    "room": 50224,
+                    "name": "(the ghost of a diplomat)"
+                },
+                {
+                    "id": 50204,
+                    "max": 2,
+                    "room": 50224,
+                    "name": "(a zombified mutineer)"
+                },
+                {
+                    "id": 50206,
+                    "max": 1,
+                    "room": 50228,
+                    "name": "(a ghostly first mate)",
+                    "equipped": [
+                        {
+                            "id": 50213,
+                            "max": 10,
+                            "location": "Eyes",
+                            "name": "(a briquet)"
+                        },
+                        {
+                            "id": 50211,
+                            "max": 6,
+                            "location": "Hold",
+                            "name": "(a fat, tarnished brass bracelet)"
+                        },
+                        {
+                            "id": 50204,
+                            "max": 3,
+                            "location": "Feet",
+                            "name": "(a purple-and-black bandanna)"
+                        }
+                    ],
+                    "carrying": [
+                        {
+                            "id": 50216,
+                            "max": 3,
+                            "name": "(a hefty iron key)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50207,
+                    "max": 1,
+                    "room": 50237,
+                    "name": "(the ghostly pirate captain)",
+                    "equipped": [
+                        {
+                            "id": 50212,
+                            "max": 3,
+                            "location": "Eyes",
+                            "name": "(a brilliant sabre)"
+                        },
+                        {
+                            "id": 50222,
+                            "max": 3,
+                            "location": "Feet",
+                            "name": "(a battered black felt tricorne)"
+                        },
+                        {
+                            "id": 50209,
+                            "max": 1,
+                            "location": "Neck",
+                            "name": "(a silver, onyx-studded ring)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50210,
+                    "max": 1,
+                    "room": 50209,
+                    "name": "(the shade of a lookout)",
+                    "carrying": [
+                        {
+                            "id": 50221,
+                            "max": 1,
+                            "name": "(a black linen blindfold)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50214,
+                    "max": 4,
+                    "room": 50209,
+                    "name": "(a winged lizard)"
+                },
+                {
+                    "id": 50218,
+                    "max": 1,
+                    "room": 50215,
+                    "name": "(a bloated mass)"
+                },
+                {
+                    "id": 50217,
+                    "max": 1,
+                    "room": 50214,
+                    "name": "(a black panther)"
+                },
+                {
+                    "id": 50216,
+                    "max": 1,
+                    "room": 50235,
+                    "name": "(a will o' the wisp)"
+                },
+                {
+                    "id": 50215,
+                    "max": 2,
+                    "room": 50211,
+                    "name": "(a kookaburra)"
+                },
+                {
+                    "id": 50215,
+                    "max": 2,
+                    "room": 50205,
+                    "name": "(a kookaburra)"
+                },
+                {
+                    "id": 50214,
+                    "max": 4,
+                    "room": 50204,
+                    "name": "(a winged lizard)"
+                },
+                {
+                    "id": 50213,
+                    "max": 4,
+                    "room": 50207,
+                    "name": "(a blood eel)"
+                },
+                {
+                    "id": 50203,
+                    "max": 1,
+                    "room": 50226,
+                    "name": "(the zombified pirate cook)",
+                    "equipped": [
+                        {
+                            "id": 50213,
+                            "max": 4,
+                            "location": "Eyes",
+                            "name": "(a briquet)"
+                        }
+                    ],
+                    "carrying": [
+                        {
+                            "id": 50200,
+                            "max": 50,
+                            "name": "(a wedge of lime)"
+                        },
+                        {
+                            "id": 50217,
+                            "max": 3,
+                            "name": "(a long, rusty iron key)"
+                        },
+                        {
+                            "id": 50207,
+                            "max": 3,
+                            "name": "(a hunk of salt pork)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50211,
+                    "max": 1,
+                    "room": 50241,
+                    "name": "(a ghostly girl)",
+                    "equipped": [
+                        {
+                            "id": 50203,
+                            "max": 3,
+                            "location": 24,
+                            "name": "(a golden crescent-shaped earring)"
+                        }
+                    ]
+                },
+                {
+                    "id": 50208,
+                    "max": 1,
+                    "room": 50216,
+                    "name": "(a quiet ranger)"
+                },
+                {
+                    "id": 50200,
+                    "max": 1,
+                    "room": 50217,
+                    "name": "(a runner boy)",
+                    "equipped": [
+                        {
+                            "id": 3020,
+                            "max": 50,
+                            "location": "Eyes",
+                            "name": "(a dagger)"
+                        }
+                    ]
+                }
+            ],
+            "door": [
+                {
+                    "room": 50238,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50233,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50230,
+                    "direction": "West",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50231,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50229,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED",
+                        [
+                            "LOCKED"
+                        ]
+                    ]
+                },
+                {
+                    "room": 50229,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50220,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50222,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50223,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 50223,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50224,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 50228,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 50232,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                }
+            ],
+            "object": [
+                {
+                    "id": 50201,
+                    "max": 1,
+                    "room": 50231,
+                    "name": "(an elegant white china teacup)"
+                },
+                {
+                    "id": 50202,
+                    "max": 1,
+                    "room": 50231,
+                    "name": "(a fragile china teapot)"
+                },
+                {
+                    "id": 50220,
+                    "max": 1,
+                    "room": 50231,
+                    "name": "(an octant)"
+                },
+                {
+                    "id": 50208,
+                    "max": 2,
+                    "room": 50229,
+                    "name": "(a portly keg)"
+                },
+                {
+                    "id": 50210,
+                    "max": 1,
+                    "room": 50229,
+                    "name": "(a squat cask)"
+                },
+                {
+                    "id": 50207,
+                    "max": 3,
+                    "room": 50229,
+                    "name": "(a hunk of salt pork)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 50200,
+            "keywords": "runner boy little ghoulish ghoul runner-boy",
+            "mob_class": "Warrior",
+            "short_desc": "a runner boy",
+            "long_desc": "A ghoulish little boy moves slowly through the area.",
+            "desc": "A spindly little ghoul stands before you.  It was once a little boy, running errands on a pirate ship.  Now it is a reanimated corpse with soulless eyes.",
+            "mob_flags": [
+                "ISNPC",
+                "MEMORY",
+                "NOCHARM",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 16,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 78,
+                "intelligence": 64,
+                "wisdom": 73,
+                "dexterity": 91,
+                "constitution": 79,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50201,
+            "keywords": "diplomat ghost man diplomat-ghost ghostly suited",
+            "mob_class": "Warrior",
+            "short_desc": "the ghost of a diplomat",
+            "long_desc": "A ghostly man in a proper suit stands in a corner.",
+            "desc": "Although he is a ghost, it is plain that this man once held a position of authority.  He wears a fine suit and carries himself well.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC"
+            ],
+            "effect_flags": [],
+            "alignment": -600,
+            "level": 25,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 64,
+                "wisdom": 73,
+                "dexterity": 98,
+                "constitution": 74,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50202,
+            "keywords": "zombie slave pitiful zombified human zombie-slave",
+            "mob_class": "Warrior",
+            "short_desc": "the zombie of a slave",
+            "long_desc": "A pitiful zombified human is standing here.",
+            "desc": "The rusted remains of manacles still cling to this poor creature's wrists and ankles.  Shreds of rotting clothing hang around its neck and waist.  It is in an advanced state of decay.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 18,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 88,
+                "intelligence": 76,
+                "wisdom": 78,
+                "dexterity": 77,
+                "constitution": 75,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 50203,
+            "keywords": "zombie cook fat horrible grotesque zombified cook zombiefied-pirate-cook zombie-cook",
+            "mob_class": "Warrior",
+            "short_desc": "the zombified pirate cook",
+            "long_desc": "A horribly fat and grotesque zombie stands before you.",
+            "desc": "Green mold is growing in a great swath across the face and chest of this morbidly obese creature.  It is clearly dead, having a shredded belly, and it's missing the back of its skull.  Nevertheless it continues to move about, cooking imaginary meals.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 22,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 68,
+                "wisdom": 82,
+                "dexterity": 85,
+                "constitution": 76,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50204,
+            "keywords": "mutineer zombie zombified angry-looking zombified-mutineer",
+            "mob_class": "Warrior",
+            "short_desc": "a zombified mutineer",
+            "long_desc": "An angry-looking zombie with half a jaw advances!",
+            "desc": "Half of the face and jaw have been ripped away from this nonliving creature. The rest of its body is covered in what would have been sores, if it were alive.  Various organisms fester here and there.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 500,
+            "level": 21,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 91,
+                "intelligence": 65,
+                "wisdom": 80,
+                "dexterity": 89,
+                "constitution": 83,
+                "charisma": 45
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50205,
+            "keywords": "zombie pirate corpse animated dead zombie-pirate",
+            "mob_class": "Warrior",
+            "short_desc": "a zombie pirate",
+            "long_desc": "A dead but animated corpse of a pirate is standing here.",
+            "desc": "Broken bones and a shattered skull are all too evident in the destroyed body of this unfortunate mariner.  Some unholy force has reanimated its corpse, however, and it stands guard against intrusion from the likes of you.    ",
+            "mob_flags": [
+                "ISNPC",
+                "AGGRESSIVE",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL"
+            ],
+            "effect_flags": [],
+            "alignment": -500,
+            "level": 21,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 70,
+                "wisdom": 82,
+                "dexterity": 76,
+                "constitution": 76,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50206,
+            "keywords": "pirate ghost first mate glowing ghostly ghostly-first-mate",
+            "mob_class": "Warrior",
+            "short_desc": "a ghostly first mate",
+            "long_desc": "The glowing ghost of the first mate hangs in the air.",
+            "desc": "Whatever force animates the other pirates here also works upon this sad, dead creature.  Apparently, its body was too destroyed to be of use.  However, it still appears dangerous.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC"
+            ],
+            "effect_flags": [],
+            "alignment": -700,
+            "level": 25,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 69,
+                "wisdom": 81,
+                "dexterity": 76,
+                "constitution": 78,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50207,
+            "keywords": "captain ghost ghostly pirate ghostly-pirate-captain fearsome scowling",
+            "mob_class": "AntiPaladin",
+            "short_desc": "the ghostly pirate captain",
+            "long_desc": "The fearsome ghost of a pirate captain scowls about.",
+            "desc": "This disincorporated pirate appears to be very angry.  The wounds of life are visible in his ghostly form, but appear to hinder him not at all.  He seems to be looking for something.    ",
+            "mob_flags": [
+                "ISNPC",
+                "AGGRESSIVE",
+                "STAY_ZONE",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "MEMORY",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 26,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 61,
+                "wisdom": 75,
+                "dexterity": 93,
+                "constitution": 81,
+                "charisma": 59
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50208,
+            "keywords": "bayou-ranger quiet man ranger",
+            "mob_class": "Ranger",
+            "short_desc": "a quiet ranger",
+            "long_desc": "A quiet man, dressed for the woods, stands nearby.",
+            "desc": "This man is dressed in simple, camouflaged clothing that makes him hard to see. He appears to be traveling or hunting, and is in good spirits.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 850,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 76,
+                "intelligence": 78,
+                "wisdom": 64,
+                "dexterity": 84,
+                "constitution": 85,
+                "charisma": 67
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50209,
+            "keywords": "maddened-diplomat-spectre maddened diplomat spectre",
+            "mob_class": "Mercenary",
+            "short_desc": "the spectre of a maddened diplomat",
+            "long_desc": "The diplomat's spectre floats here, glowing red and cackling.",
+            "desc": "No longer the mild and collected statesman, this long-dead creature now appears insane and obsessive.  He stares about him with lust and hatred, and seems to glow with an evil light.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOCHARM",
+                "NOSLEEP",
+                "NOBASH"
+            ],
+            "effect_flags": [],
+            "alignment": -1000,
+            "level": 27,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 73,
+                "intelligence": 75,
+                "wisdom": 95,
+                "dexterity": 71,
+                "constitution": 71,
+                "charisma": 68
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50210,
+            "keywords": "lookout shade ghostly lookout-shade",
+            "mob_class": "Warrior",
+            "short_desc": "the shade of a lookout",
+            "long_desc": "A ghostly lookout stands watch.",
+            "desc": "This unfortunate mariner appears to have died long ago.  Its soul has risen to watch endlessly for land, oblivious to its fate.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 18,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 98,
+                "intelligence": 64,
+                "wisdom": 73,
+                "dexterity": 86,
+                "constitution": 74,
+                "charisma": 59
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50211,
+            "keywords": "ghost child girl ghostly-girl sad little floating",
+            "mob_class": "Monk",
+            "short_desc": "a ghostly girl",
+            "long_desc": "A sad little girl floats motionlessly over the waters.",
+            "desc": "She looks strangely unhurt, and yet is clearly not alive.  Her eyes are haunting, almost totally black.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC"
+            ],
+            "effect_flags": [],
+            "alignment": 950,
+            "level": 26,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 3,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 89,
+                "intelligence": 72,
+                "wisdom": 79,
+                "dexterity": 85,
+                "constitution": 71,
+                "charisma": 56
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50212,
+            "keywords": "macaw bird bedraggled filthy bedraggled-macaw",
+            "mob_class": "Warrior",
+            "short_desc": "a bedraggled macaw",
+            "long_desc": "A filthy, bedraggled macaw is perched on a board.",
+            "desc": "Once-beautiful plumage is now oily and torn.  The bright blue and yellow feathers of this bird are now ugly and repulsive.  There is a notch in its large beak, but this bloody-eyed bird still seems to be quite belligerent.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "WIMPY",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 16,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 84,
+                "intelligence": 75,
+                "wisdom": 72,
+                "dexterity": 80,
+                "constitution": 74,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 50213,
+            "keywords": "ripple gentle blood-eel",
+            "mob_class": "Warrior",
+            "short_desc": "a blood eel",
+            "long_desc": "A gentle ripple in the surface of the water glides toward you.",
+            "desc": "This brownish-black, sinuous creature silently hunts in shallow waters.  Its many small razor-sharp teeth can grab onto nearly anything.    ",
+            "mob_flags": [
+                "ISNPC",
+                "AGGRESSIVE",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL"
+            ],
+            "effect_flags": [
+                "INFRAVISION",
+                "SNEAK"
+            ],
+            "alignment": 0,
+            "level": 18,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 80,
+                "intelligence": 73,
+                "wisdom": 67,
+                "dexterity": 81,
+                "constitution": 78,
+                "charisma": 73
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 50214,
+            "keywords": "lizard winged-lizard brownish-green winged",
+            "mob_class": "Warrior",
+            "short_desc": "a winged lizard",
+            "long_desc": "A brownish-green lizard with large batwings flutters among low branches.",
+            "desc": "Tough, leathery skin covers this somewhat large lizard.  It has four legs in addition to large wings, and a mouth full of sharp teeth.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [
+                "WATERWALK",
+                "FLY"
+            ],
+            "alignment": 0,
+            "level": 16,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 98,
+                "intelligence": 71,
+                "wisdom": 66,
+                "dexterity": 84,
+                "constitution": 70,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 50215,
+            "keywords": "kookaburra bird heavyset",
+            "mob_class": "Warrior",
+            "short_desc": "a kookaburra",
+            "long_desc": "A heavyset bird with a long, heavy beak watches the water carefully.",
+            "desc": "With its big heavy beak and sharp eyes, this kookaburra is undoubtedly an excellent fisher.  It is well-suited to the waters of the bayou.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [
+                "WATERWALK",
+                "FLY"
+            ],
+            "alignment": 0,
+            "level": 16,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 99,
+                "intelligence": 60,
+                "wisdom": 66,
+                "dexterity": 80,
+                "constitution": 82,
+                "charisma": 68
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 50216,
+            "keywords": "will wisp light glimmer softly glowing bayou-will-o-wisp",
+            "mob_class": "Diabolist",
+            "short_desc": "a will o' the wisp",
+            "long_desc": "A softly glowing light glimmers up ahead, beckoning you.",
+            "desc": "The floating light seems to shift from gold to white and back again.  It is very difficult to see, and yet almost impossible not to notice.    ",
+            "mob_flags": [
+                "ISNPC",
+                "WIMPY",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [
+                "FLY",
+                "LIGHT",
+                "ULTRAVISION"
+            ],
+            "alignment": 0,
+            "level": 21,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 19,
+            "race_align": 1,
+            "size": 1,
+            "stats": {
+                "strength": 81,
+                "intelligence": 77,
+                "wisdom": 78,
+                "dexterity": 80,
+                "constitution": 73,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Ether",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 50217,
+            "keywords": "panther cat black sinuous large black-panther",
+            "mob_class": "Warrior",
+            "short_desc": "a black panther",
+            "long_desc": "A large, sinuous black cat steps carefully through the mist.",
+            "desc": "The power of this creature is unmistakable.  Smoothly contracting muscles ripple under its midnight-black coat.  The powerful jaws reflect its favorite method of killing: a crushing bite to the back of the skull.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 21,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 75,
+                "wisdom": 79,
+                "dexterity": 85,
+                "constitution": 81,
+                "charisma": 52
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "POUND"
+        },
+        {
+            "id": 50218,
+            "keywords": "mass beast creature",
+            "mob_class": "Warrior",
+            "short_desc": "a bloated mass",
+            "long_desc": "A horrible, bloated mass of tissue surges forward at your approach.",
+            "desc": "Resembling nothing more than a giant clump of rancid cheese, this voracious beast occupies about as much room as a gaming table.  Thick, mucousy tentacles reach straight for you!    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGRESSIVE",
+                "AGGR_EVIL",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "NOCHARM",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "NOVICIOUS",
+                "NO_CLASS_AI"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 22,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 19,
+            "race_align": 1,
+            "size": 3,
+            "stats": {
+                "strength": 82,
+                "intelligence": 66,
+                "wisdom": 82,
+                "dexterity": 86,
+                "constitution": 69,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 50219,
+            "keywords": "troll swamp swamp-troll humanoid",
+            "mob_class": "Warrior",
+            "short_desc": "a swamp troll",
+            "long_desc": "A brownish-green humanoid with straggly black hair peers at you suspiciously.",
+            "desc": "Irregular spots and lengthy splotches splatter the dark olive skin of this wrinkled troll like the hurled paint of an inattentive god.  This is a tall, gangly, wizened looking troll with a bulbous nose and large droopy ears.  Its reddened eyes peer at you, as if attempting to gauge the threat you pose.    ",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 20,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 4,
+            "race_align": 1,
+            "size": 3,
+            "stats": {
+                "strength": 98,
+                "intelligence": 69,
+                "wisdom": 71,
+                "dexterity": 91,
+                "constitution": 70,
+                "charisma": 55
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 50200,
+            "type": "FOOD",
+            "keywords": [
+                "lime",
+                "wedge",
+                "green",
+                "lime-wedge",
+                "fat",
+                "little",
+                "food"
+            ],
+            "short": "a wedge of lime",
+            "ground": "A fat little wedge of lime lies on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "lime",
+                        "wedge",
+                        "green",
+                        "lime-wedge",
+                        "fat",
+                        "little",
+                        "food"
+                    ],
+                    "text": "This bright green morsel is sure to keep away scurvy.  It's also good with certain drinks.    "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.05,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50201,
+            "type": "DRINKCON",
+            "keywords": [
+                "teacup",
+                "cup",
+                "white",
+                "china",
+                "elegant",
+                "elegant-white-china-teacup"
+            ],
+            "short": "an elegant white china teacup",
+            "ground": "An elegant, white china teacup has been left here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "teacup",
+                        "cup",
+                        "white",
+                        "china",
+                        "elegant",
+                        "elegant-white-china-teacup"
+                    ],
+                    "text": "This is a fragile, white tea cup.  It is gilded on the upper edge, and painted with blue and pink flowers.  A single complex character is painted on its bottom.    "
+                },
+                {
+                    "keywords": [
+                        "character",
+                        "symbol"
+                    ],
+                    "text": "It has several strokes, and resembles no letter with which you are familiar."
+                }
+            ],
+            "values": {
+                "Capacity": 4,
+                "Remaining": 4,
+                "Liquid": "WATER",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.08,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50202,
+            "type": "DRINKCON",
+            "keywords": [
+                "teapot",
+                "tea",
+                "pot",
+                "china",
+                "fragile",
+                "fragile-china-teapot"
+            ],
+            "short": "a fragile china teapot",
+            "ground": "A fragile china teapot is lying on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "teapot",
+                        "tea",
+                        "pot",
+                        "china",
+                        "fragile",
+                        "fragile-china-teapot"
+                    ],
+                    "text": "It looks quite delicate, yet it has survived despite being in a shipwreck. The spout and the upper rim are lightly gilded, while exquisite paintings of dragons and phoenixes adorn its side.  On the bottom, a few masterful strokes of an unknown artist's brush have left a pair of complex figures that are indecipherable to you.  The are encircled by an irregular line that appears to be the coast of an island.    "
+                }
+            ],
+            "values": {
+                "Capacity": 40,
+                "Remaining": 40,
+                "Liquid": "WATER",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.6,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50203,
+            "type": "TREASURE",
+            "keywords": [
+                "earring",
+                "golden-crescent-shaped-earring",
+                "bright-crescent-shaped-golden-earring",
+                "gold",
+                "questobject"
+            ],
+            "short": "a golden crescent-shaped earring",
+            "ground": "A bright, crescent-shaped golden earring is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "earring",
+                        "golden-crescent-shaped-earring",
+                        "bright-crescent-shaped-golden-earring",
+                        "gold",
+                        "questobject"
+                    ],
+                    "text": "This is a fat, heavy crescent of solid gold with an off-center curl at one end to go through a hole in the ear.  It shines brilliantly, and even seems to have an inner glow.    "
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "ANTI_BERSERKER",
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "FLOAT"
+            ],
+            "weight": 0.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "EAR"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50204,
+            "type": "ARMOR",
+            "keywords": [
+                "bandanna",
+                "purple-black-bandanna",
+                "small-wadded-up-cloth-purple-black"
+            ],
+            "short": "a purple-and-black bandanna",
+            "ground": "A small wadded-up cloth of purple and black lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bandanna",
+                        "purple-black-bandanna",
+                        "small-wadded-up-cloth-purple-black"
+                    ],
+                    "text": "Bright purple skull-faces and assorted other bones are scattered across this black square of cloth in a whimsical pattern.  It looks like just the thing to keep the sun off your head.    "
+                }
+            ],
+            "values": {
+                "AC": 6
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.3,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "WIS",
+                    "modifier": 3
+                },
+                {
+                    "location": "SAVING_BREATH",
+                    "modifier": -1
+                },
+                {
+                    "location": "CHA",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50205,
+            "type": "ARMOR",
+            "keywords": [
+                "shirt",
+                "loose-linen-shirt",
+                "weathered-linen-shirt"
+            ],
+            "short": "a loose linen shirt",
+            "ground": "A weathered linen shirt lies here discarded.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "shirt",
+                        "loose-linen-shirt",
+                        "weathered-linen-shirt"
+                    ],
+                    "text": "This is a slightly off-white shirt made of linen, with long sleeves.  It buttons down the front."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 2.7,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "affects": [
+                {
+                    "location": "MOVE",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50206,
+            "type": "ARMOR",
+            "keywords": [
+                "breeches",
+                "brown-leather-breeches",
+                "dirty-leather-breeches"
+            ],
+            "short": "brown leather breeches",
+            "ground": "Dirty leather breeches lie here in a heap.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "breeches",
+                        "brown-leather-breeches",
+                        "dirty-leather-breeches"
+                    ],
+                    "text": "These breeches cover the legs down to the knees.  They are somewhat worn, though serviceable."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [],
+            "weight": 5.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "LEGS"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50207,
+            "type": "FOOD",
+            "keywords": [
+                "pork",
+                "hunk",
+                "salt",
+                "meat",
+                "wizened",
+                "salt-pork",
+                "food"
+            ],
+            "short": "a hunk of salt pork",
+            "ground": "A hunk of wizened meat lies on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pork",
+                        "hunk",
+                        "salt",
+                        "meat",
+                        "wizened",
+                        "salt-pork",
+                        "food"
+                    ],
+                    "text": "Salted meat isn't particularly appetizing, but at least it keeps longer.  This is no exception.  It's dried and tough like leather.    "
+                }
+            ],
+            "values": {
+                "Filling": 6,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50208,
+            "type": "DRINKCON",
+            "keywords": [
+                "keg",
+                "portly",
+                "little",
+                "wooden",
+                "portly-keg"
+            ],
+            "short": "a portly keg",
+            "ground": "A portly little wooden keg is stacked on the floor.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "keg",
+                        "portly",
+                        "little",
+                        "wooden",
+                        "portly-keg"
+                    ],
+                    "text": "This fat little keg is made of dark wood, and is fairly scratched up but intact.    "
+                }
+            ],
+            "values": {
+                "Capacity": 60,
+                "Remaining": 60,
+                "Liquid": "RUM",
+                "Poisoned": false
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 2.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50209,
+            "type": "TREASURE",
+            "keywords": [
+                "ring",
+                "silver-onyx-studded-ring",
+                "wide-silver-ring",
+                "studded",
+                "black",
+                "stones"
+            ],
+            "short": "a silver, onyx-studded ring",
+            "ground": "A wide silver ring studded with black stones has been dropped here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "silver-onyx-studded-ring",
+                        "wide-silver-ring",
+                        "studded",
+                        "black",
+                        "stones"
+                    ],
+                    "text": "Small, round black studs protrude from the centerline of this wide silver band. They are polished, and gleam darkly."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 0.02,
+            "cost": 2000,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "FINGER"
+            ],
+            "affects": [
+                {
+                    "location": "STR",
+                    "modifier": 1
+                },
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 10
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 20
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50210,
+            "type": "DRINKCON",
+            "keywords": [
+                "cask",
+                "squat",
+                "wooden",
+                "squat-cask"
+            ],
+            "short": "a squat cask",
+            "ground": "A squat wooden cask is lying here on its side.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cask",
+                        "squat",
+                        "wooden",
+                        "squat-cask"
+                    ],
+                    "text": "Banded with iron straps, this thick barrel looks quite strong.  The bottom is slightly smaller than the top.  On the underside is a faded but readable customs stamp.    "
+                },
+                {
+                    "keywords": [
+                        "stamp",
+                        "customs"
+                    ],
+                    "text": "The black ink of this stamp has run a bit, and faded. In several lines, it reads: SPECULA PORT AUTHORITY Export Duty PAID"
+                }
+            ],
+            "values": {
+                "Capacity": 64,
+                "Remaining": 64,
+                "Liquid": "SLIME",
+                "Poisoned": false
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 2.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50211,
+            "type": "TREASURE",
+            "keywords": [
+                "bracelet",
+                "flimsy-looking-fat-brass-bracelet",
+                "fat-tarnished-brass-bracelet"
+            ],
+            "short": "a fat, tarnished brass bracelet",
+            "ground": "A flimsy-looking, fat brass bracelet lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bracelet",
+                        "flimsy-looking-fat-brass-bracelet",
+                        "fat-tarnished-brass-bracelet"
+                    ],
+                    "text": "This gaudy accoutrement is fairly fat, but light.  It's also rather tarnished. "
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [],
+            "weight": 1.3,
+            "cost": 500,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "WRIST"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 5
+                },
+                {
+                    "location": "DEX",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50212,
+            "type": "WEAPON",
+            "keywords": [
+                "sabre",
+                "brilliant-sabre",
+                "highly-polished-sabre"
+            ],
+            "short": "a brilliant sabre",
+            "ground": "A highly-polished sabre is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "brilliant-sabre",
+                        "highly-polished-sabre"
+                    ],
+                    "text": "A gentle curve of razor-sharp metal sweeps outward from the ornate hilt of this attractive weapon.  It is about two and a half feet long, and very dangerous-looking."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "3",
+                    "size": "3",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 4.0,
+            "cost": 2000,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50213,
+            "type": "WEAPON",
+            "keywords": [
+                "briquet",
+                "short-worn-sabre"
+            ],
+            "short": "a briquet",
+            "ground": "A short, worn sabre is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "briquet",
+                        "short-worn-sabre"
+                    ],
+                    "text": "This is fairly short sabre, suitable for slashing foes in close quarters.  It looks well-worn and somewhat tarnished."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "3",
+                    "size": "3",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 2.0,
+            "cost": 900,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50214,
+            "type": "WEAPON",
+            "keywords": [
+                "cutlass",
+                "worn-tarnished-cutlass"
+            ],
+            "short": "a tarnished cutlass",
+            "ground": "A worn and tarnished cutlass has been left here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cutlass",
+                        "worn-tarnished-cutlass"
+                    ],
+                    "text": "This is a fairly cheap weapon, large but flimsy.  It would be very frightening to be attacked with it, however.  It resembles a large, single-edged sword with a large curve."
+                }
+            ],
+            "values": {
+                "HitRoll": 3,
+                "Hit Dice": {
+                    "num": "3",
+                    "size": "3",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 5.0,
+            "cost": 600,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                },
+                {
+                    "location": "HITROLL",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50215,
+            "type": "TREASURE",
+            "keywords": [
+                "hoop",
+                "crimson-tinged-electrum-hoop",
+                "three-inch-silvery-gold-hoop",
+                "earring"
+            ],
+            "short": "a &1crimson&0-tinged &3&belectrum&0 hoop",
+            "ground": "A three-inch, silvery-gold hoop lies in the dirt.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "hoop",
+                        "crimson-tinged-electrum-hoop",
+                        "three-inch-silvery-gold-hoop",
+                        "earring"
+                    ],
+                    "text": "About three inches in diameter, this flashy earring will surely attract attention.  It is silvery-yellow, but seems to glow with a subtle red color."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "GLOW",
+                "ANTI_BERSERKER",
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 0.03,
+            "cost": 3000,
+            "timer": 0,
+            "level": 25,
+            "wear_flags": [
+                "TAKE",
+                "EAR"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 2
+                },
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "triggers": [
+                5324,
+                5332
+            ],
+            "effects": []
+        },
+        {
+            "id": 50216,
+            "type": "KEY",
+            "keywords": [
+                "key",
+                "stout-looking",
+                "hefty",
+                "iron",
+                "hefty-iron-key"
+            ],
+            "short": "a hefty iron key",
+            "ground": "A stout-looking iron key lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "key",
+                        "stout-looking",
+                        "hefty",
+                        "iron",
+                        "hefty-iron-key"
+                    ],
+                    "text": "The business end of this key looks like a solid square of metal, out of which some holes were cut.  It seems quite solid.    "
+                }
+            ],
+            "values": {},
+            "flags": [
+                "NORENT"
+            ],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50217,
+            "type": "KEY",
+            "keywords": [
+                "key",
+                "rusty",
+                "long",
+                "iron",
+                "somewhat",
+                "long-rusty-iron-key"
+            ],
+            "short": "a long, rusty iron key",
+            "ground": "A somewhat long and rusty key has been dropped here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "key",
+                        "rusty",
+                        "long",
+                        "iron",
+                        "somewhat",
+                        "long-rusty-iron-key"
+                    ],
+                    "text": "This key is constructed of a stout cylinder of iron with a few odd protrusions here and there.  It is an unusual design.    "
+                }
+            ],
+            "values": {},
+            "flags": [
+                "NORENT"
+            ],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 50219,
+            "type": "ARMOR",
+            "keywords": [
+                "stone",
+                "sharpening-stone",
+                "small-rectangular-stone",
+                "metal-loop"
+            ],
+            "short": "a sharpening stone",
+            "ground": "A small rectangular stone with a metal loop lies in the debris.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "stone",
+                        "sharpening-stone",
+                        "small-rectangular-stone",
+                        "metal-loop"
+                    ],
+                    "text": "This is a small, gray stone in a roughly rectangular shape.  It has a metal loop that runs through a hole near one end.  The stone is somewhat abrasive, and has light striations running nearly parallel to its length."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50220,
+            "type": "TREASURE",
+            "keywords": [
+                "octant",
+                "dull-gray-metal-instrument",
+                "grey"
+            ],
+            "short": "an octant",
+            "ground": "A dull, gray metal instrument is hidden in the rubble.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "octant",
+                        "dull-gray-metal-instrument",
+                        "grey"
+                    ],
+                    "text": "Made of a gray metal, and tarnished with age, this small handheld artifact has seen better days.  It has two metal struts that are attached at one end and splay apart.  At their far end, a gradiated strip of brass curves from one to the other in an eighth of a circle.  It appears to be an octant, which is used to find one's location out at sea, with the help of the stars."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "BELT"
+            ],
+            "concealment": 200,
+            "affects": [
+                {
+                    "location": "INT",
+                    "modifier": 2
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50221,
+            "type": "ARMOR",
+            "keywords": [
+                "blindfold",
+                "crumpled-black-linen-blindfold"
+            ],
+            "short": "a black linen blindfold",
+            "ground": "A crumpled black linen blindfold was left here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "blindfold",
+                        "crumpled-black-linen-blindfold"
+                    ],
+                    "text": "This is just a simple strip of cloth, which is somewhat wide but has been folded several times lengthwise to ensure that no light can pass through it. It is long enough to tie around your head."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "EYES"
+            ],
+            "effects": [
+                "BLIND"
+            ]
+        },
+        {
+            "id": 50222,
+            "type": "ARMOR",
+            "keywords": [
+                "tricorne",
+                "battered-black-felt-tricorne",
+                "crumpled-black-felt-tricorne",
+                "fabric",
+                "hat"
+            ],
+            "short": "a battered black felt tricorne",
+            "ground": "A somewhat crumpled black felt tricorne lies in the dirt.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "tricorne",
+                        "battered-black-felt-tricorne",
+                        "crumpled-black-felt-tricorne",
+                        "fabric",
+                        "hat"
+                    ],
+                    "text": "This triple-cornered hat has seen better days.  It was once decorated with silvery thread, but most of it has fallen out.  The hat has been crushed and stained by sea water."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [],
+            "weight": 1.7,
+            "cost": 0,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "CHA",
+                    "modifier": 3
+                },
+                {
+                    "location": "SAVING_BREATH",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 50223,
+            "type": "CONTAINER",
+            "keywords": [
+                "box"
+            ],
+            "short": "a box",
+            "ground": "A little magic box sits here doing nothing.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "box",
+                        "magic"
+                    ],
+                    "text": "It looks rather ordinary, made of wood but without seams. It has no lid."
+                }
+            ],
+            "values": {
+                "Capacity": 100,
+                "Flags": [],
+                "Key": 0,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [],
+            "weight": 50.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 50224,
+            "type": "PEN",
+            "keywords": [
+                "tailfeather",
+                "parrot's-tailfeather",
+                "tail-feather",
+                "bright-green-feather",
+                "pen",
+                "quill"
+            ],
+            "short": "a &2&bparrot's&0 tailfeather",
+            "ground": "A bright green feather lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "tailfeather",
+                        "parrot's-tailfeather",
+                        "tail-feather",
+                        "bright-green-feather",
+                        "pen",
+                        "quill"
+                    ],
+                    "text": "Looking rather tattered, this long tailfeather is too beat-up to look good in a hat.  It seems sturdy enough to use as a pen, though."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.02,
+            "cost": 1,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "CHA",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 50201,
+            "name": "Ghostly Diplomat Earring Quest",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "switch %object.vnum% case 50203 * The ghost of a diplomat has received the magical golden * earring. He knows of this talisman from his studies and * travels. He knows how to make it much more powerful. Now * that he has it, he will do so. However, the process will * drive him mad. The player's job will then be to find * him (with the help of the quiet ranger) and retrieve the * enhanced earring (now a crimson-tinged electrum hoop). wait 2 mpurge %object% set person %actor% set i %person.group_size% if %i% set a 1 else set a 0 endif while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if !%person.quest_stage[bayou_quest]% quest start bayou_quest %person.name% endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done thank %actor.name% emote gazes upon the earring, overwhelmed by its beauty. mecho %self.name% says, 'You fool!  You should never have given it up so easily!' emote dashes out of the room. mteleport %self% 50243 if %get.mob_count[50209]% < 1 mload mob 50209 remove all give all maddened-diplomat-spectre mforce maddened-diplomat-spectre wear all mforce maddened-diplomat-spectre d endif mpurge %self% break case 50201 case 50202 * China from Odz mechoaround %actor% %actor.name% gives %object.shortdesc% to %self.name%. msend %actor% You give %object.shortdesc% to %self.name%. return 0 wait 1 s emote looks over %object.shortdesc% fondly. wait 2 s mecho %self.name% says, 'Attractive, is it not?  A gift from our island friends.' wait 1 s mecho %self.name% says, 'But alas, it has no intrinsic magic that I can detect.' emote politely returns the item. break case 50204 case 50209 * Magical eq from bayou mechoaround %actor% %actor.name% gives %object.shortdesc% to %self.name%. msend %actor% You give %object.shortdesc% to %self.name%. return 0 wait 1 s emote stares closely at %object.shortdesc% for a time. wait 4 s sigh wait 2 s mecho %self.name% says, 'There is something here, but this is far too weak.  No, the captain was after something much more valuable.' wait 1 s emote returns the item. break case 50215 * The electrum hoop! set person %actor% set i %person.group_size% if %i% set a 1 else set a 0 endif while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if !%person.quest_stage[bayou_quest]% quest start bayou_quest %person.name% endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done wait 2 mjunk %object% if %get.mob_count[50209]% < 1 mat 50243 mload mob 50209 mat 50243 remove all mat 50243 give all maddened-diplomat-spectre mat 50243 mforce maddened-diplomat-spectre wear all endif wait 1 s gasp wait 1 s say What... how... I cannot believe it! wait 2 s mecho %self.name% says, 'And you willingly gave it to me!  Oh the gods of Garl'lixxil smile upon me this day!' wait 1 s mecho The ghost of a diplomat cackles, and seems to grow before your very eyes! * Now: move dip to secret room; load maddip; give earring maddip; purge dip; bring maddip back eval startroom %self.room% mteleport maddened-diplomat-spectre %startroom% wait 1 mpurge %self% break default mechoaround %actor% %actor.name% gives %object.shortdesc% to %self.name%. msend %actor% You give %object.shortdesc% to %self.name%. return 0 wait 6 laugh say I'm afraid not. wait 8 emote politely returns the item. done "
+        },
+        {
+            "id": 50202,
+            "name": "Diplomat greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.vnum% == -1 && %actor.level% < 100 wait 2 msend %actor% The ghost of a diplomat stares at you for a moment. mechoaround %actor% The ghost of a diplomat stares at %actor.name%. wait 4 mecho %self.name% says, 'Please forgive my rudeness.  It has been some mecho &0time since I was in the company of the living.' sigh wait 3 s say Since the accident... end "
+        },
+        {
+            "id": 50203,
+            "name": "Diplomat replies to 'accident'",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "accident accident?",
+            "commands": "wait 2 s mecho %self.name% says, 'Yes, the horrible storm that wrecked our ships. mecho &0It was horrendous and unnatural.  I have long wondered what evil magic mecho &0spawned it, for the seas of Ethilien could scarce have birthed such a monster mecho &0on their own.' wait 6 s emote looks pensive. wait 4 s mecho %self.name% says, 'After our ships wrecked, the captain was mecho &0obsessed with finding some magical bauble or other -- he wouldn't say what, mecho &0exactly -- and though he was fairly unscathed, he would render little help mecho &0to the injured around him.  He disappeared soon after, leaving the rest of mecho &0us to die.' wait 6 s sigh wait 4 s mecho %self.name% says, 'If only I knew what it was, perhaps I could mecho &0free us from this unnatural bondage.  If you come across such a thing, would mecho &0you be so kind as to allow me to examine it?' "
+        },
+        {
+            "id": 50204,
+            "name": "Diplomat quest: ranger receiving things",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "eval avnum %actor.vnum% wait 1 if %object.vnum% == 50218 wait 1 if %avnum% == 50201 set mdiplomat 1 global mdiplomat elseif %avnum% == 50209 set mdiplomat 0 global mdiplomat endif mjunk diplomat-token end "
+        },
+        {
+            "id": 50205,
+            "name": "Ranger responds to yes",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "yes",
+            "commands": "wait 6 if %get.mob_count[50209]% < 1 peer %actor.name% else say Well, a ghostly fellow ran by here just a moment ago. m_run_room_trig 50206 endif "
+        },
+        {
+            "id": 50206,
+            "name": "Ranger makes path to maddened diplomat",
+            "attach_type": "Mobile",
+            "flags": [
+                "Global"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wdoor 50216 south room 50242 wdoor 50216 south description A faint path leads through the thicket. wait 2 s wecho The quiet ranger points out a hidden trail heading south. wait 20 s wecho A gentle breeze disturbs the branches, and the path is no longer visible. wdoor 50216 south purge "
+        },
+        {
+            "id": 50207,
+            "name": "Spectre death",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "set person %actor% set i %person.group_size% if %i% set a 1 else set a 0 endif while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if %person.quest_stage[bayou_quest]% && !%person.has_completed[bayou_quest]% quest complete bayou_quest %person.name% endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done "
+        },
+        {
+            "id": 50208,
+            "name": "Ghost Pirate Captain greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 3 if %actor.level% < 100 msend %actor% &b%self.name% tells you, 'Did you take my earring?  What have you&0 msend %actor% &0&bdone with it, rapscallion!'&0 end "
+        },
+        {
+            "id": 50209,
+            "name": "Diplomat responds to 'yes'",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "yes",
+            "commands": "wait 4 smile say Then we would forever be in your debt. "
+        },
+        {
+            "id": 50210,
+            "name": "Ranger greetings",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.vnum% == -1 && %actor.level% < 100 wait 6 if %get.mob_count[50209]% < 1 emote discreetly takes note of your passage. wait 3 s emote notices you looking at him, and bows before you with a wry grin. else emote watches you with some interest. wait 2 s say Looking for someone? end end "
+        },
+        {
+            "id": 50211,
+            "name": "Ranger responds to hello",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "hi hello",
+            "commands": "if %actor.vnum% == -1 && %actor.level% < 100 wait 6 bow %actor.name% wait 2 s say Have a care in these swamps, little one, for evil is afoot. end "
+        },
+        {
+            "id": 50212,
+            "name": "Spectre load",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mload obj 50215 wear all "
+        },
+        {
+            "id": 50213,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mload obj 50215 wear all "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "50200",
+            "name": "Soggy Marsh",
+            "description": "The marshy ground descends into wet, swampy land.  Willow trees begin to give way to cypresses.  A mist can be seen slowly creeping in from the east. Calls of birds can be heard in the distance.  It looks like passage is possible to the east. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50201"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50245"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mist"
+                    ],
+                    "text": "The mist sits motionless over all the land, as far as the eye can see. "
+                }
+            ]
+        },
+        {
+            "id": "50201",
+            "name": "Soggy Marsh",
+            "description": "Long, sharp-edged grasses grow in thick tufts wherever the earth pokes up through the water, which saturates the ground nearly everywhere.  A path leads east-west through the middle of a great thicket of willows and brambles.  These short trees and bushes take advantage of the dry ground and lack of competition here. The water grows deeper to the east, where tall trees stand in the mist. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50203"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50200"
+                }
+            }
+        },
+        {
+            "id": "50202",
+            "name": "Between the Wrecks",
+            "description": "Shipwrecks lie to either side here in the boggy ground.  A heavy mist moves slowly between them.  The eastern ship is lying upside down, only a few feet from the western ship, which lies on its side.  Its forecastle is fairly intact, though covered with fungi and mosses.  It may be possible to enter the western wreck to the south. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50212"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50244"
+                }
+            }
+        },
+        {
+            "id": "50203",
+            "name": "Bayou",
+            "description": "Tall cypress trees rise out of a layer of mist that covers the shallow, brown waters of the bayou.  A few straggly willows grow among the more resilient bramble bushes, but the lack of light, for the most part, makes this area unsuitable for their growth.  What little ground pokes out of the water is saturated and mushy. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50204"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50201"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "object"
+                    ],
+                    "text": "The object is barely visible through the mist.  It appears to have sharp corners; it may be an artifact of some kind. "
+                }
+            ]
+        },
+        {
+            "id": "50204",
+            "name": "Bayou",
+            "description": "A dinghy is wedged in the fork of a cypress about forty feet up.  A somewhat clear passage curves around it going south and west, through the everpresent bushes and a tangle of dead young cypresses.  Deep mists drift through the darkness, carrying the echoing sounds of laughing birds. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50205"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50203"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "dinghy"
+                    ],
+                    "text": "This small boat is broken and rotted. Strangely, it looks like an accessory to an oceangoing vessel--not the sort of craft that would ply these waters. "
+                }
+            ]
+        },
+        {
+            "id": "50205",
+            "name": "Bayou",
+            "description": "Few sounds are heard from the surroundings here, and even the water barely sloshes as it's stepped in.  Far off to the south, a darkened hulk can be glimpsed, though there is no way to approach it directly. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50204"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50206"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "hulk"
+                    ],
+                    "text": "All that can be seen is a large, dark object far off through the trees. It appears to be as large as a building. "
+                }
+            ]
+        },
+        {
+            "id": "50206",
+            "name": "Hillock",
+            "description": "A hillock covered with straggly weeds pokes out of the muck here.  The lonely calls of hunting birds echo across the water.  The brambly undergrowth, though stunted and twisted from the lack of light, is nearly impenetrable. Tall cypresses grow everywhere, their high canopies blocking out the sun. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50207"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50205"
+                }
+            }
+        },
+        {
+            "id": "50207",
+            "name": "Bayou",
+            "description": "Tall cypresses cluster together, and the way through them is difficult. Nothing but trees and dark water can be seen in any direction.  A heavy mist permeates the air and dampens everything. Bird calls and other strange noises can be heard all around, but the soggy atmosphere blunts the sounds and makes it difficult to judge their distance or direction. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50208"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50206"
+                }
+            }
+        },
+        {
+            "id": "50208",
+            "name": "Bayou",
+            "description": "Cypresses and stunted bushes cluster up against a natural wall of rock to the east, which rises up out of reach.  The rock is covered with lichens and moss, and is as damp as everything else in the moisture-laden air.  A narrow passage between the stiff undergrowth and the wall leads south into deepening shadows. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50209"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50207"
+                }
+            }
+        },
+        {
+            "id": "50209",
+            "name": "Lookout Post",
+            "description": "Little light penetrates the gloom between giant tree trunks.  Mossy, slimy stones poke out here and there.  The mast of a ship, its crow's nest strangely intact, leans against two cypresses. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50208"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50210"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mast",
+                        "nest",
+                        "crow's"
+                    ],
+                    "text": "The crow's nest is broken, and all of the wood is rotted and mossy. No trace of any sail may be seen. "
+                }
+            ]
+        },
+        {
+            "id": "50210",
+            "name": "Bayou",
+            "description": "A wall of rock rises to the east, covered with moss, lichens, and dark stains.  Broken trunks and branches crisscross the water, making movement difficult.  Oddly, bits of pottery poke out of the earth near the base of a large cypress.  To the southwest is what appears to be the keel of a ship. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50209"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50214"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50211"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "trunk",
+                        "branch"
+                    ],
+                    "text": "The branches on the ground are somewhat thicker here. "
+                },
+                {
+                    "keywords": [
+                        "ship",
+                        "keel"
+                    ],
+                    "text": "It's either lying on its side or its top--it is impossible to tell which from this distance. The more important qustion is: what is it doing so far from the sea? "
+                },
+                {
+                    "keywords": [
+                        "pottery"
+                    ],
+                    "text": "Most of the pottery is dull and brown, with a wide curve indicating a large vessel. However, a hint of dark blue on some fragile gray pieces hints at finer wares. All of it is broken and worthless. "
+                }
+            ]
+        },
+        {
+            "id": "50211",
+            "name": "Before the Prow",
+            "description": "The sunken and rotted timbers of an oceangoing ship rise out of the muck here.  This is the prow, and the once-mighty keel curves forward smoothly, down under the water's surface.  The ship lies upside down and to the south.  There is no opening here, but it is possible to walk around the mouldering hulk. Another wreck lies west of here. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50210"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50212"
+                }
+            }
+        },
+        {
+            "id": "50212",
+            "name": "Among the Wrecks",
+            "description": "Not two, but three hunting corsairs lie wrecked in this place.  Or two lie here, for the third is propped against a stand of cypresses to the south.  The western wreck lies on its side, the deck facing you; it may be possible to enter it a bit south of here.  A towering thicket of brambles, branches, and felled trees prevents westward movement. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50211"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50202"
+                }
+            }
+        },
+        {
+            "id": "50213",
+            "name": "Between the Wrecks",
+            "description": "Two wrecked corsairs lie on either side of this spot, where broken branches and rubble create a dry mound.  A third ship stands on its end to the south, supported by long-suffering cypresses.  The western ship's deck stands at a steep angle; there is a gaping hole where the main mast once stood. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50244"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50217"
+                }
+            }
+        },
+        {
+            "id": "50214",
+            "name": "Beside a Wreck",
+            "description": "Dark, shallow water laps silently at an overturned wreck to the west.  How it came to rest here is anyone's guess.  Fungi jut out from the dark, soaked wood in shelves just above the surface of the water.  To the east, a break in a stony hillside reveals an open channel. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50210"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50215"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50216"
+                }
+            }
+        },
+        {
+            "id": "50215",
+            "name": "Soggy Alcove",
+            "description": "Walls of natural rock form an alcove here.  They are far too steep and slippery from moss to climb.  Short, stunted pines grow on the hillside above, crouching in the slowly drifting mists. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "SWAMP",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50214"
+                }
+            }
+        },
+        {
+            "id": "50216",
+            "name": "Beside a Wreck",
+            "description": "An oceangoing corsair is curiously propped up against some tress to the west.  The water seems shallower here, as if the ground were rising gently to the south.  It seems less shadowy there, as if the trees were thinned, but a rocky ridge and thick underbrush prevent movement, except to the north. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50214"
+                }
+            }
+        },
+        {
+            "id": "50217",
+            "name": "Near Forecastle",
+            "description": "The inner wall of the fore deck stands to the north.  A large door is just visible behind a clutter of damp tree trunks.  The poop deck may be approached to the south, and a dark, gaping hole to the west allows entrance to the hold. The other wrecks lie to the east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50225"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50213"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50232"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50218"
+                }
+            }
+        },
+        {
+            "id": "50218",
+            "name": "Main Hold",
+            "description": "The hold would have been over ten feet wide when in use, but rubble has narrowed it to half that.  Movement is difficult.  Shattered bunks and round ballast stones shift underfoot. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50223"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50217"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50220"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50219"
+                }
+            }
+        },
+        {
+            "id": "50219",
+            "name": "Main Hold",
+            "description": "This is a very narrow space at the bottom (or what was the bottom) of the ship.  Some ballast stones remain wedged between the timbers, and a slick black mat of fungus grows over exposed wooden surfaces. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50218"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50221"
+                }
+            }
+        },
+        {
+            "id": "50220",
+            "name": "Main Hold",
+            "description": "Here at the rear of the hold, piles of mouldering wood and rubbish are heaped about.  Miraculously, the door south to the stores remains intact. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50218"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50229"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50221"
+                }
+            }
+        },
+        {
+            "id": "50221",
+            "name": "Main Hold",
+            "description": "This is the bottom aft corner of the main hold.  The remains of a few bunks are pegged near the top, but most were knocked down by displaced ballast stones. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50219"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50220"
+                }
+            }
+        },
+        {
+            "id": "50222",
+            "name": "Fore Hold",
+            "description": "Instead of bunks, simple benches adorn the walls here.  The rusted remains of manacles still hang from some of them.  Though the floor of this room appears to be too high to be soaked by groundwater, everything is moist, perhaps due to the misty air.  Fungi grow in streaks where wood has splintered away from the walls. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "hatch",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50223"
+                }
+            }
+        },
+        {
+            "id": "50223",
+            "name": "Fore Hold",
+            "description": "Rude wooden benches are bolted to the wall, with short chains attached every few feet.  An abundance of bones litters the floor.  At the north end of the hold, a door with a barred window is set in a bulkhead. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Pick-proof Door",
+                    "key": "50216",
+                    "destination": "50224"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50218"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "hatch",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50222"
+                }
+            }
+        },
+        {
+            "id": "50224",
+            "name": "Brig",
+            "description": "This small, oddly-shaped room must be in the prow of the ship.  The floor (now the west wall) is triangular, as is the larger ceiling.  No benches or other furniture are to be found here. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "50216",
+                    "destination": "50223"
+                }
+            }
+        },
+        {
+            "id": "50225",
+            "name": "Forecastle",
+            "description": "A bulkhead runs through this wide room, which evidently had many sailors' bunks mounted in it.  They all lie in broken, rotting piles against the starboard wall (now the floor).  Open doorways lead both north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50226"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50217"
+                }
+            }
+        },
+        {
+            "id": "50226",
+            "name": "Galley",
+            "description": "A large iron stove, its flue long since rusted away, leans against the wall. There is a light current of air moving through the room, drawn in where smoke was once expelled from the cooking fire.  Broken pottery and smashed furniture peeks out of the dark water underfoot, rotting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50225"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "stove",
+                        "iron"
+                    ],
+                    "text": "This stove looks very heavy in spite of extensive corrosion. Moss and fungi grow in its damp interior. "
+                }
+            ]
+        },
+        {
+            "id": "50227",
+            "name": "Captain's Cabin",
+            "description": "The remains of a few paintings adorn the walls here, along with a broken, spotted mirror.  A rather nice oaken chest of drawers and a bed lie in a heap. The vault is to the west and the first mate's cabin is north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50228"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50231"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mirror"
+                    ],
+                    "text": "You see only pale shadows... "
+                },
+                {
+                    "keywords": [
+                        "chest",
+                        "drawer",
+                        "drawers"
+                    ],
+                    "text": "The drawers have all fallen out. They are empty. "
+                },
+                {
+                    "keywords": [
+                        "painting",
+                        "paintings"
+                    ],
+                    "text": "The paintings appear to depict games played with cards, but they are quite decayed, and only a few scraps remain. "
+                }
+            ]
+        },
+        {
+            "id": "50228",
+            "name": "First Mate's Cabin",
+            "description": "It's as if a maelstrom passed through this small, enclosed space.  Bits of cloth and broken knives are strewn about.  A bed and table have been reduced to splinters.  The fore door has been nailed shut with boards.  The captain's cabin is to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "Several thick boards are securely nailed across this door. It appears to be impenetrable. ",
+                    "keyword": "door",
+                    "type": "Pick-proof Door",
+                    "key": "-1",
+                    "destination": "50232"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50227"
+                }
+            }
+        },
+        {
+            "id": "50229",
+            "name": "Aft Hold",
+            "description": "Here are stored many kegs and sacks, most of them broken and split.  A bulkhead with a stout door separates this room from the far aft portion of the hold. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50220"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "50217",
+                    "destination": "50231"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50230"
+                }
+            }
+        },
+        {
+            "id": "50230",
+            "name": "Musty Crawl",
+            "description": "This space was once filled with ballast, some of which has fallen downward to the west.  Scrape marks lead from the darkness back into the ship. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50229"
+                },
+                "West": {
+                    "description": "There appears to be a loose board next to the keel; it might be moved enough to pass out of the ship. ",
+                    "keyword": "board",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50233"
+                }
+            }
+        },
+        {
+            "id": "50231",
+            "name": "Vault",
+            "description": "Bundles of tapestries, stacks of chests, and numerous vases and pots fill this small room.  Unfortunately, the tapestries have rotted, the vases are shattered, and the chests have been ransacked.  The ceiling, to the east, has a gaping hole. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "50217",
+                    "destination": "50229"
+                },
+                "East": {
+                    "description": "Chop marks and smashed spots testify to the very intentional attack that opened the hole. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50227"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "ceiling",
+                        "hole"
+                    ],
+                    "text": "Chop marks and smashed spots testify to the very intentional attack that opened the hole. "
+                }
+            ]
+        },
+        {
+            "id": "50232",
+            "name": "Between the Corsairs",
+            "description": "Great masses of vines have grown up, covering the aft section of the main deck to the west.  The bulkhead of the poop deck has nails and spikes driven out from the inside, evidently in an attempt to secure the door. ",
+            "flags": [],
+            "sector": "FOREST",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50217"
+                },
+                "South": {
+                    "description": "The tips of spikes and nails protrude from the other side. It looks as though the door was well-secured. ",
+                    "keyword": "door",
+                    "type": "Pick-proof Door",
+                    "key": "-1",
+                    "destination": "50228"
+                }
+            }
+        },
+        {
+            "id": "50233",
+            "name": "Behind the Ship",
+            "description": "Dark water covers the ground here, and laps up aginst the broken keel of a sailing ship lying to the east.  The ship appears to be mostly intact, though it has lain in the water for some time, and is covered with moss.  Though this area is thick with vines and trees, a path does lead west. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "East": {
+                    "description": "A loose board might allow entrance to the bottom of the ship. ",
+                    "keyword": "board",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "50230"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50234"
+                }
+            }
+        },
+        {
+            "id": "50234",
+            "name": "Misty Wood",
+            "description": "Giant cypresses and sea pines are scattered about, appearing as eerie sentinels in the salt-scented mists.  Large stumps may be seen here and there. The path leads east-west. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50233"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50235"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "stump",
+                        "stumps"
+                    ],
+                    "text": "They appear to have been hewn down with a large, hand-held saw. None appear to have been cut recently. "
+                }
+            ]
+        },
+        {
+            "id": "50235",
+            "name": "Misty Wood",
+            "description": "Thick, stunted pine trees stand on the high points of this gently rolling grassland.  Occasionally, a massive red sequoia towers over all, but their stumps outnumber the living specimens.  A small building is visible in a cleared space to the west. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50234"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50236"
+                }
+            }
+        },
+        {
+            "id": "50236",
+            "name": "Outside the Hovel",
+            "description": "A dilapidated hovel is just to the west.  It looks as though it could house a family, though in its state of disrepair, it is doubtful that anyone lives there.  Stacks of rotting wood stand a few feet from it, as well as a long, low mound of charcoal, through which has sprouted a healthy stand of milkweed.  A path leading east goes deeper into the bayou. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50235"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50237"
+                }
+            }
+        },
+        {
+            "id": "50237",
+            "name": "Woodcutter's Hovel",
+            "description": "The hut is obviously deserted: the furniture is all broken, the windows' shutters are missing, and worse, the skeletal remains of several humans lie among the rubble on the floor.  Whatever struggle occurred as they were killed happened some time ago, for there is no trace of flesh under the rotted and tattered remains of their clothing.  The back door is open. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50236"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50238"
+                }
+            }
+        },
+        {
+            "id": "50238",
+            "name": "Back Yard",
+            "description": "This is a little yard just south of a broken-down hovel.  A wooden fence surrounds it, except for an opening to the south.  Beyond the fence, sea pines poke their twisted heads up through light mists.  The smell of salt air is unmistakable. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50237"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50239"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "12040"
+                }
+            }
+        },
+        {
+            "id": "50239",
+            "name": "Narrow Path",
+            "description": "Stunted pines and stinging brambles grow on either side of this north-south path.  It is difficult to see far due to the omnipresent salt-scented mist. The mist seems to muffle all sounds as well, making it eerily silent. ",
+            "flags": [
+                "SOUNDPROOF",
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50238"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50240"
+                }
+            }
+        },
+        {
+            "id": "50240",
+            "name": "Misty Inlet",
+            "description": "Salty mist drifts slowly across a brackish pool of water just to the south. Little twisted pine trees grow here and there in clumps among hardy grasses. The ground feels somewhat sandy, and has a light color.  A path leads north and south. ",
+            "flags": [
+                "PRIVATE"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50239"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50241"
+                }
+            }
+        },
+        {
+            "id": "50241",
+            "name": "Brackish Pool",
+            "description": "Peaceful water lies here in a shallow ocean inlet, overladen with a salty mist.  Treetops are just visible to the north, poking out of the rolling fog. An embankment is also visible in that direction. ",
+            "flags": [
+                "NOMOB",
+                "PRIVATE"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50240"
+                }
+            }
+        },
+        {
+            "id": "50242",
+            "name": "Secluded Meadow",
+            "description": "A wall of stone to the east and towering cypresses surround this place. The land is higher here, and green grass grows in the limited sunlight.  A path leads north. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50216"
+                }
+            }
+        },
+        {
+            "id": "50243",
+            "name": "A Pocket in the Void",
+            "description": "This is a small space in an infinite void.  Nothing much happens here. ",
+            "flags": [
+                "INDOORS",
+                "PEACEFUL",
+                "SOUNDPROOF",
+                "NOMAGIC",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50242"
+                }
+            }
+        },
+        {
+            "id": "50244",
+            "name": "Between the Wrecks",
+            "description": "Tangled vines grow over the soggy, muddy ground of the bayou here, in a narrow spot between two wrecked ships.  To the south is an open area between the fore and aft decks of the western ship.  It is also possible to go north. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50202"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50213"
+                }
+            }
+        },
+        {
+            "id": "50245",
+            "name": "Marsh",
+            "description": "Thickets of willows grow everywhere in this wide marsh.  The sounds of buzzing insects fill the air, but stranger bird calls can be heard from the east.  To the north, the land begins to slope upward toward nearby mountains. Low-hanging mists surround the area. ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50246"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50200"
+                }
+            }
+        },
+        {
+            "id": "50246",
+            "name": "Foothills",
+            "description": "These are the low-lying foothills of a mountain range that rises to the north.  It is misty here, and low, rounded pines grow on rocky outcroppings. Game trails descend south into the mist.  A break in the mountains, possibly usable as a pass, is directly north of here. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50247"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50245"
+                }
+            }
+        },
+        {
+            "id": "50247",
+            "name": "Trail on a Mountainside",
+            "description": "This is the southern slope of a mountain range.  The foothills are just below, to the south.  A trail rises from them, then turns west here toward a pass through the mountains.  Tall, straight pines grow all around.  Broad layers of mist lie quietly over the land to the south, beyond which the endless sea is barely visible. ",
+            "flags": [],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50246"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50248"
+                }
+            }
+        },
+        {
+            "id": "50248",
+            "name": "Mountain Pass",
+            "description": "A little-used path meanders among the ridges and low hills of this pass. Tall mountains rise to the east and west, though the pass itself continues to the east, avoiding a deadly drop to the south.  A cold wind blows north.  It brings moisture laden with the scent of decaying plants and the barest hint of the sea. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36301"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50247"
+                }
+            }
+        }
+    ]
+}

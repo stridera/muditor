@@ -1,0 +1,2293 @@
+{
+    "zone": {
+        "id": "1",
+        "name": "Reserved - create food items",
+        "top": 199,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {}
+    },
+    "mobs": [],
+    "objects": [
+        {
+            "id": 100,
+            "type": "FOOD",
+            "keywords": [
+                "broth",
+                "tepid-mug-cabbage-broth",
+                "tan-colored",
+                "food"
+            ],
+            "short": "a tepid mug of cabbage broth",
+            "ground": "A little mug of tan-colored water sits on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "broth",
+                        "mug",
+                        "cabbage",
+                        "food"
+                    ],
+                    "text": "It looks like someone's starvation ration.  A little mug is half-filled with a nearly clear broth that smells vaguely of everyone's favorite cooked vegetable, cabbage.  It's even a bit warmer than room temperature. "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 101,
+            "type": "FOOD",
+            "keywords": [
+                "gruel",
+                "cup-thin-gruel",
+                "mushy-substance",
+                "food"
+            ],
+            "short": "a cup of thin gruel",
+            "ground": "A cup full of a mushy substance has been left here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "gruel",
+                        "cup",
+                        "thin",
+                        "food"
+                    ],
+                    "text": "This is a thin drippy gruel, no doubt boiled down from some concoction of oats and water.  It has little smell and isn't the least bit appetizing. "
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 102,
+            "type": "FOOD",
+            "keywords": [
+                "boullion",
+                "bowl-tasty-boullion",
+                "little-bowl-yellow-soup",
+                "food"
+            ],
+            "short": "a bowl of tasty boullion",
+            "ground": "There's a little bowl of yellow soup lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "boullion",
+                        "bowl",
+                        "food"
+                    ],
+                    "text": "This yellowish liquid has the occasional bit of meat or vegetable drifting through it.  It smells a bit like chicken, and is salty to the taste. "
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 103,
+            "type": "FOOD",
+            "keywords": [
+                "soup",
+                "lima-bean-soup",
+                "beans",
+                "thin-soup-bowl",
+                "food"
+            ],
+            "short": "yummy lima bean soup",
+            "ground": "Some beans swim in thin soup in a bowl.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "soup",
+                        "lima",
+                        "bean",
+                        "food"
+                    ],
+                    "text": "Fat white beans are piled high in this little bowl of vegetarian soup.  A few herbs are sprinkled in, but they must be parsely, for the taste of lima beans overwhelms all. "
+                }
+            ],
+            "values": {
+                "Filling": 9,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 104,
+            "type": "FOOD",
+            "keywords": [
+                "soup",
+                "warm-lentil-soup",
+                "well-cooked-flattish-seeds",
+                "bowl",
+                "food"
+            ],
+            "short": "some warm lentil soup",
+            "ground": "Well-cooked flattish seeds form a soup in a small bowl.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "soup",
+                        "lentil",
+                        "food"
+                    ],
+                    "text": "A brownish-green slurry fills this little bowl.  It is steaming nicely.  It could use a bit of salt, but but is pretty edible as is. "
+                }
+            ],
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 105,
+            "type": "FOOD",
+            "keywords": [
+                "soup",
+                "pea-soup",
+                "bits-ham",
+                "nice-bowl-pea-soup",
+                "food"
+            ],
+            "short": "pea soup with bits of ham",
+            "ground": "A nice bowl of pea soup sits here steaming.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "soup",
+                        "pea",
+                        "food"
+                    ],
+                    "text": "A gloppy green paste fills this bowl to the brim with pea goodness.  Bits and pieces of ham are sprinked through it, giving it a nice meaty flavor. "
+                }
+            ],
+            "values": {
+                "Filling": 11,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 106,
+            "type": "FOOD",
+            "keywords": [
+                "jambalaya",
+                "spicy-bowl-pork-jambalaya",
+                "tasty-meaty-stew",
+                "little-bowl",
+                "food"
+            ],
+            "short": "a spicy bowl of pork jambalaya",
+            "ground": "Tasty-looking meaty stew sits in a little bowl, waiting to be eaten.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "jambalaya",
+                        "bowl",
+                        "pork",
+                        "spicy",
+                        "food"
+                    ],
+                    "text": "Generous strips of chewy pork appear to have been marinated, grilled, and stewed in any number of spicy herbs and vegetables, then mixed up with steamed rice. "
+                }
+            ],
+            "values": {
+                "Filling": 13,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.7,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 107,
+            "type": "FOOD",
+            "keywords": [
+                "gumbo",
+                "steaming-bowl-chicken-gumbo",
+                "food"
+            ],
+            "short": "a steaming bowl of chicken gumbo",
+            "ground": "Steam rises enticingly from a bowl of gumbo.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "gumbo",
+                        "chicken",
+                        "bowl",
+                        "steaming",
+                        "food"
+                    ],
+                    "text": "Hot spicy chicken swims in an okra-thickened stock.  Soft cooked peas and rice complete this rich stew. "
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.2,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 108,
+            "type": "FOOD",
+            "keywords": [
+                "goulash",
+                "heaping-plate-goulash",
+                "nice-plate",
+                "food"
+            ],
+            "short": "a heaping plate of goulash",
+            "ground": "There's a nice plate heaped high with goulash, left unattended.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "goulash",
+                        "plate",
+                        "heaping",
+                        "food"
+                    ],
+                    "text": "This is quite the pile of beef chunks!  They are tender and rich, smelling of hot peppers and onions.  Bits of broccoli make it a well-rounded dish. "
+                }
+            ],
+            "values": {
+                "Filling": 20,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 3.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 109,
+            "type": "FOOD",
+            "keywords": [
+                "stew",
+                "large-pot-hearty-beef-stew",
+                "beefy",
+                "food"
+            ],
+            "short": "a large pot of hearty beef stew",
+            "ground": "A large pot sits here giving off a beefy smell.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "stew",
+                        "hearty",
+                        "beef",
+                        "pot",
+                        "large",
+                        "food"
+                    ],
+                    "text": "What a huge pot of stew this is!  It looks like a meal for a king, filled with giant hunks of beef, thick carrot slices, celery, and a bit of barley for good measure.  Several potatoes lurk in the broth as well. "
+                }
+            ],
+            "values": {
+                "Filling": 25,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 5.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 110,
+            "type": "FOOD",
+            "keywords": [
+                "gristle",
+                "scrap-gristle",
+                "bit-cartilage-meat",
+                "food"
+            ],
+            "short": "a scrap of gristle",
+            "ground": "A bit of cartilage and meat sits in the dirt.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "gristle",
+                        "scrap",
+                        "food"
+                    ],
+                    "text": "Barely edible, this small dry mixture of cartilege and meat doesn't look very appetizing. "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.1,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 111,
+            "type": "FOOD",
+            "keywords": [
+                "jerky",
+                "strip-turkey-jerky",
+                "strip-dried-meat",
+                "food"
+            ],
+            "short": "a strip of turkey jerky",
+            "ground": "A strip of dried meat fell from someone's pocket.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "jerky",
+                        "turkey",
+                        "strip",
+                        "meat",
+                        "dried",
+                        "food"
+                    ],
+                    "text": "This is a stringy bit of meat.  It looks like someone marinated and smoked it a bit to give it flavor and to preserve it.  It's not much of a morsel, but better than nothing. "
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 112,
+            "type": "FOOD",
+            "keywords": [
+                "wing",
+                "fried-chicken-wing",
+                "food"
+            ],
+            "short": "a fried chicken wing",
+            "ground": "A chicken wing fell off someone's plate.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "wing",
+                        "chicken",
+                        "fried",
+                        "food"
+                    ],
+                    "text": "A few morsels of meat cling to three small bones, covered with fatty fried skin.  It smells pretty good. "
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 113,
+            "type": "FOOD",
+            "keywords": [
+                "ostrich",
+                "hunk-smoked-ostrich",
+                "nice-hunk-smoked-meat",
+                "food"
+            ],
+            "short": "a hunk of smoked ostrich",
+            "ground": "A nice hunk of smoked meat sits here looking appetizing.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "ostrich",
+                        "hunk",
+                        "smoked",
+                        "meat",
+                        "food"
+                    ],
+                    "text": "This is a chunk of meat about half the size of your fist.  It appears to have been steam-smoked, for it is slightly dry yet flexible, and has a strong smoky odor. "
+                }
+            ],
+            "values": {
+                "Filling": 9,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 114,
+            "type": "FOOD",
+            "keywords": [
+                "steak",
+                "tough-well-cooked-steak",
+                "brownish-dry-steak",
+                "food"
+            ],
+            "short": "a tough, well-cooked steak",
+            "ground": "A brownish, somewhat dry steak lies here forgotten.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "steak",
+                        "tough",
+                        "food"
+                    ],
+                    "text": "It's sad what some people will do to an innocent steak.  This one, through no fault of its own, has been cooked well-done.  It's hard to tell what part of a cow it may have come from.  At any rate, it is large and edible. "
+                }
+            ],
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.8,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 115,
+            "type": "FOOD",
+            "keywords": [
+                "pork",
+                "seasoned-pork-chop",
+                "juicy-pork-chop",
+                "food"
+            ],
+            "short": "a seasoned pork chop",
+            "ground": "A juicy-looking pork chop escaped consumption.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pork",
+                        "chop",
+                        "seasoned",
+                        "food"
+                    ],
+                    "text": "As pork chops go, this one is on the large side.  It has been delicately seasoned with garlic, parsely, and black pepper.  It is still warm, and juices flow easily from it as it is handled. "
+                }
+            ],
+            "values": {
+                "Filling": 11,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.8,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 116,
+            "type": "FOOD",
+            "keywords": [
+                "venison",
+                "large-grilled-venison-steak",
+                "food"
+            ],
+            "short": "a large grilled venison steak",
+            "ground": "A large grilled steak was somehow left behind.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "venison",
+                        "steak",
+                        "large",
+                        "grilled",
+                        "food"
+                    ],
+                    "text": "There's something about an open-fire grill that brings out both the worst and the best in cooks.  Luckily, this steak looks like it encountered the latter, for it is tender, medium-rare, and perfectly seared on both sides. "
+                }
+            ],
+            "values": {
+                "Filling": 13,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 117,
+            "type": "FOOD",
+            "keywords": [
+                "filet",
+                "superb-cut-filet-mignon",
+                "interesting-cut-meat",
+                "food"
+            ],
+            "short": "a superb cut of filet mignon",
+            "ground": "An interesting cut of meat lies on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "filet",
+                        "mignon",
+                        "cut",
+                        "superb",
+                        "meat",
+                        "food"
+                    ],
+                    "text": "Occasionally, a cook will go too far, and cut quite the thick filet mignon. It is no sin against the diner, however.  This steak is really quite large, and happily, cooked to perfection. "
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.6,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 118,
+            "type": "FOOD",
+            "keywords": [
+                "goose",
+                "roast",
+                "bird",
+                "carcass",
+                "food"
+            ],
+            "short": "a roast goose",
+            "ground": "The entire carcass of a fairly large bird sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "goose",
+                        "roast",
+                        "bird",
+                        "carcass",
+                        "food"
+                    ],
+                    "text": "They say goose flesh is an aquired taste that is impossible to lose.  The juices dripping from this spectacular bird are giving off an aroma fit to strike madness into the minds of fasters.  It is a large hen of prime roasting age, stuffed with wild onions. "
+                }
+            ],
+            "values": {
+                "Filling": 20,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 8.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 119,
+            "type": "FOOD",
+            "keywords": [
+                "lamb",
+                "rack",
+                "food"
+            ],
+            "short": "a mouthwatering rack of lamb",
+            "ground": "A whole rack of lamb was left here, fully cooked.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "lamb",
+                        "rack",
+                        "food"
+                    ],
+                    "text": "This is a meal fit for a king - or several kings.  Several pounds of juicy pinkish-white meat cling tenuously to the protruding rib bones.  It smells positively delicious. "
+                }
+            ],
+            "values": {
+                "Filling": 25,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 11.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 120,
+            "type": "FOOD",
+            "keywords": [
+                "crumbs",
+                "handful",
+                "food"
+            ],
+            "short": "a handful of crumbs",
+            "ground": "Some crumbs lie in the corner.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "crumbs",
+                        "handful",
+                        "food"
+                    ],
+                    "text": "A bunch of stale bits of bread lie here.  They look as though they could provide a modicum of sustenance...  To a very hungry person, that is. "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.08,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 121,
+            "type": "FOOD",
+            "keywords": [
+                "crust",
+                "bread",
+                "stale",
+                "breadcrust",
+                "food"
+            ],
+            "short": "a stale crust of bread",
+            "ground": "Someone tossed aside their breadcrust.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "crust",
+                        "bread",
+                        "stale",
+                        "breadcrust",
+                        "food"
+                    ],
+                    "text": "A luckier diner ripped this from a large piece of bread.  Now the hard black crust is just waiting to start growing mold.  It still looks edible. "
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.09,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 122,
+            "type": "FOOD",
+            "keywords": [
+                "heel",
+                "bread",
+                "wheat",
+                "dried",
+                "food"
+            ],
+            "short": "a dried out wheat bread heel",
+            "ground": "The heel of a loaf of bread sits on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "heel",
+                        "bread",
+                        "wheat",
+                        "dried",
+                        "food"
+                    ],
+                    "text": "This is the hind end of a larger piece of bread.  It consists almost entirely of crust, now hard and stale.  There is nothing particularly wrong with it, but appetizing it is not. "
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.15,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 123,
+            "type": "FOOD",
+            "keywords": [
+                "bread",
+                "chunk",
+                "hard",
+                "dark",
+                "rye",
+                "food"
+            ],
+            "short": "a chunk of hard dark bread",
+            "ground": "A dark chunk of bread lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bread",
+                        "chunk",
+                        "hard",
+                        "dark",
+                        "rye",
+                        "food"
+                    ],
+                    "text": "This appears to be a hunk ripped from a loaf of rye bread.  It is dark brown in color, and rather heavy.  It smells ok. "
+                }
+            ],
+            "values": {
+                "Filling": 9,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 124,
+            "type": "FOOD",
+            "keywords": [
+                "biscuits",
+                "light",
+                "handful",
+                "pile",
+                "food"
+            ],
+            "short": "a handful of light biscuits",
+            "ground": "Some little white biscuits sit here in a pile.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "biscuits",
+                        "light",
+                        "handful",
+                        "pile",
+                        "food"
+                    ],
+                    "text": "These small morsels are baked from a light-colored wheat batter.  They have ended up rather flaky and appetizing.  There are only a few, and they are fairly small. "
+                }
+            ],
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.7,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 125,
+            "type": "FOOD",
+            "keywords": [
+                "muffin",
+                "bran",
+                "food"
+            ],
+            "short": "a bran muffin",
+            "ground": "A nice brown muffin sits here on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "muffin",
+                        "bran",
+                        "food"
+                    ],
+                    "text": "This is a substantial muffin.  It is rich brown and looks somewhat grainy from all the bran.  It feels soft, and it gives off a strong wheat odor. "
+                }
+            ],
+            "values": {
+                "Filling": 11,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.12,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 126,
+            "type": "FOOD",
+            "keywords": [
+                "flatbread",
+                "pieces",
+                "bread",
+                "food"
+            ],
+            "short": "a few pieces of flatbread",
+            "ground": "A few pieces of flatbread sit on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "flatbread",
+                        "pieces",
+                        "bread",
+                        "food"
+                    ],
+                    "text": "More like crackers than bread, these flat baked goods are surprisingly dense. The lack of leavening agent has made them a chore to consume.  They are, however, quite filling. "
+                }
+            ],
+            "values": {
+                "Filling": 13,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 127,
+            "type": "FOOD",
+            "keywords": [
+                "waybread",
+                "bread",
+                "filling",
+                "wafers",
+                "stack",
+                "food"
+            ],
+            "short": "some filling waybread",
+            "ground": "A few white wafers sit here in a neat stack.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "waybread",
+                        "bread",
+                        "filling",
+                        "wafers",
+                        "stack",
+                        "food"
+                    ],
+                    "text": "This is a stack of white bready wafers.  They appear to be quite insubstantial. They give off a subtle, attractive smell and show no signs of drying out or decaying. "
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 128,
+            "type": "FOOD",
+            "keywords": [
+                "loaf",
+                "bread",
+                "sourdough",
+                "golden",
+                "food"
+            ],
+            "short": "a large sourdough loaf",
+            "ground": "A rather large golden loaf of bread lies here smelling sour.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "loaf",
+                        "bread",
+                        "sourdough",
+                        "golden",
+                        "food"
+                    ],
+                    "text": "Measuring three feet from end to end, this massive loaf could feed an entire village.  The crust is a beautiful golden brown, crisscrossed with knife cuts where butter was poured prior to baking.  A sour aroma drifts upward, making your mouth water. "
+                }
+            ],
+            "values": {
+                "Filling": 20,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 2.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 129,
+            "type": "FOOD",
+            "keywords": [
+                "nutbread",
+                "bread",
+                "wheat",
+                "loaf",
+                "round",
+                "hefty",
+                "food"
+            ],
+            "short": "a hefty round loaf of whole wheat nutbread",
+            "ground": "A large, round, nutty brown loaf of bread sits heavily on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "nutbread",
+                        "bread",
+                        "wheat",
+                        "loaf",
+                        "round",
+                        "hefty",
+                        "food"
+                    ],
+                    "text": "This huge loaf of bread could easily be used as a shield in battle.  For a while that is - it is tender and slices rather easily.  But it is very large indeed.  The soft, dense wheat bread is peppered liberally with several kinds of chopped nuts, along with "
+                }
+            ],
+            "values": {
+                "Filling": 25,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 4.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 130,
+            "type": "FOOD",
+            "keywords": [
+                "filigree",
+                "fungal",
+                "fungus",
+                "tangle",
+                "bits",
+                "food"
+            ],
+            "short": "a dried-out fungal filigree",
+            "ground": "Some bits of fungus lie here in a tangle.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "filigree",
+                        "fungal",
+                        "fungus",
+                        "tangle",
+                        "bits",
+                        "food"
+                    ],
+                    "text": "This looks like the set of nerves from a small mammal, or the crazy web of a giant spider rolled into a ball.  It is composed of thick white filaments that branch and intertwine.  It is rather dry and light, and appears to be edible. "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.06,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 131,
+            "type": "FOOD",
+            "keywords": [
+                "fungus",
+                "pug",
+                "mushroom",
+                "food"
+            ],
+            "short": "a pug fungus",
+            "ground": "A small brown fungus is trying to grow in the parched earth.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "fungus",
+                        "pug",
+                        "mushroom",
+                        "food"
+                    ],
+                    "text": "Smelly but edible, this mushroom resembles a little brown bell.  Its cap is covered with cracked, scaly bits, while the brown gills underneath give off a thick earthy smell. "
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.08,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 132,
+            "type": "FOOD",
+            "keywords": [
+                "bar",
+                "snack",
+                "seed",
+                "mistletoe",
+                "food"
+            ],
+            "short": "a mistletoe-seed snack bar",
+            "ground": "A tasty-looking snack bar lies here!",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bar",
+                        "snack",
+                        "seed",
+                        "mistletoe",
+                        "food"
+                    ],
+                    "text": "Some enterprising woodsman has discovered a use for mistletoe!  Just press the seeds together and try to sell them to passing Anti-Paladins.  Let us wish him luck, since most folks find these things unpalatable. "
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.15,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 133,
+            "type": "FOOD",
+            "keywords": [
+                "lung",
+                "braised",
+                "bile",
+                "flesh",
+                "gray",
+                "food"
+            ],
+            "short": "the braised lung of a crusher bile",
+            "ground": "A gray bit of flesh with sear marks sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "lung",
+                        "braised",
+                        "bile",
+                        "flesh",
+                        "gray",
+                        "food"
+                    ],
+                    "text": "At last, confirmation that biles must breath to live.  This was undoubtedly a soggy grayish-pink sack at one time, but now it is a singed grayish-pink pancake.  It feels spongy.  It smells almost like food. "
+                }
+            ],
+            "values": {
+                "Filling": 9,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 134,
+            "type": "FOOD",
+            "keywords": [
+                "porches",
+                "pile-newt-porches",
+                "stack-paper-thin-fungi",
+                "food"
+            ],
+            "short": "a pile of newt porches",
+            "ground": "A stack of paper-thin fungi lies here bound together.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "porches",
+                        "newt",
+                        "pile",
+                        "fungi",
+                        "stack"
+                    ],
+                    "text": "This is a stack of shelf fungi, no doubt plucked in their prime from some forgotten deadfall deep in unknown woods.  They have concentric gray and white stripes that grow as they move away from the root.  They are paper-thin, but there are a lot of them.  They don't smell too bad. "
+                }
+            ],
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.6,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 135,
+            "type": "FOOD",
+            "keywords": [
+                "intestines",
+                "treat",
+                "intestine",
+                "gnome",
+                "tangled",
+                "food"
+            ],
+            "short": "a tangled gnome-intestine treat",
+            "ground": "A length of intestines, tangled and knotted, sits on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "intestines",
+                        "treat",
+                        "intestine",
+                        "gnome",
+                        "tangled",
+                        "food"
+                    ],
+                    "text": "The boiled intestine of young gnomes is a little-known delicacy.  Something about their diet prepares their intestines well to become the tender, rubbery treat that is now tied into a tangled knot and waiting to be eaten.  Sometimes they are prepared with mild cheeses to enhance the flavor. "
+                }
+            ],
+            "values": {
+                "Filling": 11,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.9,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 136,
+            "type": "FOOD",
+            "keywords": [
+                "flesh",
+                "gobbet",
+                "roc",
+                "solid",
+                "meat",
+                "chunk",
+                "food"
+            ],
+            "short": "a solid gobbet of roc flesh",
+            "ground": "A red, bleeding chunk of meat sits here forgotten.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "flesh",
+                        "gobbet",
+                        "roc",
+                        "solid",
+                        "meat",
+                        "chunk",
+                        "food"
+                    ],
+                    "text": "Cutting chunks from fallen rocs is not for the faint of heart, for their brethren are quick to avenge their dead.  Anti-Paladins have no such fear, however, and the flesh of these mighty birds is regularly consumed by them. Or perhaps it is not fear that drives others away, but the overpowering stench. At any rate, this chunk of meat is fairly fresh...  And smelly. "
+                }
+            ],
+            "values": {
+                "Filling": 13,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 137,
+            "type": "FOOD",
+            "keywords": [
+                "eggs",
+                "clump",
+                "pickled",
+                "illithid",
+                "food"
+            ],
+            "short": "a clump of pickled illithid eggs",
+            "ground": "A clump of pickled eggs was discarded nearby.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "eggs",
+                        "clump",
+                        "pickled",
+                        "illithid",
+                        "food"
+                    ],
+                    "text": "As round as turtle eggs and just as big, these have been pickled until their shells are no longer leathery, but soft and weak.  The process also makes them clump together like so many glue-coated spider eggs.  Due to the pickling agent (whatever it is), the gluey shells, and the notioriously bloody insides of illithid eggs, few will gather the courage to consume them. "
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 2.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 138,
+            "type": "FOOD",
+            "keywords": [
+                "kidney",
+                "wyvern",
+                "wyverns",
+                "food"
+            ],
+            "short": "a wyvern's kidney",
+            "ground": "A huge fat brown kidney lies here trying to look like bread.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "kidney",
+                        "wyvern",
+                        "wyverns",
+                        "food"
+                    ],
+                    "text": "There's nothing like a huge, mushy, brownish-yellow bean-shaped excretory organ to fill you up in an emergency.  This one isn't even cooked.  It has been sliced open and cleaned, however. "
+                }
+            ],
+            "values": {
+                "Filling": 20,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 4.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 139,
+            "type": "FOOD",
+            "keywords": [
+                "caviar",
+                "black",
+                "decanter",
+                "large",
+                "food"
+            ],
+            "short": "a large decanter of black caviar",
+            "ground": "Several pounds of caviar sit here in a decanter.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "caviar",
+                        "black",
+                        "decanter",
+                        "large",
+                        "food"
+                    ],
+                    "text": "There's nothing like a couple of gallons of the finest black caviar to fill you up after a long day of adventuring.  Keep a lot of water on hand, though, because it's very very salty.  For caviar afficionados, this is heaven.  It looks as fresh as if it were squeezed from a fish five minutes ago. "
+                }
+            ],
+            "values": {
+                "Filling": 25,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 6.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 140,
+            "type": "FOOD",
+            "keywords": [
+                "acorn",
+                "food"
+            ],
+            "short": "an acorn",
+            "ground": "An acorn lies on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "acorn",
+                        "food"
+                    ],
+                    "text": "Dried and roasted, some acorns are edible without much processing.  Hopefully, this is one of those, as a mouthful of tannin is nobody's idea of a nice snack. "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.05,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 141,
+            "type": "FOOD",
+            "keywords": [
+                "raisins",
+                "handful",
+                "food"
+            ],
+            "short": "a handful of raisins",
+            "ground": "A handful of raisins lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "raisins",
+                        "handful",
+                        "food"
+                    ],
+                    "text": "A few dried grapes are better than nothing when you're hungry.  These look extra dry, as if they had been out in the sun a little too long.  They smell somewhat sweet. "
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.1,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 142,
+            "type": "FOOD",
+            "keywords": [
+                "apple",
+                "green",
+                "food"
+            ],
+            "short": "a green apple",
+            "ground": "A smooth green apple has fallen to the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "apple",
+                        "green",
+                        "food"
+                    ],
+                    "text": "Green apples are just fine to eat, but don't try to make a meal of them, unless you have plenty of extra toilet paper handy.  This one is about the size of a halfling's fist.  It is bright green without any major blemishes. "
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.7,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 143,
+            "type": "FOOD",
+            "keywords": [
+                "nuts",
+                "mound",
+                "little",
+                "food"
+            ],
+            "short": "a little mound of nuts",
+            "ground": "A mound of raw nuts sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "nuts",
+                        "mound",
+                        "little",
+                        "food"
+                    ],
+                    "text": "This pile of nuts is uncooked.  It looks like there are walnuts, almonds, and pecans.  All in all, a nice little snack. "
+                }
+            ],
+            "values": {
+                "Filling": 9,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.6,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 144,
+            "type": "FOOD",
+            "keywords": [
+                "pomegranate",
+                "firm",
+                "ripe",
+                "food"
+            ],
+            "short": "a firm ripe pomegranate",
+            "ground": "A firm reddish pomegranate sits to one side.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pomegranate",
+                        "firm",
+                        "ripe",
+                        "food"
+                    ],
+                    "text": "This is a burgundy-colored fruit, the size of a large apple, with a thin but tough leathery skin.  Inside are a multitude of juicy seeds.  They are delicious. "
+                }
+            ],
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 145,
+            "type": "FOOD",
+            "keywords": [
+                "grapes",
+                "purple",
+                "succulent",
+                "bunch",
+                "food"
+            ],
+            "short": "a bunch of succulent purple grapes",
+            "ground": "A bunch of purple grapes looks delicious.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "grapes",
+                        "purple",
+                        "succulent",
+                        "bunch",
+                        "food"
+                    ],
+                    "text": "These grapes are quite fat, and covered with a thick purple skin with a light dusting of white powder that rubs off easily.  Though they contain large seeds, these grapes are well worth the trouble.  They are amazingly sweet and juicy. "
+                }
+            ],
+            "values": {
+                "Filling": 11,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.5,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 146,
+            "type": "FOOD",
+            "keywords": [
+                "cantaloupe",
+                "melon",
+                "fruit",
+                "food"
+            ],
+            "short": "a cantaloupe",
+            "ground": "A large round cantaloupe sits here giving off a sweet smell.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cantaloupe",
+                        "melon",
+                        "fruit",
+                        "food"
+                    ],
+                    "text": "In spite of the apparently tough and leathery skin of this melon, its delicious aroma drifts outward effortlessly, making your mouth water.  It is the size of a young troll's head. "
+                }
+            ],
+            "values": {
+                "Filling": 13,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 2.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 147,
+            "type": "FOOD",
+            "keywords": [
+                "pineapple",
+                "fruit",
+                "food"
+            ],
+            "short": "a pineapple",
+            "ground": "A pineapple lies here on its side.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pineapple",
+                        "fruit",
+                        "food"
+                    ],
+                    "text": "The tangy sweet juice of this large yellow fruit flows easily when it is cut or broken open.  This is a very large specimen, and would make quite a meal on its own.  It has small pointy thorns on its skin, but is mostly harmless. "
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 3.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 148,
+            "type": "FOOD",
+            "keywords": [
+                "melon",
+                "golden",
+                "huge",
+                "dawn",
+                "vine",
+                "food"
+            ],
+            "short": "a huge golden dawn-vine melon",
+            "ground": "A massive golden melon sits here looking beautiful.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "melon",
+                        "golden",
+                        "huge",
+                        "dawn",
+                        "vine",
+                        "food"
+                    ],
+                    "text": "Now this is an odd-looking fruit indeed.  It has the size and a squat shape of a pumpkin, but is completely smooth.  Its skin almost glitters in the light, and seems to give off a slight glow for a moment when the light is removed. The heady aroma that it is giving off seems to confirm the rumors of its heavenly flavor. "
+                }
+            ],
+            "values": {
+                "Filling": 20,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 8.0,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 149,
+            "type": "FOOD",
+            "keywords": [
+                "berries",
+                "coppery",
+                "drilia",
+                "food"
+            ],
+            "short": "a few coppery drilia-berries",
+            "ground": "A few shiny coppery berries lie here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "berries",
+                        "coppery",
+                        "drilia",
+                        "food"
+                    ],
+                    "text": "This is but a handful of small, pea-sized berries.  They gleam with the bright pink of freshly-burnished, pure copper, and give off an obvious glow of their own.  Their magical properties are well known, though their source is shrouded in mystery.  To be certain, they have never shown any inclination to grow in the soils of Caelia. "
+                }
+            ],
+            "values": {
+                "Filling": 25,
+                "Poisoned": false
+            },
+            "flags": [
+                "GLOW"
+            ],
+            "weight": 0.1,
+            "cost": 1,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 100,
+            "name": "set Breathe Fire",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% breathe fire mskillset %self% fire breath "
+        },
+        {
+            "id": 101,
+            "name": "set Breathe Frost",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% breathe frost mskillset %self% frost breath "
+        },
+        {
+            "id": 102,
+            "name": "set Breathe Acid",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% breathe acid mskillset %self% acid breath "
+        },
+        {
+            "id": 103,
+            "name": "set Breathe Gas",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% breathe gas mskillset %self% gas breath "
+        },
+        {
+            "id": 104,
+            "name": "set Breathe Lightning",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% breathe lightning mskillset %self% lightning breath "
+        },
+        {
+            "id": 105,
+            "name": "set Roar",
+            "attach_type": "Object",
+            "flags": [
+                "Load"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mskillset %self% roar "
+        },
+        {
+            "id": 106,
+            "name": "Cleric Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "heal heal? resurrect resurrect? group group? dragon dragon? dragons dragons? health health?",
+            "commands": "wait 2 switch %speech% case heal case heal? case group case group? case armor case armor? if %self.class% /= cleric || %self.class% /= priest say Ah yes, there are two powerful group spells: mecho '&3&bGroup Heal&0 was a potent tool in various religious practices. There is a' mecho 'doctor who had been researching at his infirmary out west. He may know more.' mecho mecho 'The other is &7&bGroup Armor&0, powerful war magic. The paladins of South' mecho 'Caelia make ample use of it.' elseif %self.class% /= diabolist say Ah yes, there are two powerful group spells: mecho '&3&bGroup Heal&0 can be learned by members of the diabolical orders, but' mecho 'unfortunately it comes from outside our religious traditions. As loathe as I' mecho 'am to admit it, you may have to talk to some of the monks of the more' mecho 'priestly orders for more information.' mecho mecho 'The other is a spell our demonic patrons will not grant us. Don't waste your' mecho 'time trying to pursue it.' else say I'm afraid I know little about more advanced mecho 'group support magics.' endif break case resurrect case resurrect? if %self.class% /= cleric || %self.class% /= priest || %self.class% /= diabolist mecho %self.name% says, 'Yes, it is possible to &6&bResurrect&0 the dead.' mecho 'However the secrets of it have been lost over the centuries. Only' mecho 'someone with knowledge of ages past may have a chance of still knowing such' mecho 'magics.' mecho mecho 'There are rumors that nigh-immortal supplicants orship in the darkest of' mecho 'traditions. Perhaps someone in the most trecherous of religious houses would' mecho 'know where to begin.' elseif %self.class% /= necromancer say Just use &9&bAnimate Dead&0. Isn't that enough for you? else say I'm afraid I know little about returning the dead mecho 'to life.' endif break case dragon case dragon? case dragons case dragons? case health case health? if %self.class% /= cleric || %self.class% == priest say &3&bDragons Health&0 is a prayer derived from a mecho 'song passed down amongst true dragon kind. Occassionally, highly trusted' mecho 'dragonborn are taught the song while they care of the nests of their larger' mecho 'cousins.' mecho mecho 'Often these nesting grounds are near warm dunes or beaches.' else say As much as I wish I knew more about dragons, mecho 'my knowledge of that spell is limited.' endif break default return 0 done "
+        },
+        {
+            "id": 107,
+            "name": "Priest Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "banish banish? heaven heaven? heavens heavens? gate gate?",
+            "commands": "wait 2 switch %speech% case gate if %self.class% /= diabolist if %actor.class% /= diabolist say Our infernal lords can grant us the power to open a mecho '&1&bHell Gate&0 o travel anywhere instantly via the Nine Hells.' mecho mecho 'Places where Garl'lixxil have touched Ethilien like Templace are particularly' mecho 'suitable for attuning to the proper energies.' elseif %actor.class% /= priest say We don't trifle with such silly things. mecho 'Our diabolical patrons shift us through the very bowels of Hell instead!' elseif %actor.class% /= druid say Our traditions use inferal methods of travel, not lunar ones. endif elseif %self.class% /= priest if %actor.class /= diabolist say Members of priestly orders travel by the Will of mecho 'Heaven. We do not spread the knowledge of Infernal magics.' elseif %actor.class% /= priest say The secrets to opening &6&bHeavens Gate&0 are mecho 'taught by the stars themselves.' mecho mecho 'There is a place near Anduin where starlight reaches deep into the bowels of' mecho 'Ethilien and whispers to those who listen.' elseif %actor.class% /= druid say As much as we too revere the Moon in the Heavens, mecho 'we're unable to provide you with the secrets of your Order.' endif elseif %self.class% /= druid if %actor.class% /= druid mecho %self.name% says, 'The ability to call &6&bMoonwells&0 is a gift mecho 'bestowed on us by the greatest powers in Nature.' mecho mecho 'The western-most branch of our order is well known for their lunar rites.' elseif %actor.class% /= diabolist say We move by the power of the Moon, mecho 'not the Nine Hells.' elseif %actor.class% /= priest say We move by the power of the Moon, mecho 'not the Will of Heaven.' endif else say Opening gates and wells is the works of other mecho 'magical traditions, not ours.' endif break case banish case banish? if %self.class% /= priest || %self.class% /= diabolist say There's a diabolist known to skulk about South mecho 'Caelia who is said to be quite adept at &9&bBanish&0.' mecho mecho 'They say she makes common use of it in the conflict between the military city' mecho 'Ogakh and the paladins of Sacred Haven.' else say Unfortunately that spell is outside of our mecho 'guild traditions.' endif break case heaven case heavens case heaven? case heavens? if %self.class% /= priest say The secrets to opening &6&bHeavens Gate&0 are mecho 'taught by the stars themselves.' mecho mecho 'There is a place near Anduin where starlight reaches deep into the bowels of' mecho 'Ethilien and whispers to those who listen.' elseif %self.class% /= diabolist say We don't trifle with such silly things. mecho 'Our diabolical patrons shift us through the very bowels of of Hell instead!' elseif %self.class% /= druid say We move by the power of the Moon, mecho 'not the Will of Heaven.' else say Apologies, I haven't the faintest clue where to begin looking. endif break default return 0 done "
+        },
+        {
+            "id": 108,
+            "name": "Diabolist Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "hell hell? hellfire hellfire? brimstone brimstone? fire fire?",
+            "commands": "wait 2 switch %speech% case hell case hell? if %self.class% /= diabolist say Our infernal lords do grant us the power to open a mecho '&1&bHell Gate&0 to travel anywhere instantly via the Nine Hells.' mecho mecho 'Places where Garl'lixxil have touched Ethilienm, like Templace, are' mecho 'particularly suitable for attuning to the proper energies.' elseif %self.class% /= priest say Members of priestly orders travel by the Will of mecho 'Heaven. We do not spread the knowledge of Infernal magics.' elseif %self.class% /= druid say We move by the power of the Moon, mecho 'not the Nine Hells.' else say We have no knowledge of that spell in our Guild. endif break case hellfire case hellfire? case brimstone case brimstone? case fire case fire? if %self.class% /= diabolist say There is a cult on the edge of South Caelia known mecho 'for conjuring &1&bHellfire and Brimstone&0. Their dark leader holds the keys' mecho 'to the spell.' elseif %self.class% /= priest || %self.class% /= cleric say We do not dabble in such unholy magics. elseif %self.class% /= pyromancer say Unfortunately I don't know much about that spell, mecho 'but I sure would love to...' else say That spell isn't part of our magical tradition. endif break default return 0 done "
+        },
+        {
+            "id": 109,
+            "name": "Sorcerer Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "major major? globe globe? relocate relocate? charm charm? person person? wizard wizard? eye eye?",
+            "commands": "wait 2 switch %speech% case major case major? case globe case globe? if (%self.class% /= sorcerer || %self.class% /= pyromancer || %self.class% /= cryomancer) say The battle mage Lirne was talking about mecho 'developing a new spell called &4&bMajor Globe&0 to defend himself against' mecho 'powerful magicians.' mecho mecho 'Last I heard, he was going to test it out against a powerful demonic agent of' mecho 'chaos in the far north.' else say I'm afraid Major Globe isn't a spell I know how mecho 'to cast.' endif break case relocate case relocate? if (%self.class% /= sorcerer || %self.class% /= pyromancer || %self.class% /= cryomancer) say A student of Bigby's in Mielikki was working on mecho 'A powerful teleportation spell she called &5&bRelocate&0.' mecho mecho 'Bigby or one of his lab assistants might know more.' else say Our Guild doesn't keep records of esoteric mecho 'magics exclusive to other guilds. Sorry.' endif break case charm case charm? case person case person? if (%self.class% /= sorcerer || %self.class% /= illusionist || %self.class% /= bard) say Charming is both a magical and a personal skill. mecho '&5&bCharm Person&0 relies on mixing both.' mecho mecho 'However, those that make charming others a profession, particularly' mecho 'courtesans, are the best teachers.' else say As charming as you are, I cannot point you in a mecho 'better direction.' endif break case wizard case wizard? case eye case eye? if %self.class% /= sorcerer say A simple but highly effective spell! The shamans of the mecho 'Great Snow Leopard are particularly adept At teaching &6&bWizard Eye&0 to' mecho 'interested scholars.' mecho mecho 'Seek them out to learn more.' else say That is a highly exclusive sorcerer spell. I am mecho 'unable to help with that.' endif break default return 0 done "
+        },
+        {
+            "id": 110,
+            "name": "Cryomancer Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "waterform waterform? flood flood? ice ice? shards shards? water water? form form? wall wall?",
+            "commands": "wait 2 switch %speech% case waterform case waterform? case water case water? case form case form? if %self.class% /= cryomancer mecho %self.name% says, '&4&bWaterform&0 is more absorbed via osmosis than mecho 'taught in the traditional sense. The spell is typically imparted by powerful' mecho 'water elementals.' mecho mecho 'You can find such elementals in the vast lakes and rivers of Ethilien.' else say That spell is unique to the Cryomancer's Guild. endif break case ice case ice? case shards case shards? if %self.class% /= cryomancer mecho %self.name% says, 'Unfortunately, &6&bIce Shards&0' mecho 'has been lost to our guild for many centuries. Khysan, a cyromancer from a' mecho 'smaller branch of the elven Sunfire family, has been doing research into the' mecho 'last known records of the spell, but hasn't reported any findings or updates' mecho 'in many years.' mecho mecho 'Perhaps you could check in with him. He works at the springs.' else say I've heard even the cryomancers don't know where mecho 'to look for that spell. There's no chance anyone in our Guild would know.' endif break case flood case flood? if %self.class% /= cryomancer say The power to call the roaring waters of Ethilien mecho 'in a cataclysmic &4&bFlood&0 is taught by the ocean herself. You would be mecho 'either very lucky or very cursed to find her avatar. elseif %self.class% /= druid say We commune with the waters of the world in a very, mecho 'very different way.' else say Unfortunately I don't have any guidance for you. endif break case wall case wall? if %self.class% /= cryomancer if %actor.class% /= cryomancer say They regularly make use of &6&bWall of Ice&0 to mecho 'keep The most dangerous creatures from Frost Valley out of Mount Frostbite.' mecho mecho 'Someone up there will know what to do.' elseif %actor.class% /= illusionist mecho %self.name% says, 'There is an &5&bIllusory Wall&0 spell out there,' mecho 'but I don't know much about it.' endif elseif %self.class% /= illusionist if %actor.class% /= illusionist say The best teacher of &5&bIllusory Wall&0 was a Post Commander mecho 'for the Eldorian Guard.' mecho mecho 'I hear she retired to the far north.' elseif %actor.class% /= cryomancer mecho %self.name% says, 'Your &6&bWall of Ice&0 spell is extremely similar to our wall' mecho 'spell, but I don't know much about it.' endif else say Wall spells are not part of our Guild teachings. endif break default return 0 done "
+        },
+        {
+            "id": 111,
+            "name": "Druid Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "creeping creeping? doom doom? moon moon? well well? moonwell moonwell?",
+            "commands": "wait 2 switch %speech% case creeping case creeping? case doom case doom? if %self.class% /= druid say The rage of the fair folk can summon a carpet of mecho 'living death.' mecho mecho 'Seek out the weakest-seeming of faeries and sprites to learn &2&bCreeping Doom&0.' else say Invoking the wrath of nature is exclusive to the mecho 'Druid Guild.' endif break case moonwell case moonwell? case well case well? case moon case moon? if %self.class% /= diabolist say Our traditions use infernal methods of travel, mecho 'not lunar ones.' elseif %self.class% /= priest say As much as we too revere the Moon, we're unable mecho 'to provide you with the secrets of your Order.' elseif %self.class% /= druid if %actor.class% /= druid mecho %self.name% says, 'The ability to call &6&bMoonwells&0 is a gift' mecho 'bestowed on us by the greatest powers in Nature. The western-most branch of' mecho 'our order is well known for their lunar rites.' elseif %actor.class% /= diabolist say We move by the power of the Moon, mecho 'not the Nine Hells.' elseif %actor.class% /= priest say We move by the power of the Moon, mecho 'not the Will of Heaven.' endif else say Opening gates and wells is the works of other mecho 'magical traditions, not ours.' endif break default return 0 done "
+        },
+        {
+            "id": 112,
+            "name": "Ranger Quest Spell Hints",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "blur",
+            "commands": "wait 2 switch %speech% case blur if %self.class% /= ranger say After proving your dedication to the spirits of mecho 'nature you must triumph in a challenge against the Four Winds to learn &2&bBlur&0.' mecho mecho 'Investigating and ending an eternal conflict in a forest would be an ideal' mecho 'way to demonstrate your devotion to the natural world.' else say That spell is fiercely guarded by mecho 'the Ranger Guild.' endif break default return 0 done "
+        },
+        {
+            "id": 113,
+            "name": "object casts hellbolt",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "ocast 'hell bolt' %victim% "
+        },
+        {
+            "id": 114,
+            "name": "object casts stygian eruption",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "ocast 'stygian eruption' %victim% "
+        },
+        {
+            "id": 115,
+            "name": "Bard AI",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if !%self.has_spell[inspiration]% mperform inspiration %self% %self.level% endif "
+        },
+        {
+            "id": 116,
+            "name": "Bard combat songs AI",
+            "attach_type": "Object",
+            "flags": [
+                "Fight"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %self.level% >= 10 if (%now% && (%time.stamp% - %now% >= 5)) || !%now% if !%actor.has_spell[terror]% && !%actor.has_spell[ballad of tears]% mperform terror %actor% %self.level% set now %time.stamp% global now endif endif endif if %self.level% >= 70 if (%now2% && (%time.stamp% - %now2% >= 5)) || !%now2% if %actor.group_size% > 1 set room %self.room% set person %room.people% while %person% if %person.vnum% == -1 if !%self.has_spell[terror]% && !%self.has_spell[ballad of tears]% mperform 'ballad of tears' %person% %self.level% set now2 %time.stamp% global now2 halt endif endif set person %person.next_in_room% done endif endif endif "
+        },
+        {
+            "id": 117,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "b bu",
+            "commands": "return 0 "
+        },
+        {
+            "id": 118,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "s",
+            "commands": "return 0 "
+        },
+        {
+            "id": 119,
+            "name": "vampiric weapon effect",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 3,
+            "argument_list": "",
+            "commands": "osend %actor% A &9&bblack haze&0 forms around your sword as you strike %victim.name%! osend %victim% A &9&bblack haze&0 forms around %actor.name%'s sword as %heshe% strikes you! ocast 'vampiric breath' %victim% %actor.level% "
+        },
+        {
+            "id": 120,
+            "name": "Bonus fire damage",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * This trigger adds 10% damage as fire damage * if %damage% eval bonus %damage% / 10 oecho &1%self.shortdesc% burns %victim.name%!&0 (&3%bonus%&0) odamage %victim% %bonus% fire endif "
+        },
+        {
+            "id": 121,
+            "name": "Bonus cold damage",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * This trigger adds 10% damage as cold damage * if %damage% eval bonus %damage% / 10 oecho &6&b%self.shortdesc% freezes %victim.name%!&0 (&3%bonus%&0) odamage %victim% %bonus% cold endif "
+        },
+        {
+            "id": 122,
+            "name": "Bonus shock damage",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * This trigger adds 10% damage as shock damage * if %damage% eval bonus %damage% / 10 oechoaround %victim% &3%self.shortdesc% shocks %victim.name%!&0 (&3%bonus%&0) osend %victim% &3%self.shortdesc% shocks you!&0 (&3%bonus%&0) odamage %victim% %bonus% shock endif "
+        },
+        {
+            "id": 123,
+            "name": "Bonus holy damage",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * adds 5% alignment damage against neutral targets and 10% against evil targets * if %damage% if %victim.align% < 350 && %victim.align% > -350 eval bonus %damage% / 20 elseif %victim.alignment% < -350 eval bonus %damage% / 10 endif if %bonus% && %victim.hit% >= -10 oechoaround %victim% &7&b%self.shortdesc% smites %victim.name% with radiant light!&0 (&3%bonus%&0) osend %victim% &7&b%self.shortdesc% smites you with radiant light!&0 (&3%bonus%&0) odamage %victim% %bonus% align endif endif "
+        },
+        {
+            "id": 124,
+            "name": "Bonus unholy damage",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * adds 5% alignment damage against neutral targets and 10% against good targets * if %damage% if %victim.align% < 350 && %victim.align% > -350 eval bonus %damage% / 20 elseif %victim.alignment% > 350 eval bonus %damage% / 10 endif if %bonus% oecho &9&b%self.shortdesc% smites %victim.name% with unholy might!&0 (&3%bonus%&0) odamage %victim% %bonus% align endif endif "
+        },
+        {
+            "id": 125,
+            "name": "Major fire weapon",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * This trigger adds 100% damage as fire damage or 200% fire damage against air, plant, or bone that evade * if %damage% eval bonus %damage% oecho &1%self.shortdesc% burns %victim.name%!&0 (&3%bonus%&0) odamage %victim% %bonus% fire else if %victim.composition% == air || %victim.composition% == bone || %victim.composition% == plant if %actor.real_str% >= 61 && %actor.real_str% < 63 set strmod 1 elseif %actor.real_str% >= 64 && %actor.real_str% < 66 set strmod 2 elseif %actor.real_str% >= 67 && %actor.real_str% < 69 set strmod 3 elseif %actor.real_str% >= 70 && %actor.real_str% < 72 set strmod 4 elseif %actor.real_str% >= 73 && %actor.real_str% < 75 set strmod 5 elseif %actor.real_str% >= 76 && %actor.real_str% < 78 set strmod 6 elseif %actor.real_str% >= 79 && %actor.real_str% < 81 set strmod 7 elseif %actor.real_str% >= 82 && %actor.real_str% < 84 set strmod 8 elseif %actor.real_str% >= 85 && %actor.real_str% < 87 set strmod 9 elseif %actor.real_str% >= 88 && %actor.real_str% < 90 set strmod 10 elseif %actor.real_str% >= 91 && %actor.real_str% < 93 set strmod 11 elseif %actor.real_str% >= 94 && %actor.real_str% < 96 set strmod 12 elseif %actor.real_str% >= 97 && %actor.real_str% < 99 set strmod 13 elseif %actor.real_str% == 100 set strmod 14 endif eval bonus %strmod% + %actor.damroll% + ((random.%self.val2%) * %self.val1%) * 2 if %random.20% == 20 eval bonus %bonus% * 2 endif oecho &1%self.shortdesc% still burns %victim.name%!&0 (&3%bonus%&0) odamage %victim% %bonus% fire endif endif "
+        },
+        {
+            "id": 126,
+            "name": "weapon_cast_fireball",
+            "attach_type": "Room",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "ocast fireball %victim% "
+        },
+        {
+            "id": 127,
+            "name": "turn to shock",
+            "attach_type": "Room",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "ocast 'tempest of saint augustine' %actor% 10 "
+        },
+        {
+            "id": 129,
+            "name": "**UNUSED**",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "hi",
+            "commands": "return 0 "
+        },
+        {
+            "id": 130,
+            "name": "**UNUSED**",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "p",
+            "commands": "return 0 "
+        },
+        {
+            "id": 131,
+            "name": "**UNUSED**",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "for",
+            "commands": "return 0 "
+        },
+        {
+            "id": 132,
+            "name": "**UNUSED**",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "se",
+            "commands": "return 0 "
+        },
+        {
+            "id": 150,
+            "name": "object_cast_insanity",
+            "attach_type": "Room",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 5,
+            "argument_list": "",
+            "commands": "set worn %self.worn_by% if !%worn% halt else if %worn.vnum% == -1 osend %self.worn_by% %self.shortdesc% whispers words of madness to you! ocast insanity %self.worn_by% endif endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "100",
+            "name": "A bad place",
+            "description": "Bad, that's what this place is. For you to be in. ",
+            "flags": [
+                "INDOORS",
+                "NOTRACK",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE"
+        }
+    ]
+}

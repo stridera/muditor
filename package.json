@@ -1,0 +1,83 @@
+{
+  "name": "muditor",
+  "version": "0.1.0",
+  "description": "A modern, database-driven MUD editor and administration tool",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/muditor.git"
+  },
+  "license": "MIT",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=18.0.0",
+    "pnpm": ">=8.0.0"
+  },
+  "scripts": {
+    "dev": "pnpm run --parallel dev",
+    "dev:web": "pnpm --filter @muditor/web dev",
+    "dev:api": "pnpm --filter @muditor/api dev",
+    "build": "pnpm run --filter='./packages/*' build && pnpm run --filter='./apps/*' build",
+    "build:web": "pnpm --filter @muditor/web build",
+    "build:api": "pnpm --filter @muditor/api build",
+    "start": "pnpm run --parallel start",
+    "start:web": "pnpm --filter @muditor/web start",
+    "start:api": "pnpm --filter @muditor/api start",
+    "test": "pnpm run --recursive test",
+    "test:watch": "pnpm run --recursive test:watch",
+    "lint": "pnpm run --recursive lint",
+    "lint:fix": "pnpm run --recursive lint:fix",
+    "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
+    "type-check": "pnpm run --recursive type-check",
+    "db:generate": "pnpm --filter @muditor/db generate",
+    "db:push": "pnpm --filter @muditor/db push",
+    "db:migrate": "pnpm --filter @muditor/db migrate:dev",
+    "db:migrate:reset": "pnpm --filter @muditor/db migrate:reset",
+    "db:studio": "pnpm --filter @muditor/db studio",
+    "db:seed": "pnpm --filter @muditor/db seed",
+    "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
+    "clean": "pnpm run --recursive clean && rm -rf node_modules",
+    "prepare": "husky install"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^6.19.0",
+    "@typescript-eslint/parser": "^6.19.0",
+    "eslint": "^8.56.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-jsx-a11y": "^6.8.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^15.2.0",
+    "prettier": "^3.2.4",
+    "turbo": "^1.12.0",
+    "typescript": "^5.3.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,yml,yaml}": [
+      "prettier --write"
+    ]
+  },
+  "keywords": [
+    "mud",
+    "editor",
+    "gaming",
+    "world-building",
+    "postgresql",
+    "graphql",
+    "react",
+    "nextjs",
+    "nestjs"
+  ]
+}

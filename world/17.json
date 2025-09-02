@@ -1,0 +1,637 @@
+{
+    "zone": {
+        "id": "17",
+        "name": "KotF's clan hall",
+        "top": 1799,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "door": [
+                {
+                    "room": 1706,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 1701,
+                    "direction": "Down",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 1702,
+                    "direction": "Up",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                }
+            ],
+            "object": [
+                {
+                    "id": 1704,
+                    "max": 1,
+                    "room": 1701,
+                    "name": "(a stuffed mist beast)"
+                },
+                {
+                    "id": 1702,
+                    "max": 1,
+                    "room": 1700,
+                    "name": "(a large fountain)"
+                }
+            ]
+        }
+    },
+    "mobs": [],
+    "objects": [
+        {
+            "id": 1700,
+            "type": "WAND",
+            "keywords": [
+                "ring",
+                "glimmering-ring"
+            ],
+            "short": "a glimmering ring",
+            "ground": "A small ring glimmers in the light here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "glimmering",
+                        "ring"
+                    ],
+                    "text": "A silver ring with runes cut into its surface."
+                },
+                {
+                    "keywords": [
+                        "rune",
+                        "runes"
+                    ],
+                    "text": "If home is what you seek, the hold me now and use the power within."
+                }
+            ],
+            "values": {
+                "Level": 99,
+                "Max_Charges": 20,
+                "Charges_Left": 20,
+                "Spell": "WORD_OF_RECALL"
+            },
+            "flags": [],
+            "weight": 0.04,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "FINGER",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 4
+                },
+                {
+                    "location": "MOVE",
+                    "modifier": 30
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 1701,
+            "type": "OTHER",
+            "keywords": [
+                "parchment",
+                "paper",
+                "KoTF",
+                "clan-dues",
+                "agreement",
+                "lease"
+            ],
+            "short": "the KotF lease agreement",
+            "ground": "A piece of parchment titled with the initials KotF lies here abandoned.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "parchment",
+                        "paper",
+                        "agreement",
+                        "lease"
+                    ],
+                    "text": "This deed entitles the clan known as KoTF to the following items as paid for in their initial construction costs so long as they continue to pay maintainance costs of 10% of the total construction costs by the 5th of each month. At the time dues are collected the seal on this lease shall be updated to reflect the date the next collection shall take place. Note- Lease agreements pay be inspected at any time to verify that all dues are up-to-date. Clan Construction details follow and a Holy Seal is placed at the bottem."
+                },
+                {
+                    "keywords": [
+                        "details"
+                    ],
+                    "text": "The following are details surround the costs and maintain of the clans hall and item: Inital Construction cost (2 rooms)   - 15K Additional rooms (1)                 -  3K Fountain (nectar-filled)             -  2K One basic clan item                  -  3K Improved Ability on Item (4HR 1MV)   - 25K Dormitory (rentability)              -  8K Stuffed Mist Beast                   - Free  - Gift from Zzur -------------------------------------------- Total                                - 56K Upkeep is 10% of total cost          - 5.6K Note- All prices are in platinum."
+                },
+                {
+                    "keywords": [
+                        "seal"
+                    ],
+                    "text": "A holy seal is stamped at the bottom of this parchment, it reads: ------------------- \\                 / \\       K       / \\      o      / \\     T     / \\    F    / \\       / \\     / \\   / \\ / Dues paid through: November 5 Collected by: Kourrya"
+                }
+            ],
+            "values": {},
+            "flags": [
+                "NOINVIS",
+                "NOSELL",
+                "NOBURN",
+                "FLOAT"
+            ],
+            "weight": 0.01,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 1702,
+            "type": "FOUNTAIN",
+            "keywords": [
+                "fountain",
+                "large"
+            ],
+            "short": "a large fountain",
+            "ground": "A large, faceted marble fountain stands here spilling sweet nectar.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "fountain"
+                    ],
+                    "text": "This large, carved marble statue dominates the center of this courtyard. There is a small statue of a knight in the middle, with the water of the fountain gushing out from beneath the hooves of the great knight's steed.  The knight has his head fixed, looking forwards into the future, his gaze following his extended blade pointing fourth.  Just under where the water spills from the darkened marble there is a small insignia written on a plaque."
+                },
+                {
+                    "keywords": [
+                        "insignia",
+                        "plaque"
+                    ],
+                    "text": "The inscription reads: \"What was shall be again.\""
+                }
+            ],
+            "values": {
+                "Capacity": 9999,
+                "Remaining": 9999,
+                "Liquid": "NECTAR",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 10000.0,
+            "cost": 2000000,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 1703,
+            "type": "WAND",
+            "keywords": [
+                "staff",
+                "stick",
+                "wand",
+                "KotF",
+                "crest"
+            ],
+            "short": "a cracked old stick",
+            "ground": "An unfinished object is lying here.",
+            "action_desc": "",
+            "values": {
+                "Level": 4,
+                "Max_Charges": 9999,
+                "Charges_Left": 20,
+                "Spell": "WORD_OF_RECALL"
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 2.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 1704,
+            "type": "FOUNTAIN",
+            "keywords": [
+                "beast",
+                "very-realistic-stuffed-mist-beast"
+            ],
+            "short": "a stuffed mist beast",
+            "ground": "A very realistic stuffed mist beast stands in a corner, looking fierce.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "beast",
+                        "mist",
+                        "stuffed"
+                    ],
+                    "text": "A lupine looking beast endemic to the Blue Fog Trail, this is a remarkably large speciman standing almost waist high to a human.  This particular beast is very dear to the hearts of the BoP, partly because it played a significant part in their history, but more importantly because a divinely inspired taxidermist built a still into the beast's carcass.  The output from the still can be obtained from the left front nipple, where a small spigot has been tastefully imbedded.  Traditionally the BoP mentor has been in charge of caring for the still."
+                }
+            ],
+            "values": {
+                "Capacity": 9999,
+                "Remaining": 9999,
+                "Liquid": "SAKE",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 10000.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 1799,
+            "type": "WEAPON",
+            "keywords": [
+                "pair",
+                "enourmous",
+                "claws",
+                "claw"
+            ],
+            "short": "a pair of enourmous claws",
+            "ground": "An unfinished object is lying here.",
+            "action_desc": "",
+            "values": {
+                "HitRoll": 40,
+                "Hit Dice": {
+                    "num": "10",
+                    "size": "10",
+                    "bonus": 0
+                },
+                "Average": 55.0,
+                "Damage Type": "MAUL"
+            },
+            "flags": [
+                "NORENT",
+                "NOINVIS",
+                "NOSELL",
+                "NOBURN",
+                "FLOAT"
+            ],
+            "weight": 1.4,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 40
+                },
+                {
+                    "location": "DAMROLL",
+                    "modifier": 4
+                }
+            ],
+            "triggers": [
+                1798,
+                1793
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 1700,
+            "name": "glimmering_recharge",
+            "attach_type": "Mobile",
+            "flags": [
+                "GreetAll"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if (%object.vnum% == 1700) wait 1 s wecho Just as the ring hits the ground, the chest opens as if by magic. wait 1 s wecho A bright light eminates from chest, focusing on the ring. wait 1 s wecho The light subsides and the chest closes without help. wpurge glimmering wload obj 1700 end if "
+        },
+        {
+            "id": 1703,
+            "name": "dormitory_sleep",
+            "attach_type": "Mobile",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "sleep",
+            "commands": "if !%actor% return 0 elseif %actor.vnum% >= 0 return 0 elseif s == %cmd% return 0 elseif %actor.stance% != resting && %actor.stance% != alert return 0 else wsend %actor% You retreat into your cubicle, lay down your belongings, and rest. wechoaround %actor% %actor.name% enters %actor.p% cubicle and tunes out the world. wrent %actor% endif "
+        },
+        {
+            "id": 1792,
+            "name": "Beast Dirt Trig",
+            "attach_type": "Object",
+            "flags": [
+                "Greet",
+                "Fight"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mechoaround %actor% he &1Enraged Beast&0 kicks up a &3claw full of dirt&0 into %actor.name%'s face &9&bblinding&0 him! The &1%Enraged Beast%&0 kicks up a &3claw full of dirt&0 into your face &9&bblinding&0 you! "
+        },
+        {
+            "id": 1793,
+            "name": "Rip Hunk",
+            "attach_type": "Room",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "osend %actor% With a ferocious roar the %self% rips out a hunk of your flesh! oechoaround %actor% With a ferocious roar the %self% rips a hunk of flesh from %actor.name%! odamage %actor% 700 "
+        },
+        {
+            "id": 1794,
+            "name": "Beast_10",
+            "attach_type": "Object",
+            "flags": [
+                "HitPercentage"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "10",
+            "commands": "if !%done10% mecho %self% howls out in pain, writhing to and fro, its eyes glowing in rage and fear! mecho RUN FOR YOUR LIFE! mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% mload mob 48024 mforce rat kill %actor.name% endif set done10 yes global done10 "
+        },
+        {
+            "id": 1795,
+            "name": "Beast_25",
+            "attach_type": "Object",
+            "flags": [
+                "HitPercentage"
+            ],
+            "number_of_arguments": 25,
+            "argument_list": "25",
+            "commands": "if !%done25% mecho The ground all around begins to rustle with life... mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% mload mob 43001 mforce maudlin-panther kill %actor.name% endif set done25 yes global done25 "
+        },
+        {
+            "id": 1796,
+            "name": "Beast_50",
+            "attach_type": "Object",
+            "flags": [
+                "HitPercentage"
+            ],
+            "number_of_arguments": 50,
+            "argument_list": "50",
+            "commands": "if !%done50% mecho %self.name% writhes in pain, slamming its enormous claws on the ground! mecho -     -    -   -  - -----BANG----- -  -   -    -     - mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% mload mob 2801 mforce ripples kill %actor.name% endif set done50 yes global done50 "
+        },
+        {
+            "id": 1797,
+            "name": "Beast_75",
+            "attach_type": "Object",
+            "flags": [
+                "HitPercentage"
+            ],
+            "number_of_arguments": 75,
+            "argument_list": "75",
+            "commands": "if !%done75% mecho %self% screeches as its face contorts in pain! mecho The despicable beast of the realm come to its assistance! mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% mload mob 16009 mforce demon kill %actor.name% endif set done75 yes global done75 "
+        },
+        {
+            "id": 1798,
+            "name": "Head Tear",
+            "attach_type": "Room",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 80,
+            "argument_list": "",
+            "commands": "osend %actor% Seemingly for no reason %self% sets its gaze on you... osend %actor% osend %actor% osend %actor% charging across the field of battle, the %self% leaps at you! osend %actor% osend %actor% osend %actor% landing on you, %self% begins to maul the living life out of you!! osend %actor% osend %actor% osend %actor% you begin seeing red, but alas its too late, the %self% rips your head off!!!!!! oechoaround %actor% %self% leaps onto %actor.name% mauling him into a bloody pulp! odamage %actor% 30000 "
+        },
+        {
+            "id": 1799,
+            "name": "Growl Trigger",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 15,
+            "argument_list": "",
+            "commands": "msend %actor% As you enter the room %self% raises its head towards you and growls ferociously... msend %actor% msend %actor% ggggggggggggggggggggg msend %actor% msend %actor%  ggggGggggGggggGggggGggg msend %actor% msend %actor%   gggGGGgggGGGgggGGGggg msend %actor% msend %actor%    GGGgGGGgGGGgGGGgGGGg msend %actor% msend %actor%     GGGGGGGGGGGGGGGGGGG msend %actor% msend %actor%      GrGrGrGrGrGrGrGrGrGrGrGrGrG msend %actor% msend %actor%       GRGRGRGRGRGRGRGRGRGRGRG msend %actor% msend %actor%         RRRRRRRRRRRRRRRRRRRRRRRRRRR msend %actor% msend %actor%          RoRoRoRoRoRoRoRoRoRoRoRoRoRoRoRoR msend %actor% msend %actor%           OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO msend %actor% msend %actor%             OwOwOwOwOwOwOwOwOwOwOwOwOwOwOwOwO msend %actor% msend %actor%               WWWWWWWWWWWWWWWWWWWWWWW msend %actor% msend %actor%                 WlWlWlWlWlWlWlWlWlWlWlWlWlWlWlWlWlWlWlWlW msend %actor% msend %actor%                   LLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLL msend %actor% msend %actor%                     !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! mdamage %actor% 30000 "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "1700",
+            "name": "Courtyard",
+            "description": "A great place for a picnic!  The fountain runs clear and cold, a few trees scattered about the yard provide shade and some shelter for the horses.  A trickle of water runs along one side under the trees, providing a coolness for hot days.  Short soft green grass covers most of the courtyard, and invites one to camp here.  A log lies by the stream and has been carved to make a place to sit up off the ground.  A door to the north enters into the >>KotF<< hall. ",
+            "flags": [
+                "NOWELL",
+                "NOSHIFT",
+                "GUILDHALL",
+                "ALWAYSLIT"
+            ],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1701"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door",
+                    "key": "-1",
+                    "destination": "3009"
+                }
+            }
+        },
+        {
+            "id": "1701",
+            "name": "The Meeting Room",
+            "description": "A room certainly large enough to accomadate all of the member at a time. The myst beast trophy stands in the north west corner of the room.  Windows on the north wall reveal only a view of the rough path up the hill.  There is a comfortable looking couch facing the fireplace and traditionally used by the circle of five.  The clans crest is a glowing gold in the middle of the couch. Book shelves along one wall are filled with scrolls, maps, notes and small trophies.  A staircase ascends upwards to some dormitory cubicles. ",
+            "flags": [
+                "NOWELL",
+                "NOSHIFT",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1700"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1703"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "fireplace",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "1702"
+                }
+            }
+        },
+        {
+            "id": "1702",
+            "name": "Secret Room",
+            "description": "A small, dark, roughly dug cellar, dimly lit by smokey torchs on the walls. Ventilation is poor here, and one would not want to be here long.  There is a chest in the corner, which bears the clans crest, and a bulletin board stands between two of the torches.  There is a bamboo ladder leading up the fireplace here. ",
+            "flags": [
+                "NOWELL",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "The tunnel at the base of the west wall seems to run straight into the earth. It is not well lit, making it diffiult to tell how far it goes.  The mouth of the tunnel seems crudely dug out, but the earth is braced with wooden beams, making it seem safe enough. ",
+                    "keyword": "tunnel",
+                    "key": "-1",
+                    "destination": "1704"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "fireplace",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "1701"
+                }
+            }
+        },
+        {
+            "id": "1703",
+            "name": "The Dormitory Room",
+            "description": "This room is actually divided into cubicles, so that each clannie can have a sleeping area to themselves.  The men's cubicles tend to be on the spartan side with naught but a bunk, a basin, a small mirror above the basin, and a footlocker.  However the bunks are covered deeply with soft furs and a large soft pillow is at the head of each.  The femmes cubicles on the other hand, are furnished very much with Martha Stewart Every Day in mind--Curtains over the windows, bedside tables with figurines and vases of flowers.  A large mirror hangs over the basin, and gauzy canopies over the bunks from ceiling to floor. Bunks are also deeply covered with soft furs and lots of pillows, and a small wardrobe is fitted into one corner of each cubicle.  A common area on the south side of the room has a few comfortable chairs and some small tables scattered around a large window overlooking the courtyard.  A stairwell leads down into the meeting room below. ",
+            "flags": [
+                "NOMOB",
+                "PEACEFUL",
+                "NOWELL",
+                "NOSHIFT",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1701"
+                }
+            }
+        },
+        {
+            "id": "1704",
+            "name": "A Branch in the Tunnel",
+            "description": "A short way from the roughly dug cellar to the east, the earthen tunnel abruptly splits in three directions.  The main tunnel seems to continue off to the west, but similarly sized branches split off to the north and south.  This area is not well lit; the light from the torches to the east is hardly visible here. ",
+            "flags": [
+                "TUNNEL",
+                "NOWELL",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "The tunnel to the north looks roughly like the other two, dark holes into the earth with no indication of their destinations.  This tunnel seems slightly chillier than the other two, and an almost imperceptible draft seems to be blowing in. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1705"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1702"
+                },
+                "South": {
+                    "description": "The tunnel to the south is much like the other two dark holes in the earth, but this one is marked by a uniquely repulsing odor. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1707"
+                },
+                "West": {
+                    "description": "The earth tunnel to the west is pitch black with no discernible characteristics to distinguish it from the other two. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "1706"
+                }
+            }
+        },
+        {
+            "id": "1705",
+            "name": "A Frigid Stock Room",
+            "description": "The tunnel to the south abruptly lets out into a frigid stock room. Shelves line the walls here, stocked with all manner of lanterns, quills, and torches; in one corner, a large pile of frozen-looking waterskins sit, looking like a large, bulbous qua-jit.  To the south, the tunnel goes back to its dark origin, but somehow the entrance from this side is far too small to be entered--some great magicks beyond detection must be at work here.  A freezing draft wafts through a small curtained door to the north. ",
+            "flags": [
+                "PRIVATE",
+                "NOWELL",
+                "NOSHIFT",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A small curtained door sits in the wall, allowing a chilly draft to waft through. ",
+                    "keyword": "curtain",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "10031"
+                }
+            }
+        },
+        {
+            "id": "1706",
+            "name": "A Tidy Home",
+            "description": "The tunnel ends abruptly in a little home.  It's extremely tidy, with a carpet on the floor and dwarven tapestries on the walls.  Besides that, there's little here of interest, besides some wooden furniture and a lantern.  The ceiling here is only marginally higher than that of the tunnel to the east. The mouth of the tunnel on this end is strangely far too small to be entered from this side. ",
+            "flags": [
+                "PRIVATE",
+                "NOWELL",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads outside. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "6114"
+                }
+            }
+        },
+        {
+            "id": "1707",
+            "name": "A Dingy Army Tent",
+            "description": "The tunnel on the northern side of the tent lets out into a large army tent. Two rows of sleeping mats line the tent walls, forming a narrow walk-way down the center.  A uniquely horrid stench rises from the mats, filling the air with a repulsing odor.  Escape back to the tunnel is impossible however, since the entrance on this side seems to be oddly not much larger than an ant-hill.  The other exit is the tent door to the south. ",
+            "flags": [
+                "PRIVATE",
+                "NOWELL",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "The canvas of the tent walls splits to form a door to the south. ",
+                    "keyword": "door",
+                    "key": "-1",
+                    "destination": "30101"
+                }
+            }
+        }
+    ]
+}

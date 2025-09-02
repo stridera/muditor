@@ -1,0 +1,3527 @@
+{
+    "zone": {
+        "id": "173",
+        "name": "The Temple of Chaos",
+        "top": 17399,
+        "lifespan": 30,
+        "reset_mode": "Empty",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "door": [
+                {
+                    "room": 17346,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17331,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17331,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17332,
+                    "direction": "West",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17315,
+                    "direction": "South",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17303,
+                    "direction": "South",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17306,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17307,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17337,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17338,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17347,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17367,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 17372,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                }
+            ],
+            "mob": [
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17346,
+                    "name": "(a priest)",
+                    "equipped": [
+                        {
+                            "id": 17303,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(rosary beads)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17306,
+                    "max": 1,
+                    "room": 17346,
+                    "name": "(the Chaos)",
+                    "equipped": [
+                        {
+                            "id": 17308,
+                            "max": 50,
+                            "location": 27,
+                            "name": "(a black flame)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17301,
+                    "max": 1,
+                    "room": 17366,
+                    "name": "(the high priest)",
+                    "carrying": [
+                        {
+                            "id": 17310,
+                            "max": 50,
+                            "name": "(a vial of unholy water)"
+                        }
+                    ],
+                    "equipped": [
+                        {
+                            "id": 17307,
+                            "max": 1,
+                            "location": "Body",
+                            "name": "(the Cloak of Chaos)"
+                        },
+                        {
+                            "id": 17309,
+                            "max": 1,
+                            "location": 26,
+                            "name": "(a hand bell)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17366,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17366,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17366,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17366,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17303,
+                    "max": 1,
+                    "room": 17344,
+                    "name": "(a demon-steed)"
+                },
+                {
+                    "id": 17304,
+                    "max": 1,
+                    "room": 17344,
+                    "name": "(the Avenger)",
+                    "equipped": [
+                        {
+                            "id": 17301,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(the Nightblade)"
+                        },
+                        {
+                            "id": 17302,
+                            "max": 1,
+                            "location": "Feet",
+                            "name": "(a black horned helmet)"
+                        },
+                        {
+                            "id": 17306,
+                            "max": 4,
+                            "location": "Arms",
+                            "name": "(a pair of black leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17307,
+                    "max": 10,
+                    "room": 17321,
+                    "name": "(a hellhound)",
+                    "equipped": [
+                        {
+                            "id": 17304,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a spiked collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17307,
+                    "max": 10,
+                    "room": 17321,
+                    "name": "(a hellhound)",
+                    "equipped": [
+                        {
+                            "id": 17304,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a spiked collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17307,
+                    "max": 10,
+                    "room": 17321,
+                    "name": "(a hellhound)",
+                    "equipped": [
+                        {
+                            "id": 17304,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a spiked collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17307,
+                    "max": 10,
+                    "room": 17321,
+                    "name": "(a hellhound)",
+                    "equipped": [
+                        {
+                            "id": 17304,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a spiked collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17307,
+                    "max": 10,
+                    "room": 17321,
+                    "name": "(a hellhound)",
+                    "equipped": [
+                        {
+                            "id": 17304,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a spiked collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17364,
+                    "name": "(a priest)",
+                    "equipped": [
+                        {
+                            "id": 17303,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(rosary beads)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17335,
+                    "name": "(a priest)",
+                    "equipped": [
+                        {
+                            "id": 17303,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(rosary beads)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17343,
+                    "name": "(a priest)",
+                    "equipped": [
+                        {
+                            "id": 17300,
+                            "max": 2,
+                            "location": "Ear",
+                            "name": "(a thurible)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17301,
+                    "name": "(a priest)",
+                    "equipped": [
+                        {
+                            "id": 17300,
+                            "max": 2,
+                            "location": "Ear",
+                            "name": "(a thurible)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17318,
+                    "name": "(a priest)"
+                },
+                {
+                    "id": 17300,
+                    "max": 7,
+                    "room": 17357,
+                    "name": "(a priest)"
+                },
+                {
+                    "id": 17302,
+                    "max": 1,
+                    "room": 17368,
+                    "name": "(a necromancer)",
+                    "equipped": [
+                        {
+                            "id": 17305,
+                            "max": 1,
+                            "location": "Feet",
+                            "name": "(a black velvet sorcerer's hood)"
+                        }
+                    ]
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17304,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17324,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17342,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17339,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17351,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17360,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17373,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17307,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17308,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17305,
+                    "max": 10,
+                    "room": 17312,
+                    "name": "(an initiate)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17368,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17368,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17368,
+                    "name": "(the undead servant)"
+                },
+                {
+                    "id": 17308,
+                    "max": 8,
+                    "room": 17368,
+                    "name": "(the undead servant)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 17300,
+            "keywords": "priest dark chaos-priest",
+            "mob_class": "Cleric",
+            "short_desc": "a priest",
+            "long_desc": "A priest stands before you with a belligerent look on his face.",
+            "desc": "This average-sized man is dressed in totally black robes, with an odd, eight-pointed amulet around his neck. He has a perpetual sneer on his face.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 73,
+                "wisdom": 62,
+                "dexterity": 80,
+                "constitution": 30,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 17301,
+            "keywords": "priest high high-priest",
+            "mob_class": "Cleric",
+            "short_desc": "the high priest",
+            "long_desc": "An important looking priest glares at you.",
+            "desc": "This tall human man is dressed richly, but his pale skin and sunken eyes speak of his true nature.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "PROTECT_GOOD"
+            ],
+            "alignment": -900,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 69,
+                "wisdom": 72,
+                "dexterity": 79,
+                "constitution": 30,
+                "charisma": 57
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 17302,
+            "keywords": "necromancer person cadaverous",
+            "mob_class": "Necromancer",
+            "short_desc": "a necromancer",
+            "long_desc": "A cadaverous person stares blankly at you.",
+            "desc": "He looks human, dressed in foul-smelling clothing, but looks and smells just like a walking corpse. He speaks in a very chilling voice when he intones his unearthly spells.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "PUNCH"
+        },
+        {
+            "id": 17303,
+            "keywords": "steed demon-steed horse stallion",
+            "mob_class": "Layman",
+            "short_desc": "a demon-steed",
+            "long_desc": "A large horse with flaming, red eyes breathes down on you.",
+            "desc": "A majestic black stallion paws and rears before you. His coat is a lustrous coal color, and his expressive, intelligent eyes are flame-red. Smoke keeps trailing from his flaring nostrils.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 13,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 60,
+                "wisdom": 77,
+                "dexterity": 86,
+                "constitution": 30,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 17304,
+            "keywords": "avenger figure",
+            "mob_class": "AntiPaladin",
+            "short_desc": "the Avenger",
+            "long_desc": "An armoured figure looks balefully at you.",
+            "desc": "This heavily armored humanoid is quite tall, and wears armor as black as night. Despite such weight, the figure moves easily and gracefully, with quick reflexes, though its feet do not ever touch the floor.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN"
+            ],
+            "alignment": -900,
+            "level": 13,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 72,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Magic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 17305,
+            "keywords": "initiate",
+            "mob_class": "Layman",
+            "short_desc": "an initiate",
+            "long_desc": "An initiate of the order looks blankly at you.",
+            "desc": "A blank eyed, robed man looks right through you. It seems like he has no soul, and is merely a reflection of the chaos he worships.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -600,
+            "level": 6,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 76,
+                "wisdom": 85,
+                "dexterity": 76,
+                "constitution": 30,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 17306,
+            "keywords": "chaos spidery-flowing-form",
+            "mob_class": "Layman",
+            "short_desc": "the Chaos",
+            "long_desc": "A spidery, flowing form shimmers before your eyes.",
+            "desc": "You see a massive, vortex like mass before you.  Thin fingers of its essence flows out in all directions.  You can see no pattern to it, but you can catch glimpses of faces and scenes fleeting past.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOCHARM",
+                "NOSLEEP",
+                "NOBLIND",
+                "SLOW_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "FLY"
+            ],
+            "alignment": -500,
+            "level": 15,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 17,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 71,
+                "wisdom": 68,
+                "dexterity": 81,
+                "constitution": 30,
+                "charisma": 72
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Elemental",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "PIERCE"
+        },
+        {
+            "id": 17307,
+            "keywords": "hellhound hound",
+            "mob_class": "Layman",
+            "short_desc": "a hellhound",
+            "long_desc": "A large hound goes for your throat.",
+            "desc": "This huge black hound has eyes like living coals. It snarls frequently, drawing back its lips to reveal sharp white fangs. Its ribs stick out against its pelt cruelly, indicating its half-starved status.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "INFRAVISION"
+            ],
+            "alignment": -500,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 5,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 30,
+                "intelligence": 74,
+                "wisdom": 68,
+                "dexterity": 83,
+                "constitution": 30,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 17308,
+            "keywords": "undead servant rotting corpse",
+            "mob_class": "Layman",
+            "short_desc": "the undead servant",
+            "long_desc": "A rotting corpse shambles towards you.",
+            "desc": "The corpse looks like it was dug up last week, and left out in the sun. Its eye sockets are empty, and maggots are crawling out of its mouth.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN"
+            ],
+            "alignment": -300,
+            "level": 7,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 66,
+                "wisdom": 73,
+                "dexterity": 77,
+                "constitution": 30,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        }
+    ],
+    "objects": [
+        {
+            "id": 17300,
+            "type": "CONTAINER",
+            "keywords": [
+                "thurible",
+                "censer",
+                "incense",
+                "questobject"
+            ],
+            "short": "a thurible",
+            "ground": "A thurible is placed here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "thurible",
+                        "censer",
+                        "incense",
+                        "questobject"
+                    ],
+                    "text": "You see an ornately carved, bronze bowl with an ebony base.  You realise that this bowl is usually used for burning incense.  The design on it however, it almost painful to look at, as it seems to writhe and coil."
+                }
+            ],
+            "values": {
+                "Capacity": 5,
+                "Flags": [],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "ANTI_BERSERKER",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER"
+            ],
+            "weight": 0.5,
+            "cost": 50,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_SPELL",
+                    "modifier": -1
+                },
+                {
+                    "location": "HITROLL",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17301,
+            "type": "WEAPON",
+            "keywords": [
+                "Nightblade",
+                "black-longsword",
+                "black-long-sword",
+                "night-blade"
+            ],
+            "short": "the Nightblade",
+            "ground": "A black longsword floats a few feet above the ground, just in front of you.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "Nightblade",
+                        "black-longsword",
+                        "black-long-sword",
+                        "night-blade"
+                    ],
+                    "text": "The sword is made of a jet black material, with bright sparks occassionally appearing on its blade.  Somehow, it reminds you of the darkest nights, with only starlight to brighten your path."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "3",
+                    "size": "3",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "MAGIC",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "FLOAT"
+            ],
+            "weight": 4.0,
+            "cost": 500,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 1
+                },
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                },
+                {
+                    "location": "WIS",
+                    "modifier": -3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17302,
+            "type": "ARMOR",
+            "keywords": [
+                "helmet",
+                "black-horned-helmet",
+                "black-helmet"
+            ],
+            "short": "a black horned helmet",
+            "ground": "A black, horned helmet lies on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "black-horned-helmet",
+                        "black-helmet"
+                    ],
+                    "text": "The helmet is jet black, as if it is the very essense of chaos. It seems to absorb all the light that falls on it. There are vicious horns which gives it a sinister appearance."
+                }
+            ],
+            "values": {
+                "AC": 6
+            },
+            "flags": [
+                "MAGIC",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 5.1,
+            "cost": 200,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "STR",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17303,
+            "type": "TREASURE",
+            "keywords": [
+                "beads",
+                "rosary-beads",
+                "string-brown-beads"
+            ],
+            "short": "rosary beads",
+            "ground": "A string of brown beads lie in the dirt.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "beads",
+                        "rosary-beads",
+                        "string-brown-beads"
+                    ],
+                    "text": "The beads are cool to your touch, and there is an electric feeling going up your arm as you hold it."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "ANTI_BERSERKER",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 0.2,
+            "cost": 100,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 15
+                },
+                {
+                    "location": "DAMROLL",
+                    "modifier": -1
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17304,
+            "type": "ARMOR",
+            "keywords": [
+                "collar",
+                "spiked-collar",
+                "dog-collar",
+                "dog's-collar",
+                "dogs-collar"
+            ],
+            "short": "a spiked collar",
+            "ground": "There is a dog's collar here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "collar",
+                        "spiked-collar",
+                        "dog-collar",
+                        "dog's-collar",
+                        "dogs-collar"
+                    ],
+                    "text": "The collar is made of very hard, black leather.  There are very sharp metal spikes nailed into it.  It looks like one of those devices to prevent being bitten on the neck by animals."
+                }
+            ],
+            "values": {
+                "AC": 3
+            },
+            "flags": [
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL"
+            ],
+            "weight": 1.9,
+            "cost": 35,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                },
+                {
+                    "location": "HITROLL",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17305,
+            "type": "ARMOR",
+            "keywords": [
+                "hood",
+                "sorcerer's-hood",
+                "black-velvet-hood",
+                "heap",
+                "sorcerers-hood"
+            ],
+            "short": "a black velvet sorcerer's hood",
+            "ground": "A black, velvet hood lies in a crumpled heap.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "hood",
+                        "sorcerer's-hood",
+                        "black-velvet-hood",
+                        "heap",
+                        "sorcerers-hood"
+                    ],
+                    "text": "The material is soft to the touch, and it seems to fit comfortably around your neck."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "ANTI_BERSERKER",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY"
+            ],
+            "weight": 0.85,
+            "cost": 0,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "INT",
+                    "modifier": 3
+                },
+                {
+                    "location": "HITROLL",
+                    "modifier": -1
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17306,
+            "type": "ARMOR",
+            "keywords": [
+                "boots",
+                "black-leather-boots"
+            ],
+            "short": "a pair of black leather boots",
+            "ground": "A pair of black leather boots lies discarded here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "black-leather-boots"
+                    ],
+                    "text": "The boots are made of thick, black leather.  It has a sheen to it, as if someone had continuously polished it.  You can see your face on its surface."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 2.6,
+            "cost": 300,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "FEET"
+            ],
+            "affects": [
+                {
+                    "location": "MOVE",
+                    "modifier": 10
+                },
+                {
+                    "location": "SAVING_SPELL",
+                    "modifier": -3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 17307,
+            "type": "ARMOR",
+            "keywords": [
+                "cloak",
+                "cloak-chaos",
+                "heap"
+            ],
+            "short": "the Cloak of Chaos",
+            "ground": "A cloak lies in a crumpled heap at your feet.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cloak-chaos",
+                        "heap"
+                    ],
+                    "text": "The cloak seems to be jet black, and yet ...  Seems to be a swirling mass of colour.  You touch it, and it feels neither cold nor warm to your touch, yet at the same time, you get a strange sensation of burning and freezing."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [
+                "MAGIC",
+                "NODROP",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL"
+            ],
+            "weight": 2.7,
+            "cost": 100,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "ABOUT"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": -2
+                },
+                {
+                    "location": "INT",
+                    "modifier": 2
+                },
+                {
+                    "location": "WIS",
+                    "modifier": -2
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "triggers": [
+                150
+            ],
+            "effects": []
+        },
+        {
+            "id": 17308,
+            "type": "LIGHT",
+            "keywords": [
+                "flame",
+                "black-flame",
+                "small-pillar",
+                "fire",
+                "questobject"
+            ],
+            "short": "a black flame",
+            "ground": "A small pillar of black fire flickers here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "black-flame",
+                        "small-pillar",
+                        "fire",
+                        "questobject"
+                    ],
+                    "text": "The fire seems at the same time both large, yet small, hot yet cold. Strangely, you are able to pick it up in your hand.  It seems to light up the area, but somehow, seems to shed no light at all."
+                }
+            ],
+            "values": {
+                "Is_Lit:": false,
+                "Capacity": 400,
+                "Remaining": 400
+            },
+            "flags": [
+                "MAGIC",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "FLOAT",
+                "NOFALL"
+            ],
+            "weight": 0.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "HOVER"
+            ],
+            "affects": [
+                {
+                    "location": "WIS",
+                    "modifier": -1
+                },
+                {
+                    "location": "DAMROLL",
+                    "modifier": 2
+                }
+            ],
+            "triggers": [
+                5207
+            ],
+            "effects": []
+        },
+        {
+            "id": 17309,
+            "type": "INSTRUMENT",
+            "keywords": [
+                "bell",
+                "brass-hand-bell"
+            ],
+            "short": "a hand bell",
+            "ground": "A brass hand bell stands upon a stone altar.",
+            "action_desc": "A resonant note rings from the hand bell.",
+            "extras": [
+                {
+                    "keywords": [
+                        "bell",
+                        "brass-hand-bell"
+                    ],
+                    "text": "Solid and sturdy, this bell is made to provide musical accents in religious ritual.  Its single, clear, low tone makes perfect accompaniment to other instruments, chants, or has a powerful effect all on its own."
+                }
+            ],
+            "values": {
+                "Level": 15,
+                "Max_Charges": 3,
+                "Charges_Left": 3,
+                "Spell": "PROTECT_COLD"
+            },
+            "flags": [],
+            "weight": 0.03,
+            "cost": 0,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_SPELL",
+                    "modifier": -3
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "triggers": [
+                327
+            ],
+            "effects": []
+        },
+        {
+            "id": 17310,
+            "type": "POTION",
+            "keywords": [
+                "vial",
+                "vial-unholy-water",
+                "black-glass-vial",
+                "demonic-depictions"
+            ],
+            "short": "a vial of unholy water",
+            "ground": "A black glass vial etched with demonic depictions lays buried.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "vial",
+                        "vial-unholy-water",
+                        "black-glass-vial",
+                        "demonic-depictions"
+                    ],
+                    "text": "The vial is made of blackened glass.  It is etched with the image a spidery flowing mass.  The vial radiates an evil aura."
+                }
+            ],
+            "values": {
+                "Level": 10,
+                "Spells": [
+                    "DARK_PRESENCE"
+                ]
+            },
+            "flags": [],
+            "weight": 0.01,
+            "cost": 500,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "17301",
+            "name": "Temple Entrance",
+            "description": "You find yourself in a long corridor with side passages to the west and east.  The walls seem to be a multi-hued, but because the colours change so fast, it almost seem to be black.  An atmosphere of impenetrable gloom permeates this evil looking place.  Grosteque statues of malformed creatures line the corridor at irregular intervals.  You could even swear that some of them move.  The corridor continues on to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55794"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17305"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17311"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17304"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue"
+                    ],
+                    "text": "The statues are jet black in colour but they are strangely soft to the touch and has a texture similar to flesh. Some sport an astonishing array of appendages, and all look totally horrifying. "
+                }
+            ]
+        },
+        {
+            "id": "17302",
+            "name": "The Blue Corridor",
+            "description": "The corridor is now in a curious shade of blue, with streaks of purple suddenly appearing and disappearing without warning.  The scent of violets is heavy in the air.  This corridor seem to lead on forever towards the west. But then again, it seems to be a little more pleasant as there are no horrible statues arounds. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17303"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17304"
+                }
+            }
+        },
+        {
+            "id": "17303",
+            "name": "The Blue Corridor",
+            "description": "The corridor is now in a curious shade of blue, with streaks of purple suddenly appearing and disappearing without warning.  The scent of violets is heavy in the air.  This corridor seem to lead on forever towards the west. But then again, it seems to be a little more pleasant as there are no horrible statues arounds. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17304"
+                },
+                "South": {
+                    "description": "You find a small latch here which can trigger open the panel. ",
+                    "keyword": "door secret panel",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17309"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17302"
+                }
+            }
+        },
+        {
+            "id": "17304",
+            "name": "The Blue Corridor",
+            "description": "The corridor is now in a curious shade of blue, with streaks of purple suddenly appearing and disappearing without warning.  The scent of violets is heavy in the air.  This corridor seem to lead on forever towards the west. But then again, it seems to be a little more pleasant as there are no horrible statues arounds. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17303"
+                }
+            }
+        },
+        {
+            "id": "17305",
+            "name": "The Bright Corridor",
+            "description": "The walls of this place are extemely bright, almost to the point of being blinding.  They seem to radiate extreme heat, but when you raise the courage to feel one, its surface feels cold.  The corridor seems to extend from east to west. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17306"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17301"
+                }
+            }
+        },
+        {
+            "id": "17306",
+            "name": "The Curving Path",
+            "description": "The corridor seems to be bending towards the south.  Now, in addition to the heat that you feel, there is a dark, forboding feeling invading your consciousness.  To the east, there seems to be a dark outline etched in the bright surface of the wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "As you grope in the blinding mass of light, you can feel something within, cold, bar like objects. ",
+                    "keyword": "portal",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17307"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17313"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17305"
+                }
+            }
+        },
+        {
+            "id": "17307",
+            "name": "The Dark Path",
+            "description": "You seem to have stumbled upon a dark and rarely used pathway.  The dust on the floor is thick, and you leave footprints behind as you tread along this way.  Littered all around you are the bones of small, deformed creatures.  The pathway leads onwards to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17314"
+                },
+                "West": {
+                    "description": "There is a portal here, leading back to the west. ",
+                    "keyword": "portal",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17306"
+                }
+            }
+        },
+        {
+            "id": "17308",
+            "name": "Dark Corridor",
+            "description": "The blackness in this place is beyond belief.  The walls seem to swallow up light like a vacuum, and every direction looks the same.  Once in a while, there are flashes of red light, and it serves to confuse you even more. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17316"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door secret",
+                    "key": "-1",
+                    "destination": "17315"
+                }
+            }
+        },
+        {
+            "id": "17309",
+            "name": "Dark Corridor",
+            "description": "The blackness in this place is beyond belief.  The walls seem to swallow up light like a vacuum, and every direction looks the same.  Once in a while, there are flashes of red light, and it serves to confuse you even more. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17308"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door secret",
+                    "key": "-1",
+                    "destination": "17316"
+                }
+            }
+        },
+        {
+            "id": "17310",
+            "name": "Sudden Bend",
+            "description": "The passageway bends suddenly to the east and south.  You are almost blinded as you come here as a bright light suddenly flashed before your eyes.  As your eyes readjust to the gloom, you notice that there the walls here are bright red in colour. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17311"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17317"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "walls",
+                        "wall",
+                        "red"
+                    ],
+                    "text": "As you place your hand on the wall, it feels rather sticky and wet. A horrible wail fills the air as you remove your hand from the disgusting surface. "
+                }
+            ]
+        },
+        {
+            "id": "17311",
+            "name": "The Dark Corridor",
+            "description": "You find yourself in a long corridor with side passages to the west and east.  The walls seem to be a multi-hued, but because the colours change so fast, it almost seem to be black.  An atmosphere of impenetrable gloom permeates this evil looking place.  Grosteque statues of malformed creatures line the corridor at irregular intervals.  You could even swear that some of them move.  The corridor continues on to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17301"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17311"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17318"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17310"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue"
+                    ],
+                    "text": "The statues are jet black in colour but they are strangely soft to the touch and has a texture similar to flesh. Some sport an astonishing array of appendages, and all look totally horrifying. "
+                }
+            ]
+        },
+        {
+            "id": "17312",
+            "name": "A Closed Room",
+            "description": "You find yourself in an enclosed room.  The path behind you has mysteriously closed up.  As you peer in the darkness, you notice a small passage leading to the north.  Perhaps it is a way out. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17311"
+                }
+            }
+        },
+        {
+            "id": "17313",
+            "name": "The Bright Corridor",
+            "description": "The corridor seems to be aflame with bright light, making it quite difficult to see.  It is also beginning to feel uncomfortably warm here, and you feel like you're being burnt alive.  There is a small passage leading to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17306"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17320"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17312"
+                }
+            }
+        },
+        {
+            "id": "17314",
+            "name": "The Dark Path",
+            "description": "You seem to have stumbled upon a dark and rarely used pathway.  The dust on the floor is thick, and you leave footprints behind as you tread along this way.  Littered all around you are the bones of small, deformed creatures. There is a faint smell of sulphur in the air.  The pathway leads onwards to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17307"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17321"
+                }
+            }
+        },
+        {
+            "id": "17315",
+            "name": "Dark Corridor",
+            "description": "The blackness in this place is beyond belief.  The walls seem to swallow up light like a vacuum, and every direction looks the same.  Once in a while, there are flashes of red light, and it serves to confuse you even more. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17308"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17316"
+                },
+                "South": {
+                    "description": "You find a door in that direction which blended in well with the black walls. ",
+                    "keyword": "door secret",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17322"
+                }
+            }
+        },
+        {
+            "id": "17316",
+            "name": "Dark Corridor",
+            "description": "The blackness in this place is beyond belief.  The walls seem to swallow up light like a vacuum, and every direction looks the same.  Once in a while, there are flashes of red light, and it serves to confuse you even more. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17309"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door secret",
+                    "key": "-1",
+                    "destination": "17308"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17315"
+                }
+            }
+        },
+        {
+            "id": "17317",
+            "name": "The Dark Corridor",
+            "description": "You find yourself in a long corridor.  The walls seem to be a multi-hued, but because the colours change so fast, it almost seem to be black.  An atmosphere of impenetrable gloom permeates this evil looking place.  Grosteque statues of malformed creatures line the corridor at irregular intervals.  You could even swear that some of them move.  The corridor continues on to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17310"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17324"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue"
+                    ],
+                    "text": "The statues are jet black in colour but they are strangely soft to the touch and has a texture similar to flesh. Some sport an astonishing array of appendages, and all look totally horrifying. "
+                }
+            ]
+        },
+        {
+            "id": "17318",
+            "name": "The Dark Corridor",
+            "description": "You find yourself in a long corridor.  The walls seem to be a multi-hued, but because the colours change so fast, it almost seem to be black.  An atmosphere of impenetrable gloom permeates this evil looking place.  Grosteque statues of malformed creatures line the corridor at irregular intervals.  You could even swear that some of them move.  The corridor continues on to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17311"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "17325"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue"
+                    ],
+                    "text": "The statues are jet black in colour but they are strangely soft to the touch and has a texture similar to flesh. Some sport an astonishing array of appendages, and all look totally horrifying. "
+                }
+            ]
+        },
+        {
+            "id": "17319",
+            "name": "The Red Passage",
+            "description": "You find yourself in a passageway leading to the north and south.  The walls here are blood red in colour, and the floor feels sticky beneath your feet. There is even the sickeningly sweet smell of blood.  You heart begins to beat faster as your senses are assaulted by such morbid stimuli. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17316"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17326"
+                }
+            }
+        },
+        {
+            "id": "17320",
+            "name": "Bright Corridor",
+            "description": "The corridor continues on in three different directions, with identical corridors leading to the north, east and south.  The sheer intensity of the lights here threatens to blind you, yet somehow, you can see clearly.  This is very queer. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17313"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17321"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17327"
+                }
+            }
+        },
+        {
+            "id": "17321",
+            "name": "The Hound Pen",
+            "description": "You seem to have stumbled upon a holding area for animals!  There is an overpowering smell of urine and faeces here.  As you step gingerly, you can hear the sounds of bones breaking under you feet.  There is also a very squishy feeling under your boots.  You don't dare to look down. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17314"
+                }
+            }
+        },
+        {
+            "id": "17322",
+            "name": "A Bend In The Corridor",
+            "description": "The stone corridor bends here, going from east to south. There are no light sources, so the only way to tell this is if there is one brought here. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17323"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17329"
+                }
+            }
+        },
+        {
+            "id": "17323",
+            "name": "A Bend In The Corridor",
+            "description": "The corridor suddenly bends to the west, and you feel a sudden chill in the air, as if there is something missing here. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17330"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17322"
+                }
+            }
+        },
+        {
+            "id": "17324",
+            "name": "The Dark Corridor",
+            "description": "You find yourself in a long corridor.  The walls seem to be a multi-hued, but because the colours change so fast, it almost seem to be black.  An atmosphere of impenetrable gloom permeates this evil looking place.  Grosteque statues of malformed creatures line the corridor at irregular intervals.  You could even swear that some of them move.  The corridor continues on to the south and the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17317"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17325"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17331"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue"
+                    ],
+                    "text": "The statues are jet black in colour but they are strangely soft to the touch and has a texture similar to flesh. Some sport an astonishing array of appendages, and all look totally horrifying. "
+                }
+            ]
+        },
+        {
+            "id": "17325",
+            "name": "The T-Junction",
+            "description": "You arrive at a T-junction, with passages leading to the north, east and west.  The floor here is rather uneven, and you have some difficulty walking on its surface.  When you touch the walls, it is pulsating, almost as if it were alive. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17318"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17326"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17324"
+                }
+            }
+        },
+        {
+            "id": "17326",
+            "name": "The Red Passage",
+            "description": "You find yourself in a passageway leading to the north and south.  The walls here are blood red in colour, and the floor feels sticky beneath your feet. There is even the sickeningly sweet smell of blood.  You heart begins to beat faster as your senses are assaulted by such morbid stimuli. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17319"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17333"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17325"
+                }
+            }
+        },
+        {
+            "id": "17327",
+            "name": "The Curving Path",
+            "description": "The corridor seems to be bending towards the east.  The lights here seems to be getting dimmer and dimmer, and for once, you can see your shadow on the ground.  The walls around you looks a lot like marble, except for the flashes of red that sometimes crosses its surface. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17320"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17328"
+                }
+            }
+        },
+        {
+            "id": "17328",
+            "name": "A Dead End",
+            "description": "It seems like you have reached a dead end.  The walls are solid, offering no indication of any hidden portals.  The only way out is back to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17327"
+                }
+            }
+        },
+        {
+            "id": "17329",
+            "name": "The End Of The Passage",
+            "description": "The passage has ended in what seems to be a dead end.  Upon closer examination, you uncover a small hole in the ground.  It could lead somewhere. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17322"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17336"
+                }
+            }
+        },
+        {
+            "id": "17330",
+            "name": "Beyond The Portal",
+            "description": "Where the portal should be, there is only an impassable wall of bright light.  The corridor continues north, through a path of ever shifting colours. Sometimes, you can see suggestions of shapes all around you, beautiful, yet ugly.  You sense no hate here, no love, just the ever changing chaos. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17323"
+                }
+            }
+        },
+        {
+            "id": "17331",
+            "name": "Before The Portal",
+            "description": "You stand before a dark, whirling portal to the west.  The corridor has come to a dead end, and the only way out you can see is either back north, or through the dark portal. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17324"
+                },
+                "East": {
+                    "description": "There is a small, movable panel here. ",
+                    "keyword": "panel",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17332"
+                },
+                "West": {
+                    "description": "The darkness before you seems inpenetrable and hostile. It seems to suck in light and sound. ",
+                    "keyword": "portal",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17330"
+                }
+            }
+        },
+        {
+            "id": "17332",
+            "name": "The Stairwell",
+            "description": "You find yourself at the foot of a stairwell, with dark, obsidian staircase leading upwards into the innards of the temple.  There are deep, growling sounds which seems to originate from the very walls itself.  It makes you think of your stomach ...  When you are hungry. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "There is a small, movable panel on this wall. ",
+                    "keyword": "panel",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17331"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17367"
+                }
+            }
+        },
+        {
+            "id": "17333",
+            "name": "A Red Intersection",
+            "description": "You find yourself in a passageway leading to the north, east and south. The walls here are blood red in colour, and the floor feels sticky beneath your feet.  There is even the sickeningly sweet smell of blood.  You heart begins to beat faster as your senses are assaulted by such morbid stimuli. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17326"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17334"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17314"
+                }
+            }
+        },
+        {
+            "id": "17334",
+            "name": "The Red Passage",
+            "description": "You find yourself in a passageway leading to the east and west.  The walls here are blood red in colour, and the floor feels sticky beneath your feet. There is even the sickeningly sweet smell of blood.  You heart begins to beat faster as your senses are assaulted by such morbid stimuli. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17335"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17333"
+                }
+            }
+        },
+        {
+            "id": "17335",
+            "name": "A Dead End",
+            "description": "You seem to have reached a dead end.  The smell of blood is strong in the air, as if the very essense of death is concentrated here.  The ground beneath you feels soft and smells putrid.  You feel like going back out where you came from. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17334"
+                }
+            }
+        },
+        {
+            "id": "17336",
+            "name": "A Dark Tunnel",
+            "description": "The smell of earth is very strong here, though the walls seems to be made of a smooth, glassy material.  You reach out to touch its surface, but your fingers go right through it!  An icy cold sensation creeps up your fingers, and you quickly withdraw your hand.  The tunnel meanders southwards, and above you is an opening. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17342"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17329"
+                }
+            }
+        },
+        {
+            "id": "17337",
+            "name": "Portal Room",
+            "description": "You find you have entered a large, round room which is very brightly illuminated.  It is devoid of any distinguishing items, save a large, black portal which dominates the eastern wall.  There is an electric feeling in the air which seems to emanate from the portal itself. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A jet black door bars your way to the east. There is an almost electric feeling as you run your fingers across its surface. ",
+                    "keyword": "portal",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17338"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17343"
+                }
+            }
+        },
+        {
+            "id": "17338",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17339"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17344"
+                },
+                "West": {
+                    "description": "A jet black door blocks your way to the west. There is a dull throbbing on your fingers as you brush them against the surface of the door. ",
+                    "keyword": "portal",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17337"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17318"
+                }
+            }
+        },
+        {
+            "id": "17339",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "portal",
+                    "key": "-1",
+                    "destination": "17340"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "portal",
+                    "key": "-1",
+                    "destination": "17338"
+                }
+            }
+        },
+        {
+            "id": "17340",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "portal",
+                    "key": "-1",
+                    "destination": "17339"
+                }
+            }
+        },
+        {
+            "id": "17341",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17301"
+                }
+            }
+        },
+        {
+            "id": "17342",
+            "name": "A Dark Tunnel",
+            "description": "The tunnel meanders in a north-south direction.  Just at the edge of hearing is the sound of running water.  Your feet feel cold and wet, even though the floor beneath you is dry.  A small tunnel leads east. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17336"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17343"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17348"
+                }
+            }
+        },
+        {
+            "id": "17343",
+            "name": "A Dark Tunnel",
+            "description": "The tunnel meanders in a north-south direction.  Just at the edge of hearing, you can hear the sound of running water.  You feet feels cold and wet, even though the floor beneath you is dry. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17337"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17349"
+                }
+            }
+        },
+        {
+            "id": "17344",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17350"
+                }
+            }
+        },
+        {
+            "id": "17345",
+            "name": "Chamber of Chaos",
+            "description": "You find yourself in a massive chamber, which measures about 300 feet by 300 feet.  It seems to be made of a hard, red stone, which seems to sparkle with a merry life of its own.  It almost makes up for the queer sense of loss you have been feeling on this floor. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "gateway",
+                    "key": "-1",
+                    "destination": "17346"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17351"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "red",
+                        "stone"
+                    ],
+                    "text": "You try to scratch the surface of the chamber, but in spite of your best efforts, it is unmarked. Then you realise, this chamber is made of one large piece of ruby. "
+                }
+            ]
+        },
+        {
+            "id": "17346",
+            "name": "Chamber of Chaos",
+            "description": "You find yourself in a massive chamber, which measures about 300 feet by 300 feet.  It seems to be made of a hard, red stone, which seems to sparkle with a merry life of its own.  It almost makes up for the queer sense of loss you have been feeling on this floor. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "East": {
+                    "description": "There is a solid metal door in that direction. No, its a metal door. Now, its a door of stone. It seems to continue changing its material, but one thing remains the same. There is a golden doorknob right in its centre. ",
+                    "keyword": "gateway",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17347"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17352"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "gateway",
+                    "key": "-1",
+                    "destination": "17345"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "red",
+                        "stone"
+                    ],
+                    "text": "You try to scratch the surface of the chamber, but in spite of your best efforts, it is unmarked. Then you realise, this chamber is made of one large piece of ruby. "
+                }
+            ]
+        },
+        {
+            "id": "17347",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17341"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17353"
+                },
+                "West": {
+                    "description": "There is a strange gateway in this direction. It seems to be nothing more than a black abyss which is of an incredible depth, but smack in its centre is a golden doorknob. ",
+                    "keyword": "gateway",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17346"
+                }
+            }
+        },
+        {
+            "id": "17348",
+            "name": "A Dark Tunnel",
+            "description": "The tunnel meanders in a north-south direction.  Just at the edge of hearing is the sound of running water.  Your feet feel cold and wet, even though the floor beneath you is dry.  A small tunnel leads east. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17342"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17354"
+                }
+            }
+        },
+        {
+            "id": "17349",
+            "name": "A Dark Tunnel",
+            "description": "The tunnel meanders in a north-south direction.  Just at the edge of hearing, you can hear the sound of running water.  Your feet feel cold and wet, even though the floor beneath you is dry. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17343"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17355"
+                }
+            }
+        },
+        {
+            "id": "17350",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17344"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17356"
+                }
+            }
+        },
+        {
+            "id": "17351",
+            "name": "Chamber of Chaos",
+            "description": "You find yourself in a massive chamber, which measures about 300 feet by 300 feet.  It seems to be made of a hard, red stone, which seems to sparkle with a merry life of its own.  It almost makes up for the queer sense of loss you have been feeling on this floor. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17345"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "gateway",
+                    "key": "-1",
+                    "destination": "17352"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "red",
+                        "stone"
+                    ],
+                    "text": "You try to scratch the surface of the chamber, but in spite of your best efforts, it is unmarked. Then you realise, this chamber is made of one large piece of ruby. "
+                }
+            ]
+        },
+        {
+            "id": "17352",
+            "name": "Chamber of Chaos",
+            "description": "You find yourself in a massive chamber, which measures about 300 feet by 300 feet.  It seems to be made of a hard, red stone, which seems to sparkle with a merry life of its own.  It almost makes up for the queer sense of loss you have been feeling on this floor. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17346"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "gateway",
+                    "key": "-1",
+                    "destination": "17351"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "red",
+                        "stone"
+                    ],
+                    "text": "You try to scratch the surface of the chamber, but in spite of your best efforts, it is unmarked. Then you realise, this chamber is made of one large piece of ruby. "
+                }
+            ]
+        },
+        {
+            "id": "17353",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17347"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17359"
+                }
+            }
+        },
+        {
+            "id": "17354",
+            "name": "A Bend In The Tunnel",
+            "description": "The tunnel takes a sudden sharp bend towards the east.  You find yourself waist deep in water.  Just above you, you can see a steady stream of water coming down from an outlet in the roof.  Curiously, you do not feel wet, but you do feel cold. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17348"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17355"
+                }
+            }
+        },
+        {
+            "id": "17355",
+            "name": "A Bend In The Tunnel",
+            "description": "The tunnel takes a sudden sharp bend towards the north.  You find yourself waist deep in water.  Just above you, you can see a steady stream of water coming down from an outlet in the roof.  Curiously, you do not feel wet, but you do feel cold. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17349"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17354"
+                }
+            }
+        },
+        {
+            "id": "17356",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17350"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17357"
+                }
+            }
+        },
+        {
+            "id": "17357",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17358"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17356"
+                }
+            }
+        },
+        {
+            "id": "17358",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17359"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17357"
+                }
+            }
+        },
+        {
+            "id": "17359",
+            "name": "Swirling Corridor",
+            "description": "The walls and ceiling in this corridor seems to consist of a confusing jumble of swirling colours.  You feel disoriented in here, as if the structure of reality is being distorted beyond all recognition. ",
+            "flags": [
+                "INDOORS",
+                "NOMAGIC"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17353"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17358"
+                }
+            }
+        },
+        {
+            "id": "17360",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the south and east, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17361"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17365"
+                }
+            }
+        },
+        {
+            "id": "17361",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight.  A chute like passage leads down to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17362"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17366"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17360"
+                }
+            }
+        },
+        {
+            "id": "17362",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17363"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17361"
+                }
+            }
+        },
+        {
+            "id": "17363",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight.  A chute like passage leads down to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17364"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17368"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17362"
+                }
+            }
+        },
+        {
+            "id": "17364",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the south and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17369"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17363"
+                }
+            }
+        },
+        {
+            "id": "17365",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the north and south, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17360"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17370"
+                }
+            }
+        },
+        {
+            "id": "17366",
+            "name": "High Priest's Chambers",
+            "description": "The rich smell of incense fills their air, and in the distance, you could swear you can hear the sounds of chanting.  Thick books line the walls, but as you try to touch them, your hands pass right through them, as if they were an illusion. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17361"
+                }
+            }
+        },
+        {
+            "id": "17367",
+            "name": "Top Of The Stairwell",
+            "description": "The stairwell opens up to an open parapet, on the top of the temple.  It's strange but, you didn't notice this temple having a tower, but since you're here, it obviously does.  The sky looks changed, with a glory of colours dominating it from horizon to horizon.  A rope ladder suspended in mid-air, with no obvious support.  An obsidian door is to the south, beckoning you to enter. ",
+            "flags": [
+                "NOMAGIC"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "South": {
+                    "description": "The obsidian door bars your way to the south. ",
+                    "keyword": "obsidian door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17372"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17305"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17332"
+                }
+            }
+        },
+        {
+            "id": "17368",
+            "name": "Necromancer's Lair",
+            "description": "The stink of decaying flesh hits you as you walk into this chamber.  All around you, there are corpses in various stages of decay.  Maggots are crawling on the floor, making it quite distasteful to take another step. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17363"
+                }
+            }
+        },
+        {
+            "id": "17369",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the north and south, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17364"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17374"
+                }
+            }
+        },
+        {
+            "id": "17370",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the north and east, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17365"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17371"
+                }
+            }
+        },
+        {
+            "id": "17371",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17372"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17370"
+                }
+            }
+        },
+        {
+            "id": "17372",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The obsidian door bars your way to the north. ",
+                    "keyword": "obsidian door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "17367"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17373"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17371"
+                }
+            }
+        },
+        {
+            "id": "17373",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the east and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17374"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17372"
+                }
+            }
+        },
+        {
+            "id": "17374",
+            "name": "The Circular Corridor",
+            "description": "You find yourself in what resembles a giant pipe.  The surface is wet and slippery, making walking difficult.  It seems to curve away to the north and west, with no end in sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17369"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "17373"
+                }
+            }
+        }
+    ]
+}

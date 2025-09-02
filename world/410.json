@@ -1,0 +1,4626 @@
+{
+    "zone": {
+        "id": "410",
+        "name": "the Hive",
+        "top": 41099,
+        "lifespan": 22,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "remove": [
+                {
+                    "room": 41057,
+                    "id": 41012,
+                    "name": "(a sadly shredded Queen's corpse)"
+                },
+                {
+                    "room": 41057,
+                    "id": 41013,
+                    "name": "(a faithful Attendant's corpse)"
+                }
+            ],
+            "object": [
+                {
+                    "id": 41012,
+                    "max": 1,
+                    "room": 41057,
+                    "name": "(a sadly shredded Queen's corpse)",
+                    "contains": [
+                        {
+                            "id": 41014,
+                            "max": 10,
+                            "container": 41012,
+                            "name": "(a fancy woolen cloak)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41013,
+                    "max": 1,
+                    "room": 41057,
+                    "name": "(a faithful Attendant's corpse)",
+                    "contains": [
+                        {
+                            "id": 41005,
+                            "max": 3,
+                            "container": 41013,
+                            "name": "(a prismatic leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41011,
+                    "max": 10,
+                    "room": 41073,
+                    "name": "(a piece of honeycomb)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 41012,
+                    "direction": "Down",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41042,
+                    "direction": "North",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41054,
+                    "direction": "Up",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41066,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41066,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41062,
+                    "direction": "Down",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41062,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41061,
+                    "direction": "Up",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41051,
+                    "direction": "Down",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41043,
+                    "direction": "Up",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 41063,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41063,
+                    "direction": "East",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41064,
+                    "direction": "West",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41064,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41065,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41065,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 41069,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                }
+            ],
+            "mob": [
+                {
+                    "id": 41004,
+                    "max": 1,
+                    "room": 41012,
+                    "name": "(a shining Prismatic Warrior)",
+                    "equipped": [
+                        {
+                            "id": 41007,
+                            "max": 5,
+                            "location": "Legs",
+                            "name": "(a chitinous-plate)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41007,
+                    "max": 2,
+                    "room": 41042,
+                    "name": "(the Blue Drone)",
+                    "carrying": [
+                        {
+                            "id": 41006,
+                            "max": 4,
+                            "name": "(a serrated fighting-blade)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41008,
+                    "max": 1,
+                    "room": 41015,
+                    "name": "(the Red Queen)",
+                    "carrying": [
+                        {
+                            "id": 41001,
+                            "max": 3,
+                            "name": "(a red leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41005,
+                    "max": 5,
+                    "room": 41015,
+                    "name": "(a faithful Attendant)",
+                    "equipped": [
+                        {
+                            "id": 41008,
+                            "max": 4,
+                            "location": "About",
+                            "name": "(a set of chitinous-sleeves)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41014,
+                    "max": 1,
+                    "room": 41054,
+                    "name": "(a shining Prismatic Warrior)",
+                    "equipped": [
+                        {
+                            "id": 41007,
+                            "max": 5,
+                            "location": "Legs",
+                            "name": "(a chitinous-plate)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41021,
+                    "max": 1,
+                    "room": 41066,
+                    "name": "(a sparkling Prismatic Attendant)",
+                    "equipped": [
+                        {
+                            "id": 41005,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(a prismatic leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41007,
+                    "max": 2,
+                    "room": 41039,
+                    "name": "(the Blue Drone)",
+                    "equipped": [
+                        {
+                            "id": 41006,
+                            "max": 4,
+                            "location": "Eyes",
+                            "name": "(a serrated fighting-blade)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41011,
+                    "max": 1,
+                    "room": 41039,
+                    "name": "(the Blue Queen)",
+                    "equipped": [
+                        {
+                            "id": 41004,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(a pale blue leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41010,
+                    "max": 1,
+                    "room": 41030,
+                    "name": "(the Green Queen)",
+                    "equipped": [
+                        {
+                            "id": 41003,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(a green leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41001,
+                    "max": 12,
+                    "room": 41021,
+                    "name": "(the busy worker)"
+                },
+                {
+                    "id": 41009,
+                    "max": 1,
+                    "room": 41021,
+                    "name": "(the Yellow Queen)",
+                    "equipped": [
+                        {
+                            "id": 41002,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(a yellow leg spur)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41006,
+                    "max": 4,
+                    "room": 41071,
+                    "name": "(a sparkling Prismatic Attendant)"
+                },
+                {
+                    "id": 41006,
+                    "max": 4,
+                    "room": 41071,
+                    "name": "(a sparkling Prismatic Attendant)"
+                },
+                {
+                    "id": 41012,
+                    "max": 1,
+                    "room": 41071,
+                    "name": "(the bloated Hive Mother)",
+                    "equipped": [
+                        {
+                            "id": 41009,
+                            "max": 1,
+                            "location": "Take",
+                            "name": "(a jewelled eye)"
+                        },
+                        {
+                            "id": 41010,
+                            "max": 1,
+                            "location": "Ear",
+                            "name": "(a wax bubble of royal jelly)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41015,
+                    "max": 1,
+                    "room": 41061,
+                    "name": "(a shining Prismatic Warrior)",
+                    "equipped": [
+                        {
+                            "id": 41007,
+                            "max": 5,
+                            "location": "Legs",
+                            "name": "(a chitinous-plate)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41002,
+                    "max": 4,
+                    "room": 41051,
+                    "name": "(the protective Nurse)"
+                },
+                {
+                    "id": 41013,
+                    "max": 2,
+                    "room": 41004,
+                    "name": "(the Warrior)"
+                },
+                {
+                    "id": 41001,
+                    "max": 12,
+                    "room": 41006,
+                    "name": "(the busy worker)",
+                    "carrying": [
+                        {
+                            "id": 41011,
+                            "max": 10,
+                            "name": "(a piece of honeycomb)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41001,
+                    "max": 12,
+                    "room": 41011,
+                    "name": "(the busy worker)",
+                    "carrying": [
+                        {
+                            "id": 41011,
+                            "max": 10,
+                            "name": "(a piece of honeycomb)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41001,
+                    "max": 12,
+                    "room": 41014,
+                    "name": "(the busy worker)",
+                    "carrying": [
+                        {
+                            "id": 41011,
+                            "max": 10,
+                            "name": "(a piece of honeycomb)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41005,
+                    "max": 5,
+                    "room": 41016,
+                    "name": "(a faithful Attendant)",
+                    "equipped": [
+                        {
+                            "id": 41008,
+                            "max": 4,
+                            "location": "About",
+                            "name": "(a set of chitinous-sleeves)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41003,
+                    "max": 4,
+                    "room": 41017,
+                    "name": "(the Warrior)"
+                },
+                {
+                    "id": 41005,
+                    "max": 5,
+                    "room": 41029,
+                    "name": "(a faithful Attendant)",
+                    "equipped": [
+                        {
+                            "id": 41008,
+                            "max": 4,
+                            "location": "About",
+                            "name": "(a set of chitinous-sleeves)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41003,
+                    "max": 4,
+                    "room": 41031,
+                    "name": "(the Warrior)"
+                },
+                {
+                    "id": 41005,
+                    "max": 5,
+                    "room": 41038,
+                    "name": "(a faithful Attendant)",
+                    "equipped": [
+                        {
+                            "id": 41008,
+                            "max": 4,
+                            "location": "About",
+                            "name": "(a set of chitinous-sleeves)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41002,
+                    "max": 4,
+                    "room": 41047,
+                    "name": "(the protective Nurse)"
+                },
+                {
+                    "id": 41003,
+                    "max": 4,
+                    "room": 41047,
+                    "name": "(the Warrior)"
+                },
+                {
+                    "id": 41001,
+                    "max": 12,
+                    "room": 41053,
+                    "name": "(the busy worker)"
+                },
+                {
+                    "id": 41004,
+                    "max": 2,
+                    "room": 41063,
+                    "name": "(a shining Prismatic Warrior)",
+                    "equipped": [
+                        {
+                            "id": 41007,
+                            "max": 5,
+                            "location": "Legs",
+                            "name": "(a chitinous-plate)"
+                        }
+                    ]
+                },
+                {
+                    "id": 41006,
+                    "max": 4,
+                    "room": 41069,
+                    "name": "(a sparkling Prismatic Attendant)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 41001,
+            "keywords": "hive-worker busy-worker busy worker hiver",
+            "mob_class": "Warrior",
+            "short_desc": "the busy worker",
+            "long_desc": "A Worker is here, cleaning up.",
+            "desc": "The six foot long insectoid concentrates on the task at hand. She's far too busy to take much note of YOU. As she finishes this assignment, she drops to six of her eight legs, leaving two free for performing any little job she may come across on her way to the next. The colors on her body shimmer like a wave as she moves away.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [
+                "INFRAVISION"
+            ],
+            "alignment": 0,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41002,
+            "keywords": "hive-nurse protective nurse nurse-maid nanny hiver",
+            "mob_class": "Warrior",
+            "short_desc": "the protective Nurse",
+            "long_desc": "The Nurse gives you a cold glare as she moves to stand protectively in front of her small charges.",
+            "desc": "Every aspect of the Nurse seems to have been designed for motherly care. She gives off a soothing, lemony scent. All of her legs and both antennae have long, sweeping projections that resemble feathers. She reaches out to stroke and quiet her small charges with her four foremost legs, maintaining her balance with the other four, seeming the very picture of maternal love. Your blood runs cold as she whirls about, noticing your presence... and you remember the other side of being motherly.... the PROTECTIVE side...",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [
+                "INFRAVISION"
+            ],
+            "alignment": 0,
+            "level": 6,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 69,
+                "wisdom": 66,
+                "dexterity": 88,
+                "constitution": 30,
+                "charisma": 67
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41003,
+            "keywords": "hive-warrior insectoid warrior hiver",
+            "mob_class": "Warrior",
+            "short_desc": "the Warrior",
+            "long_desc": "A Warrior poised firmly on eight legs is standing here.",
+            "desc": "Looking down at you from an angle is some strange insectoid. A rainbow of colors sparkles across its body and a pleasing, lemony odor comes from its thick shell. The mandibles clack at you menacingly as it steps forward. Four legs make menacing gestures as it takes a solid stance on its remaining four and defensively curls both antennae back. Its compound eyes seem to look in all directions, making it impossible to tell what it's actually focusing on.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "SLOW_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "INFRAVISION"
+            ],
+            "alignment": -100,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41004,
+            "keywords": "prismatic-warrior prismatic warrior shining aloof hiver",
+            "mob_class": "Warrior",
+            "short_desc": "a shining Prismatic Warrior",
+            "long_desc": "An aloof Prismatic Warrior watches you through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location. You hear a chittering sound as it clacks its mandibles in indecision. You find yourself vaguely hoping it's not deciding that it's hungry. At over 8 feet tall, it probably wouldn't find you much of a meal...",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41005,
+            "keywords": "hive-attendant attendant faithful hiver queen-attendant",
+            "mob_class": "Warrior",
+            "short_desc": "a faithful Attendant",
+            "long_desc": "A faithful Attendant is here, looking after the needs of her Queen.",
+            "desc": "The Attendant nervously scuttles about the room. Several workers hurry to make way for the distinguished servant as she rushes on her latest errand. Her two free hands anxiously groom loose bits of dirt from her segmented body as her antennae search the air for any hint she should change her task.",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "INFRAVISION"
+            ],
+            "alignment": 500,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 72,
+                "wisdom": 77,
+                "dexterity": 86,
+                "constitution": 30,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41006,
+            "keywords": "prismatic-attendant prismatic attendant",
+            "mob_class": "Warrior",
+            "short_desc": "a sparkling Prismatic Attendant",
+            "long_desc": "A Prismatic Attendant stands here waiting for her Queen's next command.",
+            "desc": "The Attendant's crystal-clear chitin shell sparkles with her graceful movements. All the other Hivers look clumsy when you compare them to her refined actions. One round foot taps the floor in impatience as she waits for the workers to carry out her orders. ",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": 1000,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 72,
+                "wisdom": 72,
+                "dexterity": 78,
+                "constitution": 30,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41007,
+            "keywords": "blue-drone drone blue male",
+            "mob_class": "Warrior",
+            "short_desc": "the Blue Drone",
+            "long_desc": "A Blue Drone is here, doing things you'd rather not watch.",
+            "desc": "Nearing 10 feet long, this monstrous male is one of the largest Hivers you've seen. Surely, only the Queen could ever match his size. His peacock blue chitin darkens to violet at the shoulders. He must be young -- his wings have barely popped from their cases. They are still drying.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION",
+                "FLY"
+            ],
+            "alignment": -1000,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 72,
+                "wisdom": 80,
+                "dexterity": 86,
+                "constitution": 30,
+                "charisma": 68
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41008,
+            "keywords": "red-queen queen young red",
+            "mob_class": "Warrior",
+            "short_desc": "the Red Queen",
+            "long_desc": "A young, Red Queen stands here by her contoured couch.",
+            "desc": "While larger than the other Hivers you've seen, it's obvious that the Red Queen is very young. Her chitinous shell appears soft and wet. She looks at you with a curious tilt of her head and slowly stretches an antenna toward you in inquiry. Her two compound eyes glitter at you with a soft glow as they track your movements while her two simple eyes scan across you, taking in all the details that make you, YOU.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": 1000,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41009,
+            "keywords": "yellow-queen yellow queen",
+            "mob_class": "Warrior",
+            "short_desc": "the Yellow Queen",
+            "long_desc": "The Yellow Queen stands here, supervising the placement of gems.",
+            "desc": "A brilliant Yellow Queen scurries around the chamber, directing the workers assigned to finish construction of her quarters. She's as fussy and flighty as any teenager preparing for her first date. Even as you watch, she stops her mad dash just long enough to clean a piece of dirt from her thorax and fluff her antennae. She moves so quickly that it looks like six of her legs never touch the ground.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": 500,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41010,
+            "keywords": "green-queen green queen",
+            "mob_class": "Warrior",
+            "short_desc": "the Green Queen",
+            "long_desc": "The Green Queen stands here, tapping the floor nervously.",
+            "desc": "The forest-green Hiver queen glances around nervously. She seems very agitated as though worried about something. Indeed, even as you watch, she shivers and several loose flakes of chitin fall from her body to the floor. Her wing cases are stiff and look ready to explode. She must be nearing maturity.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "WIMPY",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 41011,
+            "keywords": "blue-queen blue queen",
+            "mob_class": "Warrior",
+            "short_desc": "the Blue Queen",
+            "long_desc": "The Blue Queen is here, preparing for her mating flight.",
+            "desc": "Sweeping color changes wash over the queen's body as she flexes her wings outward. Reaching up towards the roof of the chamber, she extends a claw and widens her private passage. She pauses just once to run her antennae over the body of the waiting Blue Drone. ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION",
+                "FLY"
+            ],
+            "alignment": -750,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41012,
+            "keywords": "hive-mother mother bloated",
+            "mob_class": "Warrior",
+            "short_desc": "the bloated Hive Mother",
+            "long_desc": "The monstrous Hive Mother is here, lost in dreams of power.",
+            "desc": "The hulking mass of the great Hive Mother's body throbs with the pulse of the Hive, keeping all its working parts focused and coordinated with her will. She seems unaware of your presence and stares off into space... dreaming? Perhaps she sleeps... at rest while her bloated body continues to produce eggs and the next generation of Hivers...",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -1000,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 20,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 2,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 4,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41013,
+            "keywords": "hive-warrior insectoid warrior hiver",
+            "mob_class": "Warrior",
+            "short_desc": "the Warrior",
+            "long_desc": "A Warrior poised firmly on eight legs is standing here.",
+            "desc": "Looking down at you from an angle is some strange insectoid. A rainbow of colors sparkles across its body and a pleasing, lemony odor comes from its thick shell. The mandibles clack at you menacingly as it steps forward. Four legs make menacing gestures as it takes a solid stance on its remaining four and defensively curls both antennae back. Its compound eyes seem to look in all directions, making it impossible to tell what it's actually focusing on.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "SLOW_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "INFRAVISION"
+            ],
+            "alignment": -100,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41014,
+            "keywords": "prismatic-warrior prismatic warrior shining aloof hiver",
+            "mob_class": "Warrior",
+            "short_desc": "a shining Prismatic Warrior",
+            "long_desc": "An aloof Prismatic Warrior watches you through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location. You hear a chittering sound as it clacks its mandibles in indecision. You find yourself vaguely hoping it's not deciding that it's hungry. At over 8 feet tall, it probably wouldn't find you much of a meal...",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41015,
+            "keywords": "prismatic-warrior prismatic warrior shining aloof hiver",
+            "mob_class": "Warrior",
+            "short_desc": "a shining Prismatic Warrior",
+            "long_desc": "An aloof Prismatic Warrior watches you through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location. You hear a chittering sound as it clacks its mandibles in indecision. You find yourself vaguely hoping it's not deciding that it's hungry. At over 8 feet tall, it probably wouldn't find you much of a meal...",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41016,
+            "keywords": "prismatic-warrior prismatic warrior royal guard",
+            "mob_class": "Warrior",
+            "short_desc": "a Prismatic Royal Guard",
+            "long_desc": "A Prismatic Royal Guard studies you closely through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location.  You hear a chittering sound as it clacks its mandibles in indecision.  It stands intently, watching every movement within line of sight.  You find yourself vaguely hoping you're not doing anything wrong in its presence, as it would probably obliterate you into tiny pieces.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 1
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 92,
+                "intelligence": 64,
+                "wisdom": 74,
+                "dexterity": 92,
+                "constitution": 69,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41017,
+            "keywords": "prismatic-warrior prismatic warrior royal guard",
+            "mob_class": "Warrior",
+            "short_desc": "a Prismatic Royal Guard",
+            "long_desc": "A Prismatic Royal Guard studies you closely through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location.  You hear a chittering sound as it clacks its mandibles in indecision.  It stands intently, watching every movement within line of sight.  You find yourself vaguely hoping you're not doing anything wrong in its presence, as it would probably obliterate you into tiny pieces.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 1
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 95,
+                "intelligence": 64,
+                "wisdom": 66,
+                "dexterity": 87,
+                "constitution": 79,
+                "charisma": 60
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41018,
+            "keywords": "prismatic-warrior prismatic warrior royal guard",
+            "mob_class": "Warrior",
+            "short_desc": "a Prismatic Royal Guard",
+            "long_desc": "A Prismatic Royal Guard studies you closely through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location.  You hear a chittering sound as it clacks its mandibles in indecision.  It stands intently, watching every movement within line of sight.  You find yourself vaguely hoping you're not doing anything wrong in its presence, as it would probably obliterate you into tiny pieces.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 1
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 93,
+                "intelligence": 72,
+                "wisdom": 67,
+                "dexterity": 86,
+                "constitution": 79,
+                "charisma": 54
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41019,
+            "keywords": "prismatic-warrior prismatic warrior royal guard",
+            "mob_class": "Warrior",
+            "short_desc": "a Prismatic Royal Guard",
+            "long_desc": "A Prismatic Royal Guard studies you closely through faceted eyes.",
+            "desc": "The light breaks across this mighty warrior in a shattered cloud of rainbows. The overall effect makes it difficult to focus on its exact location.  You hear a chittering sound as it clacks its mandibles in indecision.  It stands intently, watching every movement within line of sight.  You find yourself vaguely hoping you're not doing anything wrong in its presence, as it would probably obliterate you into tiny pieces.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": -250,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 1
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 88,
+                "intelligence": 68,
+                "wisdom": 75,
+                "dexterity": 89,
+                "constitution": 72,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 41021,
+            "keywords": "prismatic-attendant prismatic attendant",
+            "mob_class": "Layman",
+            "short_desc": "a sparkling Prismatic Attendant",
+            "long_desc": "A Prismatic Attendant stands here waiting for her Queen's next command.",
+            "desc": "The Attendant's crystal-clear chitin shell sparkles with her graceful movements. All the other Hivers look clumsy when you compare them to her refined actions. One round foot taps the floor in impatience as she waits for the workers to carry out her orders.",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "DETECT_ALIGN",
+                "SENSE_LIFE",
+                "INFRAVISION"
+            ],
+            "alignment": 0,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 30,
+                "intelligence": 30,
+                "wisdom": 30,
+                "dexterity": 30,
+                "constitution": 30,
+                "charisma": 30
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        }
+    ],
+    "objects": [
+        {
+            "id": 41001,
+            "type": "KEY",
+            "keywords": [
+                "spur",
+                "red",
+                "spur",
+                "leg",
+                "deep"
+            ],
+            "short": "a red leg spur",
+            "ground": "A deep red leg spur is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "red-spur",
+                        "spur",
+                        "red",
+                        "leg",
+                        "wavy"
+                    ],
+                    "text": "The deep red leg spur has been cruelly broken from the leg of a Hiver. Cracked bits of chitin crumble from the body end as a clear fluid slowly drips out. The lower edge has a softly undulating wave pattern running from the narrow tip to the broken end, forming a key-like series of bumps."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NORENT"
+            ],
+            "weight": 1.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41002,
+            "type": "KEY",
+            "keywords": [
+                "spur",
+                "yellow-leg-spur",
+                "yellow-spur",
+                "yellow",
+                "leg",
+                "spur"
+            ],
+            "short": "a yellow leg spur",
+            "ground": "A brilliant yellow leg spur is lying here, broken.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "yellow-spur",
+                        "leg",
+                        "spur",
+                        "yellow"
+                    ],
+                    "text": "Tiny scales overlap along the length of the spur, making it slightly rough to the touch. The upper edge follows a long, smooth curve while the lower edge has been clipped into a series of triangular wedges."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NORENT"
+            ],
+            "weight": 1.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41003,
+            "type": "KEY",
+            "keywords": [
+                "spur",
+                "green-leg-spur",
+                "green-spur",
+                "green",
+                "leg"
+            ],
+            "short": "a green leg spur",
+            "ground": "A green leg spur caked with dried blood is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "green-spur",
+                        "spur",
+                        "green",
+                        "leg"
+                    ],
+                    "text": "Dried blood forms a second covering on the spur. Hair-line cracks run its length in a series of parallel fractures. Several small chips have been cracked out of the two major spikes on the inner edge."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NORENT"
+            ],
+            "weight": 1.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41004,
+            "type": "KEY",
+            "keywords": [
+                "spur",
+                "blue-leg-spur",
+                "blue-spur",
+                "blue",
+                "leg"
+            ],
+            "short": "a pale blue leg spur",
+            "ground": "A pale blue leg spur is lying here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "blue-leg-spur",
+                        "blue-spur",
+                        "serrated",
+                        "blue",
+                        "leg",
+                        "spur",
+                        ""
+                    ],
+                    "text": "A series of fine serrations nicked out of the two under-side spikes give the spur a wicked and unique cutting edge. They would act like a saw on anyone who had the misfortune to be on the receiving end of a slash. Too bad that the end is too badly broken to form a handle. Maybe the one of a kind edge has a different intent..."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NORENT"
+            ],
+            "weight": 1.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41005,
+            "type": "KEY",
+            "keywords": [
+                "spur",
+                "prismatic-leg-spur",
+                "prismatic-spur",
+                "prismatic",
+                "leg"
+            ],
+            "short": "a prismatic leg spur",
+            "ground": "A prismatic leg spur lies here, feathered edge rustling softly in a faint wind.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "prismatic-spur",
+                        "spur",
+                        "prismatic",
+                        "feathered",
+                        "feathered-edge",
+                        "attendants"
+                    ],
+                    "text": "The Attendant's leg spur has a softly feathered edge of tattered chitin. Long ribbons hang down in imitation of a brush. As your hand smooths them back, you notice that the trimmings form a distinct band of bumps similar to the notches of a key."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NORENT"
+            ],
+            "weight": 1.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41006,
+            "type": "WEAPON",
+            "keywords": [
+                "blade",
+                "serrated-fighting-blade",
+                "sharpened-leg-spur"
+            ],
+            "short": "a serrated fighting-blade",
+            "ground": "A sharpened leg spur digs into the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "serrated-fighting-blade",
+                        "sharpened-leg-spur"
+                    ],
+                    "text": "Tooth-like serrations give this blade a wicked edge.  The sawing action of the teeth catches extra bits of flesh as it slashes.  A tapered end forms a natural grip."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "2",
+                    "size": "4",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 1.0,
+            "cost": 120,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 41007,
+            "type": "ARMOR",
+            "keywords": [
+                "plate",
+                "chitinous-plate",
+                "large-flake-chitin"
+            ],
+            "short": "a chitinous-plate",
+            "ground": "A large flake of chitin has fallen off a Hiver's thorax here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "chitinous-plate",
+                        "large-flake-chitin"
+                    ],
+                    "text": "The rough platter of insectoid scales seems to have no distinct color. Shifting hues move across its surface as light strikes it from different angles. All colors? Or none? You shake your head in wonder."
+                }
+            ],
+            "values": {
+                "AC": 7
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_ROGUE",
+                "ANTI_ASSASSIN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 15.0,
+            "cost": 45,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41008,
+            "type": "ARMOR",
+            "keywords": [
+                "sleeves",
+                "chitinous-sleeves",
+                "narrow-tubes-chitin"
+            ],
+            "short": "a set of chitinous-sleeves",
+            "ground": "Narrow tubes of chitin lie here, gathering dust.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "chitinous-sleeves",
+                        "narrow-tubes-chitin"
+                    ],
+                    "text": "These stiff tubes of chitin look like they once graced the upper legs of some Hiver.  They would make stiff but servicable sleeves for a human."
+                }
+            ],
+            "values": {
+                "AC": 6
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_ROGUE",
+                "ANTI_ASSASSIN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 6.0,
+            "cost": 200,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE",
+                "ARMS"
+            ],
+            "affects": [
+                {
+                    "location": "DEX",
+                    "modifier": -1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 41009,
+            "type": "LIGHT",
+            "keywords": [
+                "eye",
+                "jewelled-eye",
+                "fist-sized-gem",
+                "multiple-facets"
+            ],
+            "short": "a jewelled eye",
+            "ground": "A fist-sized gem with multiple facets is embedded here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "jewelled-eye",
+                        "fist-sized-gem",
+                        "multiple-facets"
+                    ],
+                    "text": "This is no natural gem!  It's the eye of a Hiver Queen, detached from its socket.  The many eye facets that once gazed upon the world with ambitious lust still gleam faintly in death."
+                }
+            ],
+            "values": {
+                "Is_Lit:": false,
+                "Capacity": 400,
+                "Remaining": 400
+            },
+            "flags": [
+                "GLOW",
+                "MAGIC"
+            ],
+            "weight": 0.5,
+            "cost": 140,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "EYES"
+            ],
+            "affects": [
+                {
+                    "location": "WIS",
+                    "modifier": 2
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 8
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 41010,
+            "type": "POTION",
+            "keywords": [
+                "jelly",
+                "wax-bubble-royal-jelly",
+                "round-bubble",
+                "half-jelled-fluid"
+            ],
+            "short": "a wax bubble of royal jelly",
+            "ground": "A round bubble containing a half-jelled fluid is here. ",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "jelly",
+                        "wax-bubble-royal-jelly",
+                        "round-bubble",
+                        "half-jelled-fluid"
+                    ],
+                    "text": "The half-jelled fluid swirls sluggishly in the container."
+                }
+            ],
+            "values": {
+                "Level": 20,
+                "Spells": [
+                    "HEAL"
+                ]
+            },
+            "flags": [
+                "MAGIC"
+            ],
+            "weight": 2.0,
+            "cost": 45,
+            "timer": 0,
+            "level": 7,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41011,
+            "type": "FOOD",
+            "keywords": [
+                "honeycomb",
+                "honey-comb",
+                "chunk-sweet-hiver",
+                "food",
+                "questobject"
+            ],
+            "short": "a piece of honeycomb",
+            "ground": "A chunk of sweet Hiver comb is getting dirty.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "honeycomb",
+                        "honey-comb",
+                        "chunk-sweet-hiver",
+                        "food",
+                        "questobject"
+                    ],
+                    "text": "Hexagonal wax chambers are filled with an amber fluid.  It covers your hands with sticky goodness as you examine it."
+                }
+            ],
+            "values": {
+                "Filling": 15,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 10,
+            "timer": 0,
+            "level": 3,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 41012,
+            "type": "CONTAINER",
+            "keywords": [
+                "corpse",
+                "queens",
+                "queen-corpse",
+                "queens-corpse",
+                "hiver",
+                "queen",
+                "corpse"
+            ],
+            "short": "a sadly shredded Queen's corpse",
+            "ground": "The ripped and torn corpse of a once-mighty Hiver Queen lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "queens-corpse",
+                        "queen",
+                        "corpse",
+                        "hiver"
+                    ],
+                    "text": "Bite marks pierce the thick chitinous shell of the Queen. Dark, permanent stains blemish the floor where her life's blood poured from her body. Her mandibles are locked open in a silent scream of pain."
+                }
+            ],
+            "values": {
+                "Capacity": 100,
+                "Flags": [
+                    "Closeable",
+                    "Closed"
+                ],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "HUM"
+            ],
+            "weight": 1000.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 41013,
+            "type": "CONTAINER",
+            "keywords": [
+                "corpse",
+                "attendants-corpse",
+                "attendants",
+                "corpse",
+                "attendant-corpse",
+                "attendant"
+            ],
+            "short": "a faithful Attendant's corpse",
+            "ground": "The silent corpse of a faithful Attendant lies near the Queen.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "attendants-corpse",
+                        "attendant",
+                        "corpse",
+                        "hiver"
+                    ],
+                    "text": "The mangled remains are a mute testament to the valiant fight this Attendant carried through the conflict that tore through here. Unfortunately, her faithful service wasn't enough to protect the Queen..."
+                }
+            ],
+            "values": {
+                "Capacity": 10,
+                "Flags": [
+                    "Closeable",
+                    "Closed"
+                ],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [],
+            "weight": 1000.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 41014,
+            "type": "TREASURE",
+            "keywords": [
+                "cloak",
+                "fancy-woolen",
+                "cloak",
+                "wool",
+                "questobject"
+            ],
+            "short": "a fancy woolen cloak",
+            "ground": "A once fancy woolen cloak lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "fancy-woolen-cloak",
+                        "questobject",
+                        "wool"
+                    ],
+                    "text": "This cloak was once quite fancy and shaped perfectly.  Now, however, it is torn and somewhat discolored.  The silvery lining is shredded and has lost its glint and sparkle.  The owner of such a cloak must have been quite wealthy, and it is a wonder why such a precious item would go to waste.  It has a lone, long faded symbol across the back."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 4.0,
+            "cost": 10,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE",
+                "ABOUT"
+            ],
+            "triggers": [
+                6018
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 41001,
+            "name": "red_death_spawn_yellow",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* checking if yellow queen is already loaded if %self.mexists[41009]% < 1 * load the yellow queen' mat 41021 mload mob 41009 mecho %self.name% screams, 'My yellow sister shall avenge my death!' else mecho %self.name% screams, 'My yellow sister shall avenge my death!' endif "
+        },
+        {
+            "id": 41002,
+            "name": "yellow_death_spawn_green",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* checking if green queen is already loaded if %self.mexists[41010]% < 1 mat 41030 mload mob 41010 mecho %self.name% moans, 'My green sister will make you sorry!' else mecho %self.name% moans, 'My green sister will make you sorry!' endif "
+        },
+        {
+            "id": 41003,
+            "name": "green_death_spawn_blue",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* checking if blue queen is already loaded if %self.mexists[41011]% < 1 mat 41039 mload mob 41011 mecho %self.name% mutters, 'Mother always said my blue sister would look after me...' else mecho %self.name% mutters, 'Mother always said my blue sister would look after me...' endif "
+        },
+        {
+            "id": 41004,
+            "name": "warrior_death_spawn_red",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "*check if red queen already loaded if %self.mexists[41008]% < 1 * load red queen mat 41015 mload mob 41008 mecho %self.name% shouts, 'I'm sorry, my Queen!' else mecho %self.name% shouts, 'I'm sorry, my Queen!' endif "
+        },
+        {
+            "id": 41005,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * Trigger 61554 for Creeping Doom * set person %actor% set i %actor.group_size% if %i% unset person while %i% > 0 set person %actor.group_member[%i%]% if %person.room% == %self.room% if %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif endif eval i %i% - 1 done elseif %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif * * Death trigger for random gem and armor drops - 55567 * * set a random number to determine if a drop will * happen. * * Miniboss setup * set bonus %random.100% set will_drop %random.100% * 3 pieces of armor per sub_phase in phase_1 set what_armor_drop %random.3% * 4 classes questing in phase_1 set what_gem_drop %random.4% * if %will_drop% <= 30 * drop nothing and bail halt endif if %will_drop% <= 70 * Normal non-bonus drops if %bonus% <= 50 * drop a gem from the previous wear pos set eval gem_vnum %what_gem_drop% + 55573 mload obj %gem_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem from the current wear pos set eval gem_vnum %what_gem_drop% + 55577 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop a gem from the next wear pos set eval gem_vnum %what_gem_drop% + 55581 mload obj %gem_vnum% endif elseif (%will_drop% >= 71 &%will_drop% <= 90) * Normal non-bonus drops if %bonus% <= 50 * drop destroyed armor 55299 is the vnum before the * first piece of armor. eval armor_vnum %what_armor_drop% + 55307 mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55311 mload obj %armor_vnum% else * We're in the BONUS ROUND!! * drop a piece of armor from next wear pos eval armor_vnum %what_armor_drop% + 55315 mload obj %armor_vnum% endif else * Normal non-bonus drops if %bonus% <= 50 * drop armor and gem from previous wear pos eval gem_vnum %what_gem_drop% + 55573 eval armor_vnum %what_armor_drop% + 55307 mload obj %gem_vnum% mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem and armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55311 mload obj %armor_vnum% eval gem_vnum %what_gem_drop% + 55577 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop armor and gem from next wear pos eval gem_vnum %what_gem_drop% + 55581 mload obj %gem_vnum% eval armor_vnum %what_armor_drop% + 55315 mload obj %armor_vnum% endif endif "
+        },
+        {
+            "id": 41006,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * Trigger 61554 for Creeping Doom * set person %actor% set i %actor.group_size% if %i% unset person while %i% > 0 set person %actor.group_member[%i%]% if %person.room% == %self.room% if %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif endif eval i %i% - 1 done elseif %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif * * Death trigger for random gem and armor drops - 55565 * * set a random number to determine if a drop will * happen. * * Miniboss setup * set bonus %random.100% set will_drop %random.100% * 3 pieces of armor per sub_phase in phase_1 set what_armor_drop %random.3% * 4 classes questing in phase_1 set what_gem_drop %random.4% * if %will_drop% <= 30 * drop nothing and bail halt endif if %will_drop% <= 70 * Normal non-bonus drops if %bonus% <= 50 * drop a gem from the previous wear pos set eval gem_vnum %what_gem_drop% + 55569 mload obj %gem_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem from the current wear pos set eval gem_vnum %what_gem_drop% + 55573 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop a gem from the next wear pos set eval gem_vnum %what_gem_drop% + 55577 mload obj %gem_vnum% endif elseif (%will_drop% >= 71 &%will_drop% <= 90) * Normal non-bonus drops if %bonus% <= 50 * drop destroyed armor 55299 is the vnum before the * first piece of armor. eval armor_vnum %what_armor_drop% + 55303 mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55307 mload obj %armor_vnum% else * We're in the BONUS ROUND!! * drop a piece of armor from next wear pos eval armor_vnum %what_armor_drop% + 55311 mload obj %armor_vnum% endif else * Normal non-bonus drops if %bonus% <= 50 * drop armor and gem from previous wear pos eval gem_vnum %what_gem_drop% + 55569 eval armor_vnum %what_armor_drop% + 55303 mload obj %gem_vnum% mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem and armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55307 mload obj %armor_vnum% eval gem_vnum %what_gem_drop% + 55573 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop armor and gem from next wear pos eval gem_vnum %what_gem_drop% + 55577 mload obj %gem_vnum% eval armor_vnum %what_armor_drop% + 55311 mload obj %armor_vnum% endif endif "
+        },
+        {
+            "id": 41007,
+            "name": "**UNUSED**",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * Trigger 61554 for Creeping Doom * set person %actor% set i %actor.group_size% if %i% unset person while %i% > 0 set person %actor.group_member[%i%]% if %person.room% == %self.room% if %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif endif eval i %i% - 1 done elseif %person.quest_stage[creeping_doom]% == 2 || (%person.level% > 80 && (%person.vnum% >= 1000 && %person.vnum% <= 1038)) set rnd %random.50% if %rnd% <= %self.level% mload obj 61517 endif endif * * Death trigger for random gem and armor drops - 55570 * * set a random number to determine if a drop will * happen. * * boss setup * set bonus %random.100% set will_drop %random.100% * 3 pieces of armor per sub_phase in phase_1 set what_armor_drop %random.3% * 4 classes questing in phase_1 set what_gem_drop %random.4% * if %will_drop% <= 20 * drop nothing and bail halt endif if %will_drop% <= 60 * Normal non-bonus drops if %bonus% <= 50 * drop a gem from the previous wear pos set eval gem_vnum %what_gem_drop% + 55577 mload obj %gem_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem from the current wear pos set eval gem_vnum %what_gem_drop% + 55581 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop a gem from the next wear pos set eval gem_vnum %what_gem_drop% + 55585 mload obj %gem_vnum% endif elseif (%will_drop% >=61 &%will_drop% <= 80) * Normal non-bonus drops if %bonus% <= 50 * drop destroyed armor 55299 is the vnum before the * first piece of armor. eval armor_vnum %what_armor_drop% + 55311 mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55315 mload obj %armor_vnum% else * We're in the BONUS ROUND!! * drop a piece of armor from next wear pos eval armor_vnum %what_armor_drop% + 55319 mload obj %armor_vnum% endif else * Normal non-bonus drops if %bonus% <= 50 * drop armor and gem from previous wear pos eval gem_vnum %what_gem_drop% + 55577 eval armor_vnum %what_armor_drop% + 55311 mload obj %gem_vnum% mload obj %armor_vnum% elseif (%bonus% >= 51 &%bonus% <= 90) * We're in the Normal drops from current wear pos set * drop a gem and armor from the current wear pos set eval armor_vnum %what_armor_drop% + 55315 mload obj %armor_vnum% eval gem_vnum %what_gem_drop% + 55581 mload obj %gem_vnum% else * We're in the BONUS ROUND!! * drop armor and gem from next wear pos eval gem_vnum %what_gem_drop% + 55585 mload obj %gem_vnum% eval armor_vnum %what_armor_drop% + 55319 mload obj %armor_vnum% endif endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "41001",
+            "name": "The Foot of the Mound",
+            "description": "Small chunks of debris have been piled high to form an earthen mound.  It angles steeply upward from here but looks climbable.  You spy a set of circular tracks leading upwards along a narrow ledge and a thick forest path to the north. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8300"
+                },
+                "South": {
+                    "description": "A break in the forest is concealed behind a mat of woven brush. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41092"
+                },
+                "Up": {
+                    "description": "The path runs straight up the slope with inhuman precision. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41002"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "track",
+                        "tracks"
+                    ],
+                    "text": "The tracks are perfectly circular with a deep depression in the center of each. "
+                },
+                {
+                    "keywords": [
+                        "path",
+                        "trail"
+                    ],
+                    "text": "The path has no switchbacks. "
+                },
+                {
+                    "keywords": [
+                        "debris",
+                        "chunks"
+                    ],
+                    "text": "Each hunk of dirt is approximately the size of your fist. They are slightly molded into hourglass figures. "
+                }
+            ]
+        },
+        {
+            "id": "41002",
+            "name": "The Side of the Mound",
+            "description": "A sudden shower of loose debris narrowly misses your head.  Most of the rubble has been packed hard by the passage of many feet.  But what kind of feet would leave perfectly circular tracks?  The path runs up and down the mount in an inhumanly precise line. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "Up": {
+                    "description": "The top of the mound is just visible. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41003"
+                },
+                "Down": {
+                    "description": "The foot of the mound lies just below. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41001"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "track",
+                        "tracks"
+                    ],
+                    "text": "The tracks are perfectly circular with a deeper depression in the center of each. "
+                },
+                {
+                    "keywords": [
+                        "path",
+                        "trail"
+                    ],
+                    "text": "The path runs straight up and down the steep side of the mound with no switchbacks. "
+                }
+            ]
+        },
+        {
+            "id": "41003",
+            "name": "The Top of the Mound",
+            "description": "The barren earth is still loose and shifting.  Much of it looks freshly dug. Only the well-trodden path you are on has been packed down.  A small pit yawns open to your south.  The narrow path leads down. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "FIELD",
+            "exits": {
+                "South": {
+                    "description": "An insectoid creature stands guard in front of the pit. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41004"
+                },
+                "Down": {
+                    "description": "A path of firmly packed bits of debris leads down at a very steep angle. It looks more suited to mountain goats than to humans. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41002"
+                }
+            }
+        },
+        {
+            "id": "41004",
+            "name": "A Small Pit",
+            "description": "A subtle, lemony scent sweeps up from the dark depths of this crater.  The air is warm and laden with moisture like a breath from a citrus sauna.  A narrow path runs north across the top of the mound. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The path plunges down the exterior of the mound. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41003"
+                },
+                "Down": {
+                    "description": "The dark maw of the pit waits to swallow you into its depths. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41005"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "small-pit",
+                        "pit",
+                        "crater"
+                    ],
+                    "text": "The perfectly circular hole descends through a narrow tunnel into darkness. "
+                }
+            ]
+        },
+        {
+            "id": "41005",
+            "name": "A Paper-lined Tunnel",
+            "description": "The narrow tunnel has been lined with plant fibers chewed and mixed with an unknown substance until it resembles lumpy paper.  It's a wonderful mixture because even in this heated moisture, it feels dry and is not disintegrating. The entrance to the mound lies just up while the paper lining continues down. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "Up": {
+                    "description": "Open sky is just visible through the narrow, pit-like entrance to the Hive. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41004"
+                },
+                "Down": {
+                    "description": "The papery lining continues down the tunnel as far as you can see. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41006"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "paper-lining",
+                        "paper",
+                        "lining"
+                    ],
+                    "text": "Very rough to the touch, it is amazingly tough. Your sweaty palms are thoroughly dry after just a brief contact. It seems to absorb the moisture from the surrounding air and dissipate it into the soil, keeping the humidity level well-regulated. "
+                }
+            ]
+        },
+        {
+            "id": "41006",
+            "name": "A Paper-lined Tunnel",
+            "description": "Paper-like lumps form a rough surface, making walking difficult.  The elusive lemon scent of the Hive seems stronger at this level.  The paper lined tunnel continues up and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "West": {
+                    "description": "The tunnel flattens out briefly before plunging downwards again. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41007"
+                },
+                "Up": {
+                    "description": "A tiny glimpse of the outside world is barely visible a ways up the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41005"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "paper-lining",
+                        "paper",
+                        "lining"
+                    ],
+                    "text": "Very rough to the touch, it is amazingly tough. Your sweaty palms are thoroughly dry after just a brief contact. It seems to absorb the moisture from the surrounding air and dissipate it into the soil, keeping the humidity level well-regulated. "
+                }
+            ]
+        },
+        {
+            "id": "41007",
+            "name": "A Paper-lined Tunnel",
+            "description": "Hivers with paper lumps attached to their feet march past you in a solemn line.  Their sticky feet pull up tiny lumps of lining from the tunnel floor. The gooey trail enters a chamber to your south.  You can follow the intact coating down into a larger room or east towards the surface. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The tunnel makes an abrupt rise just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41006"
+                },
+                "South": {
+                    "description": "Waxy packages of fluid cover the walls in the chamber just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41008"
+                },
+                "Down": {
+                    "description": "Four tunnels lead from the central hub just below. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41012"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "hiver",
+                        "hivers"
+                    ],
+                    "text": "The line of Workers marches past you without a single glance. They move together in perfect coordination as though they share a single thought. Each is fully aware of the job the Hive needs her to perform and you just aren't on the list. "
+                },
+                {
+                    "keywords": [
+                        "trail",
+                        "gooey"
+                    ],
+                    "text": "A clear amber fluid drips slowly from their feet, forming a small trail. A few of the Workers stop briefly to clean a bit of it up, but it's a futile effort. Each one leaves a little more in passing. "
+                },
+                {
+                    "keywords": [
+                        "paper-lining",
+                        "paper",
+                        "lining",
+                        "coating"
+                    ],
+                    "text": "The tough coat of the tunnel has been damaged by the sticky fluid. Bits and pieces have been lifted and carried away. It will take the workers some real effort to repair the damage here. "
+                }
+            ]
+        },
+        {
+            "id": "41008",
+            "name": "A Sticky Room",
+            "description": "A hard waxy coat covers the floor of this chamber.  Wax packages of some substance are attached to the walls.  The floor is sticky in spite of the wax coating.  You notice a distinct drop in the heat and humidity in this room. The Hivers must have a good grasp of the fundamentals of heat regulation!  The chamber continues to the east and south or you can re-enter the tunnel to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A narrow tunnel passes by just outside of this large chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41007"
+                },
+                "East": {
+                    "description": "More packages line the walls ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41009"
+                },
+                "South": {
+                    "description": "More packages line the walls ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41011"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "wax",
+                        "floor",
+                        "coat",
+                        "hard",
+                        "waxy"
+                    ],
+                    "text": "A yellowish wax has been liberally applied to all surfaces of the chamber. The seal helps give this area it's own environment, distinct from the rest of the Hive. A light, cinnamony odor assaults your nostrils from the southeast. "
+                },
+                {
+                    "keywords": [
+                        "packages",
+                        "package"
+                    ],
+                    "text": "Spherical containers of wax are filled with a clear, amber colored fluid and stuck into the wax seal of the chamber for storage. The containers look like they've been melted into place to ensure their safety. It's quite a food store! "
+                }
+            ]
+        },
+        {
+            "id": "41009",
+            "name": "A Sticky Room",
+            "description": "A hard, waxy coat covers the floor of this chamber.  Wax packages of some substance are attached to the walls.  The floor is sticky in spite of the wax coating.  It appears that some of the Workers have been a bit sloppy about filling the containers! ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "Large cracks are visible in the sealing wax to the south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41010"
+                },
+                "West": {
+                    "description": "The exit from this gooey room is just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41008"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "wax",
+                        "floor",
+                        "coat",
+                        "hard",
+                        "waxy"
+                    ],
+                    "text": "A yellowish wax has been liberally applied to all surfaces of the chamber. The seal helps give this area it's own environment, distinct from the rest of the Hive. A light, cinnamony odor assaults your nostrils from the south. "
+                },
+                {
+                    "keywords": [
+                        "packages",
+                        "package"
+                    ],
+                    "text": "Spherical containers of wax are filled with a clear, amber colored fluid and stuck into the wax seal of the chamber for storage. The containers look like they've been melted into place to ensure their safety. It's quite a food store! "
+                }
+            ]
+        },
+        {
+            "id": "41010",
+            "name": "A Sticky Room",
+            "description": "A disturbance in the earth mound has opened thick cracks in the wax lining of the wall.  A sweet, sticky substance is leaking steadily out of several of the packages.  The mixture of earth and fluid is sending out a very strong odor similar to cinnamon. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "More wax containers line the wall. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41009"
+                },
+                "West": {
+                    "description": "More wax containers line the wall. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41011"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "packages",
+                        "package"
+                    ],
+                    "text": "Spherical containers of wax are filled with a clear, amber colored fluid and stuck into the wax seal of the chamber for storage. The containers look like they've been melted into place to ensure their safety. It's quite a food store! "
+                },
+                {
+                    "keywords": [
+                        "wax",
+                        "floor",
+                        "coat",
+                        "hard",
+                        "waxy"
+                    ],
+                    "text": "The natural settling of the earth mound has opened several deep pressure cracks in the wax sealing here. Many of the food storage packages have been broken open. One has been displaced and lies on the floor. "
+                }
+            ]
+        },
+        {
+            "id": "41011",
+            "name": "A Sticky Room",
+            "description": "A hard waxy coat covers the floor of this chamber.  Wax packages of some substance are attached to the walls.  A lone Worker approaches one of the packages, clamps its jaws tightly to its side, and regurgitates a clear fluid. It gives you a quizzical look as it finishes and scuttles away. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The wax packages cover the walls ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41008"
+                },
+                "East": {
+                    "description": "Wax packages line the walls ahead of you. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41010"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "packages",
+                        "package"
+                    ],
+                    "text": "Spherical containers of wax are filled with a clear, amber colored fluid and stuck into the wax seal of the chamber for storage. The containers look like they've been melted into place to ensure their safety. It's quite a food store! "
+                },
+                {
+                    "keywords": [
+                        "wax",
+                        "floor",
+                        "coat",
+                        "hard",
+                        "waxy"
+                    ],
+                    "text": "A yellowish wax has been liberally applied to all surfaces of the chamber. The seal helps give this area it's own environment, distinct from the rest of the Hive. A light, cinnamony odor assaults your nostrils from the east. "
+                }
+            ]
+        },
+        {
+            "id": "41012",
+            "name": "A Paper-lined Chamber",
+            "description": "Tunnels radiate in five directions from this chamber.  The lumpy paper coating runs uphill, while four tunnels of different colors extend to the north, the east, the south, and the west.  You're beginning to get a headache from the overpowering lemon scent. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Yellow gems surround the entrance arch of the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41016"
+                },
+                "East": {
+                    "description": "Red gems surround the entrance arch of the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41013"
+                },
+                "South": {
+                    "description": "Blue gems surround the entrance arch of the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41031"
+                },
+                "West": {
+                    "description": "Green gems surround the entrance arch of the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41022"
+                },
+                "Up": {
+                    "description": "The paper-lined tunnel slopes upward toward the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41007"
+                },
+                "Down": {
+                    "description": "You see a hidden plug set in the floor. ",
+                    "keyword": "plug",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41043"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gem",
+                        "gems"
+                    ],
+                    "text": "The gems pulse faintly with colored light... After a second glance, you realize that you've been deceived. They aren't gems. They're Hiver eyes, plucked from their owners and mounted like trophies in the wall. "
+                }
+            ]
+        },
+        {
+            "id": "41013",
+            "name": "A Red Tunnel",
+            "description": "Large red flakes of chitin have been mixed with the plant fibers to give this tunnel section its coloration.  The coating looks very fresh and hasn't hardened completely.  The tunnel continues east or you can return to the paper lined chamber to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The red tunnel goes a short distance east, then switches south around a bend. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41014"
+                },
+                "West": {
+                    "description": "The large, paper-lined chamber lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41012"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "flakes",
+                        "lining",
+                        "tunnel"
+                    ],
+                    "text": "Flakes of chitin as large as your head dot the walls and floor of the tunnel. Their crimson hue gives you an eerie feeling as they crumble between your fingers like dried cakes of blood. "
+                }
+            ]
+        },
+        {
+            "id": "41014",
+            "name": "A Bend in the Red Tunnel",
+            "description": "The freshly applied red coating is very rough.  You can still see tiny gaps where the bare earth peeks through this imperfect job.  This must be a very new section of the Hive.  The tunnel continues west or you can enter a chamber to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "An indistinct beat echoes from the chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41015"
+                },
+                "West": {
+                    "description": "The new, red tunnel leads you back to the center of the Hive. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41013"
+                }
+            }
+        },
+        {
+            "id": "41015",
+            "name": "Red's Chambers",
+            "description": "This small chamber is still being expanded.  Only a newly emergent queen would find the cramped quarters accomodating.  A vague, intermittent pulse echoes through your bones.  The west wall shows signs of recent digging.  The coating on the south wall looks extra thick. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A narrow tunnel leads from this chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41014"
+                }
+            }
+        },
+        {
+            "id": "41016",
+            "name": "A Yellow Tunnel",
+            "description": "Yellow flakes of chitin have been mulched together with plant fibers to line this tunnel section.  Whatever it is mixed with has given it a rock hard consistency.  The tunnel continues north or you can re-enter the paper-lined chamber to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The tunnel breaks into a T-intersection just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41017"
+                },
+                "South": {
+                    "description": "The large, paper-lined hub is just ahead. You feel a shiver run down your spine at the sight of the blue gems pulsing at you on the other side of the chamber. Their pulsations are speeding up... ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41012"
+                }
+            }
+        },
+        {
+            "id": "41017",
+            "name": "A Yellow Intersection",
+            "description": "The feet of the Hivers make faint scritching sounds as they move through the surrounding tunnels.  The noise seems to be louder down the eastern tunnel.  A rough chamber lies west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The frantic sounds of many Workers speeding about on some chore is concentrated in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41019"
+                },
+                "South": {
+                    "description": "The yellow tunnel leads back to the paper-lined chamber. You can just see the glow of the tunnel-markers that line each arch. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41016"
+                },
+                "West": {
+                    "description": "The damp smell of freshly turned and watered earth is a welcome change from the ever-present citrus scent of the Hivers. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41018"
+                }
+            }
+        },
+        {
+            "id": "41018",
+            "name": "An Unfinished Chamber",
+            "description": "Bare earth greets your eye as you enter the chamber.  This room is so new that the Hivers have not had the chance to line it as yet.  The rich scent of freshly-turned earth tickles your nose.  It's considerably cooler in this incomplete room.  No temperature regulating modifications have been installed yet.  The Hivers must find this room unbearably cold.  You can re-enter the completed yellow section to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A completed tunnel section runs east for some distance. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41017"
+                }
+            }
+        },
+        {
+            "id": "41019",
+            "name": "A Yellow Tunnel",
+            "description": "The mulch lining this east-west tunnel is rock hard.  The sound of many workers chittering comes from the east.  A T-intersection lies to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A bend in the tunnel will lead you toward the south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41020"
+                },
+                "West": {
+                    "description": "A fresh, earth scented breath of air strokes your face. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41017"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mulch",
+                        "lining"
+                    ],
+                    "text": "Chewed plant fibers, flakes of yellow chitin, and some sort of adhesive have been mixed to perfection, laid down, and allowed to harden. The surface is very rough to the touch. A few crags stick out and grab at your clothing as you pass down the tunnel. "
+                }
+            ]
+        },
+        {
+            "id": "41020",
+            "name": "A Bend in the Yellow Tunnel",
+            "description": "Workers have made an effort to smooth the fibrous lumps from this tunnel, but the floor is still uneven.  The commotion of many busy Workers emanates from a chamber to the south or you can continue down the tunnel to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "Bodies flash past the entrance as several Workers scurry through the chamber on some indiscernible task. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41021"
+                },
+                "West": {
+                    "description": "The rough tunnel continues toward an intersection. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41019"
+                }
+            }
+        },
+        {
+            "id": "41021",
+            "name": "Yellow's Chambers",
+            "description": "Excavations continue to expand this immature queen's chamber to the west. Small, yellow gems are being implanted in the other walls and a contoured earth mound is being built up in the center.  It will make a very restful spot for the young Queen to recline upon.  Several Workers stand near the wall, spitting something at it. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "I'm sure it's much quieter in the tunnel you see. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41020"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "spit",
+                        "spitting",
+                        "spittle"
+                    ],
+                    "text": "Well, now you know how the Hivers line their tunnels. The Workers scoop a mouthful of plant fiber from a nearby pile, add a scoop from a pile of cast-off chitin from the queen, and chew. Their own saliva is the unknown adhesive that binds it all together. When the mix has just the right consistency, they spit it at the wall and pack it down with four of their eight legs. "
+                }
+            ]
+        },
+        {
+            "id": "41022",
+            "name": "A Green Tunnel",
+            "description": "Reflective green flakes of chitin color the walls of this east-west tunnel. Scratches in the hard floor tell the tale of much recent traffic. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The paper-lined chamber lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41012"
+                },
+                "West": {
+                    "description": "A deep set of scratches leads west toward an intersection. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41023"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "scratch",
+                        "scratches"
+                    ],
+                    "text": "The marks are very fresh. No worker has had the chance to begin repairs. "
+                }
+            ]
+        },
+        {
+            "id": "41023",
+            "name": "A Green Intersection",
+            "description": "Workers have begun repair work on a damaged section of the floor.  The green territory continues to the north, the south, and the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A very soft suss suss suss whisper wanders furtively down the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41027"
+                },
+                "East": {
+                    "description": "This short section of tunnel will lead you back to the paper-lined center of the Hive. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41022"
+                },
+                "South": {
+                    "description": "The tunnel runs into an bend some distance ahead. The deep scratches in the flooring lead in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41024"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "scratch",
+                        "scratches",
+                        "flooring",
+                        "gouge",
+                        "gouges"
+                    ],
+                    "text": "Narrow but incredibly deep gouges have been sliced out of the walls and floor here. It almost looks like someone took a sword and hacked randomly. Or... maybe blows were deflected in some mighty battle... "
+                }
+            ]
+        },
+        {
+            "id": "41024",
+            "name": "A Green Tunnel",
+            "description": "Deep gouges mar the surface of the tunnel floor as though some large creature dug in as it was pushed south against its will.  The tunnel continues north to an intersection or south to a corner. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A T-intersection is just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41023"
+                },
+                "South": {
+                    "description": "The deep gouges in the floor continue south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41025"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "depression",
+                        "depressions",
+                        "deep"
+                    ],
+                    "text": "The blades penetrated through the entire layer of lining to the bare earth underlying the tunnel. "
+                },
+                {
+                    "keywords": [
+                        "scratch",
+                        "scratches",
+                        "gouge",
+                        "gouges",
+                        "floor"
+                    ],
+                    "text": "A thin, incredibly sharp blade has scooped out a deep depression. Actually, eight depressions run in a nearly straight line to the south. "
+                }
+            ]
+        },
+        {
+            "id": "41025",
+            "name": "A Bend in the Green Tunnel",
+            "description": "Green's tunnel is much darker here, deepening to blue.  Smashed light gems cover the floor.  It looks like they fell from the south wall.  More scratches deface this chamber.  You can re-enter the tunnels to the north or enter a small chamber to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "You shiver slightly as the thought crosses your mind -- you would feel much safer up the tunnel, away from this destruction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41024"
+                },
+                "West": {
+                    "description": "A musky odor roils from the darkness of this unseen chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41026"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "patch",
+                        "plug",
+                        "plug-like",
+                        "opening"
+                    ],
+                    "text": "This plug once served as a door to let something through, but the new patch holds it securely shut. None of your efforts can open it. "
+                },
+                {
+                    "keywords": [
+                        "scratches",
+                        "scratch",
+                        "gouge",
+                        "gouges"
+                    ],
+                    "text": "The deep lines seem to pass into the south wall. "
+                }
+            ]
+        },
+        {
+            "id": "41026",
+            "name": "A Drone's Chamber",
+            "description": "A sickly sweet odor fills your nostrils as you enter the room.  A large bulk lying against the west wall proves to be the body of an exceptionally large Hiver. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The narrow green tunnel looks pretty inviting, compared to this nightmare massacre. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41025"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "hiver",
+                        "large",
+                        "drone"
+                    ],
+                    "text": "Something has ripped the legs and budding wings from the immature body of the Drone. The body has been so mangled by the ferocity of the attack that you cannot tell what color the young male was in life. Green would probably be a good guess, based on the Hivers' tendency to color-code everything. "
+                }
+            ]
+        },
+        {
+            "id": "41027",
+            "name": "A Bend in the Green Tunnel",
+            "description": "A dark stain disfigures the perfection of the wall.  The suss suss suss is still little more than a whisper from the west.  The tunnel continues to the west and the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "An intersection lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41023"
+                },
+                "West": {
+                    "description": "The tunnel takes another turn, like a snake wandering through a maze. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41028"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "stain",
+                        "dark"
+                    ],
+                    "text": "A fluid foreign to the usual coating mixture has left a permanent spray mark. The deep musky odor catches in the back of your throat as your eyes begin to water. "
+                }
+            ]
+        },
+        {
+            "id": "41028",
+            "name": "A Bend in the Green Tunnel",
+            "description": "Small green gems dry in fresh mountings along the ceiling.  The efforts of the workers have resulted in a nearly smooth corridor.  The tunnel continues to the north and the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A soft green glow comes from a small chamber, possibly the source of that odd sussing whisper. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41029"
+                },
+                "East": {
+                    "description": "Another bend in the tunnel will carry you south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41027"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem",
+                        "small",
+                        "green"
+                    ],
+                    "text": "On closer examination, you realize that they aren't gems. They're the multi-faceted eyes of Hivers. "
+                }
+            ]
+        },
+        {
+            "id": "41029",
+            "name": "An Antechamber",
+            "description": "Soft green light escapes the gems lining the walls.  A low barrier dividing this room from the chamber east of here is still under construction. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A narrow entrance has been left to allow passage into a chamber beyond. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41030"
+                },
+                "South": {
+                    "description": "The bend in the tunnel is softly lit by the glow of the Hivers' light gems. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41028"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "barrier",
+                        "low",
+                        "entrance",
+                        "passage"
+                    ],
+                    "text": "The Workers are busily narrowing the entrance to the next chamber, leaving just enough open space for their narrow bodies to slide through. "
+                }
+            ]
+        },
+        {
+            "id": "41030",
+            "name": "Green's Chambers",
+            "description": "A specially contoured earth mound dominates the center of the room.  Green gems shine steadily, filling the room with a soothing glow that beats in time with the heartbeat of the young Queen who resides here.  A muted sussing comes from the Queen herself, falling into the chamber like the sound of a weeping maiden. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "West": {
+                    "description": "A narrow passage leads into the Queen's Antechamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41029"
+                }
+            }
+        },
+        {
+            "id": "41031",
+            "name": "A Blue Tunnel",
+            "description": "Dark blue flakes gather the meager light and cast it back out in a sparkling shimmer.  This passage is remarkable.  For the first time since entering the Hive, you find yourself lost in total silence.  Of course, release from the intense heat and humidity would be nice, too.  The tunnel continues to the north and the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A paper-lined chamber lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41012"
+                },
+                "South": {
+                    "description": "This passage ends in a T-intersection just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41032"
+                }
+            }
+        },
+        {
+            "id": "41032",
+            "name": "A Blue Intersection",
+            "description": "Blue flakes of chitin sparkle along the walls and ceiling of the passage. They are darker to the north than to the east or west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Darker flakes of chitin line the passage back to the paper-lined intersection. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41031"
+                },
+                "East": {
+                    "description": "Chitin so pale as to be almost white lines the tunnel. A faint glow comes around a corner some distance ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41033"
+                },
+                "West": {
+                    "description": "Chitin so pale as to be almost white lines the tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41040"
+                }
+            }
+        },
+        {
+            "id": "41033",
+            "name": "A Blue Tunnel",
+            "description": "This east-west tunnel has been smoothed to perfection.  You can see your reflection in the floor and walls.  It wavers in time with a pulsing beat coming from your east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A faint glow sneaks around the corner just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41034"
+                },
+                "West": {
+                    "description": "The polished blue facing continues west. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41032"
+                }
+            }
+        },
+        {
+            "id": "41034",
+            "name": "A Bend in the Blue Tunnel",
+            "description": "The chitin flakes seem to be pulsing faintly in time to some unknown rhythm. The passage slips around a corner here, continuing south and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "Another bend lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41036"
+                },
+                "West": {
+                    "description": "The polished perfection of blue steers a straight course. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41033"
+                }
+            }
+        },
+        {
+            "id": "41035",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41036",
+            "name": "A Bend in the Blue Tunnel",
+            "description": "Pale blue gems gather the meager light and send a barely detectable glow along the passage to the north and the west.  The pounding beat continues to throb through your body. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The tunnel twists to the west. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41034"
+                },
+                "West": {
+                    "description": "The tunnel twists south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41037"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem",
+                        "small",
+                        "blue"
+                    ],
+                    "text": "On closer examination, you realize that they aren't gems. They're the multi-faceted eyes of Hivers. "
+                }
+            ]
+        },
+        {
+            "id": "41037",
+            "name": "A Bend in the Blue Tunnel",
+            "description": "A pale blue light beams gently down from gems embedded in the walls.  A small chamber lies to your south or you can re-enter the tunnel to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The blue tunnel slides around a bend just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41036"
+                },
+                "South": {
+                    "description": "A softly lit chamber opens before you. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41038"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem",
+                        "small",
+                        "blue"
+                    ],
+                    "text": "On closer examination, you realize that they aren't gems. They're the multi-faceted eyes of Hivers. "
+                }
+            ]
+        },
+        {
+            "id": "41038",
+            "name": "An Antechamber",
+            "description": "Pale blue light gems pulsate from their wall-settings.  A low barrier has been built up to constrict the entrance of the room to your east.  The tunnel opens to your north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The polished tunnel sweeps through a curve to the east. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41037"
+                },
+                "East": {
+                    "description": "An intermittent, low-pitched buzzing interrupts the pulsing throb coming out of this chamber. It's accompanied by a slight, musk-laden breeze. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41039"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem",
+                        "small",
+                        "blue"
+                    ],
+                    "text": "On closer examination, you realize that they aren't gems. They're the multi-faceted eyes of Hivers. "
+                }
+            ]
+        },
+        {
+            "id": "41039",
+            "name": "Blue's Chambers",
+            "description": "The dimensions of this wide chamber are revealed in the soothing glow of the Queen's eyes.  Gems line the chamber, throbbing with her lifeforce.  An open patch on the ceiling indicates where she has begun to dig her own passage out. She is much too large to fit through the narrow entrance to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "West": {
+                    "description": "A constricted tunnel leads to Blue's Antechamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41038"
+                }
+            }
+        },
+        {
+            "id": "41040",
+            "name": "A Bend in the Blue Tunnel",
+            "description": "Hive Workers must have spent weeks smoothing and polishing this passage to perfection.  You are distracted from your reflections by a carrion tainted breeze that fills the area, causing you to gag.  The tunnel continues to the south and the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The polished tunnel leads to an intersection just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41032"
+                },
+                "South": {
+                    "description": "The terrible smell seems to be coming from this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41041"
+                }
+            }
+        },
+        {
+            "id": "41041",
+            "name": "An Antechamber",
+            "description": "The passage has been slightly widened to form a small antechamber.  It has not been very well attended by the Hive workers.  Trash has built up in the corners and cast-off flakes lie loose on the floor.  Another small chamber is to your west or you can follow the tunnel north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "It might be safer to go back north into this lovely tunnel. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41040"
+                },
+                "West": {
+                    "description": "The awful stench seeps from the chamber just ahead! Listening carefully, you detect a low chewing sound. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41042"
+                }
+            }
+        },
+        {
+            "id": "41042",
+            "name": "A Drone's Chamber",
+            "description": "The dark, malevolent blue light pulsates in time with a chewing sound. Hiver body parts lie strewn about the room.  A few legs rest against the west wall and you recognize a wing-case pressed into the floor.  You can exit this chamber of cannibalism to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A concealed line outlines a plug-like door. ",
+                    "keyword": "plug line",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41025"
+                },
+                "East": {
+                    "description": "The air is much fresher in the Antechamber! ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41041"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "parts",
+                        "body",
+                        "legs",
+                        "wing-case"
+                    ],
+                    "text": "The green coloration has nearly faded from the dismembered pieces. "
+                },
+                {
+                    "keywords": [
+                        "line",
+                        "plug",
+                        "concealed"
+                    ],
+                    "text": "The Blue Drone evidently tried to conceal his secret passage. He hasn't done a very good job. Of course, tunnelling isn't exactly his main purpose in life. "
+                }
+            ]
+        },
+        {
+            "id": "41043",
+            "name": "An Opalescent Tunnel",
+            "description": "Milky pale gems line the walls of the tunnel.  The air is damp and heavy with moisture.  A soft sussing sound slips past your ears from an indeterminate direction.  More passages branch to the north, the east, and the west. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41052"
+                },
+                "East": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41045"
+                },
+                "West": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41049"
+                },
+                "Up": {
+                    "description": "A rough plug of earth opens up like a hatch. ",
+                    "keyword": "plug door trapdoor",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41012"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gem",
+                        "gems",
+                        "milky"
+                    ],
+                    "text": "Eyes, plucked from various Hivers, gleam with gem-like facets from the walls. Their light waxes and wanes in concert. Even now, these Hivers work together in perfect cooperation. "
+                }
+            ]
+        },
+        {
+            "id": "41044",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41045",
+            "name": "An Opalescent Tunnel",
+            "description": "Faint flecks of light dance through the gems on the walls in time to the soft breathy sussurations passing out of the chambers that lie to your north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Sauna-like air sweeps over you relentlessly as it escapes the close confines of the chamber just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41046"
+                },
+                "South": {
+                    "description": "Sauna-like air sweeps over you relentlessly as it escapes the close confines of the chamber just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41047"
+                },
+                "West": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41043"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gem",
+                        "gems",
+                        "milky"
+                    ],
+                    "text": "Eyes, plucked from various Hivers, gleam with gem-like facets from the walls. Their light waxes and wanes in concert. Even now, these Hivers work together in perfect cooperation. "
+                }
+            ]
+        },
+        {
+            "id": "41046",
+            "name": "A Nursery",
+            "description": "The humidity and heat of this room almost overwhelm you as you enter.  Egg sacks rest atop tiers of earth along the sides of the room.  There's not room for many more.  Grub-like Hiver larvae swarm over food in a small pit.  You can find relief from the steam by exiting south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "A convection current sweeps cooler air into the nursery from the Opalescent Tunnels. You bask in the relief from the sauna-like atmosphere and wish you had a few less clothes on. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41045"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "egg",
+                        "eggs",
+                        "egg-sacks",
+                        "sacks"
+                    ],
+                    "text": "They feel warm to the touch and shift beneath your hand as though the unborn larvae can sense your presence. "
+                },
+                {
+                    "keywords": [
+                        "larvae",
+                        "larva",
+                        "swarm"
+                    ],
+                    "text": "Newly hatched and still wet from the egg-casing, these larvae are ravenous. "
+                }
+            ]
+        },
+        {
+            "id": "41047",
+            "name": "A Nursery",
+            "description": "Huge chrysali are suspended from the ceiling by narrow strands of chitin. They dwarf the Hiver Nurses tending to them.  Several of the hardened metamorphosis cases swing about on their anchors as though the young are impatient to emerge into adulthood. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A convection current sweeps cooler air into the nursery from the Opalescent Tunnels. You bask in the relief from the sauna-like atmosphere and wish you were wearing fewer clothes. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41045"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "chrysali",
+                        "chrysalis",
+                        "cases"
+                    ],
+                    "text": "The pearly chrysali are warm to the touch. "
+                }
+            ]
+        },
+        {
+            "id": "41048",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41049",
+            "name": "An Opalescent Tunnel",
+            "description": "Faint flecks of light dance through the gems on the walls in time to the soft breathy sussurations passing out of the chambers that lie to your north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Sauna-like air sweeps over you relentlessly as it escapes the close confines of the chamber just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41050"
+                },
+                "East": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41043"
+                },
+                "South": {
+                    "description": "Sauna-like air sweeps over you relentlessly as it escapes the close confines of the chamber just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41051"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gem",
+                        "gems",
+                        "milky"
+                    ],
+                    "text": "Eyes, plucked from various Hivers, gleam with gem-like facets from the walls. Their light waxes and wanes in concert. Even now, these Hivers work together in perfect cooperation. "
+                }
+            ]
+        },
+        {
+            "id": "41050",
+            "name": "A Nursery",
+            "description": "The room is a mess, filled with the discarded chrysali of newly emerged Hivers.  A few unsuccessful pupae still hang from the ceiling.  One glance at the sheer number of empty chrysali makes you wonder where all these young Hivers have gone. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "A convection current sweeps cooler air into the nursery from the Opalescent Tunnels. You bask in the relief from the sauna-like atmosphere and wish you had were wearing fewer clothes. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41049"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "chrysali",
+                        "chrysalis"
+                    ],
+                    "text": "The discarded chrysali are a vibrant blue-green in color, reminding you of the color of the sky on the clearest winter mornings. Their split sides reveal their construction of overlapping fibers. "
+                },
+                {
+                    "keywords": [
+                        "pupae",
+                        "pupa"
+                    ],
+                    "text": "The hapless offspring remain suspended... their birth-shells transformed by fate into their coffins. "
+                }
+            ]
+        },
+        {
+            "id": "41051",
+            "name": "A Royal Nursery",
+            "description": "Two unusually large egg cases lie in state on an earthen shelf in this muggy room.  A single chrysalis hangs from the ceiling in one corner.  This is quite an exclusive nursery. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41049"
+                },
+                "Down": {
+                    "description": "Several fresh scratches reveal the location of a plug-like trapdoor. ",
+                    "keyword": "plug",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41054"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "egg-cases",
+                        "egg-case",
+                        "egg",
+                        "eggs"
+                    ],
+                    "text": "All the colors of the rainbow ripple across the surface of the cases in quick succession as the unborn larvae squirm and twist, locked in the dreams of the restless. "
+                },
+                {
+                    "keywords": [
+                        "chrysalis"
+                    ],
+                    "text": "The pearly chrysalis is vaguely tinted with red. It is warm to the touch and throbs softly beneath your fingers, pulsating with the beat of the Hive. "
+                }
+            ]
+        },
+        {
+            "id": "41052",
+            "name": "An Opalescent Tunnel",
+            "description": "Faint flecks of light dance through the gems on the walls.  A breath of sultry air from the chamber to your north caresses your face. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Warm air blows from the darkness ahead of you. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41053"
+                },
+                "South": {
+                    "description": "Multi-colored light fleck the walls of the Opalescent Tunnel ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41043"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gem",
+                        "gems",
+                        "milky"
+                    ],
+                    "text": "Eyes, plucked from various Hivers, gleam with gem-like facets from the walls. Their light waxes and wanes in concert. Even now, these Hivers work together in perfect cooperation. "
+                }
+            ]
+        },
+        {
+            "id": "41053",
+            "name": "An Unfinished Nursery",
+            "description": "If the rest of the Hive is any indication, no Hiver would ever consider this room ready for occupation.  Rough walls and mounds of unmolded dirt mark this room as incomplete. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "The multi-colored flecks of the Opalescent Tunnel twinkle invitingly. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41052"
+                }
+            }
+        },
+        {
+            "id": "41054",
+            "name": "A Prismatic Tunnel",
+            "description": "The Hivers have taken special care to smooth this tunnel to perfection. You cannot detect any bumps or flaws in its construction.  Clear white gems throw cascades of red, yellow, green, and blue around the room. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "Whispers echo through the chamber to your south, then die out on a breath of stale air. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41055"
+                },
+                "Up": {
+                    "description": "A rough plug of earth can be opened like a hatch. ",
+                    "keyword": "plug rough hatch earth",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41051"
+                }
+            }
+        },
+        {
+            "id": "41055",
+            "name": "The Faded Hall",
+            "description": "Dull gray crystals absorb what little light reaches the wall.  Dry, dusty air clogs your nostrils as you move through the room.  Bare earth is visible through large cracks in the plant fiber coating. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Brilliant prisms of light  shower through the hall ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41054"
+                },
+                "East": {
+                    "description": "A dark bulk lies next to a smaller one in the corner ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41057"
+                },
+                "South": {
+                    "description": "Only the rustle of your movements disturbs the stale air in this faded hall to your south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41058"
+                }
+            }
+        },
+        {
+            "id": "41056",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41057",
+            "name": "The Chamber of the Dead",
+            "description": "The immense bulk of a Hiver Queen's colorless corpse overshadows your insignificant presence.  The dried husk gazes at you through darkened lenses. One antenna waves slowly back and forth with the movement of the dusty air in the chamber.  The lesser corpse of her Attendant lies at her side. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "No breath of air disturbs the sleep of the dead here or to the south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41060"
+                },
+                "West": {
+                    "description": "No breath of air disturbs the sleep of the dead here or to the west. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41055"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "lesser"
+                    ],
+                    "text": "The Attendant's body has been violently dismembered. It looks like she died in a valiant effort to protect her Queen. "
+                },
+                {
+                    "keywords": [
+                        "husk",
+                        "dead",
+                        "dried"
+                    ],
+                    "text": "Scratches and holes cover the Queen's once magnificent chitin. Stains mark trails where the blood flowed from her body in her final death throes. Her mandibles are locked as though still biting at her attacker. "
+                }
+            ]
+        },
+        {
+            "id": "41058",
+            "name": "The Faded Hall",
+            "description": "Dull gray crystals absorb what little light reaches the wall.  Dry, dusty air clogs your nostrils as you move through the room.  Bare earth is visible through large cracks in the plant fiber coating. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "Even whispers fall dead in the still air filling the chamber in all directions. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41055"
+                },
+                "East": {
+                    "description": "Shush! You wish you could move in total silence through this chamber. Every slight sound seems a sacrilege. The quiet sense of reverence extends to the east... ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41060"
+                }
+            }
+        },
+        {
+            "id": "41059",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41060",
+            "name": "The Faded Hall",
+            "description": "Dull gray crystals absorb what little light reaches the wall.  Dry, dusty air clogs your nostrils as you move through the room.  Bare earth is visible through large cracks in the plant fiber coating. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A quiet bulk lies in the corner to your north. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41057"
+                },
+                "South": {
+                    "description": "Brilliant prisms of light shower the tunnel with rainbows. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41061"
+                },
+                "West": {
+                    "description": "Not even echoes penetrate the faded gloom ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41058"
+                }
+            }
+        },
+        {
+            "id": "41061",
+            "name": "A Prismatic Tunnel",
+            "description": "The Hivers have taken special care to smooth this tunnel to perfection. You cannot detect any bumps or flaws in its construction.  Clear white gems throw cascades of red, yellow, green, and blue around the room. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "All sounds seem to be absorbed into quiet reverence in the large hall ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41060"
+                },
+                "Up": {
+                    "description": "A rough plug of earth can be opened like a hatch. ",
+                    "keyword": "plug rough hatch earth",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41062"
+                }
+            }
+        },
+        {
+            "id": "41062",
+            "name": "A Prismatic Tunnel",
+            "description": "One pure shaft of red reflections concentrates on the south wall.  A plug in the floor secures this chamber from intruders from below. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "The shaft of red light highlights a narrow opening just the right size for a Hiver leg spur. ",
+                    "keyword": "shaft red light",
+                    "type": "Door",
+                    "key": "41001",
+                    "destination": "41063"
+                },
+                "Down": {
+                    "description": "A rough plug of earth can open like a hatch. ",
+                    "keyword": "plug earth rough down",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "41061"
+                }
+            }
+        },
+        {
+            "id": "41063",
+            "name": "A Prismatic Tunnel",
+            "description": "Sparkling triangles of crystal-clear chitin radiate a rainbow of colors. One pure yellow figure glows brightly on the east wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A red crystal plug blocks your passage. ",
+                    "keyword": "plug north red shaft crystal",
+                    "type": "Door",
+                    "key": "41001",
+                    "destination": "41062"
+                },
+                "East": {
+                    "description": "One glowing yellow triangle is pierced by a narrow opening just the right size for a Hiver leg spur. ",
+                    "keyword": "triangle figure yellow",
+                    "type": "Door",
+                    "key": "41002",
+                    "destination": "41064"
+                }
+            }
+        },
+        {
+            "id": "41064",
+            "name": "A Prismatic Tunnel",
+            "description": "Sparkling triangles of crystal-clear chitin radiate a rainbow of colors.  A bright green starburst highlights the south wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "A brilliant green starburst shimmers above a narrow opening just the right size for a Hiver leg spur. ",
+                    "keyword": "starburst green",
+                    "type": "Door",
+                    "key": "41003",
+                    "destination": "41065"
+                },
+                "West": {
+                    "description": "A yellow crystal plug blocks your passage. ",
+                    "keyword": "plug triangle figure yellow west crystal",
+                    "type": "Door",
+                    "key": "41002",
+                    "destination": "41063"
+                }
+            }
+        },
+        {
+            "id": "41065",
+            "name": "A Prismatic Tunnel",
+            "description": "Rainbow hued motes of light twinkle like stars all around you.  A dusting of pale blue glimmers on the south wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A green crystal plug blocks your passage. ",
+                    "keyword": "plug starburst green north crystal",
+                    "type": "Door",
+                    "key": "41003",
+                    "destination": "41064"
+                },
+                "South": {
+                    "description": "A dusting of blue sparks wink above a narrow opening just the right size for a Hiver leg spur. ",
+                    "keyword": "dusting blue sparks spark",
+                    "type": "Door",
+                    "key": "41004",
+                    "destination": "41066"
+                }
+            }
+        },
+        {
+            "id": "41066",
+            "name": "An Antechamber",
+            "description": "A subdued pulse vibrates through the chamber like the echo of blood running through your veins.  A huge, multi-faceted gem dominates the south wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A blue crystal plug blocks your passage. ",
+                    "keyword": "plug blue dusting crystal north",
+                    "type": "Door",
+                    "key": "41004",
+                    "destination": "41065"
+                },
+                "South": {
+                    "description": "The single large jewel casts rainbows of light about the room. Patterns of green, red, blue, and yellow light cover the walls. Its only flaw is a tiny dark spot in its exact center. ",
+                    "keyword": "jewel multi-faceted faceted huge slot large",
+                    "type": "Door",
+                    "key": "41005",
+                    "destination": "41069"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "spot",
+                        "tiny-spot",
+                        "dark-spot",
+                        "tiny-dark-spot"
+                    ],
+                    "text": "The spot is actually an opening! Something has drilled into the very heart of the gem, creating a hole just the right size for a Hiver to reach inside. "
+                },
+                {
+                    "keywords": [
+                        "gem",
+                        ""
+                    ],
+                    "text": "The single large gem casts rainbows of light about the room. Patterns of green, red, blue, and yellow light cover the walls. Its only flaw is a tiny dark spot in its exact center. "
+                }
+            ]
+        },
+        {
+            "id": "41067",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41068",
+            "name": "An unfinished room",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "CAVE"
+        },
+        {
+            "id": "41069",
+            "name": "A Prismatic Chamber",
+            "description": "The rhythmic pulsations are strong here.  A faint, musty scent reaches you from the west. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "A jewel resembling an eye serves as a door through this wall. ",
+                    "keyword": "jewel eye door north",
+                    "type": "Door",
+                    "key": "41005",
+                    "destination": "41066"
+                },
+                "South": {
+                    "description": "A pulsating throb echoes through the tunnel from the south. It shakes you to the bone as it courses through your body. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41072"
+                },
+                "West": {
+                    "description": "Nothing is visible in the chamber to the west. No sound, no scent, no light. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41070"
+                }
+            }
+        },
+        {
+            "id": "41070",
+            "name": "The Chamber of Honor",
+            "description": "The body of a mighty drone lies in state.  Even in death, the prismatic father has an air of quiet nobility. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A sparkling tunnel lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41069"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem"
+                    ],
+                    "text": "On closer examination, you realize they aren't gems at all. They are the faceted eyes of Hivers. "
+                },
+                {
+                    "keywords": [
+                        "drone",
+                        "prismatic",
+                        "father",
+                        "body"
+                    ],
+                    "text": "The father of the race sleeps peacefully in death. No hint of violence mars his body. "
+                }
+            ]
+        },
+        {
+            "id": "41071",
+            "name": "A Prismatic Chamber",
+            "description": "Tiny prisms are embedded on every surface in the chamber.  A mighty hill of gems dominates the center of the room and throbs deeply -- reverberating through your body in time with the life force of the Hive. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "A sparkling tunnel lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41072"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "gems",
+                        "gem"
+                    ],
+                    "text": "On closer examination, you realize they aren't gems at all. They are the faceted eyes of Hivers. "
+                }
+            ]
+        },
+        {
+            "id": "41072",
+            "name": "A Prismatic Chamber",
+            "description": "The beat is so strong that you feel it vibrating through your bones.  You must be nearing the very heart of the Hive. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "An extension of this tunnel ends in a wall ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41069"
+                },
+                "East": {
+                    "description": "A sweet scent fills your nostrils from this darkened chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41073"
+                },
+                "West": {
+                    "description": "The booming pulsations rattle you to the core as they wash over you from this vast chamber. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41071"
+                }
+            }
+        },
+        {
+            "id": "41073",
+            "name": "The Queen's Larder",
+            "description": "Specially preserved wax packages of food fill the hive mother's private larder to maximum capacity.  No one could ever starve this Queen from her hive! ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "West": {
+                    "description": "A sparkling tunnel lies just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41072"
+                }
+            }
+        },
+        {
+            "id": "41090",
+            "name": "A Narrow Break",
+            "description": "You find yourself pressed into a narrow break in the seemingly impenetrable forest wall just north of the Farmer's Row.  Something large has formed the gap but managed to conceal it fairly well.  The break continues to the east. ",
+            "flags": [
+                "NOMOB",
+                "NOTRACK"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "East": {
+                    "description": "The narrow break continues ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41091"
+                },
+                "South": {
+                    "description": "You can see Farmer's Row through a thin line of concealing brush. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8009"
+                }
+            }
+        },
+        {
+            "id": "41091",
+            "name": "A Narrow Break",
+            "description": "Something large has carefully cut branches from this thick forest to form a low, narrow pathway.  You find yourself ducking in reflex to prevent a nasty bump on the head.  The break continues west and twists off to the north. ",
+            "flags": [
+                "NOMOB",
+                "NOTRACK"
+            ],
+            "sector": "FOREST",
+            "exits": {
+                "North": {
+                    "description": "The break narrows ahead to your north, but you see light streaming through the branches in the distance. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41092"
+                },
+                "West": {
+                    "description": "The break continues to the west. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41090"
+                }
+            }
+        },
+        {
+            "id": "41092",
+            "name": "A Narrow Break",
+            "description": "Cut branches press in from all sides as the break narrows.  To the south, it twists around a turn.  To the north, light streams down into a clearing.  It looks like whoever made this break tried to conceal that, too. ",
+            "flags": [],
+            "sector": "FOREST",
+            "exits": {
+                "North": {
+                    "description": "Woven branches obscure your view of the clearing ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41001"
+                },
+                "South": {
+                    "description": "The break twists away. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41091"
+                }
+            }
+        }
+    ]
+}

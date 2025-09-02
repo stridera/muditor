@@ -1,0 +1,3166 @@
+{
+    "zone": {
+        "id": "495",
+        "name": "Nymrill",
+        "top": 49599,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 49562,
+                    "max": 1,
+                    "room": 49562,
+                    "name": "(Traek)",
+                    "carrying": [
+                        {
+                            "id": 526,
+                            "max": 50,
+                            "name": "(a vest of shards)"
+                        },
+                        {
+                            "id": 527,
+                            "max": 50,
+                            "name": "(a knotted shield)"
+                        }
+                    ]
+                },
+                {
+                    "id": 49500,
+                    "max": 1,
+                    "room": 49500,
+                    "name": "(a dark, cloaked woman)"
+                },
+                {
+                    "id": 49525,
+                    "max": 1,
+                    "room": 49525,
+                    "name": "(the master thief)"
+                },
+                {
+                    "id": 49522,
+                    "max": 1,
+                    "room": 49522,
+                    "name": "(the dark archmage)"
+                },
+                {
+                    "id": 49503,
+                    "max": 1,
+                    "room": 49521,
+                    "name": "(Driceme'y)",
+                    "carrying": [
+                        {
+                            "id": 3059,
+                            "max": 50,
+                            "name": "(a clear potion of remove poison)"
+                        },
+                        {
+                            "id": 3053,
+                            "max": 50,
+                            "name": "(a scroll of remove curse)"
+                        },
+                        {
+                            "id": 3050,
+                            "max": 50,
+                            "name": "(a scroll of identify)"
+                        },
+                        {
+                            "id": 3058,
+                            "max": 50,
+                            "name": "(a blue scroll of recall)"
+                        },
+                        {
+                            "id": 3057,
+                            "max": 50,
+                            "name": "(a green scroll of recall)"
+                        },
+                        {
+                            "id": 3056,
+                            "max": 50,
+                            "name": "(a red scroll of recall)"
+                        },
+                        {
+                            "id": 3220,
+                            "max": 50,
+                            "name": "(a bound scroll)"
+                        },
+                        {
+                            "id": 1029,
+                            "max": 50,
+                            "name": "(&0&3a spellbook&0)"
+                        }
+                    ]
+                },
+                {
+                    "id": 49514,
+                    "max": 1,
+                    "room": 49514,
+                    "name": "(a dark undead man)"
+                },
+                {
+                    "id": 49501,
+                    "max": 1,
+                    "room": 49504,
+                    "name": "(a vague figure)",
+                    "carrying": [
+                        {
+                            "id": 3025,
+                            "max": 50,
+                            "name": "(a flail)"
+                        },
+                        {
+                            "id": 3024,
+                            "max": 50,
+                            "name": "(a warhammer)"
+                        },
+                        {
+                            "id": 3020,
+                            "max": 50,
+                            "name": "(a dagger)"
+                        },
+                        {
+                            "id": 49500,
+                            "max": 25,
+                            "name": "(the black-ice sword)"
+                        },
+                        {
+                            "id": 49501,
+                            "max": 25,
+                            "name": "(the black-ice dagger)"
+                        },
+                        {
+                            "id": 49502,
+                            "max": 25,
+                            "name": "(the black-ice flail)"
+                        }
+                    ]
+                },
+                {
+                    "id": 49506,
+                    "max": 4,
+                    "room": 49533,
+                    "name": "(Guardian of Tresyn)"
+                },
+                {
+                    "id": 49505,
+                    "max": 1,
+                    "room": 49552,
+                    "name": "(Tremlece)"
+                },
+                {
+                    "id": 49502,
+                    "max": 8,
+                    "room": 49501,
+                    "name": "(a dryken)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 49525,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49524,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49520,
+                    "direction": "East",
+                    "state": [
+                        "HIDDEN"
+                    ]
+                },
+                {
+                    "room": 49517,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49519,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49515,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49501,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49511,
+                    "direction": "Up",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 49510,
+                    "direction": "Down",
+                    "state": [
+                        "CLOSED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 49500,
+            "keywords": "woman receptionist dark cloaked",
+            "mob_class": "Necromancer",
+            "short_desc": "a dark, cloaked woman",
+            "long_desc": "A fragile looking woman stands waiting here.",
+            "desc": "A jestful gleam emits from under the woman's cloak, that barely covers her face. She seems young, perhaps early twenties, and doesn't seem to show much motion. She stands vigilantly in front of the darkened path, perhaps it leads to the rooms.  She has long black hair and pale white skin, beautiful and silent.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE"
+            ],
+            "alignment": -1000,
+            "level": 99,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 5,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 30
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 80,
+                "intelligence": 85,
+                "wisdom": 82,
+                "dexterity": 84,
+                "constitution": 64,
+                "charisma": 58
+            },
+            "perception": 1000,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49501,
+            "keywords": "man form vague apparition figure",
+            "mob_class": "Warrior",
+            "short_desc": "a vague figure",
+            "long_desc": "A form of a man stands here without motion.",
+            "desc": "Standing behind the counter is but a apparition of form.  About six feet high, he is of well forged stock.  Broad shoulders and thick chest suggest this man is no stranger to work.  A grey cloak grips his body, as his hood shades any light from his face.  Though his eyes hidden, an odd feeling of \"omniscient\" fills the room.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC"
+            ],
+            "effect_flags": [
+                "PROTECT_GOOD"
+            ],
+            "alignment": -1000,
+            "level": 80,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 88,
+                "intelligence": 62,
+                "wisdom": 71,
+                "dexterity": 88,
+                "constitution": 81,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49502,
+            "keywords": "dryken feeble old man",
+            "mob_class": "Sorcerer",
+            "short_desc": "a dryken",
+            "long_desc": "A feeble old man stands silently here.",
+            "desc": "Silent and still, like a living walking painting.  The man stands just over six feet, dawning an old grey robe that flows towards the ground.  Simple and strange, this old man appears very fragile and weak.  He is bald and his skin wrinkled, appearing more fit to be lying down than walking.  His face stares into nothingness, as his eyes unknown because they are simply gone.  Yet a vigilant presence trembles not like a blind man, but stands like a warrior.  ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "NOSUMMON"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "PROTECT_GOOD"
+            ],
+            "alignment": -1000,
+            "level": 80,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 76,
+                "intelligence": 78,
+                "wisdom": 84,
+                "dexterity": 76,
+                "constitution": 72,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49503,
+            "keywords": "driceme'y figure man",
+            "mob_class": "Sorcerer",
+            "short_desc": "Driceme'y",
+            "long_desc": "A barely noticable figure rest in the shadows.",
+            "desc": "The man stands about six feet in height and yet he doesn't appear to be broad under that thick cloak.  His eyes must be as black as the shadows for they cannot be seen.  However his hands show his bright white skin, as if he hasn't seen the sun in a lifetime.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOSUMMON",
+                "NOBASH"
+            ],
+            "effect_flags": [
+                "PROTECT_GOOD"
+            ],
+            "alignment": -1000,
+            "level": 80,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 72,
+                "intelligence": 76,
+                "wisdom": 86,
+                "dexterity": 72,
+                "constitution": 72,
+                "charisma": 75
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49504,
+            "keywords": "man figure thin traek",
+            "mob_class": "Warrior",
+            "short_desc": "Traek",
+            "long_desc": "A thin figure of a man rest in the shadows here.",
+            "desc": "Motionless and appearing still-life, a reflection of light gleams back from his eyes.  An aura of fear inhabits the air, only exceeded by a sharp painful feeling of withdrawal.  He must be the shopkeeper or at least the only other form of life in this room.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOSUMMON"
+            ],
+            "effect_flags": [
+                "PROTECT_GOOD"
+            ],
+            "alignment": -1000,
+            "level": 90,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 3,
+                "size": 0,
+                "bonus": 2
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 66,
+                "wisdom": 76,
+                "dexterity": 84,
+                "constitution": 82,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49505,
+            "keywords": "woman elf tremlece",
+            "mob_class": "Layman",
+            "short_desc": "Tremlece",
+            "long_desc": "A beautiful woman elf feebly stands chained here to the wall. ",
+            "desc": "From the clouded complexion of dirt and ash, it is obvious she has been here for some time.  Even through her remarkable beauty, she appears possessed by the gleam in her eyes.  With long black hair and stunning blue eyes she has a smile; yet something else seems to be on her mind other than happiness to view another.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOSUMMON",
+                "NOBASH"
+            ],
+            "effect_flags": [
+                "INVISIBLE",
+                "DETECT_INVIS",
+                "PROTECT_EVIL"
+            ],
+            "alignment": 0,
+            "level": 65,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 1,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 95,
+                "intelligence": 58,
+                "wisdom": 82,
+                "dexterity": 70,
+                "constitution": 88,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 49506,
+            "keywords": "guardian guardian-tresyn large-suit-armor monster",
+            "mob_class": "Warrior",
+            "short_desc": "Guardian of Tresyn",
+            "long_desc": "A very large suit of armor stands in silence.",
+            "desc": "Truly startling to anyone who has not laid eyes on this before.  Standing at least nine feet tall this monster is nearly a small building within itself. The armor doesn't appear to be occupied, though to be sure is to be too brave. The metal is crafted by hand by the looks and thicker than some doors are.  It holds a monstrous sword in its hands facing tip down and standing sentinel, awaiting or guarding something.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGR_GOOD",
+                "AGGR_NEUTRAL",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOBASH"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "PROTECT_GOOD",
+                "STONE_SKIN"
+            ],
+            "alignment": -1000,
+            "level": 95,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": -10,
+            "hit_roll": 6,
+            "damage_dice": {
+                "num": 5,
+                "size": 0,
+                "bonus": 12
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 19,
+            "race_align": 1,
+            "size": 5,
+            "stats": {
+                "strength": 86,
+                "intelligence": 64,
+                "wisdom": 78,
+                "dexterity": 80,
+                "constitution": 80,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Demonic",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "WHIP"
+        },
+        {
+            "id": 49514,
+            "keywords": "necromancer guildmaster figure man",
+            "mob_class": "Necromancer",
+            "short_desc": "a dark undead man",
+            "long_desc": "A dark and undead figure sits perfectly still here.",
+            "desc": "Sitting completely still, this large impossing creature, for he does not seem to be a man, seems almost completely lifeless. His skin is a pale white while his eyes are nothing more than darkened spheres.  His garb is nothing more than a tattered black robe, although even that adds to his undead presence.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOSUMMON",
+                "TEACHER"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS"
+            ],
+            "alignment": 0,
+            "level": 90,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 72,
+                "intelligence": 90,
+                "wisdom": 84,
+                "dexterity": 73,
+                "constitution": 69,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49522,
+            "keywords": "sorcerer guildmaster woman mage",
+            "mob_class": "Sorcerer",
+            "short_desc": "the dark archmage",
+            "long_desc": "A dark and ghastly mage stares blankly at some symbols on the walls.",
+            "desc": "Dressed in a long black robe, this woman is obviously of great power and understanding, for the aura surrounding her body demands respect. Even with her great power, she seems as though she is no longer in her right mind, for all she does is stare blankly at the walls.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOSUMMON",
+                "TEACHER"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS"
+            ],
+            "alignment": 0,
+            "level": 99,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 74,
+                "intelligence": 88,
+                "wisdom": 88,
+                "dexterity": 70,
+                "constitution": 68,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49525,
+            "keywords": "thief guildmaster man figure",
+            "mob_class": "Thief",
+            "short_desc": "the master thief",
+            "long_desc": "A cloaked figure sits behind the fire here.",
+            "desc": "Completely hidden behind his cloak, this figure sit next to the fire, occationally tending to it, maintaining it's dark glow. Through his dark grab, the occational eye can be seen peeking out in notice of others that enter or exits his view.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOSUMMON"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE"
+            ],
+            "alignment": 0,
+            "level": 99,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 78,
+                "intelligence": 74,
+                "wisdom": 70,
+                "dexterity": 86,
+                "constitution": 84,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 49562,
+            "keywords": "man figure thin traek",
+            "mob_class": "Warrior",
+            "short_desc": "Traek",
+            "long_desc": "A thin figure of a man rest in the shadows here.",
+            "desc": "Motionless and appearing still-life, a reflection of light gleams back from his eyes.  An aura of fear inhabits the air, only exceeded by a sharp painful feeling of withdrawal.  He must be the shopkeeper or at least the only other form of life in this room.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY",
+                "NOSUMMON"
+            ],
+            "effect_flags": [],
+            "alignment": -1000,
+            "level": 99,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 90,
+                "intelligence": 68,
+                "wisdom": 81,
+                "dexterity": 79,
+                "constitution": 81,
+                "charisma": 52
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Undead",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 49500,
+            "type": "WEAPON",
+            "keywords": [
+                "sword",
+                "black-ice-sword",
+                "dim-blade"
+            ],
+            "short": "the black-ice sword",
+            "ground": "A dim blade is barely visible here.",
+            "action_desc": "Nothing.",
+            "extras": [
+                {
+                    "keywords": [
+                        "sword",
+                        "black-ice-sword",
+                        "dim-blade"
+                    ],
+                    "text": "The blade is light, even though this is a long-sword.  A fine edge and a leather wrapped handle.  The blade is a dim black, excellent to remove glare if one were in need to sneak."
+                }
+            ],
+            "values": {
+                "HitRoll": 2,
+                "Hit Dice": {
+                    "num": "4",
+                    "size": "4",
+                    "bonus": 0
+                },
+                "Average": 10.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "NODROP",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "NOSELL",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER"
+            ],
+            "weight": 4.0,
+            "cost": 35000,
+            "timer": 0,
+            "level": 55,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 49501,
+            "type": "WEAPON",
+            "keywords": [
+                "dagger",
+                "black-ice-dagger",
+                "knife"
+            ],
+            "short": "the black-ice dagger",
+            "ground": "A dagger here has been abandoned.",
+            "action_desc": "Nothing.",
+            "extras": [
+                {
+                    "keywords": [
+                        "dagger",
+                        "black-ice-dagger",
+                        "knife"
+                    ],
+                    "text": "Small but solid, this little dagger with its blackened blade seems like it could do some tragic damage.  A hand-wound leather handle allows a firm grip on the blade, and being black there would be no shine even during light."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "4",
+                    "size": "4",
+                    "bonus": 0
+                },
+                "Average": 10.0,
+                "Damage Type": "PIERCE"
+            },
+            "flags": [
+                "NODROP",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "NOSELL",
+                "NOBURN"
+            ],
+            "weight": 0.7,
+            "cost": 30000,
+            "timer": 0,
+            "level": 55,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 2
+                },
+                {
+                    "location": "DEX",
+                    "modifier": -3
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 49502,
+            "type": "WEAPON",
+            "keywords": [
+                "flail",
+                "black-ice-flail",
+                "shadow-ball-chain"
+            ],
+            "short": "the black-ice flail",
+            "ground": "A shadow of a ball and chain lie here.",
+            "action_desc": "Nothing.",
+            "extras": [
+                {
+                    "keywords": [
+                        "flail",
+                        "black-ice-flail",
+                        "shadow-ball-chain"
+                    ],
+                    "text": "Light but sturdy this flail is viewed anything but worthless.  Even spikes reach from atop the handle to bash an enemy that is to close for the spike. The spike is quite a large ball of protruding lengthy and wide needles, close to a spear tip.  All black, at night one may not even see the weapon coming."
+                }
+            ],
+            "values": {
+                "HitRoll": 3,
+                "Hit Dice": {
+                    "num": "4",
+                    "size": "5",
+                    "bonus": 0
+                },
+                "Average": 12.5,
+                "Damage Type": "BLUDGEON"
+            },
+            "flags": [
+                "NODROP",
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "NOSELL",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN"
+            ],
+            "weight": 6.0,
+            "cost": 30000,
+            "timer": 0,
+            "level": 55,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": -5
+                },
+                {
+                    "location": "WIS",
+                    "modifier": 3
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": [
+        {
+            "id": 49500,
+            "selling": {
+                "1110": 0,
+                "1152": 1701603656,
+                "1151": 117486848,
+                "1143": 25
+            },
+            "buy_profit": 1.0,
+            "sell_profit": 1.0,
+            "accepts": [],
+            "no_such_item1": "%s I do not have what thou ask for.",
+            "no_such_item2": "%s Thou has not such an item.",
+            "do_not_buy": "%s Alas i do not trade in such items.",
+            "missing_cash1": "%s I cannot afford such at this time.",
+            "missing_cash2": "%s Thou hast not the money, thee sucks!",
+            "message_buy": "%s I sure it is a pleasure for though do deal business with me.",
+            "message_sell": "%s Leave now before i remove thou internal organs.",
+            "temper1": 0,
+            "flags": [],
+            "keeper": 49504,
+            "trades_with": [
+                "TRADE_NOGOOD"
+            ],
+            "rooms": [],
+            "hours": [
+                {
+                    "open": 0,
+                    "close": 28
+                }
+            ]
+        },
+        {
+            "id": 49504,
+            "selling": {
+                "3025": 0,
+                "3024": 0,
+                "3020": 0,
+                "49500": 0,
+                "49501": 0,
+                "49502": 0
+            },
+            "buy_profit": 2.0,
+            "sell_profit": 0.25,
+            "accepts": [],
+            "no_such_item1": "%s Sorry, I don't stock that item.",
+            "no_such_item2": "%s You don't seem to have that.",
+            "do_not_buy": "%s I don't trade in such items.",
+            "missing_cash1": "%s No! Dont make me cry!",
+            "missing_cash2": "%s You are too poor!",
+            "message_buy": "%s Just take it and go!",
+            "message_sell": "%s Thanks for sucking life out of my day.",
+            "temper1": 0,
+            "flags": [
+                "WILL_BANK_MONEY"
+            ],
+            "keeper": 49501,
+            "trades_with": [],
+            "rooms": [
+                49504
+            ],
+            "hours": [
+                {
+                    "open": 0,
+                    "close": 28
+                }
+            ]
+        },
+        {
+            "id": 49521,
+            "selling": {
+                "3050": 0,
+                "3058": 0,
+                "3057": 50331675,
+                "3056": 25,
+                "3220": -1,
+                "1029": 218,
+                "3053": 117440512,
+                "3059": 25
+            },
+            "buy_profit": 1.0,
+            "sell_profit": 1.0,
+            "accepts": [],
+            "no_such_item1": "%s I carry not such an item.",
+            "no_such_item2": "%s Thou dost not have the item!",
+            "do_not_buy": "%s I do not wish to trade with someone who has bad breath.",
+            "missing_cash1": "%s No money, my wife the whore took it.",
+            "missing_cash2": "%s You are going to burn in hades with no money!",
+            "message_buy": "%s If this doesn't work I shall hunt thee down and remove thy spine!",
+            "message_sell": "%s Take this and begone, I tire of thee.",
+            "temper1": 0,
+            "flags": [
+                "WILL_START_FIGHT"
+            ],
+            "keeper": 49503,
+            "trades_with": [],
+            "rooms": [
+                49521
+            ],
+            "hours": [
+                {
+                    "open": 0,
+                    "close": 28
+                }
+            ]
+        },
+        {
+            "id": 49562,
+            "selling": {
+                "49503": 0,
+                "49504": 0
+            },
+            "buy_profit": 1.0,
+            "sell_profit": 1.0,
+            "accepts": [],
+            "no_such_item1": "%s Sorry, don't have it. Now get out!",
+            "no_such_item2": "%s You dont even have it you freak!",
+            "do_not_buy": "%s I don't trade in such items.",
+            "missing_cash1": "%s I can't afford that!",
+            "missing_cash2": "%s Go to hades!",
+            "message_buy": "%s Thank you and please leave now.",
+            "message_sell": "%s You got it now leave!",
+            "temper1": 0,
+            "flags": [
+                "WILL_START_FIGHT"
+            ],
+            "keeper": 49562,
+            "trades_with": [],
+            "rooms": [
+                49562
+            ],
+            "hours": [
+                {
+                    "open": 0,
+                    "close": 28
+                }
+            ]
+        },
+        {
+            "id": 49563,
+            "selling": {
+                "49503": 0,
+                "49504": 0
+            },
+            "buy_profit": 1.0,
+            "sell_profit": 1.0,
+            "accepts": [],
+            "no_such_item1": "%s Sorry, I don't stock that item.",
+            "no_such_item2": "%s You don't seem to have that.",
+            "do_not_buy": "%s I don't trade in such items.",
+            "missing_cash1": "%s I can't afford that!",
+            "missing_cash2": "%s You are too poor!",
+            "message_buy": "%s, Thanks for the deal.",
+            "message_sell": "%s, Good doing business with you.",
+            "temper1": 0,
+            "flags": [
+                "WILL_BANK_MONEY"
+            ],
+            "keeper": 49522,
+            "trades_with": [],
+            "rooms": [
+                49562
+            ],
+            "hours": [
+                {
+                    "open": 0,
+                    "close": 28
+                }
+            ]
+        }
+    ],
+    "triggers": [
+        {
+            "id": 49500,
+            "name": "Outside temple sounds",
+            "attach_type": "Mobile",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 3s wsend %actor% Sounds of chains and grunts rasp outwards from the temple entrance. "
+        },
+        {
+            "id": 49501,
+            "name": "Stairyway sound trig",
+            "attach_type": "Mobile",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 2s wsend %actor% The dark mist thickens as the shallow air thrust upwards from the deepening stairway. "
+        },
+        {
+            "id": 49502,
+            "name": "Transfer trig, 49531",
+            "attach_type": "Mobile",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "west w",
+            "commands": "if %actor.vnum% == -1 if %actor.class% /= Necromancer || Anti-Paladin || Thief || Assassin || Mercenary if %actor.align% < -349 wsend %actor% Reality blurs and melts as you find yourself in a more dark and confined place. wteleport %actor% 49533 else wsend %actor% A cloak of shadow surrounds your being, choking your very breathe. Now you awake elsewhere. wteleport %actor% 3002 endif endif endif "
+        },
+        {
+            "id": 49503,
+            "name": "Auto door opener",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "I am child of Borgan!",
+            "commands": "if %actor.class% /= Necromancer wdoor 49513 up room 49514 wecho With a terrifying crash the ceiling above falls downward, ceasing. A stairway leads upwards. wait 20 wdoor 49513 u purge endif "
+        },
+        {
+            "id": 49504,
+            "name": "Transfer trig",
+            "attach_type": "Mobile",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "east e",
+            "commands": "if %actor.vnum% == -1 if %actor.class% /= Priest || Cleric || Paladin || Ranger || Monk || Druid if %actor.align% < +350 wsend %actor% You have no business here in the realm of shadow and death. wsend %actor% You find yourself in a lighter place at peace. wteleport %actor% 3002 endif endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "49500",
+            "name": "Night Laced Inn",
+            "description": "A faint call of sleep beckons forth, as whispers and chants of horrid dark words call to weak souls.  The peaceful solitude of darkness guides gently toward the wayward path into the inn.  The floors are a smooth blackened stone and the ceiling glides along in oddly twisting planks of wood.  The only exit from the entombed room is upwards or simply embrace the whispers and dream with the darkness. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON"
+            ],
+            "sector": "CITY",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49501"
+                }
+            }
+        },
+        {
+            "id": "49501",
+            "name": "A Shaded Path",
+            "description": "Wind roars overhead as it passes through the bleak and lifeless air.  Light is pulled from its domain into a vast plane of nothingness, as it has no place here.  Whispers protrude out of the black sands below.  A few simple buildings stand near within sight: one far west, and at least two in the east.  The outline of a door or gate is apparent towards the north.  Shards of rock and blackened ice litter the ground, mostly broken up into small chunks.  To find the chosen path, one must venture forth, one way. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49515"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49518"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49502"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49500"
+                }
+            }
+        },
+        {
+            "id": "49502",
+            "name": "A Shaded Path",
+            "description": "Darkness coats the unclean as well as the pure.  Little is to be seen, save the glowing mist still glistening from the wisp.  Chants and whispers tear through the darkened winds, riddling weak minds with taints of madness.  Imprints in the sands tread eastward then disappear out of sight.  A grey lining caresses a doorway to the south, illuminating enough just to see solid stone forming the entrance. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49501"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49504"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49503"
+                }
+            }
+        },
+        {
+            "id": "49503",
+            "name": "A Shaded Path",
+            "description": "Without light the lifeless sands are withheld from rebirth and damned from renewal.  Faint footprints move northward pressed into the ground perhaps by sheer weight.  As the wind thrust by it brings about voices flowing from the north, alas the words undefined.  The fragments of street run east to west, with a branch lain northward.  Alas the darkness ensures an absence of view. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49505"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49502"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49563"
+                }
+            }
+        },
+        {
+            "id": "49504",
+            "name": "Shades Weaponry",
+            "description": "Dark and gloomy this place seems inhospitable to be a shop for fine weapons. The room is lain in a harsh black wood and its walls decorated in blood-stained shields and weapons.  Centered in the shop is a tall wooden counter adorned with bones as trim, yielding a tall cloaked man standing behind it.  The element of wind brushes lightly through the room, just enough to disturb the metal for a scrape or two that echoes violently through the otherwise silent halls. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49502"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "shield",
+                        "swords"
+                    ],
+                    "text": "Beautifully crafted these masses of blades and thick shields appear to finely forged, yet it does not look that even one of them hasn't seen battle. "
+                },
+                {
+                    "keywords": [
+                        "counter",
+                        "knobs",
+                        "engravings"
+                    ],
+                    "text": "This is a fine table indeed, wonderfully crafted from a strange wood.  It appears to have been made from one piece of wood, as there isn't one nail or separate piece noticeable. "
+                }
+            ]
+        },
+        {
+            "id": "49505",
+            "name": "The Northern Shade",
+            "description": "Blatant and clear, the simple purity of light is damned before it even reaches the scorched grounds.  The stench within the air is enough for an easy stomach to lose itself, smelling of decaying flesh and spoiled blood.  The spoils of war and thirst for darkness are open as the sea is for the tide.  The streets are littered with a vile presence of dark lust and deepened rage. Faint yet sharp words bleed from voices sounding from afar north.  Footprints lead in stride but without definition to identify.  As the wind brushes the sands, stones are revealed slightly north.  Planted within the sand it may reveal a pathway. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49506"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49503"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "footprints",
+                        "prints",
+                        "tracks"
+                    ],
+                    "text": "About three inches in width and nine in length, the prints are rather large but the winds have worn away their define.  But whatever the creature, it seems to be large because of their depth into the stale sands. "
+                }
+            ]
+        },
+        {
+            "id": "49506",
+            "name": "Outside The Temple",
+            "description": "The shadow of night is dwarfed in the light of the massive blackened structure standing sentinel.  The stone of this temple is darker than the rogue shadows that plague the light.  Standing at least sixty feet in height, it molests the land with its presence.  Leaving a blistering sore within the heart upon laying sight on it.  It stands very firmly within the thrusting winds, giving thought to be deep within the earth.  The stone road becomes more obvious now, lying like a still snake stretching towards the temple door.  The footprints are of more define here, moving through the temple entrance.  The South and Down hold the only exits. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49505"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49507"
+                }
+            }
+        },
+        {
+            "id": "49507",
+            "name": "Temple of Tresyn",
+            "description": "The stale air carries with it a vile darkness that's felt upon the good of heart and embraced by an evil one.  The entrance way leads nearly straight down, dropping at least fifty feet through this long stairway.  Beautifully haunting stonework has been crafted into the walls.  The light seems drawn into the dark stone, making the depictions and writing difficult to see.  Soft whisper and harsh chants fill the air, billowing upwards from below.  The only exit appears up or proceed forward in the darkness. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49506"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49508"
+                }
+            }
+        },
+        {
+            "id": "49508",
+            "name": "Temple of Tresyn",
+            "description": "Echoes, bursting through the hall, shatter the silence of any peaceful mind. The purity of the darkness is soaked into this chamber, as it glazes all around in its rebirth.  A feeling of a sinister presence surrounds the blackened corridors.  A tender glow seeps from the north, drifting with the dark tides of air.  Upwards stretches a lighter sight of the stairway. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49509"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49507"
+                }
+            }
+        },
+        {
+            "id": "49509",
+            "name": "Temple of Tresyn",
+            "description": "In sight are four halls, giving choice to any path.  A gray mist flows along the stone floors, creeping from the east.  The vile presence of evil and hatred rasps through the temple, leaving a taste of filth within the air.  A dark mist prevents any description of sight beyond the dim light confined within this hall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49512"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49513"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49508"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49510"
+                }
+            }
+        },
+        {
+            "id": "49510",
+            "name": "Temple of Tresyn",
+            "description": "A tentative scratching noise reaches upwards from below.  This room is crafted from darkened stone, well pieced together with heavy stone blocks and slabs.  A not so elegant door of metal bars lies downward, along with a subtle glow.  The grey mist has vacated view, leaving the stone floor to be seen. Exit to the east is the only other way out. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49509"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "gate gateway door iron",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49511"
+                }
+            }
+        },
+        {
+            "id": "49511",
+            "name": "The Cell",
+            "description": "The corrupt stillness of life echoes throughout the chamber.  The walls are lined with shelves filled with books.  A fireplace lies along the northern wall resting peacefully.  Standing just a few feet in front of a grate is a small table, littered with a few parchments and an old dried ink quill.  With the gate, this room feels more like a cell than a room, either meant to keep others out or keep what is inside within.  Upwards through the gate is the only visible exit. ",
+            "flags": [
+                "INDOORS",
+                "UNDERDARK"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49510"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "table"
+                    ],
+                    "text": "The table is beautifully crafted out of a very dark wood and uniquely engraved with mythical demons, slaying life before them.  Sitting atop are a few parchments mostly ruined by the damp air and an old fragile ink quill. Only one of the papers seems remotely salvageable. "
+                },
+                {
+                    "keywords": [
+                        "fireplace",
+                        "fire",
+                        "place",
+                        "grate"
+                    ],
+                    "text": "The fireplace is fairly large.  It seems deep within the wall and at least three feet tall.  A small iron grate rest in the center, made for the wood to rest upon. "
+                },
+                {
+                    "keywords": [
+                        "paper",
+                        "parchment"
+                    ],
+                    "text": "Unto my liege I submit my soul, as my brothers and sisters.  The fools have thrust me in this cell and believe I shall stay quaintly.  Foolish they are, and thine souls will be swallowed for such an act.  Borgan my lord hear my cry! Engourge upon the souls of the holy and innocent.  Feast so that we shall sweep the lands and bring the new world into order.  Toturn namei furch behmeo truepki nehas!  Nehas!  Nehas! "
+                }
+            ]
+        },
+        {
+            "id": "49512",
+            "name": "Temple of Tresyn",
+            "description": "The hall ceases here among the earth and broken pieces of wood scattered in the corner.  A drip of water falls, crashing to the floor, along with many brothers and sisters in company and forth coming.  The room is shallow, truly uninviting for those who seek more warming comforts.  There looks to be a broken bed among the rubble of wood with blood-soaked seats.  Quite apparent is that the previous owner shall not be returning.  The temple hall continues south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49509"
+                }
+            }
+        },
+        {
+            "id": "49513",
+            "name": "Temple of Tresyn",
+            "description": "A tribute to the dark powers appears to be all this temple's presence is for. A statue in the far northwest corner of the room grins suggestively as if it had evil plots of its own to play.  Marvelous sparks of light shimmer as they fall from the ceiling, much like rain trickles in the heart of the woods, and as wondrous as a phoenix catching ablaze in it's terrifying wrath.  Grim and daunting a rabid stench of decay fills the air, its source goes unannounced for now.  The statue grins merrily as if it has a word of direction to give to the darkest of souls.  West appears the only way out. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49509"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statue",
+                        "grins"
+                    ],
+                    "text": "With the head of grinning dog, body of a wolf, and wings of a dragon the statue simply invokes imagination and dread as a beast even as small as this statue seems it does not want to be friends.  The eyes seem to be encrusted with large rubies, that glow vibrantly in this dark.  The statue has a small inscription on its left paw: I am child of Borgan! "
+                }
+            ]
+        },
+        {
+            "id": "49514",
+            "name": "Necromancer Guild",
+            "description": "A dark room invaded by roaming spirits describes the obvious.  A magickal black flame somehow emits light; enough to comfortably displace the shadow to view the room.  A displeased looking man sits comfortably on a black stone chair behind the fire.  A golden shimmer of lights sparkles and fades in the light; draped by the spirits thrashing back and forth looking for elsewhere they may venture.  The room appears quite bare other than a simple staff the old man grasp tightly in his left hand. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49513"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "flame",
+                        "black"
+                    ],
+                    "text": "A wondrous feat has been accomplished, it must be so to create such a wonder of magick The flame is as dark as the heart of Tresyn and yet stems light through the shadows of the room.  Not removing, just displacing seemingly showing the flame does not wish to harm any dark. "
+                },
+                {
+                    "keywords": [
+                        "staff"
+                    ],
+                    "text": "Not much of it can be see other than it appears very tall, maybe six feet in length.  With a strange carving at the top it looks to be a head of a grinning dog.  Either stained very deeply and for some time ere crafted from a black wood. "
+                }
+            ]
+        },
+        {
+            "id": "49515",
+            "name": "Temple of Borgan",
+            "description": "A hauntingly peaceful feeling seeps through the lifeless walls in this room. The temple walls must stand at least twenty feet high and span upwards into the darkness.  Two stone gargoyles are resting silently upon ledges protruding from each wall, peering down upon all who enter here.  Glyphs dedicated to the deity Borgan decorate the inner walls of this unholy ground.  The gateway to the south gives way to a shaded path.  Towards the sky is the altar of Borgan. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49501"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49516"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "glyph",
+                        "glyphs"
+                    ],
+                    "text": "The symbol seems strange and unknown, perhaps followers wrote them when dedicating the temple to Borgan. | * * *{ }* -Regno- *{ }* * * | "
+                }
+            ]
+        },
+        {
+            "id": "49516",
+            "name": "Altar of Borgan",
+            "description": "The awing tower spears upwards towards the unreachable heavens.  The tainted walls are coated black in color though its reeks of the unbearable stench of blood.  A tremendous haunting statue lies along the northern wall standing behind the blood-blackened marble altar.  The room centers the statue and alter as the heart of the room.  Sound does not exist in this room, encaging troubled minds with all the horrors that occured here and that would have fallen upon deaf ears.  To the south lies the stairs leading to the temple entrance. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "SOUNDPROOF",
+                "NOWELL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49515"
+                }
+            }
+        },
+        {
+            "id": "49517",
+            "name": "Corridor of Glass",
+            "description": "A beacon streaks from the north, vaguely calling a kind heart to indulge itself in its warmth.  Alas the room seems to encrust that heart with a more darkened matter.  The narrow walkway of black sand gives birth to a calm river of glass.  The sight grips the mind, encasing the thought and view of the water-like flowing glass leading forth into the horrid nights sky.  To the north leads the corridor, the south brings the Shaded Path. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49537"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49519"
+                }
+            }
+        },
+        {
+            "id": "49518",
+            "name": "A Shaded Path",
+            "description": "The street is vague in form, revealing nothing but hardened sand and pieces of ice.  Wind swiftly flies from the north bringing with it a haunting emptiness.  The darkness seems lighter here, merely giving shades and shadows as opposed to hardened night.  The pathway continues east and west holding little viewable eastward.  A brick wall constructed out of the black ice sand stands silently northward, as well as the south. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49519"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49501"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "wall",
+                        "brick",
+                        "bricks"
+                    ],
+                    "text": "Well pieced and done fairly crafted, this wall stands about ten feet tall. Constructed out of whole bricks of black sand it seems very strong to withstand these winds. "
+                }
+            ]
+        },
+        {
+            "id": "49519",
+            "name": "A Shaded Path",
+            "description": "The light in the lamp above flickers and fades, as it dims in and out of existence.  The winds scream as they race along the tops of the buildings.  To the north a dim glow beckons as the shadows plague the crude path.  The shaded pathway travels east and west, running out of sight from here. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49517"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49520"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49518"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "lamp",
+                        "light"
+                    ],
+                    "text": "Appearing to be made from a tarnished brass the light is held upwards by a tall pole.  The pole stands around seven feet and seems to be crafted from a black wood.  The light from the lamp dims and glows brighter, perhaps from the passing winds. "
+                }
+            ]
+        },
+        {
+            "id": "49520",
+            "name": "A Shaded Path",
+            "description": "The world around fades into oblivion, as the land seems to wait for the sun to arise, unknowing of the future.  Thin and narrow the path seems to end curiously at this blind, cold, black, stone wall to the east.  The south pleads another view in a form of a shop or guild.  The small shudder of lights fades in and out of sight to the west. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49523"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49521"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49519"
+                }
+            }
+        },
+        {
+            "id": "49521",
+            "name": "Driceme'y' Magicks",
+            "description": "Tiny fragments of light sparkle and fade among the air; burning as bright as a flaming star in the naked night sky.  A wicked shift of reality departs as a simple motion depicts the lines between the walls when the light moves just right.  The room is littered with images of binding and sacred magick symbols upon the walls.  A dark wooden desk stands towards the south, barely covering any of the background.  A flight of stairs disappears moving upwards. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49520"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49522"
+                }
+            }
+        },
+        {
+            "id": "49522",
+            "name": "Sorcerer's Guild",
+            "description": "This small room reeks with the essence of magic mixed with a touch of grey light.  A restless feeling combs through the air giving the hint that both the pure of heart and evil may exist here.  A pillar to the right of the stairs, assist in bracing the ceiling.  A grey rug lays in the middle of the quaint room, allowing those whom have made the embrace with magick, study and learn here in comfort.  The walls appear to be a painted in a harsh black dust that does nothing good for ones health.  The only exit appears downward into the shop-keeper's store. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49521"
+                }
+            }
+        },
+        {
+            "id": "49523",
+            "name": "A Hidden Cove",
+            "description": "The stillness in the air will lay even the most brave a seed of fear in heart.  Air rushes through out this room and from the east, leaving a bitter feeling that the stone or ground itself is alive.  The cavern is dry, not damp, and yet the few wooden supports appear to be rotting.  The cove continues to the east, appearing to mold more into a hallway.  The shaded path is to the west. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49524"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49520"
+                }
+            }
+        },
+        {
+            "id": "49524",
+            "name": "Aula Pre Umbra",
+            "description": "This hall is completely crafted from the black stone, and so perfectly it appears there is not even a single dividing line nor scratch that threatens imperfection.  The floor ripples slightly with each step as if walking on water.  A vague form of a door lies south while the hall flows north into the darkness. ",
+            "flags": [
+                "INDOORS",
+                "UNDERDARK"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49526"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49525"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49523"
+                }
+            }
+        },
+        {
+            "id": "49525",
+            "name": "Guild of Thieves",
+            "description": "Resembling a barrack inside a power temple, this room is decorated with statues of twisted blades and tapestries depicting battles of darkness and light, much like a room torn from a beautifully spoken book. A cloaked man sits kindly behind a blackened flame that engorges the room with light but saves shadow. ",
+            "flags": [
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "49524"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "statues",
+                        "statue",
+                        "blades",
+                        "tapestries"
+                    ],
+                    "text": "Wondrously crafted statues, the head of a dog and body of wolf grin sinisterly in the dimly lit room.  The tapestries are a vivid red and trimmed in gold with pictures of large figures of dark knights slaying mercilessly their foes before them.  Small statuettes of wicked swords stand on both sides of the room, though not real blades you can feel the sting deeply as if you could be next to receive it's dreadful pierce. "
+                }
+            ]
+        },
+        {
+            "id": "49526",
+            "name": "Aula Pre Umbra",
+            "description": "The void continues from the south; stretching forth as the enclosed walls engorge in size with every step.  The room sends an uneasy shallowness that can engulf the heart and open the mind for an unsettling view for what may lie within.  The walls and ceiling are as smooth as silk, exposing not even a single flaw.  Within its own perfection it appears not even the greatest of craftsman could have constructed such a beauteous horror.  The sounds of echoing footsteps are quickly devoured by the unseen, leaving silence in its wake.  The corridor moves downward into the deeper darkness.  The south beholds the previous hall. ",
+            "flags": [
+                "INDOORS",
+                "SOUNDPROOF"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49524"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49527"
+                }
+            }
+        },
+        {
+            "id": "49527",
+            "name": "Obviam Abyssus",
+            "description": "The hall screams downward into the mind-piercing darkness.  The steps are smooth as glass and without flaw.  Light flees back to the hall, trying to escape the terrifying grasp of the night that exists further down the stairway. The Corridor is nearly straight down, exposing a painful thought if one were to fall.  The hall of shadows moves upwards and south.  This flight of stairs journeys downward into the abyss. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49526"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49528"
+                }
+            }
+        },
+        {
+            "id": "49528",
+            "name": "Obviam Abyssus",
+            "description": "Life seems to have been nonexistent here in eons.  Even the stairway appears untouched or freshly crafted because it holds no form of age.  Just a feeling that stirs inside that this place has been in existence since time itself. The air around appears pure, though if taken in, bears striking resemblance to poison as it fills the body and leaves it with a feeling that it stows away life with it. The stairs continue to steep further down and up. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49527"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49529"
+                }
+            }
+        },
+        {
+            "id": "49529",
+            "name": "Obviam Abyssus",
+            "description": "The air jolts slightly as movement strides through the darkened abyss. Echoes of flowing water shatter the silence throughout the cavern.  The night steeps all within, leaving nothing un-consumed.  The strife downward perhaps is not without loss.  Light appears at the break of the stairway edge following northward.  The only pathways are north and up. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49530"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49528"
+                }
+            }
+        },
+        {
+            "id": "49530",
+            "name": "Moenia Consisto Deceptio",
+            "description": "A faint light pierces the darkness as it enters the room from the north. The sounds of water splashing and flowing run like a mad man into the chamber walls looking for an escape.  The floor ripples with each step and flows endlessly into the unknown.  Crisp yet warm air descends slowly from the north but unable to keep its warmth long enough even to touch darkness of night. The path continues north and south.  The west holds a shallow exit in the stone. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49531"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49529"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49532"
+                }
+            }
+        },
+        {
+            "id": "49531",
+            "name": "Fas Judicium",
+            "description": "A fog of indecision erupts from this large vast room.  To the right a tremendously enchanting waterfall erupts with cool sparkling water.  A crystal sphere rest at the bottom of the waterfall displaying images of children running and laughing while playing games.  To the left several iron spikes are thrust through the harsh stone holding bodies of decaying corpses.  Several blades line an altar obviously devoted to darkness, evil, and chaos.  Resting below the altar lies a similar sphere to the one in the east of the room, holding view of villages burning and people screaming for their lives.  In the middle stands a pendulum with a obsidian crystal swaying back and forth.  The choice to move west or east is in its own fate here. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3002"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49530"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3002"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "waterfall"
+                    ],
+                    "text": "A lush forest flows around the waterfall, giving a peaceful feeling.  The entire right side of the room is filled with beautiful green plant life, even spawning some small woodland creatures to run through the miniature forest. "
+                },
+                {
+                    "keywords": [
+                        "alter"
+                    ],
+                    "text": "The alter emits an essence of pain through its ebony apparence.  Swords dangle along the outline of the alter.  Two torches one on each side, rest in holder birthing black flames.  Mind-numbing fear and power seem to thrush towards the eyes of the beholder. "
+                }
+            ]
+        },
+        {
+            "id": "49532",
+            "name": "A Small Stairwell",
+            "description": "A small room indeed, would be daring to say a small dwarf could find this tolerable.  The room is standing out of the same stone the eastern halls are crafted of.  Dark and damp, a sound of water can be heard faintly, possible from the west ere the east even.  A quaint stairway leads upwards with merely a view of charred wood and ash.  The only other exit would be east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49530"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49511"
+                }
+            }
+        },
+        {
+            "id": "49533",
+            "name": "Lair of Night",
+            "description": "The vile essence of chaos and the dark splendors of the realm of evil linger; penetrating the souls in its presence.  This is the beginning of the end for this hall, as it reaches forth into the unknown depths that lay ahead. The corridor is crafted from the same blackened stone as seen before in its preceding halls.  A simple arrow shaped window stands upon the western wall giving a wondrous view of the harsh mysterious realm of the black ice desert. Chants in an unheard language flow from the north raping the life of its innocence with its caress.  The only exit appears to be north, further down the hall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49534"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49531"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "arror",
+                        "window"
+                    ],
+                    "text": "The window is about two feet tall and a foot wide.  Looking outwards beyond the boundries of the stone walls unveils the magnificence and beauty of chaos and desctruction.  Holding within the view is the black ice desert, showing an old decrepit tree standing tall and the sharp razor winds ripping up any life of good heart that stands within its path. "
+                }
+            ]
+        },
+        {
+            "id": "49534",
+            "name": "Lair of Night",
+            "description": "The vagrant passageway drifts through time itself, steeping further into the unknown chaos of this realm.  Standing vigilant, this ancient cavern bids welcome to those who wouldst serve the darkness.  The stone floor is firm and stead-still, yet the hall seems to breathe as if it were alive.  An archway to the north brings a horrendous beauty with its elegant craftsmanship.  The hall ventures both north and back a ways southward. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49535"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49533"
+                }
+            }
+        },
+        {
+            "id": "49535",
+            "name": "Lair of Night",
+            "description": "The hall finally ends here, though giving birth unto a stairway climbing upwards into even darker catacombs.  This appears to be an entrance to a huge tower.  The stairs are massive, sloping downwards at least sixty feet. Much space reaches around the stairs giving an army room to stand within these walls.  The supports are huge, climbing all the way to the ceiling, which turns into a cone-shaped roof.  The only exits are upwards on the stairs or back to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49534"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49536"
+                }
+            }
+        },
+        {
+            "id": "49536",
+            "name": "Sedes Consisto Creperum",
+            "description": "Reality is distilled within the confines of these boundaries.  There appear to be no walls, just an unfathomed abyss of darkness and flares of light that have soared astray.  A throne crafted of solid shade stands motionless along the northern corner, seemingly floating in this endless clarity of nothingness. This void seems to be a tear in the realm of light, bringing only darkness through the bleeding rift.  The only visible escape appears down. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49535"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "throne",
+                        "shade"
+                    ],
+                    "text": "Holding its place in the corner without motion, the ebony throne stands sentry.  As if crafted from pure unadulterated darkness, the pure light seems to burn within its wicked presence.  The throne towers at least eight feet and arms as long as a half of a giant.  The appearance boast only the strongest of dark powers may rest there. "
+                }
+            ]
+        },
+        {
+            "id": "49537",
+            "name": "Corridor of Glass",
+            "description": "The silken night drapes over the moonlit sky, cloaking the sphere from sight. The glass covering the floor glistens from what little light reaches beyond the control of darkness.  The walls bear scars of an inferno, signs of the power that scorched the path around them and set this land ablaze.  A frighteningly warm light calls from atop a huge tower to the north, appearing even out of a bird's reach for the end of it cannot be seen.  The glass corridor sails downward into the shallow darkness and back south towards the gate. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49517"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49538"
+                }
+            }
+        },
+        {
+            "id": "49538",
+            "name": "Corridor of Glass",
+            "description": "Silence has found a way to make itself precious, as echoes rip through the stale air now bestowing a new recognition of horrors that may lurk in the recesses of the darkness.  A light from above peeks downward calling those who wouldst succumb to its soft warmth.  The darkest of night appears to reside here, as it feels so thick one risk shattering it by movement.  The glass runs up and north, spilling further into the corridor. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49539"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49537"
+                }
+            }
+        },
+        {
+            "id": "49539",
+            "name": "Corridor of Glass",
+            "description": "Life fades in the mere presence of these darkened hallowed quarters; leaving the stinging existence of pain and hurt to replace the feelings not needed here.  Souls have no use here, much like the lifeless glass below. This wide hall opens up into a much larger crevice in the ground.  The earth must have been taken out by hand, magic, or both to reveal at least part of an underground city.  To the west another large hall presents itself.  The corridor of glass pours further north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49540"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49538"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49541"
+                }
+            }
+        },
+        {
+            "id": "49540",
+            "name": "Corridor of Glass",
+            "description": "The eerie echoes are growing ever louder in their numbers.  The ceiling of this massive cavity which holds this hall is not within sight, just the haunting presence that the walls are becoming crushingly closer with each breath.  Reflections no longer can pierce the thick dust lain upon on the glass floor.  The air here feels tainted, pricking the flesh and soothing the pain all in the same breath.  The glass ceases at the edge of the room, appearing like a raging river frozen solid in its path.  The corridor runs south towards the entrance.  To the north begins Tresyn's Way. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49544"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49539"
+                }
+            }
+        },
+        {
+            "id": "49541",
+            "name": "Corridor of Eminence",
+            "description": "Murals paint the walls along with shards of shadow and flickering light from the east. Built partially into the wall, large columns embrace the tremendous weight from above as they stand sentinel.  A dusty and mangled floor still bears enough life to emit a sparkle of shine, as if trying to grasp a breath of air. The depth of work and craftsmanship still reflects from this tattered hall. The corridor continues west and leaves east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49539"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49542"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "murals",
+                        "mural"
+                    ],
+                    "text": "The murals appear very old and worn through to the bare stone in some parts. Pictured on this mural is a battle between black demons and an army of knights and paladins.  The outcome doesn appear clear and the mural stems out of sight to the west along the ceiling and walls. "
+                },
+                {
+                    "keywords": [
+                        "floor"
+                    ],
+                    "text": "This floor without doubt has been trampled and destroyed in many parts; yet still not without brilliance a few marks still glisten in the scarce rays of light.  The floor appears to be made out of gold, or at least an extremely convincing substitute. "
+                }
+            ]
+        },
+        {
+            "id": "49542",
+            "name": "Corridor of Eminence",
+            "description": "The curved ceiling bows deeply here, pointing downward from its tragic deep crack in the stone.  The mural still is not without details though battered in its own time.  The hall arches north in a curved form, giving it an appearance of more integrity and importance.  A broken cart along the northern wall has toppled, surrounded by many broken pieces of fine pottery that it once must have carried.  A huge slab of stone rest in the middle of the hall, though it appears to contain something at this distance.  The corridor continues north and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49543"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49541"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mural",
+                        "murals"
+                    ],
+                    "text": "The battle between the demons and the holy order of knights and paladins still rages on, although it would seem that the holy army is winning this peculiar battle.  The mural carries northward from here, and moves also to the south. "
+                },
+                {
+                    "keywords": [
+                        "cart",
+                        "pottery"
+                    ],
+                    "text": "Pottery litters the ground around this old wooden cart.  Odd it would seem that it was left here still holding goods that anyone may steal.  This cart has a small marking upon the right side.  The symbol is that of an arrow and coin, giving suggestion that this was a merchants cart. "
+                },
+                {
+                    "keywords": [
+                        "slab",
+                        "stone"
+                    ],
+                    "text": "This piece of stone is huge, for it must weigh at least two warhorses.  The bottom of the stone is a marble, color and in look, though as it progresses in thickness upwards it becomes a glass-like clear.  There is at least part of a skeleton sealed inside, no flesh only bone.  The skull and upper torso are viewable, alas the stone grows too clouded to see more.  The skeleton appears human or at least human-like. "
+                }
+            ]
+        },
+        {
+            "id": "49543",
+            "name": "Corridor of Eminence",
+            "description": "Rubble is strewn all over the once beautiful hall.  The mural comes to a closing with the halls end.  A large hole is all that remains of the eastern wall, giving further evidence that not only commerce, but life came to a abrupt end.  The floor has been torn open leaving a darkened chasm below, leading into oblivion.  An entry way stands in the west wall holding a sign above.  The hall seems to end here.  Tresyn's Way lies north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49548"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49542"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49562"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "mural",
+                        "murals"
+                    ],
+                    "text": "The battle appears amazingly long with these two powers.  A little further downward reveals a pair of huge eyes glaring over the battle field as the brave knights battle the demons up their fiery entrance to this plane.  As the knights move forward, a giant arm waves once across the sky.  The holy army burst into flames where they stand, writhing in terrifying agony.  The last painting reveals only those brilliantly dark onyx eyes glaring over the now burning white flag of the knights. "
+                },
+                {
+                    "keywords": [
+                        "floor",
+                        "chasm"
+                    ],
+                    "text": "An unwavering gash has ripped through this golden floor like an elven sword through goblin steel.  The gash appears incredibly deep that the bottom is not even visible in the light.  A light breeze emerges from the deep void. "
+                },
+                {
+                    "keywords": [
+                        "sign"
+                    ],
+                    "text": "The wooden sign dangles only by one of its two chains holding it up.  It appears to grant view of nothing more than a shield and gauntlet. "
+                }
+            ]
+        },
+        {
+            "id": "49544",
+            "name": "Tresyn's Way",
+            "description": "The smooth surface of the glass corridor has ceased just steps away from this old tattered brick and wooden floor.  Torched sand still remains and it begins and ends only as quickly as magick dispelled.  Though the glass seems to run out over the sand as it comes to a halt.  Stale air flows like a river over the ancient floor as if it was never before disturbed.  Tresyn's Way runs east to west.  The Corridor of Glass lies to the near south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49545"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49540"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49547"
+                }
+            }
+        },
+        {
+            "id": "49545",
+            "name": "Tresyn's Way",
+            "description": "Old and tattered, this road has withstood the test of time, sealed within the confines of this dark chamber.  An old street lamp still holds steadfast, but with the price of a lean against the southern wall of the street.  A grey mist hovers motionless to the east just above the wooden floor.  A wall stands firmly to the south, enclosing the street.  The path continues west and a new path begins east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49546"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49544"
+                }
+            }
+        },
+        {
+            "id": "49546",
+            "name": "Aula Per Angelus",
+            "description": "The southern wall has ended, birthing a new path to the south.  A grey mist faintly cloaks the nicely-edged floor.  Waves of warmth ride in slowly from the south.  Howling in the halls, a sound shatters the eerie silence plaguing the sane.  The deep blackness of light does not permit much view of the south, the way of Aula Per Angelus.  Tresyn's Way rests to the west of here. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49561"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49545"
+                }
+            }
+        },
+        {
+            "id": "49547",
+            "name": "Tresyn's Way",
+            "description": "A solid breeze enters from the west bidding only a vain promise of holy life.  A sparkle is visible within the western rooms, leaving a flare of hope for this desolate place.  The old stone floor is outlined by engraved planks of wood stemming westward and venturing east.  A brick wall holds fortitude along the south while the north appears to be nothing more than a hollow drop into a depthless horror of sharp spikes and sword-edged rocks.  The only exits appear east and west along Tresyn's Way. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49544"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49548"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "floor",
+                        "engraving",
+                        "stone",
+                        "planks"
+                    ],
+                    "text": "Words stream down both sides of the planks.  The first form-able sentence on the left side begins: \"I am with thee.  \" The phrase is repeated as far as the eye can see.  On the right side the words begin with \" Thou art alone.  \" and do not appear to end either within sight. "
+                }
+            ]
+        },
+        {
+            "id": "49548",
+            "name": "Tresyn's Way",
+            "description": "A subtle yet forceful wind gathers its strength as it blows by, whistling through the vacant halls.  Elegant craftsmanship is still apparent in the perfectly cut stone floors that venture westward.  Echoes of whispers move swiftly, haunting these walls, yet without even a word that can be discerned. A sparkle of light still dances in the west, beckoning life to view it. A path reaches south giving view of barely passable rubble.  Tresyn's Way runs east and west from here and the corridor appears south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49547"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49543"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49549"
+                }
+            }
+        },
+        {
+            "id": "49549",
+            "name": "Tresyn's Way",
+            "description": "The fragment of light has indeed spawned, now becoming brighter and more enticing.  This path is obviously old and tired, yet the stone itself appear to have never seen a day of wear.  Pieces of bone litter the hall and appears in more abundance westward.  A disturbing silence has begun to wreak suddenly, all that was has ceased.  The stone wall has begun again here to the south. Tresyn's Way stretches east to west and it seems those are the only exits. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49548"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49550"
+                }
+            }
+        },
+        {
+            "id": "49550",
+            "name": "Tresyn's Way",
+            "description": "The wondrous stone floor boldly stops here, leaving only to the imagination to were it once stretched further into the dark reaches of the cavern.  The light that has been so dazzling softly leads farther south, ever coming more queer as the strides continue.  More pieces of bone gather here ere simply becoming shards and fragments.  The south opens up allowing entry onto a path. Tresyn's Way retreats to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49549"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49551"
+                }
+            }
+        },
+        {
+            "id": "49551",
+            "name": "Aula Per Levo",
+            "description": "A bleak crack of sound ruptures the silence that encased this corridor, melting away as fast as it echoed with horrifying precision.  A grey mist floods the path here as well as southward, blocking any sight of what is below. A twinkle of light spreads in the distance, fading as quickly as it flares.  A large stone wall seals entry to the east, as for the west only impassible rocks lay hewn as if placed from being thrown by a giant among giants.  A blight appears south ere a wonderful gleam within the darkness.  Aula Per Levo runs north to south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49550"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49552"
+                }
+            }
+        },
+        {
+            "id": "49552",
+            "name": "Aula Per Levo",
+            "description": "A wonderful essence of life is flushed forth within the confines of this scorched hall.  Fog begins to lift towards the heavens growing ever thicker while conveying a sense of loneliness and indescribable rage.  The eastern wall glows ever so brightly even through the grey fog that thrust itself to block all view.  The Aula Per Levo stretches north and south, no other exits appear to be visible. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49551"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49553"
+                }
+            }
+        },
+        {
+            "id": "49553",
+            "name": "Aula Per Levo",
+            "description": "A draft of cold stale air flows in and out of the hall, giving the sensation of a breath from behind.  The fog has thinned from the floor so a view is possible while it permits.  A stringent taste of oil permits itself to enthrall on ones senses with a glimpse of darkness.  Shadows can be traced in the distance to the east, bidding way upon Aula Per Ignem.  The north brings flickers of dancing light and the path of Aula Per Levo. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49552"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49554"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "floor"
+                    ],
+                    "text": "Remnants of marble floor are left, some even still intact, though, very sparse and it's shine has diminished to a deep grey haze of tragedy.  Rather large drops of dried blood are tainting the floor, which is mostly broken rock now.  It appears the drops may suggest leads from north and east, neither is discernible for now. "
+                }
+            ]
+        },
+        {
+            "id": "49554",
+            "name": "Aula Per Ignem",
+            "description": "The dimness brings its own conciseness, invading light and gently coaxing it to die in its arms.  A simple blade of grass pierces the ground below it, reaching for a breath of life before it shall dwindle and die as all life seemingly has done here.  The ceiling is very tall, and not within sight, though the slightest movement brings a screeching echo that shatters silence and reflects the very depths of these walls.  The hallway of Aula Per Ignem ventures from west to east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49555"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49553"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "blade",
+                        "grass",
+                        "simple"
+                    ],
+                    "text": "A young plant it is, very premature with it's pale green color.  It reaches for any light near it, thirsting for any life it may grasp to sustain it.  It is indeed a wonder how life could grow in this cavern, life and light seems to not have existed here in centuries. "
+                }
+            ]
+        },
+        {
+            "id": "49555",
+            "name": "Aula Per Ignem",
+            "description": "The bordering walls here are streaked with blackened flame.  The stench of cooked flesh bellows through this wicked place.  As if out of a dream, a blue light glistens out of the eastern darkness.  A large rock blocks the path to the east, fallen from above it may have ere been hurled by a powerful force. Aula Per Ignem continues west to east, no other exits appear obvious. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49556"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49554"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "wall",
+                        "walls"
+                    ],
+                    "text": "These stone walls are quite tall and appear to stretch far into the unseen. When touched the burnt flakes fall away like ash blows in the wind.  With such a huge hall covered in flame, it would take a tremendous power to achieve such disaster. "
+                },
+                {
+                    "keywords": [
+                        "light",
+                        "blue",
+                        "darkness",
+                        "eastern"
+                    ],
+                    "text": "The light appears to shimmer and dim but never fade as it rises brightly again.  It does not liken to be any flame of torch.  Perhaps magic or a simple illusion could explain it, cautiously of course. "
+                },
+                {
+                    "keywords": [
+                        "rock",
+                        "large"
+                    ],
+                    "text": "This large stone must weigh a small family of overweight dwarves.  It doesn't reach very high, only a few feet tall, four at the most.  It is however, quite wide.  Nearly blocking the path so if it were not low. "
+                }
+            ]
+        },
+        {
+            "id": "49556",
+            "name": "Aula Per Ignem",
+            "description": "This weary way continues its vacant march forward into the abysmal ere perhaps delightful, though the last considered unlikely.  Shadows quickly race one another along the scorched walls.  It seems there are still movements of them even without light their way. A feeling of elegant pain attempts to pierce any sane mind, as the gentle breeze of soot and oil pres on, retreating from the east. Aula Per Ignem runs east and west, no other exits yet visible. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49557"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "49555"
+                }
+            }
+        },
+        {
+            "id": "49557",
+            "name": "Aula Per Ignem",
+            "description": "Atrocity is ever growing within the confines of this torrid hall, never ending or perhaps never beginning.  A waste of elegance that once was and put forth is barely visible, only shards of remnants remain.  A small skeleton has found itself a final resting place among the rubble, a wooden handle is all that can be seen of what went through this persons skull.  Ash litters the corridor, making quite the pile upon the middle of the floor.  Still Aula Per Ignem runs east to west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49558"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49556"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "skeleton",
+                        "handle"
+                    ],
+                    "text": "It is apparent upon closer view that this is a body of a child, human from the looks, maybe twelve or so.  The bones don't appear to be burnt but are still blanketed in ash from over the passing time.  It appears the cause of death is from a small dirk that has been buried deeply into the skull. "
+                },
+                {
+                    "keywords": [
+                        "ash"
+                    ],
+                    "text": "A deep black ash covers all that can be seen from here.  There isn't much left except the remnants of what was a skeleton. The ash could be from cloth or maybe paper, nevertheless it is clear there was a great reign of fire indeed. "
+                }
+            ]
+        },
+        {
+            "id": "49558",
+            "name": "Aula Per Ignem",
+            "description": "A shimmer of light still flares to the east, fueled by something unknown. This wing of the hall has felt the blast of raging flame in the past, its evidence becomes ever more clear when taking notice of the torched walls.  A crude well rests just left of center of the hall.  The horrid smell of oil permeates the air, leaving it nearly unbreathable.  A small murder of mice has left nothing but a family of corpses along the northern wall.  Aula Per Ignem ceases here and flees west.  Aula Per Angelus lies east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49559"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49557"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "well",
+                        "crude"
+                    ],
+                    "text": "One step up from the being merely a hole, a makeshift well stands firmly in the earth.  Large cobblestones have been placed less than a foot in length above the well, not firmly mind you.  With just a peek towards the murky hole the stench is nearly over-powering with the smell of oil.  A bubble makes its way up from the ooze occasionally.  Whether this well was meant for oil or not, not even a drop of water can be seen. "
+                },
+                {
+                    "keywords": [
+                        "murder",
+                        "mice",
+                        "family",
+                        "corpses"
+                    ],
+                    "text": "It looks to be at least eight animal skeletons has been left here.  They may have starved without any apparent source of food or water, perhaps they met their fate in the same flame that had painted these halls black. "
+                }
+            ]
+        },
+        {
+            "id": "49559",
+            "name": "Aula Per Angelus",
+            "description": "A subtle cloak of darkness lingers here, sealing full light even by full flame of torch.  Much of the marble flooring is no more than rubble.  A musky smoke fills this section of hall: thick, black, and full of soot.  An odd blue light trickles downward on the eastern wall, caressing the stone as it runs like a river pouring gracefully over a waterfall.  Darkness and fire are the only two things that can be proven to exist here.  Aula Per Angelus lies just north while Aula Per Ignem reaches merely west of here. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49560"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49558"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "blue",
+                        "light",
+                        "fire"
+                    ],
+                    "text": "The heat that surrounds the liquid fire is immense.  With but a close look it is hard to conceive but this indeed is fire; a magnificent blue flame that flows so much as running water does.  To add to the queerness of it all, the flame never touches the floor, just seemingly disappears or perhaps dissipates. "
+                }
+            ]
+        },
+        {
+            "id": "49560",
+            "name": "Aula Per Angelus",
+            "description": "A thick cloud of heat wretches forth from the south.  The western wall continues until out of sight, thick and strong it would seem though it's days of glory and beauty have long passed.  A tremendously large imprint has smashed the floor into rubble, leaving only a few marble tiles intact.  A rush of air pushes forth, the likes of a wind among the mountain tops, that no force can withhold.  A sparkle of blue light lingers and dissipates in the southern darkness. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49561"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49559"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "imprint",
+                        "rubble"
+                    ],
+                    "text": "It's rough in detail, but the imprint appears to be a giant claw or footprint.  It would take something of tremendous weight or force to reduce this once beautiful marble floor into but a waste. "
+                },
+                {
+                    "keywords": [
+                        "blue",
+                        "light",
+                        "darkness",
+                        "southern"
+                    ],
+                    "text": "The light flickers in and out of existence without truly dying.  The light may come from flame or magic, but doesn't look to liken to a camp fire or torch light. "
+                }
+            ]
+        },
+        {
+            "id": "49561",
+            "name": "Aula Per Angelus",
+            "description": "An absence of faith is ever enduring in this unholy burrow.  A rush of heat flanks in from the south, warming the air and instantly chilling it for just a brief, indescribable moment of time.  A firmly built shadow stands sentinel painted on the western wall.  Without sound or movement, just a wicked grin gleaming on its face.  Aula Per Angelus runs north to south, no other exits appear for now. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49546"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49560"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "shadow",
+                        "grin",
+                        "sentinel",
+                        "western",
+                        "wall"
+                    ],
+                    "text": "Standing at least six feet in height and a broad center, this reflection of darkness is anything but comforting.  Oddly no matter where the light shifts to, the shadow never flickers or bolts.  It does however appear to be human in shape at least, with a troublesome grin on it's head. "
+                }
+            ]
+        },
+        {
+            "id": "49562",
+            "name": "Traek's Armor Shop",
+            "description": "Still standing against its foe of time, the room boasts a twelve foot high ceiling and a floor that spans almost as large as a giants palm.  Pieces of armor stand gleaming behind large panes of glass along the walls.  The floor is composed of huge smooth marble blocks, spanning up to and beyond the elegant wooden desk in the middle of the glass casings.  A figure stands behind the desk, cloaked in the shadows.  The only exit is east to the Corridor of Eminence. ",
+            "flags": [
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "NOSUMMON",
+                "ALWAYSLIT"
+            ],
+            "sector": "CITY",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49543"
+                }
+            }
+        },
+        {
+            "id": "49563",
+            "name": "A Shaded Path",
+            "description": "The air flows roughly in from the west, carrying a rotting stench upon its shoulders.  The absence of light makes it difficult to see out of this town. The sounds of rolling thunder and crashes of lightning make themselves clear in the distant western hills.  The sandy floor is quite treacherous with the shards of black ice that glisten like buffed glass.  The shaded Path goes eastward and the west gate is nearby. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49503"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49564"
+                }
+            }
+        },
+        {
+            "id": "49564",
+            "name": "West Gate of Treysn",
+            "description": "The howling of the winds soars over head, just running from the unseen, seeking refuge.  Scattered lightning strikes brighten the black sky for brief seconds, until it dims, darker than the sky was before.  This gate seems to lie unguarded, save two stone posts, where it seems pikes and swords lay staged and awaiting enemies once before.  The Shaded Path reaches directly east.  The untold dark horrors of the night wait to the west. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49563"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "49244"
+                }
+            }
+        }
+    ]
+}

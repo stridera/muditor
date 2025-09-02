@@ -1,0 +1,237 @@
+{
+    "zone": {
+        "id": "49",
+        "name": "Team Domination",
+        "top": 4999,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {}
+    },
+    "mobs": null,
+    "objects": [
+        {
+            "id": 4900,
+            "type": "OTHER",
+            "keywords": [
+                "pylon",
+                "magical-pylon",
+                "caelia",
+                "teamdominationpylon"
+            ],
+            "short": "a magical pylon",
+            "ground": "One of the magical pylons of Caelia is exposed here!",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pylon",
+                        "magical-pylon",
+                        "caelia"
+                    ],
+                    "text": "The thread of the very underbelly of the world is exposed here, its magical manifestation shimmering and humming.  Usually incomprehensible and invisible, this pylon has been stripped from the natural flow of the earth and forced into the physical openness of Caelia.  But such a fundamental element of the world carries great power, and anyone determined enough could surely wield such power, whether it be for good or evil. The pylon seems to glow more brightly in your presence, strengthening as you near it.  Its soft light dances temptingly...perhaps you could be the one to claim its power."
+                }
+            ],
+            "values": {},
+            "flags": [
+                "HUM",
+                "NOINVIS",
+                "MAGIC",
+                "NOBURN",
+                "FLOAT"
+            ],
+            "weight": 500.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 100,
+            "wear_flags": [],
+            "triggers": [
+                4905,
+                4906,
+                4907,
+                4908
+            ],
+            "effects": []
+        },
+        {
+            "id": 4901,
+            "type": "ARMOR",
+            "keywords": [
+                "armband",
+                "white-armband",
+                "white-arm-band",
+                "teamdominationab"
+            ],
+            "short": "a white armband",
+            "ground": "A white armband lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "armband",
+                        "white-armband",
+                        "white-arm-band"
+                    ],
+                    "text": "It's made of some white gauzy material, but doesn't seem to have very many distinguishing characteristics."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "NORENT",
+                "MAGIC",
+                "NOBURN",
+                "DECOMP",
+                "FLOAT"
+            ],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "ARMS"
+            ],
+            "triggers": [
+                4903,
+                4904
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 4900,
+            "name": "TD WR Init",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "TDCommand Start",
+            "commands": "* Team Domination War Room Init (Speech) Trigger set teams 4 set team0 Mielikki's Champions set abbr0 MC set team1 Rangers of the North set abbr1 RN set team2 The Invasion Army set abbr2 IA set team3 The Miner's Guild set abbr3 MG global teams set i 0 while %i% < %teams% global team%i% global abbr%i% eval i %i% + 1 done set pylons 10 global pylons set i 0 while %i% < %pylons% set pylon%i% -1 global pylon%i% eval i %i% + 1 done set pylonname Caelian Pylon global pylonname if %actor.mexists[4900]% < 1 wload mob 4900 endif wecho Team Domination War Room variables initialized to defaults. "
+        },
+        {
+            "id": 4901,
+            "name": "TD WR Reset",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "TDCommand Purge",
+            "commands": "* Team Domination War Room Reset (Speech) Trigger if %teams% set i 0 while %i% < %teams% unset team%i% unset abbr%i% eval i %i% + 1 done unset teams endif if %pylons% set i 0 while %i% < %pylons% unset pylon%i% eval i %i% + 1 done unset pylons endif unset pylonname if %actor.mexists[4900]% > 0 wpurge teamdominationmc endif wecho Team Domination War Room variables reset. "
+        },
+        {
+            "id": 4902,
+            "name": "TD WR Capture",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "TDCommand Capture",
+            "commands": "* Team Domination War Room Capture (Speech) Trigger set i 0 while %i% < %pylons% if %speech% /= P%i%P set j 0 while %j% < %teams% if %speech% /= T%j%T set pylon%i% %j% global pylon%i% switch %j% case 0 set team %team0% break case 1 set team %team1% break case 2 set team %team2% break case 3 set team %team3% break done eval num %i% + 1 switch %num% case 1 set suffix st break case 2 set suffix nd break case 3 set suffix rd break default set suffix th done wforce teamdominationmc gossip %team% captures the %num%%suffix% %pylonname%! wecho Team Domination pylon %i% captured by team %j%. halt endif eval j %j% + 1 done if %j% >= %teams% log TD Error: Bad team identifier to WR Capture trigger endif halt endif eval i %i% + 1 done "
+        },
+        {
+            "id": 4903,
+            "name": "TD AB Normalizer",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 1,
+            "argument_list": "ca",
+            "commands": "* Team Domination Armband Capture Normalization (Command) Trigger return 0 "
+        },
+        {
+            "id": 4904,
+            "name": "TD AB Capture",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 1,
+            "argument_list": "capture",
+            "commands": "* Team Domination Armband Capture (Command) Trigger if T%team%T != TT oforce %actor% xcapture T%team%T return 1 else return 0 endif "
+        },
+        {
+            "id": 4905,
+            "name": "TD PY Init",
+            "attach_type": "Room",
+            "flags": [
+                "GreetAll"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* Team Domination Pylon Init (Drop) Trigger set teams 4 global teams set owner -1 global owner set pylonname Caelian Pylon global pylonname set pylon 0 global pylon "
+        },
+        {
+            "id": 4906,
+            "name": "TD PY Normalize",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 4,
+            "argument_list": "xcaptur",
+            "commands": "return 0 "
+        },
+        {
+            "id": 4907,
+            "name": "TD PY Capture",
+            "attach_type": "Room",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 4,
+            "argument_list": "xcapture",
+            "commands": "* Team Domination Pylon Capture (Command) Trigger if !%arg% return 0 halt endif set i 0 while %i% < %teams% if %arg% /= T %i%T if %candidate% == %i% eval seconds %timeout% * 12 osend %actor% Your team will capture this %pylonname% in %seconds% seconds! elseif %owner% == %i% if %candidate% osend %actor% You touch the %pylonname%, canceling team %candidate%'s attempt to capture your %pylonname%! oechoaround %actor% %actor.name% touches the %pylonname%, disrupting its pulsing. oforce teamdominationmc say TDCommand Cancel T%i%T P%pylon%P unset candidate else osend %actor% But your team already controls this %pylonname%! endif else set timeout 4 global timeout set candidate %i% global candidate eval seconds %timeout% * 12 osend %actor% You touch the %pylonname%, and it starts pulsating. osend %actor% Your team will capture this %pylonname% in %seconds% seconds! oechoaround %actor% %actor.name% touches the %pylonname%, and it starts pulsating. oforce teamdominationmc say TDCommand Countdown T%candidate%T P%pylon%P endif return 1 halt endif eval i %i% + 1 done return 0 "
+        },
+        {
+            "id": 4908,
+            "name": "TD PY Countdown",
+            "attach_type": "Room",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* Team Domination Pylon Countdown (Random) Trigger if %timeout% eval timeout %timeout% - 1 global timeout if %timeout% < 1 oecho The %pylonname% glows brightly, erupting in light! oforce teamdominationmc say TDCommand Capture T%candidate%T P%pylon%P set owner %candidate% global owner unset candidate unset timeout endif endif "
+        },
+        {
+            "id": 4909,
+            "name": "TD WR Countdown",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "TDCommand Countdown",
+            "commands": "* Team Domination War Room Countdown (Speech) Trigger set i 0 while %i% < %pylons% if %speech% /= P%i%P set j 0 while %j% < %teams% if %speech% /= T%j%T set pylon%i% %j% global pylon%i% switch %j% case 0 set team %team0% break case 1 set team %team1% break case 2 set team %team2% break case 3 set team %team3% break done eval num %i% + 1 switch %num% case 1 set suffix st break case 2 set suffix nd break case 3 set suffix rd break default set suffix th done wforce teamdominationmc gossip %team% infiltrates the %num%%suffix% %pylonname%!  1 minute to capture! wecho Team Domination countdown started for pylon %i%'s capture by team %j%. halt endif eval j %j% + 1 done if %j% >= %teams% log TD Error: Bad team identifier to WR Countdown trigger endif halt endif eval i %i% + 1 done if %i% >= %pylons% log TD Error: Bad pylon identifier to WR Countdown trigger endif "
+        },
+        {
+            "id": 4910,
+            "name": "TD WR Cancel",
+            "attach_type": "Mobile",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "TDCommand Cancel",
+            "commands": "* Team Domination War Room Cancel (Speech) Trigger set i 0 while %i% < %pylons% if %speech% /= P%i%P set j 0 while %j% < %teams% if %speech% /= T%j%T set pylon%i% %j% global pylon%i% switch %j% case 0 set team %team0% break case 1 set team %team1% break case 2 set team %team2% break case 3 set team %team3% break done eval num %i% + 1 wforce teamdominationmc gossip %team% disrupts the countdown for %pylonname% %num%'s capture! wecho Team Domination countdown cancelled for pylon %i%'s capture. halt endif eval j %j% + 1 done if %j% >= %teams% log TD Error: Bad team identifier to WR Cancel trigger endif halt endif eval i %i% + 1 done if %i% >= %pylons% log TD Error: Bad pylon identifier to WR Cancel trigger endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "4900",
+            "name": "Team Domination Headquarters",
+            "description": "You are in an unfinished room. ",
+            "flags": [],
+            "sector": "STRUCTURE"
+        }
+    ]
+}

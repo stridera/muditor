@@ -1,0 +1,2900 @@
+{
+    "zone": {
+        "id": "88",
+        "name": "The Dairy Farm",
+        "top": 8899,
+        "lifespan": 25,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "OCEANIC",
+        "resets": {
+            "mob": [
+                {
+                    "id": 8808,
+                    "max": 2,
+                    "room": 8824,
+                    "name": "(a farmer's wife)",
+                    "carrying": [
+                        {
+                            "id": 8817,
+                            "max": 5,
+                            "name": "(the garden key)"
+                        },
+                        {
+                            "id": 8814,
+                            "max": 5,
+                            "name": "(a wooden bucket)"
+                        }
+                    ],
+                    "equipped": [
+                        {
+                            "id": 6216,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a &4blue&0 hair-ribbon)"
+                        },
+                        {
+                            "id": 3076,
+                            "max": 30,
+                            "location": "Arms",
+                            "name": "(light brown leather shoes)"
+                        },
+                        {
+                            "id": 6214,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a pretty &4blue linen&0 dress)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8801,
+                    "max": 3,
+                    "room": 8830,
+                    "name": "(a farm boy)",
+                    "equipped": [
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 50206,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(brown leather breeches)"
+                        },
+                        {
+                            "id": 8803,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a red linen tunic)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8801,
+                    "max": 3,
+                    "room": 8805,
+                    "name": "(a farm boy)",
+                    "equipped": [
+                        {
+                            "id": 1012,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a thin dagger)"
+                        },
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 50206,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(brown leather breeches)"
+                        },
+                        {
+                            "id": 8803,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a red linen tunic)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8806,
+                    "max": 2,
+                    "room": 8813,
+                    "name": "(a sheepdog)",
+                    "equipped": [
+                        {
+                            "id": 8809,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a leather collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8803,
+                    "max": 3,
+                    "room": 8813,
+                    "name": "(a cow)"
+                },
+                {
+                    "id": 8801,
+                    "max": 3,
+                    "room": 8813,
+                    "name": "(a farm boy)",
+                    "equipped": [
+                        {
+                            "id": 6905,
+                            "max": 50,
+                            "location": "Eyes",
+                            "name": "(a gardening hoe)"
+                        },
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 50206,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(brown leather breeches)"
+                        },
+                        {
+                            "id": 8803,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a red linen tunic)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8809,
+                    "max": 2,
+                    "room": 8838,
+                    "name": "(a manor guest)",
+                    "equipped": [
+                        {
+                            "id": 1027,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(some plain leather sandals)"
+                        },
+                        {
+                            "id": 8811,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a yellow linen skullcap)"
+                        },
+                        {
+                            "id": 18510,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a yellow scholarly robe)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8804,
+                    "max": 4,
+                    "room": 8801,
+                    "name": "(a farmer)",
+                    "equipped": [
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 8807,
+                            "max": 30,
+                            "location": "Eyes",
+                            "name": "(a pitchfork)"
+                        },
+                        {
+                            "id": 8806,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a wide-brimmed straw hat)"
+                        },
+                        {
+                            "id": 58810,
+                            "max": 40,
+                            "location": "Legs",
+                            "name": "(a beige wool shirt)"
+                        },
+                        {
+                            "id": 8805,
+                            "max": 30,
+                            "location": "Hands",
+                            "name": "(blue woolen pants)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8804,
+                    "max": 4,
+                    "room": 8831,
+                    "name": "(a farmer)",
+                    "equipped": [
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 8806,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a wide-brimmed straw hat)"
+                        },
+                        {
+                            "id": 58810,
+                            "max": 40,
+                            "location": "Legs",
+                            "name": "(a beige wool shirt)"
+                        },
+                        {
+                            "id": 8805,
+                            "max": 30,
+                            "location": "Hands",
+                            "name": "(blue woolen pants)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8805,
+                    "max": 4,
+                    "room": 8807,
+                    "name": "(a calico kitten)"
+                },
+                {
+                    "id": 8804,
+                    "max": 4,
+                    "room": 8807,
+                    "name": "(a farmer)",
+                    "equipped": [
+                        {
+                            "id": 8807,
+                            "max": 30,
+                            "location": "Eyes",
+                            "name": "(a pitchfork)"
+                        },
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 8806,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a wide-brimmed straw hat)"
+                        },
+                        {
+                            "id": 58810,
+                            "max": 40,
+                            "location": "Legs",
+                            "name": "(a beige wool shirt)"
+                        },
+                        {
+                            "id": 8805,
+                            "max": 30,
+                            "location": "Hands",
+                            "name": "(blue woolen pants)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8807,
+                    "max": 1,
+                    "room": 8826,
+                    "name": "(a calico cat)",
+                    "equipped": [
+                        {
+                            "id": 8810,
+                            "max": 4,
+                            "location": "Body",
+                            "name": "(a narrow green collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8804,
+                    "max": 4,
+                    "room": 8826,
+                    "name": "(a farmer)",
+                    "equipped": [
+                        {
+                            "id": 30207,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(lightweight brown boots)"
+                        },
+                        {
+                            "id": 8806,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a wide-brimmed straw hat)"
+                        },
+                        {
+                            "id": 58810,
+                            "max": 40,
+                            "location": "Legs",
+                            "name": "(a beige wool shirt)"
+                        },
+                        {
+                            "id": 8805,
+                            "max": 30,
+                            "location": "Hands",
+                            "name": "(blue woolen pants)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8800,
+                    "max": 2,
+                    "room": 8803,
+                    "name": "(a milkmaid)",
+                    "equipped": [
+                        {
+                            "id": 3077,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a &2green&0 hair-ribbon)"
+                        },
+                        {
+                            "id": 8801,
+                            "max": 30,
+                            "location": "Arms",
+                            "name": "(black leather shoes)"
+                        },
+                        {
+                            "id": 3075,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(an apple-green linen dress)"
+                        }
+                    ],
+                    "carrying": [
+                        {
+                            "id": 8814,
+                            "max": 5,
+                            "name": "(a wooden bucket)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8809,
+                    "max": 2,
+                    "room": 8837,
+                    "name": "(a manor guest)",
+                    "equipped": [
+                        {
+                            "id": 36004,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(a cloak of the Kaaz)"
+                        },
+                        {
+                            "id": 8811,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a yellow linen skullcap)"
+                        },
+                        {
+                            "id": 18510,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a yellow scholarly robe)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8805,
+                    "max": 4,
+                    "room": 8825,
+                    "name": "(a calico kitten)"
+                },
+                {
+                    "id": 8808,
+                    "max": 2,
+                    "room": 8822,
+                    "name": "(a farmer's wife)",
+                    "equipped": [
+                        {
+                            "id": 6216,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a &4blue&0 hair-ribbon)"
+                        },
+                        {
+                            "id": 3076,
+                            "max": 30,
+                            "location": "Arms",
+                            "name": "(light brown leather shoes)"
+                        },
+                        {
+                            "id": 6214,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(a pretty &4blue linen&0 dress)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8806,
+                    "max": 2,
+                    "room": 8802,
+                    "name": "(a sheepdog)",
+                    "equipped": [
+                        {
+                            "id": 8809,
+                            "max": 10,
+                            "location": "Body",
+                            "name": "(a leather collar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 8805,
+                    "max": 4,
+                    "room": 8818,
+                    "name": "(a calico kitten)"
+                },
+                {
+                    "id": 8803,
+                    "max": 3,
+                    "room": 8818,
+                    "name": "(a cow)"
+                },
+                {
+                    "id": 8805,
+                    "max": 4,
+                    "room": 8833,
+                    "name": "(a calico kitten)"
+                },
+                {
+                    "id": 8803,
+                    "max": 3,
+                    "room": 8814,
+                    "name": "(a cow)"
+                },
+                {
+                    "id": 8802,
+                    "max": 4,
+                    "room": 8819,
+                    "name": "(a sheep)"
+                },
+                {
+                    "id": 8802,
+                    "max": 4,
+                    "room": 8817,
+                    "name": "(a sheep)"
+                },
+                {
+                    "id": 8802,
+                    "max": 4,
+                    "room": 8811,
+                    "name": "(a sheep)"
+                },
+                {
+                    "id": 8802,
+                    "max": 4,
+                    "room": 8809,
+                    "name": "(a sheep)"
+                },
+                {
+                    "id": 8800,
+                    "max": 2,
+                    "room": 8808,
+                    "name": "(a milkmaid)",
+                    "equipped": [
+                        {
+                            "id": 8802,
+                            "max": 30,
+                            "location": "Ear",
+                            "name": "(a wicker basket)"
+                        },
+                        {
+                            "id": 3077,
+                            "max": 30,
+                            "location": "Feet",
+                            "name": "(a &2green&0 hair-ribbon)"
+                        },
+                        {
+                            "id": 8801,
+                            "max": 30,
+                            "location": "Arms",
+                            "name": "(black leather shoes)"
+                        },
+                        {
+                            "id": 3075,
+                            "max": 30,
+                            "location": "Legs",
+                            "name": "(an apple-green linen dress)"
+                        }
+                    ]
+                }
+            ],
+            "door": [
+                {
+                    "room": 8824,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8824,
+                    "direction": "East",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 8842,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8842,
+                    "direction": "West",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 8805,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8807,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8823,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8828,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8825,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8808,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8820,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8806,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8806,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 8804,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                }
+            ],
+            "remove": [
+                {
+                    "room": 8824,
+                    "id": 8815,
+                    "name": "(a purple squash)"
+                },
+                {
+                    "room": 8824,
+                    "id": 8816,
+                    "name": "(a cucumber)"
+                }
+            ],
+            "object": [
+                {
+                    "id": 8815,
+                    "max": 20,
+                    "room": 8824,
+                    "name": "(a purple squash)"
+                },
+                {
+                    "id": 8816,
+                    "max": 20,
+                    "room": 8824,
+                    "name": "(a cucumber)"
+                },
+                {
+                    "id": 8812,
+                    "max": 1,
+                    "room": 8805,
+                    "name": "(the well)"
+                },
+                {
+                    "id": 8800,
+                    "max": 1,
+                    "room": 8838,
+                    "name": "(a wrought-iron altar)"
+                },
+                {
+                    "id": 8813,
+                    "max": 1,
+                    "room": 8828,
+                    "name": "(a brown package)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 8800,
+            "keywords": "milkmaid maid",
+            "mob_class": "Layman",
+            "short_desc": "a milkmaid",
+            "long_desc": "A cheerful-looking milkmaid goes about her duties.",
+            "desc": "She's young, with a well-scrubbed appearance and sandy-blonde hair. Her wide blue eyes seem very innocent, and she herself doesn't appear to have much on her mind as she sashays along, doing her chores.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 800,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 77,
+                "wisdom": 66,
+                "dexterity": 87,
+                "constitution": 75,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 8801,
+            "keywords": "boy farmboy farm",
+            "mob_class": "Layman",
+            "short_desc": "a farm boy",
+            "long_desc": "A farm boy heads past on an errand.",
+            "desc": "He's very young, with red hair and lots of freckles. His blue eyes betray his complete innocence. ",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 800,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 87,
+                "intelligence": 68,
+                "wisdom": 84,
+                "dexterity": 85,
+                "constitution": 76,
+                "charisma": 54
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 8802,
+            "keywords": "sheep",
+            "mob_class": "Layman",
+            "short_desc": "a sheep",
+            "long_desc": "A fluffy white sheep grazes here.",
+            "desc": "She's a four-hooved animal with a dense, thick coat of soft white wool. Her black head, ears, and legs stick out from the central bundle of white, making a contrast. Sometimes the creature bleats in a very nasal voice.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 300,
+            "level": 3,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 95,
+                "intelligence": 77,
+                "wisdom": 77,
+                "dexterity": 72,
+                "constitution": 72,
+                "charisma": 60
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 8803,
+            "keywords": "cow",
+            "mob_class": "Layman",
+            "short_desc": "a cow",
+            "long_desc": "A placid cow stands here idly.",
+            "desc": "She's quite large, with four hooves, a long tail, and placid brown eyes. Her short coat of hair is a solid honey-brown. She doesn't move around much, preferring to stand around twitching her tail and chewing on cud.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 6,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 91,
+                "intelligence": 67,
+                "wisdom": 76,
+                "dexterity": 76,
+                "constitution": 82,
+                "charisma": 59
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 8804,
+            "keywords": "farmer",
+            "mob_class": "Layman",
+            "short_desc": "a farmer",
+            "long_desc": "A farmer goes about his duties here.",
+            "desc": "He is middle-ages with care etched into the lines of his face.  Intelligent and perceptive looking, he smile often and speaks in a genial voice most of the time.  His calloused hands look very capable of hard labor.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 800,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 91,
+                "intelligence": 67,
+                "wisdom": 76,
+                "dexterity": 77,
+                "constitution": 68,
+                "charisma": 75
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 8805,
+            "keywords": "kitten calico",
+            "mob_class": "Layman",
+            "short_desc": "a calico kitten",
+            "long_desc": "A calico kitten tumbles past.",
+            "desc": "She's a small calico kitten with bright, curious green eyes and a tail that sticks up almost straight as she wobbles past doing whatever important things kittens must do. She meows loudly every so often.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [
+                "SNEAK"
+            ],
+            "alignment": -200,
+            "level": 2,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 76,
+                "intelligence": 69,
+                "wisdom": 82,
+                "dexterity": 76,
+                "constitution": 89,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "POUND"
+        },
+        {
+            "id": 8806,
+            "keywords": "sheepdog dog",
+            "mob_class": "Layman",
+            "short_desc": "a sheepdog",
+            "long_desc": "A large sheepdog trots up to you.",
+            "desc": "He's a large, friendly-looking dog with a coat of long brown hair streaked with white around his head and chest. His pink tongue lolls out continually.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "HELPER",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 700,
+            "level": 4,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 98,
+                "intelligence": 66,
+                "wisdom": 71,
+                "dexterity": 80,
+                "constitution": 72,
+                "charisma": 67
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 8807,
+            "keywords": "cat calico calico-cat",
+            "mob_class": "Layman",
+            "short_desc": "a calico cat",
+            "long_desc": "A calico cat suns herself here.",
+            "desc": "She's a full-grown cat, slender and muscular, with large ears and a long tail. Her soft fur is calico-patterned, and her lazy green eyes barely flicker as she looks around.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "SNEAK"
+            ],
+            "alignment": 700,
+            "level": 3,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 91,
+                "intelligence": 71,
+                "wisdom": 73,
+                "dexterity": 86,
+                "constitution": 75,
+                "charisma": 59
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "POUND"
+        },
+        {
+            "id": 8808,
+            "keywords": "woman farm wife",
+            "mob_class": "Layman",
+            "short_desc": "a farmer's wife",
+            "long_desc": "A woman hums to herself as she tends the house.",
+            "desc": "She is of middle age, but still very shapely, with a narrow waist and wide hips. Broad-shouldered, she looks quite strong. Her long hair is braided in back, but a few tendrils escape into her brown eyes.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 800,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 93,
+                "intelligence": 68,
+                "wisdom": 75,
+                "dexterity": 79,
+                "constitution": 74,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 8809,
+            "keywords": "guest visitor",
+            "mob_class": "Cleric",
+            "short_desc": "a manor guest",
+            "long_desc": "A manor guest relaxes here.",
+            "desc": "He's of middle years, with a well-fed, satisfied look to him. He moves slowly most of the time, and smiles and talks almost constantly. He doesn't appear to have any function in his surroundings.",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 700,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 88,
+                "wisdom": 92,
+                "dexterity": 78,
+                "constitution": 66,
+                "charisma": 54
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 8800,
+            "type": "OTHER",
+            "keywords": [
+                "altar"
+            ],
+            "short": "a wrought-iron altar",
+            "ground": "A wrought-iron altar is set into the south wall.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "altar",
+                        "wrought",
+                        "iron"
+                    ],
+                    "text": "The altar is made of wrought-iron, with a shelf on it to hold candles and other precious items. A small kneeling bench is built into it, so one may kneel and pray while looking at the things on the shelf. "
+                }
+            ],
+            "values": {},
+            "flags": [],
+            "weight": 9999.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 8801,
+            "type": "ARMOR",
+            "keywords": [
+                "shoes",
+                "black-leather-shoes"
+            ],
+            "short": "black leather shoes",
+            "ground": "A pair of black leather shoes rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "black-leather-shoes"
+                    ],
+                    "text": "Suitable for wear by men or women, these shoes are made from thin black top-grain leather, with a strap around their tops to hold them closed.  They fit the feet very well."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 2.0,
+            "cost": 40,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "FEET"
+            ],
+            "affects": [
+                {
+                    "location": "MOVE",
+                    "modifier": 15
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 8802,
+            "type": "CONTAINER",
+            "keywords": [
+                "basket",
+                "wicker-basket"
+            ],
+            "short": "a wicker basket",
+            "ground": "A wicker basket rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "basket",
+                        "wicker-basket"
+                    ],
+                    "text": "This large basket is made of many pieces of wicker woven together.  Its handle is wrapped with fabric at the top for ease of carrying, and its generously-sized bowl is lined with the same yellow-striped cloth."
+                }
+            ],
+            "values": {
+                "Capacity": 50,
+                "Flags": [],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 15,
+            "timer": 0,
+            "level": 2,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8803,
+            "type": "ARMOR",
+            "keywords": [
+                "tunic",
+                "red-linen-tunic"
+            ],
+            "short": "a red linen tunic",
+            "ground": "A red linen tunic lies draped here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "red-linen-tunic"
+                    ],
+                    "text": "The tunic is made from rough linen and dyed a medium shade of red. Long-sleeved, it is cut full for ease of wear, and its lower hem reaches the knees."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 1.0,
+            "cost": 40,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 8805,
+            "type": "ARMOR",
+            "keywords": [
+                "pants",
+                "blue-woolen-pants",
+                "wool"
+            ],
+            "short": "blue woolen pants",
+            "ground": "A pair of blue woolen pants lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "blue-woolen-pants"
+                    ],
+                    "text": "The pants are made of coarsely woven wool, and are dyed medium-blue.  They fasten down the left side with bronze buttons.  Cut very full for ease of movement, they look very warm and sturdy."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 25,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "LEGS"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8806,
+            "type": "ARMOR",
+            "keywords": [
+                "hat",
+                "wide-brimmed-straw-hat"
+            ],
+            "short": "a wide-brimmed straw hat",
+            "ground": "A wide-brimmed straw hat lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "wide-brimmed-straw-hat"
+                    ],
+                    "text": "Made from many long, slender pieces of straw all braided together, this hat has a wide brim and a generally rounded crown.  It is just a little floppy, but does an excellent job of keeping the sun out of one's eyes."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 2.0,
+            "cost": 10,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 8807,
+            "type": "WEAPON",
+            "keywords": [
+                "pitchfork",
+                "pitch-fork"
+            ],
+            "short": "a pitchfork",
+            "ground": "A pitchfork is set out of the way.",
+            "action_desc": "",
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "2",
+                    "size": "5",
+                    "bonus": 0
+                },
+                "Average": 7.5,
+                "Damage Type": "STAB"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 1.4,
+            "cost": 40,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "2HWIELD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8809,
+            "type": "ARMOR",
+            "keywords": [
+                "collar",
+                "leather-collar"
+            ],
+            "short": "a leather collar",
+            "ground": "A leather collar lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "leather-collar"
+                    ],
+                    "text": "This collar appears to be of the variety one fastens around the neck of a large animal, such as a dog.  It fastens by way of a very strong looking bronze buckle, with a clasp to hold the end of the collar in."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [],
+            "weight": 0.96,
+            "cost": 10,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8810,
+            "type": "ARMOR",
+            "keywords": [
+                "collar",
+                "narrow-green-collar",
+                "leather"
+            ],
+            "short": "a narrow green collar",
+            "ground": "A narrow green collar rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "narrow-green-collar",
+                        "leather"
+                    ],
+                    "text": "Made from light apple-green linen, braided to form a narrow collar, this object looks like it would fit well on a small animal, such as a cat.  Wearing such a collar helps pets live longer."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 10,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 4
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 8811,
+            "type": "ARMOR",
+            "keywords": [
+                "skullcap",
+                "yellow-linen-skullcap",
+                "skull-cap"
+            ],
+            "short": "a yellow linen skullcap",
+            "ground": "A yellow skullcap rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "yellow-linen-skullcap",
+                        "skull-cap"
+                    ],
+                    "text": "This skullcap is small and fitting, undoubtedly closely hugging the head of its wearer.  A pattern of red thread runs through the cap, creating intricate decorations around its circumference."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.25,
+            "cost": 5,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "WIS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 8812,
+            "type": "FOUNTAIN",
+            "keywords": [
+                "well",
+                "stone",
+                "fountain"
+            ],
+            "short": "the well",
+            "ground": "A plain stone well stands off to the side of the driveway.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "well",
+                        "fountain",
+                        "stone"
+                    ],
+                    "text": "Made of what seem to be mortared-together river stones, this well has a little roof to keep the rainwater out of the well water. The water lies far below, and is gotten by way of a bucket on a rope. An inscription on it reads: 'Azkrael, 2/12/00'"
+                }
+            ],
+            "values": {
+                "Capacity": 999,
+                "Remaining": 999,
+                "Liquid": "WATER",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 9999.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 2,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 8813,
+            "type": "CONTAINER",
+            "keywords": [
+                "package",
+                "brown-package",
+                "tied",
+                "questobject"
+            ],
+            "short": "a brown package",
+            "ground": "A brown package tied up here, sits in a corner.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "brown-package",
+                        "tied",
+                        "questobject"
+                    ],
+                    "text": "It is a simple little paper-wrapped package.  The postmark is from Mielikki."
+                }
+            ],
+            "values": {
+                "Capacity": 50,
+                "Flags": [
+                    "Closeable",
+                    "Closed"
+                ],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "NOSELL",
+                "FLOAT"
+            ],
+            "weight": 1.0,
+            "cost": 324,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "triggers": [
+                6020,
+                6026
+            ],
+            "effects": []
+        },
+        {
+            "id": 8814,
+            "type": "DRINKCON",
+            "keywords": [
+                "bucket",
+                "wooden"
+            ],
+            "short": "a wooden bucket",
+            "ground": "A wooden bucket with a handle sits on the floor.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bucket",
+                        "wooden"
+                    ],
+                    "text": "This is a stained old bucket made of wood.  It is rather stout and has a handle oneach side.  It appears to have been used quite a lot, yet it doesn't leak."
+                }
+            ],
+            "values": {
+                "Capacity": 256,
+                "Remaining": 256,
+                "Liquid": "MILK",
+                "Poisoned": false
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 4.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8815,
+            "type": "FOOD",
+            "keywords": [
+                "squash",
+                "purple",
+                "food"
+            ],
+            "short": "a purple squash",
+            "ground": "A curved purple squash is growing in the shade.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "squash",
+                        "purple",
+                        "food"
+                    ],
+                    "text": "The deep purple of this medium-sized squash is remarkable.  Lighter stripes emanate from the stem.  It is covered with warty welts and is about the size of a large apple.  It smells rather nice, and has a firm skin."
+                }
+            ],
+            "values": {
+                "Filling": 6,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8816,
+            "type": "FOOD",
+            "keywords": [
+                "cucumber",
+                "green",
+                "food"
+            ],
+            "short": "a cucumber",
+            "ground": "A light-green cucumber grows among the flowering vines.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cucumber"
+                    ],
+                    "text": "Hidden from the sun, the skin of this vegetable is only a light green color, with yellowish stripes in places.  Little points dot the surface.  It is shaped like a cigar, but much larger.  It feels crisp and ready to eat."
+                }
+            ],
+            "values": {
+                "Filling": 4,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 8817,
+            "type": "KEY",
+            "keywords": [
+                "key",
+                "garden-key",
+                "plain-key",
+                "garden-gate"
+            ],
+            "short": "the garden key",
+            "ground": "A plain key to a garden gate lays forgotten amongst the vegetables.",
+            "action_desc": "",
+            "values": {},
+            "flags": [
+                "NORENT"
+            ],
+            "weight": 0.01,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 8800,
+            "name": "thief_subclass_farmer_greeting",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.quest_variable[merc_ass_thi_subclass:subclass_name]% == thief if %actor.quest_stage[merc_ass_thi_subclass]% == 3 || %actor.quest_stage[merc_ass_thi_subclass]% == 4 if %actor.can_be_seen% && %actor.hiddenness% < 1 msend %actor% %self.name% notices you skulking about! msend %actor% %self.name% says, 'Who are you?!  You weren't invited here!' msend %actor% %self.name% shoos you off the farm! mteleport %actor% 8006 wait 1 mforce %actor% look quest fail merc_ass_thi_subclass %actor% msend %actor% &3&bYou have failed your quest!&0 msend %actor% You'll have to go back to %get.mob_shortdesc[6050]% and start over! endif endif endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "8801",
+            "name": "A Dirt Road",
+            "description": "A dirt road leads from east to west.  To the east is a deep forest, and the road turns south.  The path leads west past pasture lands and a large manor house.  A wooden post-and-rail fence separates the pasture from the road.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8843"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8802"
+                }
+            }
+        },
+        {
+            "id": "8802",
+            "name": "A Dirt Road",
+            "description": "A little dirt path leads from east to west past pasturelands and a large, white-painted manor house to the south. The area appears well tended and scrupulously kept, with even the windows in the kitchen shiny and sparkling clean. A wooden post-and-rail fence separates the pasture from the road.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8801"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8803"
+                }
+            }
+        },
+        {
+            "id": "8803",
+            "name": "A Dirt Road",
+            "description": "This dirt road appears to be well-traveled, with many ruts and footprints in it. To the north, beyond a wooden post-and-rail fence, is visible a large, green, well-tended pasture. In the other direction stands a white-painted manor house. A pretty hedge runs along the side of the house.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8802"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8804"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "hedge"
+                    ],
+                    "text": "It's just a shrubbery hedge, but it's kept perfectly pruned, and is dotted with little pink flowers amidst its dark green leaves."
+                }
+            ]
+        },
+        {
+            "id": "8804",
+            "name": "A Wooden Gate",
+            "description": "A dirt road runs from here to the east past some beautifully tended pasture lands to the north, and a well-kept, white-painted house to the south. A wooden fence separates the dirt road from the house's property, and the gate is right here. There doesn't appear to be any way to lock the gate; it only latches.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8803"
+                },
+                "West": {
+                    "description": "The gate stands here.",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8805"
+                }
+            }
+        },
+        {
+            "id": "8805",
+            "name": "A Circular Driveway",
+            "description": "This bit of ground is devoid of grass, but has numerous footprints and wheel ruts in it. It is circular more because that's just how traffic landed on it than out of any deliberate design. A short path leads north toward a shed and toward the pasture gate, and to the south lie the steps leading up to the manor house.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8806"
+                },
+                "East": {
+                    "description": "The gate leading out of the manor compound stands here.",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8804"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8820"
+                }
+            }
+        },
+        {
+            "id": "8806",
+            "name": "A Short Path",
+            "description": "This little path leads from the circular driveway to the south to an equally small shed to the north. The area is verdant and smells vaguely of animals and greenery. A collection of buildings to the northwest, and the manor house to the southeast, are the only signs of civilization in sight. A wooden rail-and-post fence separates the pastures to the east from the path. The gate leading into the pasture is visible here.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "A door leads into the little shed.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8807"
+                },
+                "East": {
+                    "description": "A gate leads into the pasture.",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8808"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8805"
+                }
+            }
+        },
+        {
+            "id": "8807",
+            "name": "A Small Shed",
+            "description": "This whitewashed shed is constructed of timber planks. It is not only extremely well-built, but well-tended as well, with a freshly swept dirt floor and its tools all put away on shelves. There are no windows in such a small structure, of course, and only one door, standing in the south wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door leads back outside.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8806"
+                }
+            }
+        },
+        {
+            "id": "8808",
+            "name": "A Corner of the Pasture",
+            "description": "This is the southwest corner of a large, verdant pasture. A bed of lush green clover grows amid the soft grass, as far as the eye can see, to the east and north. The pasture is bounded by a wooden post-and-rail fence that, while constructed expertly, does not appear to be built to keep thieves out. The gate out of the pasture stands here.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8812"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8809"
+                },
+                "West": {
+                    "description": "A gate leads out of the pasture.",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8806"
+                }
+            }
+        },
+        {
+            "id": "8809",
+            "name": "The Southern End of the Pasture",
+            "description": "A green, lush pasture rolls on to the north, east, and west, bounded to the immediate south by a wooden rail-and-post fence. Beyond the fence, a dirt road can be seen, and beyond this, a large manor house.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8813"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8810"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8808"
+                }
+            }
+        },
+        {
+            "id": "8810",
+            "name": "The Southern End of the Pasture",
+            "description": "A green, lush pasture rolls on to the north, east, and west, bounded to the immediate south by a wooden rail-and-post fence. Beyond the fence, a dirt road can be seen, and beyond this, a large manor house.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8814"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8811"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8809"
+                }
+            }
+        },
+        {
+            "id": "8811",
+            "name": "A Corner of the Pasture",
+            "description": "This is the southeastern corner of a large, rolling pasture that extends far to the north and west. Beds of clover mix with the soft grass, making the air heady with the scent of greenery. The fields are bounded by a wooden fence to the east and south, but beyond it, to the south, one can see a dirt road, and to the east, cultivated fields.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8815"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8810"
+                }
+            }
+        },
+        {
+            "id": "8812",
+            "name": "The Western Edge of the Pasture",
+            "description": "The lush, green pasture is bounded here on its west side by a wooden rail-and-post fence. Beds of clover and soft, sweet grass are visible extending to the north, south, and east, with a shed directly to the west. Not too far to the northwest, one can see a small collection of tidy-looking buildings, but of course one cannot reach them from here.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8816"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8813"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8808"
+                }
+            }
+        },
+        {
+            "id": "8813",
+            "name": "The Center of the Pasture",
+            "description": "This is the middle of a large grazing pasture. Beds of lush, sweet- smelling clover and soft grass grow in all directions. The area is pastoral in nature, with a manor house visible to the south a short distance away, past the fence, and a small collection of buildings standing far to the northwest.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8817"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8814"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8809"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8812"
+                }
+            }
+        },
+        {
+            "id": "8814",
+            "name": "The Center of the Pasture",
+            "description": "This is the middle of a large grazing pasture. Beds of lush, sweet- smelling clover and soft grass grow in all directions. The area is pastoral in nature, with a manor house visible to the south a short distance away, past the fence, and a small collection of buildings standing far to the northwest.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8818"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8815"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8810"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8813"
+                }
+            }
+        },
+        {
+            "id": "8815",
+            "name": "The Eastern Edge of the Pasture",
+            "description": "This lush, green pasture is bounded to the east by a wooden post-and-rail fence, with cultivated fields visible beyond it. The soft green grass and clover beds extend to the north, south, and west -- perfect grazing land. A manor house rises not far away to the southwest.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8819"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8811"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8814"
+                }
+            }
+        },
+        {
+            "id": "8816",
+            "name": "A Corner of the Pasture",
+            "description": "This is the northwest corner ofa large, lush pasture. Beds of soft grass and sweet-smelling clover abound, growing in abundance for grazing animals. Some buildings stand far off to the northwest, and a shed is visible to the southwest not too far away.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8817"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8812"
+                },
+                "West": {
+                    "description": "The neatly whitewashed wall of a wooden shed blocks the view in this direction.",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "8817",
+            "name": "The Northern Edge of the Pasture",
+            "description": "This is the very northern edge of the large, lush pasture. Sweet clover and soft grass extend to the east, west, and south, making this a perfect grazing ground. A wooden rail-and-post fence bounds the field to the north, separating it from other pasturelands. Some buildings stand to the northwest a ways off, but of course they cannot be entered from here.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8818"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8813"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8816"
+                }
+            }
+        },
+        {
+            "id": "8818",
+            "name": "The Northern Edge of the Pasture",
+            "description": "This is the very northern edge of the large, lush pasture. Sweet clover and soft grass extend to the east, west, and south, making this a perfect grazing ground. A wooden rail-and-post fence bounds the field to the north, separating it from other pasturelands. Some buildings stand to the northwest a ways off, but of course they cannot be entered from here.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8819"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8814"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8817"
+                }
+            }
+        },
+        {
+            "id": "8819",
+            "name": "A Corner of the Pasture",
+            "description": "This is the northeastern edge of a very large pasture that stretches to the west and south as far as the eye can see. Soft grass and sweet clover grow in beds all over the field, making this perfect pasture land. To the east, past a rail-and-post fence, one can see cultivated fields.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8815"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8818"
+                }
+            }
+        },
+        {
+            "id": "8820",
+            "name": "Some Steps Leading to the Manor House",
+            "description": "The circular driveway to the north empties onto a short, tiled pathway. The pathway, in turn, leads to a trio of wide, shallow steps that lead right up to a well-tended manor house. The door leading into the house stands at the top of the steps. Pretty flowers and hedges run along the walls of the house and the edges of the steps.",
+            "flags": [],
+            "sector": "CITY",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8805"
+                },
+                "South": {
+                    "description": "The steps lead up to a door, which in turn leads into the large manor house.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8825"
+                }
+            }
+        },
+        {
+            "id": "8821",
+            "name": "A Receiving Room",
+            "description": "This cozy little room is warm from the heat of a fireplace set in the eastern wall. It's large enough to seat several people on the sofas and chairs around the room, but small enough to feel intimate and hear everybody speaking. Large windows look out to the north. An archway is set into the south wall, leading to a hallway.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door stands in the south wall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8826"
+                }
+            }
+        },
+        {
+            "id": "8822",
+            "name": "A Study",
+            "description": "This small, tidy room is painted a soft green. It is large enough to house several bookshelves, some of which even contain hand-illuminated books, and some comfortable chairs. The room is very well-lit, with large windows to the north and lanterns hanging from the ceiling.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door stands here.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8827"
+                }
+            }
+        },
+        {
+            "id": "8823",
+            "name": "The Kitchen",
+            "description": "This spacious kitchen is equipped with all the amenities -- a cast iron stove in one corner, shelves and racks for pots and pans, and several lanterns for light. It's a clean room with whitewashed walls and a wooden floor that's white from being scrubbed with sand and lye so often. Doors lead east and south.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A screened door leads out to the garden.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8824"
+                },
+                "South": {
+                    "description": "A door leads south, to the dining room.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8828"
+                }
+            }
+        },
+        {
+            "id": "8824",
+            "name": "The Kitchen Garden",
+            "description": "All sort of vegetables grow in neat little rows in this small, fenced backyard.  A road is visible north of the fence, with pastures beyond it.  The manor house rises directly to the west.  The scent of flowers is quite strong, and most would find it pleasant, as they would the sight of all the well-tended plants. A door leads into the manor house to the west.",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "8817",
+                    "destination": "8842"
+                },
+                "West": {
+                    "description": "A screened door leads west, into the house.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8823"
+                }
+            }
+        },
+        {
+            "id": "8825",
+            "name": "The Front Room",
+            "description": "This is a large foyer, built out of well-sanded timber planks. Ceiled inside and out, it is effective protection against the elements, and is made cozy by the addition of a large red woolen rag rug lying on the floor. Racks and shelves built into the walls give ample storage space for cloaks and other small objects. A door stands to the north, leading outside, while a hallway leads off to the east. A staircase ascends to an upper level of the house.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A sturdy door is set into the north wall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8820"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8826"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8829"
+                }
+            }
+        },
+        {
+            "id": "8826",
+            "name": "A Wide Hallway",
+            "description": "This wide hallway runs from east to west through the lower floor of a large manor house. It is constructed of well-sanded and clean timber planks, with the walls darkened from age. A long, oval-shaped rag rug runs the length of the hallway, making footing more comfortable. Doors stand to the north and south.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door stands in the north wall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8821"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8827"
+                },
+                "South": {
+                    "description": "A door stands in the south wall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8838"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8825"
+                }
+            }
+        },
+        {
+            "id": "8827",
+            "name": "A Wide Hallway",
+            "description": "This wide hallway runs from east to west through the lower floor of a large manor house. It is constructed of well-sanded and clean timber planks, with the walls darkened from age. A long, oval-shaped rag rug runs the length of the hallway, making footing more comfortable. Doors stand to the north and south.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door stands here.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8822"
+                },
+                "East": {
+                    "description": "A door leads into the dining room.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8828"
+                },
+                "South": {
+                    "description": "A door stands here.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8839"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8826"
+                }
+            }
+        },
+        {
+            "id": "8828",
+            "name": "The Dining Room",
+            "description": "Lanterns hang from the ceiling by chains, illuminating this large dining hall. Candles in sconces along the walls provide additional light. A large wooden table stands in the middle of the room, dominating it by sheer force of its bulk. There are eight chairs around it, with one at each end. Hangings on the walls are simple, more to detract from the dark wooden walls than to show pictures of anything. One door leads north, to the kitchen, and another to the west, leading to a long hallway.",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads to the kitchen.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8823"
+                },
+                "West": {
+                    "description": "A door leads out to the hallway.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8827"
+                }
+            }
+        },
+        {
+            "id": "8829",
+            "name": "A Wooden Landing",
+            "description": "This narrow landing is the top of a wooden staircase that descends to the lower floor of a large house. A narrow hall runs off to the east, past sturdy wooden doors. A few paintings on the walls depict mostly pastoral scenes.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8830"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8825"
+                }
+            }
+        },
+        {
+            "id": "8830",
+            "name": "A Narrow Hallway",
+            "description": "This narrow hallway is made of wood, and runs from east to west through the upper floor of a house. Doors stand to the north and south, and a landing is visible to the west. A rag rug lies the length of the hallway.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads into a room.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8835"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8831"
+                },
+                "South": {
+                    "description": "A door leads into a room.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8833"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8829"
+                }
+            }
+        },
+        {
+            "id": "8831",
+            "name": "A Narrow Hallway",
+            "description": "This narrow hallway is made of wood, and runs from east to west through the upper floor of a house. Doors stand to the north and south, and a landing is visible to the west. A rag rug lies the length of the hallway.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door stands here.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8836"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8832"
+                },
+                "South": {
+                    "description": "A door is set into this wall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8834"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8830"
+                }
+            }
+        },
+        {
+            "id": "8832",
+            "name": "A Narrow Hallway",
+            "description": "This is the end of a narrow wooden hallway. It extends to the west a distance, ending at a landing visible to the west not far away. An archway leads into a sitting room to the north, with a rag rug lying the length of the hallway floor.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8837"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8831"
+                }
+            }
+        },
+        {
+            "id": "8833",
+            "name": "A Bedroom",
+            "description": "This small bedroom is very clean, with a sanded wooden floor and a round rag rug taking up most of it. The furniture is well-made but not luxurious, consisting of a bed, a desk, and a wardrobe. The one window looks out to the south, showing the pastures. A door is set into the north wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads out to the hall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8830"
+                }
+            }
+        },
+        {
+            "id": "8834",
+            "name": "A Bedroom",
+            "description": "This small bedroom is very clean, with a sanded wooden floor and a round rag rug taking up most of it. The furniture is well-made but not luxurious, consisting of a bed, a desk, and a wardrobe. The one window looks out to the south, showing the pastures. A door is set into the north wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads out to the hallway.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8831"
+                }
+            }
+        },
+        {
+            "id": "8835",
+            "name": "A Bedroom",
+            "description": "This small bedroom is very clean, with a sanded wooden floor and a round rag rug taking up most of it. The furniture is well-made but not luxurious, consisting of a bed, a desk, and a wardrobe. The one window looks out to the north, showing the pastures. A door is set into the south wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door leads back out to the hall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8830"
+                }
+            }
+        },
+        {
+            "id": "8836",
+            "name": "A Bedroom",
+            "description": "This small bedroom is very clean, with a sanded wooden floor and a round rag rug taking up most of it. The furniture is well-made but not luxurious, consisting of a bed, a desk, and a wardrobe. The one window looks out to the north, showing the pastures. A door is set into the south wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door leads back out to the hall.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8831"
+                }
+            }
+        },
+        {
+            "id": "8837",
+            "name": "A Sitting Room",
+            "description": "This spacious room has a sanded wooden floor mostly covered by a large woven red wool rug. The furniture is utilitarian, but well-made, consisting of some tables and chairs. Paintings on the walls display pastoral scenes, and the window in the north wall shows some real pastures. An archway leads southward.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8832"
+                }
+            }
+        },
+        {
+            "id": "8838",
+            "name": "A Small Home Altar",
+            "description": "This quiet chamber is hung with dark blue wall-hangings, each depicting a golden spiral embroidered upon it. The floor is darkened wood, scrubbed clean and well-swept, and the walls, though dark with age, don't have any soot on them. A small window set into the west wall reveals fields and pasturelands to the west. A door leads back out to the hallway.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads back out to the hallway.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8826"
+                }
+            }
+        },
+        {
+            "id": "8839",
+            "name": "The Portrait Gallery",
+            "description": "This chamber has no rug upon its polished wooden floor, and no furniture aside from a pair of comfortable-looking, overstuffed chairs set against the east wall. Against the west wall are hung about half a dozen paintings. Wall sconces set to either side of the sofa provide adequate light, as does a window set into the south wall.",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A door leads back out to the hallway.",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "8827"
+                }
+            }
+        },
+        {
+            "id": "8840",
+            "name": "A Dirt Road",
+            "description": "This little dirt road runs north from Farmer's Row, which is just off to the south.  A white fence runs along each side, with three horizontal planks that are straight, level, and freshly whitewashed.  Hoof and footprints are visible in the dirt, and a large farmhouse is off to the northwest.    ",
+            "flags": [
+                "NOMOB",
+                "NOTRACK"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8841"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8006"
+                }
+            }
+        },
+        {
+            "id": "8841",
+            "name": "A Dirt Road",
+            "description": "The road is nearing the farmhouse, which now sits a little distance to the west.  The road appears to continue a ways to the north, however.  It has straight white fences on either side, and little ruts where wagons pass.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8842"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8840"
+                }
+            }
+        },
+        {
+            "id": "8842",
+            "name": "A Dirt Road",
+            "description": "A large farmhouse sits directly to the west of this well-kept road.  It is as freshly painted as the fences along the road.  There is a tidy little garden between the road and the house, and a small gate in the fence.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8843"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8841"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "8817",
+                    "destination": "8824"
+                }
+            }
+        },
+        {
+            "id": "8843",
+            "name": "Turn in a Dirt Road",
+            "description": "A tidy dirt road makes a turn here to the west and south.  To the west, it goes between a farmhouse and a pasture.  A well-kept fence runs along each side, curving along with the road's turn in several smart segments.  The sound of cattle lowing can be heard nearby.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8842"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8801"
+                }
+            }
+        }
+    ]
+}

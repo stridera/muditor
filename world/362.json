@@ -1,0 +1,1793 @@
+{
+    "zone": {
+        "id": "362",
+        "name": "The Greengreen Sea",
+        "top": 36299,
+        "lifespan": 26,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 36202,
+                    "max": 4,
+                    "room": 36204,
+                    "name": "(the gray Liath)",
+                    "carrying": [
+                        {
+                            "id": 36200,
+                            "max": 1,
+                            "name": "(a Liath feather)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36200,
+                    "max": 6,
+                    "room": 36209,
+                    "name": "(the Iasgair)"
+                },
+                {
+                    "id": 36200,
+                    "max": 6,
+                    "room": 36223,
+                    "name": "(the Iasgair)"
+                },
+                {
+                    "id": 36201,
+                    "max": 8,
+                    "room": 36226,
+                    "name": "(the blue Gorm)"
+                },
+                {
+                    "id": 36201,
+                    "max": 8,
+                    "room": 36226,
+                    "name": "(the blue Gorm)"
+                },
+                {
+                    "id": 36201,
+                    "max": 8,
+                    "room": 36217,
+                    "name": "(the blue Gorm)"
+                },
+                {
+                    "id": 36201,
+                    "max": 8,
+                    "room": 36229,
+                    "name": "(the blue Gorm)"
+                },
+                {
+                    "id": 36202,
+                    "max": 4,
+                    "room": 36211,
+                    "name": "(the gray Liath)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 36203,
+                    "direction": "South",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 36200,
+            "keywords": "iasgair fisherman",
+            "mob_class": "Layman",
+            "short_desc": "the iasgair",
+            "long_desc": "An iasgair is here, dangling a line into the water. ",
+            "desc": "A lean man with fiery red hair sits calmly in his small round boat. Several fishing lines dangle into the water and a stringer of fish hangs from his side. ",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [
+                "WATERWALK"
+            ],
+            "alignment": 200,
+            "level": 17,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 64,
+                "intelligence": 71,
+                "wisdom": 79,
+                "dexterity": 81,
+                "constitution": 30,
+                "charisma": 83
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "BLAST"
+        },
+        {
+            "id": 36201,
+            "keywords": "gorm blue-bird bird",
+            "mob_class": "Layman",
+            "short_desc": "the blue Gorm",
+            "long_desc": "the blue gorm ",
+            "desc": "A bird with feathers of the palest blue soars by on spread wings. Its head turns from side to side as it scans the kelp bed for entangled fish or snails. It must be some kind of gull. ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY",
+                "SLOW_TRACK",
+                "AQUATIC"
+            ],
+            "effect_flags": [
+                "INFRAVISION",
+                "NOTRACK",
+                "SNEAK"
+            ],
+            "alignment": 500,
+            "level": 18,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 68,
+                "intelligence": 69,
+                "wisdom": 68,
+                "dexterity": 72,
+                "constitution": 30,
+                "charisma": 99
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 36202,
+            "keywords": "liath gray gray-bird",
+            "mob_class": "Layman",
+            "short_desc": "the gray liath",
+            "long_desc": "A large gray bird floats softly on the breeze overhead. ",
+            "desc": "Soft gray feathers tipped with blue form a striking pattern on this huge sea bird. You've never seen such a large bird! Its wings must span at least seven feet. It soars easily overhead, catching the breeze so skillfully that it seldom has to beat its mighty wings. ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "NOBASH",
+                "AQUATIC"
+            ],
+            "effect_flags": [
+                "INFRAVISION",
+                "NOTRACK",
+                "SNEAK",
+                "FLY"
+            ],
+            "alignment": -500,
+            "level": 20,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 74,
+                "intelligence": 56,
+                "wisdom": 72,
+                "dexterity": 78,
+                "constitution": 30,
+                "charisma": 97
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        }
+    ],
+    "objects": [
+        {
+            "id": 36200,
+            "type": "PEN",
+            "keywords": [
+                "feather",
+                "liath-feather",
+                "long-grey-feather",
+                "long-gray-feather",
+                "pen",
+                "quill"
+            ],
+            "short": "a &9&bliat&0&4h&0 feather",
+            "ground": "A long gray feather tipped with blue is floating here",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "liath-feather",
+                        "long-grey-feather",
+                        "long-gray-feather"
+                    ],
+                    "text": "A wing feather from the rare gray liath, this quill is nearly a foot long. Prized by artisans and mages alike, it is in high demand as a scribing quill, especially for water-based spells as it comes from a seabird.  The feathers are also supposed to be lucky!"
+                }
+            ],
+            "values": {},
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.02,
+            "cost": 500,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "CHA",
+                    "modifier": 3
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "36200",
+            "name": "The Beginning of the Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  It makes a sharp contrast to the blue seas you've walked before.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents.  Here at the surface, the water is amazingly calm and glassy.  To the east, a great scattering of rocks lies waiting for you to scramble across their surfaces. Passage south and west seems doubtful as the great kelp forest breaches the surface in those directions.  North of you the calm, glassy pathway of water continues. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the one clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36201"
+                },
+                "East": {
+                    "description": "A jumble of sharp rocks lies tumbled to your east. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "Seaweed pokes its curious head above water to your south, blocking passage in that direction. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "Nothing. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "39088"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "The tops of several strands of kelp wave at you from a few feet below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36201",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your east.  The narrow, clear lane of water continues to your south and to your west. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36200"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the one clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36202"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36202",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your south.  The narrow, clear lane of water continues to your east and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A narrow passage of open water runs between the tangles of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36203"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36201"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36217"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36203",
+            "name": "An Entanglement in the Fronds",
+            "description": "The dark green sea below you is preternaturally calm, but at least it's clear of seaweed.  You find this fact less reassuring than you did as you glance around and note how the kelp fronds have closed in all about you. There is no way out!  The menacing weeds even reach above you in a canopy, blocking all light from this tangle. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The tangling seaweed is impassable. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The tangling seaweed is impassable. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The tangling seaweed is impassable. The tangling seaweed seems impassable! ",
+                    "keyword": "tangle",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36202"
+                },
+                "West": {
+                    "description": "The tangling seaweed is impassable. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The thick tangle above you blocks all view of the sky above. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Dark green waters shine back at you, reflecting everything about you like the finest mirror, but giving no clue as to what's below. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36204",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your east.  The narrow, clear lane of water continues to your south and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "A narrow passage of open water runs between the tangles of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36203"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36217"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36205"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36205",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your west.  The narrow, clear lane of water continues to your north and to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36206"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36204"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. Nothing is visible between the weave. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36206",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your east.  The narrow, clear lane of water continues to your south and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36205"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the one clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36207"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36207",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your south.  The narrow, clear lane of water continues to your east and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36206"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36208"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36208",
+            "name": "A Clearing upon the Greengreen Sea",
+            "description": "The field of kelp has opened here into a small clearing.  Your way is open in every direction except south.  Clear pathways wind away from here in several directions.  One leads off immediately to your east.  Across the clearing, you can see two others: one leading west and the other south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36209"
+                },
+                "East": {
+                    "description": "A narrow pathway, clear of the ever-present seaweed, leads off to the east. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36207"
+                },
+                "South": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36228"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36209",
+            "name": "A Clearing upon the Greengreen Sea",
+            "description": "The field of kelp has opened here into a small clearing.  Your way is open to the south and the west.  A little ways away, you can see clear pathways winding their way deeper into the kelp bed to the east, the south, and the west.  I wonder where they lead? ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36208"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the one clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36210"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36210",
+            "name": "A Clearing upon the Greengreen Sea",
+            "description": "The field of kelp has opened here into a small clearing.  Your way is open in every direction except north.  Clear pathways wind away from the clearing in several directions.  One leads off immediately to your west.  Across the clearing, you can see two others: one leading east and the other south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36209"
+                },
+                "South": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36228"
+                },
+                "West": {
+                    "description": "A narrow pathway, clear of the ever-present seaweed, leads off to the west. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36211"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36211",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your west.  The narrow, clear lane of water continues to your north and to your east. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36212"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36210"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. Nothing is visible between the weave. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36212",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your east and to your west.  The narrow, clear lane of water continues to your north and to your south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36213"
+                },
+                "East": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36211"
+                },
+                "West": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36213",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your east and to your west.  The narrow, clear lane of water continues to your north and to your south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36214"
+                },
+                "East": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36212"
+                },
+                "West": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36214",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your east.  The narrow, clear lane of water continues to your south and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36213"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the one clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36215"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36215",
+            "name": "The Greengreen Sea",
+            "description": "The green tinge is fading from the waters below you.  A more normal blue replaces it to the west.  Waves form beneath you and roll towards the rocks protecting a peninsula to your west.  The kelp holds sway to the north and the south.  The narrow, clear lane of water continues to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. The passage disappears around a bend just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36214"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36216"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36216",
+            "name": "The Beginning of the Greengreen Sea",
+            "description": "The waters below you are faintly tinged with green.  A more normal blue replaces it to the west while the green deepens to your east.  Gentle waves roll beneath you toward the near shore area.  Tall kelp thrusts above the water to your north and south, blocking your passage.  A narrow, clear lane of water continues to your east. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The narrow passage between the stands of kelp winds around a corner a short distance ahead. Who can tell where it leads? ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36215"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "A sad melody fades away in the wind as you face a small area of shallow waters guarding the headland. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "41107"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36217",
+            "name": "A T-Crossing on the Greengreen Sea",
+            "description": "Tall fronds of kelp press in from nearby on all sides.  The press especially close to you from the west, but narrow passages of clear water wind a careful path between the strands to your north, south, and east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "A haunting melody floats across the clear, glassy path of green water like the lost sound of a lullaby. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36204"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36202"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36218"
+                },
+                "West": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. Nothing is visible between the weave. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36218",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your east and to your west.  The narrow, clear lane of water continues to your north and to your south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36217"
+                },
+                "East": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36219"
+                },
+                "West": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36219",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your east.  The narrow, clear lane of water continues to your north and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36218"
+                },
+                "East": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36220"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36220",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your south.  The narrow, clear lane of water continues to your east and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36219"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36221"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36221",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your west.  The narrow, clear lane of water continues to your north and to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. All sounds are deadened and flat. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36222"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36220"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. Nothing is visible between the weave. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36222",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your east and to your west.  The narrow, clear lane of water continues to your north and to your south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36223"
+                },
+                "East": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The clear passage of water winds through the stand of kelp. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36221"
+                },
+                "West": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36223",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your east.  The narrow, clear lane of water continues to your south and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36222"
+                },
+                "West": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36224"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36224",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your north and to your west.  The narrow, clear lane of water continues to your south and to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36223"
+                },
+                "South": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36225"
+                },
+                "West": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36225",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your east.  The narrow, clear lane of water continues to your north and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36224"
+                },
+                "East": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36226"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36226",
+            "name": "The Greengreen Sea",
+            "description": "The green tinge is fading from the waters below you.  A more normal blue replaces it to the west.  Waves form beneath you and roll towards the rocks protecting a peninsula to your west.  The kelp holds sway to the north and the south.  The narrow, clear lane of water continues to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. The passage disappears around a bend just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36225"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "A hunting horn sounds in the distance and a great noise like the passing of a flock of geese fills the air from the island ahead of you. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36227"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36227",
+            "name": "The Beginning of the Greengreen Sea",
+            "description": "The waters below you are faintly tinged with green.  A more normal blue replaces it to the west while the green deepens to your east.  Gentle waves roll beneath you toward the near shore area.  Tall kelp thrusts above the water to your north and south, blocking your passage.  A narrow, clear lane of water continues to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The narrow passage between the stands of kelp winds around a corner a short distance ahead. Who can tell where it leads? ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36226"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The sound of many horsemen crashes through the forest on the land ahead of you. It sounds like a mighty hunt is in progress on the island. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36228",
+            "name": "A Clearing upon the Greengreen Sea",
+            "description": "The field of kelp has opened here into a small clearing.  Your way is open in every direction except south.  Clear pathways wind away from the clearing in several directions.  One leads off immediately to your south.  Across the clearing, you can see two others: one leading east and the other west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36210"
+                },
+                "East": {
+                    "description": "The open area extends ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36208"
+                },
+                "South": {
+                    "description": "A narrow pathway, clear of the ever-present seaweed, leads off to the south. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36229"
+                },
+                "West": {
+                    "description": "Seaweed pokes its curious head above water, blocking passage in this direction. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36229",
+            "name": "The Greengreen Sea",
+            "description": "The waters below you are tinged with the deepest green.  Below the surface, a tall kelp forest waves fronds slowly in the subtle action of the currents. Here at the surface, the water is amazingly calm and glassy.  A tangled mat of kelp thrusts above the ocean to your south and to your east.  The narrow, clear lane of water continues to your north and to your west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36228"
+                },
+                "East": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "Flat fronds of seaweed form a thick, impassable mat on the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36230"
+                },
+                "Up": {
+                    "description": "The sky seems to have taken on a greenish hue. It doesn't look healthy. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36230",
+            "name": "The Greengreen Sea",
+            "description": "The green tinge is fading from the waters below you.  A more normal blue replaces it to the west.  Waves form beneath you and roll towards the rocks protecting a peninsula to your west.  The kelp holds sway to the north and the south.  The narrow, clear lane of water continues to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The calm surface waters are clear of the entangling seaweed. The passage disappears around a bend just ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36229"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The faint whinny of a horse comes from the island visible ahead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36231"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        },
+        {
+            "id": "36231",
+            "name": "The Beginning of the Greengreen Sea",
+            "description": "The waters below you are faintly tinged with green.  A more normal blue replaces it to the west while the green deepens to your east.  Gentle waves roll beneath you toward the near shore area.  Tall kelp thrusts above the water to your north and south, blocking your passage.  A narrow, clear lane of water continues to your east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "East": {
+                    "description": "The narrow passage between the stands of kelp winds around a corner a short distance ahead. Who can tell where it leads? ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36230"
+                },
+                "South": {
+                    "description": "Tall weeds wave in the wind. They block your view completely making you feel small and isolated in this unnatural forest on the open sea. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The sounds of bells and laughter carry across the water from the woods on the island. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Up": {
+                    "description": "The green fades to blue above. A lone gull rides the currents far overhead. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "Down": {
+                    "description": "Thick leaves of seaweed tangle and untangle in a slow dance just below the surface. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "-1"
+                }
+            }
+        }
+    ]
+}
