@@ -1,0 +1,3336 @@
+{
+    "zone": {
+        "id": "70",
+        "name": "the Great Road",
+        "top": 7199,
+        "lifespan": 20,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "OCEANIC",
+        "resets": {
+            "mob": [
+                {
+                    "id": 7075,
+                    "max": 1,
+                    "room": 7089,
+                    "name": "(a mysteriously cloaked figure)"
+                },
+                {
+                    "id": 7052,
+                    "max": 3,
+                    "room": 7043,
+                    "name": "(a mendicant priest)",
+                    "equipped": [
+                        {
+                            "id": 7002,
+                            "max": 99,
+                            "location": "Body",
+                            "name": "(a silver sword pendant)"
+                        },
+                        {
+                            "id": 1003,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(&9&ban ebony hood&0)"
+                        },
+                        {
+                            "id": 1027,
+                            "max": 99,
+                            "location": "Arms",
+                            "name": "(some plain leather sandals)"
+                        }
+                    ]
+                },
+                {
+                    "id": 7052,
+                    "max": 3,
+                    "room": 7069,
+                    "name": "(a mendicant priest)",
+                    "equipped": [
+                        {
+                            "id": 7002,
+                            "max": 99,
+                            "location": "Body",
+                            "name": "(a silver sword pendant)"
+                        },
+                        {
+                            "id": 1003,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(&9&ban ebony hood&0)"
+                        },
+                        {
+                            "id": 1027,
+                            "max": 99,
+                            "location": "Arms",
+                            "name": "(some plain leather sandals)"
+                        }
+                    ]
+                },
+                {
+                    "id": 7050,
+                    "max": 3,
+                    "room": 7012,
+                    "name": "(a traveling halfling)",
+                    "equipped": [
+                        {
+                            "id": 38,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(black linen leggings)"
+                        },
+                        {
+                            "id": 1028,
+                            "max": 99,
+                            "location": "Wrist",
+                            "name": "(a &2green&0 woolen cloak)"
+                        },
+                        {
+                            "id": 7000,
+                            "max": 99,
+                            "location": "Legs",
+                            "name": "(a bright red woolen vest)"
+                        },
+                        {
+                            "id": 1103,
+                            "max": 99,
+                            "location": "Feet",
+                            "name": "(a leather cap)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 99,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 7050,
+                    "max": 3,
+                    "room": 7002,
+                    "name": "(a traveling halfling)",
+                    "equipped": [
+                        {
+                            "id": 1106,
+                            "max": 99,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        },
+                        {
+                            "id": 1103,
+                            "max": 99,
+                            "location": "Feet",
+                            "name": "(a leather cap)"
+                        },
+                        {
+                            "id": 7000,
+                            "max": 99,
+                            "location": "Legs",
+                            "name": "(a bright red woolen vest)"
+                        },
+                        {
+                            "id": 1028,
+                            "max": 99,
+                            "location": "Wrist",
+                            "name": "(a &2green&0 woolen cloak)"
+                        },
+                        {
+                            "id": 38,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(black linen leggings)"
+                        }
+                    ]
+                },
+                {
+                    "id": 7053,
+                    "max": 3,
+                    "room": 7091,
+                    "name": "(an old alligator)"
+                },
+                {
+                    "id": 7053,
+                    "max": 3,
+                    "room": 7090,
+                    "name": "(an old alligator)"
+                },
+                {
+                    "id": 7004,
+                    "max": 3,
+                    "room": 7095,
+                    "name": "(a black snake)"
+                },
+                {
+                    "id": 7004,
+                    "max": 3,
+                    "room": 7087,
+                    "name": "(a black snake)"
+                },
+                {
+                    "id": 7004,
+                    "max": 3,
+                    "room": 7082,
+                    "name": "(a black snake)"
+                },
+                {
+                    "id": 7003,
+                    "max": 3,
+                    "room": 7092,
+                    "name": "(a warthog)"
+                },
+                {
+                    "id": 7003,
+                    "max": 3,
+                    "room": 7085,
+                    "name": "(a warthog)"
+                },
+                {
+                    "id": 7003,
+                    "max": 3,
+                    "room": 7081,
+                    "name": "(a warthog)"
+                },
+                {
+                    "id": 7051,
+                    "max": 2,
+                    "room": 7018,
+                    "name": "(a small Southern Bile)"
+                },
+                {
+                    "id": 7051,
+                    "max": 2,
+                    "room": 7037,
+                    "name": "(a small Southern Bile)"
+                },
+                {
+                    "id": 7002,
+                    "max": 2,
+                    "room": 7036,
+                    "name": "(a large brown toad)"
+                },
+                {
+                    "id": 7002,
+                    "max": 2,
+                    "room": 7041,
+                    "name": "(a large brown toad)"
+                },
+                {
+                    "id": 7001,
+                    "max": 3,
+                    "room": 7030,
+                    "name": "(a slime-covered shrew)"
+                },
+                {
+                    "id": 7001,
+                    "max": 3,
+                    "room": 7008,
+                    "name": "(a slime-covered shrew)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 7001,
+            "keywords": "shrew",
+            "mob_class": "Layman",
+            "short_desc": "a slime-covered shrew",
+            "long_desc": "A large shrew chitters at you from some undergrowth.",
+            "desc": "It's a four-footed mammal similar in shape to a mouse or rat, but with a longer snout and sharper teeth. It looks this way and that, sniffing out food in its swampy home.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -30,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 82,
+                "intelligence": 70,
+                "wisdom": 73,
+                "dexterity": 84,
+                "constitution": 80,
+                "charisma": 65
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 7002,
+            "keywords": "toad large brown",
+            "mob_class": "Layman",
+            "short_desc": "a large brown toad",
+            "long_desc": "A large brown toad croaks a mating song.",
+            "desc": "He's a large and well-formed specimen of the species, with a full throat capable of blasting out gutteral songs. His muddy brown skin is very bumpy.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 86,
+                "intelligence": 82,
+                "wisdom": 66,
+                "dexterity": 78,
+                "constitution": 81,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "BLUDGEON"
+        },
+        {
+            "id": 7003,
+            "keywords": "warthog hog",
+            "mob_class": "Layman",
+            "short_desc": "a warthog",
+            "long_desc": "A warthog snuffles at undergrowth.",
+            "desc": "This foul-smelling beast has four legs ending in cloven hooves and a generally piglike appearance. He's got very large tusks that curl at the sides of his mouth, and beady little black eyes that squint. His skin is reddish-brown and coarse with inch-long black hairs that stick up out of it every couple inches.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": -200,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 80,
+                "intelligence": 72,
+                "wisdom": 79,
+                "dexterity": 78,
+                "constitution": 79,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 7004,
+            "keywords": "snake black black-snake",
+            "mob_class": "Layman",
+            "short_desc": "a black snake",
+            "long_desc": "A sinuous black snake slithers toward you.",
+            "desc": "This snake is at least as long as a human is tall, with a wide, muscular body and glittering eyes. Its coat of scales gleams and shines black in any light, giving a handsome contrast to its pure white fangs.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -50,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 63,
+                "wisdom": 81,
+                "dexterity": 86,
+                "constitution": 80,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 7005,
+            "keywords": "bile crusher",
+            "mob_class": "Layman",
+            "short_desc": "the Northern Crusher Bile",
+            "long_desc": "The Northern Crusher Bile is here with an evil gleam in his eyes.",
+            "desc": "Larger than the regular bile, the Crusher Biles are part of Blackmourne's elite force.  Bred for a love of violence and the strength to rip someone's arms off, the Crusher are the most feared bile.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -400,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 89,
+                "intelligence": 75,
+                "wisdom": 81,
+                "dexterity": 70,
+                "constitution": 76,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7009,
+            "keywords": "bile southern swamp bushes",
+            "mob_class": "Layman",
+            "short_desc": "the Southern Swamp Bile",
+            "long_desc": "There are some bushes here.. is that something moving in there?",
+            "desc": "The swamp here is very thick, so thick it is difficult to see more than 30 feet but you think you see something moving.  Looking closer, you see the outline of a bile... a large bile.  He draws his sword and charges.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -400,
+            "level": 7,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 90,
+                "intelligence": 64,
+                "wisdom": 72,
+                "dexterity": 86,
+                "constitution": 81,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7010,
+            "keywords": "bile southern swamp bushes thorn",
+            "mob_class": "Layman",
+            "short_desc": "the Southern Thornguard",
+            "long_desc": "There are some bushes here.. is that something moving there?",
+            "desc": "The swamp here is very thick, so thick it is difficult to see more than 30 feet but you think you see something moving.  Looking closer, you see the outline of a bile... a large bile.  He draws his sword and charges.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -500,
+            "level": 15,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 92,
+                "intelligence": 72,
+                "wisdom": 75,
+                "dexterity": 92,
+                "constitution": 72,
+                "charisma": 48
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7012,
+            "keywords": "bilerot rot bile southern",
+            "mob_class": "Layman",
+            "short_desc": "the Southern Bilerot",
+            "long_desc": "The Southern Bilerot is standing here, ready to tear your head off.",
+            "desc": "Standing well over 9 feet tall, this creature has to be one of the biggest bilerots you have ever seen.  Similar to their northern cousins, these bilerot are bigger and nastier.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -400,
+            "level": 24,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 98,
+                "intelligence": 62,
+                "wisdom": 72,
+                "dexterity": 86,
+                "constitution": 82,
+                "charisma": 55
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7014,
+            "keywords": "clave bile",
+            "mob_class": "Layman",
+            "short_desc": "the Bile Clave",
+            "long_desc": "The Bile Clave is standing before you, mumbling some words.",
+            "desc": "The Clave are bile that survive the countless experiments of their shew masters and have learned to use some of those magics.  You have heard of the clave's magics.. mostly necromancy.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -700,
+            "level": 17,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 89,
+                "intelligence": 68,
+                "wisdom": 72,
+                "dexterity": 78,
+                "constitution": 79,
+                "charisma": 65
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7050,
+            "keywords": "traveler halfling",
+            "mob_class": "Layman",
+            "short_desc": "a traveling halfling",
+            "long_desc": "A halfling dressed for a trip goes past.",
+            "desc": "He's merry-looking, short and plump, with curly brown hair cut rather short and a round, pleasant face. He whistles most of the time as he walks.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "WIMPY"
+            ],
+            "effect_flags": [],
+            "alignment": 400,
+            "level": 7,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 11,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 97,
+                "intelligence": 71,
+                "wisdom": 68,
+                "dexterity": 88,
+                "constitution": 78,
+                "charisma": 52
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7051,
+            "keywords": "bile small southern",
+            "mob_class": "Layman",
+            "short_desc": "a small Southern Bile",
+            "long_desc": "A small bile oozes its way toward you.",
+            "desc": "It is small, about the size of a boot, and almost flat to the ground, making it hard to hit. It is tea-colored, with a blubbery, gelatinous body and no discernible eyes or mouth.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "AGGR_GOOD",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 17,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 99,
+                "intelligence": 65,
+                "wisdom": 64,
+                "dexterity": 78,
+                "constitution": 86,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "BLUDGEON"
+        },
+        {
+            "id": 7052,
+            "keywords": "mendicant priest zadash",
+            "mob_class": "Cleric",
+            "short_desc": "a mendicant priest",
+            "long_desc": "A wandering priest staggers past.",
+            "desc": "He's a bit wild-eyed, and tattooed all over. He seems very weak, shaking as he walks and stuttering when he speaks.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 79,
+                "intelligence": 74,
+                "wisdom": 85,
+                "dexterity": 75,
+                "constitution": 75,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 7053,
+            "keywords": "alligator old",
+            "mob_class": "Layman",
+            "short_desc": "an old alligator",
+            "long_desc": "A large, old alligator suns itself here.",
+            "desc": "It's an old one, big and thick-bodied, with a hard reptilian body and jagged teeth in its long snout.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "SLOW_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 92,
+                "intelligence": 63,
+                "wisdom": 64,
+                "dexterity": 85,
+                "constitution": 83,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 7075,
+            "keywords": "ranger mysteriously cloaked figure elf",
+            "mob_class": "Ranger",
+            "short_desc": "a mysteriously cloaked figure",
+            "long_desc": "A cloaked figure leans on his walking staff.",
+            "desc": "A tall, slender elf leans gently on a walking staff.  His clothes show some wear from travel, but his boots are of the best quality and show an amazingly small amount of aging.  Outfitted for a long journey he seems to be consulting a large map of some sort.  His eyes leave the parchment only long enough to glance around as if looking for something.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOSLEEP",
+                "NOBASH",
+                "NOBLIND",
+                "PEACEFUL"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE",
+                "PROTECT_EVIL",
+                "PROTECT_GOOD",
+                "BLUR"
+            ],
+            "alignment": 800,
+            "level": 90,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 1,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 87,
+                "intelligence": 76,
+                "wisdom": 64,
+                "dexterity": 97,
+                "constitution": 73,
+                "charisma": 56
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 7000,
+            "type": "ARMOR",
+            "keywords": [
+                "vest",
+                "bright-red-woolen-vest",
+                "bright-red-vest",
+                "wool"
+            ],
+            "short": "a bright red woolen vest",
+            "ground": "A bright red vest lies tossed here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "bright-red-woolen-vest",
+                        "bright-red-vest",
+                        "wool"
+                    ],
+                    "text": "It's a bright red vest made of densely woven wool, quilted for protection against the elements.  It has little cap sleeves and bright brass buttons to close it down the front."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [],
+            "weight": 3.0,
+            "cost": 100,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "effects": []
+        },
+        {
+            "id": 7002,
+            "type": "TREASURE",
+            "keywords": [
+                "pendant",
+                "silver-sword-pendant",
+                "zadash",
+                "necklace"
+            ],
+            "short": "a silver sword pendant",
+            "ground": "A pendant shaped like a sword lies here.",
+            "action_desc": "",
+            "values": {
+                "AC": 0
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 300,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "affects": [
+                {
+                    "location": "STR",
+                    "modifier": 1
+                },
+                {
+                    "location": "SAVING_SPELL",
+                    "modifier": -2
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 7075,
+            "name": "Mystwatch Entrance Guard (southern)",
+            "attach_type": "Object",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "north",
+            "commands": "if %actor.vnum% == -1 if %actor.level% < 30 whisper %actor.name% Young adventurer, you are far too small to venture north of here. wait 1 whisper %actor.name%  Try a safer location to pick battles for now. smile %actor.name% else return 0 endif else return 0 endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "7000",
+            "name": "The Great Road",
+            "description": "You are at the beginning of the Great Road.  This road travels to the great city of Anduin and beyond.  This road also travels through the swamps so be careful.    ",
+            "flags": [],
+            "sector": "CITY",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7003"
+                },
+                "South": {
+                    "description": "You see the North Gate.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3051"
+                }
+            }
+        },
+        {
+            "id": "7001",
+            "name": "The Great Road",
+            "description": "You are at the beginning of the Great Road.  This road travels to the great city of Anduin and beyond.  This road also travels through the swamps so be careful. The wide, unpaved road runs to the north and south. Just south of here is the small woodland village of Mielikki, with a light forest to the east and west. The gates of Mielikki are visible to the south.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7003"
+                },
+                "South": {
+                    "description": "You see the North Gate.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3051"
+                }
+            }
+        },
+        {
+            "id": "7002",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7006"
+                },
+                "East": {
+                    "description": "You can make out a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7003"
+                }
+            }
+        },
+        {
+            "id": "7003",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing on a bend in the Great Road.  The road runs south-east. To the north and west you might be able to make your way into the swamp.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7007"
+                },
+                "East": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7004"
+                },
+                "South": {
+                    "description": "You see the Great Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7001"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7002"
+                }
+            }
+        },
+        {
+            "id": "7004",
+            "name": "The Great Road",
+            "description": "The wide road is easy to travel, heading east-west through gradually wetter and wetter land. The plant life is particularly thick to the northeast.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7005"
+                },
+                "West": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7003"
+                }
+            }
+        },
+        {
+            "id": "7005",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs west-north.  A huge ruined hall sits partially submerged in the swamp to the south.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7008"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3211"
+                },
+                "West": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7004"
+                }
+            }
+        },
+        {
+            "id": "7006",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7011"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7007"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7002"
+                }
+            }
+        },
+        {
+            "id": "7007",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7003"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7006"
+                }
+            }
+        },
+        {
+            "id": "7008",
+            "name": "The Great Road",
+            "description": "The road runs to the north and south past bogs and swamps. There's little of interest along it, but further south, there rises a small village.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7012"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7009"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7005"
+                }
+            }
+        },
+        {
+            "id": "7009",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7013"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7010"
+                },
+                "West": {
+                    "description": "You can make out the Great Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7008"
+                }
+            }
+        },
+        {
+            "id": "7010",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7014"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7010"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7009"
+                }
+            }
+        },
+        {
+            "id": "7011",
+            "name": "Thick Swamp",
+            "description": "Dark knee-deep water sits unmoving beneath the thick bushes.  Dense trees and plants choke your vision, but there is a break to the west and some sort of path on higher ground.  Everywhere else is tangled vegetation.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7011"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7011"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7006"
+                },
+                "West": {
+                    "description": "The ground is higher this way and a path leads out of the swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "8608"
+                }
+            }
+        },
+        {
+            "id": "7012",
+            "name": "The Great Road",
+            "description": "The road runs to the north and south past bogs and swamps. There's little of interest along it, but further south, there rises a small village.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7019"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7008"
+                }
+            }
+        },
+        {
+            "id": "7013",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7020"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7009"
+                }
+            }
+        },
+        {
+            "id": "7014",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7021"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7015"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7010"
+                }
+            }
+        },
+        {
+            "id": "7015",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7022"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7015"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7014"
+                }
+            }
+        },
+        {
+            "id": "7018",
+            "name": "Thick Swamp",
+            "description": "The knee-deep water and vegetation appears to come to a head here, and there is no way out of this thicket except to the north.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7028"
+                }
+            }
+        },
+        {
+            "id": "7019",
+            "name": "The Great Road",
+            "description": "The road runs to the north and south past bogs and swamps. There's little of interest along it, but further south, there rises a small village.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7030"
+                },
+                "East": {
+                    "description": "You see thick swamp in this direction.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7020"
+                },
+                "South": {
+                    "description": "You see the Great road this way.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7012"
+                }
+            }
+        },
+        {
+            "id": "7020",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7031"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7021"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7013"
+                },
+                "West": {
+                    "description": "You can make out the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7019"
+                }
+            }
+        },
+        {
+            "id": "7021",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7021"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7021"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7014"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7020"
+                }
+            }
+        },
+        {
+            "id": "7022",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7033"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7015"
+                }
+            }
+        },
+        {
+            "id": "7027",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7037"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7028"
+                }
+            }
+        },
+        {
+            "id": "7028",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "You see thick swamp. You feel that going this way might be bad.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7018"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7027"
+                }
+            }
+        },
+        {
+            "id": "7029",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs north-east. The swamp lies all around, but cannot be entered from here, for the footing is far too dangerous.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7039"
+                },
+                "East": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7030"
+                }
+            }
+        },
+        {
+            "id": "7030",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs south-west. To the north you might be able to make your way into the swamp.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7040"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7019"
+                },
+                "West": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7029"
+                }
+            }
+        },
+        {
+            "id": "7031",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7041"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7032"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7020"
+                }
+            }
+        },
+        {
+            "id": "7032",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7032"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7033"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7031"
+                }
+            }
+        },
+        {
+            "id": "7033",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7033"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7022"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7032"
+                }
+            }
+        },
+        {
+            "id": "7036",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7042"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7037"
+                }
+            }
+        },
+        {
+            "id": "7037",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7038"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7027"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7036"
+                }
+            }
+        },
+        {
+            "id": "7038",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7039"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7038"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7037"
+                }
+            }
+        },
+        {
+            "id": "7039",
+            "name": "The Great Road",
+            "description": "The wide road runs from north to south through fairly dead countryside. Bogs and swamps have pretty much taken over it, but the road itself is wide and clear of debris.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road this way.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7045"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7029"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7038"
+                }
+            }
+        },
+        {
+            "id": "7040",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7041"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7030"
+                }
+            }
+        },
+        {
+            "id": "7041",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7031"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7040"
+                }
+            }
+        },
+        {
+            "id": "7042",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7047"
+                },
+                "East": {
+                    "description": "You can make out the great road through the bushes.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7043"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7036"
+                }
+            }
+        },
+        {
+            "id": "7043",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs north-east. You can see the swamp to the west through the thick bushes.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a long stretch of the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7048"
+                },
+                "East": {
+                    "description": "Another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7044"
+                },
+                "West": {
+                    "description": "You can see the swamp through the bushes.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7042"
+                }
+            }
+        },
+        {
+            "id": "7044",
+            "name": "A Bend in the Great Road",
+            "description": "This wide road twists and turns, heading north and west through swampy bogs that look thoroughly unappetizing to most people. The road itself is easy to traverse, but the land around it is hostile to travelers.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "Another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7049"
+                },
+                "West": {
+                    "description": "A bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7043"
+                }
+            }
+        },
+        {
+            "id": "7045",
+            "name": "The Great Road",
+            "description": "The road is wide, running from north to south through a wet, swampy area. Clear and free of ruts, the road is not very interesting, and the scenery is not what most people would call pleasantly scented or attractive.",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7050"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7039"
+                }
+            }
+        },
+        {
+            "id": "7047",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see the great road through the bushes.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7048"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7042"
+                }
+            }
+        },
+        {
+            "id": "7048",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7051"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7043"
+                },
+                "West": {
+                    "description": "You can see some swamp through the bushes.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7047"
+                }
+            }
+        },
+        {
+            "id": "7049",
+            "name": "A Bend in the Great Road",
+            "description": "The road is wide and easy to travel, but it has many twists and turns. Currently it runs from south to east, with an intersection visible to the east.",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "A bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7050"
+                },
+                "South": {
+                    "description": "Another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7044"
+                }
+            }
+        },
+        {
+            "id": "7050",
+            "name": "The Great Road Intersection",
+            "description": "Two large, wide old roads intersect here. The Great Road continues to the south and west. The Old Road, thus called because of its overgrown and disused nature, runs eastward from here. The swamps look passable to the north.",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7053"
+                },
+                "East": {
+                    "description": "You see the beginning of the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7079"
+                },
+                "South": {
+                    "description": "You see the great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7045"
+                },
+                "West": {
+                    "description": "You see another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7049"
+                }
+            }
+        },
+        {
+            "id": "7051",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7054"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7048"
+                }
+            }
+        },
+        {
+            "id": "7052",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7052"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7053"
+                }
+            }
+        },
+        {
+            "id": "7053",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7055"
+                },
+                "East": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7090"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7050"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7052"
+                }
+            }
+        },
+        {
+            "id": "7054",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7056"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7051"
+                }
+            }
+        },
+        {
+            "id": "7055",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7058"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7053"
+                }
+            }
+        },
+        {
+            "id": "7056",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7059"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7057"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7054"
+                }
+            }
+        },
+        {
+            "id": "7057",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7058"
+                },
+                "West": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7056"
+                }
+            }
+        },
+        {
+            "id": "7058",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7055"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7057"
+                }
+            }
+        },
+        {
+            "id": "7059",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7060"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7056"
+                }
+            }
+        },
+        {
+            "id": "7060",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7061"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7059"
+                }
+            }
+        },
+        {
+            "id": "7061",
+            "name": "The Great Road",
+            "description": "The wide road runs north to south through swampy bogs. There is no sign of civilization anywhere nearby, and no sounds except the squelching of mud in the swamps.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7064"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7060"
+                }
+            }
+        },
+        {
+            "id": "7062",
+            "name": "Long Dirt Road",
+            "description": "This road runs east-west through tall pines.  There is something of a clearing to the west, though some odd-looking trees grow in it as well.  The road descends into a swamp to the east.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7063"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "6913"
+                }
+            }
+        },
+        {
+            "id": "7063",
+            "name": "Long Dirt Road",
+            "description": "A road leads through the swamp, barely rising above the soupy water and tangled branches.  It leads east toward a T-crossing with a larger road, or west toward a pine forest.  The swamp ends at the forest's edge.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see the Great road through the bushes.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7064"
+                },
+                "West": {
+                    "description": "You see a lond dirt road that streaches on forever.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7062"
+                }
+            }
+        },
+        {
+            "id": "7064",
+            "name": "T-Crossing in the Great Road",
+            "description": "The wide road runs north to south through swampy bogs.  A narrow dirt road starts here and leads west through the brush and mists.  There is no other sign of civilization anywhere nearby.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7065"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7061"
+                },
+                "West": {
+                    "description": "You think you might be able to enter the swamp through the bushes here.",
+                    "keyword": "bushes",
+                    "key": "-1",
+                    "destination": "7063"
+                }
+            }
+        },
+        {
+            "id": "7065",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs south-east. You can see the swamp to the west and north through the thick bushes.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7066"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7064"
+                }
+            }
+        },
+        {
+            "id": "7066",
+            "name": "The Great Road",
+            "description": "The road is wide and clear of debris, making it easy to traverse. There is little of note on the road itself, and only swamps full of dense plant life to look at to the north and south. The road runs east-west, with a bend to the west.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7067"
+                },
+                "West": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7065"
+                }
+            }
+        },
+        {
+            "id": "7067",
+            "name": "The Great Road",
+            "description": "The road is wide and clear of debris, making it easy to traverse. There is little of note on the road itself, and only swamps full of dense plant life to look at to the north and south. The road runs east-west.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7068"
+                },
+                "West": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7066"
+                }
+            }
+        },
+        {
+            "id": "7068",
+            "name": "A Bend in the Great Road",
+            "description": "The road bends here, heading north and west through swampy countryside. Though the road itself is easy to travel, the swamps do not look as safe.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7069"
+                },
+                "West": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7067"
+                }
+            }
+        },
+        {
+            "id": "7069",
+            "name": "The Great Road",
+            "description": "The road runs from north to south through very swampy ground. The road itself is in good condition, being clean and free of debris, but the land around it is inhospitable and murky, full of plant life.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7071"
+                },
+                "South": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7068"
+                }
+            }
+        },
+        {
+            "id": "7070",
+            "name": "A Bend in the Great Road",
+            "description": "The wide merchant road curves from north to east, passing through very inhospitable, thick swamps full of jungle-type plant life.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7073"
+                },
+                "East": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7071"
+                }
+            }
+        },
+        {
+            "id": "7071",
+            "name": "A Bend in the Great Road",
+            "description": "The wide merchant road curves from south to west, passing through very inhospitable, thick swamps full of jungle-type plant life.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7069"
+                },
+                "West": {
+                    "description": "You see another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7070"
+                }
+            }
+        },
+        {
+            "id": "7072",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs north-east. This is one of the few places that you can't enter the swamp.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7074"
+                },
+                "East": {
+                    "description": "You see another bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7073"
+                }
+            }
+        },
+        {
+            "id": "7073",
+            "name": "A Bend in the Great Road",
+            "description": "The road is wide, but twists in many directions around very inhospitable bogs and swamps. Currently it runs south to west, avoiding a dense tangle of odd-looking trees.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "South": {
+                    "description": "You see another Bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7070"
+                },
+                "West": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7072"
+                }
+            }
+        },
+        {
+            "id": "7074",
+            "name": "The Great Road",
+            "description": "The Great Road stretches for quite some distance to the north and south, running through very inhospitable swampland. The road itself is slightly raised, making it slightly drier. ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7075"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7072"
+                }
+            }
+        },
+        {
+            "id": "7075",
+            "name": "The Great Road",
+            "description": "The Great Road stretches for quite some distance to the north and south, running through very inhospitable swampland. The road itself is slightly raised, making it slightly drier. ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a bend in the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7076"
+                },
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7074"
+                }
+            }
+        },
+        {
+            "id": "7076",
+            "name": "A Bend in the Great Road",
+            "description": "You are standing at a bend in the Great Road.  The road runs south-west. The swamplands appear to be drying out here, growing more boggy to the south. Some little scrubby trees appear to the west.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "South": {
+                    "description": "You see the Great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7075"
+                },
+                "West": {
+                    "description": "You see the Great road leading toward the gates of Anduin.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7077"
+                }
+            }
+        },
+        {
+            "id": "7077",
+            "name": "The Great Road",
+            "description": "The road runs from east to west through scrublands of little starved trees and shrubs. The area is drier than the swamps to the southeast, with mountains in the far background.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see a bend in the great road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7076"
+                },
+                "West": {
+                    "description": "You see a bend in the Great road that leads to the Gates of Anduin.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55808"
+                }
+            }
+        },
+        {
+            "id": "7079",
+            "name": "The Beginning of the Old Road",
+            "description": "You are standing at the beginning of the Old Road.  It looks like its been a very long time since this road has been used.  The road is just barely recognizable, overgrown as it is.  The Old Road continues on to the east, and you can return to the Great Road to the west.  You can also make your way into the swamplands to the north.    ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7090"
+                },
+                "East": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7080"
+                },
+                "West": {
+                    "description": "You see a bend in the Great Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7050"
+                }
+            }
+        },
+        {
+            "id": "7080",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the north and west from here.  You could also force your way into the swamps to the east.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7081"
+                },
+                "East": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7094"
+                },
+                "West": {
+                    "description": "You see the beginning of the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7079"
+                }
+            }
+        },
+        {
+            "id": "7081",
+            "name": "The Old Road",
+            "description": "You are standing on the Old Road, pushing your way through the plant life that has long ago overgrown it.  The Old Road runs north-south here.  You could also make your way into the swamps to the west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7082"
+                },
+                "South": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7080"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7090"
+                }
+            }
+        },
+        {
+            "id": "7082",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the south and east from here.  The Old Road has been almost completely overrun by the swamp's plantlife here.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7083"
+                },
+                "South": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7081"
+                }
+            }
+        },
+        {
+            "id": "7083",
+            "name": "The Old Road",
+            "description": "You are standing on the Old Road, pushing your way through the plant life that has long ago overgrown it.  The Old Road runs east-west here.  You can also make your way into the swamps to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7099"
+                },
+                "East": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7084"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7091"
+                },
+                "West": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7082"
+                }
+            }
+        },
+        {
+            "id": "7084",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the north and west from here.  You could also force your way into the swamplands to the south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7085"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7092"
+                },
+                "West": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7083"
+                }
+            }
+        },
+        {
+            "id": "7085",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the south and east from here.  You can also make your way into the surrounding swamplands to the west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7086"
+                },
+                "South": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7084"
+                },
+                "West": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7099"
+                }
+            }
+        },
+        {
+            "id": "7086",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the south and west from here.  The Old Road has been almost completely overgrown with the swamp's plantlife here.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "South": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7087"
+                },
+                "West": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7085"
+                }
+            }
+        },
+        {
+            "id": "7087",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the north and east from here.  The plantlife of the swamp has almost completely obliterated the Old Road here.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7086"
+                },
+                "East": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7088"
+                }
+            }
+        },
+        {
+            "id": "7088",
+            "name": "A Turn in the Old Road",
+            "description": "You are standing at a turn in the Old Road.  The Old Road continues on to the north and west from here.  You could also squeeze your way into the swamp to the south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the end of the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7089"
+                },
+                "South": {
+                    "description": "You see thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7098"
+                },
+                "West": {
+                    "description": "You see another turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7087"
+                }
+            }
+        },
+        {
+            "id": "7089",
+            "name": "The End of the Old Road",
+            "description": "A very wide road begins here, at the southern gate of a large, darkened fortress, and runs to the south in a twisting loop. The road is completely overgrown with plant life, making it difficult to traverse, and the swamps on either side of it do not look hospitable. The fortress to the north looks even less hospitable.",
+            "flags": [
+                "NOMOB",
+                "NOTRACK"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "You see the entrance to the Fortress of Mystwatch.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16001"
+                },
+                "South": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7088"
+                }
+            }
+        },
+        {
+            "id": "7090",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and plantlife.  Dense vegetation chokes your vision in all directions.  Every so often you think you feel something slither by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7090"
+                },
+                "East": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7081"
+                },
+                "South": {
+                    "description": "You see the beginning of the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7079"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7053"
+                }
+            }
+        },
+        {
+            "id": "7091",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense swamp plant life makes it difficult to see in any direction.  From time to time you feel something swimming around your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7083"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7094"
+                }
+            }
+        },
+        {
+            "id": "7092",
+            "name": "Thick Swamp",
+            "description": "The foul-smelling swamp has a perpetual sheen of water on its surface, and is always damp and clammy-feeling. The mucky ground is both muddy and stinking, but the plant life, uniformly dark green and lush, seems to like it.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7084"
+                },
+                "East": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7095"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7093"
+                }
+            }
+        },
+        {
+            "id": "7093",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7092"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7093"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7094"
+                }
+            }
+        },
+        {
+            "id": "7094",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and plantlife.  Dense vegetation chokes your vision in all directions.  Every so often you think you feel something slither by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7091"
+                },
+                "East": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7093"
+                },
+                "West": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7080"
+                }
+            }
+        },
+        {
+            "id": "7095",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "East": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7098"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7096"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7092"
+                }
+            }
+        },
+        {
+            "id": "7096",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7095"
+                },
+                "East": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7097"
+                }
+            }
+        },
+        {
+            "id": "7097",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and vegetation.  Dense trees and plants choke your vision in all directions.  Every so often you think you feel something swim by your feet.  There is a very thick, partially cut tree trunk to the east.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7098"
+                },
+                "East": {
+                    "description": "A forlorn tree trunk, scuffled with signs of abuse, lies to the east.",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7097"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7096"
+                }
+            }
+        },
+        {
+            "id": "7098",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and plantlife.  Dense vegetation chokes your vision in all directions.  Every so often you think you feel something slither by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7088"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16410"
+                },
+                "South": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7097"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7095"
+                }
+            }
+        },
+        {
+            "id": "7099",
+            "name": "Thick Swamp",
+            "description": "You are knee deep in swamp water and plantlife.  Dense vegetation chokes your vision in all directions.  Every so often you think you feel something slither by your feet.    ",
+            "flags": [],
+            "sector": "SWAMP",
+            "exits": {
+                "North": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7099"
+                },
+                "East": {
+                    "description": "You see a turn in the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7085"
+                },
+                "South": {
+                    "description": "You see the Old Road.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7083"
+                },
+                "West": {
+                    "description": "You see more thick swamp.",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7099"
+                }
+            }
+        }
+    ]
+}

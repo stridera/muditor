@@ -1,0 +1,4485 @@
+{
+    "zone": {
+        "id": "161",
+        "name": "the Desert of Gothra",
+        "top": 16199,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 16111,
+                    "max": 3,
+                    "room": 16185,
+                    "name": "(the bandit chief)",
+                    "equipped": [
+                        {
+                            "id": 16110,
+                            "max": 1,
+                            "location": "Wield",
+                            "name": "(a small bronze sash)"
+                        },
+                        {
+                            "id": 16106,
+                            "max": 9,
+                            "location": "Eyes",
+                            "name": "(a golden scimitar)"
+                        },
+                        {
+                            "id": 16101,
+                            "max": 9,
+                            "location": "Waist",
+                            "name": "(a hide shield)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16185,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16185,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16185,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16185,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16108,
+                    "max": 3,
+                    "room": 16185,
+                    "name": "(a horse)",
+                    "equipped": [
+                        {
+                            "id": 16102,
+                            "max": 3,
+                            "location": "Legs",
+                            "name": "(a leather saddle)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 25,
+                    "room": 16185,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 50,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16101,
+                    "max": 4,
+                    "room": 16146,
+                    "name": "(a trader)"
+                },
+                {
+                    "id": 16101,
+                    "max": 4,
+                    "room": 16146,
+                    "name": "(a trader)"
+                },
+                {
+                    "id": 16111,
+                    "max": 3,
+                    "room": 16125,
+                    "name": "(the bandit chief)",
+                    "equipped": [
+                        {
+                            "id": 16106,
+                            "max": 9,
+                            "location": "Eyes",
+                            "name": "(a golden scimitar)"
+                        },
+                        {
+                            "id": 16101,
+                            "max": 9,
+                            "location": "Waist",
+                            "name": "(a hide shield)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16125,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16125,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16125,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16125,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16125,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16108,
+                    "max": 3,
+                    "room": 16125,
+                    "name": "(a horse)",
+                    "equipped": [
+                        {
+                            "id": 16102,
+                            "max": 3,
+                            "location": "Legs",
+                            "name": "(a leather saddle)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16111,
+                    "max": 3,
+                    "room": 16105,
+                    "name": "(the bandit chief)",
+                    "equipped": [
+                        {
+                            "id": 16106,
+                            "max": 9,
+                            "location": "Eyes",
+                            "name": "(a golden scimitar)"
+                        },
+                        {
+                            "id": 16101,
+                            "max": 9,
+                            "location": "Waist",
+                            "name": "(a hide shield)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16105,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Badge",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16105,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16105,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16105,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16107,
+                    "max": 99,
+                    "room": 16105,
+                    "name": "(a bandit)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        },
+                        {
+                            "id": 3030,
+                            "max": 9999,
+                            "location": "Ear",
+                            "name": "(a torch)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16108,
+                    "max": 3,
+                    "room": 16105,
+                    "name": "(a horse)",
+                    "equipped": [
+                        {
+                            "id": 16102,
+                            "max": 3,
+                            "location": "Legs",
+                            "name": "(a leather saddle)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16109,
+                    "max": 1,
+                    "room": 16108,
+                    "name": "(an old man)",
+                    "equipped": [
+                        {
+                            "id": 16105,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(an ironwood staff)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16140,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16140,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16140,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16116,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16116,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16116,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16160,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16160,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16106,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16100,
+                    "max": 15,
+                    "room": 16106,
+                    "name": "(the camel)"
+                },
+                {
+                    "id": 16103,
+                    "max": 5,
+                    "room": 16135,
+                    "name": "(a snake)"
+                },
+                {
+                    "id": 16103,
+                    "max": 5,
+                    "room": 16155,
+                    "name": "(a snake)"
+                },
+                {
+                    "id": 16104,
+                    "max": 5,
+                    "room": 16153,
+                    "name": "(a lizard)"
+                },
+                {
+                    "id": 16104,
+                    "max": 5,
+                    "room": 16143,
+                    "name": "(a lizard)"
+                },
+                {
+                    "id": 16102,
+                    "max": 10,
+                    "room": 16103,
+                    "name": "(the nomad)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16102,
+                    "max": 10,
+                    "room": 16118,
+                    "name": "(the nomad)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16102,
+                    "max": 10,
+                    "room": 16132,
+                    "name": "(the nomad)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16102,
+                    "max": 10,
+                    "room": 16142,
+                    "name": "(the nomad)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16102,
+                    "max": 10,
+                    "room": 16149,
+                    "name": "(the nomad)",
+                    "equipped": [
+                        {
+                            "id": 16100,
+                            "max": 25,
+                            "location": "Eyes",
+                            "name": "(a scimitar)"
+                        }
+                    ]
+                },
+                {
+                    "id": 16106,
+                    "max": 5,
+                    "room": 16130,
+                    "name": "(a sand devil)"
+                },
+                {
+                    "id": 16106,
+                    "max": 5,
+                    "room": 16150,
+                    "name": "(a sand devil)"
+                },
+                {
+                    "id": 16106,
+                    "max": 5,
+                    "room": 16180,
+                    "name": "(a sand devil)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16166,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16166,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16166,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16169,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16169,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16110,
+                    "max": 20,
+                    "room": 16169,
+                    "name": "(a baby scorpion)"
+                },
+                {
+                    "id": 16105,
+                    "max": 1,
+                    "room": 16174,
+                    "name": "(the giant scorpion)",
+                    "carrying": [
+                        {
+                            "id": 16103,
+                            "max": 1,
+                            "name": "(a sandstone ring)"
+                        }
+                    ]
+                }
+            ],
+            "door": [
+                {
+                    "room": 16164,
+                    "direction": "South",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 16166,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 16100,
+            "keywords": "camel",
+            "mob_class": "Layman",
+            "short_desc": "the camel",
+            "long_desc": "A cranky-looking camel is standing here.",
+            "desc": "A camel is standing here chewing cud. It doesn't seem to like you looking at him.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MOUNTABLE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 6,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 88,
+                "intelligence": 64,
+                "wisdom": 73,
+                "dexterity": 82,
+                "constitution": 30,
+                "charisma": 65
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 16101,
+            "keywords": "trader",
+            "mob_class": "Layman",
+            "short_desc": "a trader",
+            "long_desc": "A trader stands here, selling his wares.",
+            "desc": "This trader is dressed in rich, brightly coloured garments. He looks like he lives a very luxurious life.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 92,
+                "intelligence": 70,
+                "wisdom": 77,
+                "dexterity": 82,
+                "constitution": 30,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16102,
+            "keywords": "nomad",
+            "mob_class": "Layman",
+            "short_desc": "the nomad",
+            "long_desc": "A desert nomad stands here, looking at you silently.",
+            "desc": "He looks like he has been through hell. You cannot see his face as it is covered by a piece of cloth. A nasty looking scimitar hangs by his belt.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "FAST_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 92,
+                "intelligence": 63,
+                "wisdom": 77,
+                "dexterity": 78,
+                "constitution": 30,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16103,
+            "keywords": "snake brown",
+            "mob_class": "Layman",
+            "short_desc": "a snake",
+            "long_desc": "A brown snake slithers on the ground here.",
+            "desc": "The snake is brown in colour, and blends perfectly with the sand.  It looks quite vicious.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [
+                "SNEAK"
+            ],
+            "alignment": 0,
+            "level": 5,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 90,
+                "intelligence": 60,
+                "wisdom": 72,
+                "dexterity": 95,
+                "constitution": 30,
+                "charisma": 63
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 16104,
+            "keywords": "lizard horned",
+            "mob_class": "Layman",
+            "short_desc": "a lizard",
+            "long_desc": "A horned lizard sits on a rock here.",
+            "desc": "The lizard is a rather small creature, but it has an impressive array of teeth.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 3,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 1,
+            "default_position": 1,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 88,
+                "intelligence": 62,
+                "wisdom": 66,
+                "dexterity": 80,
+                "constitution": 30,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "SLASH"
+        },
+        {
+            "id": 16105,
+            "keywords": "scorpion giant giant-scorpion",
+            "mob_class": "Layman",
+            "short_desc": "the giant scorpion",
+            "long_desc": "A giant scorpion waits among a pile of bones.",
+            "desc": "This scorpion is ruddy-colored, with an unearthly appearance. She is quite large, twice as tall as a human or perhaps more, with a barbed tail that twitches constantly.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AGGRESSIVE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "NOSUMMON",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": -700,
+            "level": 15,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 14,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 84,
+                "intelligence": 76,
+                "wisdom": 76,
+                "dexterity": 80,
+                "constitution": 30,
+                "charisma": 72
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16106,
+            "keywords": "devil cloud dust sand twister",
+            "mob_class": "Layman",
+            "short_desc": "a sand devil",
+            "long_desc": "A dust cloud is spinning here.",
+            "desc": "You notice that there is a creature in the middle of the twister. It seems to be spinning rather rapidly. This must be the famous sand-devils of this desert.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -100,
+            "level": 9,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 4,
+            "default_position": 4,
+            "gender": 0,
+            "race": 17,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 90,
+                "intelligence": 66,
+                "wisdom": 76,
+                "dexterity": 85,
+                "constitution": 30,
+                "charisma": 52
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Elemental",
+            "composition": "Air",
+            "stance": "Alert",
+            "damage_type": "PIERCE"
+        },
+        {
+            "id": 16107,
+            "keywords": "bandit masked",
+            "mob_class": "Warrior",
+            "short_desc": "a bandit",
+            "long_desc": "A masked bandit threatens you with his scimitar.",
+            "desc": "The bandit looks very mean and he looks like he means business.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -600,
+            "level": 11,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 90,
+                "intelligence": 72,
+                "wisdom": 71,
+                "dexterity": 81,
+                "constitution": 30,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16108,
+            "keywords": "horse desert",
+            "mob_class": "Layman",
+            "short_desc": "a horse",
+            "long_desc": "A desert horse stands here, ready to ride at a moment's notice.",
+            "desc": "A dusty horse stands proudly here. You realise that this is a rather fine equine specimen in spite of the hard desert conditions.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "MOUNTABLE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 3,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 91,
+                "intelligence": 67,
+                "wisdom": 78,
+                "dexterity": 85,
+                "constitution": 30,
+                "charisma": 49
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 16109,
+            "keywords": "man old-man",
+            "mob_class": "Sorcerer",
+            "short_desc": "an old man",
+            "long_desc": "An old man sits on a rock, muttering to himself.",
+            "desc": "You notice from the old mans' stance that once he was a mighty warrior, perhaps even a chieftain. He keeps muttering to himself about a giant scorpion he had personally imprisoned in a cave.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": 100,
+            "level": 14,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 1,
+            "default_position": 1,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 89,
+                "intelligence": 70,
+                "wisdom": 91,
+                "dexterity": 70,
+                "constitution": 30,
+                "charisma": 56
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16110,
+            "keywords": "scorpion baby small",
+            "mob_class": "Layman",
+            "short_desc": "a baby scorpion",
+            "long_desc": "A small scorpion scurries among the rocks here.",
+            "desc": "The scorpion is rather large for its age, as it measures about 6 inches long. If this is a baby, you wonder how large the mother is.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "HELPER",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -200,
+            "level": 7,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 0,
+            "stats": {
+                "strength": 88,
+                "intelligence": 78,
+                "wisdom": 75,
+                "dexterity": 90,
+                "constitution": 30,
+                "charisma": 57
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 16111,
+            "keywords": "chief leader bandit bandit-chief",
+            "mob_class": "Warrior",
+            "short_desc": "the bandit chief",
+            "long_desc": "A stern bandit chief glares at you.",
+            "desc": "The chief is a very large and muscular man. He has a golden scimitar at his side and he looks very competent at swordplay. This is a man to fear.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "FAST_TRACK",
+                "AGGR_EVIL_RACE",
+                "AGGR_GOOD_RACE"
+            ],
+            "effect_flags": [],
+            "alignment": -800,
+            "level": 13,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 92,
+                "intelligence": 66,
+                "wisdom": 70,
+                "dexterity": 90,
+                "constitution": 30,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 16100,
+            "type": "WEAPON",
+            "keywords": [
+                "scimitar",
+                "iron"
+            ],
+            "short": "a scimitar",
+            "ground": "A scimitar lies on the ground here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "scimitar",
+                        "iron"
+                    ],
+                    "text": "This scimitar is made of the finest steel in the land.  Its blade is keen and sharp.  "
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "1",
+                    "size": "8",
+                    "bonus": 0
+                },
+                "Average": 8.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 2.0,
+            "cost": 200,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DEX",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 16101,
+            "type": "ARMOR",
+            "keywords": [
+                "shield",
+                "hide-shield",
+                "camel-hide"
+            ],
+            "short": "a hide shield",
+            "ground": "A shield made of camel hide is on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "shield",
+                        "hide-shield",
+                        "camel-hide"
+                    ],
+                    "text": "Poorly constructed of rough wood with a thick layer of tightly stretched camel hide over it, this shield nevertheless does its job, standing between its wearer and attackers.  It appears to have seen quite the history of violence, with numerous gashes and dents in the hide, but still holds together somehow."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 1.9,
+            "cost": 100,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "SHIELD"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 16102,
+            "type": "CONTAINER",
+            "keywords": [
+                "saddle",
+                "leather-saddle"
+            ],
+            "short": "a leather saddle",
+            "ground": "A leather saddle lies abandoned here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "leather-saddle"
+                    ],
+                    "text": "This saddle is made of very high quality leather.  It looks like it was made to last.  "
+                }
+            ],
+            "values": {
+                "Capacity": 200,
+                "Flags": [],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [],
+            "weight": 8.0,
+            "cost": 100,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "affects": [
+                {
+                    "location": "CON",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 16103,
+            "type": "TREASURE",
+            "keywords": [
+                "ring",
+                "dull-sandstone-ring",
+                "sand-stone"
+            ],
+            "short": "a sandstone ring",
+            "ground": "A dull sandstone ring lies in the dirt.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "sandstone-ring",
+                        "dull",
+                        "sand-stone"
+                    ],
+                    "text": "The stone of the ring is a dull brown in colour.  However, you sense an aura of power around it.  "
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [
+                "HUM"
+            ],
+            "weight": 0.2,
+            "cost": 2000,
+            "timer": 0,
+            "level": 15,
+            "wear_flags": [
+                "TAKE",
+                "FINGER"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 1
+                },
+                {
+                    "location": "STR",
+                    "modifier": 3
+                },
+                {
+                    "location": "CON",
+                    "modifier": 2
+                }
+            ],
+            "triggers": [
+                5324,
+                5332
+            ],
+            "effects": []
+        },
+        {
+            "id": 16104,
+            "type": "KEY",
+            "keywords": [
+                "lever",
+                "small-lever",
+                "scorp-level",
+                "small-wooden-lever"
+            ],
+            "short": "a small lever",
+            "ground": "A small wooden lever lies on the ground here.",
+            "action_desc": "",
+            "values": {},
+            "flags": [
+                "NORENT"
+            ],
+            "weight": 0.6,
+            "cost": 0,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 16105,
+            "type": "WEAPON",
+            "keywords": [
+                "staff",
+                "ironwood-staff",
+                "iron-wood",
+                "sturdy-staff"
+            ],
+            "short": "an ironwood staff",
+            "ground": "A sturdy staff is propped against the wall.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "staff",
+                        "ironwood-staff",
+                        "iron-wood",
+                        "sturdy-staff"
+                    ],
+                    "text": "This staff is made of an extremely hard and rare wood. It would make quite a formidable weapon."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "2",
+                    "size": "3",
+                    "bonus": 0
+                },
+                "Average": 4.5,
+                "Damage Type": "CRUSH"
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 2.0,
+            "cost": 100,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 16106,
+            "type": "WEAPON",
+            "keywords": [
+                "scimitar",
+                "gleaming-golden-scimitar",
+                "gold"
+            ],
+            "short": "a golden scimitar",
+            "ground": "A gleaming golden scimitar lies upon a large rock.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "scimitar",
+                        "gleaming-golden-scimitar",
+                        "gold"
+                    ],
+                    "text": "This weapon seems to be made of pure gold.  It is however extremely light and has a very good balance.  "
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "2",
+                    "size": "4",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "GLOW",
+                "MAGIC",
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 2.0,
+            "cost": 1000,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 2
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 16107,
+            "type": "INSTRUMENT",
+            "keywords": [
+                "djembe",
+                "weather-worn-drum",
+                "desert-drum"
+            ],
+            "short": "a desert drum",
+            "ground": "A weather-worn drum rests in the sand.",
+            "action_desc": "An earthy rhythm beats from the desert drum.",
+            "extras": [
+                {
+                    "keywords": [
+                        "djembe",
+                        "weather-worn-drum",
+                        "desert-drum"
+                    ],
+                    "text": "This drum is fashioned from a single log of hardwood, carved into an upside-down vase shape.  A patch of animal skin is stretched tight across the wider end and lashed down with rope, forming a powerfully resonant drum head."
+                }
+            ],
+            "values": {
+                "Level": 25,
+                "Max_Charges": 3,
+                "Charges_Left": 3,
+                "Spell": "EARTHQUAKE"
+            },
+            "flags": [],
+            "weight": 1.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 25,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "AC",
+                    "modifier": 2
+                },
+                {
+                    "location": "CON",
+                    "modifier": 3
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "triggers": [
+                327
+            ],
+            "effects": []
+        },
+        {
+            "id": 16110,
+            "type": "TREASURE",
+            "keywords": [
+                "sash",
+                "small-bronze-sash",
+                "bronze-colored-sash",
+                "questobject"
+            ],
+            "short": "a small bronze sash",
+            "ground": "A bronze colored sash lies here, junked.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "sash",
+                        "small-bronze-sash",
+                        "bronze-colored-sash",
+                        "questobject"
+                    ],
+                    "text": "This is just a small bronze piece of fabric, woven into a colorful sash.    "
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [],
+            "weight": 1.2,
+            "cost": 140,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "WAIST"
+            ],
+            "affects": [
+                {
+                    "location": "DEX",
+                    "modifier": 2
+                },
+                {
+                    "location": "CON",
+                    "modifier": 1
+                }
+            ],
+            "triggers": [
+                5113
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 16101,
+            "name": "Gothra_Old_Man_rece",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* This is the script that give the prize for the effort if %object.vnum% == 2023 wait 1 mjunk bracelet shout Woo Hoo! say YES! thanks %actor.name% say I may actually get out of the dog house now! grin me wait 3 eye %actor.name% say Hey, if you are resourceful enough to find this, then maybe you are up for some adventure! grin mload obj 16104 give lever %actor.name% say Good luck... set person %actor% set i %person.group_size% if %i% set a 1 else set a 0 endif while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if !%person.quest_stage[desert_quest]% quest start desert_quest %person.name% endif quest variable desert_quest %person.name% lever 1 elseif %person% eval i %i% + 1 endif eval a %a% + 1 done endif "
+        },
+        {
+            "id": 16102,
+            "name": "Gothra_Old_Man_speech1",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "precious",
+            "commands": "sigh mechoaround %actor% An old man speaks to %actor.name% in a low voice. msend %actor% An old man whispers to you 'Yes, during our battles a gift from my dear wife was lost.' wince wait 1 mechoaround %actor% An old man speaks to %actor.name% in a low voice. msend %actor% An old man whispers to you 'She wasn't happy, she's quite the rogue and the bracelet was an heirloom.' frown msend %actor% An old man whispers to you 'If I only had it back....' "
+        },
+        {
+            "id": 16103,
+            "name": "Gothra_Old_Man_speech2",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "scorpion",
+            "commands": "grin %actor.name% say Oh yea... smile man mechoaround %actor% An old man speaks to %actor.name% in a low voice. msend %actor% An old man whispers to you 'I was able to trick the vile beast and trap it.' wait 1 msend %actor% An old man whispers to you 'It was a bit too mighty for me and my men to actually slay.' sigh mechoaround %actor% An old man speaks to %actor.name% in a low voice. msend %actor% An old man whispers to you 'The battle was quite brutal and I lost something precious.' frown "
+        },
+        {
+            "id": 16104,
+            "name": "Gothra_Old_Man_speech3",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "trouble",
+            "commands": "nod %actor.name% say Yes I said trouble, kids today, why when I was your age I was taming the realms! And I even caught me a giant scorpion! nod man "
+        },
+        {
+            "id": 16105,
+            "name": "Gothra_Old_Man_greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 1 eye msend %actor% An old man rubs his chin and ponders about you. msend %actor% An old man says 'hrmff probably some adventurer looking for trouble.' "
+        },
+        {
+            "id": 16106,
+            "name": "Scorpion desert quest death",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "set person %actor% set i %person.group_size% if %i% set a 1 else set a 0 endif while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if %person.quest_stage[desert_quest]% quest variable desert_quest %person.name% scorpion 1 endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "16100",
+            "name": "The Pass",
+            "description": "You are walking in a pass running from east to west through a great mountain range.  You notice that the air seems to be drier and hotter as you head towards the west.  Vegetation becomes more sparse as you go along. ",
+            "flags": [
+                "NOTRACK"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "2019"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16124"
+                }
+            }
+        },
+        {
+            "id": "16101",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. A dusty path extends to the west of here, leading off away from the hot sands of the desert. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16101"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16102"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16107"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "20358"
+                }
+            }
+        },
+        {
+            "id": "16102",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16102"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16103"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16108"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16101"
+                }
+            }
+        },
+        {
+            "id": "16103",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16103"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16104"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16109"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16102"
+                }
+            }
+        },
+        {
+            "id": "16104",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes to the south, east, and west of you.  However, you can make out a structure in the distance to the north.  With the sand blowing in your eyes, you can't quite make it out from here, however, but it certainly looks large! ",
+            "flags": [
+                "NOTRACK"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "You see a large structure, a pyramid perhaps? ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16200"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16105"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16110"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16103"
+                }
+            }
+        },
+        {
+            "id": "16105",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16105"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16106"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16111"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16104"
+                }
+            }
+        },
+        {
+            "id": "16106",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16112"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16105"
+                }
+            }
+        },
+        {
+            "id": "16107",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16101"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16108"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16113"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16107"
+                }
+            }
+        },
+        {
+            "id": "16108",
+            "name": "Old Man's Hut",
+            "description": "A solitary hut stands in this great inhospitable desert.  It looks well kept though it is sparsely furnished.  Its small size indicates only one occupant lives here.  You wonder what would make a person choose to live in total isolation like this. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16102"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16109"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16114"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16107"
+                }
+            }
+        },
+        {
+            "id": "16109",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16103"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16110"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16115"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16108"
+                }
+            }
+        },
+        {
+            "id": "16110",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16104"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16111"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16116"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16109"
+                }
+            }
+        },
+        {
+            "id": "16111",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16105"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16112"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16117"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16110"
+                }
+            }
+        },
+        {
+            "id": "16112",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16106"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16118"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16111"
+                }
+            }
+        },
+        {
+            "id": "16113",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16107"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16114"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16119"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16113"
+                }
+            }
+        },
+        {
+            "id": "16114",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16108"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16115"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16120"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16113"
+                }
+            }
+        },
+        {
+            "id": "16115",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16109"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16116"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16121"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16114"
+                }
+            }
+        },
+        {
+            "id": "16116",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16110"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16117"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16122"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16115"
+                }
+            }
+        },
+        {
+            "id": "16117",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16111"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16118"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16123"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16116"
+                }
+            }
+        },
+        {
+            "id": "16118",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16112"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16124"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16117"
+                }
+            }
+        },
+        {
+            "id": "16119",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16113"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16120"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16125"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16119"
+                }
+            }
+        },
+        {
+            "id": "16120",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16114"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16121"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16126"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16119"
+                }
+            }
+        },
+        {
+            "id": "16121",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16115"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16122"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16127"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16120"
+                }
+            }
+        },
+        {
+            "id": "16122",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16116"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16123"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16128"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16121"
+                }
+            }
+        },
+        {
+            "id": "16123",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16117"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16124"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16129"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16122"
+                }
+            }
+        },
+        {
+            "id": "16124",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west and to the east, a pass can be seen leading through the barrier range.  Some greenery can be seen growing in the pass.  It must lead to a more pleasant place than this. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16118"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16100"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16130"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16123"
+                }
+            }
+        },
+        {
+            "id": "16125",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16119"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16126"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16131"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16125"
+                }
+            }
+        },
+        {
+            "id": "16126",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16120"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16127"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16132"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16125"
+                }
+            }
+        },
+        {
+            "id": "16127",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16121"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16128"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16133"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16126"
+                }
+            }
+        },
+        {
+            "id": "16128",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16122"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16129"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16134"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16127"
+                }
+            }
+        },
+        {
+            "id": "16129",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16123"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16130"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16135"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16128"
+                }
+            }
+        },
+        {
+            "id": "16130",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16124"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16136"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16129"
+                }
+            }
+        },
+        {
+            "id": "16131",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16125"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16132"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16137"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16131"
+                }
+            }
+        },
+        {
+            "id": "16132",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16126"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16133"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16138"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16131"
+                }
+            }
+        },
+        {
+            "id": "16133",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16127"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16134"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16139"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16132"
+                }
+            }
+        },
+        {
+            "id": "16134",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16128"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16135"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16140"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16133"
+                }
+            }
+        },
+        {
+            "id": "16135",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16129"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16136"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16141"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16134"
+                }
+            }
+        },
+        {
+            "id": "16136",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16130"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16142"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16135"
+                }
+            }
+        },
+        {
+            "id": "16137",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16131"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16138"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16143"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16137"
+                }
+            }
+        },
+        {
+            "id": "16138",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16132"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16139"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16144"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16137"
+                }
+            }
+        },
+        {
+            "id": "16139",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16133"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16140"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16145"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16138"
+                }
+            }
+        },
+        {
+            "id": "16140",
+            "name": "Oasis",
+            "description": "Palm trees grow on the outskirts of this little oasis, providing shade to the weary travellers who roam this desert.  Traders seem to have set up shop here to cater to the needs of those who have come here to rest between their journey. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16134"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16141"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16146"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16139"
+                }
+            }
+        },
+        {
+            "id": "16141",
+            "name": "Oasis",
+            "description": "Palm trees grow on the outskirts of this little oasis, providing shade to the weary travellers who roam this desert.  Traders seem to have set up shop here to cater to the needs of those who have come here to rest between their journey. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16135"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16142"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16147"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16140"
+                }
+            }
+        },
+        {
+            "id": "16142",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16136"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16148"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16141"
+                }
+            }
+        },
+        {
+            "id": "16143",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16137"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16144"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16149"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16143"
+                }
+            }
+        },
+        {
+            "id": "16144",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16138"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16145"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16150"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16143"
+                }
+            }
+        },
+        {
+            "id": "16145",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16139"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16146"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16151"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16144"
+                }
+            }
+        },
+        {
+            "id": "16146",
+            "name": "Oasis",
+            "description": "Palm trees grow on the outskirts of this little oasis, providing shade to the weary travellers who roam this desert.  Traders seem to have set up shop here to cater to the needs of those who have come here to rest between their journey. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16140"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16147"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16152"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16145"
+                }
+            }
+        },
+        {
+            "id": "16147",
+            "name": "Oasis",
+            "description": "Palm trees grow on the outskirts of this little oasis, providing shade to the weary travellers who roam this desert.  Traders seem to have set up shop here to cater to the needs of those who have come here to rest between their journey. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16141"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16148"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16153"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16146"
+                }
+            }
+        },
+        {
+            "id": "16148",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east.  The mountains runs to the north and south of here. This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16142"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16154"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16147"
+                }
+            }
+        },
+        {
+            "id": "16149",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16143"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16150"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16155"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16149"
+                }
+            }
+        },
+        {
+            "id": "16150",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16144"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16151"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16156"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16149"
+                }
+            }
+        },
+        {
+            "id": "16151",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16145"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16152"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16157"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16150"
+                }
+            }
+        },
+        {
+            "id": "16152",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16146"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16153"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16158"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16151"
+                }
+            }
+        },
+        {
+            "id": "16153",
+            "name": "The Great Gothra Desert",
+            "description": "You look around you, and all you see are sand dunes.  Every direction looks the same to you, it seems like an endless expanse of sand.  This place looks devoid of all life.  You hope that you have enough water to survive this place. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16147"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16154"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16159"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16152"
+                }
+            }
+        },
+        {
+            "id": "16154",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The mountain range can be seen to extend still to the south and north. However, there is a well worn path leading eastwards to a mesa which dominates this landscape. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16148"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16180"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16160"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16153"
+                }
+            }
+        },
+        {
+            "id": "16155",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the north, and a great mountain range blocks passage to the south.  This range blocks rain from falling here, and it is also impossible to scale.  But just at the base of the mountain range, you see a cave entrance. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16149"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16156"
+                },
+                "South": {
+                    "description": "You get a feeling that great evil was once at work here. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16161"
+                }
+            }
+        },
+        {
+            "id": "16156",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the north, and a great mountain range blocks passage to the south.  This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16150"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16157"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16155"
+                }
+            }
+        },
+        {
+            "id": "16157",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the north, and there is a great mountain range to the south.  A small, barely passable path winds its way through the mountain here.  This range blocks rain from falling here, but there may be a way to cross it further down the path. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16151"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16158"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16156"
+                }
+            }
+        },
+        {
+            "id": "16158",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the north, and a great mountain range blocks passage to the south.  This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16152"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16159"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16157"
+                }
+            }
+        },
+        {
+            "id": "16159",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the north, and a great mountain range blocks passage to the south.  This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16153"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16160"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16158"
+                }
+            }
+        },
+        {
+            "id": "16160",
+            "name": "The Great Gothra Desert",
+            "description": "The ground is strewn with large, black rocks which are too hot to touch or hold.  The sandy desert can be seen to the west, and a great mountain range blocks passage to the east and south.  This range blocks rain from falling here, and it is also impossible to scale. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16154"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16159"
+                }
+            }
+        },
+        {
+            "id": "16161",
+            "name": "Cavern Entrance",
+            "description": "The cavern leads southwards and downwards into the heart of the mountain. Black, smooth rock makes up the walls of this place, as if it was melted through by some great heat.  The sheer blackness of your surroundings gives the impression that the walls are swallowing up the light given off by your light. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16155"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16162"
+                }
+            }
+        },
+        {
+            "id": "16162",
+            "name": "Cavern Entrance",
+            "description": "The cavern leads southwards and downwards into the heart of the mountain. Black, smooth rock makes up the walls of this place, as if it was melted through by some great heat.  The sheer blackness of your surroundings gives the impression that the walls are swallowing up the light given off by your light. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16161"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16163"
+                }
+            }
+        },
+        {
+            "id": "16163",
+            "name": "Cavern Entrance",
+            "description": "The cavern leads southwards and downwards into the heart of the mountain. Black, smooth rock makes up the walls of this place, as if it was melted through by some great heat.  The sheer blackness of your surroundings gives the impression that the walls are swallowing up the light given off by your light. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16162"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16164"
+                }
+            }
+        },
+        {
+            "id": "16164",
+            "name": "Black Chamber",
+            "description": "The passageway opens up to a great, round chamber with walls blacker than night.  A massive stone door blocks your passage to the south.  You realise that this place was a specially built prison for someone or something. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16163"
+                },
+                "South": {
+                    "description": "The stone door is set into bedrock, making it difficult if not impossible to pry out. The sheer weight of it is also beyond all of you. To its right, you notice a small hole which looks like it would fit a small lever of some sort. ",
+                    "keyword": "door stone massive",
+                    "type": "Pick-proof Door",
+                    "key": "16104",
+                    "destination": "16166"
+                }
+            }
+        },
+        {
+            "id": "16165",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16166"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16168"
+                }
+            }
+        },
+        {
+            "id": "16166",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "The door is massive, and it looks like only a god may be able to move it. ",
+                    "keyword": "door stone massive",
+                    "type": "Pick-proof Door",
+                    "key": "16104",
+                    "destination": "16164"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16167"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16169"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16165"
+                }
+            }
+        },
+        {
+            "id": "16167",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16170"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16166"
+                }
+            }
+        },
+        {
+            "id": "16168",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16165"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16169"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16171"
+                }
+            }
+        },
+        {
+            "id": "16169",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16166"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16170"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16172"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16168"
+                }
+            }
+        },
+        {
+            "id": "16170",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16167"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16173"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16169"
+                }
+            }
+        },
+        {
+            "id": "16171",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16168"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16172"
+                }
+            }
+        },
+        {
+            "id": "16172",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its' ceiling.  There seem to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16169"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16173"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16174"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16171"
+                }
+            }
+        },
+        {
+            "id": "16173",
+            "name": "The Dark Chamber",
+            "description": "You find yourself in a high vaulted chamber.  Its sheer size makes it impossible for you to see its ceiling.  There seems to be some sort of brittle substance underfoot, but you are unable to make out what it is. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16170"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16172"
+                }
+            }
+        },
+        {
+            "id": "16174",
+            "name": "The Lair",
+            "description": "You have stumbled upon the lair of the Great Scorpion!  Skeletal remains of creatures litter the ground.  This must be what the desert people had imprisoned in this foul place. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16172"
+                }
+            }
+        },
+        {
+            "id": "16175",
+            "name": "Mesa Edge",
+            "description": "You stand near the edge of this great mesa and gaze upon the vast expanse of desert.  You cannot believe that the desert is so huge.  You notice that quite close to the west there is a patch of greenery.  But that could be a mirage. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16176"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16178"
+                }
+            }
+        },
+        {
+            "id": "16176",
+            "name": "Mesa Edge",
+            "description": "You stand near the edge of this great mesa and gaze upon the vast expanse of desert.  You cannot believe that the desert is so huge.  You notice that quite close to the west there is a patch of greenery.  But that could be a mirage. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16179"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16175"
+                }
+            }
+        },
+        {
+            "id": "16177",
+            "name": "Mesa Edge",
+            "description": "You stand near the edge of this great mesa and gaze upon the vast expanse of desert.  You cannot believe that the desert is so huge.  You notice that quite close to the west there is a patch of greenery.  But that could be a mirage. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16178"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16181"
+                }
+            }
+        },
+        {
+            "id": "16178",
+            "name": "Mesa Top",
+            "description": "The top of the mesa has been worn totally flat by the harsh winds that blows in this barren land.  The hard rock makes plant life difficult if not impossible.  But you notice that there are signs of life to the south. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16175"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16179"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16182"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16177"
+                }
+            }
+        },
+        {
+            "id": "16179",
+            "name": "Mesa Top",
+            "description": "The top of the mesa has been worn almost totally flat by the harsh winds that blow through this barren land.  The hard rock surfaces make plant life difficult, if not impossible, to cultivate here.  There are some signs of life to the south, an encampment perhaps? ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16176"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16183"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16178"
+                }
+            }
+        },
+        {
+            "id": "16180",
+            "name": "Worn Path",
+            "description": "The path you now tread on is very well worn, as if many people used this way frequently.  The trail leads eastwards and upwards, and it looks like it may lead to the top of this mesa. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16181"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16154"
+                }
+            }
+        },
+        {
+            "id": "16181",
+            "name": "The Mesa",
+            "description": "You find yourself standing on the top of this great mesa.  To the east, you notice signs of human habitation.  Perhaps there is a village of nomads here. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16177"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16182"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16184"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16180"
+                }
+            }
+        },
+        {
+            "id": "16182",
+            "name": "Bandit Camp",
+            "description": "You have stumbled on the bandits' camp!  Their tents are pitched all over the mesa and the fire-pits are still warm.  You hope that no one is home now or you will be in real big trouble. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16178"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16183"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16185"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16181"
+                }
+            }
+        },
+        {
+            "id": "16183",
+            "name": "Bandit Camp",
+            "description": "You have stumbled on the bandits' camp!  Their tents are pitched all over the mesa and the fire-pits are still warm.  You hope that no one is home at now or you will be in real big trouble. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16179"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16186"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16182"
+                }
+            }
+        },
+        {
+            "id": "16184",
+            "name": "Mesa Edge",
+            "description": "You stand near the edge of this great mesa and gaze upon the vast expanse of desert.  You cannot believe that the desert is so huge.  You notice that quite close to the west there is a patch of greenery.  But that could be a mirage. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16181"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16185"
+                }
+            }
+        },
+        {
+            "id": "16185",
+            "name": "Bandit Camp",
+            "description": "You have stumbled on the bandits' camp!  Their tents are pitched all over the mesa and the fire-pits are still warm.  You hope that no one is home at now or you will be in real big trouble.  A cool breeze blows to the south, where a narrow trail leads up into the tall mountains. ",
+            "flags": [
+                "NOTRACK"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16182"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16186"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16381"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16184"
+                }
+            }
+        },
+        {
+            "id": "16186",
+            "name": "Bandit Camp",
+            "description": "You have stumbled on the bandits' camp!  Their tents are pitched all over the mesa and the fire-pits are still warm.  You hope that no one is home at now or you will be in real big trouble. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16183"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "16185"
+                }
+            }
+        }
+    ]
+}

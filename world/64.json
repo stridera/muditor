@@ -1,0 +1,1599 @@
+{
+    "zone": {
+        "id": "64",
+        "name": "Quest Zone II",
+        "top": 6499,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {}
+    },
+    "mobs": [],
+    "objects": [
+        {
+            "id": 6401,
+            "type": "ARMOR",
+            "keywords": [
+                "liripipe",
+                "pyromancers-liripipe",
+                "pyromancer-liripipe",
+                "long-red-sock-cloth",
+                "eone"
+            ],
+            "short": "the Pyromancer's Liripipe",
+            "ground": "A long red sock-like cloth is piled up here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "liripipe",
+                        "pyromancers-liripipe",
+                        "pyromancer-liripipe",
+                        "long-red-sock-cloth"
+                    ],
+                    "text": "The long-tailed liripipe is sewn from a light wispy fabric and has been carefully dyed streaks of red, orange, and white, giving it the appearance of a large willowy flame.  It is hemmed by a light blue ribbon with a small cinch on one side to tighten the hood around the head."
+                }
+            ],
+            "values": {
+                "AC": 7
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.54,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_BREATH",
+                    "modifier": -2
+                },
+                {
+                    "location": "HIT",
+                    "modifier": 10
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 4
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6402,
+            "type": "TREASURE",
+            "keywords": [
+                "shades",
+                "mirrorshades-demulcent",
+                "pair-shiny-blackened-glasses",
+                "eone"
+            ],
+            "short": "Mirrorshades of the Demulcent",
+            "ground": "A pair of shiny blackened glasses rest here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "shades",
+                        "mirrorshades-demulcent",
+                        "pair-shiny-blackened-glasses",
+                        "eone"
+                    ],
+                    "text": "The lenses of the shades are a deep shiny slate gray, perfectly reflecting those who would dare look at its wearer in the eyes.  The frames are a strange red stone, immensely hot, but not painful to touch."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.12,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "EYES"
+            ],
+            "affects": [
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 80
+                },
+                {
+                    "location": "HITROLL",
+                    "modifier": 2
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "INT",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "DETECT_ALIGN",
+                "DETECT_INVIS"
+            ]
+        },
+        {
+            "id": 6403,
+            "type": "TREASURE",
+            "keywords": [
+                "filter",
+                "smoke-filter",
+                "blackened-white-mask",
+                "eone"
+            ],
+            "short": "a smoke filter",
+            "ground": "A blackened white mask sits here offering its services.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "smoke-filter",
+                        "blackened-white-mask"
+                    ],
+                    "text": "This protective white mask is made from a smooth white linen with a red rubber seal, offering a thin barrier between its wearer and air particulates such as smoke."
+                }
+            ],
+            "values": {
+                "AC": 5
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.05,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "FACE"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 5
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "FARSEE"
+            ]
+        },
+        {
+            "id": 6404,
+            "type": "LIGHT",
+            "keywords": [
+                "marble",
+                "hollow-crystal-marble",
+                "tiny-glass-marble",
+                "eone"
+            ],
+            "short": "a hollow crystal marble",
+            "ground": "A tiny glass marble rolls aimlessly around the floor.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "hollow-crystal-marble",
+                        "tiny-glass-marble"
+                    ],
+                    "text": "The marble's crystal is of the purest quality, diffracting very little of the light that passes through it.  A small red hook protrudes from one side, allowing one to wear it as decoration.  A tiny wisp of smoke can be seen wafting about within the marble, apparently moving with a mind of its own."
+                }
+            ],
+            "values": {
+                "Is_Lit:": false,
+                "Capacity": -1,
+                "Remaining": -1
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.05,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 25
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 10
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6405,
+            "type": "TREASURE",
+            "keywords": [
+                "amulet",
+                "solid-gold-amulet-prime-shior",
+                "eone"
+            ],
+            "short": "the Amulet of the Prime Shior",
+            "ground": "A solid gold amulet rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "solid-gold-amulet-prime-shior"
+                    ],
+                    "text": "The amulet is vaguely teardrop shaped and molded from solid gold.  The gleaming surface is polished to perfection, its smooth curve broken only by a sizeable ruby set on the front.  The whole amulet hangs from a fine silver chain."
+                },
+                {
+                    "keywords": [
+                        "ruby"
+                    ],
+                    "text": "The gold amulet's ruby is immaculate, and much larger than the average jewel. It seems to glow with an inner warmth.  As you look into its center, words fill your thoughts... ...the Shiori was once an order of the pyromantic arts which was dedicated to the understanding and furtherment of magic.  The Prime Shior was the greatest of these mages, and the head of the Kerristone-based order.  But even he could not escape the Great Crash, and he perished along with the others whom the gods deemed infidels.  As the Towers of Shiori fell upon him, he flung his amulet through time itself, such that the Shiori legacy might not be forgotten..."
+                }
+            ],
+            "values": {
+                "AC": 10
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 1.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "affects": [
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6406,
+            "type": "TREASURE",
+            "keywords": [
+                "necklace",
+                "scarlet-necklace-braided-silk",
+                "mass-scarlet-tendrils",
+                "eone"
+            ],
+            "short": "a scarlet necklace of braided silk",
+            "ground": "A mass of scarlet tendrils wriggles here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "scarlet-necklace-braided-silk",
+                        "mass-scarlet-tendrils"
+                    ],
+                    "text": "Braided from strong spidersilk, the necklace is strong yet light, resting against the skin with a cool touch.  Its strands are infused with a lightly scented dye, smelling vaguely like cinnamon."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 25
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6407,
+            "type": "TREASURE",
+            "keywords": [
+                "phoenix",
+                "tiny-golden-phoenix",
+                "gold-speck",
+                "eone"
+            ],
+            "short": "a tiny golden phoenix",
+            "ground": "A speck of gold sits here quietly.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "tiny-golden-phoenix",
+                        "gold-speck"
+                    ],
+                    "text": "Glowing softly in the light, the miniature golden phoenix looks like a magnificent representation of what a living phoenix might look like, but at a fraction of the size.  On the back, a thin metal spoke juts out into a large C-shaped curve, allowing the phoenix to be hooked into an earlobe."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.01,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "EAR"
+            ],
+            "affects": [
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 30
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6408,
+            "type": "TREASURE",
+            "keywords": [
+                "tooth",
+                "flaming-tooth",
+                "small-fire-tooth",
+                "eone"
+            ],
+            "short": "a flaming tooth",
+            "ground": "A small fire takes the vague shape of a tooth here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "flaming-tooth",
+                        "small-fire-tooth"
+                    ],
+                    "text": "The flame waves in and out of the shape of a cuspid; it feels soft and insubstantial, but nevertheless has a sharp point that might allow it to pierce something soft."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "EAR"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 3
+                },
+                {
+                    "location": "HIT",
+                    "modifier": 10
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6409,
+            "type": "CONTAINER",
+            "keywords": [
+                "robes",
+                "voluminous-silver-trimmed-robes",
+                "pile-velvety-scarlet-robes",
+                "eone"
+            ],
+            "short": "voluminous silver-trimmed robes",
+            "ground": "A pile of velvety scarlet robes lie here, neatly folded.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "voluminous-silver-trimmed-robes",
+                        "pile-velvety-scarlet-robes"
+                    ],
+                    "text": "These scarlet robes simply exude regalness.  They are large and voluminous yet extremely comfortable due to their mink fur lining.  The exterior is a soft velvet trimmed in silver threading sewn into intricate Technitzitlian patterns. Each armhole hangs loosely, stretching large enough at the mouth to fit a small child.  A large hood hangs from the back of the collar, allowing the wearer's features to be hidden even in broad daylight.  A series of golden scales lines the hem of the robes, clinking softly as the fabric sways."
+                }
+            ],
+            "values": {
+                "Capacity": 100,
+                "Flags": [],
+                "Key": 0,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 13.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_SPELL",
+                    "modifier": -5
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "AC",
+                    "modifier": 20
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6410,
+            "type": "ARMOR",
+            "keywords": [
+                "cloak",
+                "long-plain-cloak",
+                "dull-reddish-brown-cloak",
+                "eone"
+            ],
+            "short": "a long, plain cloak",
+            "ground": "A dull reddish-brown cloak rests here unobtrusively.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "long-plain-cloak",
+                        "dull-reddish-brown-cloak"
+                    ],
+                    "text": "The cloak is a featureless reddish-brown and cut from an unremarkable length of excessively plain felt.  It looks not unlike many other cloaks one might see walking down an Anduin street."
+                }
+            ],
+            "values": {
+                "AC": 10
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 3.5,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "ABOUT"
+            ],
+            "affects": [
+                {
+                    "location": "HIDDENNESS",
+                    "modifier": 400
+                }
+            ],
+            "effects": [
+                "SNEAK"
+            ]
+        },
+        {
+            "id": 6411,
+            "type": "CONTAINER",
+            "keywords": [
+                "belt",
+                "set-matching-spell-pouches",
+                "eone"
+            ],
+            "short": "a set of matching spell pouches",
+            "ground": "A belt with many pockets is rolled up on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "belt",
+                        "set-matching-spell-pouches"
+                    ],
+                    "text": "The belt itself is cut from a sturdy piece of genuine brown leather, carefully tanned to perfection.  A set of velvety scarlet pockets are sewn to the belt, each closeable with a small brass clasp."
+                }
+            ],
+            "values": {
+                "Capacity": 20,
+                "Flags": [
+                    "Closeable",
+                    "Closed"
+                ],
+                "Key": 0,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 1.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "WAIST"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_PARA",
+                    "modifier": -10
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "AC",
+                    "modifier": 9
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6412,
+            "type": "TREASURE",
+            "keywords": [
+                "crystal",
+                "vulceras-ignition",
+                "vulcera-ignition",
+                "large-red-crystal",
+                "eone"
+            ],
+            "short": "Vulcera's Ignition",
+            "ground": "A large red crystal glows menacingly.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "vulceras-ignition",
+                        "vulcera-ignition",
+                        "large-red-crystal"
+                    ],
+                    "text": "It appears to be a very large ruby, but an inner glow would seem to dissuade one from any idea of plainness about this gem.  The glow pulses slowly from imperceptibly dim to nearly bright enough to read by, exuding what can only be described as waves of evil in time with the weak light.  A small 'V' is engraved on one side of the ruby."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 1.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "CHARM"
+            ]
+        },
+        {
+            "id": 6413,
+            "type": "ARMOR",
+            "keywords": [
+                "rerebraces",
+                "sovereign-rerebraces",
+                "sturdy-looking-pair-crimson-painted-rerebraces",
+                "eone"
+            ],
+            "short": "the Sovereign Rerebraces",
+            "ground": "A sturdy-looking pair of crimson-painted rerebraces rest here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "sovereign-rerebraces",
+                        "sturdy-looking-pair-crimson-painted-rerebraces"
+                    ],
+                    "text": "Polished to a shine, these rerebraces are crafted from a fine, lightweight steel painted with a smooth, translucent crimson paint.  When worn, the rerebraces extend from just below the shoulder to just past the elbow.  A stylish flame decal is printed on each brace."
+                }
+            ],
+            "values": {
+                "AC": 10
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 8.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "ARMS"
+            ],
+            "affects": [
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 3
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 10
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6414,
+            "type": "ARMOR",
+            "keywords": [
+                "wristband",
+                "flamestrong-wristband",
+                "rubbery-red-bracelet",
+                "eone"
+            ],
+            "short": "a Flamestrong wristband",
+            "ground": "A rubbery red bracelet sits here attracting lint.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "flamestrong-wristband",
+                        "rubbery-red-bracelet"
+                    ],
+                    "text": "Molded from a stretchy red rubber, this bracelet is easily slipped on and off a wrist.  The letters FLAMESTRONG are imprinted neatly along the outside of the band."
+                }
+            ],
+            "values": {
+                "AC": 5
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "WRIST"
+            ],
+            "affects": [
+                {
+                    "location": "HIT_REGEN",
+                    "modifier": 3
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 10
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6415,
+            "type": "TREASURE",
+            "keywords": [
+                "bangle",
+                "colorful-copper-bangle-elga",
+                "eone"
+            ],
+            "short": "the Bangle of Elga",
+            "ground": "A colorful copper bangle rests here tempting you to snatch it.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "colorful-copper-bangle-elga"
+                    ],
+                    "text": "The bangle is circular in shape and inflexible, barely large enough to push a hand through.  It's hammered from high-quality dwarven copper, but engraved with decidedly gypsy-like glyphs.  Various colors adorn the outside face of the bangle, following the lines of the glyphs."
+                }
+            ],
+            "values": {
+                "AC": 1
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "WRIST"
+            ],
+            "affects": [
+                {
+                    "location": "SAVING_PARA",
+                    "modifier": -20
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "CHA",
+                    "modifier": 3
+                },
+                {
+                    "location": "DEX",
+                    "modifier": 3
+                }
+            ],
+            "effects": [
+                "FLY"
+            ]
+        },
+        {
+            "id": 6416,
+            "type": "ARMOR",
+            "keywords": [
+                "gloves",
+                "emmath-firegloves",
+                "balls-flame",
+                "eone"
+            ],
+            "short": "Emmath Firegloves",
+            "ground": "Gloves like balls of flame rest here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "emmath-firegloves",
+                        "gloves-balls-flame"
+                    ],
+                    "text": "Emmath Firegloves have certainly earned their name.  They are masters of the fiery protection, glowing like small balls of flame in the shape of hands. Their image dances about in all orange, yellow, and red, appearing to be living flames themselves."
+                }
+            ],
+            "values": {
+                "AC": 5
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.6,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HANDS"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 20
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "INT",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "CHARM",
+                "BLUR"
+            ]
+        },
+        {
+            "id": 6417,
+            "type": "TREASURE",
+            "keywords": [
+                "bane",
+                "sea-bane",
+                "seas-bane",
+                "clear-red-ring",
+                "eone"
+            ],
+            "short": "the Sea's Bane",
+            "ground": "A clear red ring rests on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "sea-bane",
+                        "seas-bane",
+                        "clear-red-ring"
+                    ],
+                    "text": "A series of fearsome phoenix chase each other around the circumference of the fire-red ring.  It is difficult to determine exactly what the ring is made of -- clear, yet neither crystal nor glass."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "FINGER"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 30
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 4
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6418,
+            "type": "TREASURE",
+            "keywords": [
+                "ring",
+                "silvery-ring",
+                "spessartine-eternity",
+                "eone"
+            ],
+            "short": "a spessartine eternity",
+            "ground": "A silvery ring of red gemstones glints menacingly.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "silvery-ring",
+                        "spessartine-eternity"
+                    ],
+                    "text": "A row of tiny orange-yellow spessartine garnets loops around the smoothly polished perimeter of this silvery platinum ring.  Each gemstone is identical and meticulously embedded in an eternity setting encircling the ring."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 0.1,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "FINGER"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 30
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "DETECT_MAGIC"
+            ]
+        },
+        {
+            "id": 6419,
+            "type": "SPELLBOOK",
+            "keywords": [
+                "tome",
+                "selfish-tome",
+                "large-black-book",
+                "eone"
+            ],
+            "short": "the Selfish Tome",
+            "ground": "A large black book rests here open, taunting you with its knowledge.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "selfish-tome",
+                        "large-black-book"
+                    ],
+                    "text": "A haunting aura seems to enshroud this book, emanating from its deep black leather cover.  Every one of its parchment pages is filled with words -- knowledge -- but none of them seem to be readable, despite obviously being written in basic Caelian.  Something about the tome prevents its knowledge from being read or understood."
+                }
+            ],
+            "values": {
+                "Pages": 100
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 5.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 150
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": -50
+                },
+                {
+                    "location": "MOVE",
+                    "modifier": -25
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6420,
+            "type": "ARMOR",
+            "keywords": [
+                "shield",
+                "shield-firestorm",
+                "fiery-red-buckler",
+                "eone"
+            ],
+            "short": "the Shield of the Firestorm",
+            "ground": "A fiery red buckler burns the ground beneath it.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "shield-firestorm",
+                        "fiery-red-buckler"
+                    ],
+                    "text": "A circular buckler whose diameter is about the length of a human thigh, this shield is decorated on the outside with the fiery image of a phoenix rising from its ashes.  A leather strap on the back of the shield allows it to be clasped to a forearm.  Red-trimmed words are embossed around the outside edge of the shield: \"He that shall brave the flames also shall the fire be given\""
+                }
+            ],
+            "values": {
+                "AC": 20
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 6.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "SHIELD"
+            ],
+            "affects": [
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                }
+            ],
+            "effects": [
+                "BLUR"
+            ]
+        },
+        {
+            "id": 6421,
+            "type": "ARMOR",
+            "keywords": [
+                "culottes",
+                "pair-royal-culottes",
+                "tight-knee-length-pants",
+                "eone"
+            ],
+            "short": "a pair of royal culottes",
+            "ground": "Tight knee-length pants are laid out here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pair-royal-culottes",
+                        "tight-knee-length-pants"
+                    ],
+                    "text": "The culottes are relatively fitting and short, only reaching down to the knee. The fabric seems to be a soft, airy cotton, and each leg is closed and fastened at the knee by a red drawstring.  Gold threads are inlaid in each leg, forming a pattern of a phoenix repeatedly burning up and rising from the conflagration."
+                }
+            ],
+            "values": {
+                "AC": 10
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 2.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "LEGS"
+            ],
+            "affects": [
+                {
+                    "location": "FOCUS",
+                    "modifier": 3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6422,
+            "type": "ARMOR",
+            "keywords": [
+                "boots",
+                "ashen-leather-boots",
+                "singed-gray-boots-dark-leather",
+                "eone"
+            ],
+            "short": "ashen leather boots",
+            "ground": "Singed gray boots of dark leather await their owner here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "ashen-leather-boots",
+                        "singed-gray-boots-dark-leather"
+                    ],
+                    "text": "These boots were once magnificently rich and beautiful, crafted from smooth leather and lightly decorated with blood-red tassels.  Only remnants of the boots' previous splendor remains, burned away by some unknown fire.  Somehow the boots were not completely consumed, perhaps by some magical protection."
+                }
+            ],
+            "values": {
+                "AC": 10
+            },
+            "flags": [
+                "PERMANENT",
+                "ANTI_CLERIC",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "NOSELL",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER",
+                "NOBURN",
+                "NOLOCATE",
+                "FLOAT"
+            ],
+            "weight": 3.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "FEET"
+            ],
+            "affects": [
+                {
+                    "location": "MOVE",
+                    "modifier": 100
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 4
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 6423,
+            "type": "WEAPON",
+            "keywords": [
+                "sword",
+                "unholy-wrath",
+                "large-sword",
+                "black-flame,"
+            ],
+            "short": "Unholy Wrath",
+            "ground": "A large sword flickers with black flame.",
+            "action_desc": "",
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "15",
+                    "size": "12",
+                    "bonus": 0
+                },
+                "Average": 96.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "GLOW",
+                "MAGIC",
+                "NODROP",
+                "FLOAT"
+            ],
+            "weight": 8.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 70,
+            "wear_flags": [
+                "TAKE",
+                "2HWIELD"
+            ],
+            "affects": [
+                {
+                    "location": "STR",
+                    "modifier": 10
+                },
+                {
+                    "location": "WIS",
+                    "modifier": 10
+                }
+            ],
+            "triggers": [
+                6,
+                124
+            ],
+            "effects": [
+                "PROTECT_GOOD",
+                "FARSEE",
+                "HASTE",
+                "TONGUES"
+            ]
+        },
+        {
+            "id": 6424,
+            "type": "SPELLBOOK",
+            "keywords": [
+                "tome",
+                "aqua-mundi",
+                "gold-trimmed-leather-bound-tome",
+                "spells",
+                "book"
+            ],
+            "short": "Aqua Mundi",
+            "ground": "A gold-trimmed leather-bound tome of spells rests on a nearby shelf.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "tome",
+                        "aqua-mundi",
+                        "gold-trimmed-leather-bound-tome",
+                        "spells",
+                        "book"
+                    ],
+                    "text": "This softly glowing book contains some of the most miraculous and dangerous magic known to Cryomancers.  Embossed with gold and written with golden ink, the magic radiating from the tome is palpable.  Flipping through it, the book has many long-lost spells like To Bring Winter on Water, Fisher of the Polar Deep, Blood Bender, Phantom's Gondola, the Burning Rain of Death, Watergate, and more."
+                }
+            ],
+            "values": {
+                "Pages": 250
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 90,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "FOCUS",
+                    "modifier": 5
+                },
+                {
+                    "location": "INT",
+                    "modifier": 5
+                },
+                {
+                    "location": "WIS",
+                    "modifier": 5
+                },
+                {
+                    "location": "HIT",
+                    "modifier": 50
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "6400",
+            "name": "The Beginning",
+            "description": "Not much here. ",
+            "flags": [],
+            "sector": "STRUCTURE"
+        }
+    ]
+}

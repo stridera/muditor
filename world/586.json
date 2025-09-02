@@ -1,0 +1,3359 @@
+{
+  "zone": {
+    "id": "586",
+    "name": "the Beachhead",
+    "top": 58699,
+    "lifespan": 13,
+    "reset_mode": "Empty",
+    "hemisphere": "NORTHWEST",
+    "climate": "NONE",
+    "resets": {
+      "mob": [
+        {
+          "id": 58610,
+          "max": 1,
+          "room": 58691,
+          "name": "(Myorrhed)",
+          "equipped": [
+            {
+              "id": 16311,
+              "max": 50,
+              "location": "Legs",
+              "name": "(a leather hauberk)"
+            },
+            {
+              "id": 1011,
+              "max": 50,
+              "location": "Eyes",
+              "name": "(a steel mace)"
+            }
+          ]
+        },
+        {
+          "id": 58609,
+          "max": 4,
+          "room": 58643,
+          "name": "(a surveyor)",
+          "equipped": [
+            {
+              "id": 58608,
+              "max": 1,
+              "location": "Ear",
+              "name": "(the surveyor's map scroll)"
+            }
+          ]
+        },
+        {
+          "id": 58603,
+          "max": 4,
+          "room": 58627,
+          "name": "(a healer)",
+          "carrying": [
+            {
+              "id": 58609,
+              "max": 50,
+              "name": "(some marigold poultice)"
+            }
+          ],
+          "equipped": [
+            {
+              "id": 58604,
+              "max": 3,
+              "location": "Legs",
+              "name": "(some violet-colored linen robes)"
+            }
+          ]
+        },
+        {
+          "id": 58601,
+          "max": 1,
+          "room": 58612,
+          "name": "(the Lighthouse Keeper)",
+          "equipped": [
+            {
+              "id": 58601,
+              "max": 1,
+              "location": "Ear",
+              "name": "(a spyglass)"
+            },
+            {
+              "id": 58606,
+              "max": 1,
+              "location": "About",
+              "name": "(a pair of rerebraces)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58614,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58607,
+              "max": 99,
+              "location": "Arms",
+              "name": "(a pair of embroidered moccasins)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58617,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58603,
+              "max": 10,
+              "location": "Wrist",
+              "name": "(a duffel bag)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58649,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58607,
+              "max": 99,
+              "location": "Arms",
+              "name": "(a pair of embroidered moccasins)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58651,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58603,
+              "max": 10,
+              "location": "Wrist",
+              "name": "(a duffel bag)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58630,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58607,
+              "max": 99,
+              "location": "Arms",
+              "name": "(a pair of embroidered moccasins)"
+            }
+          ]
+        },
+        {
+          "id": 58602,
+          "max": 6,
+          "room": 58660,
+          "name": "(a Settler man)",
+          "equipped": [
+            {
+              "id": 58607,
+              "max": 99,
+              "location": "Arms",
+              "name": "(a pair of embroidered moccasins)"
+            }
+          ]
+        },
+        {
+          "id": 58603,
+          "max": 4,
+          "room": 58632,
+          "name": "(a healer)",
+          "equipped": [
+            {
+              "id": 58604,
+              "max": 3,
+              "location": "Legs",
+              "name": "(some violet-colored linen robes)"
+            }
+          ]
+        },
+        {
+          "id": 58603,
+          "max": 4,
+          "room": 58640,
+          "name": "(a healer)",
+          "equipped": [
+            {
+              "id": 58604,
+              "max": 3,
+              "location": "Legs",
+              "name": "(some violet-colored linen robes)"
+            }
+          ]
+        },
+        {
+          "id": 58603,
+          "max": 4,
+          "room": 58654,
+          "name": "(a healer)",
+          "equipped": [
+            {
+              "id": 58604,
+              "max": 3,
+              "location": "Legs",
+              "name": "(some violet-colored linen robes)"
+            }
+          ]
+        },
+        {
+          "id": 58604,
+          "max": 1,
+          "room": 58642,
+          "name": "(a spurlacht)"
+        },
+        {
+          "id": 58605,
+          "max": 3,
+          "room": 58638,
+          "name": "(a sailor)",
+          "equipped": [
+            {
+              "id": 58602,
+              "max": 10,
+              "location": "Eyes",
+              "name": "(a wooden oar)"
+            },
+            {
+              "id": 58605,
+              "max": 99,
+              "location": "Face",
+              "name": "(a green glass bottle)"
+            }
+          ]
+        },
+        {
+          "id": 58605,
+          "max": 3,
+          "room": 58633,
+          "name": "(a sailor)",
+          "equipped": [
+            {
+              "id": 58605,
+              "max": 99,
+              "location": "Face",
+              "name": "(a green glass bottle)"
+            }
+          ]
+        },
+        {
+          "id": 58605,
+          "max": 3,
+          "room": 58639,
+          "name": "(a sailor)",
+          "equipped": [
+            {
+              "id": 58602,
+              "max": 10,
+              "location": "Eyes",
+              "name": "(a wooden oar)"
+            },
+            {
+              "id": 58605,
+              "max": 99,
+              "location": "Face",
+              "name": "(a green glass bottle)"
+            }
+          ]
+        },
+        {
+          "id": 58606,
+          "max": 4,
+          "room": 58608,
+          "name": "(a Man O' War)"
+        },
+        {
+          "id": 58606,
+          "max": 4,
+          "room": 58610,
+          "name": "(a Man O' War)"
+        },
+        {
+          "id": 58606,
+          "max": 4,
+          "room": 58682,
+          "name": "(a Man O' War)"
+        },
+        {
+          "id": 58606,
+          "max": 4,
+          "room": 58690,
+          "name": "(a Man O' War)"
+        },
+        {
+          "id": 58607,
+          "max": 3,
+          "room": 58604,
+          "name": "(a giant horsefish)"
+        },
+        {
+          "id": 58607,
+          "max": 3,
+          "room": 58688,
+          "name": "(a giant horsefish)"
+        },
+        {
+          "id": 58607,
+          "max": 3,
+          "room": 58683,
+          "name": "(a giant horsefish)"
+        },
+        {
+          "id": 58608,
+          "max": 3,
+          "room": 58686,
+          "name": "(a narwhal)"
+        },
+        {
+          "id": 58608,
+          "max": 3,
+          "room": 58687,
+          "name": "(a narwhal)"
+        },
+        {
+          "id": 58608,
+          "max": 3,
+          "room": 58605,
+          "name": "(a narwhal)"
+        },
+        {
+          "id": 58609,
+          "max": 4,
+          "room": 58634,
+          "name": "(a surveyor)"
+        },
+        {
+          "id": 58609,
+          "max": 4,
+          "room": 58662,
+          "name": "(a surveyor)"
+        },
+        {
+          "id": 58609,
+          "max": 4,
+          "room": 58619,
+          "name": "(a surveyor)"
+        }
+      ],
+      "object": [
+        {
+          "id": 58610,
+          "max": 1,
+          "room": 58691,
+          "name": "(a bronze dragon egg)"
+        }
+      ]
+    }
+  },
+  "mobs": [
+    {
+      "id": 58601,
+      "keywords": "lighthouse-keeper lighthouse keeper old man",
+      "mob_class": "Shaman",
+      "short_desc": "the Lighthouse Keeper",
+      "long_desc": "An old man tends to chores for his lighthouse.",
+      "desc": "He wears weathered old clothes -- blue coveralls, a patched white shirt -- and he himself seems weathered, as men of the sea often are. He doesn't seem interested in you particularly, more irritated than curious.",
+      "mob_flags": [
+        "SENTINEL",
+        "SCAVENGER",
+        "ISNPC",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN",
+        "PROTECT_EVIL"
+      ],
+      "alignment": 750,
+      "level": 35,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 13,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 79,
+        "intelligence": 85,
+        "wisdom": 89,
+        "dexterity": 78,
+        "constitution": 30,
+        "charisma": 53
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58602,
+      "keywords": "pioneer pioneer-man man settler",
+      "mob_class": "Ranger",
+      "short_desc": "a Settler man",
+      "long_desc": "A man dressed in buckskins packs up his satchel.",
+      "desc": "This man is young, perhaps in his late twenties, and strong and rugged-looking. He doesn't look like the type to put up with annoying foreigners! Weathered skin and buckskin clothes complete a rather intimidating picture.",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN"
+      ],
+      "alignment": 300,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 13,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 90,
+        "intelligence": 76,
+        "wisdom": 66,
+        "dexterity": 90,
+        "constitution": 30,
+        "charisma": 60
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58603,
+      "keywords": "healer woman",
+      "mob_class": "Cleric",
+      "short_desc": "a healer",
+      "long_desc": "A woman dressed in healer's robes holds out her hands gently.",
+      "desc": "Gentle, graceful beyond all imagining, this woman's dark eyes invite you to stay, to allow her to forgive your sins and heal your body's ills. Her skin is tanned by long exposure to the sun, but it only adds to a general picture of vibrance.",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN"
+      ],
+      "alignment": 1000,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 2,
+      "race": 13,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 82,
+        "intelligence": 88,
+        "wisdom": 100,
+        "dexterity": 75,
+        "constitution": 30,
+        "charisma": 42
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58604,
+      "keywords": "spurlacht dripping creature",
+      "mob_class": "Warrior",
+      "short_desc": "a spurlacht",
+      "long_desc": "A dripping wet creature festooned with gunk snarls at you.",
+      "desc": "It sniffs in your general direction, muttering to itself. You can't tell if it's male or female, or even what species it is. But when you try to walk around the disgusting creature, it stands in your way, growling and sniffing in a most threatening and aggressive manner.",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN"
+      ],
+      "alignment": -600,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 18,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 85,
+        "intelligence": 67,
+        "wisdom": 82,
+        "dexterity": 93,
+        "constitution": 30,
+        "charisma": 57
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "CLAW"
+    },
+    {
+      "id": 58605,
+      "keywords": "sailor",
+      "mob_class": "Warrior",
+      "short_desc": "a sailor",
+      "long_desc": "A sailor lurches around you, cursing you loudly.",
+      "desc": "He's lurching around as if he's very drunk, which is possible, since he's not actively serving on a ship! His clothes smell of ale and assorted bodily function odors and are badly patched in many places. An air of menace seems to surround him like an aura; perhaps it'd be best to avoid him.",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [],
+      "alignment": 300,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 13,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 90,
+        "intelligence": 64,
+        "wisdom": 68,
+        "dexterity": 83,
+        "constitution": 30,
+        "charisma": 59
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58606,
+      "keywords": "jellyfish man-o-war man o war purple",
+      "mob_class": "Warrior",
+      "short_desc": "a Man O' War",
+      "long_desc": "A huge blue-purple jellyfish lurches toward you with its stingers.",
+      "desc": "A thoroughly alarming and alien sight, this puffy, dark-blue jellyfish floats gently and serenely on the waters. Tentacles drift below it into the water for quite a ways down, it looks like, and they reach out to you almost gently. The creature has no eyes or obvious internal organs -- how can you fight it?",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "WATERWALK"
+      ],
+      "alignment": 0,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 14,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 84,
+        "intelligence": 69,
+        "wisdom": 74,
+        "dexterity": 87,
+        "constitution": 30,
+        "charisma": 60
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58607,
+      "keywords": "horsefish horse fish giant",
+      "mob_class": "Warrior",
+      "short_desc": "a giant horsefish",
+      "long_desc": "A giant horsefish floats past lazily.",
+      "desc": "Serene and perky-looking, this busy brown creature floats vertically through the water, propelling itself with its long, slightly curled tail. Its head is very equine, and if you were brave, you could indeed ride on its back (if you didn't mind being on the equivalent of a rearing horse!), but it doesn't seem that friendly!",
+      "mob_flags": [
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "WATERWALK"
+      ],
+      "alignment": 0,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 14,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 86,
+        "intelligence": 68,
+        "wisdom": 74,
+        "dexterity": 84,
+        "constitution": 30,
+        "charisma": 64
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "MAUL"
+    },
+    {
+      "id": 58608,
+      "keywords": "narwhal unicorn horn whale",
+      "mob_class": "Layman",
+      "short_desc": "a narwhal",
+      "long_desc": "A unicorn horn pokes up out of the water.",
+      "desc": "This creature resembles a whale or a dolphin in general form, but one thing that makes it different is the improbably long, spiralling horn growing from just above and between its sea-grey eyes. The narwhal's natural weapon seems unwieldy and out of place, but somehow, you sense that this impression is not at all true.",
+      "mob_flags": [
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [
+        "WATERWALK"
+      ],
+      "alignment": 0,
+      "level": 30,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 14,
+      "race_align": 0,
+      "size": 4,
+      "stats": {
+        "strength": 88,
+        "intelligence": 78,
+        "wisdom": 78,
+        "dexterity": 82,
+        "constitution": 30,
+        "charisma": 70
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "PUNCH"
+    },
+    {
+      "id": 58609,
+      "keywords": "surveyor man",
+      "mob_class": "Warrior",
+      "short_desc": "a surveyor",
+      "long_desc": "A man in clean cream-colored robes surveys the land.",
+      "desc": "He's fairly young, and still has that eager look young professionals get. His robe is cream-colored and made of store-boughten cloth, made to look like a uniform of some kind. He looks at the lay of the land and jots all kinds of remarks onto a scroll.",
+      "mob_flags": [
+        "SCAVENGER",
+        "ISNPC",
+        "STAY_ZONE",
+        "MEMORY"
+      ],
+      "effect_flags": [],
+      "alignment": 600,
+      "level": 40,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 13,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 90,
+        "intelligence": 69,
+        "wisdom": 78,
+        "dexterity": 78,
+        "constitution": 30,
+        "charisma": 64
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 58610,
+      "keywords": "myorrhed bronze bipedal dragonoid woman dragonborn",
+      "mob_class": "Priest",
+      "short_desc": "Myorrhed",
+      "long_desc": "A bronze scaled bipedal dragonoid woman tends to an egg.",
+      "desc": "This woman wears thick leather armor and is heavily armed with mace and shield. Her bronze scales and humanoid form indicate is part of an unusual race of beings known as 'dragonborn.  ' Distantly related to true dragons, they often serve as caretakers and emissaries for their distant cousins.  She hovers protectively over the nearby egg indicating her role as some kind of caretaker.",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "NOCHARM",
+        "NOSUMMON",
+        "NO_CLASS_AI"
+      ],
+      "effect_flags": [
+        "INFRAVISION"
+      ],
+      "alignment": 0,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 2,
+      "race": 29,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 72,
+        "intelligence": 82,
+        "wisdom": 96,
+        "dexterity": 78,
+        "constitution": 64,
+        "charisma": 59
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    }
+  ],
+  "objects": [
+    {
+      "id": 58601,
+      "type": "TREASURE",
+      "keywords": [
+        "spyglass",
+        "spy-glass",
+        "cylindrical",
+        "object"
+      ],
+      "short": "a spyglass",
+      "ground": "A cylindrical object rolls out of reach.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "spyglass",
+            "spy-glass",
+            "cylindrical",
+            "object"
+          ],
+          "text": "This object is made up of many cylinders in progressive sizes that collapse to make a little object the size of a drinking cup, and expands to form a long, narrowing tube with glass at either end.  When you look through it, you can see things close up, or so the legends go."
+        }
+      ],
+      "values": {
+        "AC": 0
+      },
+      "flags": [
+        "GLOW"
+      ],
+      "weight": 0.75,
+      "cost": 2000,
+      "timer": 0,
+      "level": 10,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "affects": [
+        {
+          "location": "DEX",
+          "modifier": 5
+        }
+      ],
+      "effects": [
+        "FARSEE"
+      ]
+    },
+    {
+      "id": 58602,
+      "type": "WEAPON",
+      "keywords": [
+        "oar",
+        "wooden-oar",
+        "boats-oar",
+        "boat's-oar"
+      ],
+      "short": "a wooden oar",
+      "ground": "Some sailor has lost his boat's oar.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "oar",
+            "wooden-oar",
+            "boats-oar",
+            "boat's-oar"
+          ],
+          "text": "This formidable wooden object consists of a weathered wooden shaft that ends in a flipper-like wide wooden paddle.  It's quite heavy."
+        }
+      ],
+      "values": {
+        "HitRoll": 0,
+        "Hit Dice": {
+          "num": "2",
+          "size": "4",
+          "bonus": 0
+        },
+        "Average": 6.0,
+        "Damage Type": "BLUDGEON"
+      },
+      "flags": [
+        "FLOAT"
+      ],
+      "weight": 2.0,
+      "cost": 20,
+      "timer": 0,
+      "level": 15,
+      "wear_flags": [
+        "TAKE",
+        "WIELD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58603,
+      "type": "CONTAINER",
+      "keywords": [
+        "duffel",
+        "duffel-bag",
+        "bag",
+        "satchel",
+        "canvas-satchel",
+        "canvas"
+      ],
+      "short": "a duffel bag",
+      "ground": "A canvas satchel awaits its new owner.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "satchel",
+            "canvas",
+            "bag",
+            "duffel"
+          ],
+          "text": "A green sailcloth bag that closes at the top with a drawstring, this satchel seems like it'd hold a lot of stuff! Straps allow it to be worn as well as merely held."
+        }
+      ],
+      "values": {
+        "Capacity": 100,
+        "Flags": [
+          "Closeable",
+          "Closed"
+        ],
+        "Key": -1,
+        "IsCorpse": false,
+        "Weight Reduction": 0.0
+      },
+      "flags": [],
+      "weight": 1.75,
+      "cost": 60,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "ABOUT"
+      ],
+      "affects": [
+        {
+          "location": "AC",
+          "modifier": 4
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 58604,
+      "type": "ARMOR",
+      "keywords": [
+        "robes",
+        "violet-colored-linen-robes",
+        "heap-violet-linen"
+      ],
+      "short": "some &5violet-colored&0 linen robes",
+      "ground": "A heap of violet linen claims your eye.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "robes",
+            "violet-colored-linen-robes",
+            "heap-violet-linen"
+          ],
+          "text": "Fine purple cloth, unwrinkled linen, forms what is clearly a robe of high value.  Golden embroidery lines the hems, cuffs, and shawl collar.  Though light, the robes seem magical in nature."
+        }
+      ],
+      "values": {
+        "AC": 4
+      },
+      "flags": [
+        "MAGIC",
+        "FLOAT"
+      ],
+      "weight": 1.5,
+      "cost": 300,
+      "timer": 0,
+      "level": 15,
+      "wear_flags": [
+        "TAKE",
+        "ABOUT"
+      ],
+      "affects": [
+        {
+          "location": "INT",
+          "modifier": 2
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 58605,
+      "type": "DRINKCON",
+      "keywords": [
+        "bottle",
+        "green",
+        "glass"
+      ],
+      "short": "a green glass bottle",
+      "ground": "Don't step on that bottle!",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "bottle",
+            "ale"
+          ],
+          "text": "It's just a plain green glass bottle. It doesn't seem to be ornamented at all, or marked in any way, which is odd, since most bottle manufacturers mark their wares."
+        }
+      ],
+      "values": {
+        "Capacity": 10,
+        "Remaining": 10,
+        "Liquid": "DARKALE",
+        "Poisoned": false
+      },
+      "flags": [],
+      "weight": 0.17,
+      "cost": 8,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58606,
+      "type": "ARMOR",
+      "keywords": [
+        "rerebraces",
+        "twin-tubes-steel",
+        "braces"
+      ],
+      "short": "a pair of rerebraces",
+      "ground": "Twin tubes of steel lie together on the ground.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "rerebraces",
+            "twin-tubes-steel",
+            "braces"
+          ],
+          "text": "They're made of shiny, polished steel that straps on to their wearer's upper arms.  They're jointed a bit near the elbow to allow freedom of movement; you watch the joints click into and out of place with fascination."
+        }
+      ],
+      "values": {
+        "AC": 7
+      },
+      "flags": [
+        "ANTI_BERSERKER",
+        "ANTI_SORCERER",
+        "ANTI_ROGUE",
+        "ANTI_RANGER",
+        "ANTI_DRUID",
+        "ANTI_ASSASSIN",
+        "ANTI_MERCENARY",
+        "ANTI_NECROMANCER"
+      ],
+      "weight": 1.1,
+      "cost": 3200,
+      "timer": 0,
+      "level": 20,
+      "wear_flags": [
+        "TAKE",
+        "ARMS"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58607,
+      "type": "ARMOR",
+      "keywords": [
+        "moccasins",
+        "embroidered-moccasins",
+        "leather-moccasins"
+      ],
+      "short": "a pair of embroidered moccasins",
+      "ground": "A pair of leather moccasins have been tied together.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "embroidered-moccasins",
+            "leather-moccasins"
+          ],
+          "text": "You observe well-tanned brown leather cunningly worked into a pair of shoes that lace with a thong across the arch of the foot.  They're quite new-looking, even smelling of leather still.  You can tell the material is soft and supple."
+        }
+      ],
+      "values": {
+        "AC": 4
+      },
+      "flags": [],
+      "weight": 1.0,
+      "cost": 50,
+      "timer": 0,
+      "level": 15,
+      "wear_flags": [
+        "TAKE",
+        "FEET"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58608,
+      "type": "OTHER",
+      "keywords": [
+        "scroll",
+        "surveyor's-map-scroll",
+        "rolled-up-scroll",
+        "surveyors-map-scroll"
+      ],
+      "short": "the surveyor's map scroll",
+      "ground": "A rolled-up scroll rolls around on the ground.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "scroll",
+            "surveyor's-map-scroll",
+            "rolled-up-scroll",
+            "surveyors-map-scroll"
+          ],
+          "text": "The scroll appears to be the surveyor's notes of the lay of the land. There is a PICTURE and a LEGEND here for your perusal."
+        },
+        {
+          "keywords": [
+            "legend"
+          ],
+          "text": "The legend, printed in a bit of blank area on the map, reads: ------------------------------------------- /                                          / /        ^          ***   Bay              / /      /   \\        &&&   Forest           / /     /     \\       $$$   Mountain         / /      |   |        ^^^   Beach            / /      |   |        @@@   Pt. of Interest  / /      |   |                               / /                      Beware of the       / /                       Fur Bearers        / /      NORTH                               / --------------------------------------------"
+        },
+        {
+          "keywords": [
+            "picture"
+          ],
+          "text": "The map is very blurry and hard to make out, as if water has been spilled on it very often, or sprayed across it. *^^^\\ **     ***   ^^ *** ^^^^^/  @  / ^^^^/@          ^/ ^/                / ^^/                  ^/ ^^/                  ^^/ ^^/      &&&     @       / ^/      &$$ &&      /^ \\     &&$$&&    ^/ ^^\\           / ^^\\__  @ ^/ \\__/^ There is no more."
+        }
+      ],
+      "values": {},
+      "flags": [
+        "FLOAT"
+      ],
+      "weight": 1.1,
+      "cost": 25,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58609,
+      "type": "OTHER",
+      "keywords": [
+        "marigold-poultice",
+        "soft-mass-marigold-mush",
+        "questobject"
+      ],
+      "short": "some marigold poultice",
+      "ground": "A soft mass of marigold mush burbles here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "marigold-poultice",
+            "soft-mass-marigold-mush",
+            "questobject"
+          ],
+          "text": "Varying shades of green, this poultice is crushed from freshly-picked marigolds.  It has a sickly scent, smelling strongly of herbs and medicine."
+        }
+      ],
+      "values": {},
+      "flags": [],
+      "weight": 0.2,
+      "cost": 0,
+      "timer": 0,
+      "level": 30,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "effects": []
+    },
+    {
+      "id": 58610,
+      "type": "OTHER",
+      "keywords": [
+        "egg",
+        "bronze-dragon-egg",
+        "large-bronze-egg",
+        "questobject"
+      ],
+      "short": "a bronze dragon egg",
+      "ground": "A large bronze egg stands half-buried in the sand.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "egg",
+            "bronze-dragon-egg",
+            "large-bronze-egg",
+            "questobject"
+          ],
+          "text": "Nearly three feet tall, the egg is comfortably nestled in the warm sands. Sunlight highlights the metallic bronze sheen of the egg's speckled shell. Warmth from the sand and sun make the perfect environment for the growing creature inside it."
+        }
+      ],
+      "values": {},
+      "flags": [],
+      "weight": 999.0,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [],
+      "effects": []
+    }
+  ],
+  "shops": null,
+  "triggers": [
+    {
+      "id": 58600,
+      "name": "dragons_health_myorrhed_greeting",
+      "attach_type": "Object",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2 if %actor.quest_stage[dragons_health]% > 0 wave %actor.name% say Welcome back! elseif %actor.vnum% == -1 growl %actor.name% say Stay back!  I will not allow you to harm this egg! endif "
+    },
+    {
+      "id": 58601,
+      "name": "dragons_health_myorrhed_speech",
+      "attach_type": "Object",
+      "flags": [
+        "Speech"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "egg egg? Yes yes? No no? Why why? Procured procured? Procure procure? Task task? Value value?",
+      "commands": "if %actor.quest_stage[dragons_health]% == 0 wait 2 if %speech% /= egg? || %speech% /= egg say Yes, this egg here. emote gestures to the large bronze egg. mecho mecho %self.name% says, 'It's the last egg of the old bronze wyrm Dormynalth. mecho &0I am sworn to guard it until it hatches.' mecho emote utters a prayer of health and strength for the hatchling. wait 5s if %actor.level% > 88 if (%actor.class% /= Cleric || %actor.class% /= Priest) mecho %self.name% says, 'However, I could use some assistance from someone as capable mecho &0as you are.  If you're willing to help me, I can teach you a prayer to invoke mecho &0the health of dragons in exchange.' wait 4s say Are you interested? endif endif elseif %speech% /= Yes || %speech% /= yes? wait 2 if (%actor.class% /= Cleric || %actor.class% /= Priest) && %actor.class% > 88 emote smiles with gratitude. quest start dragons_health %actor.name% wait 1s say Good.  Allow me to explain the plan. wait 2s mecho %self.name% says, 'Dragon eggs like this one need the proper environment to grow mecho &0and develop.  Often this is a slow process, taking months or even years for mecho &0certain species.  But this process can be sped up by accumulating wealth into mecho &0a hoard for the unhatched dragon.' wait 6s mecho %self.name% says, 'You may be wondering &6&bwhy&0.' endif endif elseif %actor.quest_stage[dragons_health]% == 1 if %speech% /= why || %speech% /= why? wait 2 say Dragons love treasure.  This is well-known. wait 2s mecho %self.name% says, 'On one level, they just love having it.  To many, all dragons, mecho &0good or evil, are personifications of greed.' wait 4s mecho %self.name% says, 'What many don't know is this love of treasure is more than mecho &0just habitual; it is instinctual.' wait 4s mecho %self.name% says, 'Dragons are compelled to hoard treasure because they draw mecho &0power directly from the &6&bvalue&0 of the artifacts they claim dominion over.' elseif %speech% /= value || %speech% /= value? wait 2 mecho %self.name% says, 'That value isn't always monetary.  Things imbued with precious mecho &0memories, little physical bits of ruins, even a plant that has been carried mecho &0from one land to another, all of that contributes to something's value.' wait 2s say And then of course there's the monetary value. laugh wait 6s say We help the egg mature by increasing the value of its hoard. wait 2s mecho %self.name%'s eyes twinkle with mischief. mecho %self.name% says, 'It would be... valuable if you &6&b\"procured\"&0 a few items from the mecho &0hoards of chromatic dragons.' elseif %speech% /= procured || %speech% /= procured? || %speech% /= procure || %speech% /= procure? wait 2 say Yes, that probably means you would have to slay them. shrug wait 5s mecho %self.name% says, 'There is long-standing enmity between chromatic dragons, who mecho &0embody the abstract concepts of evil and maliciousness, and the metallic mecho &0dragons, who personify aloof goodness and righteousness.' wait 5s mecho %self.name% says, 'Fewer chromatic dragons means more space for metallic dragons. mecho &0To see if you're up to the &6&btask&0 though, let's start with something less mecho &0dangerous.' elseif %speech% /= task || %speech% /= task? wait 2 mecho %self.name% says, 'A young blue dragon has made a lair near the old tower west of mecho &0Anduin.  Bring back the crystal it keeps in its hoard for our hatchling.' wait 2s mecho %self.name% says, 'You may ask me about your &6&b[progress]&0 if you need a reminder.' elseif %speech% /= No || %speech% /= no? if (%actor.class% /= Cleric || %actor.class% /= Priest) && %actor.class% > 88 && !%actor.quest_stage[dragons_health]% say That's alright.  We shall let nature take its course. emote gently pats the egg. endif endif endif "
+    },
+    {
+      "id": 58602,
+      "name": "dragons_health_myorrhed_receive",
+      "attach_type": "Object",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set stage %actor.quest_stage[dragons_health]% if %stage% == 1 if %object.vnum% == 12509 wait 2 emote examines %object.shortdesc%. mjunk %object% wait 1s nod msend %actor% %self.name% says, 'I had little doubt you would succeed.' quest advance dragons_health %actor.name% wait 2s msend %actor% %self.name% says, 'Your next target is considerably more powerful so be prepared.' wait 2s msend %actor% %self.name% says, 'The dragon Tri-Aszp has a cult dedicated to her in the msend %actor% &0northern reaches.  She uses them to commit heinous acts and keep the msend %actor% &0region in her clutches.' wait 5s emote places her hands on the egg. msend %actor% %self.name% says, 'It would be a boon to both this dragon's future and to all msend %actor% &0dragonkind if you could eliminate her.' wait 3s msend %actor% %self.name% says, 'Dragon scales have incredible monetary and ancestral value. msend %actor% &0A scale from Tri-Aszp will remind our hatchling of the legacy it bears. msend %actor% &0Bring back one of her scales as a trophy.' else return 0 msend %actor% %self.name% says, 'Hmmm, this doesn't seem to have the proper draconic energies.' msend %actor% %self.name% refuses %object.shortdesc%. endif elseif %stage% == 2 if %object.vnum% == 53325 quest advance dragons_health %actor.name% wait 2 emote runs her eyes over %object.shortdesc%. mjunk %object% wait 1s msend %actor% %self.name% says, 'Excellent work.  With the Cult of the Ice Dragon in shambles, msend %actor% &0the world is that much safer.' wait 3s msend %actor% %self.name% says, 'Tri-Aszp's children may grow to be a threat in the future msend %actor% &0which is why this next generation is so important.' wait 4s msend %actor% %self.name% says, 'That next generation of chromatic dragons is actually what msend %actor% &0we should address next.' wait 2s msend %actor% %self.name% says, 'Sagece of Raymif, the half-demon dragon that rules Templace, msend %actor% &0had two spawn sometime after she crawled into our world.  They are entombed in msend %actor% &0a crypt far to the north as guardians of a soul-shredding lich.' wait 5s msend %actor% %self.name% says, 'In their position is a wondrous stone unlike anything else in msend %actor% &0existence.  It flickers with an inner green light.' wait 2s msend %actor% %self.name% says, 'Destroy her spawn, the black dragons Thelriki and Jerajai, and msend %actor% &0return with the stone.' else return 0 msend %actor% %self.name% refuses %object.shortdesc%. wait 2 msend %actor% %self.name% says, '%object.shortdesc% is not one of Tri-Aszp's scales.' endif elseif %stage% == 3 if %object.vnum% == 48024 if %actor.quest_variable[dragons_health:thelriki]% && %actor.quest_variable[dragons_health:jerajai]% quest advance dragons_health %actor.name% wait 2 emote looks suspiciously at %object.shortdesc%. mjunk %object% wait 1s msend %actor% %self.name% says, 'Thank you for ending them.  They shall blight the world no more.' wait 3s msend %actor% %self.name% says, 'Now for the hardest task of all.  When Templace fell and demons msend %actor% &0from Garl'lixxil were loosed on Ethilien, the balance of the Dragonwars msend %actor% &0was forever changed.' wait 4s msend %actor% %self.name% says, 'The time has come to right that balance.' wait 4s msend %actor% %self.name% says, 'Lay siege to Templace and slay the ancient black dragon Sagece msend %actor% &0of Raymif.  Bring back her skin and a shield she keeps, plus the two decoys msend %actor% &0she keeps in her cursed hoard.' wait 2s msend %actor% %self.name% says, 'And know, you must be there when the demon dragon falls.' wait 4s msend %actor% %self.name% says, 'May Bahamut watch over you and grant you fortune!' elseif %actor.quest_variable[dragons_health:thelriki]% && !%actor.quest_variable[dragons_health:jerajai]% return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'Jerajai still lives!  You must destroy him first!' elseif !%actor.quest_variable[dragons_health:thelriki]% && %actor.quest_variable[dragons_health:jerajai]% return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'Thelriki still lives!  You must destroy her first!' else return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'The hell-dragon spawn still live!  You must destroy them first!' endif else return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'This is not part of their hoard.' endif elseif %stage% == 4 set sagece %actor.quest_variable[dragons_health:sagece]% if %object.vnum% == 52016 || %object.vnum% == 52017 || %object.vnum% == 52022 || %object.vnum% == 52023 if !%sagece% return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'You must slay Sagece first!' else if %actor.quest_variable[dragons_health:%object.vnum%]% return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'You have already given this to me.' halt else quest variable dragons_health %actor.name% %object.vnum% 1 wait 2 set emote %random.4% switch %emote% case 1 emote looks at %object.shortdesc% with disdain. break case 2 emote regards %object.shortdesc% with caution. break case 3 emote grimaces at %object.shortdesc%. break default emote sneers at %object.shortdesc%. done mjunk %object% endif endif set item1 %actor.quest_variable[dragons_health:52016]% set item2 %actor.quest_variable[dragons_health:52017]% set item3 %actor.quest_variable[dragons_health:52022]% set item4 %actor.quest_variable[dragons_health:52023]% wait 1s if %item1% && %item2% && %item3% && %item4% quest advance dragons_health %actor.name% msend %actor% %self.name% says, 'I can't believe she's finally gone.' wait 2s emote places the remnants of the other dragons' hoards around the egg.' wait 2 msend %actor% The egg shifts and rocks slightly with signs of life! way 3s msend %actor% %self.name% says, 'The last thing the egg needs is money.  Lots of it.' msend %actor% msend %actor% %self.name% says, 'Bring anything of value you can find. You can even offer coin. msend %actor% &0About 10,000 platinum worth of treasure should be satisfactory.  That's about msend %actor% &010,000,000 copper, in case it needed to be said.' wait 4s msend %actor% %self.name% says, 'Some very powerful objects are so unique they are priceless. msend %actor% &0Bring them to me and I shall see if they are worth including as well.' wait 3s msend %actor% %self.name% says, 'And remember, just because someone sells something for a msend %actor% &0certain price, doesn't mean it's actually worth that much!' else msend %actor% %self.name% says, 'Good.  Do you have the remaining artifacts?' endif else return 0 msend %actor% %self.name% refuses %object.shortdesc%. msend %actor% %self.name% says, 'This is not significant enough to Sagece.' halt endif elseif %stage% == 5 if %object.cost% == 0 && %object.level% < 60 return 0 wait 2 emote examines %object.shortdesc% closely. wait 1s msend %actor% %self.name% says, 'Unfortunately there isn't enough inherent value to &3&b%object.shortdesc% to be part of the hatchling's hoard.' halt else wait 2 emote examines %object.shortdesc% closely. if (%object.level% >= 60) && (%object.cost% == 0) eval price (%object.level% * 1000) msend %actor% %self.name% says, 'Ah, %object.shortdesc%.  Although it has no inherent price, the mystic value of it is: &b&3%price%&0 copper.' elseif (%object.level% >= 60 && %object.cost% < (%object.level% * 1000)) eval price (%object.level% * 1000) msend %actor% %self.name% says, 'Ah, %object.shortdesc%.  Even though it has some material value, the mystic value of it is: &3&b%price%&0 copper.' elseif (%object.level% < 60 && %object.cost% > 0) || (%object.level% >= 60 && %object.cost% >= (%object.level% * 1000)) eval price %object.cost% msend %actor% %self.name% says, 'Ah, %object.shortdesc%.  It has a value of: &3&b%object.cost%&0 copper.' endif msend %actor% &0 msend %actor% %self.name% says, 'It shall be included in the offerings.' emote places %object.shortdesc% next to the egg. mjunk %object% wait 2 endif set hoard %actor.quest_variable[dragons_health:hoard]% eval wealth (%hoard% + %price%) quest variable dragons_health %actor.name% hoard %wealth% set value %actor.quest_variable[dragons_health:hoard]% if %value% >= 10000000 quest advance dragons_health %actor.name% m_run_room_trig 58604 else eval total (10000000 - %value%) eval plat (%total% / 1000) eval gold (%total% / 100) - (%plat% * 10) eval silv (%total% / 10) - (%plat% * 100) - (%gold% * 10) eval copp %total%  - (%plat% * 1000) - (%gold% * 100) - (%silv% * 10) *now the price can be reported msend %actor% %self.name% says, 'We need %plat% platinum, %gold% gold, %silv% silver, %copp% copper more in treasure and coins.' endif else return 0 msend %actor% %self.name% refuses %object.shortdesc%. wait 2 msend %actor% %self.name% says, 'I'm not looking for anything right now.' endif "
+    },
+    {
+      "id": 58603,
+      "name": "dragons_health_myorrhed_bribe",
+      "attach_type": "Object",
+      "flags": [
+        "Bribe"
+      ],
+      "number_of_arguments": 1,
+      "argument_list": "",
+      "commands": "if %actor.quest_stage[dragons_health]% == 5 wait 2 mecho %self.name% says, 'Ah, coin itself!  I count:' if %platinum% mecho %platinum% platinum endif if %gold% mecho %gold% gold endif if %silver% mecho %silver% silver endif if %copper% mecho %copper% copper endif wait 2 say This shall be included in the offerings. emote places the money next to the egg. set hoard %actor.quest_variable[dragons_health:hoard]% eval wealth %hoard% + ((%platinum% * 1000) + (%gold% * 100) + (%silver% * 10) + %copper%) quest variable dragons_health %actor.name% hoard %wealth% set value %actor.quest_variable[dragons_health:hoard]% if %value% >= 10000000 quest advance dragons_health %actor.name% m_run_room_trig 58604 else eval total (10000000 - %value%) eval plat (%total% / 1000) eval gold ((%total% / 100) - (%plat% * 10)) eval silv ((%total% / 10) - (%plat% * 100) - (%gold% * 10)) eval copp (%total%  - (%plat% * 1000) - (%gold% * 100) - (%silv% * 10)) *now the price can be reported mecho %self.name% says, 'We need %plat% platinum, %gold% gold, %silv% silver, %copp% copper mecho &0more in treasure and coins.' endif else say I appreciate the gesture, but I am in no need of money. give %platinum% platinum %gold% gold %silver% silver %copper% copper %actor.name% end "
+    },
+    {
+      "id": 58604,
+      "name": "dragons_health_room_hatch",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho As %get.mob_shortdesc[58610]% turns to walk away from the egg, a crack begins to form... wait 3s wecho The crack continues to grow, branching into hundreds of smaller cracks! wait 6s wecho A talon suddenly breaks through the egg shell! wait 3s wecho Slowly, the head of a bronze dragon pushes through the shell. wait 2s wecho The dragon egg continues to split into pieces. wait 2s wecho A small, bronze dragon emerges from the broken egg shell. wecho The tiny dragon looks at %get.mob_shortdesc[58610]%. wpurge dragon-egg wait 3s wecho The bronze hatchling says, 'Mistress, thank you for protecting me. wecho &0You have done a great service to our kind.' wait 2s wecho The bronze dragon looks around itself. wecho In a rush of wind, the dragon beats its wings, launching itself into the air. Wait 6s wecho %get.mob_shortdesc[58610]% watches the hatchling soar through the sky and skim across the ocean's surface. wait 2s wecho %get.mob_shortdesc[58610]% beams with joy! wait 3s wecho %get.mob_shortdesc[58610]% says, 'I will be forever grateful to you for helping dragonkind. wecho &0To show my gratitude, I gift you the Song of the Dragons.' wait 3s wecho %get.mob_shortdesc[58610]% sings an ancient Draconic prayer. wait 1s set person %self.people% while %person% if %person.quest_stage[dragons_health]% == 6 wforce dragonborn mskillset %person% dragons health wsend %person% &3&bFrom the Song of the Dragons you have learned Dragons Health!&0 quest complete dragons_health %person.name% endif set person %person.next_in_room% done "
+    },
+    {
+      "id": 58605,
+      "name": "dragons_health_myorrhed_status_checker",
+      "attach_type": "Object",
+      "flags": [
+        "Speech"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "progress progress? status status?",
+      "commands": "set stage %actor.quest_stage[dragons_health]% wait 2 if %actor.has_completed[dragons_health]% mecho %self.name% says, 'You have already kept vigil with me. mecho &0May the Song of the Dragons give you strength.' halt else switch %stage% case 1 set dragon the blue dragon in the Tower in the Wastes set treasure its crystal break case 2 set dragon Tri-Aszp set treasure one of her scales break case 3 set dragon Thelriki and Jerajai set treasure the jewel in their hoard break case 4 set dragon Sagece set treasure her skins and shields break case 5 eval total 10000000 - %actor.quest_variable[dragons_health:hoard]% eval plat %total% / 1000 eval gold %total% / 100 - %plat% * 10 eval silv %total% / 10 - %plat% * 100 - %gold% * 10 eval copp %total%  - %plat% * 1000 - %gold% * 100 - %silv% * 10 *now the price can be reported mecho %self.name% says, 'The new hatchling's hoard needs enriching. mecho &0%plat% platinum, %gold% gold, %silv% silver, %copp% copper mecho &0more in treasure and coins ought to do it.' halt break default say Progress of what?  You're not keeping guard with me... done if %stage% == 4 mecho %self.name% says, 'You are undertaking your hardest task:' elseif %stage% != 5 mecho %self.name% says, 'You are trying to:' endif mecho - kill %dragon% and bring me %treasure%. if %stage% == 3 set thelriki %actor.quest_variable[dragons_health:thelriki]% set jerajai %actor.quest_variable[dragons_health:jerajai]% mecho if %thelriki% || %jerajai% mecho You have slain: if %thelriki% mecho - Thelriki endif if %jerajai% mecho - Jerajai endif endif mecho mecho You must still: if !%thelriki% mecho - kill Thelriki endif if !%actor.quest_variable[dragons_health:jerajai]% mecho - kill Jerajai endif mecho - bring the heartstone elseif %stage% == 4 mecho set item1 %actor.quest_variable[dragons_health:52016]% set item2 %actor.quest_variable[dragons_health:52017]% set item3 %actor.quest_variable[dragons_health:52022]% set item4 %actor.quest_variable[dragons_health:52023]% set sagece %actor.quest_variable[dragons_health:sagece]% if %item1% || %item2% || %item3% || %item4% || %sagece% mecho You have already: if %sagece% mecho - slain Sagece of Raymif endif if %item1% mecho - brought Sagece's skin endif if %item2% mecho - brought Sagece's shield endif if %item3% mecho - brought the skin from Sagece's hoard endif if %item4% mecho - brought the shield from Sagece's hoard endif endif mecho mecho You must still: if !%sagece% mecho - kill Sagece of Raymif endif if !%item1% mecho - bring Sagece's skin endif if !%item2% mecho - bring Sagece's shield endif if !%item3% mecho - find the skin in Sagece's hoard endif if !%item4% mecho - find the shield in Sagece's hoard endif endif endif "
+    },
+    {
+      "id": 58606,
+      "name": "dragons_health_thelriki_jerajai_death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set person %actor% set i %actor.group_size% if %i% set a 1 unset person while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if %person.quest_stage[dragons_health]% == 3 quest variable dragons_health %person.name% %self.name% 1 endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done elseif %person.quest_stage[dragons_health]% == 3 quest variable dragons_health %person.name% %self.name% 1 endif "
+    },
+    {
+      "id": 58607,
+      "name": "sagece_dragons_health_death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set person %actor% set i %actor.group_size% if %i% set a 1 unset person while %i% >= %a% set person %actor.group_member[%a%]% if %person.room% == %self.room% if %person.quest_stage[dragons_health]% == 4 quest variable dragons_health %person.name% sagece 1 endif elseif %person% eval i %i% + 1 endif eval a %a% + 1 done elseif %person.quest_stage[dragons_health]% == 4 quest variable dragons_health %person.name% sagece 1 endif "
+    }
+  ],
+  "rooms": [
+    {
+      "id": "58601",
+      "name": "Ocean's Edge",
+      "description": "The sea, so huge to the west, seems to come to an abrupt shore here.  You can easily make out the outlines of a huge continent to the east!  It runs to the northeast as the eye can see, a mass of unexplored territory -- a beach marks the shoreline, and beyond that, beyond the dunes, you can see forests, swamps, purple mountains..  You cannot reach the shore from here, but the water continues to the west, tracing a promontory. ",
+      "flags": [
+        "NOMOB"
+      ],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The waters continue to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58680"
+        },
+        "West": {
+          "description": "The water continues. Far beyond, the ocean rolls onward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58602"
+        }
+      }
+    },
+    {
+      "id": "58602",
+      "name": "Ocean's Edge",
+      "description": "You bob near the shoreline of a vast continent stretching far to the distance.  The dark blue waters abruptly turn aquamarine as you pass the continental shelf.  Under the water, near the surface, you see various ocean life.  To the southeast, you see a lighthouse.  Though the ocean extends westward, currents prevent sailing in that direction. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "You can sail east if you want. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58601"
+        },
+        "South": {
+          "description": "You can sail around the edge of the lighthouse if you want. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58603"
+        }
+      }
+    },
+    {
+      "id": "58603",
+      "name": "Ocean's Edge",
+      "description": "The aquamarine water isn't terribly deep here, but you can't tell how far down it goes.  The ocean rolls far out of sight to the west, but to the east, you see a lighthouse, and beyond it, a vast landmass that disappears into the horizon. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The water's edge extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58602"
+        },
+        "South": {
+          "description": "A channel begins to the south that skirts the landmass' shoreline. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58605"
+        },
+        "West": {
+          "description": "The ocean extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58604"
+        }
+      }
+    },
+    {
+      "id": "58604",
+      "name": "Ocean's Edge",
+      "description": "The vast ocean rolls on to the north, south, and west.  Far to the east, a lighthouse stands, shining down all around, day or night.  Further, you can see a huge landmass -- a continent, no island.  The water turns a dark blue as you pass over the continental shelf.  Marine life is evident everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "The ocean waters lap up against the shoreline, and the base of the lighthouse. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58603"
+        }
+      }
+    },
+    {
+      "id": "58605",
+      "name": "The Edge of a Marine Channel",
+      "description": "The ocean waters seem shallower, and thus more treacherous.  A narrow channel has formed over the eons, guiding any vessels safely past the dangers. To the northeast, a lighthouse perches on the edge of a promontory, lighting the area day or night -- a good thing, since the ocean spray even in daylight makes seeing difficult. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The ocean's waters extend northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58603"
+        },
+        "East": {
+          "description": "The channel extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58606"
+        }
+      }
+    },
+    {
+      "id": "58606",
+      "name": "A Channel near the Shore",
+      "description": "You bob in the center of a narrow channel.  You can see shoals and large rocks under the water's surface nearby that would make sailing outside the channel dangerous.  You are entering a bay of sorts, and this channel hugs the northern shore of it.  A continent, its mass huge, extends to the south a long way, past a beach to the immediate northeast.  There are no safe landing places, however.  To the north, a rocky promontory boasts a large lighthouse. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "The channel extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58607"
+        },
+        "West": {
+          "description": "The channel ends to the west. The ocean rolls on beyond it. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58605"
+        }
+      }
+    },
+    {
+      "id": "58607",
+      "name": "A Channel Near the Shore",
+      "description": "This narrow channel's azure waters skirt between the shoreline to the immediate north, and a large bay to the south.  Shoals and rocks prevent any reasonable access south.  The continent to the south is not only beautiful, and mysteriously quiet, rippling dunes leading to a forest.  The brightness from the lighthouse to the northwest is fading a bit here. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "The channel continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58608"
+        },
+        "West": {
+          "description": "The channel continues, going around a lighthouse to the northwest. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58606"
+        }
+      }
+    },
+    {
+      "id": "58608",
+      "name": "A Channel Near the Shore",
+      "description": "You skirt the very edge of a shoreline leading to beaches and sand dunes. A continent extends as far as the eye can see, though there are no safe places to land a vessel here.  The light blue waters seem idyllic enough. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "The channel skirts a curving shoreline to the east. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58609"
+        },
+        "West": {
+          "description": "The channel extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58607"
+        }
+      }
+    },
+    {
+      "id": "58609",
+      "name": "A Channel Near the Shore",
+      "description": "This narrow little channel skirts the edge of a shoreline of a large continent running to the north, south, and east as far as the eye can see. There's nowhere safe to disembark, but the beach looks clear and safe enough from here.  Beyond it, you see sand dunes, and a forest taking up far into the distance, where you see dim mountains. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "South": {
+          "description": "The channel flows south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58610"
+        },
+        "West": {
+          "description": "The channel flows west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58608"
+        }
+      }
+    },
+    {
+      "id": "58610",
+      "name": "A Channel Near the Shore",
+      "description": "This narrow channel flows up against the shoreline, but there is nowhere safe enough to land a vessel.  Shoals and rocks barely visible beneath the azure waters prevent any passage to the south, into the bay that laps up against the shore.  The landmass to the east, north, and south seems to go on forever. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The channel flows northward. Further, you see the beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58609"
+        },
+        "East": {
+          "description": "The channel ends to the east, at a landing site. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58611"
+        }
+      }
+    },
+    {
+      "id": "58611",
+      "name": "Coming Ashore",
+      "description": "The waters become shallower, and you sense somehow that this is probably your only chance of landing anywhere near the continent.  A picturesque bay flows out to the south and west; around this, golden sands form a beach, curling around the waters. ",
+      "flags": [
+        "NOMOB"
+      ],
+      "sector": "WATER",
+      "exits": {
+        "East": {
+          "description": "You can disembark onto the golden beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58632"
+        },
+        "West": {
+          "description": "The channel begins here, skirting the shoreline. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58610"
+        }
+      }
+    },
+    {
+      "id": "58612",
+      "name": "The Promontory Lighthouse",
+      "description": "A rocky outcropping of reddish stones falls into a kind of cliff to the waters below.  Plants -- grasses mostly -- can barely dine at this kind of table, and the wind whistles past you.  Surely this is an inhospitable place. The lighthouse itself is a tall structure made of whitewashed bricks.  A glass enclosure at its top reveals a flamelike light that shines brightly through any weather and every time of day. ",
+      "flags": [],
+      "sector": "MOUNTAIN",
+      "exits": {
+        "East": {
+          "description": "You can walk down the lonely promontory to the east, to the beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58625"
+        }
+      }
+    },
+    {
+      "id": "58613",
+      "name": "The Shoreline",
+      "description": "Near the northern end of this landmass, you can see the ocean to the north and west, rolling so far you cannot see its end.  To the south, the beach becomes sand dunes, which in their turn become a scruffy forest that goes far into the distance, to dim mountains.  The shoreline ends here; rocks and dangerous looking surf prevent any further access. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "South": {
+          "description": "The sands continue. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58614"
+        }
+      }
+    },
+    {
+      "id": "58614",
+      "name": "The Beach",
+      "description": "Near the northern end of this landmass, you can see the ocean to the north and west, rolling so far you cannot see its end.  To the south, the beach becomes sand dunes, which in their turn become a scruffy forest that goes far into the distance, to dim mountains. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline ends to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58613"
+        },
+        "West": {
+          "description": "The shoreline extends to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58615"
+        }
+      }
+    },
+    {
+      "id": "58615",
+      "name": "The Shoreline",
+      "description": "You stand at the northwestern edge of a huge landmass that extends so far to the southeast you can't see its edge.  The ocean, azure that sharply turns to indigo, extends to the western horizon, while the beach you find yourself on becomes sand dunes, then scrubby shrubs and trees.  Far away, you see mountains. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58614"
+        },
+        "West": {
+          "description": "The shoreline extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58616"
+        }
+      }
+    },
+    {
+      "id": "58616",
+      "name": "The Shoreline",
+      "description": "You stand right at the edge of a vast landmass, on a golden beach.  Every wave of the ocean laps up onto the sand, turning it dark and dense enough to build a sand castle.  In fact, somebody already has.  A landmass extends off to the east and south, drawing your attention upward to the dim mountains far away.  Someone's made a sand castle on this beach. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The shoreline extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58615"
+        },
+        "South": {
+          "description": "The beach extends southward for a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58617"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "sand",
+            "castle",
+            "sandcastle"
+          ],
+          "text": "The sand castle seems expertly made, though surely few people are authorities on excellence in building anything out of sand. Its turrets and little windows are detailed carefully, and a piece of driftwood forms a drawbridge suspended by little vines of seaweed. "
+        }
+      ]
+    },
+    {
+      "id": "58617",
+      "name": "The Beach",
+      "description": "Occasional waves from the ocean to the west roll in and soak the golden sands, turning them dark.  Footprints show everywhere, clear indications of recent passage through here.  Sand dunes to the southeast become a scrubby little forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58616"
+        },
+        "East": {
+          "description": "Sand dunes blow endlessly to the east. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58645"
+        },
+        "West": {
+          "description": "The shoreline extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58618"
+        }
+      }
+    },
+    {
+      "id": "58618",
+      "name": "The Shoreline",
+      "description": "You stand on a gentle curve of the beach.  Salty water, tangy in the breeze, laps up against the golden sands.  Out to the west, the ocean extends to the horizon.  This is the northwestern edge of a huge landmass that extends further south than you can see.  Sand dunes and a vast, scrubby forest grow all the way into the distance. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58617"
+        },
+        "South": {
+          "description": "The beach extends southward for a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58619"
+        }
+      }
+    },
+    {
+      "id": "58619",
+      "name": "The Beach",
+      "description": "Soft golden sands, warmed by decades of sunlight, feel oddly crunchy as you pass.  To the north and west, the waters regularly lap up against the shore, but here, the sand rarely feels the ocean's caress.  Sand dunes begin to the east and extend quite a ways before ending at a forest that goes as far as the eye can see to the south. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see the shoreline. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58618"
+        },
+        "East": {
+          "description": "The sand dunes extend east a short distance. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58647"
+        },
+        "South": {
+          "description": "The beach extends southward for a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58622"
+        },
+        "West": {
+          "description": "The shoreline lies just west of here. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58620"
+        }
+      }
+    },
+    {
+      "id": "58620",
+      "name": "The Shoreline",
+      "description": "This is the northeastern end of a large landmass that extends far to the southern horizon.  The ocean's dark blue depths reach the far western horizon, turning suddenly to bright azure blue waves that lap up against the golden sand of the beach.  To the east, the drier sands become dunes, and beyond that, a forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach extends eastward a short distance. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58619"
+        },
+        "South": {
+          "description": "The shore continues a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58621"
+        }
+      }
+    },
+    {
+      "id": "58621",
+      "name": "The Shoreline",
+      "description": "This gentle shoreline faces a huge ocean to the west that seems to go on forever.  The beach is made of golden sand with footprints marking it everywhere. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shore continues northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58620"
+        },
+        "East": {
+          "description": "The beach to the east eventually becomes sand dunes. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58622"
+        }
+      }
+    },
+    {
+      "id": "58622",
+      "name": "The Beach",
+      "description": "Occasional waves from the ocean to the west roll in and soak the golden sands, turning them dark.  Footprints show everywhere, clear indications of recent passage through here.  Sand dunes to the east become a scrubby little forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58619"
+        },
+        "East": {
+          "description": "The dunes extend eastward a short distance. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58648"
+        },
+        "South": {
+          "description": "The beach continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58623"
+        },
+        "West": {
+          "description": "You see the shoreline. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58621"
+        }
+      }
+    },
+    {
+      "id": "58623",
+      "name": "The Beach",
+      "description": "Occasional waves from the ocean to the west roll in and soak the golden sands, turning them dark.  Footprints show everywhere, clear indications of recent passage through here.  Sand dunes to the east become a scrubby little forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58622"
+        },
+        "South": {
+          "description": "You see the shoreline. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58626"
+        },
+        "West": {
+          "description": "You see a beach to the west. Beyond it, you see the ocean. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58624"
+        }
+      }
+    },
+    {
+      "id": "58624",
+      "name": "The Shoreline",
+      "description": "Golden sands give way to larger rocks that seem to tumble in the tides that roll in every few seconds, like a heartbeat.  Featuring prominently in the landscape is a tall lighthouse to the southwest, up on a hill.  The blue waters extend as far westward as the eye can see. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach continues, eventually becoming sand dunes. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58623"
+        },
+        "South": {
+          "description": "The promontory begins to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58625"
+        }
+      }
+    },
+    {
+      "id": "58625",
+      "name": "A Rocky Promontory",
+      "description": "Bits of sand run in between the cracks of the many rocks that jut out from this promontory.  Almost a cliff, rising as you walk further west, you find you have an excellent view of the surrounding countryside.  The ocean just runs on forever, to the west, beyond a whitewashed lighthouse.  A mainland extends southward, past the dunes of the beach. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shore runs northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58624"
+        },
+        "East": {
+          "description": "The shore runs eastward from here. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58626"
+        },
+        "West": {
+          "description": "A whitewashed lighthouse, shining like the sun, stands to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58612"
+        }
+      }
+    },
+    {
+      "id": "58626",
+      "name": "The Shoreline",
+      "description": "This is the northern shore of a wide azure bay.  It's very picturesque, though you know that the going is treacherous out there in the water.  The sands of the beach are golden and fairly large, indicating their youth.  You see footprints in the sand. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach runs northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58623"
+        },
+        "East": {
+          "description": "The shoreline continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58627"
+        },
+        "West": {
+          "description": "The beach ends at a rocky promontory jutting out from the shore. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58625"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "footprints",
+            "prints"
+          ],
+          "text": "The prints seem human, most of them.. but some aren't at all. Most are recently made. "
+        }
+      ]
+    },
+    {
+      "id": "58627",
+      "name": "The Shoreline",
+      "description": "This is the northern shore of a wide azure bay.  It's very picturesque, though you know that the going is treacherous out there in the water.  The tangy winds seem strong.  Though you can tell that sand dunes lie northward, you can only see a wall of sand there. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The dunes are too large to see anything beyond them. ",
+          "keyword": "",
+          "type": "Description only",
+          "key": "-1",
+          "destination": "-1"
+        },
+        "East": {
+          "description": "You see the beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58628"
+        },
+        "West": {
+          "description": "The shoreline continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58626"
+        }
+      }
+    },
+    {
+      "id": "58628",
+      "name": "The Beach",
+      "description": "This is the northeastern corner of a large bay at the northern end of a huge landmass.  Sand dunes give way to a a forest that seems to go on forever. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58629"
+        },
+        "South": {
+          "description": "You see the shoreline to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58631"
+        },
+        "West": {
+          "description": "The shoreline extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58627"
+        }
+      }
+    },
+    {
+      "id": "58629",
+      "name": "The Beach",
+      "description": "Soft, golden sand forms a beautiful beach that extends all around a curved bay, whose waters are visible to the southwest.  Dunes lie to the north and east, and beyond that, the ill- defined forms of a forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "Sand dunes lie to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58653"
+        },
+        "East": {
+          "description": "Dunes extend east of here, and beyond that, it's difficult to see. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58654"
+        },
+        "South": {
+          "description": "The beach extends southward in golden sands. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58630"
+        },
+        "West": {
+          "description": "The beach extends westward in golden sands. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58628"
+        }
+      }
+    },
+    {
+      "id": "58630",
+      "name": "The Beach",
+      "description": "Soft, golden sand forms a beautiful beach that extends all around a curved bay, whose waters are visible to the west.  The beach continues to the north, with the dunes beyond it, and the shoreline is visible to the west.  It seems peaceful enough. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58629"
+        },
+        "South": {
+          "description": "You see a kind of harbor to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58632"
+        },
+        "West": {
+          "description": "The shoreline is visible to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58631"
+        }
+      }
+    },
+    {
+      "id": "58631",
+      "name": "The Shoreline",
+      "description": "This is the northeast corner of a large blue bay that sparkles in the light. The briny water laps up against the golden sands of the shore; you can see all the ocean running all the way to the western horizon.  To the south, the thick forest fades into the mists of a purple mountain. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58628"
+        },
+        "East": {
+          "description": "The beach extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58630"
+        }
+      }
+    },
+    {
+      "id": "58632",
+      "name": "The Pier: Coming Ashore",
+      "description": "A busy little pier made of sodden wood put together sturdily is the focus of many activities.  Fishing tackle and ancient little boats are tethered to the pier's wooden sides.  Rickety steps lead downward, vaguely over the water, to the sand itself.  The sands of the beach extend north and south, and it is obvious that people have been passing through here.  Sand dunes to the east obscure vision in that direction. ",
+      "flags": [],
+      "sector": "ROAD",
+      "exits": {
+        "North": {
+          "description": "The beach extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58630"
+        },
+        "East": {
+          "description": "You can't see much beyond this wall of sand! ",
+          "keyword": "",
+          "type": "Description only",
+          "key": "-1",
+          "destination": "-1"
+        },
+        "South": {
+          "description": "The beach extends southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58633"
+        },
+        "West": {
+          "description": "To the west lie the salt waters of the bay. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58611"
+        }
+      }
+    },
+    {
+      "id": "58633",
+      "name": "The Shoreline",
+      "description": "This is the eastern end of a large circular bay.  The Blue Fog Sea, misty and as mysterious as ever, rolls on to the west, beyond the bay's confines, as far as the eye can see, while, to the south, you perceive a huge landmass -- a continent, unexplored and ready for anything. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see a small dock to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58632"
+        },
+        "South": {
+          "description": "The beach extends southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58634"
+        }
+      }
+    },
+    {
+      "id": "58634",
+      "name": "The Shoreline",
+      "description": "This is the eastern end of a large circular bay.  The Blue Fog Sea, misty and as mysterious as ever, rolls on to the west, beyond the bay's confines, as far as the eye can see, while, to the south, you perceive a huge landmass -- a continent, unexplored and ready for anything. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends northward. Further on, you see a dock. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58633"
+        },
+        "East": {
+          "description": "The beach extends eastward, into some sand dunes. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58635"
+        },
+        "South": {
+          "description": "The shoreline extends southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58636"
+        }
+      }
+    },
+    {
+      "id": "58635",
+      "name": "The Beach",
+      "description": "Golden sands, baked over ages by the sun, are soft underfoot.  You can see dunes to the north and south, though you cannot reach them from here.  The shoreline to the west fronts a sparkling blue bay, and past that, you can see the ocean rolling all the way to the horizon. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "West": {
+          "description": "The shoreline seems peaceful and inviting, right next to the waters of the bay. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58634"
+        }
+      }
+    },
+    {
+      "id": "58636",
+      "name": "The Shoreline",
+      "description": "This is the eastern end of a large circular bay.  The Blue Fog Sea, misty and as mysterious as ever, rolls on to the west, beyond the bay's confines, as far as the eye can see, while, to the south, you perceive a huge landmass -- a continent, unexplored and ready for anything. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58634"
+        },
+        "South": {
+          "description": "You see the beach to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58637"
+        }
+      }
+    },
+    {
+      "id": "58637",
+      "name": "The Beach",
+      "description": "This pleasant little beach is situated near the southeastern end of an azure blue bay.  The golden sands are only sometimes reached by the waters just west of here.  Footprints in the deep sand indicate frequent recent activity near here. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58636"
+        },
+        "East": {
+          "description": "A narrow gap between sand dunes admits passage east. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58662"
+        },
+        "South": {
+          "description": "The beach extends south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58640"
+        },
+        "West": {
+          "description": "The beach extends westward. Far away, you see blue waters. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58638"
+        }
+      }
+    },
+    {
+      "id": "58638",
+      "name": "The Shoreline",
+      "description": "This is the southeastern corner of a bright blue bay.  Way to the west, the bay ends, while here, to the east, and to the south, footprints indicate recent passage by humanoid life. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58637"
+        },
+        "South": {
+          "description": "The beach extends southward, where it ends. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58639"
+        }
+      }
+    },
+    {
+      "id": "58639",
+      "name": "The Beach",
+      "description": "This pleasant little beach is situated near the southeastern end of an azure blue bay.  The golden sands are only sometimes reached by the waters just west of here.  Footprints in the deep sand indicate frequent recent activity near here. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58638"
+        },
+        "West": {
+          "description": "The shoreline extends west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58641"
+        }
+      }
+    },
+    {
+      "id": "58640",
+      "name": "The Beach",
+      "description": "This pleasant little beach is situated near the southeastern end of an azure blue bay.  The golden sands are only sometimes reached by the waters just west of here.  Footprints in the deep sand indicate frequent recent activity near here.  Golden dunes spread beyond a sandy crest to the south.  There is no way to continue to the east; the sands are riddled with holes. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The beach continues north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58637"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58691"
+        }
+      }
+    },
+    {
+      "id": "58641",
+      "name": "The Shoreline",
+      "description": "This is the southeastern edge of a large azure bay that cuts into a large continent that extends far to the south.  Misty blue mountains to the southwest rise up above a thick forest.  The beach itself is made of golden sand; many footprints indicate recent activity. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach extends eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58639"
+        },
+        "South": {
+          "description": "The beach extends southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58642"
+        }
+      }
+    },
+    {
+      "id": "58642",
+      "name": "The Beach",
+      "description": "Golden sands are soft underfoot.  You cannot see distinct footprints, since the azure waters of the bay to the west only seldom reach this far inland. What you do see is numerous indentations in the soft surface, which seem to indicate numerous passersby.  To the immediate south, the beach gives way abruptly to scrubby little trees that allow no passage. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The shoreline extends northward. Beyond, you see the very edge of the bay. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58641"
+        },
+        "West": {
+          "description": "The shoreline extends westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58643"
+        }
+      }
+    },
+    {
+      "id": "58643",
+      "name": "The Shoreline",
+      "description": "This is the southern edge of a circular bay that cuts into a huge landmass extending southwest, from the golden sands of this beach, dark with salty moisture, to the scrubby trees south of here, to the faraway forests fading into misty purple mountains. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The beach extends eastward. Beyond, you cannot pass through the scrubby undergrowth. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58642"
+        },
+        "West": {
+          "description": "The beach ends to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58644"
+        }
+      }
+    },
+    {
+      "id": "58644",
+      "name": "The Shoreline",
+      "description": "This is the very western edge of a gracefully curving beach made of golden sand; the sands curve to the northeast, then back out to the west.  The bay's azure waters ripple with waves that sometimes make it all the way to the shore. Rocks and treacherous sands prevent you from trying to head southward, and a kind of reef keeps you from the west, leaving you only east as an option. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The shoreline extends east a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58643"
+        }
+      }
+    },
+    {
+      "id": "58645",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "South": {
+          "description": "The dunes continue for a ways. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58646"
+        },
+        "West": {
+          "description": "Slight increases in moisture accompany the advent of a beach to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58617"
+        }
+      }
+    },
+    {
+      "id": "58646",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The dunes extend northward. You can't tell what lies further. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58645"
+        },
+        "South": {
+          "description": "The dunes extend southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58649"
+        },
+        "West": {
+          "description": "Beyond the dunes just west of here, you see the shore of the bay. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58647"
+        }
+      }
+    },
+    {
+      "id": "58647",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The dunes extend eastward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58646"
+        },
+        "South": {
+          "description": "More dunes extend southward. Beyond them, a hill of sand blocks any further view. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58648"
+        },
+        "West": {
+          "description": "You can leave the life-filled dunes for the quieter beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58619"
+        }
+      }
+    },
+    {
+      "id": "58648",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The dunes extend northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58647"
+        },
+        "West": {
+          "description": "You see a beach to the west, and beyond that, a blue bay. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58622"
+        }
+      }
+    },
+    {
+      "id": "58649",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "More dunes extend northward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58646"
+        },
+        "South": {
+          "description": "More dunes extend southward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58652"
+        }
+      }
+    },
+    {
+      "id": "58650",
+      "name": "Scattered Growth",
+      "description": "A few scrubby little shrubs and spindly trees make a brave stand against the sandy soil here.  Dunes all around to the west and south lead off to what seems to be the water far away, though to the east, you see a mysterious, dense forest that you cannot get to from here. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "South": {
+          "description": "You see a narrow split between two large dunes which seems to be the only way out of these shrubs. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58653"
+        }
+      }
+    },
+    {
+      "id": "58651",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The dunes extend eastward -- your only option. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58652"
+        }
+      }
+    },
+    {
+      "id": "58652",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The dunes extend northward, a golden vision. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58649"
+        },
+        "East": {
+          "description": "A little row of prints seems to lead off east, but you can't tell their destination. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58653"
+        },
+        "West": {
+          "description": "The dunes extend westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58651"
+        }
+      }
+    },
+    {
+      "id": "58653",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here, at the northern edge of a large patch of them.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth.  To the north, footprints lead into a hummock of grass. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see a bit of life to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58650"
+        },
+        "South": {
+          "description": "The dunes break into a golden-sand beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58629"
+        },
+        "West": {
+          "description": "The dunes extend westward. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58652"
+        }
+      }
+    },
+    {
+      "id": "58654",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "South": {
+          "description": "You see more dunes, running off in a long line south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58655"
+        },
+        "West": {
+          "description": "To the west, the sand grows moister -- a sure indication of a beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58629"
+        }
+      }
+    },
+    {
+      "id": "58655",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see more dunes to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58654"
+        },
+        "East": {
+          "description": "You see a few tufts of determined grass to the east. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58657"
+        },
+        "South": {
+          "description": "You see more dunes to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58656"
+        }
+      }
+    },
+    {
+      "id": "58656",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see more dunes to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58655"
+        },
+        "South": {
+          "description": "You see more dunes to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58658"
+        }
+      }
+    },
+    {
+      "id": "58657",
+      "name": "A Hummock of Grass",
+      "description": "Large tufts of yellowing grasses eke out a marginal existence here, where the soil looks just a bit less sandy.  Little movements every so often indicate that a bit of animal life also makes its home here. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "West": {
+          "description": "To the west, you see some impressive sand dunes; a narrow path between two of them appears to be the only way away from this outgrowth. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58655"
+        }
+      }
+    },
+    {
+      "id": "58658",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "You see sand dunes -- huge yellow hills -- to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58656"
+        },
+        "East": {
+          "description": "To the east, you see more of the rolling sand dunes. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58659"
+        }
+      }
+    },
+    {
+      "id": "58659",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "West": {
+          "description": "The only way out of these dunes appears to be the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58658"
+        }
+      }
+    },
+    {
+      "id": "58660",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "You see more dunes to the east, but you cannot see beyond them. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58661"
+        },
+        "South": {
+          "description": "You see more dunes to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58662"
+        }
+      }
+    },
+    {
+      "id": "58661",
+      "name": "Sand Dunes",
+      "description": "The dunes seem less threatening here, where they sort of taper off into a sort of trail the extends northward a bit.  The soft yellow sands, baked by decades or more of sunlight, seem to radiate their own heat. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "To the north, you see a gravelly trail. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58663"
+        },
+        "West": {
+          "description": "The dunes extend to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58660"
+        }
+      }
+    },
+    {
+      "id": "58662",
+      "name": "Sand Dunes",
+      "description": "The myriad forms of life in the sand dunes are gleefully evident here.  The yellow sands, dry and otherwise inhabitable, are home to all manner of moving bugs, elusive rodents, and scrubby growth. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "Sand dunes continue toward the north, but you can't see beyond them. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58660"
+        },
+        "West": {
+          "description": "You see the moister, friendlier world of the beach to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58637"
+        }
+      }
+    },
+    {
+      "id": "58663",
+      "name": "The Beginning of a Path Through the Dunes",
+      "description": "Yellow sands mix with coarser gravel, forming what is undeniably a primitive trail, though certainly no more than that.  Indentations in the loose surface of the path indicate footprints, though how recent those prints are is anybody's guess.  The trail continues to the east. ",
+      "flags": [],
+      "sector": "MOUNTAIN",
+      "exits": {
+        "East": {
+          "description": "The path through the dunes curves to the east, out of sight. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58664"
+        },
+        "South": {
+          "description": "The dunes extend to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58661"
+        }
+      }
+    },
+    {
+      "id": "58664",
+      "name": "A Path Through the Dunes",
+      "description": "This path is made of sand mixed in with gravel -- an almost intentional looking mess that makes walking a bit easier, though still an effort!  You can see the forest looming nearby to the east and north, but there's no way to get to it from here; the footing looks quite treacherous. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The trail extends northward. It ends before some wooden gates. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58701"
+        },
+        "South": {
+          "description": "The path continues. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58665"
+        },
+        "West": {
+          "description": "The path ends to the west. Beyond, you see the beach. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58663"
+        }
+      }
+    },
+    {
+      "id": "58665",
+      "name": "A Path Through the Dunes",
+      "description": "This is a short little trail butting up against sand dunes to the west; you can't see beyond them in that direction.  To the east, you see the forest. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The path curves up ahead. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58664"
+        },
+        "South": {
+          "description": "The path curves up ahead. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58666"
+        },
+        "West": {
+          "description": "A solid wall of sand prevents any view west, though you can smell the sea. ",
+          "keyword": "",
+          "type": "Description only",
+          "key": "-1",
+          "destination": "-1"
+        }
+      }
+    },
+    {
+      "id": "58666",
+      "name": "A Path Through the Dunes",
+      "description": "The trail curves a bit here, heading off to the north and west.  Sand dunes to the northwest form a powerful barrier, while lack of good footing makes it impossible to explore the forest to the east. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The path through the sands extends northward a bit. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58665"
+        },
+        "West": {
+          "description": "The path curves up ahead. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58667"
+        }
+      }
+    },
+    {
+      "id": "58667",
+      "name": "A Path Through the Dunes",
+      "description": "This path, obviously different from the plain sand so in evidence to the west, is made of gravel intentionally mixed with the sand, forming a slightly easier path to traverse!  It appears to end to the south. ",
+      "flags": [],
+      "sector": "HILLS",
+      "exits": {
+        "East": {
+          "description": "The path curves up ahead. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58666"
+        },
+        "South": {
+          "description": "The path seems to be obscured... ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58668"
+        }
+      }
+    },
+    {
+      "id": "58668",
+      "name": "The Dune Trail's End..?",
+      "description": "Perhaps in time this path will be continued; for now, it simply ends, as if somebody decided \"All right, enough of this, let's go get some ale!  \" Though it was only a small touch of civilization in the middle of what amounts to wasteland, take comfort...  It is not over yet. ",
+      "flags": [
+        "NOMOB"
+      ],
+      "sector": "HILLS",
+      "exits": {
+        "North": {
+          "description": "The path curves up ahead. Beyond, you see only the tall dunes. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58667"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58669"
+        }
+      }
+    },
+    {
+      "id": "58669",
+      "name": "A Simple Coastal Road",
+      "description": "The road slopes upward sharply to the south as it enters a copse of dense trees.  The Green Green Sea can be heard to the north as the road tails off into the coastal sand. ",
+      "flags": [],
+      "sector": "ROAD",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58668"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58670"
+        }
+      }
+    },
+    {
+      "id": "58670",
+      "name": "A Climb Among the Trees",
+      "description": "The warm air of the green sea to the north blows gently though the trees at the base of this high mountain range.  The trail turns sharpy upward to the south and continues though the trees to a costal road to the north. ",
+      "flags": [],
+      "sector": "ROAD",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58669"
+        },
+        "Up": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58671"
+        }
+      }
+    },
+    {
+      "id": "58671",
+      "name": "A Steep Climb Between the Rocks",
+      "description": "The salty wind coming off the northern sea whips up the precipice around the rocks.  A faint wailing can be heard from the top of the ridge to the south. The trail continues downward to the north. ",
+      "flags": [],
+      "sector": "MOUNTAIN",
+      "exits": {
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58672"
+        },
+        "Down": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58670"
+        }
+      }
+    },
+    {
+      "id": "58672",
+      "name": "The Pinnacle of a Rocky Path in the Wailing Mountains",
+      "description": "Sloping up to a soft point, this peak stands slightly higher than the other ridge lines that tail off to the south.  The sea is plainly visible to the north and a stout gale blows an icy breath of salt though the valleys below. The sound is nearly deafening at this point as the wail of the wind tries to blur the senses.  A northern land can almost be seen across the shallow green sea, but a blue haze seems to obscure its view.  Th trail sharply declines between some rocks below and to the south.  Large rocks can be seen all around the ridges to the south.  The mountains continue over the horizon southward and a steep climb northward leads down through some trees to the coast not to far away. ",
+      "flags": [
+        "NOMOB",
+        "NOTRACK"
+      ],
+      "sector": "MOUNTAIN",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58671"
+        },
+        "Down": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2405"
+        }
+      }
+    },
+    {
+      "id": "58680",
+      "name": "Ocean's Edge",
+      "description": "The sea, so huge to the west, seems to come to an abrupt shore here.  You can easily make out the outlines of a huge continent to the east!  It runs to the northeast as the eye can see, a mass of unexplored territory -- a beach marks the shoreline, and beyond that, beyond the dunes, you can see forests, swamps, purple mountains..  You cannot reach the shore from here, but the water continues to the west, tracing a promontory. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The waters continue to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58681"
+        },
+        "South": {
+          "description": "The waters extend to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58601"
+        }
+      }
+    },
+    {
+      "id": "58681",
+      "name": "Ocean's Edge",
+      "description": "The sea, so huge to the west, seems to come to an abrupt shore here.  You can easily make out the outlines of a huge continent to the east!  It runs to the northeast as the eye can see, a mass of unexplored territory -- a beach marks the shoreline, and beyond that, beyond the dunes, you can see forests, swamps, purple mountains..  You cannot reach the shore from here, but the water continues to the west, tracing a promontory. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The waters continue to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58682"
+        },
+        "South": {
+          "description": "The waters extend to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58680"
+        }
+      }
+    },
+    {
+      "id": "58682",
+      "name": "Entering a Bay",
+      "description": "The bright blue waters of the ocean to the north become a little more shallow here.  Not far away, to the east, lies a huge-looking landmass that shines in the light with green, brown, and purple hues. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "You see the ocean to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58686"
+        },
+        "South": {
+          "description": "The waters extend to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58681"
+        },
+        "West": {
+          "description": "The ocean thins out to the east, where you can see a landmass! ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58683"
+        }
+      }
+    },
+    {
+      "id": "58683",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The Blue Fog Sea rolls on to the North. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58684"
+        },
+        "East": {
+          "description": "Deep blue waters lie eastward. Far away, you see land. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58682"
+        }
+      }
+    },
+    {
+      "id": "58684",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The Blue Fog Sea rolls on to the North. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58685"
+        },
+        "East": {
+          "description": "The ocean rolls on to the east. Far away, you see land! ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58686"
+        },
+        "South": {
+          "description": "The ocean rolls far to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58683"
+        }
+      }
+    },
+    {
+      "id": "58685",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The ocean rolls on to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58687"
+        },
+        "South": {
+          "description": "The ocean rolls on to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58684"
+        }
+      }
+    },
+    {
+      "id": "58686",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "South": {
+          "description": "The ocean extends far to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58682"
+        },
+        "West": {
+          "description": "The ocean extends far to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58684"
+        }
+      }
+    },
+    {
+      "id": "58687",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "South": {
+          "description": "The ocean rolls on to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58685"
+        },
+        "West": {
+          "description": "The ocean extends far to the west. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58688"
+        }
+      }
+    },
+    {
+      "id": "58688",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The ocean rolls on to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58689"
+        },
+        "East": {
+          "description": "The ocean extends far to the east. Far away, you see land. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58687"
+        }
+      }
+    },
+    {
+      "id": "58689",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The ocean rolls on to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58690"
+        },
+        "South": {
+          "description": "The ocean rolls on to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58688"
+        }
+      }
+    },
+    {
+      "id": "58690",
+      "name": "The Blue Fog Sea",
+      "description": "Before you, and on all sides, extends a vast expanse of cool colours. Where your eyes blur and the horizon begins, the greys, the greens, and the blues of the ocean blend into the sky.  Struck by the beauty and by the sheer immensity of your surroundings, you feel unimportant, you feel insignificant, and most of all, you feel so terribly vulnerable.  North, South, East, West, it doesn't seem to matter much - the water is everywhere. ",
+      "flags": [],
+      "sector": "WATER",
+      "exits": {
+        "North": {
+          "description": "The ocean rolls on to the north. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "39136"
+        },
+        "South": {
+          "description": "The ocean rolls on to the south. ",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58689"
+        }
+      }
+    },
+    {
+      "id": "58691",
+      "name": "A Beachside Nest",
+      "description": "This pleasant little beach is situated near the southeastern end of an azure blue bay.  The golden sands are only sometimes reached by the waters just north and west of here.  Just beyond the ridge a pit has been dug in the sand and piled around it to form a large nest.  The sandy ring amidst the rolling dunes provides the nest excellent shelter from the elements. ",
+      "flags": [
+        "NOMOB",
+        "PEACEFUL"
+      ],
+      "sector": "SWAMP",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "58640"
+        }
+      }
+    }
+  ]
+}

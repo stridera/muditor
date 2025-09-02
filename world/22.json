@@ -1,0 +1,3672 @@
+{
+  "zone": {
+    "id": "22",
+    "name": "the Nine Hells",
+    "top": 2299,
+    "lifespan": 15,
+    "reset_mode": "Never",
+    "hemisphere": "SOUTHEAST",
+    "climate": "NONE",
+    "resets": {
+      "mob": [
+        {
+          "id": 2299,
+          "max": 1,
+          "room": 2299,
+          "name": "(the Grim Reaper)",
+          "equipped": []
+        },
+        {
+          "id": 2251,
+          "max": 2,
+          "room": 2269,
+          "name": "(a Greater Baatezu)"
+        },
+        {
+          "id": 2216,
+          "max": 1,
+          "room": 2215,
+          "name": "(a Balor)",
+          "equipped": []
+        },
+        {
+          "id": 2219,
+          "max": 1,
+          "room": 2218,
+          "name": "(Crown Prince Belial)"
+        },
+        {
+          "id": 2251,
+          "max": 2,
+          "room": 2217,
+          "name": "(a Greater Baatezu)"
+        },
+        {
+          "id": 2215,
+          "max": 1,
+          "room": 2214,
+          "name": "(a Nalfeshnee)"
+        },
+        {
+          "id": 2210,
+          "max": 1,
+          "room": 2211,
+          "name": "(an Incubus)"
+        },
+        {
+          "id": 2214,
+          "max": 1,
+          "room": 2213,
+          "name": "(a Glabrezu)"
+        },
+        {
+          "id": 2213,
+          "max": 1,
+          "room": 2212,
+          "name": "(a Greater Yugoloth)"
+        },
+        {
+          "id": 2212,
+          "max": 1,
+          "room": 2210,
+          "name": "(a Pit Fiend)"
+        },
+        {
+          "id": 52017,
+          "max": 1,
+          "room": 2201,
+          "name": "(a towering rock demon)",
+          "equipped": [
+            {
+              "id": 52051,
+              "max": 1,
+              "location": "Legs",
+              "name": "(the Demon Carapace)"
+            }
+          ]
+        }
+      ]
+    }
+  },
+  "mobs": [
+    {
+      "id": 2200,
+      "keywords": "Stryker human monk Questmob",
+      "mob_class": "Monk",
+      "short_desc": "Stryker",
+      "long_desc": "Stryker &7&b(&0&6Human&7&b)&0&9&b(&0medium&9&b)&0 is standing here. ",
+      "desc": "Stryker is calm and collected, strong and has a slight smile at all times. ",
+      "mob_flags": [
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBLIND",
+        "TEACHER"
+      ],
+      "effect_flags": [
+        "SENSE_LIFE",
+        "PROTECT_EVIL",
+        "PROTECT_GOOD",
+        "SNEAK",
+        "FARSEE",
+        "HASTE",
+        "VITALITY"
+      ],
+      "alignment": 0,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 10,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 10
+      },
+      "money": {
+        "copper": 2,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 0,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 86,
+        "intelligence": 62,
+        "wisdom": 74,
+        "dexterity": 87,
+        "constitution": 74,
+        "charisma": 71
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "BLAST"
+    },
+    {
+      "id": 2201,
+      "keywords": "Varin halfling thief Questmob",
+      "mob_class": "Thief",
+      "short_desc": "Varin",
+      "long_desc": "Varin &7(&0&6Human&7&8) &9(&0medium&8&9)&0 is standing here. ",
+      "desc": "Varin is sleek and agile, complete with cunning eyes and a piercing look. ",
+      "mob_flags": [
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "TEACHER"
+      ],
+      "effect_flags": [
+        "SENSE_LIFE",
+        "PROTECT_EVIL",
+        "PROTECT_GOOD",
+        "NOTRACK",
+        "SNEAK",
+        "FARSEE",
+        "BLUR",
+        "VITALITY"
+      ],
+      "alignment": 0,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 5,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 15
+      },
+      "money": {
+        "copper": 0,
+        "silver": 450,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 2,
+      "race": 11,
+      "race_align": 0,
+      "size": 1,
+      "stats": {
+        "strength": 76,
+        "intelligence": 81,
+        "wisdom": 77,
+        "dexterity": 88,
+        "constitution": 75,
+        "charisma": 58
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "THRASH"
+    },
+    {
+      "id": 2202,
+      "keywords": "tsaeldin historian",
+      "mob_class": "Layman",
+      "short_desc": "Tsaeldin the historian",
+      "long_desc": "Tsaeldin the ancient historian stands here, slowly walking around. ",
+      "desc": "An wisened old man with greyish white hair and a long, scruffy beard.  The ancient historian paces back and fourth, looking rather pensive about something as he moves slowly about.  Occasionally he stops just long enough to rub his chin or tap his cheek with his fore finger.  His plain brown robes have long since begun to tatter and look quite worn, with frayed edges and holes here and there. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE"
+      ],
+      "effect_flags": [
+        "HASTE",
+        "BLUR"
+      ],
+      "alignment": 1000,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": -1,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 50
+      },
+      "money": {
+        "copper": 0,
+        "silver": 1000,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 2,
+      "race_align": 0,
+      "size": 1,
+      "stats": {
+        "strength": 78,
+        "intelligence": 81,
+        "wisdom": 72,
+        "dexterity": 76,
+        "constitution": 77,
+        "charisma": 70
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 2210,
+      "keywords": "incubus demon devastating handsome man leering hells-incubus brian-incubus",
+      "mob_class": "AntiPaladin",
+      "short_desc": "an Incubus",
+      "long_desc": "A devastatingly handsome man is here, leering at you. ",
+      "desc": "A man with an impressive mane of golden-blond hair and wickedly gleaming black eyes is here, leering contemptuously.  His body could only be described as perfectly sculpted, with bronzed muscles rippling with power as he moves.  His face could send even the most cold-hearted of women into a passionate frenzy and, judging by the expression on his face, he knows it and is proud of it. Faintly visible on his forehead are a set of pointed horns. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "STAY_ZONE",
+        "MEMORY",
+        "HELPER",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH",
+        "NOBLIND"
+      ],
+      "effect_flags": [
+        "INVISIBLE",
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "INFRAVISION",
+        "PROTECT_EVIL",
+        "NOTRACK"
+      ],
+      "alignment": -1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 2,
+      "stats": {
+        "strength": 79,
+        "intelligence": 60,
+        "wisdom": 77,
+        "dexterity": 87,
+        "constitution": 80,
+        "charisma": 70
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "CLAW"
+    },
+    {
+      "id": 2211,
+      "keywords": "succubus demon stunning woman hells-succubus",
+      "mob_class": "Diabolist",
+      "short_desc": "a Succubus",
+      "long_desc": "A stunning woman shrieks in delight! ",
+      "desc": "Voluptuous, gorgeous, sexy...  Such words do not begin to describe this woman. Long hair whips around her seductively, and her clothing seems to be more ornamental than functional.  Gleaming red eyes promise mystery and excitement to anyone foolish enough to look into them, but something about this woman is slightly off.  Perhaps it is her pointed teeth and long, flexible tongue. Perhaps it is the subtle aura of malice she projects. ",
+      "mob_flags": [
+        "SENTINEL",
+        "SCAVENGER",
+        "ISNPC",
+        "AWARE",
+        "AGGRESSIVE",
+        "STAY_ZONE",
+        "HELPER",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH",
+        "NOSILENCE"
+      ],
+      "effect_flags": [
+        "PROTECT_EVIL"
+      ],
+      "alignment": -1000,
+      "level": 80,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 2,
+      "race": 19,
+      "race_align": 1,
+      "size": 2,
+      "stats": {
+        "strength": 78,
+        "intelligence": 88,
+        "wisdom": 88,
+        "dexterity": 76,
+        "constitution": 76,
+        "charisma": 62
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "SLASH"
+    },
+    {
+      "id": 2212,
+      "keywords": "demon pit fiend grinning hells-pit-fiend",
+      "mob_class": "Layman",
+      "short_desc": "a Pit Fiend",
+      "long_desc": "A grinning demon with long horns cracks his whip here. ",
+      "desc": "A very tall demon with fiery eyes grins contemptuously here, cackling in mad delight as he cracks his whip of fire at anything that gets near.  Long, wickedly sharp black horns add to his height.  His upper torso is a shiny red that bulges with muscle, but it fades into goatlike legs covered in black fur that end in cloven hooves.  A howling wind surrounds him, and when he grins his teeth are pointed and bloodstained. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "AGGRESSIVE",
+        "STAY_ZONE",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "PROTECT_EVIL",
+        "HASTE"
+      ],
+      "alignment": -1000,
+      "level": 90,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 5,
+      "stats": {
+        "strength": 77,
+        "intelligence": 73,
+        "wisdom": 79,
+        "dexterity": 77,
+        "constitution": 70,
+        "charisma": 77
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "STING"
+    },
+    {
+      "id": 2213,
+      "keywords": "yugoloth greater humanoid grey mottled eyes greater-yugoloth hells-yugoloth",
+      "mob_class": "Sorcerer",
+      "short_desc": "a Greater Yugoloth",
+      "long_desc": "A humanoid with mottled grey skin and two huge eyes floats here. ",
+      "desc": "Its body is covered in a robe of deep blue lined with red, but the hands that come out of the sleeves are not even remotely human - seven fingers and two thumbs on each hand, with skin of mottled dark grey and bony ridges protruding at odd angles.  The head is even more inhuman, as it is elongated and lacks all featured except for two large, cruel yellow eyes with hypnotic swirling pupils. The malice in those eyes would be enough to stop anyone. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "STAY_ZONE",
+        "AGGR_GOOD",
+        "HELPER",
+        "NOSUMMON",
+        "NOBASH",
+        "NOSILENCE"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "PROTECT_EVIL",
+        "FLY"
+      ],
+      "alignment": -1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 4,
+      "default_position": 4,
+      "gender": 0,
+      "race": 13,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 77,
+        "intelligence": 89,
+        "wisdom": 84,
+        "dexterity": 69,
+        "constitution": 70,
+        "charisma": 66
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "PIERCE"
+    },
+    {
+      "id": 2214,
+      "keywords": "glabrezu giant four-armed demon stalking hells-glabrezu",
+      "mob_class": "Warrior",
+      "short_desc": "a Glabrezu",
+      "long_desc": "A giant, four-armed demon stalks back and forth here. ",
+      "desc": "A pitch black demon with four large arms and an extremely muscular body, the Glabrezu's eyes glint with intelligence and malice.  One pair of arms ends in claws, while the other ends in cruel, massive pincers.  Its beastial features include tristed horns and a mouth full of glinting fangs.  The Glabrezu is said to be a demon that tempts mortals with power in many forms - physical power, political power, even material wealth. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "AGGRESSIVE",
+        "STAY_ZONE",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "PROTECT_EVIL",
+        "HASTE",
+        "BLUR"
+      ],
+      "alignment": -1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 19,
+      "race_align": 1,
+      "size": 5,
+      "stats": {
+        "strength": 92,
+        "intelligence": 72,
+        "wisdom": 72,
+        "dexterity": 78,
+        "constitution": 72,
+        "charisma": 72
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "POUND"
+    },
+    {
+      "id": 2215,
+      "keywords": "nalfeshnee demon massive floating hells-nalfeshnee",
+      "mob_class": "Monk",
+      "short_desc": "a Nalfeshnee",
+      "long_desc": "A massive demon with tiny wings floats here. ",
+      "desc": "Half bear, half boar and all demon, the Nalfeshnee is grossly fat, yet floats despite its tiny wings.  Tusks and horns protrude at all angles from its head, but its body is furred and reminiscent of either a boar or a bear.  Giant, clawed hands glint with rings that seem totally out of place on such a huge, ugly creature.  A cruel expression on its almost-human face somehow makes it even worse... ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "STAY_ZONE",
+        "HELPER",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "PROTECT_EVIL",
+        "FLY"
+      ],
+      "alignment": 0,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 4,
+      "default_position": 4,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 5,
+      "stats": {
+        "strength": 84,
+        "intelligence": 80,
+        "wisdom": 74,
+        "dexterity": 80,
+        "constitution": 74,
+        "charisma": 63
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 2216,
+      "keywords": "balor demon huge winged snarling hells-balor",
+      "mob_class": "AntiPaladin",
+      "short_desc": "a Balor",
+      "long_desc": "A huge demon with giant bat wings snarls at you! ",
+      "desc": "An aura of dark power radiates from the form of the Balor.  Standing almost four times as tall as a human with dark red skin and bat wings capable of blowing down small trees with the force of their wind, the Balor is a truly frightening manifestation of the wrath of the Nine Hells.  Flames lick its skin, spontaneously lighting and dousing themselves.  This demon would be a formiddable foe to even the most powerful mortals. ",
+      "mob_flags": [
+        "SENTINEL",
+        "SCAVENGER",
+        "ISNPC",
+        "AWARE",
+        "AGGRESSIVE",
+        "STAY_ZONE",
+        "NOSUMMON",
+        "NOBASH",
+        "NOBLIND",
+        "NOSILENCE"
+      ],
+      "effect_flags": [
+        "INVISIBLE",
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "PROTECT_EVIL",
+        "NOTRACK",
+        "SNEAK",
+        "HASTE",
+        "BLUR",
+        "FIRESHIELD"
+      ],
+      "alignment": -1000,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 3,
+      "stats": {
+        "strength": 95,
+        "intelligence": 73,
+        "wisdom": 68,
+        "dexterity": 88,
+        "constitution": 78,
+        "charisma": 53
+      },
+      "perception": 0,
+      "concealment": 1000,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 2219,
+      "keywords": "Belial demon crown prince nine hells lord destruction hells-belial",
+      "mob_class": "AntiPaladin",
+      "short_desc": "Crown Prince Belial",
+      "long_desc": "Belial, Crown Prince of the Nine Hells, is standing here. ",
+      "desc": "Human in form, the Demon Prince is at once unsettling and frightening.  Red, pupil-less eyes look down upon anything and everything as inferior.  Dressed in black silk, his movement is inhumanly graceful and his lithe form is far more powerful than one could guess just by looking.  From time to time, an observant person could see flashes of Belial's true form - wings, perhaps, a towering form, massive claws, scales and feathers over smooth skin... ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "STAY_ZONE",
+        "MEMORY",
+        "HELPER",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOSLEEP",
+        "NOBASH",
+        "NOBLIND",
+        "NOSILENCE"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "SANCTUARY",
+        "NOTRACK",
+        "SNEAK",
+        "HASTE",
+        "BLUR"
+      ],
+      "alignment": -1000,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 16,
+        "size": 3,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 3,
+      "stats": {
+        "strength": 99,
+        "intelligence": 71,
+        "wisdom": 67,
+        "dexterity": 81,
+        "constitution": 71,
+        "charisma": 66
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "PIERCE"
+    },
+    {
+      "id": 2220,
+      "keywords": "DummyLoader Dummy Loader",
+      "mob_class": "Layman",
+      "short_desc": "a dummy loader",
+      "long_desc": "A dummy loader stands here, waiting to receive orders. ",
+      "desc": "It looks dumb, with its facial features not dissimilar to your own. If you didn't know better, you'd almost swear you were looking into a mirror. ",
+      "mob_flags": [
+        "ISNPC"
+      ],
+      "effect_flags": [],
+      "alignment": 0,
+      "level": 100,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 17,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 98,
+        "intelligence": 60,
+        "wisdom": 72,
+        "dexterity": 94,
+        "constitution": 74,
+        "charisma": 53
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 2221,
+      "keywords": "Belial lord destruction lord-of-destruction belial-stage-two hells-belial",
+      "mob_class": "AntiPaladin",
+      "short_desc": "Belial, Lord of Destruction",
+      "long_desc": "Belial, Lord of Destruction, has manifested himself here. ",
+      "desc": "Far more massive than any creature save perhaps the largest dragons stands a figure straight out of a god's nightmare.  Wings of flame and shadow tentacles sprout from the back of a six-limbed body topped with a monstrous horned head. Spikes and claws protrude unnaturally from many angles, and his three-pronged tail drips with a searing acid.  Black and red feathers alternate with diamond scales reflecting light that further confuses the mind. ",
+      "mob_flags": [
+        "SENTINEL",
+        "SCAVENGER",
+        "ISNPC",
+        "AWARE",
+        "AGGRESSIVE",
+        "STAY_ZONE",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOSLEEP",
+        "NOBASH",
+        "NOBLIND",
+        "FAST_TRACK",
+        "NOSILENCE"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "SANCTUARY",
+        "INFRAVISION",
+        "PROTECT_EVIL",
+        "PROTECT_GOOD",
+        "NOTRACK",
+        "HASTE",
+        "BLUR"
+      ],
+      "alignment": -1000,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 0,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 19,
+      "race_align": 1,
+      "size": 6,
+      "stats": {
+        "strength": 76,
+        "intelligence": 79,
+        "wisdom": 69,
+        "dexterity": 82,
+        "constitution": 90,
+        "charisma": 57
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "HIT"
+    },
+    {
+      "id": 2250,
+      "keywords": "elementalist demented old man",
+      "mob_class": "Pyromancer",
+      "short_desc": "an elementalist",
+      "long_desc": "A demented old man waves his arms about, muttering to himself. ",
+      "desc": "The elementalist paces about with his arms, hands and fingers waving about in the air as he mutters long forgotten arcane incantations.  His eyes are wide and glazed over, as if his lucidity had slipped by him long ago.  His flowing black robes are tattered and marred by scorch marks here and there. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "NOTRACK",
+        "FLY",
+        "STONE_SKIN",
+        "FARSEE",
+        "VITALITY"
+      ],
+      "alignment": 0,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": -20000,
+      "ac": 0,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 10,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 64,
+        "intelligence": 89,
+        "wisdom": 79,
+        "dexterity": 79,
+        "constitution": 75,
+        "charisma": 66
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "BLAST"
+    },
+    {
+      "id": 2251,
+      "keywords": "Baatezu foul red demon spawn",
+      "mob_class": "Monk",
+      "short_desc": "a Greater Baatezu",
+      "long_desc": "A foul red demon unfurls its wings and snarls at your approach. ",
+      "desc": "Spawned in the depths of the nine hells, this Greater Baatezu stands a commanding ten feet tall.  It has a long snout like that of a dragon and its maw is filled with sharp and jagged teeth.  Protruding from atop the Greater Baatezu are two black tusks that slope over its head.  The Greater Baatezu's muscles ripple and tighten as it returns a thunderous roar for your gaze. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "NOTRACK",
+        "SNEAK",
+        "FLY",
+        "FARSEE",
+        "HASTE",
+        "BLUR",
+        "VITALITY"
+      ],
+      "alignment": -1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 10,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 10
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 4,
+      "default_position": 4,
+      "gender": 0,
+      "race": 19,
+      "race_align": 1,
+      "size": 3,
+      "stats": {
+        "strength": 74,
+        "intelligence": 85,
+        "wisdom": 80,
+        "dexterity": 77,
+        "constitution": 72,
+        "charisma": 66
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Demonic",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "POUND"
+    },
+    {
+      "id": 2252,
+      "keywords": "fire elemental lord burning demon",
+      "mob_class": "AntiPaladin",
+      "short_desc": "a fire elemental lord",
+      "long_desc": "A burning effigy of a muscular man grins evilly at your approach. ",
+      "desc": "Though its lower half a vortex of reddish-white hot flame, its upper body is much that of a muscular male human with a demonic looking head.  Its arms are massive and robust with large hands and long, slender fingers that could almost wrap around a human skull.  It head has eight knobby horn-like protrusions, four on either side, running from the cheek upwards as flames billow about its entire body.  The fire elemental lord points at you and grins evilly. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "NOTRACK",
+        "SNEAK",
+        "FLY",
+        "FARSEE",
+        "VITALITY"
+      ],
+      "alignment": -1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 10,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 90,
+        "intelligence": 67,
+        "wisdom": 74,
+        "dexterity": 91,
+        "constitution": 76,
+        "charisma": 57
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Elemental",
+      "composition": "Fire",
+      "stance": "Alert",
+      "damage_type": "BLAST"
+    },
+    {
+      "id": 2253,
+      "keywords": "zodar knight black armored",
+      "mob_class": "Paladin",
+      "short_desc": "a heavily armored knight",
+      "long_desc": "A knight stands quiescent here, apathetic to his surroundings. ",
+      "desc": "Covered by quarter-inch thick black plates, the heavily armored knight stands motionless much like that of a statue.  There are no visible gaps in its armaments save for its helm.  An eerie greenish light glows from underneath its visor. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "NOTRACK",
+        "FLY",
+        "STONE_SKIN",
+        "FARSEE",
+        "BLUR",
+        "VITALITY"
+      ],
+      "alignment": 0,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": -20000,
+      "ac": 0,
+      "hit_roll": 10,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 10
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 0,
+      "race": 10,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 87,
+        "intelligence": 71,
+        "wisdom": 80,
+        "dexterity": 79,
+        "constitution": 70,
+        "charisma": 64
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Life",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "BLAST"
+    },
+    {
+      "id": 2254,
+      "keywords": "Krethrin archangel arch-angel divine-being wavering-light",
+      "mob_class": "Paladin",
+      "short_desc": "an archangel",
+      "long_desc": "A divine being of wavering light hovers effortlessly nearby. ",
+      "desc": "Though surrounded by a bright heavenly light, you can easily make out the soft, angelic features of the archangel.  Her wings rest motionless as she hovers freely about while six tentacles of light, three on either side, flutter vertically as if resting on an ocean surface.  The archangel's eyes burn a briliant light-blue as she quizzically returns your gaze. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "SANCTUARY",
+        "NOTRACK",
+        "SNEAK",
+        "FLY",
+        "FARSEE",
+        "VITALITY"
+      ],
+      "alignment": 1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 10,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 10
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 4,
+      "default_position": 4,
+      "gender": 2,
+      "race": 13,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 95,
+        "intelligence": 64,
+        "wisdom": 74,
+        "dexterity": 79,
+        "constitution": 74,
+        "charisma": 65
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Celestial",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "STING"
+    },
+    {
+      "id": 2255,
+      "keywords": "Bryne archangel arch-angel divine-being wavering-light",
+      "mob_class": "Monk",
+      "short_desc": "an archangel",
+      "long_desc": "A divine being hovers effortlessly nearby, shrouded in wavering light. ",
+      "desc": "You can easily make out the soft angelic features of the archangel, though he is shrouded in a bright heavenly light.  With his wings resting motionlessly, the archangel hovers about while six tentacles of light, three on either side, flutter vertically as if resting on a liquid surface.  His eyes burn a vibrant light-blue as the archangel quizzically returns your gaze. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AWARE",
+        "MEMORY",
+        "NOCHARM",
+        "NOSUMMON",
+        "NOBASH"
+      ],
+      "effect_flags": [
+        "DETECT_INVIS",
+        "SENSE_LIFE",
+        "SANCTUARY",
+        "NOTRACK",
+        "SNEAK",
+        "FLY",
+        "FARSEE",
+        "VITALITY"
+      ],
+      "alignment": 1000,
+      "level": 95,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 10,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 10
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 4,
+      "default_position": 4,
+      "gender": 1,
+      "race": 13,
+      "race_align": 0,
+      "size": 3,
+      "stats": {
+        "strength": 86,
+        "intelligence": 73,
+        "wisdom": 73,
+        "dexterity": 85,
+        "constitution": 78,
+        "charisma": 56
+      },
+      "perception": 0,
+      "concealment": 0,
+      "life_force": "Celestial",
+      "composition": "Flesh",
+      "stance": "Alert",
+      "damage_type": "STING"
+    },
+    {
+      "id": 2299,
+      "keywords": "the-grim-reaper",
+      "mob_class": "Monk",
+      "short_desc": "the Grim Reaper",
+      "long_desc": "The Grim Reaper is standing here. ",
+      "desc": "A coarse black robe covers him from head to toe.  His face is hidden under the hood and leaves only a black empty void to be gazed upon.  His skeletal hands hold a scythe, and are the only part of him which can be seen. ",
+      "mob_flags": [
+        "SENTINEL",
+        "ISNPC",
+        "AGGRESSIVE",
+        "FAST_TRACK",
+        "AGGR_EVIL_RACE",
+        "AGGR_GOOD_RACE"
+      ],
+      "effect_flags": [
+        "DETECT_ALIGN",
+        "DETECT_INVIS",
+        "DETECT_MAGIC",
+        "SENSE_LIFE",
+        "SANCTUARY",
+        "INFRAVISION",
+        "PROTECT_EVIL",
+        "PROTECT_GOOD",
+        "SNEAK",
+        "STONE_SKIN",
+        "HASTE",
+        "BLUR",
+        "SOULSHIELD",
+        "PROT_FIRE",
+        "PROT_COLD",
+        "PROT_AIR",
+        "PROT_EARTH",
+        "MAJOR_GLOBE",
+        "ULTRAVISION"
+      ],
+      "alignment": -1000,
+      "level": 99,
+      "hp_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "move": 0,
+      "ac": 0,
+      "hit_roll": 20,
+      "damage_dice": {
+        "num": 0,
+        "size": 0,
+        "bonus": 0
+      },
+      "money": {
+        "copper": 0,
+        "silver": 0,
+        "gold": 0,
+        "platinum": 0
+      },
+      "position": 3,
+      "default_position": 3,
+      "gender": 1,
+      "race": 0,
+      "race_align": 0,
+      "size": 2,
+      "stats": {
+        "strength": 78,
+        "intelligence": 65,
+        "wisdom": 65,
+        "dexterity": 84,
+        "constitution": 97,
+        "charisma": 63
+      },
+      "perception": 700,
+      "concealment": 0,
+      "life_force": "Undead",
+      "composition": "Bone",
+      "stance": "Alert",
+      "damage_type": "WHIP"
+    }
+  ],
+  "objects": [
+    {
+      "id": 2202,
+      "type": "WEAPON",
+      "keywords": [
+        "quest_dagger",
+        "dagger1"
+      ],
+      "short": "a razor-sharp dagger",
+      "ground": "A razor-sharp dagger with specks of blood on it lies here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "dagger",
+            "razor",
+            "sharp"
+          ],
+          "text": "This seems to be an extremely sharp weapon, with specks of blood..."
+        }
+      ],
+      "values": {
+        "HitRoll": 2,
+        "Hit Dice": {
+          "num": "6",
+          "size": "4",
+          "bonus": 0
+        },
+        "Average": 14.0,
+        "Damage Type": "PIERCE"
+      },
+      "flags": [
+        "HUM",
+        "NORENT",
+        "ANTI_SORCERER",
+        "ANTI_CLERIC",
+        "ANTI_WARRIOR",
+        "NOSELL",
+        "ANTI_PALADIN",
+        "ANTI_ANTI_PALADIN",
+        "ANTI_RANGER",
+        "ANTI_DRUID",
+        "ANTI_SHAMAN",
+        "ANTI_ASSASSIN",
+        "ANTI_MERCENARY",
+        "ANTI_NECROMANCER",
+        "ANTI_CONJURER",
+        "DECOMP"
+      ],
+      "weight": 1.0,
+      "cost": 20,
+      "timer": 0,
+      "level": 99,
+      "wear_flags": [
+        "TAKE",
+        "WIELD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2203,
+      "type": "POTION",
+      "keywords": [
+        "potion",
+        "odd-little-potion",
+        "strange-liquid",
+        "flask",
+        "quest",
+        "heal"
+      ],
+      "short": "an odd little potion",
+      "ground": "A flask full of strange liquid sits here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "heal",
+            "potion"
+          ],
+          "text": "A quaint little potion of goodness."
+        }
+      ],
+      "values": {
+        "Level": 99,
+        "Spells": [
+          "FULL_HEAL",
+          "FULL_HEAL",
+          "VIGORIZE_CRITIC"
+        ]
+      },
+      "flags": [],
+      "weight": 0.2,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2208,
+      "type": "TREASURE",
+      "keywords": [
+        "necklace",
+        "pentagram",
+        "circle",
+        "cord"
+      ],
+      "short": "a shiny pentagram",
+      "ground": "A shiny, silver pentagram hanging from a small cord has been dropped here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "necklace",
+            "pentagram",
+            "circle",
+            "cord"
+          ],
+          "text": "A shiny pentagram encircled by a wire thin piece of silver, it hangs loosely from a black leather cord.  The silver is rather tarnished and dull, but still makes an attractive emblem nonetheless."
+        }
+      ],
+      "values": {
+        "AC": 0
+      },
+      "flags": [],
+      "weight": 0.05,
+      "cost": 1,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "NECK"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2210,
+      "type": "TREASURE",
+      "keywords": [
+        "shiny",
+        "bracelet"
+      ],
+      "short": "a shiny bracelet",
+      "ground": "A shiny silver circle lies here in the dirt.",
+      "action_desc": "",
+      "values": {
+        "AC": 0
+      },
+      "flags": [
+        "HUM"
+      ],
+      "weight": 0.1,
+      "cost": 100,
+      "timer": 0,
+      "level": 50,
+      "wear_flags": [
+        "TAKE",
+        "WRIST"
+      ],
+      "affects": [
+        {
+          "location": "CHA",
+          "modifier": 43
+        },
+        {
+          "location": "WIS",
+          "modifier": -43
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 2211,
+      "type": "SCROLL",
+      "keywords": [
+        "tee",
+        "shirt",
+        "t-shirt",
+        "shirt"
+      ],
+      "short": "an &1&b\"I Died for Pergus\"&0 t-shirt",
+      "ground": "A brilliant-white shirt with some odd lettering floats here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "tee",
+            "shirt",
+            "t-shirt",
+            "shirt"
+          ],
+          "text": "A pure cotton t-shirt with some arcane lettering on the front. The lettering reads: I died for pergus and all I got was this lousy t-shirt."
+        }
+      ],
+      "values": {
+        "Level": 99,
+        "Spells": [
+          "WORD_OF_RECALL"
+        ]
+      },
+      "flags": [
+        "GLOW",
+        "NOINVIS",
+        "MAGIC",
+        "NOFALL"
+      ],
+      "weight": 1.66,
+      "cost": 1,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "ABOUT"
+      ],
+      "affects": [
+        {
+          "location": "AC",
+          "modifier": 12
+        },
+        {
+          "location": "MOVE",
+          "modifier": -10
+        },
+        {
+          "location": "CON",
+          "modifier": 2
+        },
+        {
+          "location": "CHA",
+          "modifier": 2
+        },
+        {
+          "location": "DEX",
+          "modifier": -3
+        },
+        {
+          "location": "AGE",
+          "modifier": -50
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 2212,
+      "type": "OTHER",
+      "keywords": [
+        "necklace",
+        "broken",
+        "silver",
+        "small",
+        "missing",
+        "QUEST_OBJECT"
+      ],
+      "short": "a broken silver necklace",
+      "ground": "A small silver necklace which is partially missing lies here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "necklace",
+            "broken",
+            "silver",
+            "small",
+            "missing",
+            "QUEST_OBJECT"
+          ],
+          "text": "This bit of necklace looks as though it is part of a broken amulet.  It is a small linking of silver circlets fixed to a portion of broken gold."
+        }
+      ],
+      "values": {},
+      "flags": [],
+      "weight": 0.07,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2213,
+      "type": "OTHER",
+      "keywords": [
+        "jewel",
+        "necklace",
+        "glowing",
+        "large",
+        "quest_object"
+      ],
+      "short": "a glowing necklace jewel",
+      "ground": "A large jewel belonging in a necklace lies abandoned here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "jewel",
+            "necklace",
+            "glowing",
+            "large"
+          ],
+          "text": "This jewel is large and appears as though it would fit nicely into a necklace. There is a broken piece of gold still attached to the gem which would appear to connect to some of the gold holdings on the chain. "
+        }
+      ],
+      "values": {},
+      "flags": [],
+      "weight": 0.03,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2215,
+      "type": "ARMOR",
+      "keywords": [
+        "leggings",
+        "black",
+        "shimmering",
+        "shimmering-black-leggings"
+      ],
+      "short": "a pair of shimmering black leggings",
+      "ground": "A pile of black plates lies discarded here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "leggings",
+            "black",
+            "shimmering",
+            "shimmering-black-leggings"
+          ],
+          "text": "Constructed from thick metallic plates, they shimmer from black to a dark charcoal gray.  The plates themselves are very light and oddly warm to the touch.  If you didn't know better, you would almost say they glow with an blackened aura."
+        }
+      ],
+      "values": {
+        "AC": 9
+      },
+      "flags": [],
+      "weight": 3.7,
+      "cost": 100,
+      "timer": 0,
+      "level": 70,
+      "wear_flags": [
+        "TAKE",
+        "LEGS"
+      ],
+      "affects": [
+        {
+          "location": "HIT",
+          "modifier": 10
+        },
+        {
+          "location": "FOCUS",
+          "modifier": 5
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 2220,
+      "type": "OTHER",
+      "keywords": [
+        "piece",
+        "staff"
+      ],
+      "short": "a piece of a staff",
+      "ground": "A splintered piece of a staff lies here.",
+      "action_desc": "",
+      "values": {},
+      "flags": [],
+      "weight": 1.0,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2225,
+      "type": "TREASURE",
+      "keywords": [
+        "stone",
+        "marble"
+      ],
+      "short": "a stone marble",
+      "ground": "A small polished pebble lies on the floor here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "stone",
+            "marble"
+          ],
+          "text": "A small polished stone, it swirls of white and crimson with tiny flecks of onyx.  The stone is smooth and cold to the touch, rolling loosely about in your hand."
+        }
+      ],
+      "values": {
+        "AC": 0
+      },
+      "flags": [],
+      "weight": 0.01,
+      "cost": 0,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "affects": [
+        {
+          "location": "CON",
+          "modifier": 1
+        }
+      ],
+      "effects": [
+        "DETECT_MAGIC"
+      ]
+    },
+    {
+      "id": 2250,
+      "type": "TRASH",
+      "keywords": [
+        "icicle"
+      ],
+      "short": "an icicle",
+      "ground": "A long, slender icicle hangs off the side of the ledge here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "icicle",
+            "frozen",
+            "shaft"
+          ],
+          "text": "A slender shaft of frozen water, it is about four feet in length and three inches in diameter.  The icicle stings your exposed flesh as you examine it, sticking to your slowly numbing hand instead of melting.  Being of such an infinitely cold nature, you're not even sure one could melt such an object.  "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.07,
+      "cost": 0,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "triggers": [
+        2250,
+        2263
+      ],
+      "effects": []
+    },
+    {
+      "id": 2251,
+      "type": "TRASH",
+      "keywords": [
+        "dandelion",
+        "flower"
+      ],
+      "short": "a dandelion",
+      "ground": "Sprouted up nearby is a small dandelion.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "dandelion"
+          ],
+          "text": "A delicate weed, it its fragile leaves fluttering loosely about as you examine it.  It looks like many of the other dandelion that have cropped up sporadically in patches here and there about the place.  Even as you gently hold the dandelion, the breeze nearly blows the leaves from its stem.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOBURN"
+      ],
+      "weight": 0.03,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2251
+      ],
+      "effects": []
+    },
+    {
+      "id": 2252,
+      "type": "TRASH",
+      "keywords": [
+        "green",
+        "rubber",
+        "ball"
+      ],
+      "short": "a rubber ball",
+      "ground": "Lost here in the dirt is a green rubber ball.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "green",
+            "rubber",
+            "ball"
+          ],
+          "text": "A small rubber ball of a deep greenish color, it is worn and chewed along various spots with bits of rubber missing where teeth and claw markings have marred the ball.  However, it appears to be quite resilient still, making for a good child's play toy or something to bounce around here and there.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.6,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2252
+      ],
+      "effects": []
+    },
+    {
+      "id": 2253,
+      "type": "TRASH",
+      "keywords": [
+        "snowglobe",
+        "globe"
+      ],
+      "short": "a snowglobe",
+      "ground": "A tiny, plastic snowglobe sits upon a ledge here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "snowglobe",
+            "globe"
+          ],
+          "text": "A plastic snowglobe, complete with miniature town, denizens, guardsmen and even a fountain square.  Its is an exact replicate of the Town of Mielikki except that its encapsulated by water and covered by a blanket ivory shavings to represent that of snow.  "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.1,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2253
+      ],
+      "effects": []
+    },
+    {
+      "id": 2254,
+      "type": "PEN",
+      "keywords": [
+        "feathered",
+        "stylus"
+      ],
+      "short": "a feathered stylus",
+      "ground": "Dropped here, is a vibrant feathered stylus.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "feather",
+            "stylus",
+            "pen"
+          ],
+          "text": "Dropped here, is a vibrant feather with a sharp needle like point made of silver.  A bit tarnished with ink dried to the tip, this rare quill looks like it has written its fair share of tomes and manuals, perhaps even a secret note or three in its usefulness."
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.02,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2254
+      ],
+      "effects": []
+    },
+    {
+      "id": 2255,
+      "type": "TRASH",
+      "keywords": [
+        "Old",
+        "Lamp"
+      ],
+      "short": "an old lamp",
+      "ground": "A old brass lamp has been left here to tarnish.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "old",
+            "brass",
+            "lamp"
+          ],
+          "text": "Old and tarnished, the lamp is still quite the treasure.  From its ornately curving handle to its long spout, it looks rather simple yet a masterpiece. Perhaps with a little polish or a good rubbing it would once again look as new."
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 2.4,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2255
+      ],
+      "effects": []
+    },
+    {
+      "id": 2256,
+      "type": "TRASH",
+      "keywords": [
+        "incense",
+        "stick"
+      ],
+      "short": "an incense stick",
+      "ground": "Sitting atop an altar is a long, scented, wooden stick.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "incense",
+            "stick",
+            "scented"
+          ],
+          "text": "A long stick, perfumed to emit a delicious oder when burned, the incense is most commonly used in cermonial functions by priests of the various mythoi. This particular stick has a heavy musty yet floral scent.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.01,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2256
+      ],
+      "effects": []
+    },
+    {
+      "id": 2257,
+      "type": "TRASH",
+      "keywords": [
+        "blue",
+        "orchid"
+      ],
+      "short": "a bluish orchid",
+      "ground": "A beautiful bluish orchid is growing in the garden here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "blue",
+            "orchid",
+            "flower"
+          ],
+          "text": "The orchid is fully blossomed with rich, blue peddals that fade a stark white towards the tips.  Truely one of natures finer creations, it gives off a strong and alluring floral scent.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN",
+        "FLOAT"
+      ],
+      "weight": 0.03,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2257
+      ],
+      "effects": []
+    },
+    {
+      "id": 2258,
+      "type": "OTHER",
+      "keywords": [
+        "worn",
+        "coin"
+      ],
+      "short": "a worn coin",
+      "ground": "A glint from a small coin here, catches your attention.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "small",
+            "worn",
+            "coin"
+          ],
+          "text": "A rare find indeed, this coin is unline any other minted coin you have seen. Its edges and face are now worn smooth and there is a peculiar scratch marring on one side, as if to denote it from the other.    "
+        }
+      ],
+      "values": {},
+      "flags": [],
+      "weight": 0.03,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2258
+      ],
+      "effects": []
+    },
+    {
+      "id": 2259,
+      "type": "OTHER",
+      "keywords": [
+        "cards",
+        "deck-cards",
+        "old"
+      ],
+      "short": "a deck of cards",
+      "ground": "On a nearby shelf, is an old deck of cards.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "old",
+            "deck",
+            "cards"
+          ],
+          "text": "The paper wrapping of the package is ripped and worn here and there, however the cards inside are barely worn except for a few snubbed corners.  With the right amount of skill, one could put on quite an impressive show of cardshuffling or cunning gambling with these.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN",
+        "FLOAT"
+      ],
+      "weight": 0.2,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2259
+      ],
+      "effects": []
+    },
+    {
+      "id": 2260,
+      "type": "TRASH",
+      "keywords": [
+        "match"
+      ],
+      "short": "a match",
+      "ground": "A small, wooden match has been accidentally dropped in the dirt here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "wooden",
+            "match"
+          ],
+          "text": "What, you've never seen a match before?  You strike it across something and POOF!...  Through the power of combustion you have momentary fire.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.02,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2260
+      ],
+      "effects": []
+    },
+    {
+      "id": 2261,
+      "type": "TRASH",
+      "keywords": [
+        "metal",
+        "disc"
+      ],
+      "short": "a metal disc",
+      "ground": "Sitting in the corner is a a flat, metal disc.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "metal",
+            "disc"
+          ],
+          "text": "Metallic black, the disc has an eerie reflection to it.  It is just light enough to be thrown about, more than likely catching air and sailing a good distance before it would come to rest.  The scuff markings and cracking near the rim of the disc indicate that it has seen much such use in its time.    "
+        }
+      ],
+      "values": {},
+      "flags": [
+        "NORENT",
+        "NOINVIS",
+        "NODROP",
+        "NOSELL",
+        "NOBURN"
+      ],
+      "weight": 0.05,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "triggers": [
+        2263
+      ],
+      "effects": []
+    },
+    {
+      "id": 2275,
+      "type": "ARMOR",
+      "keywords": [
+        "fierycon",
+        "t-shirt",
+        "shirt"
+      ],
+      "short": "an official &1&bFieryCon&0 2002 t-shirt",
+      "ground": "An official &1&bFieryCon&0 2002 t-shirt floats here.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "fierycon",
+            "t-shirt",
+            "shirt"
+          ],
+          "text": "A loose-fitting, all cotton, stark white t-shirt with a small FieryCon logo over the right side and a large FieryCon logo covering the back."
+        }
+      ],
+      "values": {
+        "AC": 10
+      },
+      "flags": [
+        "NOFALL"
+      ],
+      "weight": 3.0,
+      "cost": 0,
+      "timer": 0,
+      "level": 1,
+      "wear_flags": [
+        "TAKE",
+        "ABOUT"
+      ],
+      "affects": [
+        {
+          "location": "STR",
+          "modifier": 1
+        },
+        {
+          "location": "DEX",
+          "modifier": 1
+        },
+        {
+          "location": "INT",
+          "modifier": 1
+        },
+        {
+          "location": "WIS",
+          "modifier": 1
+        },
+        {
+          "location": "CON",
+          "modifier": 1
+        },
+        {
+          "location": "CHA",
+          "modifier": 1
+        }
+      ],
+      "effects": []
+    },
+    {
+      "id": 2276,
+      "type": "OTHER",
+      "keywords": [
+        "note",
+        "small"
+      ],
+      "short": "a small note",
+      "ground": "A small note is lying here on the ground.",
+      "action_desc": "",
+      "extras": [
+        {
+          "keywords": [
+            "note",
+            "small"
+          ],
+          "text": "Hello commander, I was wondering if you could let me borrow those boots for a little while, when I am done I will have them promptly returned. Templar Magistrate of Mielikki"
+        }
+      ],
+      "values": {},
+      "flags": [
+        "FLOAT"
+      ],
+      "weight": 0.01,
+      "cost": 0,
+      "timer": 0,
+      "level": 0,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "effects": []
+    },
+    {
+      "id": 2278,
+      "type": "TREASURE",
+      "keywords": [
+        "eye",
+        "priestess",
+        "bloody-eye",
+        "QUEST"
+      ],
+      "short": "a priestess' eye",
+      "ground": "Ripped straight from someone's eye socket, a bloody eye lies here.",
+      "action_desc": "",
+      "values": {
+        "AC": 0
+      },
+      "flags": [
+        "MAGIC",
+        "ANTI_GOOD",
+        "ANTI_NEUTRAL",
+        "ANTI_PALADIN",
+        "ANTI_RANGER",
+        "ANTI_DRUID",
+        "NOBURN"
+      ],
+      "weight": 0.3,
+      "cost": 2342347,
+      "timer": 0,
+      "level": 95,
+      "wear_flags": [
+        "TAKE",
+        "HOLD"
+      ],
+      "affects": [
+        {
+          "location": "CON",
+          "modifier": 1
+        }
+      ],
+      "effects": [
+        "DETECT_INVIS",
+        "SENSE_LIFE"
+      ]
+    },
+    {
+      "id": 2279,
+      "type": "CONTAINER",
+      "keywords": [
+        "bag",
+        "black"
+      ],
+      "short": "a black bag",
+      "ground": "A black bag lies discarded here, forgotten by the ages.",
+      "action_desc": "",
+      "values": {
+        "Capacity": 50000,
+        "Flags": [],
+        "Key": -1,
+        "IsCorpse": false,
+        "Weight Reduction": 0.0
+      },
+      "flags": [],
+      "weight": 25000.0,
+      "cost": 0,
+      "timer": 0,
+      "level": 99,
+      "wear_flags": [
+        "TAKE"
+      ],
+      "effects": []
+    }
+  ],
+  "shops": null,
+  "triggers": [
+    {
+      "id": 2200,
+      "name": "Balor_death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "return 0 mecho As %actor.name% slays the Balor, the demon splits open with a bright crack! m_run_room_trig 2201 mjunk balor-sword mjunk flame-whip "
+    },
+    {
+      "id": 2201,
+      "name": "Balor_death_damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set person %self.people% while %person% set next %person.next_in_room% if %person.vnum% != 2216 eval damage 100 + %random.50% wdamage %person% %damage% fire wsend %person% The Balor explodes in a &3&bblinding&0 flash, scorching the area! (&1&b%damdone%&0) endif set person %next% done wait 2s wecho &7&bAs the smoke &7subsides, a stairway down appears.&0 wdoor 2215 down room 2216 wdoor 2215 down description Down the stairs, there is a faint sound of cheering... "
+    },
+    {
+      "id": 2202,
+      "name": "Acid_swamp_damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Random"
+      ],
+      "number_of_arguments": 50,
+      "argument_list": "",
+      "commands": "set count %self.people[count]% if %count% > 3 set count 3 end while %count% > 0 eval victim %random.char% if %victim.vnum% != 2213 eval damage 50 + %random.30% eval which %random.2% switch %which% case 1 wdamage %victim% %damage% poison wsend %victim% You accidentally inhale some noxious gases!  Oops! (&1&b%damdone%&0) wechoaround %victim% %victim.name% suddenly chokes, coughing on the acrid swamp gases. (&4&b%damdone%&0) break case 2 wdamage %victim% %damage% acid wsend %victim% A large bubble pops in the waters, spewing acid on you! (&1&b%damdone%&0) wechoaround %victim% A large bubble pops in the waters, spewing burning acid on %victim.name%! (&4&b%damdone%&0) break default done end eval count %count% - 1 wait 3s done "
+    },
+    {
+      "id": 2203,
+      "name": "Fields_of_fire_damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Random"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set count %self.people[count]% if %count% > 3 set count 3 endif while %count% > 0 eval victim %random.char% if %victim.vnum% != 2214 eval damage 40 + %random.20% eval which %random.3% eval damage %damage% * 2 switch %which% case 1 wdamage %victim% %damage% fire wsend %victim% Scorching &1flames&0 burst out of a nearby crack, scalding your skin! (&1&b%damdone%&0) wechoaround %victim% White-hot flames explode out of a crack in the ground right next to %victim.name%! (&4&b%damdone%&0) break case 2 wdamage %victim% %damage% fire wsend %victim% Bubbling, hot lava roils out of the ground onto your feet! (&1&b%damdone%&0) wechoaround %victim% Burning lava bubbles out of the ground onto %victim.name%'s feet! Ouch! (&4&b%damdone%&0) break case 3 wdamage %victim% %damage% fire wsend %victim% The sharp leaves of a lava bush cut at your legs! (&1&b%damdone%&0) wechoaround %victim% %victim.name% yelps as a lava bush's sharp leaves slice into %victim.p% legs. (&4&b%damdone%&0) break default eval damage %damage% * 1.5 wdamage %victim% %damage% fire wsend %victim% Some of your hair spontaneously catches fire, burning your scalp! (&1&b%damdone%&0) wechoaround %victim% A caustic odor fills the air as %victim.name%'s hair suddenly bursts into flame. (&4&b%damdone%&0) done endif eval count %count% - 1 wait 3s done "
+    },
+    {
+      "id": 2204,
+      "name": "Dark_ice_sea_damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Random"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set count %self.people[count]% if %count% > 3 set count 3 end while %count% > 0 eval victim %random.char% if %victim.vnum% != 2215 eval damage 20 + %random.15% eval which %random.2% switch %which% case 1 * Less damage for flying people if !(%victim.aff_flagged[fly]%) eval damage %damage% * 3 end wdamage %victim% %damage% slash wsend %victim% A sharp-edged iceberg suddenly comes rushing out of the water and into you! (&1&b%damdone%&0) wechoaround %victim% A twisted iceberg suddely rushes out of the water, striking %victim.name%! (&4&b%damdone%&0) break default * More damage for people with stoneskin if !(%victim.aff_flagged[stone]%) eval damage %damage% * 3 wdamage %victim% %damage% cold wsend %victim% Ice begins to form around your stony skin, dragging you downwards! (&1&b%damdone%&0) wechoaround %victim% Frost starts forming all over the skin of %victim.name%, freezing %victim.p% joints! (&4&b%damdone%&0) else eval damage %damage% * 2 wdamage %victim% %damage% cold wsend %victim% The dark waters around you begin to chill your bones. (&1&b%damdone%&0) wechoaround %victim% %victim.name% grows a little blue and begins to shiver. (&4&b%damdone%&0) end done end eval count %count% - 1 wait 3s done "
+    },
+    {
+      "id": 2205,
+      "name": "pit-fiend-death-exit",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mecho &3The ground shakes violently!&0 m_run_room_trig 2206 "
+    },
+    {
+      "id": 2206,
+      "name": "pit-fiend-room-exit",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &3The trembling subsides and a &1&bfi&3er&1y pit&0 &3appears, leading down.&0 wdoor 2210 down room 2211 wdoor 2210 down description A &1&bburning&0 hole leads down. "
+    },
+    {
+      "id": 2207,
+      "name": "yugoloth-death-exits",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mecho &2A horrid squelching can be heard as the swamp begins to drain!&0 m_run_room_trig 2208 "
+    },
+    {
+      "id": 2208,
+      "name": "swamp-exit-yugoloth",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &2The swamp drains, leaving a &bmoss&0&2-covered staircase leading down.&0 wdoor 2212 down room 2213 wdoor 2212 down description &2A slippery staircase leads down.&0 "
+    },
+    {
+      "id": 2209,
+      "name": "Incubus_Succubus_Death_Exit",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "if (%get.mob_count[2210]% + %get.mob_count[2211]% == 1) m_run_room_trig 2218 endif "
+    },
+    {
+      "id": 2210,
+      "name": "Incubus_Succubus_Load",
+      "attach_type": "Object",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "if !%done% wait 2s say So you wish to play do you? wait 2s cackle wait 2s mload mob 2211 mload mob 2211 mload mob 2211 mload mob 2211 mecho Sounds of screetching can be heard from all around as mounds of cloth fly in from all directions. set done 1 global done else wait 2s say Back again are you?! growl end "
+    },
+    {
+      "id": 2211,
+      "name": "Succubus_Emot_Damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set target 0 set loop 0 while (%target% == 0) set dice %random.50% eval damage 75 + %dice% set victim %random.char% if ((%victim.vnum% != -1) || (%victim.sex% != Male)) if %loop% > 10 set target 1 else eval loop %loop% + 1 endif else set target 1 set message %random.4% switch %message% case 1 wechoaround %victim% A Succubus reaches in and fondles %victim.name% gently. (&4%damage%&0) wsend %victim% A Succubus reaches in and fondles you gently. (&1&b%damage%&0) break case 2 wechoaround %victim% A Succubus kisses %victim.name% passionately... (&4%damage%&0) wsend %victim% A Succubus kisses you passionately, it seems to last forever... (&1&b%damage%&0) break case 3 wechoaround %victim% A Succubus gropes at %victim.name%. How inappropriate! (&4%damage%&0) wsend %victim% A Succubus gropes you wildly! Boy does that feel good! (&1&b%damage%&0) break default wechoaround %victim% A Succubus strokes %victim.name%'s inner thigh. (&4%damage%&0) wsend %victim% A Succubus strokes your inner thigh. She's getting frisky! (&1&b%damage%&0) break done wdamage %victim% %damage% set target 1 endif done "
+    },
+    {
+      "id": 2212,
+      "name": "Succubus_Call_Emot",
+      "attach_type": "Object",
+      "flags": [
+        "Fight"
+      ],
+      "number_of_arguments": 20,
+      "argument_list": "",
+      "commands": "wait 2s m_run_room_trig 2211 "
+    },
+    {
+      "id": 2213,
+      "name": "Incubus_Emot_Damage",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "set dice %random.50% eval damage 100 + %dice% set victim %random.char% if %victim.vnum% == -1 if %victim.sex% == Female wechoaround %victim% The Incubus grabs hold of %victim.name% and gives her a passionate kiss. (&4%damage%&0) wsend %victim% The Incubus grabs you tenderly and gives you an amazingly passionate kiss... (&1&b%damage%&0) wdamage %victim% %damage% endif endif "
+    },
+    {
+      "id": 2214,
+      "name": "Succubus_Call_Emot",
+      "attach_type": "Object",
+      "flags": [
+        "Fight"
+      ],
+      "number_of_arguments": 40,
+      "argument_list": "",
+      "commands": "wait 2s m_run_room_trig 2213 "
+    },
+    {
+      "id": 2215,
+      "name": "Random_Illness_Trigger",
+      "attach_type": "Mobile",
+      "flags": [
+        "Random"
+      ],
+      "number_of_arguments": 30,
+      "argument_list": "",
+      "commands": "if %self.people% set victim %random.char% if %victim.vnum% == -1 set message %random.3% switch %message% case 1 wechoaround %victim% A tiny, vicious bug buzzes around %victim.name%, landing on %victim.p% arm and biting %victim.o%. wsend %victim% A tiny, vicious bug buzzes around you before landing on your arm and biting you! wait 15s wechoaround %victim% %victim.name% begins to look pale and starts shivering. (&450&0) wsend %victim% You turn pale and shiver as nausea begins to set in. (&1&b50&0) wdamage %victim% 50 wait 15s wechoaround %victim% %victim.name% falls over in pain as %victim.n% begins to purge his stomach (&4100&0) wsend %victim% You fall over in pain as you being to vomit all over the floor. (&1&b100&0) wdamage %victim% 100 break case 2 wechoaround %victim% %victim.name% trips on a rock and cuts %victim.o%self on a rusted blade. (&450&0) wsend %victim% You trip on a rock, cutting yourself on a rusted blade. (&1&b50&0) wait 15s wdamage %victim% 50 wechoaround %victim% %victim.name% beings to twitch uncontrollably. (&4100&0) wsend %victim% You begin to twitch uncomfortably as a cold shiver runs through your body. (&1&b100&0) wdamage %victim% 100 wait 15s wechoaround %victim% %victim.name% arches %victim.p% back painfully and loses all control. (&4150&0) wsend %victim% Uncontrollably you arch your back, causing extreme pain! (&1&b150&0) wdamage %victim% 150 break default wechoaround %victim% %victim.name% beings to cough endlessly. (&450&0) wsend %victim% Something seems caught in your throat as you coughing harshly. (&1&b50&0) wdamage %victim% 50 wait 15s wechoaround %victim% %victim.name% gasps for air as %victim.n% continues to cough. (&4100&0) wsend %victim% You gasp wildly for air as you continue to cough. (&1&b100&0) wdamage %victim% 100 wait 15s wechoaround %victim% %victim.name% chokes wildly in an attempt to get air. Nearly passing out! (&4150&0) wsend %victim% Lack of air causes you to nearly pass out as you choke in an attempt to obtain oxygen. (&1&b150&0) wdamage %victim% 150 break done done endif endif "
+    },
+    {
+      "id": 2216,
+      "name": "glabrezu-death-exits",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mecho &1&bThe fires begin to &3burn &7white-hot!&0 m_run_room_trig 2217 "
+    },
+    {
+      "id": 2217,
+      "name": "glabrezu-exits",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &7&bThe white-hot&3 fires begin &1to recede and &0&1a path down is revealed.&0 wdoor 2213 down room 2214 wdoor 2213 down description &1A red staircase leads down.&0 "
+    },
+    {
+      "id": 2218,
+      "name": "Succubus_Incubus_Exit",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &1The &bunbearable &3heat&0 &1&bsuddenly burns away the carpeting,&0&1 revealing a trapdoor.&0 wdoor 2211 down room 2212 wdoor 2211 down description &1A red &bhot &3iron&0&1&b staircase&0&1 leads downwards.&0 "
+    },
+    {
+      "id": 2219,
+      "name": "archon_sceptre_wield",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "if %actor.vnum% == -1 wait 1 s if %actor.class% /= Anti osend %actor% You feel a great surge of power rush through your body. oechoaround %actor% The eyes of %actor.name% begin to burn brightly. wait 1 s oechoaround %actor% Blackened horns protrude from atop the head of %actor.name%. else set dmg %random.100% osend %actor% Your mind is %actor.class% by horrific images and a sense of extreme pain. eval dmg %dmg% + 150 odamage %actor% %dmg% oforce %actor% remove sceptre oforce %actor% drop sceptre endif else wait 1 s osend %actor% You can't have the Sceptre of the Archon.  You're not worthy! oforce %actor% remove sceptre oforce %actor% drop sceptre endif "
+    },
+    {
+      "id": 2220,
+      "name": "Nezer_Entry_Trigger",
+      "attach_type": "Mobile",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "*Nezer entry messages if (%alreadydone% != 1) set alreadydone 1 global alreadydone wait 10s wecho A large flapping noice can be heard coming from above. wait 8s wecho The blood red sky is suddenly blocked out by a flying silhouette. wait 8s wecho You're forced to duck suddenly, as a massive figure swoops low, nearly taking your head off. wait 10s wecho With a giant thump Nezer of Raymif hits the ground sending a shockwave across the ground! * start of damage loop set victim %self.people% while %victim% set next %victim.next_in_room% if (%victim.vnum% == -1) &(%victim.level% < 100) eval damage 350 + %random.50% wdamage %victim% %damage% crush if %damdone% == 0 wsend %victim% Nezer's shockwave passes through you like a shot, momentarily disorienting you. elseif (%victim.aff_flagged[fly]%) eval damage %damage% / 2 wsend %victim% Nezer's shockwave sends you flying into the arena wall! (&1&b%damdone%&0) wechoaround %victim% %victim.name% is thrown violently into the arena's wall! (&4%damdone%&0) else wsend %victim% You are slammed violently into the ground after being thrown into the air by Nezer's shockwave! (&1&b%damdone%&0) wechoaround %victim% %victim.name% is slammed into the ground after being thrown into the air by Nezer's shockwave! (&4%damdone%&0) endif endif set victim %next% done wload mob 1200 endif "
+    },
+    {
+      "id": 2221,
+      "name": "Nezer_Dragon_trigger",
+      "attach_type": "Object",
+      "flags": [
+        "Fight"
+      ],
+      "number_of_arguments": 15,
+      "argument_list": "",
+      "commands": "set val %random.10% switch %val% case 1 breath fire break case 2 case 3 sweep break case 4 case 5 roar break default growl done "
+    },
+    {
+      "id": 2222,
+      "name": "Nezer_head_rip_1",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "dont-let-me-catch-you-testing-this",
+      "commands": "wait 5s * Let's see how many casters we have in the room. set casters 0 set victim %self.people% while %victim% if (%victim.vnum% == -1) && (%victim.level% < 100) if (%victim.class% /= Cleric || %victim.class% /= Priest || %victim.class% /= Druid || %victim.class% /= Diabolist || %victim.class% /= Sorcerer || %victim.class% /= Cryomancer || %victim.class% /= Pyromancer || %victim.class% /= Necromancer) eval casters %casters% + 1 endif endif set victim %victim.next_in_room% done * So if we have casters, pick one, we don't want the same * one or to have a set order, so lets pick a random caster. if (%casters% > 0) set gotyou 0 while %gotyou% == 0 set victim %random.char% if (%victim.class% /= Cleric || %victim.class% /= Priest || %victim.class% /= Druid || %victim.class% /= Diabolist || %victim.class% /= Sorcerer || %victim.class% /= Cryomancer || %victim.class% /= Pyromancer || %victim.class% /= Necromancer) eval gotyou %gotyou% + 1 endif done * Hello target, now you must die! set message 1 set keepgoing 1 while %keepgoing% == 1 if (%victim.room% == 2216) switch %message% case 1 wechoaround %victim% %victim.name%'s magic catches the attention of one of Nezer's heads. wsend %victim% One of Nezer's heads suddenly takes notice of you.' break case 2 wechoaround %victim% Nezer's head darts at %victim.name%, who only barely side steps the attack. wsend %victim% You just barely side step a bite by Nezer's head. Lucky you. break case 3 set damage %random.20% eval damage %damage% + 105 wechoaround %victim% Nezer's head darts at %victim.name% again, this time grabbing %victim.p% in his razor sharp teeth! (&4%damage%&0) wsend %victim% Nezer's head darts at you again, this time grabbing at you with it's shapr teeth, OUCH! (&1&b%damage%&0) wdamage %victim% %damage% break case 4 set damage %random.20% eval damage %damage% + 150 wechoaround %victim% Nezer's second head notices the first chewing on something. (&4%damage%&0) wsend %victim% Nezer's second head notices you as the first chomps down on you hard, OUCH! (&1&b%damage%&0) wdamage %victim% %damage% break case 5 wechoaround %victim% Nezer's second head bites onto the half of %victim.name% that was sticking out before RIPPING %victim.p% in half! (&4DEAD&0) wsend %victim% Nezer's second head bites onto the half of you that wasn't already being consumed before RIPPING you in half! You are DEAD! (&1&bDEAD&0) wdamage %victim% 10000 eval keepgoing %keepgoing% + 1 break default done else wecho Nezer looks around for something that is no longer there. eval keepgoing %keepgoing% + 1 endif wait 8s eval message %message% + 1 done endif "
+    },
+    {
+      "id": 2223,
+      "name": "Nezer_head_rip_start",
+      "attach_type": "Object",
+      "flags": [
+        "Fight",
+        "HitPercentage"
+      ],
+      "number_of_arguments": 10,
+      "argument_list": "",
+      "commands": "m_run_room_trig 2222 "
+    },
+    {
+      "id": 2224,
+      "name": "nezer-death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mecho &9&bThe giant black dragon collapses to the ground with a mighty thunder!&0 m_run_room_trig 2225 "
+    },
+    {
+      "id": 2225,
+      "name": "arena-exits",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &9&bA gate opens on the floor of the arena, leading down into darkness.&0 wdoor 2216 down room 2217 wdoor 2216 down description &9&bA grate has opened, leading down...&0 "
+    },
+    {
+      "id": 2226,
+      "name": "baatezu-death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "if %self.room% == 2217 mecho &1A hideous &broar&0&1 fades into &9&bnothingness.&0 m_run_room_trig 2227 endif "
+    },
+    {
+      "id": 2227,
+      "name": "vault-exits",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &1&bA trapdoor clicks open, &0&1leading down.&0 wdoor 2217 down room 2218 wdoor 2217 down description &1&bRed stairs lead &1down to the unknown.&0 "
+    },
+    {
+      "id": 2228,
+      "name": "balor-fight",
+      "attach_type": "Object",
+      "flags": [
+        "GreetAll",
+        "Fight"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "if !(%self.aff_flagged[fireshield]%) mload obj 52053 mat 1100 quaff sagece-fireshield mjunk sagece-fireshield endif "
+    },
+    {
+      "id": 2229,
+      "name": "RESET THE NINE HELLS DOORS",
+      "attach_type": "Mobile",
+      "flags": [
+        "Speech"
+      ],
+      "number_of_arguments": 0,
+      "argument_list": "Restart the Nine Hells quest.",
+      "commands": "wdoor 2201 down purge wdoor 2210 down purge wdoor 2211 down purge wdoor 2212 down purge wdoor 2213 down purge wdoor 2214 down purge wdoor 2215 down purge wdoor 2216 down purge wdoor 2217 down purge wecho Doors reset. "
+    },
+    {
+      "id": 2230,
+      "name": "nalfeshnee-death-exits",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mecho &6A fierce &bwail&0&6 echoes over the sea!&0 m_run_room_trig 2231 "
+    },
+    {
+      "id": 2231,
+      "name": "nalfeshnee-load-mirror",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s wecho &6Out of nowhere, a &bmirror&0&6 appears!&0 wload obj 23772 "
+    },
+    {
+      "id": 2232,
+      "name": "START THE NINE HELLS QUEST",
+      "attach_type": "Mobile",
+      "flags": [
+        "Speech"
+      ],
+      "number_of_arguments": 0,
+      "argument_list": "Start the Nine Hells quest.",
+      "commands": "wdoor 2201 down room 2210 wdoor 2201 down name hole wdoor 2201 down description &1The hole in the earth seems to be a bottomless shaft, with the roiling flames of hell licking the edges.&0 wat 2201 wecho &1The earth &3heaves&1 and suddenly breaks open to reveal a &bfiery &0&1pit.&0 wecho Quest started. "
+    },
+    {
+      "id": 2233,
+      "name": "Mog Death Log",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "log %actor.name% has killed %self.name% "
+    },
+    {
+      "id": 2240,
+      "name": "belial_quest_start",
+      "attach_type": "Object",
+      "flags": [
+        "GreetAll"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* Set the quest in motion, prevent retriggering stages * until completion or reboot/crash/etc. if %belial_queue% m_run_room_trig 2242 else set belial_queue 1 global belial_queue m_run_room_trig 2241 endif "
+    },
+    {
+      "id": 2241,
+      "name": "belial_pre_combat_banter",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* Belial's Pre Combat Banter set %belial_queue% 2 set victim %self.people% while %victim% if %victim.vnum% != 2219 if %victim.class% == Paladin if %victim.sex% == Female wait 1s wsend %victim% Belial slowly approaches, lifting your chin to meet his piercing gaze. wechoaround %victim% Belial slowly approaches %victim.name%, lifting her chin to his gaze. wait 5s wecho Belial says in common, 'A rare and beautiful thing...' wait 3s wecho Belial says in common, 'Such a pity you should end here.' wsend %victim% Belial gently presses a finger to your lips. wechoaround %victim% Belial gently presses a finger to the lips of %victim.name%'. wait 5s wecho Belial says in common, 'I could offer you such pleasures beyond imagination.' wait 3s wsend %victim% Belial stares deeply into your eyes. wechoaround %victim% Belial stares deeply into the eyes of %victim.name% wecho Belial says in common, 'But that would not be enough, no.?' wait 5s wecho Belial says in common, 'No... your soul is too puerile to understand such!' wait 3s wsend %victim% Belial casts your head away from his sudden, baleful sneer. wechoaround %victim% Belial balefully sneers at %victim.name%, casting her head aside. wecho Belial says in common, 'Instead you shall all die by my hand!' wait 1s wforce belial kill %victim.name% halt elseif %victim.sex% == Male wait 1s wsend %victim% Belial slowly paces about you, sizing up your mettle. wechoaround %victim% slowly paces about %victim.name%, sizing him up. wait 5s wecho Belial says in common, 'Such pious arrogance...' wait 3s wecho Belial says in common, 'Fitting that you should end here.' wecho Belial pauses for a moment, pressing his finger to his lips. wait 5s wecho Belial breaths in heavily, raising his hands skyward. wecho Belial says in common, 'Do you hear them... do you hear their screams?' wait 5s wecho Belial says in common, 'They sing to me...' wait 3s wsend %victim% Belial snaps around, sneering at you with loathing and contempt. wechoaround %victim% Belial snaps around, sneering at %victim.name% with loathing and contempt. wait 5s wecho Belial says in common, 'And now I shall add your screams to the concerto!' wait 1s wforce belial kill %victim.name% halt endif else wait 2s wecho Belial says in common, 'How charming, someone come to throw themselves on my blade!' wait 3s wecho Belial says in common, 'Agents of a lesser perhaps... hmmm?' wecho Belial says in common, 'Come to usurp my throne, yes?' wait 5s wecho Belial paces about observingly, one hand clenched around a blood-red ranseur. wait 3s wecho Belial says in common, 'What's the matter, hellcat got your tongue?' wait 3s wecho Belial says in common, 'Don't be fooled, I see you trembling with fear...' wecho Belial says in common, 'I can smell it on you like a rotting, fetid wound!' wait 5s wecho Belial's eyes flair black as coal as he spins the blood-red ranseur about. wait 3s wecho Belial says in common, 'No matter, for your life ends here!' wecho Belial growls, 'Have at thee!' wait 1s wforce belial kill %victim.name% halt endif endif set victim %victim.next_in_room% done "
+    },
+    {
+      "id": 2242,
+      "name": "belial_return_banter",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* Belial's Return Banter set banter %random.6 set victim %random.char% switch %banter% case 1 wait 2s wecho Belial says in common, 'Once more must we play this game?' wecho Belial says in common, 'By now, you know you can't defeat a crowned Prince of the Nines.' break case 2 wait 2s wecho Belial says in common, 'How I tired of this foolishness...' wecho Belial says in common, 'You are but a gnat to be squished forthwith.' break case 3 wait 2s wecho Belial says in common, 'It will be pleasure to show you unimaginable pain once more! break case 4 wait 2s wecho Belial says in common, 'Your death will be as meaningless as your pathetic life!' break case 5 wait 2s wecho Belial says in common, 'I grow weary of your intrusions...' wecho Belial says in common, 'This time I shaill see you stay dead!' break case 6 wait 2s wecho Belial says in common, 'The Nine Hells take thee...' wecho Belial says in common, 'For your soul now belongs to me!' break default wait 2s wecho Belial says in common, 'Your life ends here!' break done wforce belial kill %victim.name% "
+    },
+    {
+      "id": 2243,
+      "name": "belial_spawn_demon_belial",
+      "attach_type": "Object",
+      "flags": [
+        "HitPercentage"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "5",
+      "commands": "* Spawn Demon Belial on 5% HP set %belial_queue% 3 set victim %random.char% mload mob 2221 mecho Belial falls to one knee, his chest heaving in exhaustion from battle. wait 3s mecho Belial says in common, 'Fools!  You have yet to witness the true power of the Nines!' mecho Belial contorts momentarily as wings and shadow tentacles sprout from his back. wait 3s mecho Belial slowly rises up, his demonic form dwarfing you in size. mecho Belial throws back his head and roars with ferocity, causing your soul to quake. wait 1s force destruction kill %victim.name% mpurge %self% "
+    },
+    {
+      "id": 2244,
+      "name": "belial_combat_ai_script",
+      "attach_type": "Object",
+      "flags": [
+        "Speech",
+        "Fight"
+      ],
+      "number_of_arguments": 20,
+      "argument_list": "test",
+      "commands": "* random combat events set timer %random.4% if %belial_ai% > 0 switch %action% case 1 * Deadly Spell *line 10 m_run_room_trig 2246 break case 2 * Severe Spell m_run_room_trig 2247 break case 3 * Severe Spell m_run_room_trig 2248 *line 20 break case 4 mecho Belial says in common, 'Fear my wrath, puny mortal!' break case 5 * Kick / Switch Opponents eval victim %random.char% eval which %random.2% switch %which% *line 30 case 1 kill %victim.name% break case 2 kick break done break case 6 *line 40 * Show random caster Fun Lovin's! if (%self.mexists[15]% < 1) m_run_room_trig 2249 endif break case 7 * Kick / Switch Opponents eval victim %random.char% eval which %random.2% switch %which% case 1 *line 50 kill %victim.name% break case 2 kick break done break case 8 * Random Banter *line 60 break case 9 * Severe Spell m_run_room_trig 2248 break case 10 * Severe Spell m_run_room_trig 2247 break *line 70 case 11 * Deadly Spell m_run_room_trig 2246 break default say Your soul belongs to the Nines! kick done *line 80 endif if %belial_ai% >= 1 eval belial_ai %belial_ai% - 1 else set belial_ai %timer% endif global belial_ai "
+    },
+    {
+      "id": 2245,
+      "name": "belial_insanity_script",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* find a caster, cause some brain pain! "
+    },
+    {
+      "id": 2246,
+      "name": "belial_blasphemy_script",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* blasphemy = 325-400hp demonic unholy word! wait 1s wecho Belial throws his hands in the air, uttering in demonic, 'Verai Thak! set victim %self.people% while %victim% if (%victim.vnum% == -1) && (%victim.level% < 100) eval damage 325 + %random.75% wsend %victim% You cover your ears in horror upon hearing the demonic oath! (&1&b%damage%&0) wechoaround %victim% %victim.name% covers %victim.p% ears in horror upon hearing the demonic oath! (&4%damage%&0) wdamage %victim% %damage% endif set victim %victim.next_in_room% done * blasphemy = 325-400hp demonic unholy word! wait 1s wecho Belial throws his hands in the air, uttering in demonic, 'Verai Thak! set victim %self.people% while %victim% set next %victim.next_in_room% if (%victim.vnum% == -1) && (%victim.level% < 100) eval damage 325 + %random.75% wsend %victim% You cover your ears in horror upon hearing the demonic oath! (&1&b%damage%&0) wechoaround %victim% %victim.name% covers %victim.p% ears in horror upon hearing the demonic oath! (&4%damage%&0) wdamage %victim% %damage% endif set victim %next% done "
+    },
+    {
+      "id": 2247,
+      "name": "belial_enervation_script",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* enervation spell = 375-450 random damage set count 3 wait 1s wecho Belial cackles madly, spreading his open hands apart! wecho A blackened bolts of energy crackles from Belial's fingertips. while %count% > 0 eval victim %random.char% if (%victim.vnum% == -1) eval damage 375 + %random.75% eval saved %random.2% switch %saved% case 1 eval damage = %damage%/2 wsend %victim% You narrowly avoid a blackened bolt of energy! (&1&b%damage%&0) wechoaround %victim% %victim.name% narrowly avoids a blackend bolt of energy! (&4%damage%&0) break case 2 wsend %victim% You are hit dead on by a blackened bolt of energy! (&1&b%damage%&0) wechoaround %victim% %victim.name% is hit dead on by a blackend bolt of energy! (&4%damage%&0) break default done wdamage %victim% %damage% endif eval count %count% - 1 done "
+    },
+    {
+      "id": 2248,
+      "name": "belial_fissure_script",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "* trigger info here set count %self.people[count]% if (%count% > 3) set count 3 endif while %count% > 0 set victim %random.char% if (%victim.vnum% == -1) eval damage 225 + %random.75% eval which %random.3% set fireproof %victim.aff_flagged[!heat]% switch %which% case 1 if !(%fireproof%) eval damage %damage% * 2 endif wsend %victim% Scorching flames burst out of a nearby fissure, scalding your skin! (&1&b%damage%&0) wechoaround %victim% White-hot flames explode out of a fissure in the ground next to %victim.name%! (&4%damage%&0) break case 2 if !(%fireproof%) eval damage %damage% * 2 endif wsend %victim% Bubbling, hot lava roils out of the ground onto your feet! (&1&b%damage%&0) wechoaround %victim% Burning lava bubbles out of the ground onto %victim.name%'s feet! Ouch! (&4%damage%&0) break default if !(%fireproof%) eval damage %damage% * 3 endif wsend %victim% A torrent of molten lava consumes you, engulging you in flame! (&1&b%damage%&0) wechoaround %victim% A torrent of molten lava consumes %victim.name%, engulfing %victim.n% in flame. (&4%damage%&0) done wdamage %victim% %damage% endif eval count %count% - 1 wait 2s done "
+    },
+    {
+      "id": 2249,
+      "name": "belial_soul_swarm_script",
+      "attach_type": "Mobile",
+      "flags": [
+        "Global"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wecho Start of 2249 wait 2s wecho Belial closes his eyes, raises his hands in the air and shouts, 'Fadre Zarku!' wait 1s set person 0 while %person% < 1 eval victim %random.char% if (%victim.vnum% == -1) if (%victim.class% == sorcerer || %victim.class% == cryomancer || %victim.class% == pyromancer || %victim.class% == priest || %victim.class% == druid || %victim.class% == cleric) wsend %victim% To Victim test wechoaround %victim% To Room test wload mob 15 wforce wraith kill %victim.name% wload mob 15 wforce wraith kill %victim.name% wload mob 15 wforce wraith kill %victim.name% eval person %person% + 1 endif endif done "
+    },
+    {
+      "id": 2250,
+      "name": "Icicle_Melt",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "melt",
+      "commands": "osend %actor% The long &4&bicicle&0 starts to soften up and begins to melt. oechoaround %actor% %actor.name% squeezes the &4&bicicle&0 and it begins to melt. wait 5s oecho &3&0Gratz on finding the 1st piece!  This &1&bIS&7&0 the format for whole the quest.&0 wait 3s oecho The water &6&ddroplets&0 flow from the &4&0icicle&0 to the ground, forming a &7&bpuddle&0. wait 5s oecho Suddenly, &3&bwords&0 begin to slowly take form in the &7&bpuddle&0. wait 2s oecho Held by a peaceful man oft found meditating in his favorite sacred grove. oecho A difficult opponent if tested, his wand wisks anything away with a few taps. "
+    },
+    {
+      "id": 2251,
+      "name": "Dandelion_Blow",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "blow",
+      "commands": "osend %actor% You &7&bblow&0 the seeds from the small &6&bdandelion&0 in all directions. oechoaround %actor% %actor.name% &7&bblows&0 on the small &6&bdandelion&0, sending seeds everywhere. wait 5s oecho A &6&bbreeze&0 picks up, swirling the &3&bseeds&0 about and whispering in you ear... wait 5s oecho Resting in the &4&bfrigid&0 pools, this 75' long lizard keeps a &1&bdemented&0 grin. oecho Though aged, her vicious &1&broar&0 is more menacing than the greatest of &3&blions&0. "
+    },
+    {
+      "id": 2252,
+      "name": "RubberBall_Bounce",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "bounce",
+      "commands": "osend %actor% The &2&bgreen ball&0 ricochets off the ground and &1&bsmacks&0 your chin. oechoaround %actor% %actor.name% bounces the &2&bball&0.  It ricochets off the ground, &1&bsmacking&0 %actor.o% in the &1&b&3&bjaw&0&0. wait 3s osend %actor% You slump to the ground, &1&bknocked out&0 from the sudden blow from a &2&bgreen ball&0. oechoaround %actor% %actor.name% slumps to the ground, &1&bknocked out&0 from the sudden blow from a &2&bgreen ball&0. wait 8s osend %actor% As you are &6&bawaken&0, you feel obligated to relay your &7&bvision&0 to the group... oechoaround %actor%  As %actor.name% & &6&bawakens&0, %actor.n% tells you of %actor.p% &7&bvision&0... wait 4s oecho Held by a &3&bscarred hunter&0 who has hunted nearly as many as have &1&bhunted&0 him! oecho His body witness to his &3&bwarrior prowess&0 and acts of &4&bpride&0 for his fellow people. "
+    },
+    {
+      "id": 2253,
+      "name": "Snowglobe_Shake",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "shake",
+      "commands": "osend %actor% The old &7&bsnowglobe&0 glows and the small town inside comes &6&balive&0. oechoaround %actor% %actor.name% shakes the &7&bsnowglobe&0 and the town inside comes &6&balive&0. wait 7s oecho The &5&bsmall town&0 continues to glow as you make out a visage in the &7&bsnow&0... wait 5 oecho A &3&btall&0 and &3muscular&0 &7&bcleric&0 who could almost pass for that of a human. oecho His eyes &1&b&1&bscorch&0&0 the &4&bsoul&0 of all those who dare gaze deeply into them. "
+    },
+    {
+      "id": 2254,
+      "name": "Stylus_Write",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "write",
+      "commands": "osend %actor% The &3&bc&2&bo&4&bl&5&bo&3&br&6&bf&5&bu&1&bl&0 stylus glows briefly, filling the room with light. oechoaround %actor% %actor.name% writes with a &3&bc&2&bo&4&bl&5&bo&3&br&6&bf&5&bu&1&bl&0 stylus and it begins to glow brightly. wait 5s osend %actor% The &3&bc&2&bo&4&bl&5&bo&3&br&6&bf&5&bu&1&bl&0 stylus flies from your hands and begins writing in the air. oechoaround %actor% The &3&bc&2&bo&4&bl&5&bo&3&br&6&bf&5&bu&1&bl&0 stylus suddenly begins writing in the air by itself. wait 3 oecho Held by a hidden man, he was the only one to achieve &7&bimmortality&0 via &4&bwizardry&0. oecho Though &4&bmagic&0 slowed his age, endlessly he searchs for a new &7&bsoul&0 to &1&bleach&0. "
+    },
+    {
+      "id": 2255,
+      "name": "Lamp_Rub",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "rub",
+      "commands": "osend %actor% The &3&bold lamp&0 begins to shake as a cloud of &7&bsmoke&0 comes out. oechoaround %actor% %actor.name% rubs the &3&bold lamp&0 and a cloud of &7&bsmoke&0 comes out. wait 5s oecho The cloud of &7&bsmoke&0 begins to thin out and forms into &6&bwords&0. wait 7s oecho Held by a &6&bpoltergeist&0 that is about as far from &2&bMielikki&0 as possible. oecho In his &3&bmaster's chamber&0 he does rest, expelling his energy &7&bpeacefully&0 about. "
+    },
+    {
+      "id": 2256,
+      "name": "Incense_Burn",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "burn",
+      "commands": "osend %actor% The old &6&bi&3&bn&6&bc&3&be&6&bn&3&bs&6&be&0 lights briefly and begins to emit a &5&bnoxious&0 odor. oechoaround %actor% %actor.name% lights the old &6&bi&3&bn&6&bc&3&be&6&bn&3&bs&6&be&0 and it begins to emit a &5&bnoxious&0 odor. wait 5s oecho The old &6&bi&3&bn&6&bc&3&be&6&bn&3&bs&6&be&0 starts to flash brightly, sending sparks everywhere! wait 5s oecho The &7&bsparks&0 spray all over the ground in some oddly apparent &3&bpattern&0. wait 5s oecho As the &7&bsmoke&0 clears, a message is revealed in the &1&bscorched&0 ground... wait 5s oecho Held by an &2&bold hag&0 who sits above her &7&bcauldron&0 brewing evil potions. oecho Though &6&bformidable&0, you must first pass the &3&bdoor&0 that is without a knot. "
+    },
+    {
+      "id": 2257,
+      "name": "Orchid_Smell",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "smell",
+      "commands": "osend %actor% You reach down and smell the &4&bblue orchid&0, which gives off a &6&bdelictable&0 scent. oechoaround %actor% %actor.name% smells a &4&bblue orchid&0, which sends the scent all through the room. wait 5s oecho The &5&bscent&0 from the &4&bblue orchid&0 permeates through the area. wait 5ss oecho For a moment, you a struck with a soothing &6&bclairity&0 and &7&bcalm&0. wait 5s oecho A strange &7&bvision&0 prevades your &3&bmoment&0 of &2&benlightenment&0... wait 5ss oecho In a land where &4&bliquid&0 is rare and &1&bwarriors&0 master thier skills well. oecho Seek out the &7&bhidden woman&0, but beware your imminent &3&bimprisonment&0. "
+    },
+    {
+      "id": 2258,
+      "name": "Coin_Flip",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "flip",
+      "commands": "oechoaround %actor% %actor.name% flips an &2&bworn coin&0, sending it high in the &6&bair&0. osend %actor% The &3&bworn&0 coin flips high into the air, &1&btumbling&0 over and over. wait 5s oecho You wait what seems an &7&beternity&0 as the worn &3&bcoin soars&0 through the &6&bair&0. wait 7s osend %actor% With a &2&bflick&0 of your wrist, you reach out and snag the &3&bworn coin&0 in flight. oechoaround %actor% %actor.name% reaches out and catches the &3&bworn coin&0 while on the &1&bdescent&0. wait 5s oecho Where once there were two different &2&bsides&0 there is only a &5&bsingle&0 image... wait 3s oecho Far from &2&bMielikki&0, a man of much &6&bjubilation&0 and a happy &1&blover&0. oecho He roams &7&bpeacefully&0 about his &2&bpavillion&0 hoping to see his &5&bprincess&0. "
+    },
+    {
+      "id": 2259,
+      "name": "Cards_Shuffle",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "shuffle",
+      "commands": "osend %actor% You &3&bshuffle&0 the cards around in your hands and a &1&bJoker&0 ends up on top. oechoaround %actor% %actor.name% &3&bshuffles&0 the cards around and a &1&bJoker&0 ends up on top. wait 5s osend %actor% You &3&bshuffle&0 the cards once more, before cutting to an &1&bunusual&0 card... oechoaround %actor% %actor.name% &3&bshuffles&0 the cards once more, before cutting to an &1&bunusual&0 card... wait 5s oecho The &3&bcard&0 shows an &7&bold ship&0, though once a &2&bprosperous&0 merchant vessel. oecho As well, a &7&bresurrected&0 man who forever dwells like a good &5&bcaptain&0 should. "
+    },
+    {
+      "id": 2260,
+      "name": "Match_Light",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "light",
+      "commands": "osend %actor% You strike the &1&bmatch&0 on the ground as &7&bbright sparks&0 shoot forth. oechoaround %actor% %actor.name% strikes the &1&bmatch&0 on the ground as &7&bbright sparks&0 shoot forth. wait 7s oecho The &1&bmatch&0 suddenly flares into a briliant blinding &3&bexplosion&0 of &7&blight&0. wait 5s oecho As your eyes adjust, you recall a &6faint&0 image &1&bburned&0 in your &4&bmind&0... wait 5 oecho The &3crumbled&0 remains of a once &7&bgreat city&0 and endless billowing &6&bash&0. oecho A strong &2&boaf&0, and would be &7&bnobler&0 if it weren't for his &1&bevil passion&0. "
+    },
+    {
+      "id": 2261,
+      "name": "Disc_Toss",
+      "attach_type": "Room",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 2,
+      "argument_list": "5",
+      "commands": "Nothing. "
+    },
+    {
+      "id": 2262,
+      "name": "Mobs_Death",
+      "attach_type": "Object",
+      "flags": [
+        "Death"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "mforce %actor.name% petition %actor.name%'s group has killed %self.name%!! "
+    },
+    {
+      "id": 2263,
+      "name": "Get_12th_piece",
+      "attach_type": "Room",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2 oload mob 2202 oteleport tsaeldin 3002 oforce tsaeldin goss At last!  The lost artifacts have been recovered! wait 10 oforce tsaeldin goss You MUST come see me at once.  I shall await your arrival in Mielikki. "
+    },
+    {
+      "id": 2265,
+      "name": "lylaith",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 5,
+      "argument_list": "lylaith",
+      "commands": "wait 2s osend %actor% As you wield %self.shortdesc%, the blade glows a &7&bbright white&0! oechoaround %actor% As %actor.name% wields %self.shortdesc%, the blade glows a &7&bbright white&0! "
+    },
+    {
+      "id": 2267,
+      "name": "pfarlysia_cloak",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s osend %actor% As you wear %self.shortdesc%, the cloak shimmers a &1&bredish&0-&3&byellow&0. oechoaround %actor% As %actor.name% wears %self.shortdesc%, the cloak shimmers a &1&bredish&0-&3&byellow&0. "
+    },
+    {
+      "id": 2270,
+      "name": "vang_gauntlets",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2 osend %actor% As you wear %self.shortdesc%, they begin to burn a &1&bflaming red&0. oechoaround %actor% As %actor.name% wears %self.shortdesc%, they begin to burn a &1&bflaming red&0. "
+    },
+    {
+      "id": 2272,
+      "name": "krystophus_ring",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2 osend %actor% Your head beings to reel momentarily as you wear %self.shortdesc%. oechoaround %actor% %actor.name% suddenly looks off balance for a moment. "
+    },
+    {
+      "id": 2274,
+      "name": "sysmaith",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 5,
+      "argument_list": "sysmaith",
+      "commands": "wait 2s osend %actor% As you wield %self.shortdesc%, a &4&bbright blue&0 flame burns along the blade! oechoaround %actor% As %actor.name% wields %self.shortdesc%, a &4&bbright blue&0 flame burns along the blade! "
+    },
+    {
+      "id": 2280,
+      "name": "dual_axe_blur_script",
+      "attach_type": "Room",
+      "flags": [
+        "Command"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "Niamh",
+      "commands": "say My trigger commandlist is not complete! "
+    },
+    {
+      "id": 2293,
+      "name": "heartbeat",
+      "attach_type": "Room",
+      "flags": [
+        "Greet"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 2s osend %actor.name% as you grab the heart, you notice it starts to beat in your hand. oechoaround %actor.name% %actor.name% grabs a ruby heart, which starts beating within his hand! "
+    },
+    {
+      "id": 2294,
+      "name": "cats_eyes_wear",
+      "attach_type": "Room",
+      "flags": [
+        "Receive"
+      ],
+      "number_of_arguments": 100,
+      "argument_list": "",
+      "commands": "wait 1s osend %actor.name% As you lift the cat's eyes towards your own, they are absorbed into your eye sockets. oechoaround %actor.name% %actor.name% lifts a pair of green eyes to his own, and they are absorbed into %actor.p% own. return 1 "
+    }
+  ],
+  "rooms": [
+    {
+      "id": "2200",
+      "name": "Quest Stuff Zone, nothing Else",
+      "description": "OH GOD, WHY ARE YOU HERE!!  YOU WILL DIE!!!!! ",
+      "flags": [
+        "NOMAGIC",
+        "PRIVATE",
+        "GODROOM",
+        "NOWELL",
+        "NORECALL",
+        "UNDERDARK",
+        "NOSUMMON",
+        "NOSHIFT",
+        "NOSCAN"
+      ],
+      "sector": "ETHEREALPLANE"
+    },
+    {
+      "id": "2201",
+      "name": "A Ruined Basement",
+      "description": "This hole in the ground used to be a finished basement, but now it's just a ruins like the rest of the house above it.  There are no furnishings or other adornments, but the rubble is piled up everywhere, covered in dust.  The tiles that used to line the room are missing, cracked, and piled up in sorry heaps. ",
+      "flags": [],
+      "sector": "STRUCTURE"
+    },
+    {
+      "id": "2202",
+      "name": "Torture Room",
+      "description": "Hidden amongst the depths that are the Nine Hells.  This room is adorned with dozens of different varieties of torture instruments.  Pools of blood surround the instruments, covering most ofthe floor.  A large sign hangs in the far side of the room, perhaps it is important. ",
+      "flags": [
+        "INDOORS",
+        "PEACEFUL",
+        "NOTRACK",
+        "NOMAGIC",
+        "PRIVATE",
+        "GODROOM",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "STRUCTURE",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2211"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2210"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "Sign"
+          ],
+          "text": "Be good and ye might just be released, be proud and ye shall certainly be further punished. "
+        }
+      ]
+    },
+    {
+      "id": "2210",
+      "name": "A Blood River in the Wastes",
+      "description": "A broken, rusty red land stretches out as far as the eyes can see, littered with chunks of smoldering rocks, broken weapons, and bones.  Everywhere rush torrents of blood, giving the plain a sickly-sweet tang to the air.  The sky has no sun, but is covered in orange clouds and seems to be backlit by an even glow permeating the atmosphere evenly.  The rushing sound of the blood rivers obscures most other sounds, but the ear is tricked into hearing screams and moans and the clashes of battle even while there are no visible creatures. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "exits": {
+        "North": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2202"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2201"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "river",
+            "blood",
+            "torrent",
+            "torrents",
+            "rivers"
+          ],
+          "text": "Torrents of red flow in every direction, covering the already reddish land with an even brighter crimson shade.  The smell rising from it is a familiar one - blood.  Legend has it that the blood spilled in every battle makes its way here, though where it goes from here no one knows for certain. "
+        },
+        {
+          "keywords": [
+            "rocks",
+            "rock",
+            "weapons",
+            "bones"
+          ],
+          "text": "Wherever the blood river does not rush, the dry land is filled with broken chunks of rocks, steaming with evaporating blood.  Shards of shattered weapons stick out at odd angles, some rusted into nearly nothingness and many others looking as sharp as the day they were forged.  Splintered bones litter the ground as well, making walking rather dangerous. "
+        }
+      ]
+    },
+    {
+      "id": "2211",
+      "name": "A Tower of Burning Iron",
+      "description": "Walls of iron glowing red-hot surround you on all sides.  However, the furnishings of this room seem to be unaffected by the heat that comes radiating from all sides.  The floor is covered with a sumptuous carpet which, luckily, blocks the worst of the heat.  Stained glass windows and fanciful paintings cover the walls, and a huge chandelier hangs from the ceiling.  It has no candles, but glows instead with a pale blue magical light.  Plush couches draped with red silk adorn the room as well.  There do not appear to be any exits. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "exits": {
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2202"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "painting",
+            "paintings"
+          ],
+          "text": "The paintings depict beautiful figures engaged in acts of carnal lust. "
+        },
+        {
+          "keywords": [
+            "chandelier"
+          ],
+          "text": "Crystals take the pale blue glow and refract it into thousands of tiny beams of light, casting a mottled luminescence over the room.  Ordinary candles would no doubt melt in the room's heat. "
+        },
+        {
+          "keywords": [
+            "stained",
+            "glass",
+            "window",
+            "windows"
+          ],
+          "text": "Dark shards of glass are illuminated into figures of demons battling angels while mortals, tiny creatures in the background, quake in terror of the unknown. "
+        }
+      ]
+    },
+    {
+      "id": "2212",
+      "name": "An Acid Swamp",
+      "description": "A fetid mire stretches out in all directions, though you seem to have landed on a mushy hillock instead of in the water.  This is probably a good thing, as the plants seem to be slowly dissolving even as they grow.  The stench of decay is mixed with another smell, one which turns the stomach though it is hard to place.  Visible creatures include giant insects covered in blood, imps, mephits, and lemures.  However, all of them keep a healthy distance from invading mortals. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "extras": [
+        {
+          "keywords": [
+            "plants"
+          ],
+          "text": "Looking like nothing so much as the tortured souls of twisted trees, massive plants seem to shriek in agony, dissolving even as they grow.  Smaller, parasitic plants grow on the trees and periodically release spores, giving the entire area a thick miasma that makes it impossible to see the sky. "
+        }
+      ]
+    },
+    {
+      "id": "2213",
+      "name": "The Field of Fire",
+      "description": "Roaring fires belch up in all directions.  The ground is made of hardened lava, or perhaps it is only rocks melted by the constant, sporadic flames.  In the distance is a lake of lava giving out waves of heat, obscuring vision. Chained figures march around, whipped by vicious fiends, looking terrified that they will step into a flame.  Despite the fires, plants with sharp leaves thrive on the bare rock and slice open the feet of the unwary. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "extras": [
+        {
+          "keywords": [
+            "plants"
+          ],
+          "text": "Broken leaves of the plant reveal a sticky goo on the inside, which probably helps it survive the flames.  However, breaking a leaf to get at the goo is tough - a leathery skin covered in barbs protects the plant. "
+        },
+        {
+          "keywords": [
+            "chained",
+            "figures"
+          ],
+          "text": "The chained figures seem to be of many races: humans, dwarves, elves, even orcs and trolls.  None of them look happy. "
+        }
+      ]
+    },
+    {
+      "id": "2214",
+      "name": "A Sea of Dark Ice",
+      "description": "In all directions spreads a dark ocean.  The sky is black and starless, with the only light being a sickly green glow coming from the enormous mountains of ice that float on the sea.  Rather than naturally formed, these icebergs are probably magical in nature - twisted features scream silently in their depths, forever trapped by the wrath of the Lords of Hell. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "SHALLOWS",
+      "extras": [
+        {
+          "keywords": [
+            "mountain",
+            "mountains",
+            "ice",
+            "iceberg",
+            "icebergs"
+          ],
+          "text": "From tiny chunks of ice encasing evil-looking animals to huge mountains that could contain entire nations, the ice of the dark sea glows a faint green. Some icebergs are stuck together with many figures inside, while others contain only single creatures.  All have features locked into expressions of terror. "
+        },
+        {
+          "keywords": [
+            "sky",
+            "starless"
+          ],
+          "text": "Impossible to tell how far up it extends, the velvet sky seems at once close and impossibly far away.  The only perspective is provided by the icebergs. "
+        }
+      ]
+    },
+    {
+      "id": "2215",
+      "name": "A Diseased Battlefield",
+      "description": "Grey soil soaked with blood stretches out at a steep angle here.  In the distance are many armies, each trying to gain higher ground than the others. The crashing sound of avalanches is but a distant rumble beneath the much louder clamor of steel and iron clashing as the armies vie for the upper hand. Decaying corpses litter the ground, and broken weapons abound beneath the scurrying of otherworldly scavengers.  Flies buzz in giant swarms that occastionally block out the harsh glare from above, though no sun is visible. Though there is constant fighting, the purpose seems unknown. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "extras": [
+        {
+          "keywords": [
+            "corpses",
+            "weapons",
+            "flies",
+            "swarm"
+          ],
+          "text": "Many corpses look bloated from the heat and have turned a sickly yellow-green.  Weapons are rusted or, in some cases, coated with a nasty goo that looks quite poisonous.  The swarm of flies feasts upon dead and living alike, undoubtedly spreading nasty diseases with every bite.  All in all, this place seems like an extremely dangerous place to hold a battle. "
+        },
+        {
+          "keywords": [
+            "army",
+            "armies",
+            "battle"
+          ],
+          "text": "Each army seems to be composed solely of one type of creature: goblins, drow, harpies, hellhounds and the like.  No single army has a definate advantage, since the terrain is constantly shifting and a good position one moment may be completely undone with a surprise avalanche.  Demons float over the armies, overseeing the battles and occasionally descending and whipping a certain army to a certain goal. "
+        }
+      ]
+    },
+    {
+      "id": "2216",
+      "name": "Demonic Arena",
+      "description": "Dark black sand, pools of blood and bits of flesh make up what could be called terrain in this massive arena of darkness. The walls are made of ancient stone made into arches that support the grand stands that sit upon them. Glowing red eyes gleam out towards the arena from iron gateways that appear within each archway. Loud chanting is deafening as demonic forms scream for death from the grand stands that surround the entire arena. A gigantic throne sits to the north end of the arena, empty save for flashes of lightning that seem to hover in mid-air immediately above its great seat. ",
+      "flags": [
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "STRUCTURE",
+      "exits": {
+        "West": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2269"
+        }
+      },
+      "extras": [
+        {
+          "keywords": [
+            "stands"
+          ],
+          "text": "Demonic forms clutter the great stands of this arena. Different forms from large ogres to smaller goblins all chanting for death. All chanting toward the great throne toward the north, chanting for Ac.... "
+        },
+        {
+          "keywords": [
+            "walls",
+            "archway",
+            "stone"
+          ],
+          "text": "Ancient stones abound these great walls. Dark red in color or just tainted from all the blood that has splattered on them over the ages, they stand with great presence and dominate the surroundings. Each stone seems to have demonic etchings carved into it, unique from the others but pulsating with great power. "
+        },
+        {
+          "keywords": [
+            "throne",
+            "lightning",
+            "seat"
+          ],
+          "text": "A massive stone throne, outlined with polished charcoal black marble, stands erect at the northern edge of the arena. It's large glowing emblem showing it's relative vacancy. Although it seems empty a mighty presence still manages to make itself known as bright flashes of lightning periodically reveal the outline of a giganic being. "
+        },
+        {
+          "keywords": [
+            "emblem"
+          ],
+          "text": "Two half crescents, one pointing to the sky and the other pointing toward the ground, overlap each other every so slightly as they are intersected vertically by a large lightning bolt. "
+        }
+      ]
+    },
+    {
+      "id": "2217",
+      "name": "The Crimson Vault",
+      "description": "Beaten copper, delicate threads of red gold, radiantly shining rubies, deep mahogany and every other imaginable precious thing red in color line the walls of this room.  No exits are visible, but a large mirror with a frame lined in scarlet silk shows a constantly shifting landscape: now fire, now plains, now a sea.  Utterly silent except for a sound of heavy breathing, the apparent peacefulness of this vault is unnerving after the constant conflict elsewhere in the Hells.  Though earthly riches abound here, what use are they if there is no escape? ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "AVERNUS",
+      "extras": [
+        {
+          "keywords": [
+            "mirror",
+            "frame",
+            "silk"
+          ],
+          "text": "A long oval mirror set horizontal rather than the customary alignment of vertical flashes continuously with images of this plane and others.  Cities past and present vie with images of volcanoes, whirlpools, tornadoes and other places of heavy activity, be it mortal or natural in nature.  The frame is a work of art in itself: the scarlet silk that edges the mirror is embroidered with golden runes of magic and slender outlines of fantastical creatures doing battle.  Its value alone would be worth the price of a soul. "
+        }
+      ]
+    },
+    {
+      "id": "2218",
+      "name": "The Rift Citadel",
+      "description": "Here in the top room of a massive citadel, far larger than any earthly structure, the walls are made of dull ebon and lustrous obsidian alternating in ways that hurt the mind.  Arched windows overlook a sickly swirling rift in the fabric of space-time that surrounds the citadel which insistently draws the eyes away from the other features in the room.  Almost by an act of will, the windows can be ignored and the rest of the room observed.  Lavishly decorated with priceless items beautiful and terrible ranging from sculptures to weapons to paintings, the center of the room is taken up by a large desk forged from the souls of the damned facing the Rift in the center of a giant pentagram inscribed in blood.  This is surely one of the prime centers of power in Hell. There are no visible exits. ",
+      "flags": [
+        "INDOORS",
+        "NOTRACK",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "NOSHIFT"
+      ],
+      "sector": "STRUCTURE",
+      "extras": [
+        {
+          "keywords": [
+            "window",
+            "windows",
+            "arched",
+            "rift"
+          ],
+          "text": "Windows arched into gothic points appear on all sides of the circular room, though an especially large one rises to the north.  Flashing with colors that change almost too quickly for the mind to comprehend, scenery which may be real and may just be a trick of the eyes, and warped textures that make it impossible to tell the distance between here and there, the Rift is massive in both size and power.  Someone who could control it would have access to any plane they wished, at any time in its history.  In other words, it would take a true planewalker to go any nearer without having their minds and bodies torn asunder, but the reward would be beyond imagining. "
+        },
+        {
+          "keywords": [
+            "center",
+            "desk",
+            "souls",
+            "pentagram",
+            "blood"
+          ],
+          "text": "In the dead center of the room facing the largest window is a massive desk made of the swirling grey-black mass that is the physical appearance of forged souls.  The pentagram it sits in the exact center of is arranged so that on point faces west, one south, one east and two north.  The pentagram is formed by a shallow trough in the floor that is filled with constantly moving, steaming hot blood.  The chair set at the desk is almost a throne; and why should it not be, as this is the seat of power of Crown Prince Belial himself? "
+        }
+      ]
+    },
+    {
+      "id": "2269",
+      "name": "Amid the Nine Hells",
+      "description": "You have entered a looming hall that stretches about five hundred feet, with vaulted ceiling and elaborate pillars running then length.  The smooth marble used in its construct absorbs nearly all light, casting a soft, almost ethereal, reflection of all things nearby.  Grand architectural carvings border the top of each wall with runic inscriptions found etched center wall at metered intervals, centered on brightly burning sconces. ",
+      "flags": [
+        "INDOORS",
+        "PRIVATE",
+        "GODROOM",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON",
+        "ALWAYSLIT"
+      ],
+      "sector": "STRUCTURE",
+      "exits": {
+        "East": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2216"
+        },
+        "South": {
+          "description": "",
+          "keyword": "",
+          "key": "0",
+          "destination": "2216"
+        }
+      }
+    },
+    {
+      "id": "2299",
+      "name": "The Reaper's Lair",
+      "description": "The smell of death permeates the stale air of this filthy looking room. Countless skulls from the Reaper's past victims line the walls and litter the floor.  Candles of various sizes illuminate the rather large room, casting eerie flickering shadows that seem to have lives of their own.  The only noise that can be heard is the steady sound of dripping water echoing across the room from an unseen source. ",
+      "flags": [
+        "INDOORS",
+        "PEACEFUL",
+        "NOMAGIC",
+        "PRIVATE",
+        "NOWELL",
+        "NORECALL",
+        "NOSUMMON"
+      ],
+      "sector": "STRUCTURE",
+      "exits": {
+        "East": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2201"
+        },
+        "West": {
+          "description": "",
+          "keyword": "",
+          "key": "-1",
+          "destination": "2269"
+        }
+      }
+    }
+  ]
+}

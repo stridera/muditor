@@ -1,0 +1,3182 @@
+{
+    "zone": {
+        "id": "558",
+        "name": "the Eastern Eldorian Foothills",
+        "top": 55899,
+        "lifespan": 20,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "OCEANIC",
+        "resets": {
+            "remove": [
+                {
+                    "room": 55821,
+                    "id": 55804,
+                    "name": "(a freshwater creek)"
+                }
+            ],
+            "object": [
+                {
+                    "id": 55804,
+                    "max": 7,
+                    "room": 55821,
+                    "name": "(a freshwater creek)"
+                }
+            ],
+            "mob": [
+                {
+                    "id": 55244,
+                    "max": 1,
+                    "room": 55821,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55835,
+                    "name": "(a white-tailed deer)",
+                    "carrying": [
+                        {
+                            "id": 55803,
+                            "max": 5,
+                            "name": "(a deer tail)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55815,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55815,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55815,
+                    "name": "(a white-tailed deer)",
+                    "carrying": [
+                        {
+                            "id": 55803,
+                            "max": 5,
+                            "name": "(a deer tail)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55871,
+                    "name": "(a white-tailed deer)",
+                    "carrying": [
+                        {
+                            "id": 55803,
+                            "max": 5,
+                            "name": "(a deer tail)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55800,
+                    "name": "(a small brown rabbit)",
+                    "carrying": [
+                        {
+                            "id": 55802,
+                            "max": 99,
+                            "name": "(a warm bit of fresh rabbit meat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55800,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55830,
+                    "name": "(a small brown rabbit)",
+                    "carrying": [
+                        {
+                            "id": 55802,
+                            "max": 99,
+                            "name": "(a warm bit of fresh rabbit meat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55830,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55899,
+                    "name": "(a small brown rabbit)",
+                    "carrying": [
+                        {
+                            "id": 55802,
+                            "max": 99,
+                            "name": "(a warm bit of fresh rabbit meat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55803,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55811,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55824,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55829,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55859,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55859,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55876,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55224,
+                    "max": 26,
+                    "room": 55892,
+                    "name": "(a wild horse)",
+                    "carrying": [
+                        {
+                            "id": 55801,
+                            "max": 99,
+                            "name": "(a chunk of horsemeat)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55819,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55819,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55842,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55842,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55851,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55851,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55858,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55858,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55896,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55210,
+                    "max": 61,
+                    "room": 55896,
+                    "name": "(a small grey squirrel)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55816,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55816,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55853,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55212,
+                    "max": 55,
+                    "room": 55877,
+                    "name": "(a small brown rabbit)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55801,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55823,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55852,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55858,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55875,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55879,
+                    "name": "(a white-tailed deer)"
+                },
+                {
+                    "id": 55214,
+                    "max": 55,
+                    "room": 55898,
+                    "name": "(a white-tailed deer)"
+                }
+            ]
+        }
+    },
+    "mobs": [],
+    "objects": [
+        {
+            "id": 55801,
+            "type": "FOOD",
+            "keywords": [
+                "horsemeat",
+                "horse",
+                "meat",
+                "chunk",
+                "food"
+            ],
+            "short": "a chunk of horsemeat",
+            "ground": "A warm chunk of fresh horsemeat lies here getting dirty.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "horsemeat",
+                        "horse",
+                        "meat",
+                        "chunk",
+                        "food"
+                    ],
+                    "text": "This warm bit of horsemeat has a gamey scent."
+                }
+            ],
+            "values": {
+                "Filling": 7,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 5,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 55802,
+            "type": "FOOD",
+            "keywords": [
+                "meat",
+                "fresh",
+                "rabbit",
+                "warm",
+                "bit",
+                "piece",
+                "food"
+            ],
+            "short": "a warm bit of fresh rabbit meat",
+            "ground": "A warm piece of rabbit meat lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "fresh",
+                        "rabbit",
+                        "meat",
+                        "warm",
+                        "bit",
+                        "piece"
+                    ],
+                    "text": "It looks like raw meat."
+                }
+            ],
+            "values": {
+                "Filling": 4,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.5,
+            "cost": 5,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 55803,
+            "type": "OTHER",
+            "keywords": [
+                "tail",
+                "deer-tail"
+            ],
+            "short": "a deer tail",
+            "ground": "A deer tail, disattached from its owner, lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "deer-tail"
+                    ],
+                    "text": "It is a little white deer tail which has little strips of brown down the side."
+                }
+            ],
+            "values": {},
+            "flags": [],
+            "weight": 0.08,
+            "cost": 50,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "BELT"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 55804,
+            "type": "FOUNTAIN",
+            "keywords": [
+                "creek",
+                "freshwater",
+                "water"
+            ],
+            "short": "a freshwater creek",
+            "ground": "A freshwater creek burbles through here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "water",
+                        "freshwater",
+                        "fresh",
+                        "creek"
+                    ],
+                    "text": "It's full of absolutely, crystal clear water. The stones that make up its bed are easily seen."
+                }
+            ],
+            "values": {
+                "Capacity": 9999,
+                "Remaining": 9999,
+                "Liquid": "WATER",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 9999.0,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "triggers": [
+                2806
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "55800",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55804"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55801"
+                }
+            }
+        },
+        {
+            "id": "55801",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55805"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55800"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55802"
+                }
+            }
+        },
+        {
+            "id": "55802",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55806"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55801"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55803"
+                }
+            }
+        },
+        {
+            "id": "55803",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55807"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55802"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "5500"
+                }
+            }
+        },
+        {
+            "id": "55804",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55810"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55800"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55805"
+                }
+            }
+        },
+        {
+            "id": "55805",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55804"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55801"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55806"
+                }
+            }
+        },
+        {
+            "id": "55806",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is mostly the same. Small woodland creatures scurry about, and though normally at peace with the woods something is amiss to the south east.  Smoke rises from a large hill to the south and west and tracks can be seen exiting the road to the south.  The road continues north and east.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55812"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55805"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55802"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55807"
+                }
+            }
+        },
+        {
+            "id": "55807",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55813"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55806"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55803"
+                }
+            }
+        },
+        {
+            "id": "55808",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55814"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "7077"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55809"
+                }
+            }
+        },
+        {
+            "id": "55809",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55815"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55808"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55810"
+                }
+            }
+        },
+        {
+            "id": "55810",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surronding hills look inviting.  The road continues to the east and south.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55816"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55809"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55804"
+                }
+            }
+        },
+        {
+            "id": "55811",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55817"
+                }
+            }
+        },
+        {
+            "id": "55812",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55818"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55806"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55813"
+                }
+            }
+        },
+        {
+            "id": "55813",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55819"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55812"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55807"
+                }
+            }
+        },
+        {
+            "id": "55814",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55808"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55815"
+                }
+            }
+        },
+        {
+            "id": "55815",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55826"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55814"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55809"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55816"
+                }
+            }
+        },
+        {
+            "id": "55816",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55827"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55815"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55810"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55817"
+                }
+            }
+        },
+        {
+            "id": "55817",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55816"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55811"
+                }
+            }
+        },
+        {
+            "id": "55818",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55845"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55812"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55819"
+                }
+            }
+        },
+        {
+            "id": "55819",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55829"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55818"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55813"
+                }
+            }
+        },
+        {
+            "id": "55820",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55830"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55821"
+                }
+            }
+        },
+        {
+            "id": "55821",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55820"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55822"
+                }
+            }
+        },
+        {
+            "id": "55822",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55832"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55821"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55823"
+                }
+            }
+        },
+        {
+            "id": "55823",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55833"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55822"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55824"
+                }
+            }
+        },
+        {
+            "id": "55824",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55843"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55823"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55825"
+                }
+            }
+        },
+        {
+            "id": "55825",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55834"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55824"
+                }
+            }
+        },
+        {
+            "id": "55826",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55815"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55827"
+                }
+            }
+        },
+        {
+            "id": "55827",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55826"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55816"
+                }
+            }
+        },
+        {
+            "id": "55828",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55835"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55845"
+                }
+            }
+        },
+        {
+            "id": "55829",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55845"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55819"
+                }
+            }
+        },
+        {
+            "id": "55830",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55820"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55831"
+                }
+            }
+        },
+        {
+            "id": "55831",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55839"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55830"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55832"
+                }
+            }
+        },
+        {
+            "id": "55832",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55840"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55831"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55822"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55833"
+                }
+            }
+        },
+        {
+            "id": "55833",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55841"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55832"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55823"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55843"
+                }
+            }
+        },
+        {
+            "id": "55834",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55842"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55843"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55825"
+                }
+            }
+        },
+        {
+            "id": "55835",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the south and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55847"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55828"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55836"
+                }
+            }
+        },
+        {
+            "id": "55836",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55848"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55835"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55837"
+                }
+            }
+        },
+        {
+            "id": "55837",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55849"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55836"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55838"
+                }
+            }
+        },
+        {
+            "id": "55838",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55850"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55837"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55839"
+                }
+            }
+        },
+        {
+            "id": "55839",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55851"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55838"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55831"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55840"
+                }
+            }
+        },
+        {
+            "id": "55840",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55852"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55839"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55832"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55841"
+                }
+            }
+        },
+        {
+            "id": "55841",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55853"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55840"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55833"
+                }
+            }
+        },
+        {
+            "id": "55842",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55844"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55834"
+                }
+            }
+        },
+        {
+            "id": "55843",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and east.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55844"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55833"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55824"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55834"
+                }
+            }
+        },
+        {
+            "id": "55844",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55854"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55843"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55842"
+                }
+            }
+        },
+        {
+            "id": "55845",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55828"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55818"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55829"
+                }
+            }
+        },
+        {
+            "id": "55846",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55847"
+                }
+            }
+        },
+        {
+            "id": "55847",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55846"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55835"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55848"
+                }
+            }
+        },
+        {
+            "id": "55848",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55847"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55836"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55849"
+                }
+            }
+        },
+        {
+            "id": "55849",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55848"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55837"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55850"
+                }
+            }
+        },
+        {
+            "id": "55850",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and the Great Northern Road passes near here.  Looks like a good spot for a nap.",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55849"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55838"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55851"
+                }
+            }
+        },
+        {
+            "id": "55851",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55850"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55839"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55852"
+                }
+            }
+        },
+        {
+            "id": "55852",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55851"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55840"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55853"
+                }
+            }
+        },
+        {
+            "id": "55853",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55852"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55841"
+                }
+            }
+        },
+        {
+            "id": "55854",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the west and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55860"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55844"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55855"
+                }
+            }
+        },
+        {
+            "id": "55855",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55861"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55854"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55856"
+                }
+            }
+        },
+        {
+            "id": "55856",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55862"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55855"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55857"
+                }
+            }
+        },
+        {
+            "id": "55857",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and east.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55863"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55856"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55858"
+                }
+            }
+        },
+        {
+            "id": "55858",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55864"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55857"
+                }
+            }
+        },
+        {
+            "id": "55859",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55865"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55860"
+                }
+            }
+        },
+        {
+            "id": "55860",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55859"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55854"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55861"
+                }
+            }
+        },
+        {
+            "id": "55861",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55860"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55855"
+                }
+            }
+        },
+        {
+            "id": "55862",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55856"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55863"
+                }
+            }
+        },
+        {
+            "id": "55863",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55869"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55862"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55857"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55864"
+                }
+            }
+        },
+        {
+            "id": "55864",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55870"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55863"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55858"
+                }
+            }
+        },
+        {
+            "id": "55865",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55871"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55859"
+                }
+            }
+        },
+        {
+            "id": "55866",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55872"
+                }
+            }
+        },
+        {
+            "id": "55867",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55873"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55868"
+                }
+            }
+        },
+        {
+            "id": "55868",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55874"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55867"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55869"
+                }
+            }
+        },
+        {
+            "id": "55869",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the south and east.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55875"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55868"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55863"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55870"
+                }
+            }
+        },
+        {
+            "id": "55870",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55869"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55864"
+                }
+            }
+        },
+        {
+            "id": "55871",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55882"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55865"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55872"
+                }
+            }
+        },
+        {
+            "id": "55872",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55883"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55871"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55866"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55873"
+                }
+            }
+        },
+        {
+            "id": "55873",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55884"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55872"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55867"
+                }
+            }
+        },
+        {
+            "id": "55874",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55868"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55875"
+                }
+            }
+        },
+        {
+            "id": "55875",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55874"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55869"
+                }
+            }
+        },
+        {
+            "id": "55876",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55887"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55877"
+                }
+            }
+        },
+        {
+            "id": "55877",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55888"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55876"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55878"
+                }
+            }
+        },
+        {
+            "id": "55878",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55889"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55877"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55904"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55879"
+                }
+            }
+        },
+        {
+            "id": "55879",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55890"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55878"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55905"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55880"
+                }
+            }
+        },
+        {
+            "id": "55880",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the north and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55891"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55879"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55906"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55881"
+                }
+            }
+        },
+        {
+            "id": "55881",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55892"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55880"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55907"
+                }
+            }
+        },
+        {
+            "id": "55882",
+            "name": "The Black Woods Trail",
+            "description": "The trail is made up of tracks of wagons and verious beast.  There is little sign of anyone mantaining it.  The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and the Great Northern Road is to the west of here.  Looks like a good spot for a nap.  The balck woods trail lay to the north and west.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55893"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55871"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55883"
+                }
+            }
+        },
+        {
+            "id": "55883",
+            "name": "The Black Woods Trail",
+            "description": "The trail is made up of tracks of wagons and verious beast.  There is little sign of anyone mantaining it.  The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and the Great Northern Road is to the west of here.  Looks like a good spot for a nap.  The black woods trail lay to the east.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55894"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55882"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55872"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55884"
+                }
+            }
+        },
+        {
+            "id": "55884",
+            "name": "A T-Crossing in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. The black woods trail can be seen to the east and Eldorian foothills to the north.  The woods and surounding hills look inviting. The Great Northern Road continues to the south and west.  ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55895"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55883"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55873"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55885"
+                }
+            }
+        },
+        {
+            "id": "55885",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55896"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55884"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55886"
+                }
+            }
+        },
+        {
+            "id": "55886",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55897"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55885"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55887"
+                }
+            }
+        },
+        {
+            "id": "55887",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55898"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55886"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55876"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55888"
+                }
+            }
+        },
+        {
+            "id": "55888",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55899"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55887"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55877"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55889"
+                }
+            }
+        },
+        {
+            "id": "55889",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55900"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55888"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55878"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55890"
+                }
+            }
+        },
+        {
+            "id": "55890",
+            "name": "The Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and west.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55901"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55889"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55879"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55891"
+                }
+            }
+        },
+        {
+            "id": "55891",
+            "name": "A Turn in the Great Northern Road",
+            "description": "The road continues through the hills and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature. Open fields can be seen in the distance and a the woods of the surrounding hills look inviting.  Looks like a good spot for a nap.  The road continues to the east and south.    ",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55902"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55890"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55880"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55892"
+                }
+            }
+        },
+        {
+            "id": "55892",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55903"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55891"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55881"
+                }
+            }
+        },
+        {
+            "id": "55893",
+            "name": "The Black Woods Trail",
+            "description": "The trail is made up of tracks of wagons and verious beast.  There is little sign of anyone mantaining it.  The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and the Great Northern Road is to the west of here.  Looks like a good spot for a nap.  The black woods trail lay to the north and south.",
+            "flags": [],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55212"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55882"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55894"
+                }
+            }
+        },
+        {
+            "id": "55894",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55893"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55883"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55895"
+                }
+            }
+        },
+        {
+            "id": "55895",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and the Great Northern Road passes near here.  The hills drop away to the north.  You could climb into the treetops from here if you were daring enough.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "48450"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55894"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55884"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55896"
+                }
+            }
+        },
+        {
+            "id": "55896",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55895"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55885"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55897"
+                }
+            }
+        },
+        {
+            "id": "55897",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55896"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55886"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55898"
+                }
+            }
+        },
+        {
+            "id": "55898",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55897"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55887"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55899"
+                }
+            }
+        },
+        {
+            "id": "55899",
+            "name": "The Eldorian Foothills",
+            "description": "The hills roll softly and the view is breathtaking.  Small woodland creatures scurry about and you feel at peace in this serene nature.  Open fields can be seen in the distance and a the Great Northern Road passes near here.  Looks like a good spot for a nap.    ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55898"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55888"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55900"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,3249 @@
+{
+    "zone": {
+        "id": "363",
+        "name": "Smuggler's Hideout",
+        "top": 36399,
+        "lifespan": 15,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 36306,
+                    "max": 1,
+                    "room": 36319,
+                    "name": "(the chief smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36305,
+                            "max": 4,
+                            "location": 26,
+                            "name": "(the smuggler's key)"
+                        },
+                        {
+                            "id": 36301,
+                            "max": 50,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 99,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 99,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36303,
+                    "max": 10,
+                    "room": 36319,
+                    "name": "(a smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36304,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a spetum)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 99,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36329,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36302,
+                    "max": 1,
+                    "room": 36329,
+                    "name": "(a cougar)"
+                },
+                {
+                    "id": 36304,
+                    "max": 4,
+                    "room": 36329,
+                    "name": "(a smuggler)"
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36327,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36303,
+                    "max": 10,
+                    "room": 36337,
+                    "name": "(a smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36304,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a spetum)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36303,
+                    "max": 10,
+                    "room": 36325,
+                    "name": "(a smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36304,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a spetum)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36303,
+                    "max": 10,
+                    "room": 36335,
+                    "name": "(a smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36304,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a spetum)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36301,
+                    "max": 1,
+                    "room": 36336,
+                    "name": "(the smuggler's leader)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 50,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36365,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "TwoHandWield",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36359,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "TwoHandWield",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36349,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "TwoHandWield",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36318,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36304,
+                    "max": 4,
+                    "room": 36318,
+                    "name": "(a smuggler)"
+                },
+                {
+                    "id": 36303,
+                    "max": 10,
+                    "room": 36315,
+                    "name": "(a smuggler guard)",
+                    "equipped": [
+                        {
+                            "id": 36304,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a spetum)"
+                        },
+                        {
+                            "id": 1101,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a studded leather jacket)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36333,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 50,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        }
+                    ],
+                    "carrying": [
+                        {
+                            "id": 1006,
+                            "max": 50,
+                            "name": "(a leather waterskin)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36316,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36304,
+                    "max": 4,
+                    "room": 36316,
+                    "name": "(a smuggler)"
+                },
+                {
+                    "id": 36300,
+                    "max": 18,
+                    "room": 36317,
+                    "name": "(a smuggler)",
+                    "equipped": [
+                        {
+                            "id": 36301,
+                            "max": 99,
+                            "location": "Eyes",
+                            "name": "(a smuggler's blade)"
+                        },
+                        {
+                            "id": 1001,
+                            "max": 50,
+                            "location": 26,
+                            "name": "(a cloth sack)"
+                        },
+                        {
+                            "id": 1106,
+                            "max": 50,
+                            "location": "Arms",
+                            "name": "(sturdy leather boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36305,
+                    "max": 5,
+                    "room": 36301,
+                    "name": "(a mountain lion)"
+                },
+                {
+                    "id": 36305,
+                    "max": 5,
+                    "room": 36314,
+                    "name": "(a mountain lion)"
+                },
+                {
+                    "id": 36305,
+                    "max": 5,
+                    "room": 36302,
+                    "name": "(a mountain lion)"
+                },
+                {
+                    "id": 36304,
+                    "max": 4,
+                    "room": 36332,
+                    "name": "(a smuggler)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 36319,
+                    "direction": "West",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 36325,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36335,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36336,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36333,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36338,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36320,
+                    "direction": "East",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 36324,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36326,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36330,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36332,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36331,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 36370,
+                    "direction": "Up",
+                    "state": [
+                        "CLOSED"
+                    ]
+                }
+            ],
+            "object": [
+                {
+                    "id": 36302,
+                    "max": 1,
+                    "room": 36336,
+                    "name": "(the smuggler's log book)"
+                },
+                {
+                    "id": 36300,
+                    "max": 9,
+                    "room": 36318,
+                    "name": "(a crate)",
+                    "contains": [
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 9,
+                    "room": 36316,
+                    "name": "(a crate)",
+                    "contains": [
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        }
+                    ]
+                },
+                {
+                    "id": 36300,
+                    "max": 9,
+                    "room": 36317,
+                    "name": "(a crate)",
+                    "contains": [
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        },
+                        {
+                            "id": 36303,
+                            "max": 99,
+                            "container": 36300,
+                            "name": "(a dozen donuts)"
+                        }
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 36300,
+            "keywords": "smuggler mean man",
+            "mob_class": "Rogue",
+            "short_desc": "a smuggler",
+            "long_desc": "A mean looking smuggler glares at you.",
+            "desc": "He's a large fellow, with huge, muscular arms and a narrow waist. He has a neatly tended moustache that curls up at the ends slightly, and his head is shaved. He wears only ragged leather clothes.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -350,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 76,
+                "wisdom": 68,
+                "dexterity": 83,
+                "constitution": 30,
+                "charisma": 65
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 36301,
+            "keywords": "leader smuggler man huge gannigan",
+            "mob_class": "Warrior",
+            "short_desc": "the smuggler's leader",
+            "long_desc": "The huge man before you is the leader of the smugglers.  He looks very upset.",
+            "desc": "He is a huge man, bulging with muscles, a veritable mountain of flesh and power. Throbbing veins can be seen to pulse on the surface of his shaved head. He does not appear to be terribly intelligent, given the way he mumbles to himself.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "MEMORY",
+                "HELPER",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": -375,
+            "level": 14,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 88,
+                "intelligence": 74,
+                "wisdom": 73,
+                "dexterity": 76,
+                "constitution": 30,
+                "charisma": 60
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 36302,
+            "keywords": "cougar",
+            "mob_class": "Warrior",
+            "short_desc": "a cougar",
+            "long_desc": "A cougar lies curled up on the floor in front of the fireplace.",
+            "desc": "This cougar is apparently domesticated.  He lies curled up on the floor in front of the huge fireplace.  A metal chain attached to the wall snakes down to a collar around his neck.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 11,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 1,
+            "default_position": 1,
+            "gender": 1,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 66,
+                "wisdom": 68,
+                "dexterity": 85,
+                "constitution": 30,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Resting",
+            "damage_type": "CLAW"
+        },
+        {
+            "id": 36303,
+            "keywords": "guard smuggler huge man",
+            "mob_class": "Mercenary",
+            "short_desc": "a smuggler guard",
+            "long_desc": "A huge man with his arms crossed stands in front of you, barring your way.",
+            "desc": "A huge man well over 6' tall stands before you.  He glares down at you with undisguised hatred.  You notice another look in his eye...anticipation? Yes, he is just looking for the slightest reason to pound you to a pulp. You can see as it dawns on him.  You are trespassing.  He moves in....",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "MEMORY"
+            ],
+            "effect_flags": [],
+            "alignment": -375,
+            "level": 12,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 89,
+                "intelligence": 68,
+                "wisdom": 74,
+                "dexterity": 82,
+                "constitution": 30,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 36304,
+            "keywords": "woman smuggler female",
+            "mob_class": "Rogue",
+            "short_desc": "a smuggler",
+            "long_desc": "A woman dressed in tattered rags shifts though a box, unaware of your presence.",
+            "desc": "She is a fairly young woman, and under the dirt smudging her features, she doesn't look unattractive. She wears tattered rags, and her hands are quite dirty.",
+            "mob_flags": [
+                "SENTINEL",
+                "SCAVENGER",
+                "ISNPC",
+                "WIMPY"
+            ],
+            "effect_flags": [],
+            "alignment": -120,
+            "level": 7,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 91,
+                "intelligence": 83,
+                "wisdom": 73,
+                "dexterity": 72,
+                "constitution": 30,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 36305,
+            "keywords": "lion mountain-lion mountain",
+            "mob_class": "Warrior",
+            "short_desc": "a mountain lion",
+            "long_desc": "A ferocious looking mountain lion growls at you.",
+            "desc": "This mountain lion watches its surroundings carefully, letting out a loud growl whenever it notices movement.  The large cat is sleek and beautiful, with a long flowing mane.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "FAST_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 8,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 85,
+                "intelligence": 75,
+                "wisdom": 68,
+                "dexterity": 81,
+                "constitution": 30,
+                "charisma": 58
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "POUND"
+        },
+        {
+            "id": 36306,
+            "keywords": "guard smuggler huge chief man",
+            "mob_class": "Mercenary",
+            "short_desc": "the chief smuggler guard",
+            "long_desc": "A tall muscular guard strides around shouting at people.",
+            "desc": "This guard has risen to the chief guard position by being crueller and nastier than any of the others.  He will quite happily grind you into the dust if he even thinks you look like you are considering irritating him.  Luckily for you he is quite busy shouting at people at the moment.  He has a large scar around half his neck where someone has tried and failed to cut his throat. Presumably that person is no longer among the living.    ",
+            "mob_flags": [
+                "ISNPC",
+                "AWARE",
+                "MEMORY",
+                "HELPER",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": -500,
+            "level": 13,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 94,
+                "intelligence": 74,
+                "wisdom": 71,
+                "dexterity": 76,
+                "constitution": 76,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "CRUSH"
+        }
+    ],
+    "objects": [
+        {
+            "id": 36300,
+            "type": "CONTAINER",
+            "keywords": [
+                "crate",
+                "giant",
+                "wood"
+            ],
+            "short": "a crate",
+            "ground": "A giant crate made of wooden planks sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "crate",
+                        "giant",
+                        "wooden"
+                    ],
+                    "text": "This giant crate is made of wooden planks.  It looks like it was made by someone who didn't exactly know what he was doing.  There are gaps between some of the planks and some of the nails are bent.  But, it functions quite well as a crate."
+                }
+            ],
+            "values": {
+                "Capacity": 75,
+                "Flags": [
+                    "Closeable",
+                    "Closed"
+                ],
+                "Key": -1,
+                "IsCorpse": false,
+                "Weight Reduction": 0.0
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 14.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 20,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 36301,
+            "type": "WEAPON",
+            "keywords": [
+                "blade",
+                "smuggler's-blade",
+                "finely",
+                "crafted",
+                "smugglers-blade"
+            ],
+            "short": "a smuggler's blade",
+            "ground": "A finely crafted blade gleams in the light.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "smuggler's-blade",
+                        "finely",
+                        "crafted",
+                        "smugglers-blade"
+                    ],
+                    "text": "This blade looks like a finely crafted long sword with a slight curve at the time.  The blade is highly polished and extremely sharp.  The hilt is wrapped in soft leather and it is extremely well balanced."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "1",
+                    "size": "6",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "SLASH"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 1.4,
+            "cost": 150,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "affects": [
+                {
+                    "location": "HITROLL",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 36302,
+            "type": "OTHER",
+            "keywords": [
+                "book-log",
+                "log",
+                "book",
+                "black",
+                "log-book"
+            ],
+            "short": "the smuggler's log book",
+            "ground": "A black log book lies on a small table.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "log",
+                        "book",
+                        "black"
+                    ],
+                    "text": "The log book records the activities of the smugglers over the past few weeks: 14 days ago: Smuggled 3 crates of glazed donuts to Helena. 12 days ago: Helena needs 3 crates of jelly donuts and 2 crates of glazed donuts. 10 days ago: Smuggled 3 crates of jelly donuts and 2 crates of glazed donuts. 9 days ago: Guard convention in Mielikki.  Helena needs 12 crates of glazed donuts. 7 days ago: Smuggled 10 crates of glazed donuts. 2 days ago: Helena wants 2 crates of glazed donuts and 5 crates of jelly donuts. Wow! You never realized there was such a market in smuggled donuts!"
+                }
+            ],
+            "values": {},
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 1.1,
+            "cost": 20,
+            "timer": 0,
+            "level": 5,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 36303,
+            "type": "FOOD",
+            "keywords": [
+                "donuts-dozen",
+                "donuts",
+                "dozen",
+                "donut",
+                "dozen-donuts",
+                "food"
+            ],
+            "short": "a dozen donuts",
+            "ground": "A dozen glazed donuts lie here.  They look scrumptious!",
+            "action_desc": "",
+            "values": {
+                "Filling": 10,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 36304,
+            "type": "WEAPON",
+            "keywords": [
+                "spetum",
+                "spear",
+                "long-narrow-point-barbs"
+            ],
+            "short": "a spetum",
+            "ground": "A spear with a long narrow point and barbs lies here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "spetum",
+                        "spear",
+                        "long-narrow-point-barbs"
+                    ],
+                    "text": "The spetum is a vastly improved spear.  It has a long narrow blade with two projections below the thrusting blade which are used to catch an opponent's weapons and disarm her.  However, the spetum is much heavier than a normal spear."
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "1",
+                    "size": "6",
+                    "bonus": 0
+                },
+                "Average": 6.0,
+                "Damage Type": "STAB"
+            },
+            "flags": [
+                "ANTI_SORCERER",
+                "ANTI_CLERIC",
+                "ANTI_DRUID",
+                "ANTI_NECROMANCER",
+                "ANTI_CONJURER"
+            ],
+            "weight": 5.2,
+            "cost": 200,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "WIELD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 36305,
+            "type": "KEY",
+            "keywords": [
+                "smuggler's-key"
+            ],
+            "short": "the smuggler's key",
+            "ground": "A smuggler's key lies in the dust here.",
+            "action_desc": "",
+            "values": {},
+            "flags": [
+                "NORENT"
+            ],
+            "weight": 0.15,
+            "cost": 20,
+            "timer": 0,
+            "level": 6,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 36300,
+            "name": "chief_guard_rant",
+            "attach_type": "Object",
+            "flags": [
+                "Entry"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 2 set rnd %random.char% if %rnd.vnum% == 36303 poke 2.guard glare 2.guard say My granny could do a better job guarding this place than you! whap 2.guard say Chest out! Shoulders back! steam endif "
+        },
+        {
+            "id": 36301,
+            "name": "Smugg_leader_greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* This is to engage anyone walking in msend %actor% %self.name% looks around quickly. if %actor.level% > 99 say Hehe, I _am_ honoured to have such a visitor bow else msend %actor% %self.name% stares at you in disbelief. mechoaround %actor% %self.name% stares at %actor.name% in disbelief. say What the HELL do you think you are DOING!? say You just made the last mistake of your miserable existence! kill %actor.name% end "
+        },
+        {
+            "id": 36302,
+            "name": "Smugg_guard_rand1",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "say How am I ever gonna spend my wages stuck in this hole. sigh emote looks dejected. "
+        },
+        {
+            "id": 36303,
+            "name": "Smugg_guard_rand2",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "emote looks around furtively. emote hurriedly munches on a stolen donut. burp blush "
+        },
+        {
+            "id": 36304,
+            "name": "Smugg_guard_greet1",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 40,
+            "argument_list": "",
+            "commands": "* This is a cute lil greet for the chief guard. if %actor.vnum% == 36306 emote snaps to attention. else switch %actor.quest_stage[illusionist_subclass]% case 0 break case 1 case 2 wait 2 s gasp wait 2 s say Cestia!  How nice it is to see you again. wait 3 s smile %actor.name% break case 3 wait 2 s look %actor.name% wait 3 s ponder break case 4 wait 1 s emote looks rather worried. wait 3 s say I hope they don't make it this far.  I'm not that good at fighting! break case 5 wait 1 s glare %actor.name% wait 2 s say Cestia, I heard you brought a posse from Mielikki with you! wait 4 s say We ought to offer you up to them! break case 6 wait 1 s say Aha!  If it isn't the little thief herself! wait 4 kill %actor.name% done end "
+        },
+        {
+            "id": 36305,
+            "name": "Smugg_chief_rand1",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 10,
+            "argument_list": "",
+            "commands": "glare say Something's wrong here, but I just can't put my finger on it. stomp "
+        },
+        {
+            "id": 36306,
+            "name": "Smugg_chief_greet1",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 30,
+            "argument_list": "",
+            "commands": "msent %actor% The chief guard frisks you quickly and expertly for donuts. mechoaround %actor% The chief guard frisks %actor.name% quickly and expertly for donuts. grumble say Someone's stealing them... fume "
+        },
+        {
+            "id": 36307,
+            "name": "Smugg_chief_entry1",
+            "attach_type": "Object",
+            "flags": [
+                "Entry"
+            ],
+            "number_of_arguments": 30,
+            "argument_list": "",
+            "commands": "say There'd better not be any pinching of donuts going on round, here. peer 2.smuggler say It will come out of your wages if there is. glare "
+        },
+        {
+            "id": 36308,
+            "name": "Smugg_chief_entry2",
+            "attach_type": "Object",
+            "flags": [
+                "Entry"
+            ],
+            "number_of_arguments": 30,
+            "argument_list": "",
+            "commands": "emote shouts, 'Ok, lets get those crates moving people.' whap 2.smuggler emote shouts, 'Move it, move it, MOVE IT!' "
+        },
+        {
+            "id": 36309,
+            "name": "Ill-subclass: Invasion illusion ***NOT USED***",
+            "attach_type": "Mobile",
+            "flags": [
+                "Global"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 3 s wzoneecho &5The scent of magic is discernable, as a spell builds.&0 wecho &5The scent of magic is discernable, as a spell builds.&0 wait 7 s wzoneecho &5The magical force is still spreading, and remains low-key.&0 wecho &5The magical force is still spreading, and remains low-key.&0 wait 7 s wzoneecho &5A spell seems to be coming together.  Slowly, it builds.&0 wecho &5A spell seems to be coming together.  Slowly, it builds.&0 wait 5 s wzoneecho &5Something supernatural is beginning to coalesce - and the sounds of a militant&0 wzoneecho &0&5crowd are beginning to rise above the threshold of hearing.&0 wecho &5Something supernatural is beginning to coalesce - and the sounds of a militant&0 wecho &0&5crowd are beginning to rise above the threshold of hearing.&0 wait 7 s wzoneecho &7&bSuddenly, a shout is heard!  It is joined by others, and the sounds of battle commence!&0 wecho &7&bSuddenly, a shout is heard!  It is joined by others, and the sounds of battle commence!&0 wait 2 s * Now, if Gannigan and the quester are in here, Gannigan should react accordingly. set gannigan 0 set quester 0 set person %self.people% while %person% if %person.vnum% == 36301 set gannigan %person% elseif %person.vnum% == -1 && %person.quest_stage[illusionist_subclass]% > 1 set quester %person% end set person %person.next_in_room% done if %quester% && %gannigan% if %quester.quest_stage[illusionist_subclass]% == 2 wecho Test 3 wforce %gannigan% say What?!  They attack?  Can Mielikki have gone mad? wait 2 s wforce %gannigan% say Cestia, you must hide.  Do you recall the incantation? wforce %gannigan% say The one that will reveal the passage above the falls? quest advance illusionist_subclass %quester.name% quest advance illusionist_subclass %quester.name% elseif %quester.quest_stage[illusionist_subclass]% == 3 wforce %gannigan% say An attack?  Cestia!  What have you done?  It is betrayal! wait 2 s wforce %gannigan% glare %quester.name% wait 2 s wforce %gannigan% say You will not destroy me.  But I cannot bring myself to raise my sword against you. quest advance illusionist_subclass %quester.name% quest advance illusionist_subclass %quester.name% end end "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "36300",
+            "name": "Light Mountain Trail",
+            "description": "You push through the brush and stumble upon a narrow trail that climbs up between two mountains.  The mountains rise up to the north and south and the path widens to the east. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36302"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "3539"
+                }
+            }
+        },
+        {
+            "id": "36301",
+            "name": "Grassy Hill",
+            "description": "You are standing on a small hill covered in rich green grass.  This would make the perfect picnic spot.  From here you have a perfect view of the waterfall that lies off in the distance to the north.  Steep mountains surround this spot.  A mountain trail leads north, and a narrow pass goes south into the hills. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36306"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "50248"
+                }
+            }
+        },
+        {
+            "id": "36302",
+            "name": "Light Mountain Trail",
+            "description": "The trail continues to wind between the two mountains, continuing off to the east and west.  Just under the wind, you think you hear a low, continuous roar. You can only wonder what lies ahead... ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36303"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36300"
+                }
+            }
+        },
+        {
+            "id": "36303",
+            "name": "Light Mountain Trail",
+            "description": "The mountain trail continues between the two mountains to the north and south.  From here, the trail leads off to the east and west.  You can hear a low roar coming from the east. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36304"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36302"
+                }
+            }
+        },
+        {
+            "id": "36304",
+            "name": "T-Junction in Mountain Trail",
+            "description": "The mountain trail comes to a T-Junction here.  A small pool of sparkling water lies just to the northeast.  The path splits to circle around the pool to the north and west.  Off in the distance, to the northeast, you can see a huge waterfall. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36314"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36305"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36303"
+                }
+            }
+        },
+        {
+            "id": "36305",
+            "name": "Light Mountain Trail",
+            "description": "The mountain trail continues between the sparkling pool to the north and the mountain range to the south.  The trail continues to the east and west. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36312"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36306"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36304"
+                }
+            }
+        },
+        {
+            "id": "36306",
+            "name": "Light Mountain Trail",
+            "description": "The trail continues along the edge of the sparkling pool to the north.  A small hill covered in rich green grass lies just to the south.  The trail continues to the east and west. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36313"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36307"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36301"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36305"
+                }
+            }
+        },
+        {
+            "id": "36307",
+            "name": "Turn in Light Mountain Trail",
+            "description": "The trail turns here to follow along the shores of the small sparkling pool, which lies to the northwest.  The path leads to the north and west from here. The roar of the waterfall, which lies a ways to the north, is quite loud. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36308"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36306"
+                }
+            }
+        },
+        {
+            "id": "36308",
+            "name": "Light Mountain Trail",
+            "description": "You can hear the roar of the waterfall, which lies just to the north.  Off to the west the water of the small pool sparkles in the light.  The mountain trail continues to the north and south. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36309"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36307"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36313"
+                }
+            }
+        },
+        {
+            "id": "36309",
+            "name": "Base of Waterfall",
+            "description": "A huge sheet of water comes crashing down to the north.  The water flows west to form a small pool of sparkling water.  A cavern opens up darkly just east of the waterfall, just beyond a little path edged with flowers.  The smells of fresh mist and wildflowers are pleasant. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "You notice a small crevice between the mountain and the falling water of the waterfall. You wonder if it is possible to walk behind the waterfall... ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36315"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36308"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36310"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "flower",
+                        "flowers"
+                    ],
+                    "text": "They appear to be an ordinary assortment of wildflowers, though they do grow suspiciously thick near the path and the cavern entrance.  There are buttercups and paintbrush, among other plainer flowers. "
+                },
+                {
+                    "keywords": [
+                        "waterfall"
+                    ],
+                    "text": "It is tall, perhaps over one hundred feet.  Much of it has devolved into mist by the time it reaches the ground.  Far up near the top, on the opposite side, there seems to be a platform of some kind in the cliff wall. "
+                }
+            ]
+        },
+        {
+            "id": "36310",
+            "name": "Sparkling Pool (NE)",
+            "description": "You are floating in a small pool of sparkling water.  It is fed by the huge waterfall that comes crashing down just to the east.  The face of a huge mountain towers over you to the north.  The base of the waterfall is to the east, while to the south and west the pool surrounds you. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36309"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36313"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36311"
+                }
+            }
+        },
+        {
+            "id": "36311",
+            "name": "Small Sparkling Pool (NW)",
+            "description": "You are floating in a small pool of sparkling water.  It is fed by a huge waterfall that is off a distance to the east.  To the north and west the huge cliffs of a mountain tower over you.  The pool surrounds you to the east and south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36310"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36312"
+                }
+            }
+        },
+        {
+            "id": "36312",
+            "name": "Sparkling Pool (SW)",
+            "description": "You are floating in a small pool of sparkling water.  It is fed by the huge waterfall a ways to the northeast.  The pool surrounds you to the north and east.  To the south and west a small trail winds its way around the pool. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36311"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36313"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36305"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36314"
+                }
+            }
+        },
+        {
+            "id": "36313",
+            "name": "Sparkling Pool (SE)",
+            "description": "You are floating in a small pool of sparkling water.  It is fed by the huge waterfall a ways to the northeast.  The pool surrounds you to the north and west.  To the south and east a small trail winds its way around the pool. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36310"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36308"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36306"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36312"
+                }
+            }
+        },
+        {
+            "id": "36314",
+            "name": "Light Mountain Trail End",
+            "description": "The mountain trail ends here.  The steep face of a huge mountain rises up before you to the north and west.  To the east is the pool of sparkling water. The mountain trail leads back to the south. ",
+            "flags": [],
+            "sector": "HILLS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36312"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36304"
+                }
+            }
+        },
+        {
+            "id": "36315",
+            "name": "Hidden Cavern",
+            "description": "You step through the small crevice between the mountain and the falling water and emerge in a large cavernous chamber hidden behind the waterfall. The waterfall makes it really humid in here and it takes your eyes a second to adjust to the dimmer light.  The cavern stretches off to the north and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36316"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36309"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36318"
+                }
+            }
+        },
+        {
+            "id": "36316",
+            "name": "Hidden Cavern",
+            "description": "The huge cavern stretches out to the south and west from here.  The roar of the waterfall echoes about the cavern making it hard to hear anything.  You notice that the floor of the cavern has been flattened.  This cavern is obviously used as a hideout of sorts. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36315"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36317"
+                }
+            }
+        },
+        {
+            "id": "36317",
+            "name": "Hidden Cavern",
+            "description": "The cavern stretches out around you to the south and east.  Someone has placed coarse mats on the ground here, perhaps to use for sleeping.  You notice a small tunnel leads off from this cavern to the west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36316"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36318"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36319"
+                }
+            }
+        },
+        {
+            "id": "36318",
+            "name": "Hidden Cavern",
+            "description": "The huge cavern stretches out to the north and west from here.  The roar of the waterfall echoes about the cavern making it hard to hear anything.  You notice that the floor of the cavern has been flattened.  This cavern is obviously used as a hideout of sorts. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36317"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36315"
+                }
+            }
+        },
+        {
+            "id": "36319",
+            "name": "Tunnel off Hidden Cavern",
+            "description": "A narrow tunnel carved out of the rock of the mountain leads off from the huge cavern to the east.  Thick wooden pillars support the roof in places. The tunnel ends a thick wooden door to the west.  To the north another tunnel heads off into the darkness to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36344"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36317"
+                },
+                "West": {
+                    "description": "A sturdy wooden door banded in metal blocks your passage to the east. A small barred window is set into the door and through it you can see a stone staircase rising up into the mountain. ",
+                    "keyword": "door wooden sturdy",
+                    "type": "Door",
+                    "key": "36305",
+                    "destination": "36320"
+                }
+            }
+        },
+        {
+            "id": "36320",
+            "name": "Stairwell",
+            "description": "A stairway made of grey stone begins here and climbs up a stairwell that has been crudely carved out of the solid rock of the mountain.  A doorway stands in crude door frame to the east. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A sturdy wooden door reinforced with thick metal bands stands in a crude door frame made of stone. A small barred window offers you a view of what lies beyond the door. Through the window you can see a crudely carved tunnel leading off to the east. ",
+                    "keyword": "door sturdy wooden",
+                    "type": "Door",
+                    "key": "36305",
+                    "destination": "36319"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36321"
+                }
+            }
+        },
+        {
+            "id": "36321",
+            "name": "Stairwell",
+            "description": "A staircase made of stone spirals up through a stairwell that has been crudely carved out of the solid rock of the mountain.  The staircase leads both up and down from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36322"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36320"
+                }
+            }
+        },
+        {
+            "id": "36322",
+            "name": "Stairwell",
+            "description": "A staircase made of stone spirals up through a stairwell that has been crudely carved out of the solid rock of the mountain.  The staircase leads both up and down from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36323"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36321"
+                }
+            }
+        },
+        {
+            "id": "36323",
+            "name": "Stairwell",
+            "description": "A staircase made of stone spirals up through a stairwell that has been crudely carved out of the solid rock of the mountain.  The staircase leads both up and down from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36324"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36322"
+                }
+            }
+        },
+        {
+            "id": "36324",
+            "name": "Stairwell",
+            "description": "The staircase of grey stone ends at a sturdy wooden door which lies to the east.  Now that you have climbed all the way to the top, you realize that you have climbed quite a distance up inside the mountain.  You would estimate it has been at least a couple hundred feet. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A sturdy wooden door reinforced with thick metal bands blocks any passage to the east. A small barred window offers a view of what is beyond. Through the window you can see a stone hallway leading off to the east. Are you in some sort of building now? ",
+                    "keyword": "door wooden sturdy",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36325"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36323"
+                }
+            }
+        },
+        {
+            "id": "36325",
+            "name": "Stone Hallway",
+            "description": "You find yourself in a hallway made of stone.  It would appear you are in some sort of building.  During the day light shines through windows in the south wall.  You must have climbed all the way to the top of the mountain. Outside you can hear the roar of the waterfall.  The hallway leads off to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36326"
+                },
+                "West": {
+                    "description": "A sturdy wooden door reinforced with thick metal bands stands in the wall to the west. A small barred window offers a view at what is behind the door. Through the window you can see a stone staircase that drops down into the heart of the mountain. ",
+                    "keyword": "door wooden sturdy",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36324"
+                }
+            }
+        },
+        {
+            "id": "36326",
+            "name": "Stone Hallway",
+            "description": "The hallway turns here leading to the north and west.  Off to the east the hallway opens up into what appears to be some sort of dining or meeting hall. A small doorway is set into the south wall. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36330"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36327"
+                },
+                "South": {
+                    "description": "A small wooden doorway stands in the south wall. There is nothing on the door that would hint at what is behind it. ",
+                    "keyword": "door wooden small",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36338"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36325"
+                }
+            }
+        },
+        {
+            "id": "36327",
+            "name": "Dining Hall",
+            "description": "A massive wooden table dominates this huge dining hall which stretches off to the north.  At least 20 chairs are placed around the table which appears to be made of rare wood.  Windows along the east and south wall let light in into this hall during the daytime. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36328"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36326"
+                }
+            }
+        },
+        {
+            "id": "36328",
+            "name": "Dining Hall",
+            "description": "The dining hall continues here.  The hall is dominated by a huge wooden table made of rare wood.  Windows in the east wall let light into the hall during the daytime.  A wooden cabinet, its top stained from spilled water, sits below the window supporting several flowerpots.  A kitchen is off to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36329"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36327"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "flower",
+                        "flowers",
+                        "pot",
+                        "pots",
+                        "flowerpot",
+                        "flowerpots"
+                    ],
+                    "text": "These little pots contain an assortment of violets.  They are blue, red, and indeed, violet.  Their perfume drifts subtly in the air, competing with the aroma of baked bread. "
+                }
+            ]
+        },
+        {
+            "id": "36329",
+            "name": "Kitchen",
+            "description": "This small kitchen is stocked full of all manner of pots and pans.  A huge fireplace is set into the north wall and burns brightly.  A table stands in the middle of the kitchen and is covered with all sorts of uncooked food.  The dining hall is to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36328"
+                }
+            }
+        },
+        {
+            "id": "36330",
+            "name": "Stone Hallway",
+            "description": "This hallway made of grey stone leads north and south from here.  A small door is set into the west wall.  A ways to the north you can see a stairwell that leads up. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36331"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36326"
+                },
+                "West": {
+                    "description": "A simple wooden door is set into the west wall. A large iron ring allows you to open the door by pulling outward. There are no markings on the door. ",
+                    "keyword": "door wooden simple",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36332"
+                }
+            }
+        },
+        {
+            "id": "36331",
+            "name": "Stone Hallway",
+            "description": "This hallway is made of grey stones and runs north to south.  A simple wooden door is set into the west wall.  To the north a stone staircase spirals up a tower. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36334"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36330"
+                },
+                "West": {
+                    "description": "A simple wooden door is set into the west wall. A huge iron ring allows you to open the door by pulling outward. There are no markings on the door. ",
+                    "keyword": "door wooden simple",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36333"
+                }
+            }
+        },
+        {
+            "id": "36332",
+            "name": "Sleeping Quarters",
+            "description": "The walls of this room are lined with wooden bunk beds.  Ten men could sleep in this room.  At the base of each bunk is a huge wooden footlocker.  There doesn't appear to be anything valuable in any of them. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A simple wooden door is set into the east wall and leads back out to the hallway. ",
+                    "keyword": "door wooden simple",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36330"
+                }
+            }
+        },
+        {
+            "id": "36333",
+            "name": "Sleeping Quarters",
+            "description": "The walls of this room are lined with wooden bunk beds.  Ten men could sleep in this room.  At the base of each bunk is a huge wooden footlocker.  There doesn't appear to be anything valuable in any of them. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A simple wooden door is set into the east wall and leads back out to the hallway. ",
+                    "keyword": "door wooden simple",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36331"
+                }
+            }
+        },
+        {
+            "id": "36334",
+            "name": "Tower Staircase",
+            "description": "This stone staircase spirals up the sides of a huge round tower.  To the south a hallway cuts through the heart of the hideout.  You would guess that this tower is probably a lookout tower. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36331"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36335"
+                }
+            }
+        },
+        {
+            "id": "36335",
+            "name": "Tower Staircase",
+            "description": "This staircase winds its way around the inside of the lookout tower.  A small landing is here and a wooden door is set into the north wall.  The staircase continues both up and down. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A wooden door made of rare wood stands in the north wall of the tower. A handle made of brass allows you to open the door by pulling outward. ",
+                    "keyword": "door wooden",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36336"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36337"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36334"
+                }
+            }
+        },
+        {
+            "id": "36336",
+            "name": "Smuggler Leader's Quarters",
+            "description": "This curved room is built around the tower.  Rich stained glass windows adorn the north wall.  Drapings of silk and thick rich rugs decorate the room. Looking out the windows you have a marvelous view of the mountains and the river that becomes the waterfall.  A huge bed covered in sheets of satin lies against the west wall.  The leader of the smugglers appears to have made a small fortune for himself. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A door made of rare wood leads back to the tower staircase. ",
+                    "keyword": "door wooden wood rare",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36335"
+                }
+            }
+        },
+        {
+            "id": "36337",
+            "name": "Lookout",
+            "description": "You climb up to the top of the tower.  From here the smuggler's keep a lookout over the surrounding valley.  You can see the forest town of Mielikki off to the northwest.  A staircase leads back down into the smuggler's hideout. A few potted plants nestle in the crennelations: marigolds, snapdragons, and a buttercup. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36335"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "flower",
+                        "flowers",
+                        "plant",
+                        "plants",
+                        "marigold",
+                        "marigolds",
+                        "snapdragon",
+                        "snapdragons",
+                        "buttercup"
+                    ],
+                    "text": "The flowers are growing nicely in small clay pots.  They look a little out of place in this lawless hideout.  Nevertheless they brighten up the room with their colors and scents. "
+                }
+            ]
+        },
+        {
+            "id": "36338",
+            "name": "Balcony",
+            "description": "You are standing on a wide balcony connected to the mountain hideout. Looking down you can see the sparkling pool of water hundreds of feet below. You can see that the hideout is built onto the side of the mountain and there doesn't seem to be any path leading up to it.  Off to the east a river hurls itself over a cliff.  The balcony continues to the east, and to the north there is a small door in the wall. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A simple wooden door leads back into the mountain hideout. ",
+                    "keyword": "door wooden simple",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "36326"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36339"
+                }
+            }
+        },
+        {
+            "id": "36339",
+            "name": "Balcony",
+            "description": "You are standing on a wide balcony connected to the mountain hideout. Looking down you can see the sparkling pool of water hundreds of feet below. Directly to the east a river hurls itself over a cliff.  You probably could make it across the river to the other side. Pots filled with wildflowers line the rear of the balcony, and the air is heavy with their scent. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "The balcony ends at the waterfall.  Oddly, there is no railing at this end. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36340"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36338"
+                }
+            }
+        },
+        {
+            "id": "36340",
+            "name": "River",
+            "description": "The balcony to the west is an impossible distance away--below lies the waterfall, crashing down into the pool and the river that are all too far below. The stone tower is a sleek structure falling away to the ground. ",
+            "flags": [],
+            "sector": "AIR",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36339"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36341"
+                }
+            }
+        },
+        {
+            "id": "36341",
+            "name": "...and fall...",
+            "description": "Ack, falling in a waterfall is extremely unpleasant, the water flows around and over you, tumbling you roughly as you head towards the bottom. ",
+            "flags": [],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36340"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36342"
+                }
+            }
+        },
+        {
+            "id": "36342",
+            "name": "...and fall...",
+            "description": "Ack, falling in a waterfall is extremely unpleasant, the water flows around and over you, tumbling you roughly as you head towards the bottom. ",
+            "flags": [],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36341"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36343"
+                }
+            }
+        },
+        {
+            "id": "36343",
+            "name": "...and fall...",
+            "description": "Ack, falling in a waterfall is extremely unpleasant, the water flows around and over you, tumbling you roughly as you head towards the bottom. ",
+            "flags": [],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36342"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36309"
+                }
+            }
+        },
+        {
+            "id": "36344",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36345"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36319"
+                }
+            }
+        },
+        {
+            "id": "36345",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36346"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36344"
+                }
+            }
+        },
+        {
+            "id": "36346",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36347"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36345"
+                }
+            }
+        },
+        {
+            "id": "36347",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36348"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36346"
+                }
+            }
+        },
+        {
+            "id": "36348",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36349"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36347"
+                }
+            }
+        },
+        {
+            "id": "36349",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36350"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36348"
+                }
+            }
+        },
+        {
+            "id": "36350",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36351"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36349"
+                }
+            }
+        },
+        {
+            "id": "36351",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36352"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36350"
+                }
+            }
+        },
+        {
+            "id": "36352",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36353"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36351"
+                }
+            }
+        },
+        {
+            "id": "36353",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see.  You wonder if this is the tunnel that the smugglers use to sneak their goods into Mielikki.  The tunnels off to the north and south from here. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36354"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36352"
+                }
+            }
+        },
+        {
+            "id": "36354",
+            "name": "Bend in Secret Tunnel",
+            "description": "The secret tunnel bends here leading off to the west and south.  You wonder if this is the tunnel that the smugglers use to sneak their goods into the forest town of Mielikki. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36353"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36355"
+                }
+            }
+        },
+        {
+            "id": "36355",
+            "name": "Another Bend in the Secret Tunnel",
+            "description": "The secret tunnel bends again here, leading off to the north and east.  You wonder who made this tunnel and how long it took.  It seems to go on forever. The tunnel heads off into the darkness to the north and east. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36356"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36354"
+                }
+            }
+        },
+        {
+            "id": "36356",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see; it seems to go on forever.  The tunnel heads off into the darkness to the north and south. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36357"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36355"
+                }
+            }
+        },
+        {
+            "id": "36357",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see; it seems to go on forever.  The tunnel heads off into the darkness to the north and south. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36358"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36356"
+                }
+            }
+        },
+        {
+            "id": "36358",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see; it seems to go on forever.  The tunnel heads off into the darkness to the north and south. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36359"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36357"
+                }
+            }
+        },
+        {
+            "id": "36359",
+            "name": "Secret Tunnel",
+            "description": "This secret tunnel runs roughly north to south.  It stretches out before you for as long as you can see; it seems to go on forever.  The tunnel heads off into the darkness to the north and south. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36360"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36358"
+                }
+            }
+        },
+        {
+            "id": "36360",
+            "name": "Bend in the Secret Tunnel",
+            "description": "The secret tunnel bends again here leading off to the west and south.  You wonder where this tunnel ends as it seems to just go on forever.  You have lost all sense of distance and you are beginning to doubt your sense of direction. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36359"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36361"
+                }
+            }
+        },
+        {
+            "id": "36361",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36360"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36362"
+                }
+            }
+        },
+        {
+            "id": "36362",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36361"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36363"
+                }
+            }
+        },
+        {
+            "id": "36363",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36362"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36364"
+                }
+            }
+        },
+        {
+            "id": "36364",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36363"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36365"
+                }
+            }
+        },
+        {
+            "id": "36365",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36364"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36366"
+                }
+            }
+        },
+        {
+            "id": "36366",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36365"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36367"
+                }
+            }
+        },
+        {
+            "id": "36367",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36366"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36368"
+                }
+            }
+        },
+        {
+            "id": "36368",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36367"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36369"
+                }
+            }
+        },
+        {
+            "id": "36369",
+            "name": "Secret Tunnel",
+            "description": "You think the tunnel is now running east to west but without any sort of reference you cannot be certain.  Thick beams support the roof of this tunnel and the air has become very humid. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36368"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36370"
+                }
+            }
+        },
+        {
+            "id": "36370",
+            "name": "Secret Tunnel",
+            "description": "Relief floods your heart as you see a narrow staircase to the west leading up.  You pray that this is the end to the secret tunnel.  Finally you will get a chance to see where the tunnel leads.  The staircase leads up, or you could follow the secret tunnel back to the east. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "NOTRACK",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36369"
+                },
+                "Up": {
+                    "description": "The staircase ends at a trapdoor. It has a strange locking mechanism and it looks like it can only be opened from this side. ",
+                    "keyword": "trapdoor",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "3027"
+                }
+            }
+        },
+        {
+            "id": "36371",
+            "name": "Snaking Walkway",
+            "description": "The rush of the waterfall and the flying mist fill the air.  The walkway is wet, but traction is good due to its rough surface.  It snakes back and forth as if to fool any who would walk upon it without the ability to see it.  There is a wide balcony to the west, and the walkway continues east a bit. ",
+            "flags": [
+                "NOMOB",
+                "TUNNEL",
+                "PRIVATE"
+            ],
+            "sector": "CITY",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36372"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36339"
+                }
+            }
+        },
+        {
+            "id": "36372",
+            "name": "Snaking Walkway Corner",
+            "description": "The walkway takes an unexpected twist, and nearly curves in behind the waterfall to the north.  A cave entrance can be seen beside the rushing water. It looks as if it would be invisible from any other vantage point.  The walkway also continues west in front of the waterfall. ",
+            "flags": [
+                "NOMOB",
+                "TUNNEL",
+                "PRIVATE"
+            ],
+            "sector": "CITY",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36373"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36371"
+                }
+            }
+        },
+        {
+            "id": "36373",
+            "name": "Safe Room",
+            "description": "Is this room a sanctuary, or a repository for valuables?  It appears capable of both roles.  Sadly, there is very little of worth here.  A couple of wretched empty sacks lie in the corner under dust and cobwebs.  The only exit is south. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "Little light enters through this narrow slit in the rock.  Mist flows in constantly, leaving the walls and floor near the exit slick with moisture and algae. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "36372"
+                }
+            }
+        }
+    ]
+}

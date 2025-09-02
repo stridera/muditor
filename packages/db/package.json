@@ -1,0 +1,27 @@
+{
+  "name": "@muditor/db",
+  "version": "0.1.0",
+  "private": true,
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "scripts": {
+    "generate": "prisma generate",
+    "push": "prisma db push",
+    "studio": "prisma studio",
+    "migrate:dev": "prisma migrate dev",
+    "migrate:reset": "prisma migrate reset",
+    "migrate:deploy": "prisma migrate deploy",
+    "seed": "tsx src/seed/index.ts",
+    "type-check": "tsc --noEmit",
+    "clean": "rm -rf node_modules/.prisma"
+  },
+  "dependencies": {
+    "@prisma/client": "^5.9.0"
+  },
+  "devDependencies": {
+    "prisma": "^5.9.0",
+    "tsx": "^4.7.0",
+    "@types/node": "^20.11.0",
+    "typescript": "^5.3.3"
+  }
+}

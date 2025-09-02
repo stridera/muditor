@@ -1,0 +1,2424 @@
+{
+    "zone": {
+        "id": "476",
+        "name": "Doom: The Plane of the Earth",
+        "top": 47699,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 48405,
+                    "max": 2,
+                    "room": 47662,
+                    "name": "(an undead captain)"
+                },
+                {
+                    "id": 48405,
+                    "max": 2,
+                    "room": 47654,
+                    "name": "(an undead captain)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47649,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48408,
+                    "max": 3,
+                    "room": 47649,
+                    "name": "(a Phase Worm)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47644,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47644,
+                    "name": "(an Ogre)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47613,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48408,
+                    "max": 3,
+                    "room": 47613,
+                    "name": "(a Phase Worm)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47610,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47628,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48402,
+                    "max": 5,
+                    "room": 47628,
+                    "name": "(a nomadic Jann)",
+                    "carrying": [
+                        {
+                            "id": 48407,
+                            "max": 3,
+                            "name": "(a crystal decanter)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47625,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47621,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47619,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47603,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48414,
+                    "max": 6,
+                    "room": 47601,
+                    "name": "(an Earth Elemental)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47642,
+                    "name": "(an Ogre)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47642,
+                    "name": "(an Ogre)",
+                    "equipped": [
+                        {
+                            "id": 48408,
+                            "max": 1,
+                            "location": "Arms",
+                            "name": "(a pair of spiked boots)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48401,
+                    "max": 1,
+                    "room": 47672,
+                    "name": "(the Grimalkin)"
+                },
+                {
+                    "id": 48403,
+                    "max": 1,
+                    "room": 47672,
+                    "name": "(the Butcher of Anduin)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47650,
+                    "name": "(an Ogre)"
+                },
+                {
+                    "id": 48402,
+                    "max": 5,
+                    "room": 47646,
+                    "name": "(a nomadic Jann)",
+                    "carrying": [
+                        {
+                            "id": 48407,
+                            "max": 3,
+                            "name": "(a crystal decanter)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48402,
+                    "max": 5,
+                    "room": 47639,
+                    "name": "(a nomadic Jann)",
+                    "equipped": [
+                        {
+                            "id": 48405,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(a barbed dagger)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47638,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47638,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47629,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47629,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47627,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47626,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48402,
+                    "max": 5,
+                    "room": 47623,
+                    "name": "(a nomadic Jann)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47620,
+                    "name": "(an Ogre)"
+                },
+                {
+                    "id": 48407,
+                    "max": 9,
+                    "room": 47620,
+                    "name": "(an Ogre)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47616,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47616,
+                    "name": "(a Black Dwarf)"
+                },
+                {
+                    "id": 48408,
+                    "max": 3,
+                    "room": 47607,
+                    "name": "(a Phase Worm)"
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47607,
+                    "name": "(a Black Dwarf)",
+                    "equipped": [
+                        {
+                            "id": 48406,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(a dwarven mallet)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48409,
+                    "max": 10,
+                    "room": 47605,
+                    "name": "(a Black Dwarf)"
+                }
+            ],
+            "object": [
+                {
+                    "id": 48400,
+                    "max": 1,
+                    "room": 47672,
+                    "name": "(the remains of Kara-Sithri)",
+                    "contains": [
+                        {
+                            "id": 48403,
+                            "max": 1,
+                            "container": 48400,
+                            "name": "(the Shield of Valor)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48503,
+                    "max": 1,
+                    "room": 47672,
+                    "name": "(a map case)",
+                    "contains": [
+                        {
+                            "id": 48500,
+                            "max": 1,
+                            "container": 48503,
+                            "name": "(a map of the Caelian Region)"
+                        },
+                        {
+                            "id": 48501,
+                            "max": 1,
+                            "container": 48503,
+                            "name": "(a map of the forest town of Mielikki)"
+                        },
+                        {
+                            "id": 48502,
+                            "max": 1,
+                            "container": 48503,
+                            "name": "(a map of the village of Ickle)"
+                        }
+                    ]
+                }
+            ],
+            "door": [
+                {
+                    "room": 47672,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 47648,
+                    "direction": "Up",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 47641,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 47634,
+                    "direction": "Up",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 47618,
+                    "direction": "East",
+                    "state": [
+                        "LOCKED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [],
+    "objects": [],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "47600",
+            "name": "On a Ledge",
+            "description": "Standing upon a narrow ledge, the view is crowded with incredible images: enormous mountains straining to touch a cloudless sky; bright streams of lava spewing from some mountains, and encircling others; precarious spires of stone that appear ready to topple at any moment, yet remain standing.  The land is so impossibly different from your own you are forced to the conclusion that the Archway has transferred you to an entirely different world, one dominated by the element of stone.  Glancing around, the mountain at your back rises almost vertically for as far as you can see.  Behind, to the east, the ledge leads to an opening in the mountain. ",
+            "flags": [],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47601"
+                }
+            }
+        },
+        {
+            "id": "47601",
+            "name": "Inside a Cave",
+            "description": "Examing the cave, the jagged outcroppings of rock near the entrance resemble giant fangs, ready to snap shut locking tresspassers inside the cave mouth. In addition to the exit west, a narrow tunnel bores through the mountain to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47602"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47600"
+                }
+            }
+        },
+        {
+            "id": "47602",
+            "name": "A Fractured Tunnel",
+            "description": "This tunnel is composed of a light gray stone.  Fractures riddle the rock, as though the weight of the mountain above has become too burdensome for the stones to maintain.  The tunnel continues to the east and south.  To the west, the tunnel widens into a cave. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47603"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47635"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47601"
+                }
+            }
+        },
+        {
+            "id": "47603",
+            "name": "A Fractured Tunnel",
+            "description": "The stones of this tunnel are heavily fractured.  In places the rock has actually begun to flake, dusting the floor with a light powder.  There are numerous humanoid footprints crisscrossing the floor.  The tunnel continues to the east and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47604"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47602"
+                }
+            }
+        },
+        {
+            "id": "47604",
+            "name": "A Fractured Tunnel",
+            "description": "A light powder covers the floor of this tunnel.  Examining the rock-dust carefully, you find many footprints crisscrossing the tunnel.  Some of the prints are very old and have nearly become buried under newer layers of powder, but many of the tracks are very clearly impressed upon the rock-dust and appear recent.  The tunnel continues to the west and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47605"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47603"
+                }
+            }
+        },
+        {
+            "id": "47605",
+            "name": "A Fractured Tunnel",
+            "description": "Examining the stones about the tunnel, there grow some concern that the tunnel may be unstable.  The walls and ceiling are heavily fractured, and the floor is covered with a thick layer of rock-dust and rubble.  Perhaps it would be wise to leave this area before the entire tunnel collapses.  The tunnel continues to the west and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47606"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47604"
+                }
+            }
+        },
+        {
+            "id": "47606",
+            "name": "A Fractured Tunnel",
+            "description": "This section of the tunnel is choked with rubble, making movement difficult. At one point the ceiling has partially collapsed, leaving only a narrow opening that allows one passage.  Rock-dust rises from your passing.  Moving through the opening it can be seen that it continues to either the north or south. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47605"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47607"
+                }
+            }
+        },
+        {
+            "id": "47607",
+            "name": "A Fractured Tunnel",
+            "description": "This section of the tunnel is composed of two types of stone.  The southern end is dominated by a dark gray stone which is gradually replaced by a light gray stone to the north.  The rocks to the north are heavily fractured.  The tunnel continues to the north, south, and west.  The tunnel to the west is very narrow. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47606"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47619"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47608"
+                }
+            }
+        },
+        {
+            "id": "47608",
+            "name": "A Narrow Tunnel",
+            "description": "The tunnel here is very narrow and some fighting styles will be seriously hampered if forced to defend yourself here.  What is waiting on the other side of this tunnel?  It seems like an ideal place for an ambush.  The tunnel continues to the west and east. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47607"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47609"
+                }
+            }
+        },
+        {
+            "id": "47609",
+            "name": "An Inscription on the Tunnel",
+            "description": "Entering this section of the tunnel, an inscription which has been carved onto the stone wall becomes evident.  The inscription is crude and seems to have been made in haste.  The tunnel continues to south and narrows to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47608"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47610"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "inscription",
+                        "wall",
+                        "stone",
+                        "writing"
+                    ],
+                    "text": "The inscription is really nothing more than a few words carved onto the wall of this tunnel. The inscription reads: Whatever the outcome, may the world never forget our deeds. "
+                }
+            ]
+        },
+        {
+            "id": "47610",
+            "name": "Before the Battleground",
+            "description": "Scattered possessions of long-dead warriors line the floor.  Fragile, most of them have long since crumbled to the tan-colored dust that permeates the tunnel.  Here and there is a belt buckle, a bit of armor, the shard of a blade, or another piece of metal that lies dirty but intact.  The tunnel continues north and south, and the tunnel to the south looks like it was once the site of a battle. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47609"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47611"
+                }
+            }
+        },
+        {
+            "id": "47611",
+            "name": "An Ancient Battleground",
+            "description": "This section of the tunnel was the sight of an ancient skirmish.  The walls of the tunnel are scored with sword slashes- the warriors of old must have been mighty indeed, to leave such vicious marks upon the stone.  There are a few pieces of heavily dented armor scattered about the floor, but no evidence of bones.  The tunnel continues to the north and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47610"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47612"
+                }
+            }
+        },
+        {
+            "id": "47612",
+            "name": "An Ancient Battleground",
+            "description": "Traveling west, signs of an ancient battle become more intense and more frequent.  The floor of this tunnel is littered with broken bits of armor and weaponry.  There are few bones scattered about as well, but no complete skeletons.  The tunnel continues to the west and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47611"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47613"
+                }
+            }
+        },
+        {
+            "id": "47613",
+            "name": "An Ancient Battleground",
+            "description": "The tunnel becomes wide enough for four to stand abreast.  The litter of bones and armor is more common here than to the east and some of the bones are humanoid.  A great battle was fought here; the most frightening kind of battle, where tactics are useless and the only determinant of battle is who has the most warriors.  The tunnel continues to the south and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47612"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47614"
+                }
+            }
+        },
+        {
+            "id": "47614",
+            "name": "An Ancient Battleground",
+            "description": "Signs of battle are much less frequent here than to the north.  Perhaps one of the two forces was victorious in the engagement that began to the north, and killed the last few of the enemy here.  There are no humanoid bones, and only a few bits of armor and weaponry.  The tunnel slopes sharply upward and may be followed in that direction, or return to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47613"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47615"
+                }
+            }
+        },
+        {
+            "id": "47615",
+            "name": "Past the Battleground",
+            "description": "The tunnel begins to narrow until only two men may walk abreast.  It is possible to exit this section of the tunnel by traveling east, or by following the tunnel as it slopes down. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47616"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47614"
+                }
+            }
+        },
+        {
+            "id": "47616",
+            "name": "A Hot Tunnel",
+            "description": "As a drop of sweat slides down your face, and it becomes evident that the air is very warm here.  The heat, while not yet uncomfortable, becomes more intolerable to the south.  The tunnel continues to the south, toward the source of the heat.  The tunnel continues to the west as well. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47617"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47615"
+                }
+            }
+        },
+        {
+            "id": "47617",
+            "name": "A Hot Tunnel",
+            "description": "The air is very warm and dry, as it feels standing unprotected under a desert sun.  The tunnel continues to the north and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47616"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47618"
+                }
+            }
+        },
+        {
+            "id": "47618",
+            "name": "Gateway to a Fiery Realm",
+            "description": "The tunnel widens into a chamber and comes to an end.  There is a pool of lava in the center of the chamber.  Just beyond the pool, on the east side of the chamber, lies a Gateway.  The surface of the lava is blanketed by a thick black crust.  Bubbles sporadically rise from deep within the pool, bursting through the crust and spewing noxious gases into the air.  Putting your back to the scorching walls of this tunnel, alows one to carefully skirt around the edge of the pool and reach the Gateway.  To the east sits the Gateway, or there is a tunnel to the west. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal- despite the intense heat radiated by the lava, the metal is surprisingly cool. The metal, strangely enough, yields to your touch, as though it has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "47800"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47617"
+                }
+            }
+        },
+        {
+            "id": "47619",
+            "name": "An Unstable Tunnel",
+            "description": "The stones under foot tremble slightly, as though the rock is responding to an earthquake occurring deep within the earth.  A faint rumbling sound can be heard which could mean that the quake has triggered an avalanche on the surface of the mountain.  The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47607"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47620"
+                }
+            }
+        },
+        {
+            "id": "47620",
+            "name": "An Unstable Tunnel",
+            "description": "The tunnel shakes violently due to a sudden tremor.  The ceiling here seems stable but precariously close to falling.  Several lesser jolts further shake the tunnel.  It may be wise to hurry out of this area.  The tunnel continues to either the north or west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47619"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47621"
+                }
+            }
+        },
+        {
+            "id": "47621",
+            "name": "An Unstable Tunnel",
+            "description": "The stones under foot tremble slightly, as though the rock is responding to earthquake occurring deep within the earth.  A faint rumbling sound can be heard which could mean that the quake has triggered an avalanche on the surface of the mountain.  The tunnel continues to the east and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47620"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47622"
+                }
+            }
+        },
+        {
+            "id": "47622",
+            "name": "End of the Tunnel",
+            "description": "This is the end of the tunnel.  At this point, the tunnel continues to the north but passage to the south has been blocked by a cave-in.  There is a narrow hole in the center of the tunnel floor that leads almost straight down into the darkness. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47621"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47623"
+                }
+            }
+        },
+        {
+            "id": "47623",
+            "name": "Inside a Narrow Hole",
+            "description": "There is very little room to move about in this cramped hole.  It might be possible to fight in the cramped quarters, but it would be preferable not to try.  The only objects to grip are outcroppings of stone along the narrow hole. Travel can continue either up or down from this point. ",
+            "flags": [
+                "INDOORS",
+                "TUNNEL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47622"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47624"
+                }
+            }
+        },
+        {
+            "id": "47624",
+            "name": "Beneath a Narrow Hole",
+            "description": "An inky black tunnel stretches to the north.  Bits of something can be seen sparkling in the distance.  Above there is a narrow hole which drills through the rock and continues up into the darkness. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47625"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47623"
+                }
+            }
+        },
+        {
+            "id": "47625",
+            "name": "A Glittering Tunnel",
+            "description": "Magnificent veins of gold run through this passageway and continue to the north.  The veins are as thin as a spider's web but they are so numerous the entire tunnel glitters and sparkles in the light.  The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47626"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47624"
+                }
+            }
+        },
+        {
+            "id": "47626",
+            "name": "A Glittering Tunnel",
+            "description": "Thin veins of gold crisscross the north wall, forming fantastic loops and spirals.  Surely one could amass a great fortune mining these tunnels.  The tunnel continues to the west, east, and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47639"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47625"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47627"
+                }
+            }
+        },
+        {
+            "id": "47627",
+            "name": "A Glittering Tunnel",
+            "description": "The walls of the tunnel glitter in light.  Veins of gold run through the area.  If it were possible to mine the gold in this one tunnel alone, there would easily be enough gold to amass a fortune large enough to buy an entire kingdom.  The veins seem more concentrated to the east.  The tunnel continues to the west and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47626"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47628"
+                }
+            }
+        },
+        {
+            "id": "47628",
+            "name": "A Glittering Tunnel",
+            "description": "The weight of the stones above you somehow becomes more tangible.  The rock seems to press down.  Will ever see the sky be seen again?  A few filaments of gold crisscross the walls.  The tunnel continues to the north, west, and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47638"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47627"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47629"
+                }
+            }
+        },
+        {
+            "id": "47629",
+            "name": "A Glittering Tunnel",
+            "description": "The rocks seem to press heavily downward, almost opressively.  Unwelcome would be a good world to desribe your intrusion in this underworld realm. Pray silently to the Gods that they will guide you out of this realm and to someplace with fresh air.  A few veins of gold, as thin and delicate as a dream, crisscross each other in this tunnel, seeming to form patterns but ultimately only confusing the mind with their glimmer.  The tunnel continues east and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47628"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47630"
+                }
+            }
+        },
+        {
+            "id": "47630",
+            "name": "A Breath of Fresh Air",
+            "description": "Traveling this tunnel, there is a breath of wind that caresss your face. The wind swirls around the tunnel but seems to be originating from the north. The air smells very fresh.  Perhaps there is a way out of this underworld realm after all.  The tunnel continues to the north and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47631"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47629"
+                }
+            }
+        },
+        {
+            "id": "47631",
+            "name": "A Breath of Fresh Air",
+            "description": "There is no doubt about it: the wind is picking up, and the air is becoming fresher.  The tunnel ends here but there is a draft of air descending from above.  Glancing up, there is another tunnel continues in that direction. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47630"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47632"
+                }
+            }
+        },
+        {
+            "id": "47632",
+            "name": "A Breath of Fresh Air",
+            "description": "This wide tunnel looks purposefully dug into the solid rock.  The walls of the tunnel are smooth and worn from the wind eroding it.  The tunnel continues in a vertical direction.  The smell of fresh air draws you upward. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47633"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47631"
+                }
+            }
+        },
+        {
+            "id": "47633",
+            "name": "A Breath of Fresh Air",
+            "description": "This wide tunnel looks purposefully dug into the solid rock.  The walls of the tunnel are smooth and worn from the wind eroding it.  The tunnel continues in a vertical direction.  The smell of fresh air draws you upward. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47634"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47632"
+                }
+            }
+        },
+        {
+            "id": "47634",
+            "name": "Gateway to a Realm of Air",
+            "description": "The tunnel ends suddenly here.  High above, there is a Gateway fixed to the stone ceiling.  The winds are strong here and whip around the chamber, without any apparent source.  Through the Gateway huge billowing clouds and fierce thunderstorms can be seen.  The tunnel continues downward. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal- strangely enough, it yields to your touch, as though the metal has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "48801"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47633"
+                }
+            }
+        },
+        {
+            "id": "47635",
+            "name": "A Fractured Tunnel",
+            "description": "This tunnel has numerous fractures running along the ceiling and walls. The light gray stone of this tunnel is very brittle and does not appear to be safe.  The tunnel continues to the north, and slopes sharply down at this point. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47602"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47636"
+                }
+            }
+        },
+        {
+            "id": "47636",
+            "name": "A Fractured Tunnel",
+            "description": "The walls and ceiling of this tunnel are heavily fractured.  Below, the fractures become less common as the light gray stone is replaced by a darker type of stone which is evidently less brittle.  The tunnel continues in a vertical direction. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47635"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47637"
+                }
+            }
+        },
+        {
+            "id": "47637",
+            "name": "Beneath a Brittle Tunnel",
+            "description": "In this section of the tunnel deep inside the bowels of the mountain, the outside world seems miles away.  The descent into the mountain has been arduous.  Due the the depth in the mountain, the weight of the stones above must be enormous!  The earth seems to press down and there is an almost irresistible urge to flee this realm as soon as possible.  The tunnel continues to the south.  Another tunnel drills through the rock directly above and continues up beyond sight. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47638"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47636"
+                }
+            }
+        },
+        {
+            "id": "47638",
+            "name": "Memorial to a Fallen Comrade",
+            "description": "In the center of this tunnel there is a large pile of stones.  An inscription just above the mound indicates it is the burial site of a legendary Hero who lost his life in battle here.  The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47637"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47628"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "inscription",
+                        "mound"
+                    ],
+                    "text": "The inscription reads: The legendary Somar fell here to while defending his comrades. He will be remembered as an honorable and fearsome warrior. "
+                }
+            ]
+        },
+        {
+            "id": "47639",
+            "name": "A Glittering Tunnel",
+            "description": "Veins of gold crisscross the walls, making the tunnel sparkle and glitter in your light.  The amount of gold buried deep within this mountain is remarkable. What other treasures may lied buried in these subterranean tunnels?  The path continues to the west and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47640"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47626"
+                }
+            }
+        },
+        {
+            "id": "47640",
+            "name": "A Glittering Tunnel",
+            "description": "A few veins of gold trace through the walls here.  The gold seems to be more concentrated to the north.  The tunnel continues to the north, and another tunnel slopes down from this point. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47639"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47641"
+                }
+            }
+        },
+        {
+            "id": "47641",
+            "name": "An Odd Glimmer in the Tunnel",
+            "description": "In this section of the tunnel, an odd glimmer of white catches draws your attention.  Examining the glimmer, it appears that a human skeleton which partially projects through a solid stone wall is the source.  It appears as though much of the man's body was somehow pushed or molded into the stone. The man's skeletal hands claw at the floor, as though to slow his progress through the stone.  The tunnel continues to the west.  A hole in the ceiling will provide access to another set of tunnels. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "As you examine the skeleton, you become aware of a faint outline which surrounds his form. Examining the line carefully, you deduce that there is a chamber north of this tunnel, and that the skeleton has somehow been incorporated into a door to this chamber. Looking at the skeleton in this new light, you understand that the clenched hands of the skeleton could have been designed to be the handle of this gruesome door. ",
+                    "keyword": "skeleton hand hands",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "47672"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47642"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47640"
+                }
+            }
+        },
+        {
+            "id": "47642",
+            "name": "A T-Intersection in the Tunnel",
+            "description": "The tunnel is narrow here, barely enough for a party to pass.  The huge rocks above serve as a constant reminder of both the tremendous weight and sheer number of stones above.  It would surely be detrimental to ones health if there were to be a cave-in.  The tunnel continues to the north, east, and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47649"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47641"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47643"
+                }
+            }
+        },
+        {
+            "id": "47643",
+            "name": "A Chilly Tunnel",
+            "description": "It is chilly here and your clothes do little to make you feel warmer. There are sounds of water dripping in the distance, but the sound echoes and rebounds throughout the tunnel, making its source impossible to determine. The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47642"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47644"
+                }
+            }
+        },
+        {
+            "id": "47644",
+            "name": "A Chilly Tunnel",
+            "description": "It is chilly here and your clothes do little to make you feel warmer. There are sounds of water dripping in the distance, but the sound echoes and rebounds throughout the tunnel, making its source impossible to determine. The tunnel continues to the north and west. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47643"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47645"
+                }
+            }
+        },
+        {
+            "id": "47645",
+            "name": "A Chilly Tunnel",
+            "description": "It is chilly here and your clothes do little to make you feel warmer. There are sounds of water dripping in the distance, but the sound echoes and rebounds throughout the tunnel, making its source impossible to determine. The tunnel continues to the west and east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47644"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47646"
+                }
+            }
+        },
+        {
+            "id": "47646",
+            "name": "A Slippery Tunnel",
+            "description": "There is a dripping sound that echoes throughout the tunnel.  The air is humid here and the stones to the south are actually slick with moisture.  The tunnel continues to the north, west, and south. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47669"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47645"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47647"
+                }
+            }
+        },
+        {
+            "id": "47647",
+            "name": "A Muddy Tunnel",
+            "description": "Care must be taken to tread carefully through this tunnel.  The floor is muddy and a fall here would be most unpleasant, not to mention embarrassing. This is the first room chanced upon in this realm that has any sign of mud- perhaps that is significant.  To the west, the tunnel continues up a steep muddy slope.  The tunnel looks a bit more slippery to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47646"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47648"
+                }
+            }
+        },
+        {
+            "id": "47648",
+            "name": "Gateway to an Aqueous Realm",
+            "description": "Carefully ascending the muddy slope and following the tunnel, leads and widens into a chamber.  The damp ceiling of this chamber is spiked with massive stalactites so long they nearly pierce the floor.  Water drips from the ends of the stalactites and flows slowly to the east.  There is a Gateway on the ceiling, nearly hidden among the projections.  The only other exit from this chamber is back down the slope to the east. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47647"
+                },
+                "Up": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal- strangely enough, it yields to your touch, as though the metal has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "47701"
+                }
+            }
+        },
+        {
+            "id": "47649",
+            "name": "Memorial to a Fallen Comrade",
+            "description": "Chiseled into the stone walls here are a number of crudely drawn symbols: the sun, a sword, and a horn.  Examining the walls carefully, reveals a lengthy message that has been carved onto the stones of this tunnel.  The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47650"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47642"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "message",
+                        "writing",
+                        "inscription",
+                        "stone",
+                        "walls",
+                        "wall",
+                        "memorial"
+                    ],
+                    "text": "The message has been chipped and carved into the stone by a sharp object. The writing is difficult to read but after puzzling over the script for several minutes you are able to decipher it. It reads: On the Eve of a great battle, we wish to make it known those that follow that a mighty warrior, the legendary Kara-Sithri, fell not far from here while defending her comrades against the traitorous Padraeg. Her selfless sacrifice spared the lives of many warriors and we will not allow her to be forgotten. The murderous Padraeg was imprisoned within living stone by mighty magic and Kara-Sithri's sacred remains placed beyond it. "
+                }
+            ]
+        },
+        {
+            "id": "47650",
+            "name": "A Battleground",
+            "description": "An epic, running battle was fought in these tunnels.  The walls are scored with sword slashes and blackened by magic.  The floor of the tunnel is littered with bones, armor, and weaponry.  Faint, ghostly battle cries still can be heard issuing from the tunnels around you as though the spectres of the valiant warriors continue to battle their evil foes.  Surveying this ancient battleground, a wave of dizziness descends.  You stagger about madly, and when you finally come to your senses, realize that you have lost all sense of direction.  The tunnels continue to the north, south, and west, and they all look the same... ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47651"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47649"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47651"
+                }
+            }
+        },
+        {
+            "id": "47651",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47652"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47650"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47659"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47665"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the north and east exits. "
+                }
+            ]
+        },
+        {
+            "id": "47652",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47651"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47660"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47653"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47666"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the north and south exits. "
+                }
+            ]
+        },
+        {
+            "id": "47653",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47661"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47667"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47652"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47654"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the south and west exits. "
+                }
+            ]
+        },
+        {
+            "id": "47654",
+            "name": "At the Warning Post",
+            "description": "In the center of this chamber stands a human skeleton.  The skeleton is supported by a stone framework to which he is lashed.  At the skeleton's feet is a mound of humanoid skulls.  The tunnels radiate from this point in all four directions.  You are still disoriented and unsure of which way to turn. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47668"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47662"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47655"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47653"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "skeleton"
+                    ],
+                    "text": "The skeleton's skull is bashed in and his bones are scored with claw marks. "
+                }
+            ]
+        },
+        {
+            "id": "47655",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47656"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47663"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47654"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47669"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the north and south exits. "
+                }
+            ]
+        },
+        {
+            "id": "47656",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47663"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47656"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47671"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47657"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the west and east exits. "
+                }
+            ]
+        },
+        {
+            "id": "47657",
+            "name": "A Path of Bones",
+            "description": "This section of the tunnel continues to show signs of an epic battle.  The bones of many fallen warriors crunch underfoot.  Only about one-half of the bones strewn about are humanoid, which would seem it indicate there was no clear victor.  The rest of the bones must belong to the foul monsters that were enlisted to serve in Lokari's army.  Glancing about, you are dismayed to discover that you are still disoriented.  Tunnels continue in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47658"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47663"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47656"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47666"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bones",
+                        "bone",
+                        "path"
+                    ],
+                    "text": "The bones are scattered about the area; however, they are concentrated near the north and south exits. "
+                }
+            ]
+        },
+        {
+            "id": "47658",
+            "name": "The Heart of the Realm",
+            "description": "Escaping the maze of tunnels this is the very heart of this underworld realm.  The rock that forms this chamber pulses and quivers as though it were alive.  Veins of gold and silver streak through the rock, glittering in your light.  There are tunnels that can be explored by exiting this chamber to the south. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47657"
+                }
+            }
+        },
+        {
+            "id": "47659",
+            "name": "Edge of the Battleground",
+            "description": "Signs of battle are less apparent here than in some of the other tunnels. There are a few bits of battered armor and an occasional skeleton, but this tunnel seems to have been at the very fringe of the action.  Tunnels branch away to the north, west, south, and east.  The layout of these tunnels are still very disorienting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47660"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47651"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47664"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47664"
+                }
+            }
+        },
+        {
+            "id": "47660",
+            "name": "Edge of the Battleground",
+            "description": "Signs of battle are less apparent here than in some of the other tunnels. There are a few bits of battered armor and an occasional skeleton, but this tunnel seems to have been at the very fringe of the action.  Tunnels branch away to the north, west, south, and east.  The layout of these tunnels are still very disorienting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47652"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47665"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47665"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47659"
+                }
+            }
+        },
+        {
+            "id": "47661",
+            "name": "Edge of the Battleground",
+            "description": "Signs of battle are less apparent here than in some of the other tunnels. There are a few bits of battered armor and an occasional skeleton, but this tunnel seems to have been at the very fringe of the action.  Tunnels branch away to the north, west, south, and east.  The layout of these tunnels are still very disorienting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47666"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47668"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47653"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47662"
+                }
+            }
+        },
+        {
+            "id": "47662",
+            "name": "Edge of the Battleground",
+            "description": "Signs of battle are less apparent here than in some of the other tunnels. There are a few bits of battered armor and an occasional skeleton, but this tunnel seems to have been at the very fringe of the action.  Tunnels branch away to the north, west, south, and east.  The layout of these tunnels are still very disorienting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47654"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47667"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47661"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47667"
+                }
+            }
+        },
+        {
+            "id": "47663",
+            "name": "Edge of the Battleground",
+            "description": "Signs of battle are less apparent here than in some of the other tunnels. There are a few bits of battered armor and an occasional skeleton, but this tunnel seems to have been at the very fringe of the action.  Tunnels branch away to the north, west, south, and east.  The layout of these tunnels are still very disorienting. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47659"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47656"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47657"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47668"
+                }
+            }
+        },
+        {
+            "id": "47664",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47659"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47659"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47670"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47671"
+                }
+            }
+        },
+        {
+            "id": "47665",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47651"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47667"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47660"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47660"
+                }
+            }
+        },
+        {
+            "id": "47666",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47657"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47671"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47652"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47661"
+                }
+            }
+        },
+        {
+            "id": "47667",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47662"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47665"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47662"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47653"
+                }
+            }
+        },
+        {
+            "id": "47668",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47669"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47661"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47654"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47663"
+                }
+            }
+        },
+        {
+            "id": "47669",
+            "name": "Lost in the Tunnels",
+            "description": "Entering this tunnel there is still a lingering sense of disorientation and there is no way to really determine from which direction you arrived.  A constant dripping sound that rebounds throughout the tunnel can be heard, but there is no clear indication of the source.  The tunnels radiate out from this point in all four direction. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47670"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47668"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47646"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47671"
+                }
+            }
+        },
+        {
+            "id": "47670",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize you are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47655"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47670"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47664"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47669"
+                }
+            }
+        },
+        {
+            "id": "47671",
+            "name": "Lost in the Tunnels",
+            "description": "This tunnel seems to have escaped the battle that raged through so many of the others.  As you glance around you become dismayed as you realize you are still disoriented.  Tunnels continue from this point in the four cardinal directions. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47664"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47666"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47656"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47669"
+                }
+            }
+        },
+        {
+            "id": "47672",
+            "name": "The Tomb of Kara-Sithri",
+            "description": "One glance at this chamber is enough to convince that its formation was not natural.  The walls have a polished look and the floor is even.  A number of evil-looking helms and shields, and even a few standards, are fixed to the walls.  These are apparently war trophies.  In the center of the chamber is a slab of stone upon which lie the remains of a great warrior.  To the south, another skeleton has been sealed into the stone itself, and from this direction it appears that somehow, the skeleton has been made to be a part of the door. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "The skeleton appears to have been molded into the stone. From this side of the tunnel, it is apparent that the skeleton is part of the door. ",
+                    "keyword": "skeleton",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "47641"
+                }
+            }
+        }
+    ]
+}

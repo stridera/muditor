@@ -1,0 +1,1736 @@
+{
+    "zone": {
+        "id": "551",
+        "name": "Technitzitlan Pyramid Secrets",
+        "top": 55199,
+        "lifespan": 20,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "TROPICAL",
+        "resets": {
+            "mob": [
+                {
+                    "id": 55001,
+                    "max": 1,
+                    "room": 55104,
+                    "name": "(Huitzipa)",
+                    "equipped": [
+                        {
+                            "id": 55005,
+                            "max": 1,
+                            "location": "Ear",
+                            "name": "(a crystalline skull)"
+                        },
+                        {
+                            "id": 55011,
+                            "max": 2,
+                            "location": "Hover",
+                            "name": "(a jeweled leopard's eye)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55012,
+                    "max": 1,
+                    "room": 55105,
+                    "name": "(the Knight Champion)",
+                    "equipped": [
+                        {
+                            "id": 55002,
+                            "max": 1,
+                            "location": "Hold",
+                            "name": "(a jade bracelet)"
+                        },
+                        {
+                            "id": 55007,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(a crystalline club)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55002,
+                    "max": 1,
+                    "room": 55114,
+                    "name": "(Xapizo)",
+                    "equipped": [
+                        {
+                            "id": 55014,
+                            "max": 1,
+                            "location": "Body",
+                            "name": "(the Sunstone Diadem)"
+                        },
+                        {
+                            "id": 55011,
+                            "max": 2,
+                            "location": "Hover",
+                            "name": "(a jeweled leopard's eye)"
+                        },
+                        {
+                            "id": 55029,
+                            "max": 1,
+                            "location": "Wrist",
+                            "name": "(a tattered bag)",
+                            "contains": [
+                                {
+                                    "id": 55004,
+                                    "max": 1,
+                                    "container": 55029,
+                                    "name": "(the Codex of War)"
+                                }
+                            ]
+                        }
+                    ]
+                },
+                {
+                    "id": 55015,
+                    "max": 2,
+                    "room": 55111,
+                    "name": "(an Ice Golem)"
+                },
+                {
+                    "id": 55015,
+                    "max": 2,
+                    "room": 55125,
+                    "name": "(an Ice Golem)",
+                    "equipped": [
+                        {
+                            "id": 55015,
+                            "max": 1,
+                            "location": "Finger",
+                            "name": "(a crystal ring)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55008,
+                    "max": 9,
+                    "room": 55123,
+                    "name": "(a Leopard Knight)",
+                    "equipped": [
+                        {
+                            "id": 55009,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(some polar bear skin pants)"
+                        },
+                        {
+                            "id": 55001,
+                            "max": 48,
+                            "location": "Eyes",
+                            "name": "(a jade-headed club)"
+                        },
+                        {
+                            "id": 55012,
+                            "max": 50,
+                            "location": "Feet",
+                            "name": "(a leopard helm)"
+                        },
+                        {
+                            "id": 53023,
+                            "max": 48,
+                            "location": "Legs",
+                            "name": "(the Cuir Bouilli)"
+                        }
+                    ]
+                },
+                {
+                    "id": 55009,
+                    "max": 9,
+                    "room": 55123,
+                    "name": "(a Leopard Knight)",
+                    "equipped": [
+                        {
+                            "id": 55009,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(some polar bear skin pants)"
+                        },
+                        {
+                            "id": 55001,
+                            "max": 48,
+                            "location": "Eyes",
+                            "name": "(a jade-headed club)"
+                        },
+                        {
+                            "id": 55012,
+                            "max": 50,
+                            "location": "Feet",
+                            "name": "(a leopard helm)"
+                        },
+                        {
+                            "id": 53023,
+                            "max": 48,
+                            "location": "Legs",
+                            "name": "(the Cuir Bouilli)"
+                        }
+                    ]
+                }
+            ],
+            "object": [
+                {
+                    "id": 55027,
+                    "max": 1,
+                    "room": 55112,
+                    "name": "(a glowing pool)"
+                },
+                {
+                    "id": 55028,
+                    "max": 1,
+                    "room": 55133,
+                    "name": "(a glowing pool)"
+                },
+                {
+                    "id": 55026,
+                    "max": 1,
+                    "room": 55127,
+                    "name": "(a glowing pool)"
+                },
+                {
+                    "id": 55025,
+                    "max": 1,
+                    "room": 55126,
+                    "name": "(a glowing pool)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 55112,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 55111,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 55111,
+                    "direction": "East",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED",
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 55109,
+                    "direction": "East",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 55124,
+                    "direction": "West",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 55106,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [],
+    "objects": [],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "55101",
+            "name": "An Icen Tunnel",
+            "description": "You struggle as you make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  You notice a partially crushed monolith in the ice.  The tunnel continues to the west and south. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55102"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55044"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55102",
+            "name": "An Icen Tunnel",
+            "description": "You struggle as you make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  You can't help but notice a mammoth monolith in the ice. The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55101"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55103"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55103",
+            "name": "An Icen Tunnel",
+            "description": "You struggle as you make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  You notice a partially crushed monolith in the ice.  The tunnel continues to the north and east. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55102"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55125"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55104",
+            "name": "Huitzipa's Lair",
+            "description": "You slide and crawl your way into a huge opening in the ice.  This room looks as though it were carved from three levels of the surrounding pyramid that have long been buried in ice.  This place looks like a prison of sorts and you see two giant jade stones fixed in the walls humming.  The stones resemble the eyes of a cat and are keeping a mass in the center of the room imprisoned by their gaze.  It is very cold here. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55132"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55105",
+            "name": "The Altar of The Snow Leopard Order",
+            "description": "You stand before a giant statue of the Snow Leopard.  It looks down upon an an open arena where the warriors of the order practice their skills under the gaze of their god.  There are jewels and gold adorning the walls and statue. On the walls you see murals and carvings of many battles fought long ago under the blessings of the Snow Leopard.  Many heroes of the Snow Leopard Order gave their lives in fierce battle.  You hope not to face any this day. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CITY",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55098"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55106",
+            "name": "Steps of Silence",
+            "description": "You struggle to stand as you notice you are on a long ice-covered granite stairway.  You look ahead to make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  Ice covers everything and you realize that as you move you make no sound, it must be the configuration of the passage.  You notice a partially crushed monolith in the ice.  The stairs continue to downward. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "mural",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55124"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55107"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                },
+                {
+                    "keywords": [
+                        "monolith"
+                    ],
+                    "text": "You can't quite make it out but it looks like a frightened person carved into the granite. "
+                }
+            ]
+        },
+        {
+            "id": "55107",
+            "name": "Steps of Silence",
+            "description": "You struggle to stand as you notice you are on a long ice-covered granite stairway.  You look ahead to make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  Ice covers everything and you realize that as you move you make no sound, it must be the configuration of the passage.  The stairs continue downward. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55106"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55108"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55108",
+            "name": "Steps of Silence",
+            "description": "You struggle to stand as you notice you are below a long ice-covered granite stairway.  You look ahead to make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  Ice covers everything and you realize that as you move you make no sound, it must be the configuration of the passage.  The tunnel continues to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55109"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55107"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55109",
+            "name": "Hall of Silence",
+            "description": "You struggle to stand as you notice you are in a long ice-covered granite hallway.  You look ahead to make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  Ice covers everything and you realize that as you move you make no sound, it must be the configuration of the passage.  You notice a large monolith in the ice.  The tunnel continues to the north and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55108"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "monolith",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55111"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55110"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "monolith"
+                    ],
+                    "text": "You notice a frightened person and a huge creature in the monolith. "
+                },
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55110",
+            "name": "Hall of Silence",
+            "description": "You struggle to stand as you notice you are in a long ice-covered granite hallway.  You look ahead to make your way through a tunnel that hasn't been traveled for what looks like thousands of years.  There is crushed stone and rubble everywhere and the passage is difficult.  You notice it is much colder down here and you question your sanity as you wonder what could be in this dark forgotten place.  Ice covers everything and you realize that as you move you make no sound, it must be the configuration of the passage. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55109"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55111",
+            "name": "An Ornate Hall",
+            "description": "Leaving the bleak faceless granite of the other tunnels, this cramped chamber is covered in runes and pictograms.  There was an immense amount of death in this land many years ago.  The runes and pictures seem to continue the tale of the ones in the other passages.  You notice a giant cat forcing an evil looking giant into banishment.  The passage to the east looks guarded. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "You are amazed by an intricately carved talisman into the granite wall. The talisman is crying, but missing a tear? ",
+                    "keyword": "talisman",
+                    "type": "Door",
+                    "key": "55023",
+                    "destination": "55112"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "monolith",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55109"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55112",
+            "name": "Altar of Xapizo",
+            "description": "You slide and crawl your way into a huge opening in the ice.  This room looks as though it were carved from three surrounding rooms of the pyramid that have long been buried in ice.  It is very cold here and a strange mist clings to the ceiling.  There are symbols carved into huge monoliths in every wall and a large bloodstained stone table dominates the center of the room, and icen statues surround it.  The statues look irritated by your presence. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "wall talisman",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55111"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55114",
+            "name": "Lair of Xapizo",
+            "description": "You crawl you way into an almost totally black room.  This room looks as though it is absorbing all the light of your light source.  This place looks like a prison of sorts and you see two giant jade stones fixed in the wall humming.  The stones resemble the eyes of a cat and are keeping a mass in the center of the room imprisoned by their gaze.  It is very cold here. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55137"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55117",
+            "name": "The Order Gauntlet",
+            "description": "You stand just inside the pyramid from the guard station.  It's slightly warmer here and you see torches lining the wall along the passage.  You see statues of battle-scarred warriors along each wall of the hallway.  The statues look as though they are inspecting you as you pass them.  The passage continues to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55118"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55123"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55118",
+            "name": "The Order Gauntlet",
+            "description": "You stand in a spartan hallway of many statues of the heroes of the Leopard Order.  The faces of the once mighty warriors tell a tale of honor and nobility.  It's slightly warmer here and there is no ice.  You see torches lining the wall along the passage.  As you travel the passage you realize the statues look as though they are inspecting you as you pass them.  Immaculately clean steps of black granite lead upward.  The passage also continues to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55117"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55119"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55119",
+            "name": "The Order Gauntlet",
+            "description": "You stand in a spartan hallway of many statues of the heroes of the Leopard Order.  The faces of the once mighty warriors tell a tale of honor and nobility.  It's slightly warmer here and there is no ice.  You see torches lining the wall along the passage.  As you travel the passage you realize the statues look as though they are inspecting you as you pass them.  Immaculately clean steps of black granite lead downward.  The passage also continues to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55120"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55118"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55120",
+            "name": "The Order Gauntlet",
+            "description": "You stand in a spartan hallway of many statues of the heroes of the Leopard Order.  The faces of the once mighty warriors tell a tale of honor and nobility.  It's warmer here and there is no ice.  You see torches lining the wall along the passage.  As you travel the passage you realize the statues look as though they are inspecting you as you pass them.  Immaculately clean steps of black granite lead upward.  The passage also continues to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55119"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55121"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55121",
+            "name": "The Order Gauntlet",
+            "description": "You stand in a spartan hallway of many statues of the heroes of the Leopard Order.  The faces of the once mighty warriors tell a tale of honor and nobility.  It's warmer here and there is no ice.  You see torches lining the wall along the passage.  As you travel the passage you realize the statues look as though they are inspecting you as you pass them.  Immaculately clean steps of black granite lead downward.  The passage also continues to the east. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55082"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55120"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55122",
+            "name": "In the Air...",
+            "description": "You float above the plaza fountain. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL"
+            ],
+            "sector": "AIR",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55089"
+                }
+            }
+        },
+        {
+            "id": "55123",
+            "name": "The Leopard Guard Station",
+            "description": "You stand on a flat landing extending away from the steppe of the pyramid. The wind and cold are greater here as the walls of the pyramid do not protect you.  All around you, on the landing, are statues buried in ice that have no features and barely any form.  You can determine that most of the statues are of men wielding weapons in poses of battle.  The entire landing is covered in ice, as is everything else in sight.  You notice a small exit leading downward between the blocks of the pyramid and a guarded door to the east. ",
+            "flags": [],
+            "sector": "RUINS",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55117"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55043"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55124",
+            "name": "The Leopard Plaza",
+            "description": "This part of the plaza resembles the rest.  It is well lit by large oil lamps placed along the wall and on the columns that support the weight of the ceiling.  There are symbols and murals on the walls and columns.  The murals depict the giant snow leopard and its teachings to the peoples of this land. The plaza continues east, west, and south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55093"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "55087"
+                },
+                "West": {
+                    "description": "The murals depict the giant snow leopard. ",
+                    "keyword": "mural",
+                    "type": "Door",
+                    "key": "-1",
+                    "destination": "55106"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "snow",
+                        "ice"
+                    ],
+                    "text": "You seem to be losing this snowball fight. "
+                }
+            ]
+        },
+        {
+            "id": "55125",
+            "name": "An Ornate Antechamber",
+            "description": "Leaving the bleak faceless granite of the other tunnels this cramped chamber is covered in runes and pictograms.  There was an immense amount of death in this land many years ago.  The runes and pictures seem to continue the tale of the ones in the other passages.  You notice a giant cat forcing an evil looking giant into banishment.  The passage to the east looks guarded. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55126"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55103"
+                }
+            }
+        },
+        {
+            "id": "55126",
+            "name": "Altar of Huitzipa",
+            "description": "The guarded tunnel ends into this large room of decoratively carved black granite.  There is a sacrificial table in the center of the room and a glow coming from the behind it.  There is a large pool carved into the granite floor containing a mysterious silver liquid. ",
+            "flags": [
+                "INDOORS",
+                "PRIVATE"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55125"
+                }
+            }
+        },
+        {
+            "id": "55127",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55128",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55129"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55130"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55131"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55127"
+                }
+            }
+        },
+        {
+            "id": "55129",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55132"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55130",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55131",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55132",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55129"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55104"
+                }
+            }
+        },
+        {
+            "id": "55133",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55134"
+                }
+            }
+        },
+        {
+            "id": "55134",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55135"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55136"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55137"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55133"
+                }
+            }
+        },
+        {
+            "id": "55135",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55134"
+                }
+            }
+        },
+        {
+            "id": "55136",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55134"
+                }
+            }
+        },
+        {
+            "id": "55137",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55134"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55114"
+                }
+            }
+        },
+        {
+            "id": "55138",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "ASTRALPLANE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55139",
+            "name": "On the Demon Plane",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "ASTRALPLANE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55128"
+                }
+            }
+        },
+        {
+            "id": "55140",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55141"
+                }
+            }
+        },
+        {
+            "id": "55141",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55142"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55144"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55145"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55140"
+                }
+            }
+        },
+        {
+            "id": "55142",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55143"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55141"
+                }
+            }
+        },
+        {
+            "id": "55143",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55147"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55144"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55142"
+                }
+            }
+        },
+        {
+            "id": "55144",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55143"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55148"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55146"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55141"
+                }
+            }
+        },
+        {
+            "id": "55145",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55141"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55146"
+                }
+            }
+        },
+        {
+            "id": "55146",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55144"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55149"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55145"
+                }
+            }
+        },
+        {
+            "id": "55147",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55152"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55151"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55148"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55143"
+                }
+            }
+        },
+        {
+            "id": "55148",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55147"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55150"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55149"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55144"
+                }
+            }
+        },
+        {
+            "id": "55149",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55148"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55146"
+                }
+            }
+        },
+        {
+            "id": "55150",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55151"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55148"
+                }
+            }
+        },
+        {
+            "id": "55151",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55153"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55150"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55147"
+                }
+            }
+        },
+        {
+            "id": "55152",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55153"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55147"
+                }
+            }
+        },
+        {
+            "id": "55153",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55154"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55151"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55152"
+                }
+            }
+        },
+        {
+            "id": "55154",
+            "name": "On the Outer Planes",
+            "description": "The realm around you is nebulous and difficult to focus on.  Passages of stone appear to fold in on themselves and the smell of brimstone and death permeates the air. ",
+            "flags": [
+                "INDOORS",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "55153"
+                }
+            }
+        }
+    ]
+}

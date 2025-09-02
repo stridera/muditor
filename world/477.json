@@ -1,0 +1,1592 @@
+{
+    "zone": {
+        "id": "477",
+        "name": "Doom: The Plane of Water",
+        "top": 47799,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "NONE",
+        "resets": {
+            "mob": [
+                {
+                    "id": 48635,
+                    "max": 1,
+                    "room": 47748,
+                    "name": "(the Leviathan)",
+                    "equipped": [
+                        {
+                            "id": 48427,
+                            "max": 1,
+                            "location": 22,
+                            "name": "(the Mask of the Deepest Depths)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48632,
+                    "max": 1,
+                    "room": 47717,
+                    "name": "(the Ice Elemental Lord)",
+                    "equipped": [
+                        {
+                            "id": 48426,
+                            "max": 1,
+                            "location": "About",
+                            "name": "(the Bracers of Loong)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48633,
+                    "max": 1,
+                    "room": 47745,
+                    "name": "(a Titan)",
+                    "equipped": [
+                        {
+                            "id": 48424,
+                            "max": 3,
+                            "location": "Ear",
+                            "name": "(Timun's golden sphere)"
+                        },
+                        {
+                            "id": 48423,
+                            "max": 1,
+                            "location": "Wield",
+                            "name": "(a Titan's girth)"
+                        }
+                    ]
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47750,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47750,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47741,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47741,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47740,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47735,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47735,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47734,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47733,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47732,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47732,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48634,
+                    "max": 8,
+                    "room": 47732,
+                    "name": "(a mist elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47730,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47730,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47728,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47724,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47720,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48631,
+                    "max": 11,
+                    "room": 47720,
+                    "name": "(a Water Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47718,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47718,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47713,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47713,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47710,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47710,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47709,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47709,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47709,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47708,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47708,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47704,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47704,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47704,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47702,
+                    "name": "(an Ice Elemental)"
+                },
+                {
+                    "id": 48630,
+                    "max": 12,
+                    "room": 47702,
+                    "name": "(an Ice Elemental)"
+                }
+            ],
+            "door": [
+                {
+                    "room": 47751,
+                    "direction": "Up",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 47746,
+                    "direction": "Down",
+                    "state": [
+                        "LOCKED"
+                    ]
+                },
+                {
+                    "room": 47736,
+                    "direction": "North",
+                    "state": [
+                        "LOCKED"
+                    ]
+                }
+            ]
+        }
+    },
+    "mobs": [],
+    "objects": [],
+    "shops": null,
+    "triggers": [],
+    "rooms": [
+        {
+            "id": "47700",
+            "name": "An Ice Cavern",
+            "description": "This small cavern appears to have been painstakingly carved out of the ice. The walls are rough hewn and bear the chisel marks of its makers.  Dominating the center of the cavern is a huge obelisk made of ice.  It nearly touches the ceiling some 20 feet overhead.  An eerie light radiates from the center of the obelisk bathing the room in a soft bluish-white light.  At the far end of the cavern a small set of steps lead to a raised ledge.  At the center of the ledge, a small spring sends pure, ice-cold water into a small pool.  Directly in front of the spring, carved into the wall of this icy cavern you see a huge arctic rose.  The only exit is north. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47746"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "rose",
+                        "arctic"
+                    ],
+                    "text": "The arctic rose, some five feet tall, has been carved into the walls of the cavern and the indentations filled with an ice of a deeper, purer blue.  The effect is simple but striking.  A sense of peace and holiness floods through your body as you gaze at the rose.  You recognize the arctic rose as the symbol of Haddixx, the arctic god. "
+                },
+                {
+                    "keywords": [
+                        "obelisk",
+                        "huge"
+                    ],
+                    "text": "This giant obelisk has been carved out of a single piece of pure ice. It is perfectly carved, not a single chisel mark or blemish mars its surface.  A soft bluish-white light radiates from deep within the obelisk. "
+                },
+                {
+                    "keywords": [
+                        "spring",
+                        "pool",
+                        "water",
+                        "pure",
+                        "small"
+                    ],
+                    "text": "Pure ice-cold water flows from a small spring directly under the arctic rose.  It flows into a small pool in the center of the ledge. A small circular wall about two feet high, formed from bricks made of ice, contains the small pool. You consider drinking from the pool, but realize that this water is sacred to a powerful diety and you are not about to pollute it with your dirty lips. "
+                }
+            ]
+        },
+        {
+            "id": "47701",
+            "name": "The Iceberg",
+            "description": "The environment here is harsh and cold.  A frigid arctic air literally saps the heat from your body.  Great clouds of fog form in the air whenever you exhale, and steam rises from your exposed flesh.  Fortunately there is no wind, else you would surely perish from hypothermia.  As you dance about in an attempt to warm up, you see you are upon the northern edge of an iceberg.  To the north, west and east, the iceberg falls steeply and merges with ocean water.  The iceberg itself continues to the south. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "FIELD",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47702"
+                }
+            }
+        },
+        {
+            "id": "47702",
+            "name": "The Iceberg",
+            "description": "Involuntary shivers send you into spasms as you travel this landscape.  You huddle into your clothing for warmth but the cloth does little to prevent a chill from seeping into your bones.  You may continue along the iceberg in any direction. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47701"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47703"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47705"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47706"
+                }
+            }
+        },
+        {
+            "id": "47703",
+            "name": "The Iceberg",
+            "description": "The ice of this berg is slipperly and cold.  Your boots do little to protect you from the cold and you can actually feel a chill creeping up your feet and spreading throughout your body.  You find yourself longing for a thick wool blanket and a bottle of whiskey.  The iceberg continues to the west, east and south, and drops off sharply into the ocean to the north. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47711"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47708"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47702"
+                }
+            }
+        },
+        {
+            "id": "47704",
+            "name": "The Iceberg",
+            "description": "This is the western edge of the iceberg.  Further to the west and south, the ice slopes down abruptly and merges with the ocean.  The ice is slippery here and you keep a fair distance from the edge of the iceberg in order to prevent a plunge into the frigid water.  The iceberg continues to the north and east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47706"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47705"
+                }
+            }
+        },
+        {
+            "id": "47705",
+            "name": "The Iceberg",
+            "description": "The intense cold continues and the frigid winds blast the landscape flattening everything in sight.  The brief glimpses of sunlight far above do little to warm the air, and it would be dangerous to be exposed to these conditions for any length of time.  Passage is possbile along the iceberg in any direction. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47702"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47708"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47707"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47704"
+                }
+            }
+        },
+        {
+            "id": "47706",
+            "name": "The Iceberg",
+            "description": "The iceberg is impossible to traverse to the west or north from this point. The ice falls sharply in those direction, merging with the deathly cold water. Glancing into the western horizon, there are several other icebergs in the vicinity, though none as large as the one you are exploring.  Some of the icebergs have an odd bluish tint.  The iceberg continue to the south and east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47702"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47704"
+                }
+            }
+        },
+        {
+            "id": "47707",
+            "name": "The Iceberg",
+            "description": "A light snow drifts slowly from the sky here.  The snow is dry and the flakes are as large as a thumbnail.  The iceberg continues to the north, east, and south.  To the west, the ice drops away and merges with the ocean far, far below. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47705"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47709"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47713"
+                }
+            }
+        },
+        {
+            "id": "47708",
+            "name": "A Crack in the Ice",
+            "description": "The surface of the iceberg is marred here by a narrow crack not more than two meters long.  Peering into the crack, you see it continues straight down for some distance.  The crack is large enough for to squeeze through and it can be explored, by leaving down.  It is also possible to continue to the north, south, west and east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47703"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47710"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47709"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47705"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47715"
+                }
+            }
+        },
+        {
+            "id": "47709",
+            "name": "The Iceberg",
+            "description": "A light snow drifts slowly from the sky here.  The snow is dry and the flakes are as large as a thumbnail.  The iceberg continues to the north, east, and south.  To the east, the ice drops away and merges with the ocean far, far below. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47708"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47714"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47707"
+                }
+            }
+        },
+        {
+            "id": "47710",
+            "name": "The Iceberg",
+            "description": "The ice falls away to the south and meets with deathly cold water.  The sea, for as far as can be seen, seems to resemble the flat, gray clouds overhead. The ocean seems as lifeless as the sky it mirrors.  Color is absent on this plane, consisting strictly of shades of white and gray.  The iceberg continues along to the north, west, and east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47711"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47712"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47708"
+                }
+            }
+        },
+        {
+            "id": "47711",
+            "name": "The Iceberg",
+            "description": "The air is so frigid even your clothing has become frozen and stiff.  You may continue along the iceberg to the west and south.  To the east and north the ice falls away and merges with the ocean. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47710"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47703"
+                }
+            }
+        },
+        {
+            "id": "47712",
+            "name": "The Iceberg",
+            "description": "To the north and east, the ice falls steeply into the dead gray sea.  A large landmass covered with ice and snow lies on the eastern horizon.  Almost directly to the east, there appears to be a natural bay leading into the landmass.  The iceberg continues to the west and slopes down to the south. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47718"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47710"
+                }
+            }
+        },
+        {
+            "id": "47713",
+            "name": "The Iceberg",
+            "description": "A light snow drifts down from the sky here.  Glancing toward the sky, you see that the clouds are traveling from south to north and you are at the northern edge of the stormfront.  The flat gray clouds promise even more miserable conditions in the future.  You may continue to the north and east. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47707"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47714"
+                }
+            }
+        },
+        {
+            "id": "47714",
+            "name": "The Iceberg",
+            "description": "A light snow falls here from flat gray clouds overhead.  You are at the southern end of the iceberg.  Glancing into the southern horizon, you see that the snow is falling heavily in that direction.  The snow acts as a veil which hides whatever, if anything, lies in that direction.  You may continue to the north and west. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47709"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47713"
+                }
+            }
+        },
+        {
+            "id": "47715",
+            "name": "A Blue Tunnel",
+            "description": "You are just a few meters beneath the surface of the iceberg.  The crack in the ice above lets in very little light.  For some reason, the light changes color and takes on a bluish tint as it travels through the ice.  This is the first hint of color you have seen in this world.  The tunnel continues to slope down, or it is possible to follow it up and return to the surface. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "AIR",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47708"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47716"
+                }
+            }
+        },
+        {
+            "id": "47716",
+            "name": "A Blue Tunnel",
+            "description": "A little light filters into this section of the tunnel from above.  The light is dim but is a very pleasant shade of blue.  The tunnel continues up through the ice at this point, and also breaks off to the east. ",
+            "flags": [],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47717"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47715"
+                }
+            }
+        },
+        {
+            "id": "47717",
+            "name": "The Ice Lord's Cavern",
+            "description": "Dim blue light with no apparent source illuminates this chamber and gives it an eerie feel.  This cavern was carved out of ice by clumsy hands or rough tools.  There is a tunnel in the western wall of this cavern. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47716"
+                }
+            }
+        },
+        {
+            "id": "47718",
+            "name": "The Iceberg",
+            "description": "The path slopes down toward the sea.  The ice is brittle where it meets the ocean, as the slightly warmer water erodes the edges of the iceberg.  The path around the iceberg slopes upward to the north, or it is possible to float out to sea by traveling south. ",
+            "flags": [],
+            "sector": "FIELD",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47712"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47719"
+                }
+            }
+        },
+        {
+            "id": "47719",
+            "name": "On the Ocean",
+            "description": "To the north an iceberg rises from the sea.  The ice slopes down to meet the sea here, and you may leave the water and travel along the ice if you wish. Small chunks of floating ice block your travel to the immediate west and east, but you may continue along the ocean to the south. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47718"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47720"
+                }
+            }
+        },
+        {
+            "id": "47720",
+            "name": "On the Ocean",
+            "description": "The water is flat and gray and moves with long, slow swells.  A fall into the freezing sea, in this environment, could be fatal.  What is the draw that lures explorers to this ocean?  Passage to the immediate west is blocked by small chunks of floating ice, the path to the north, east, and south is clear. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47719"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47721"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47727"
+                }
+            }
+        },
+        {
+            "id": "47721",
+            "name": "On the Ocean",
+            "description": "It strikes you that the landscape is a featureless representation of the color gray.  The sky and the sea are both the same dull gray color, and the dismal monotony is broken only by the occasional iceberg floating in the distance.  Passage to the immediate north and south is blocked by small chunks of floating ice, but you may continue to the east and west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47722"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47720"
+                }
+            }
+        },
+        {
+            "id": "47722",
+            "name": "On the Ocean",
+            "description": "The sharp tang of the ocean air is quite satisfying.  This world may be monotonous and dreary, but the scent of the sea is refreshing and invigorating. Passage to the south and east is blocked by small chunks of floating ice, but you may continue to the north and west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47723"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47721"
+                }
+            }
+        },
+        {
+            "id": "47723",
+            "name": "On the Ocean",
+            "description": "Glancing to the east, there is a large landmass composed entirely of ice and snow.  Much of the landmass is inaccessible, because the ice forms sheer cliffs where it meets the sea.  There is what appears to be a bay a little to the northeast.  Perhaps it will allow exploration of the landmass from there. Passage to the immediate west is blocked by small chunks of floating ice, but you may continue to the north, east, and south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47747"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47724"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47722"
+                }
+            }
+        },
+        {
+            "id": "47724",
+            "name": "On the Ocean",
+            "description": "A landmass rises from the sea to the east.  Sheer cliffs of ice prevent you from landing upon the icemass but you spot a bay almost directly east. Passage to the immediate south and east is blocked by small chunks of floating ice, but you may continue west or north. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47725"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47723"
+                }
+            }
+        },
+        {
+            "id": "47725",
+            "name": "On the Ocean",
+            "description": "A land made of ice and snow rises from the sea to the east.  Passage to the immediate north and west is blocked by small chunks of floating ice, but you may continue to the east or south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47726"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47724"
+                }
+            }
+        },
+        {
+            "id": "47726",
+            "name": "Entrance to the Bay",
+            "description": "To the east, the ocean spills into a protected bay.  Cliffs of ice and snow rise to the north and south, guarding the entrance to the bay.  You may continue west toward the ocean, or east into the bay. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47737"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47725"
+                }
+            }
+        },
+        {
+            "id": "47727",
+            "name": "On the Ocean",
+            "description": "A light snow begins to fall from the flat gray clouds overhead.  You huddle within your clothing and curse the gods.  The freezing temperatures make this realm difficult, but the snow makes the situation completely unbearable. Passage to the west and east is blocked by small chunks of floating ice, but you may continue to the north and south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47720"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47728"
+                }
+            }
+        },
+        {
+            "id": "47728",
+            "name": "On the Ocean",
+            "description": "Snow falls heavily from the sky.  The snow stacks on your clothing and begins to cover your body.  Passage to the immediate south and east is blocked by small chunks of floating ice, but you may continue to the west and north. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47727"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47729"
+                }
+            }
+        },
+        {
+            "id": "47729",
+            "name": "On the Ocean",
+            "description": "The snow is falling heavily.  The horizon is a complete wall of white.  The whiteness seems to be denser to the southwest, but from this distance it is difficult to determine whether the denseness is caused by snowfall or fog. Passage to the immediate north and south is blocked by small chunks of floating ice, but you may continue to the west and east. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47728"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47730"
+                }
+            }
+        },
+        {
+            "id": "47730",
+            "name": "On the Ocean",
+            "description": "As you traverse this area, you notice that you are along the northern edge of a tremendous fog bank.  The snowfall is lighter here and from here it would appear that the entire southern horizon is shrouded in fog.  It may be possible to explore this fog, or return to the east.  Passage to the immediate north and west is blocked by small chunks of floating ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47729"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47731"
+                }
+            }
+        },
+        {
+            "id": "47731",
+            "name": "The Fringe of the Fog",
+            "description": "To the south lies a vast fog bank.  It is quite impossible to determine what who or what might live within it.  A sense of dread bears down at the thought of becoming lost in the fog, but a warm breeze blows from the south and you welcome the opportunity to be finally able to escape the freezing temperature. Passage to the immediate west and east is blocked by small chunks of floating ice, but you may continue to the north or south. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47730"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47732"
+                }
+            }
+        },
+        {
+            "id": "47732",
+            "name": "In the Fog Bank",
+            "description": "The fog is heavy here, limiting visibility to just a few meters.  The air is quite moist and feels very heavy, but the air is so warm and that is an improvement from the intense cold of the realm.  The gray fog surrounds on all sides and may confuses your sense of direction. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47731"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47733"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47733"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47735"
+                }
+            }
+        },
+        {
+            "id": "47733",
+            "name": "In the Fog Bank",
+            "description": "The fog is heavy here, limiting visibility to just a few meters.  The air is quite moist and feels very heavy, but the air is so warm and that is an improvement from the intense cold of the realm.  The gray fog surrounds on all sides and may confuses your sense of direction. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47734"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47732"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47732"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47735"
+                }
+            }
+        },
+        {
+            "id": "47734",
+            "name": "In the Fog Bank",
+            "description": "The fog is heavy here, limiting visibility to just a few meters.  The air is quite moist and feels very heavy, but the air is so warm and that is an improvement from the intense cold of the realm.  The gray fog surrounds on all sides and may confuses your sense of direction.  The fog seems to be denser to the south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47735"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47733"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47736"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47731"
+                }
+            }
+        },
+        {
+            "id": "47735",
+            "name": "In the Fog Bank",
+            "description": "The fog lifts a bit here, extending your visibility.  Although you can see several dozen meters in every direction, you find no landmarks to provide you with orientation. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47731"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47734"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47733"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47732"
+                }
+            }
+        },
+        {
+            "id": "47736",
+            "name": "Gateway to a Fiery Realm",
+            "description": "The fog is dense here, so dense it limits visibility to under a meter.  It seems possible to be lost in this fog forever, were it not for a faint hissing sound which acts as a point of reference.  Effectively blinded by the fog, you sail toward the sound, hoping to find a way to escape this fog bank.  The hissing grows louder and louder as you near it, till it becomes a roar.  The air is very warm here, and reaching down into the water you find the water is also very warm.  The fog parts suddenly, and you discover the source of both the roar and the heat.  Rising in front of you is a small island.  Water along the outskirts of the newly birthed island bubbles and froths as lava pours from the land and into the sea.  Great clouds of fog result from the union, explaining why the mist is so dense here.  The lava makes the island unsafe to travel, but there is a Gateway standing without support on the northern edge of the land.  It seems possible to enter the Gateway by traveling north. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "HILLS",
+            "exits": {
+                "North": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal. The metal, strangely enough, yields to your touch, as though it has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "47800"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47734"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47734"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47734"
+                }
+            }
+        },
+        {
+            "id": "47737",
+            "name": "The Bay",
+            "description": "Entering the bay, the magnificance of the natural beauty is stunning. Forget about the freezing cold and admire the sheer cliffs which rise further to the north, south and east.  Even in this harsh environment, the Earth Goddess can work beauty into the landscape.  From this point, travel can proceed in any direction. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47739"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47738"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47741"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47726"
+                }
+            }
+        },
+        {
+            "id": "47738",
+            "name": "The Bay",
+            "description": "In the distance, to the north, there is a flicker of movement that draws your attention in that direction.  A layer of ice peels from a cliff and falls with a thunderous crash into the sea!  It is possible continue along the bay to the north, west or south.  To the east, there is a staircase which has been carved into the ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47740"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47743"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47742"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47737"
+                }
+            }
+        },
+        {
+            "id": "47739",
+            "name": "The Bay",
+            "description": "Sailing through the still water, the cliffs to your immediate north and west are awe inspiring.  The cliffs are made entirely of ice and rise vertically for several hundred meters.  It is possible to continue to the east and south. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47740"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47737"
+                }
+            }
+        },
+        {
+            "id": "47740",
+            "name": "The Bay",
+            "description": "You sail along the edge of the northern and eastern cliffs, wary of the ice which may fall at any time and without warning.  This part of the bay is littered with numerous chunks of floating ice.  It is possible to continue exploring to the south and west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47738"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47739"
+                }
+            }
+        },
+        {
+            "id": "47741",
+            "name": "The Bay",
+            "description": "Sailing carefully along the edge of the ice cliffs, the ice above seems is unstable and may slide down into the sea at any time.  The bay continues to the north and east.  Passage west and south is blocked by the cliffs. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47737"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47742"
+                }
+            }
+        },
+        {
+            "id": "47742",
+            "name": "The Bay",
+            "description": "Sheer cliffs made of ice block passage to the south and east.  The cliffs rise for several hundred meters and are unscalable.  The bay continues to the north and west. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47738"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47741"
+                }
+            }
+        },
+        {
+            "id": "47743",
+            "name": "Steps of Ice",
+            "description": "The ice falls into the sea here, but not as steeply as the other cliffs you have observed.  As you scan the cliff to your east for the easiest route, your spot a narrow stairway which has been cut into the cliff's face.  The stairway has unusual steps: they are wide, and the steps are twice as far away from each other as they should be.  It is as if these steps have been cut for or by a giant.  The stairs continue up, and the bay lies to the west. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47738"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47744"
+                }
+            }
+        },
+        {
+            "id": "47744",
+            "name": "Steps of Ice",
+            "description": "The steps up the cliff are long and trecherous.  The only way to effectively traverse them is to assume a very long and awkward stride which causes fatigue to set in easily.  The steps continue in a vertical direction. ",
+            "flags": [],
+            "sector": "MOUNTAIN",
+            "exits": {
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47745"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47743"
+                }
+            }
+        },
+        {
+            "id": "47745",
+            "name": "The Ice Cave",
+            "description": "The steps lead to a cave midway up the cliff and proceed no further.  What an amazing discovery!  The cave is stocked with furniture and tools.  On this primitive plane of ice, evidence of intelligent life is surely the last thing expected.  The furniture and even the tools are made of pure, clear ice.  The cave continues to the east.  It is also possible to continue down along the ice steps. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47746"
+                },
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47744"
+                }
+            }
+        },
+        {
+            "id": "47746",
+            "name": "Gateway to a Realm of Earth",
+            "description": "Slick ice covers the floor and walls of this chamber.  The ice is thin and clear, and you can see rocky ground behind it.  This is the first evidence of solid land you have seen since landing on this plane.  The ice seems especially thin on the ground, and peering through the ice you see a Gateway beneath your feet.  You scrape the ice away and see you may easily travel through the Gateway if you wish.  You may also continue to the west and south. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS"
+            ],
+            "sector": "CAVE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47700"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47745"
+                },
+                "Down": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal.  The metal, strangely enough, yields to your touch, as though it has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "47600"
+                }
+            }
+        },
+        {
+            "id": "47747",
+            "name": "On the Ocean",
+            "description": "Irregular waves disturb the otherwise clam surface of the ocean here.  The waves travel from north to south.  To the east, you see a large landmass made of ice and snow.  You may continue along the ocean to the north and south, but passage to the immediate west and east is blocked by small chunks of floating ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47748"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47723"
+                }
+            }
+        },
+        {
+            "id": "47748",
+            "name": "On the Ocean",
+            "description": "The water is turbulant here, as though stirred up from beneath.  The choppy water radiates out in all directions, creating low waves which disturb the calm surface of the sea.  You may continue along the ocean to the north and south, but passage to the immediate west and east is blocked by small chunks of floating ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47749"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47747"
+                }
+            }
+        },
+        {
+            "id": "47749",
+            "name": "On the Ocean",
+            "description": "Slow waves originating from the south disturb the calm surface of the sea here.  Glancing to the northwest, you see a watersprout dancing along the sea's surface.  You may continue to the west and south, but passage to the immediate north and east is blocked by small chunks of floating ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47748"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47750"
+                }
+            }
+        },
+        {
+            "id": "47750",
+            "name": "On the Ocean",
+            "description": "To the north, a watersprout skips across the ocean's surface.  You are some distance from it but may get a closer look by moving north.  You may also continue along the ocean to the east, but passage to the immediate west and south is blocked by small chunks of floating ice. ",
+            "flags": [],
+            "sector": "WATER",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47751"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47749"
+                }
+            }
+        },
+        {
+            "id": "47751",
+            "name": "Gateway to a Realm of Air",
+            "description": "A funnel made of water dances upon the ocean here.  It moves across the ocean eratically, sometimes actually flying several meters in the air as it skips from spot to spot.  You are hesitant to approach the sprout, fearful of being sucked up within it and drowned.  However, as though sensing your presence, the sprout rushes toward you and then, quite suddenly, becomes still. Water parts from the surface of the sprout like a curtain, revealing a Gateway some distance above your head. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "WATER",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "47750"
+                },
+                "Up": {
+                    "description": "The Gateway is fashioned from a silvery metal that has an almost liquid appearance. Gingerly, you reach out and touch the metal. The metal, strangely enough, yields to your touch, as though it has the consistency of butter; but when you remove your finger, the metal flows and rebounds to its original state. You have no doubt this metal, despite its apparent softness, is virtually indestructible. ",
+                    "keyword": "Gateway",
+                    "type": "Pick-proof Door",
+                    "key": "48401",
+                    "destination": "48801"
+                }
+            }
+        }
+    ]
+}

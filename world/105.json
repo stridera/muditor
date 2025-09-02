@@ -1,0 +1,542 @@
+{
+    "zone": {
+        "id": "105",
+        "name": "Some Forests",
+        "top": 10599,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "OCEANIC",
+        "resets": {}
+    },
+    "mobs": [],
+    "objects": [
+        {
+            "id": 10502,
+            "type": "ARMOR",
+            "keywords": [
+                "claws",
+                "disembodied-wolf-claws"
+            ],
+            "short": "a pair of wolf claws",
+            "ground": "A pair of disembodied wolf claws lies here.",
+            "action_desc": "Nothing.",
+            "extras": [
+                {
+                    "keywords": [
+                        "disembodied-wolf-claws"
+                    ],
+                    "text": "Cleaned and carved out, these wolf paws have enough space inside each one to accomodate a hand.  A crude beaten leather has been attached to the inside of the paw, much like the lining in a glove.  Several sharp claws protrude from each paw, sharp enough to cut wood."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [],
+            "weight": 0.8,
+            "cost": 20,
+            "timer": 0,
+            "level": 10,
+            "wear_flags": [
+                "TAKE",
+                "HANDS"
+            ],
+            "affects": [
+                {
+                    "location": "DAMROLL",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        }
+    ],
+    "shops": null,
+    "triggers": [
+        {
+            "id": 10501,
+            "name": "Witch_rand1",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 17,
+            "argument_list": "",
+            "commands": "mecho &0The &2witchwoman&0 looks at you then turns away with a look of disappointment.&0 sigh "
+        },
+        {
+            "id": 10502,
+            "name": "MOB_RAND_SOCIAL_CURSE_30",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 30,
+            "argument_list": "",
+            "commands": "curse "
+        },
+        {
+            "id": 10503,
+            "name": "Witch_rand2",
+            "attach_type": "Object",
+            "flags": [
+                "Random"
+            ],
+            "number_of_arguments": 20,
+            "argument_list": "",
+            "commands": "mecho &0&2The &0&b&9witchwoman&0&2 looks around frantically.&0 say Damn! frown say Hey you. wait 2 say Yes you! Got any mushrooms? I need some for this spell I'm doing. pond wait 1 say I'll reward you if you get me one. mecho &0She goes back to searching the room.&0 "
+        },
+        {
+            "id": 10504,
+            "name": "Witch_receive",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "say thanks %actor.alias% * This is the cute little script that gives players * spells for their efforts. if %object.vnum% == 10509 wait 1 mjunk mushroom cast 'create food' mload obj 10510 wait 3s give mushroom %actor.name% give waybread %actor.name% say Thanks for the thought, but thats no good for me. else if %object.vnum% == 10508 wait 1 mjunk mushroom cast 'armor' %actor.name% thank %actor.name% else if %object.vnum% == 10507 wait 1 junk mushroom thank %actor.name% cast 'cure crit' %actor.name% else wait 1 eye %actor.name% end end end "
+        },
+        {
+            "id": 10505,
+            "name": "MOB_GREET_STEAL_40",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 40,
+            "argument_list": "",
+            "commands": "steal coins %actor.name% "
+        },
+        {
+            "id": 10506,
+            "name": "Old_Dweller_greet",
+            "attach_type": "Object",
+            "flags": [
+                "GreetAll"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* A level checking greet trig. wait 1 msend %actor% &0&b&6The old man tells you, '&0Ahh Welcome my friend.&b&6'&0 if %actor.level% > 25 if %actor.level% < 71 msend %actor% &0&b&6The old man tells you, '&0This is just a happy little forest.&b&6'&0 msend %actor% &0&b&6The old man tells you, '&0Not worth such a mighty one as you even entering.&b&6'&0 msend %actor% &0&b&6The old man tells you, '&0Please leave.&b&6'&0 end end if %actor.level% > 70 bow %actor.name% msend %actor% &0&b&6The old man says 'It's a pleasure %actor.name%. Always welcome into my home.' end if %actor.level% > 5 if %actor.level% < 26 msend %actor% &0&b&6The old man tells you, '&0Hmm You are welcome here, but please don't hurt anything within.&b&6'&0 end end if %actor.level% < 6 msend %actor% &0&b&6The old man tells you, '&0Hello there! Welcome to my forest.&b&6'&0 msend %actor% &0&b&6The old man tells you, '&0Its a beautiful, safe little place that I call home.&b&6'&0 end "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "10501",
+            "name": "A Thickening Forest",
+            "description": "The forest to the east is quite dark, although enough light filters through the treetops far ebove to illuminate the forest floor during daylight hours. Towards the forest, the brush quickly grows very dense, looking very easy to become lost in.  However, the cool, calm tranquility of the trees beckons with its soothing natural atmosphere. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10502"
+                }
+            }
+        },
+        {
+            "id": "10502",
+            "name": "A Confusing Path through the Forest",
+            "description": "This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10503"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10507"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10505"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10501"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10515"
+                }
+            }
+        },
+        {
+            "id": "10503",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10505"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10504"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10506"
+                }
+            }
+        },
+        {
+            "id": "10504",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10508"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "bark",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10516"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10506"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10514"
+                }
+            }
+        },
+        {
+            "id": "10505",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10506"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10503"
+                }
+            }
+        },
+        {
+            "id": "10506",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10507"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10503"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10509"
+                }
+            }
+        },
+        {
+            "id": "10507",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10508"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10502"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10504"
+                }
+            }
+        },
+        {
+            "id": "10508",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10505"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10507"
+                }
+            }
+        },
+        {
+            "id": "10509",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10511"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10512"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10508"
+                }
+            }
+        },
+        {
+            "id": "10510",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10510"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10510"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10504"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10510"
+                }
+            }
+        },
+        {
+            "id": "10511",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10509"
+                }
+            }
+        },
+        {
+            "id": "10512",
+            "name": "&0&2Confusing Path through the Forest&0",
+            "description": "&0&2This forest is scary.  The endless number of thick, seemless trees play tricks with your mind.  Even the most skillful woodsmen in the realms could get lost in here.  However something tells you that this forest is not a place to fear.  Rather the endless trees form a sense of tranquility.  This place would be an ideal place for some weaker animals to hide out in to avoid their predators.  &0 ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10506"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10510"
+                },
+                "Up": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10513"
+                }
+            }
+        },
+        {
+            "id": "10513",
+            "name": "In a Tree House",
+            "description": "This tree house is little more than a thick wooden platform walled with bark.  The bark is still quite green suggesting these sorts of constructions must frequently need rebuilding due to high winds and other destructive forces. Nevertheless, someone has kept the room quite clean, gathering the wind-blown debris in one corner of of the tree house.  The treetop seems to sway quite dramatically, making it difficult to maintain balance. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10512"
+                }
+            }
+        },
+        {
+            "id": "10514",
+            "name": "In a Tree House",
+            "description": "This tree house is little more than a thick wooden platform walled with bark.  The bark is still quite green suggesting these sorts of constructions must frequently need rebuilding due to high winds and other destructive forces. Nevertheless, someone has kept the room quite clean, gathering the wind-blown debris in one corner of of the tree house.  The treetop seems to sway quite dramatically, making it difficult to maintain balance. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10503"
+                }
+            }
+        },
+        {
+            "id": "10515",
+            "name": "In a Tree House",
+            "description": "The walls of this small tree house is quite well constructed, with the walls covered by shelves lined with poisons, salves, skulls, and other wonderous things.  A tangled mass of beaded necklaces lies strewn about on the floor. This house almost certainly belongs to a witch of the forest dwellers, and it looks quite lived in! ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10505"
+                }
+            }
+        },
+        {
+            "id": "10516",
+            "name": "A Small Enclosed Hut",
+            "description": "Little more than some large bark pieces strung up between the trees, this little hut is used by the forest wolf-tamer as a corral for his wolves.  From the look of the flimsy walls, and large gaps between the bark pieces and trees, it would be easy for a wolf or two to escape.  Canine manure and tree branches form a dirty floor to the hut, emitting a strange odor.  To the west, several bark pieces have been tied together to form a doorway. ",
+            "flags": [],
+            "sector": "STRUCTURE",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "bark",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10504"
+                }
+            }
+        },
+        {
+            "id": "10517",
+            "name": "Loading room",
+            "description": "You are in an unfinished room. ",
+            "flags": [
+                "DARK",
+                "PEACEFUL",
+                "SOUNDPROOF",
+                "NOTRACK",
+                "NOWELL",
+                "NORECALL",
+                "NOSUMMON",
+                "NOSHIFT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10504"
+                },
+                "East": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10508"
+                },
+                "South": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10505"
+                },
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10510"
+                }
+            }
+        }
+    ]
+}

@@ -1,0 +1,3681 @@
+{
+    "zone": {
+        "id": "103",
+        "name": "Phoenix Feather Hot Springs",
+        "top": 10399,
+        "lifespan": 30,
+        "reset_mode": "Normal",
+        "hemisphere": "NORTHWEST",
+        "climate": "SUBARCTIC",
+        "resets": {
+            "mob": [
+                {
+                    "id": 10307,
+                    "max": 1,
+                    "room": 10305,
+                    "name": "(Irise)",
+                    "equipped": [
+                        {
+                            "id": 10308,
+                            "max": 1,
+                            "location": "Wrist",
+                            "name": "(a tundra cloak)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10315,
+                    "max": 1,
+                    "room": 10305,
+                    "name": "(a barista)",
+                    "carrying": [
+                        {
+                            "id": 10324,
+                            "max": 50,
+                            "name": "(a teacup)"
+                        },
+                        {
+                            "id": 10323,
+                            "max": 50,
+                            "name": "(a teacup)"
+                        },
+                        {
+                            "id": 10322,
+                            "max": 50,
+                            "name": "(a tall glass)"
+                        },
+                        {
+                            "id": 10321,
+                            "max": 50,
+                            "name": "(a small cup)"
+                        },
+                        {
+                            "id": 10320,
+                            "max": 50,
+                            "name": "(a mug)"
+                        },
+                        {
+                            "id": 10319,
+                            "max": 50,
+                            "name": "(a mug)"
+                        },
+                        {
+                            "id": 10318,
+                            "max": 50,
+                            "name": "(a mug)"
+                        },
+                        {
+                            "id": 10317,
+                            "max": 50,
+                            "name": "(a mug)"
+                        },
+                        {
+                            "id": 10316,
+                            "max": 50,
+                            "name": "(a mug)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10302,
+                    "max": 1,
+                    "room": 10306,
+                    "name": "(Jaden, the Chosen of Journeys)",
+                    "equipped": [
+                        {
+                            "id": 10305,
+                            "max": 1,
+                            "location": "Ear",
+                            "name": "(a golden lantern)"
+                        },
+                        {
+                            "id": 10306,
+                            "max": 10,
+                            "location": "Badge",
+                            "name": "(an apple)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10314,
+                    "max": 1,
+                    "room": 10306,
+                    "name": "(Eamon)"
+                },
+                {
+                    "id": 10313,
+                    "max": 1,
+                    "room": 10332,
+                    "name": "(an osprey)"
+                },
+                {
+                    "id": 10303,
+                    "max": 1,
+                    "room": 10324,
+                    "name": "(Kaz, the Chosen of Battles)",
+                    "equipped": [
+                        {
+                            "id": 10302,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(a green men's towel)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10312,
+                    "max": 5,
+                    "room": 10324,
+                    "name": "(a swimmer)",
+                    "equipped": [
+                        {
+                            "id": 10302,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(a green men's towel)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10300,
+                    "max": 1,
+                    "room": 10307,
+                    "name": "(Khysan Greyshard)",
+                    "equipped": [
+                        {
+                            "id": 10300,
+                            "max": 1,
+                            "location": "Body",
+                            "name": "(a spirit crystal pendant)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10311,
+                    "max": 5,
+                    "room": 10303,
+                    "name": "(a guest)",
+                    "equipped": [
+                        {
+                            "id": 10314,
+                            "max": 5,
+                            "location": "Legs",
+                            "name": "(a light cotton robe)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10310,
+                    "max": 1,
+                    "room": 10301,
+                    "name": "(Warikh)",
+                    "equipped": [
+                        {
+                            "id": 10312,
+                            "max": 1,
+                            "location": "Wrist",
+                            "name": "(a brown fur wrap)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10309,
+                    "max": 5,
+                    "room": 10333,
+                    "name": "(a polar trout)"
+                },
+                {
+                    "id": 10309,
+                    "max": 5,
+                    "room": 10330,
+                    "name": "(a polar trout)"
+                },
+                {
+                    "id": 10308,
+                    "max": 1,
+                    "room": 10309,
+                    "name": "(Rianne d'Argent)",
+                    "equipped": [
+                        {
+                            "id": 10310,
+                            "max": 1,
+                            "location": "Eyes",
+                            "name": "(the master chef's wooden spoon)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10306,
+                    "max": 1,
+                    "room": 10316,
+                    "name": "(Osnys)",
+                    "equipped": [
+                        {
+                            "id": 10302,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(a green men's towel)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10305,
+                    "max": 1,
+                    "room": 10326,
+                    "name": "(Liada Delamon)",
+                    "equipped": [
+                        {
+                            "id": 10303,
+                            "max": 50,
+                            "location": "Legs",
+                            "name": "(a light blue women's towel)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10304,
+                    "max": 1,
+                    "room": 10302,
+                    "name": "(Arceroi, the Chosen of Secrets)",
+                    "equipped": [
+                        {
+                            "id": 10307,
+                            "max": 1,
+                            "location": "Hover",
+                            "name": "(a pair of glasses)"
+                        }
+                    ]
+                },
+                {
+                    "id": 10301,
+                    "max": 1,
+                    "room": 10318,
+                    "name": "(Tai'ir, the Chosen of Endings)",
+                    "equipped": [
+                        {
+                            "id": 10304,
+                            "max": 1,
+                            "location": 22,
+                            "name": "(a demonic mask)"
+                        },
+                        {
+                            "id": 10302,
+                            "max": 50,
+                            "location": "Hands",
+                            "name": "(a green men's towel)"
+                        }
+                    ]
+                }
+            ],
+            "door": [
+                {
+                    "room": 10310,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10311,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10311,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10311,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10307,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10301,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10309,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10309,
+                    "direction": "South",
+                    "state": [
+                        "HIDDEN",
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10300,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10313,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10308,
+                    "direction": "East",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10315,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10312,
+                    "direction": "West",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10317,
+                    "direction": "South",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10321,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10319,
+                    "direction": "North",
+                    "state": [
+                        "CLOSED"
+                    ]
+                },
+                {
+                    "room": 10320,
+                    "direction": "North",
+                    "state": [
+                        "HIDDEN"
+                    ]
+                }
+            ],
+            "remove": [
+                {
+                    "room": 10316,
+                    "id": 10309,
+                    "name": "(a pitcher of cool water)"
+                }
+            ],
+            "object": [
+                {
+                    "id": 10309,
+                    "max": 1,
+                    "room": 10316,
+                    "name": "(a pitcher of cool water)"
+                }
+            ]
+        }
+    },
+    "mobs": [
+        {
+            "id": 10300,
+            "keywords": "khysan greyshard contented-looking half-elf shopkeeper",
+            "mob_class": "Cryomancer",
+            "short_desc": "Khysan Greyshard",
+            "long_desc": "A contented-looking half-elf tends to the counter.",
+            "desc": "A little short for a half-elf, this mage is graced with pale blond hair and the muscular frame of his human side.  His eyes are a pale, icy blue color, but there is warmth in them.  His clothing is an odd mixture of silvery silks and light blue cottons, all of the highest quality.  The overall impression is of someone sleek and capable.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "MEMORY",
+                "NOCHARM",
+                "NOSUMMON",
+                "NOBASH"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS"
+            ],
+            "alignment": 1000,
+            "level": 99,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 9,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 76,
+                "intelligence": 83,
+                "wisdom": 85,
+                "dexterity": 80,
+                "constitution": 66,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10301,
+            "keywords": "tai'ir man muscular taiir soaking chosen-endings",
+            "mob_class": "Monk",
+            "short_desc": "Tai'ir, the Chosen of Endings",
+            "long_desc": "A muscular man soaks in the hot spring.",
+            "desc": "Scars crisscross the muscular body of this man.  He moves with feline grace, though for the most part he seems content to sit here and let the hot waters soak his troubles away.  Obviously looking for privacy, he has chosen this pool to avoid the women in the resort.  On his forehead is a strange, purple tattoo. ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "MEMORY"
+            ],
+            "effect_flags": [
+                "HASTE"
+            ],
+            "alignment": 0,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 70,
+                "wisdom": 74,
+                "dexterity": 86,
+                "constitution": 86,
+                "charisma": 68
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10302,
+            "keywords": "monk jaden blind-monk journeys-chosen gliding graceful",
+            "mob_class": "Monk",
+            "short_desc": "Jaden, the Chosen of Journeys",
+            "long_desc": "A blind monk glides gracefully along his way.",
+            "desc": "Dressed in robes of soft blue, this monk has a black silk blindfold covering his eyes.  Despite this impediment to vision, he smiles cheerfully and seems to be able to move around without worrying about bumping into anything.  On his forehead is an unfamiliar symbol, glowing a bright blue.    ",
+            "mob_flags": [
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [
+                "BLIND",
+                "SNEAK"
+            ],
+            "alignment": 0,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 96,
+                "intelligence": 68,
+                "wisdom": 74,
+                "dexterity": 82,
+                "constitution": 76,
+                "charisma": 68
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10303,
+            "keywords": "monk kaz battles-chosen vigorous-monk",
+            "mob_class": "Monk",
+            "short_desc": "Kaz, the Chosen of Battles",
+            "long_desc": "A vigorous monk is here, enjoying the hot springs.",
+            "desc": "Constantly in motion, this monk seems to have too much energy despite the relaxing care of the hot springs.  Still, his moves are graceful, like a large cat hot on the scent of prey.  Long scars on his back are almost reminiscent of lash marks, but his beefy form attests to someone who can take care of himself. An unfamiliar symbol on his forehead glows bright red.    ",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER"
+            ],
+            "effect_flags": [
+                "WATERWALK"
+            ],
+            "alignment": 0,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 86,
+                "intelligence": 68,
+                "wisdom": 75,
+                "dexterity": 84,
+                "constitution": 77,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10304,
+            "keywords": "monk arceroi quiet-monk reading secrets-chosen",
+            "mob_class": "Monk",
+            "short_desc": "Arceroi, the Chosen of Secrets",
+            "long_desc": "A quiet monk is reading by the fire.",
+            "desc": "She is a little on the short side, and ignores people quite effectively when occupied with her book.  When she does move, it is with an elegance that speaks of martial training - not what one would expect from a scholar.  A half-smirk on her face implies that she knows everything.  A strange symbol on her forehead glows with a soft yellow light.    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "STAY_ZONE",
+                "MEMORY",
+                "NOCHARM"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE"
+            ],
+            "alignment": 0,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 96,
+                "intelligence": 64,
+                "wisdom": 74,
+                "dexterity": 82,
+                "constitution": 78,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10305,
+            "keywords": "liada delamon sensuous-woman",
+            "mob_class": "Paladin",
+            "short_desc": "Liada Delamon",
+            "long_desc": "A sensuous woman relaxes in the hot springs.",
+            "desc": "Her hair is dark brown, almost black, and it is pinned up to keep dry.  Her skin is dusky, as though she sees a lot of sunlight.  Her eyes are a piercing blue, and they don't seem to miss much.  She is built like a warrior but moves more like a gymnast.  An almost palpable air of serenity surrounds her.    ",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "NOVICIOUS"
+            ],
+            "effect_flags": [
+                "WATERWALK"
+            ],
+            "alignment": 1000,
+            "level": 30,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 88,
+                "intelligence": 70,
+                "wisdom": 76,
+                "dexterity": 82,
+                "constitution": 82,
+                "charisma": 64
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10306,
+            "keywords": "osnys pyromancer relaxing",
+            "mob_class": "Pyromancer",
+            "short_desc": "Osnys",
+            "long_desc": "A pyromancer is relaxing in the hottest part of the pool.",
+            "desc": "This man doesn't seem entirely human.  Maybe it's the color of his hair - yellow at the roots, slowly darkening to orange and then a rich red, with black at the very tips.  Maybe it's his skin (golden) or his eyes (also golden), but he seems more like a creature from the plane of Fire who's only wearing a human form for this vacation.  That in mind, why is he visiting a water resort?    ",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "HELPER",
+                "NOSUMMON"
+            ],
+            "effect_flags": [
+                "WATERWALK",
+                "NOTRACK"
+            ],
+            "alignment": 0,
+            "level": 35,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 13,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 93,
+                "intelligence": 78,
+                "wisdom": 77,
+                "dexterity": 79,
+                "constitution": 68,
+                "charisma": 59
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Elemental",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10307,
+            "keywords": "irise arctic-druid",
+            "mob_class": "Druid",
+            "short_desc": "Irise",
+            "long_desc": "An arctic druid wanders the halls of the resort.",
+            "desc": "White feathers woven into her dark hair make this woman look quite exotic. Her clothing has patterns reminiscent of animal camoflauge, but is made from thick linens and cottons rather than real animal skins.  She seems very serene and always has a smile on her face.    ",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 25,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 82,
+                "wisdom": 83,
+                "dexterity": 77,
+                "constitution": 66,
+                "charisma": 61
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10308,
+            "keywords": "woman rianne d'argent silver-haired regal cook chef",
+            "mob_class": "Ranger",
+            "short_desc": "Rianne d'Argent",
+            "long_desc": "A regal, silver-haired woman is here, waving around a spoon.",
+            "desc": "She is tall, but not overly so.  Her quick grey eyes don't miss anything that goes on in her domain, for she is the Queen of the Kitchen.  Not a knife goes dull nor a dish unperfected.  It is said that elves live for hundreds of years, so her mastery of gourmet has the potential to far surpass any mortal cook.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "STAY_ZONE",
+                "MEMORY",
+                "FAST_TRACK"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE",
+                "GLORY"
+            ],
+            "alignment": 1000,
+            "level": 65,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 2,
+            "race": 1,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 84,
+                "intelligence": 86,
+                "wisdom": 65,
+                "dexterity": 72,
+                "constitution": 83,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10309,
+            "keywords": "trout fish polar-trout white",
+            "mob_class": "Ranger",
+            "short_desc": "a polar trout",
+            "long_desc": "A white fish swims gracefully through the water.",
+            "desc": "A favorite catch of fishermen everywhere, the trout is a fish that loves streams and brooks.  This particular variety has adapted itself to the waters that flow from the hot spring, so is leaner than other varieties of fish found in this region.  Its coloring is a mottled brown-white to blend in with the rocks and ice, and is well-known for its flaky flesh that tastes delicious in fish stew.",
+            "mob_flags": [
+                "ISNPC"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 0,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 87,
+                "intelligence": 68,
+                "wisdom": 71,
+                "dexterity": 79,
+                "constitution": 75,
+                "charisma": 74
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "MAUL"
+        },
+        {
+            "id": 10310,
+            "keywords": "warikh inconspicuous-youth",
+            "mob_class": "Thief",
+            "short_desc": "Warikh",
+            "long_desc": "An inconspicuous youth inspects the resort here.",
+            "desc": "Sandy brown hair and pale eyes make this young man barely noticeable up north, where most people have that coloring.  He is small, but quick, and his build is of an athlete rather than a warrior.  He doesn't have any visible weapons and is clad in a very generic brown fur wrap.",
+            "mob_flags": [
+                "SCAVENGER",
+                "ISNPC",
+                "STAY_ZONE",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [
+                "DETECT_INVIS",
+                "SENSE_LIFE",
+                "SNEAK"
+            ],
+            "alignment": 0,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 95,
+                "intelligence": 69,
+                "wisdom": 62,
+                "dexterity": 89,
+                "constitution": 73,
+                "charisma": 65
+            },
+            "perception": 0,
+            "concealment": 400,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10311,
+            "keywords": "guest peaceful-looking resort customer resort-guest resort-customer",
+            "mob_class": "Warrior",
+            "short_desc": "a guest",
+            "long_desc": "A peaceful-looking resort customer wanders around here.",
+            "desc": "He has the bearing of a military officer, but he's obviously on vacation. He's dressed in the sort of loose robe provided by the resort to its patrons for casual wear.  Dark hair and tanned skin speak of an origin far to the south - the resort seems to be popular with all kinds of people!",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 45,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 80,
+                "intelligence": 66,
+                "wisdom": 71,
+                "dexterity": 93,
+                "constitution": 81,
+                "charisma": 62
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10312,
+            "keywords": "swimmer scarred man relaxing scarred-man-relaxing-in-pool",
+            "mob_class": "Mercenary",
+            "short_desc": "a swimmer",
+            "long_desc": "A scarred man is relaxing in the pool here.",
+            "desc": "A few scars mark this man as a fighter, though he seems to be compeltely relaxed in the pool.  He has the look of someone from Ickle, probably a local out enjoying some extra vacation time.  He probably wouldn't like to be disturbed - but then, who would?",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE"
+            ],
+            "effect_flags": [],
+            "alignment": 300,
+            "level": 40,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 10,
+            "race_align": 0,
+            "size": 3,
+            "stats": {
+                "strength": 76,
+                "intelligence": 70,
+                "wisdom": 80,
+                "dexterity": 82,
+                "constitution": 77,
+                "charisma": 69
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10313,
+            "keywords": "osprey",
+            "mob_class": "Ranger",
+            "short_desc": "an osprey",
+            "long_desc": "An osprey watches the waters for signs of fish.",
+            "desc": "Also known as the fighing eagle, the osprey is a magnificent bird.  Its feathers are white speckled with brown, its talons are long and sharp, and its beak is deadly to its prey.  It has dark, beady eyes that can see for a very long distance and can make out the shape of a fish even through the ice.",
+            "mob_flags": [
+                "ISNPC",
+                "STAY_ZONE",
+                "SLOW_TRACK"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 10,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 0,
+            "race": 14,
+            "race_align": 0,
+            "size": 1,
+            "stats": {
+                "strength": 85,
+                "intelligence": 76,
+                "wisdom": 64,
+                "dexterity": 85,
+                "constitution": 84,
+                "charisma": 57
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10314,
+            "keywords": "eamon muscular-druid masseuse",
+            "mob_class": "Druid",
+            "short_desc": "Eamon",
+            "long_desc": "A muscular druid stands ready at a massage chair.",
+            "desc": "This large druid is clad in simple robes with a golden aspen-leaf necklace identifying his class.  His face is lit with a gentle smile.  A nametag pinned to his robes says he is Eamon, the resident massage therapist of Phoenix Feather.  Under his robes, his arms are tattooed, but the figures are difficult to make out.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "AWARE",
+                "NOSUMMON"
+            ],
+            "effect_flags": [],
+            "alignment": 0,
+            "level": 45,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 79,
+                "intelligence": 80,
+                "wisdom": 85,
+                "dexterity": 77,
+                "constitution": 66,
+                "charisma": 66
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        },
+        {
+            "id": 10315,
+            "keywords": "barista skillful shopkeeper bartender",
+            "mob_class": "Rogue",
+            "short_desc": "a barista",
+            "long_desc": "A skillful barista is here, ready to sell drinks to patrons.",
+            "desc": "By his official-looking posture, he appears to be an employee of the resort. Dark brown hair is neatly tied back and his hands are stained dark from mixing up drinks.  A true master of his craft, this man is capable of mixing and brewing up any hot drink that is ordered.",
+            "mob_flags": [
+                "SENTINEL",
+                "ISNPC",
+                "NOSUMMON",
+                "NO_CLASS_AI"
+            ],
+            "effect_flags": [],
+            "alignment": 750,
+            "level": 75,
+            "hp_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "move": 0,
+            "ac": 0,
+            "hit_roll": 20,
+            "damage_dice": {
+                "num": 0,
+                "size": 0,
+                "bonus": 0
+            },
+            "money": {
+                "copper": 0,
+                "silver": 0,
+                "gold": 0,
+                "platinum": 0
+            },
+            "position": 3,
+            "default_position": 3,
+            "gender": 1,
+            "race": 0,
+            "race_align": 0,
+            "size": 2,
+            "stats": {
+                "strength": 82,
+                "intelligence": 74,
+                "wisdom": 82,
+                "dexterity": 82,
+                "constitution": 82,
+                "charisma": 72
+            },
+            "perception": 0,
+            "concealment": 0,
+            "life_force": "Life",
+            "composition": "Flesh",
+            "stance": "Alert",
+            "damage_type": "HIT"
+        }
+    ],
+    "objects": [
+        {
+            "id": 10300,
+            "type": "TREASURE",
+            "keywords": [
+                "pendant",
+                "spirit-crystal-pendant",
+                "pale-blue-crystal",
+                "silver-chain"
+            ],
+            "short": "a spirit crystal pendant",
+            "ground": "A pale blue crystal on a silver chain rests here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pendant",
+                        "spirit-crystal-pendant",
+                        "pale-blue-crystal",
+                        "silver-chain"
+                    ],
+                    "text": "It shimmers of its own light, constantly reflecting the emotional state of its owner.  The setting is a delicate filgiree net that encases the crystal and keeps it safe while still allowing it to be visible.  A strange energy shocks anyone who tries to touch it directly unless the crystal is their own.    "
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [],
+            "weight": 0.7,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "NECK"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10301,
+            "type": "ARMOR",
+            "keywords": [
+                "towel",
+                "white-towel",
+                "head-towel"
+            ],
+            "short": "a white towel",
+            "ground": "A white towel is folded here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "white-towel",
+                        "head-towel",
+                        "cloth"
+                    ],
+                    "text": "This is a simple, fuzzy white towel.  It looks quite water-absorbant and is the kind of thing you'd want to wear around your head to keep your hair from getting soaked, or to dry off your hair in case it's already wet.  There's a small tag on one end that reads, \"Property of Phoenix Feather Hot Springs\"."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.8,
+            "cost": 500,
+            "timer": 10,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HEAD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10302,
+            "type": "ARMOR",
+            "keywords": [
+                "towel",
+                "green-men's-towel",
+                "green-mens-towel",
+                "fabric"
+            ],
+            "short": "a green men's towel",
+            "ground": "A green towel has been tossed on the ground here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "towel",
+                        "green-men's-towel",
+                        "green-mens-towel",
+                        "fabric"
+                    ],
+                    "text": "This is a large, fluffy towel dyed dark green.  Though it is well-made, it looks like it's seen plenty of use and has a slight sulfur smell from the mineral water.  Still, it would be good either to dry oneself off or to wear around the waist to preserve decency while bathing.  A small tag on one of the hems says \"Phoenix Feather Hot Springs\"."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.8,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "LEGS"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10303,
+            "type": "ARMOR",
+            "keywords": [
+                "towel",
+                "light-blue-women's-towel",
+                "light-blue-womens-towel",
+                "light-blue-towel"
+            ],
+            "short": "a light blue women's towel",
+            "ground": "A neatly folded light blue towel has been left here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "towel",
+                        "light-blue-women's-towel",
+                        "light-blue-womens-towel",
+                        "light-blue-towel"
+                    ],
+                    "text": "This cute towel is the pure blue of a winter sky.  Made of fine cotton, it would be ideal for covering oneself in the hot springs or for drying off afterwards.  Though well-used, it seems to be in good condition.  A white tag on the hem says, \"Property of Phoenix Feather Hot Springs\"."
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.8,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10304,
+            "type": "TREASURE",
+            "keywords": [
+                "mask",
+                "demonic-mask",
+                "frightening-mask"
+            ],
+            "short": "a demonic mask",
+            "ground": "A frightening mask is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "mask",
+                        "demonic-mask",
+                        "frightening-mask"
+                    ],
+                    "text": "Made of beaten gold and shaped into the fearsome visage of a scowling demon, this mask is complete with curling white horns.  Sure to frighten anyone gazing upon it, the demon's face is both ugly and true to form.  Perhaps it was modeled after a real demon."
+                }
+            ],
+            "values": {
+                "AC": 2
+            },
+            "flags": [
+                "ANTI_GOOD",
+                "ANTI_NEUTRAL",
+                "ANTI_SORCERER",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_DRUID",
+                "ANTI_SHAMAN",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY",
+                "ANTI_CONJURER"
+            ],
+            "weight": 3.5,
+            "cost": 5000,
+            "timer": 100,
+            "level": 35,
+            "wear_flags": [
+                "TAKE",
+                "FACE"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 5
+                },
+                {
+                    "location": "WIS",
+                    "modifier": 1
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 10305,
+            "type": "LIGHT",
+            "keywords": [
+                "lantern",
+                "golden-lantern",
+                "gold"
+            ],
+            "short": "a golden lantern",
+            "ground": "A golden lantern shines with a pale light here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "golden-lantern"
+                    ],
+                    "text": "This lanters glows with a strange, almost dark light.  A brass shielding lets the user focus the light on one side or, by lowering it, allows the light to spread around and illuminate everything.  Though ancient, the goldwork is plain and the only decoration is a dragon etched on the handle."
+                }
+            ],
+            "values": {
+                "Is_Lit:": false,
+                "Capacity": 100,
+                "Remaining": 100
+            },
+            "flags": [
+                "NOINVIS",
+                "ANTI_GOOD"
+            ],
+            "weight": 4.0,
+            "cost": 1000,
+            "timer": 100,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10306,
+            "type": "FOOD",
+            "keywords": [
+                "apple",
+                "tasty-green-apple",
+                "food"
+            ],
+            "short": "an apple",
+            "ground": "A tasty green apple rolls around on the floor.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "apple",
+                        "tasty-green-apple",
+                        "food"
+                    ],
+                    "text": "It's a scrumptious-looking apple, dripping with yummy apple juice and crunching noisily when bitten into.  It looks quite fresh, and would surely taste excellent.  It's nice and round and has nary a wormhole, so what are you waiting for??  Eat it!    "
+                }
+            ],
+            "values": {
+                "Filling": 3,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10307,
+            "type": "TREASURE",
+            "keywords": [
+                "glasses",
+                "silver-trimmed-glasses"
+            ],
+            "short": "a pair of glasses",
+            "ground": "A pair of silver-trimmed glasses has been abandoned here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "glasses",
+                        "silver-trimmed-glasses"
+                    ],
+                    "text": "These finely ground lenses must be gnomish work, for they seem to be flawless. The rims are a thin silver and the nosepiece seems quite comfortable.  They would surely be a great help to someone who has no near-vision that wants to read a book or crochet or do anything else that requires them to see things close up.    "
+                }
+            ],
+            "values": {
+                "AC": 0
+            },
+            "flags": [
+                "ANTI_BERSERKER",
+                "ANTI_ROGUE",
+                "ANTI_WARRIOR",
+                "ANTI_PALADIN",
+                "ANTI_ANTI_PALADIN",
+                "ANTI_RANGER",
+                "ANTI_ASSASSIN",
+                "ANTI_MERCENARY"
+            ],
+            "weight": 0.1,
+            "cost": 500,
+            "timer": 5,
+            "level": 40,
+            "wear_flags": [
+                "TAKE",
+                "EYES"
+            ],
+            "affects": [
+                {
+                    "location": "INT",
+                    "modifier": 3
+                },
+                {
+                    "location": "PERCEPTION",
+                    "modifier": 80
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 1
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 10308,
+            "type": "ARMOR",
+            "keywords": [
+                "cloak",
+                "tundra-cloak",
+                "pile",
+                "snowy-white-cloth"
+            ],
+            "short": "a tundra cloak",
+            "ground": "A pile of snowy white cloth has been carelessly dropped here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cloak",
+                        "tundra-cloak",
+                        "pile",
+                        "snowy-white-cloth"
+                    ],
+                    "text": "This finely woven cloak is made of pure white satin with cotton embroidery marking out an abstract bird symbol on the back which, though it is also in white, shows up in string light due to the difference in luster between the two fabrics.  Long ties at the neck can be used to fasten the cloak against the chill winds of the north.  It looks like it would also make great camoflauge in the snow."
+                }
+            ],
+            "values": {
+                "AC": 4
+            },
+            "flags": [
+                "GLOW",
+                "MAGIC",
+                "FLOAT"
+            ],
+            "weight": 8.0,
+            "cost": 5000,
+            "timer": 0,
+            "level": 25,
+            "wear_flags": [
+                "TAKE",
+                "ABOUT"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 5
+                },
+                {
+                    "location": "MOVE",
+                    "modifier": 10
+                },
+                {
+                    "location": "WIS",
+                    "modifier": 3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 10309,
+            "type": "FOUNTAIN",
+            "keywords": [
+                "pitcher",
+                "cool-water",
+                "cool-drinking-water"
+            ],
+            "short": "a pitcher of cool water",
+            "ground": "A pitcher of cool drinking water sits on a shelf.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "pitcher",
+                        "cool-water",
+                        "cool-drinking-water"
+                    ],
+                    "text": "A sizeable pitcher made of some dwarven alloy that won't rust or tarnish even in the steam from the hot springs sits on a stone shelf.  Condensation has formed on the outside of the pitcher, and it has a little cap to prevent the water inside from evaporating.  It must be magically cooled as well, but then, the resort IS owned and managed by a cryomancer."
+                }
+            ],
+            "values": {
+                "Capacity": 100,
+                "Remaining": 100,
+                "Liquid": "WATER",
+                "Poisoned": false
+            },
+            "flags": [
+                "NOINVIS",
+                "FLOAT"
+            ],
+            "weight": 105.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [],
+            "effects": []
+        },
+        {
+            "id": 10310,
+            "type": "WEAPON",
+            "keywords": [
+                "spoon",
+                "master-chef's-wooden-spoon",
+                "slender-wooden-spoon",
+                "master-chefs-wooden-spoon"
+            ],
+            "short": "the master chef's wooden spoon",
+            "ground": "A slender wooden spoon has been lost here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "spoon",
+                        "master-chef's-wooden-spoon",
+                        "slender-wooden-spoon",
+                        "master-chefs-wooden-spoon"
+                    ],
+                    "text": "An ordinary kitchen utensil...  Or is it?"
+                }
+            ],
+            "values": {
+                "HitRoll": 0,
+                "Hit Dice": {
+                    "num": "1",
+                    "size": "2",
+                    "bonus": 0
+                },
+                "Average": 2.0,
+                "Damage Type": "BLUDGEON"
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 0.2,
+            "cost": 0,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "affects": [
+                {
+                    "location": "CHAR_HEIGHT",
+                    "modifier": 5
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 10311,
+            "type": "FOOD",
+            "keywords": [
+                "fish",
+                "meat",
+                "tasty",
+                "bit",
+                "white",
+                "polar-trout-filet",
+                "food"
+            ],
+            "short": "a filet of polar trout",
+            "ground": "A tasty bit of white fish meat is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "fish",
+                        "meat",
+                        "tasty",
+                        "bit",
+                        "white",
+                        "polar-trout-filet",
+                        "food"
+                    ],
+                    "text": "It's a bit of meat from the elusive polar trout.  Fry it up with dill or mince it into pies for the best flavor.  It's said that te natives of Odaishyozen eat raw fish with rice, but it would probably taste better cooked."
+                }
+            ],
+            "values": {
+                "Filling": 5,
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.4,
+            "cost": 100,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10312,
+            "type": "ARMOR",
+            "keywords": [
+                "wrap",
+                "brown-fur-wrap",
+                "pile"
+            ],
+            "short": "a brown fur wrap",
+            "ground": "A pile of brown fur sits on the ground.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "brown-fur-wrap",
+                        "pile"
+                    ],
+                    "text": "A style popular in Ickle, this length of warm fur looks like it's made fromgrizzly bear hide, which is excellent at keeping in the warmth.  On the inside is a small sigil burned into the leather: a stylized four-pointed sun, symbol of the tribe of the Bear in the Canyons."
+                }
+            ],
+            "values": {
+                "AC": 5
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 6.0,
+            "cost": 500,
+            "timer": 1,
+            "level": 20,
+            "wear_flags": [
+                "TAKE",
+                "ABOUT"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10314,
+            "type": "ARMOR",
+            "keywords": [
+                "yukata",
+                "light-cotton-yukata",
+                "cotton-robe"
+            ],
+            "short": "a light cotton yukata",
+            "ground": "A neatly folded cotton robe rests here.",
+            "action_desc": "Nothing.",
+            "extras": [
+                {
+                    "keywords": [
+                        "yukata",
+                        "light-cotton-yukata",
+                        "cotton-robe"
+                    ],
+                    "text": "This light blue robe is decorated with a feather pattern, identifying it as belonging to the Phoenix Feather Resort west of Ickle.  The style is familiar to anyone who knows the customs of Odaishyozen: it's meant to be worn in the same way as a kimono.  Because it's made of cotton rather than silk and designed for more casual wear, this style of robe is called a yukata.  It was probably designed by someone from the resort who visited the Emerald Isle."
+                }
+            ],
+            "values": {
+                "AC": 7
+            },
+            "flags": [
+                "FLOAT"
+            ],
+            "weight": 1.3,
+            "cost": 700,
+            "timer": 0,
+            "level": 25,
+            "wear_flags": [
+                "TAKE",
+                "BODY"
+            ],
+            "affects": [
+                {
+                    "location": "WIS",
+                    "modifier": 3
+                }
+            ],
+            "effects": []
+        },
+        {
+            "id": 10315,
+            "type": "LIGHT",
+            "keywords": [
+                "emerald",
+                "brilliant-emerald",
+                "green-gem-remarkable-beauty",
+                "beautiful"
+            ],
+            "short": "a brilliant emerald",
+            "ground": "A green gem of remarkable beauty rests on the floor.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "emerald",
+                        "brilliant-emerald",
+                        "green-gem-remarkable-beauty",
+                        "beautiful"
+                    ],
+                    "text": "It's a large emerald, about the size of a bean.  It glows with a brilliant green light, illuminating the area around it.  It is undoubtedly enchanted, since it's warm to the touch and gives off a faint sense of well-being to anyone who picks it up.  Looking closely, the very faint outline of a hawk is visible on one facet."
+                }
+            ],
+            "values": {
+                "Is_Lit:": false,
+                "Capacity": -1,
+                "Remaining": -1
+            },
+            "flags": [
+                "GLOW",
+                "MAGIC"
+            ],
+            "weight": 0.02,
+            "cost": 30000,
+            "timer": 0,
+            "level": 65,
+            "wear_flags": [
+                "TAKE",
+                "HOLD",
+                "HOVER"
+            ],
+            "affects": [
+                {
+                    "location": "HIT",
+                    "modifier": 10
+                },
+                {
+                    "location": "MOVE",
+                    "modifier": 50
+                },
+                {
+                    "location": "FOCUS",
+                    "modifier": 3
+                },
+                {
+                    "location": "AC",
+                    "modifier": 2
+                }
+            ],
+            "effects": [
+                "STONE_SKIN"
+            ]
+        },
+        {
+            "id": 10316,
+            "type": "DRINKCON",
+            "keywords": [
+                "mug",
+                "phoenix-feather-hot-springs"
+            ],
+            "short": "a mug",
+            "ground": "A mug with the insignia of Phoenix Feather Hot Springs is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "insignia"
+                    ],
+                    "text": "The symbol is that of a single red feather slanting diagonally against a snowflake."
+                },
+                {
+                    "keywords": [
+                        "mug",
+                        "phoenix-feather-hot-springs"
+                    ],
+                    "text": "It's a large cermaic mug with enough room for a few drinks of liquid.  It's marked with the insignia of Phoenix Feather Hot Springs."
+                }
+            ],
+            "values": {
+                "Capacity": 6,
+                "Remaining": 0,
+                "Liquid": "WHISKY",
+                "Poisoned": true
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 15,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10317,
+            "type": "DRINKCON",
+            "keywords": [
+                "mug",
+                "phoenix-feather-hot-springs-mug"
+            ],
+            "short": "a mug",
+            "ground": "A mug with the insignia of Phoenix Feather Hot Springs is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "mug",
+                        "phoenix-feather-hot-springs"
+                    ],
+                    "text": "It's a large cermaic mug with enough room for a few drinks of liquid.  It's marked with the insignia of Phoenix Feather Hot Springs."
+                },
+                {
+                    "keywords": [
+                        "insignia"
+                    ],
+                    "text": "The symbol is that of a single red feather slanting diagonally against a snowflake."
+                }
+            ],
+            "values": {
+                "Capacity": 8,
+                "Remaining": 8,
+                "Liquid": "COFFEE",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 15,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10318,
+            "type": "DRINKCON",
+            "keywords": [
+                "mug",
+                "phoenix-feather-hot-springs-mug"
+            ],
+            "short": "a mug",
+            "ground": "A mug with the insignia of Pheonix Feather Hot Springs is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "mug",
+                        "phoenix-feather-hot-springs"
+                    ],
+                    "text": "It's a large cermaic mug with enough room for a few drinks of liquid.  It's marked with the insignia of Phoenix Feather Hot Springs."
+                },
+                {
+                    "keywords": [
+                        "insignia"
+                    ],
+                    "text": "The symbol is that of a single red feather slanting diagonally against a snowflake."
+                }
+            ],
+            "values": {
+                "Capacity": 8,
+                "Remaining": 8,
+                "Liquid": "CIDER",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 20,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10319,
+            "type": "DRINKCON",
+            "keywords": [
+                "mug",
+                "phoenix-feather-hot-springs"
+            ],
+            "short": "a mug",
+            "ground": "A mug with the insignia of Phoenix Feather Hot Springs is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "insignia"
+                    ],
+                    "text": "The symbol is that of a single red feather slanting diagonally against a snowflake."
+                },
+                {
+                    "keywords": [
+                        "mug",
+                        "phoenix-feather-hot-springs"
+                    ],
+                    "text": "It's a large cermaic mug with enough room for a few drinks of liquid.  It's marked with the insignia of Phoenix Feather Hot Springs."
+                }
+            ],
+            "values": {
+                "Capacity": 6,
+                "Remaining": 6,
+                "Liquid": "CHAI",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 21,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10320,
+            "type": "DRINKCON",
+            "keywords": [
+                "mug",
+                "phoenix-feather-hot-springs"
+            ],
+            "short": "a mug",
+            "ground": "A mug with the insignia of Phoenix Feather Hot Springs is sitting here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "mug",
+                        "phoenix-feather-hot-springs"
+                    ],
+                    "text": "It's a large cermaic mug with enough room for a few drinks of liquid.  It's marked with the insignia of Phoenix Feather Hot Springs."
+                },
+                {
+                    "keywords": [
+                        "insignia"
+                    ],
+                    "text": "The symbol is that of a single red feather slanting diagonally against a snowflake."
+                }
+            ],
+            "values": {
+                "Capacity": 8,
+                "Remaining": 8,
+                "Liquid": "COCOA",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 25,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10321,
+            "type": "DRINKCON",
+            "keywords": [
+                "cup",
+                "small-cup",
+                "shot-glass-cup"
+            ],
+            "short": "a small cup",
+            "ground": "A small cup about the size of a shot glass sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "cup",
+                        "small-cup",
+                        "shot-glass-cup"
+                    ],
+                    "text": "This cute little cup is made of white porcelain, delicately painted with snowflakes.  The white and blue coloring is strongly reminiscent of Odaishyozen.  Perhaps it was imported, though the potential cost of bringing pottery across most of Caelia is staggering."
+                }
+            ],
+            "values": {
+                "Capacity": 4,
+                "Remaining": 4,
+                "Liquid": "ESPRESSO",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.1,
+            "cost": 35,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10322,
+            "type": "DRINKCON",
+            "keywords": [
+                "glass",
+                "tall-glass",
+                "handle",
+                "proud"
+            ],
+            "short": "a tall glass",
+            "ground": "A tall glass with a handle sits here proudly.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "glass",
+                        "tall-glass",
+                        "handle",
+                        "proud"
+                    ],
+                    "text": "Much taller than a regular drinking glass, it has a base and stem and handle like a mug.  Perhaps it's made to hold hot liquids?"
+                }
+            ],
+            "values": {
+                "Capacity": 16,
+                "Remaining": 16,
+                "Liquid": "CAPPUCCINO",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.3,
+            "cost": 45,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10323,
+            "type": "DRINKCON",
+            "keywords": [
+                "teacup",
+                "cup",
+                "painted",
+                "phoenix"
+            ],
+            "short": "a teacup",
+            "ground": "A teacup painted with a phoenix sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "teacup",
+                        "cup",
+                        "painted",
+                        "phoenix"
+                    ],
+                    "text": "This beautiful porcelain teacup is painted with a phoenix in the style of Odaishyozen.  Its handle is small enough that it doesn't detract from the artistry, but large enough that a hot drink could be consumed without any danger of burning one's fingers."
+                }
+            ],
+            "values": {
+                "Capacity": 6,
+                "Remaining": 6,
+                "Liquid": "GREENTEA",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 35,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10324,
+            "type": "DRINKCON",
+            "keywords": [
+                "teacup",
+                "painted",
+                "phoenix",
+                "cup"
+            ],
+            "short": "a teacup",
+            "ground": "A teacup painted with a phoenix sits here.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "teacup",
+                        "cup",
+                        "phoenix",
+                        "painted"
+                    ],
+                    "text": "This beautiful porcelain teacup is painted with a phoenix in the style of Odaishyozen.  Its handle is small enough that it doesn't detract from the artistry, but large enough that a hot drink could be consumed without any danger of burning one's fingers."
+                }
+            ],
+            "values": {
+                "Capacity": 6,
+                "Remaining": 6,
+                "Liquid": "CHAMOMILE",
+                "Poisoned": false
+            },
+            "flags": [],
+            "weight": 0.2,
+            "cost": 35,
+            "timer": 0,
+            "level": 1,
+            "wear_flags": [
+                "TAKE"
+            ],
+            "effects": []
+        },
+        {
+            "id": 10325,
+            "type": "SPELLBOOK",
+            "keywords": [
+                "tome",
+                "aqua-mundi",
+                "gold-trimmed-leather-bound-tome",
+                "spells",
+                "book"
+            ],
+            "short": "Aqua Mundi",
+            "ground": "A gold-trimmed leather-bound tome of spells rests on a nearby shelf.",
+            "action_desc": "",
+            "extras": [
+                {
+                    "keywords": [
+                        "tome",
+                        "aqua-mundi",
+                        "gold-trimmed-leather-bound-tome",
+                        "spells",
+                        "book"
+                    ],
+                    "text": "This softly glowing book contains some of the most miraculous and dangerous magic known to Cryomancers.  Embossed with gold and written with golden ink, the magic radiating from the tome is palpable.  Flipping through it, the book has many long-lost spells like To Bring Winter on Water, Fisher of the Polar Deep, Blood Bender, Phantom's Gondola, the Burning Rain of Death, Watergate, and more."
+                }
+            ],
+            "values": {
+                "Pages": 250
+            },
+            "flags": [],
+            "weight": 1.0,
+            "cost": 0,
+            "timer": 0,
+            "level": 0,
+            "wear_flags": [
+                "TAKE",
+                "HOLD"
+            ],
+            "effects": []
+        }
+    ],
+    "shops": [
+        {
+            "id": 10305,
+            "selling": {
+                "10316": 0,
+                "10317": 0,
+                "10318": 0,
+                "10319": 0,
+                "10320": 0,
+                "10321": 0,
+                "10322": 0,
+                "10323": 0,
+                "10324": 0
+            },
+            "buy_profit": 1.0,
+            "sell_profit": 0.5,
+            "accepts": [
+                {
+                    "type": "DrinkContainer",
+                    "keywords": ""
+                }
+            ],
+            "no_such_item1": "%s I don't have that, sorry.",
+            "no_such_item2": "%s If you had one, I might consider it.",
+            "do_not_buy": "%s I don't trade in such items.",
+            "missing_cash1": "%s I don't have enough money to buy it.",
+            "missing_cash2": "%s Come back when you have more money.",
+            "message_buy": "%s Enjoy your delicious treat.",
+            "message_sell": "%s I'm sure someone will want this.",
+            "temper1": 0,
+            "flags": [],
+            "keeper": 10315,
+            "trades_with": [],
+            "rooms": [
+                10305
+            ],
+            "hours": [
+                {
+                    "open": 6,
+                    "close": 22
+                }
+            ]
+        }
+    ],
+    "triggers": [
+        {
+            "id": 10300,
+            "name": "thief_steal_stuff",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "*Thief steal stuff trigger... *Chose a set of common keywords and aligned percentage chances *so that it has a random chance to steal any of the keywords set rnd %random.100% if %rnd% > 99 set loot gem elseif %rnd% == 99 set loot iron elseif %rnd% <= 98 && %rnd% >= 97 set loot cloth elseif %rnd% <= 96 && %rnd% >= 95 set loot wood elseif %rnd% <= 94 && %rnd% >= 93 set loot white elseif %rnd% <= 92 && %rnd% >= 90 set loot red elseif %rnd% <= 89 && %rnd% >= 85 set loot blue elseif %rnd% <= 84 && %rnd% >= 80 set loot green elseif %rnd% <= 79 && %rnd% >= 76 set loot black elseif %rnd% <= 75 && %rnd% >= 71 set loot dagger elseif %rnd% <= 70 && %rnd% >= 66 set loot shield elseif %rnd% <= 65 && %rnd% >= 61 set loot sword elseif %rnd% <= 60 && %rnd% >= 56 set loot leather elseif %rnd% <= 55 && %rnd% >= 46 set loot raft elseif %rnd% <= 45 && %rnd% >= 36 set loot canoe elseif %rnd% <= 35 && %rnd% >= 26 set loot sack elseif %rnd% <= 25 && %rnd% >= 16 set loot bag elseif %rnd% <= 15 set loot gem endif *now the real command! steal %loot% %actor.name% "
+        },
+        {
+            "id": 10301,
+            "name": "fish-death",
+            "attach_type": "Object",
+            "flags": [
+                "Death"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "mload obj 10311 "
+        },
+        {
+            "id": 10302,
+            "name": "rianne-greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "wait 1s if %actor.vnum% == -1 if %actor.quest_stage[resort_cooking]% >= 1 switch %actor.quest_stage[resort_cooking]% case 1 set recipe Peach Cobbler break case 2 set recipe Seafood Salad break case 3 set recipe Fish Stew break case 4 set recipe Honey-Glazed Ham break case 5 set recipe Saffroned Jasmine Rice break default halt done mecho %self.name% says, 'Welcome back, %actor.name%! mecho &0Have you brought me the ingredients for &7&b%recipe%?&0' wait 1s mecho %self.name% says, 'Remember, you can look in the icebox to see what you've mecho &0already brought me.' wait 2s mecho %self.name% says, 'Oh, and the recipe for &7&b%recipe%&0 is on the wall!' else mecho %self.name% says, 'Welcome to Phoenix Feather Resort, %actor.name%! mecho &0My name is %self.name% and I am the cook here.' wait 2s mecho %self.name% says, 'But I could use a little help!  Being located up north mecho &0makes it hard to get everything I need for some of my more exotic dishes.' wait 2s say %actor.name% do you think you could help me? smile %actor.name% endif endif "
+        },
+        {
+            "id": 10303,
+            "name": "rianne-quest-start",
+            "attach_type": "Object",
+            "flags": [
+                "Speech",
+                "SpeechTo"
+            ],
+            "number_of_arguments": 1,
+            "argument_list": "yes yes?",
+            "commands": "if %actor.vnum% == -1 && %actor.quest_stage[resort_cooking]% < 1 quest start resort_cooking %actor.name% wait 5 mecho %self.name% says, 'Excellent!  The dish I am making next is &7&bPeach Cobbler&0.' wait 2s say I will need you to find the following ingredients for me: mecho - &7&b%get.obj_shortdesc[61501]%&0 mecho - &7&b%get.obj_shortdesc[23754]%&0 mecho - &7&b%get.obj_shortdesc[3114]%&0 mecho - &7&b%get.obj_shortdesc[35001]%&0 wait 2s say Bring them to me quickly so that I may begin! wink %actor.name% wait 2s mecho %self.name% says, 'Oh!  And you can look at my recipe wall at any time to mecho &0see what else we need.' endif "
+        },
+        {
+            "id": 10304,
+            "name": "rianne-quest-receive",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "* * Added by Daedela 3-9-2021 for Group Heal quest * if %actor.quest_stage[group_heal]% == 5 if %actor.quest_variable[group_heal:%self.vnum%]% if %object.vnum% == 18514 say I've told you everything I can.  Good luck! halt endif else if %object.vnum% == 18514 quest variable group_heal %actor.name% %self.vnum% 1 return 0 say Well you've definitely come to the right place! wait 4 emote reads over the ritual recipe. wait 4s mecho %self.name% says, 'Oh my, what a challenge.  No wonder someone would need help with this.' wait 3s mecho %self.name% says, 'The names for many of these ingredients have changed since...  How old is this recipe anyway??' wait 1s beam say I love it. wait 3s emote begins writing down a list of notes. wait 1s say ... and this is called this... wait 1s say ... this can be substituted with this... wait 2s mecho %self.name% says, '... that's been extinct for over a century, so perhaps this will do...?' wait 4s emote finishes her list. mload obj 18520 give notes %actor.name% wait 2s say That should help you.  I can't wait to hear how it goes! wave %actor% halt endif endif endif * * Original resumes here * * Preset item and recipe vars set item4 0 set item5 0 set item6 0 set item7 0 set stage %actor.quest_stage[resort_cooking]% set recipe1 Peach Cobbler set recipe2 Seafood Salad set recipe3 Fish Stew set recipe4 Honey-Glazed Ham set recipe5 Saffroned Jasmine Rice switch %stage% case 1 set recipe %recipe1% set next %recipe2% set item1 61501 set item2 23754 set item3 3114 set item4 35001 break case 2 set recipe %recipe2% set next %recipe3% set item1 49024 set item2 23750 set item3 23722 set item4 8003 set item5 12515 set item6 1606 break case 3 set recipe %recipe3% set next %recipe4% set item1 55213 set item2 30002 set item3 10030 set item4 12552 set item5 23757 set item6 18509 set item7 10311 break case 4 set recipe %recipe4% set next %recipe5% set item1 41011 set item2 8350 set item3 2001 set item4 50207 set item5 6106 break case 5 set recipe %recipe5% set item1 58019 set item2 37013 set item3 23760 break default return 0 say I don't have time for that right now. emote refuses your item. halt done * What item is being turned in? switch %object.vnum% case %item1% set item 1 break case %item2% set item 2 break case %item3% set item 3 break case %item4% set item 4 break case %item5% set item 5 break case %item6% set item 6 break case %item7% set item 7 break default return 0 mecho %self.name% says, 'The recipe doesn't call for this!  Perhaps you should consult the recipe on the wall to refresh your memory.' halt done if %actor.quest_variable[resort_cooking:item%item%]% return 0 mecho %self.name% says, 'You already brought in %object.shortdesc%, so we don't need more.' emote hands your item back to you. halt endif wait 1 mjunk %object.name% wait 4 mecho %self.name% says, 'Just what we need for &7&b%recipe%&0!' quest variable resort_cooking %actor.name% item%item% 1 * See if we've turned in everything for this recipe set item 1 while %item% <= 7 set item%item% 0 eval item %item% + 1 done if %actor.quest_variable[resort_cooking:item1]% set item1 1 endif if %actor.quest_variable[resort_cooking:item2]% set item2 1 endif if %actor.quest_variable[resort_cooking:item3]% set item3 1 endif if %stage% == 5 || %actor.quest_variable[resort_cooking:item4]% set item4 1 endif if %stage% == 1 || %stage% == 5 || %actor.quest_variable[resort_cooking:item5]% set item5 1 endif if (%stage% != 2 && %stage != 3) || %actor.quest_variable[resort_cooking:item6]% set item6 1 endif if %stage% != 3 || %actor.quest_variable[resort_cooking:item7]% set item7 1 endif * If all the items have been turned in, start mixing if %item1% && %item2% && %item3% && %item4% && %item5% && %item6% && %item7% quest advance resort_cooking %actor.name% set item 1 * Reset item variables while %item% <= 7 quest variable resort_cooking %actor.name% item%item% 0 eval item %item% + 1 done say I think I can start preparing it now. wait 1s emote gets the other ingredients from the icebox. emote begins mixing them together. wait 2s if %stage% == 5 mecho %self.name% says, 'You've been such a great help, %actor.name%!  Now I'm almost prepared for this huge dinner party, thanks!' wait 3s say I'd like you to have this. wait 5 mecho %self.name% says, 'It was enchanted by a good friend of mine, so I hope it will help you as much as you've helped me.' mload obj 10315 set gem 0 while %gem% < 3 eval drop %random.11% + 55736 mload obj %drop% eval gem %gem% + 1 done give all.gem %actor% * * Set X to the level of the award - code does not run without it * if %actor.level% < 65 set expcap %actor.level% else set expcap 65 endif set expmod 0 if %expcap% < 9 eval expmod (((%expcap% * %expcap%) + %expcap%) / 2) * 55 elseif %expcap% < 17 eval expmod 440 + ((%expcap% - 8) * 125) elseif %expcap% < 25 eval expmod 1440 + ((%expcap% - 16) * 175) elseif %expcap% < 34 eval expmod 2840 + ((%expcap% - 24) * 225) elseif %expcap% < 49 eval expmod 4640 + ((%expcap% - 32) * 250) elseif %expcap% < 90 eval expmod 8640 + ((%expcap% - 48) * 300) else eval expmod 20940 + ((%expcap% - 89) * 600) endif * * Adjust exp award by class so all classes receive the same proportionate amount * switch %actor.class% case Warrior case Berserker * * 110% of standard * eval expmod (%expmod% + (%expmod% / 10)) break case Paladin case Anti-Paladin case Ranger * * 115% of standard * eval expmod (%expmod% + ((%expmod% * 2) / 15) break case Sorcerer case Pyromancer case Cryomancer case Illusionist case Bard * * 120% of standard * eval expmod (%expmod% + (%expmod% / 5)) break case Necromancer case Monk * * 130% of standard * eval expmod (%expmod% + (%expmod% * 2) / 5) break default set expmod %expmod% done msend %actor% &3&bYou gain experience!&0 eval setexp (%expmod% * 10) set loop 0 while %loop% < 10 * * Xexp must be replaced by mexp, oexp, or wexp for this code to work * Pick depending on what is running the trigger * mexp %actor% %setexp% eval loop %loop% + 1 done quest complete resort_cooking %actor.name% else mecho %self.name% says, 'I'll keep preparing this while you collect items for the next recipe.' ponder wait 1s say The next dish is %next%. wait 2 say Here's the recipe.  Please take a look at it. emote points out a slip of paper hanging on the wall. endif else emote puts the item into the icebox. wait 1s say Thanks!  Quickly, bring the rest! endif drop all "
+        },
+        {
+            "id": 10305,
+            "name": "rianne-quest-look",
+            "attach_type": "Mobile",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "look",
+            "commands": "if %actor.quest_stage[resort_cooking]% < 1 || %actor.quest_stage[resort_cooking]% > 5 return 0 halt endif switch %actor.quest_stage[resort_cooking]% case 1 set recipe Peach Cobbler set item1 61501 set item2 23754 set item3 3114 set item4 35001 break case 2 set recipe Seafood Salad set item1 49024 set item2 23750 set item3 23722 set item4 8003 set item5 12515 set item6 1606 break case 3 set recipe Fish Stew set item1 55213 set item2 30002 set item3 10030 set item4 12552 set item5 23757 set item6 18509 set item7 10311 break case 4 set recipe Honey-Glazed Ham set item1 41011 set item2 8350 set item3 2001 set item4 50207 set item5 6106 break case 5 set recipe Saffroned Jasmine Rice set item1 58019 set item2 37013 set item3 23760 break default return 0 halt done if %arg% /= recipe || %arg% /= wall || %arg% /= paper || %arg% /= slip wsend %actor% The wall is covered in slips of paper, each with a different recipe.  One wsend %actor% &0especially stands out among the mess. wsend %actor% &0 wsend %actor% &0==========&7&b%recipe%&0========== if %item1% wsend %actor% &0  %get.obj_shortdesc[%item1%]% endif if %item2% wsend %actor% &0  %get.obj_shortdesc[%item2%]% endif if %item3% wsend %actor% &0  %get.obj_shortdesc[%item3%]% endif if %item4% wsend %actor% &0  %get.obj_shortdesc[%item4%]% endif if %item5% wsend %actor% &0  %get.obj_shortdesc[%item5%]% endif if %item6% wsend %actor% &0  %get.obj_shortdesc[%item6%]% endif if %item7% wsend %actor% &0  %get.obj_shortdesc[%item7%]% endif elseif %arg% /= icebox wsend %actor% Looking inside the icebox, you see: set nothing 1 if %actor.quest_variable[resort_cooking:item1]% wsend %actor% &0  %get.obj_shortdesc[%item1%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item2]% wsend %actor% &0  %get.obj_shortdesc[%item2%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item3]% wsend %actor% &0  %get.obj_shortdesc[%item3%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item4]% wsend %actor% &0  %get.obj_shortdesc[%item4%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item5]% wsend %actor% &0  %get.obj_shortdesc[%item5%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item6]% wsend %actor% &0  %get.obj_shortdesc[%item6%]% set nothing 0 endif if %actor.quest_variable[resort_cooking:item7]% wsend %actor% &0  %get.obj_shortdesc[%item7%]% set nothing 0 endif if %nothing% wsend %actor% &0  Nothing. endif else return 0 endif "
+        },
+        {
+            "id": 10306,
+            "name": "men-only",
+            "attach_type": "Mobile",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.level% < 100 if %actor.sex% == female wsend %actor% That room is for men only! return 0 endif endif "
+        },
+        {
+            "id": 10307,
+            "name": "women-only",
+            "attach_type": "Mobile",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.level% < 100 if %actor.sex% == male wsend %actor% That room is for women only! return 0 endif endif "
+        },
+        {
+            "id": 10308,
+            "name": "hot-spring",
+            "attach_type": "Mobile",
+            "flags": [
+                "Random",
+                "Speech",
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": ".",
+            "commands": "if !%actor% set actor %random.char% endif if !%actor% halt endif set fireproof %actor.aff_flagged[!HEAT]% if %actor.vnum% == -1 if %actor.class% == Pyromancer elseif %fireproof% else eval damage %random.10% + %random.10% wechoaround %actor% %actor.name% starts to look a bit woozy from the extreme heat. wsend %actor% The water is too hot for you.... wdamage %actor% %damage% end end "
+        },
+        {
+            "id": 10309,
+            "name": "khysan-greet",
+            "attach_type": "Object",
+            "flags": [
+                "Greet"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "if %actor.quest_stage[ice_shards]% set return yes endif if %actor.quest_stage[%type%_wand]% > %wandstep% set return yes endif if %actor.quest_stage[%type%_wand]% == %wandstep% && %actor.quest_variable[%type%_wand:greet]% == 1 set return yes endif wait 1s msend %actor% %self.name% looks up at your approach. if %return% == yes say Welcome back my friend. wait 2 if %actor.quest_stage[ice_shards]% && !%actor.has_completed[ice_shards]% say Did you find any more clues? if %actor.quest_stage[%type%_wand]% == %wandstep% eval minlevel (%wandstep% - 1) * 10 wait 1s if %actor.level% >= %minlevel% if %actor.quest_variable[%type%_wand:greet]% == 0 say Or is there something else that brings you back? else say Or do you have what I need for a new staff? endif endif endif else if %actor.quest_stage[%type%_wand]% == %wandstep% eval minlevel (%wandstep% - 1) * 10 if %actor.level% >= %minlevel% if %actor.quest_variable[%type%_wand:greet]% == 0 say Is there something else that brings you back? else say Do you have what I need for a new staff? endif endif endif endif else mecho %self.name% smiles warmly and says, 'Welcome to Phoenix Feather Resort.' wait 1s say We are currently offering free services to all adventurers. wait 1s bow %actor% say Please enjoy your stay.  You may enter the hot springs to the south. if %actor.quest_stage[%type%_wand]% == %wandstep% wait 1s eval minlevel (%wandstep% - 1) * 10 if %actor.level% >= %minlevel% if %actor.quest_variable[%type%_wand:greet]% == 0 mecho %self.name% says, 'I see you're crafting something.  If you want my help, we can talk about &6&b[upgrades]&0.' endif endif endif if !%actor.quest_stage[ice_shards]% wait 3 if %actor.class% /= Cryomancer if %actor.has_completed[major_globe_spell]% && %actor.has_completed[relocate_spell_quest]% && %actor.has_completed[wall_ice]% && %actor.has_completed[waterform]% && %actor.has_completed[flood]% say Oh, %actor.name% %actor.title%!  I've heard of you!  You're quite talked about amongst our fellow cryomancers. if %actor.level% > 88 mecho &0 say Makes me wonder if you could have mastered the most powerful cryomantic spell ever known. endif endif endif endif endif "
+        },
+        {
+            "id": 10310,
+            "name": "ice_shards_khysan_speech1",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "spell spell? powerful powerful?  Ever ever? ",
+            "commands": "if %actor.class% /= Cryomancer wait 2 mecho %self.name% says, 'The spell was called Ice Shards.  Supreme cryomancers mecho &0could conjure a multitude of glistening ice fragments to annihilate their mecho &0foes.' wait 2s say But that magic is lost to us now. endif "
+        },
+        {
+            "id": 10311,
+            "name": "ice_shards_khysan_speech2",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "lost lost?",
+            "commands": "if %actor.class% /= Cryomancer wait 2 nod mecho %self.name% says, 'Even my elven family, the Sunfire clan, has lost the mecho &0secrets to the spell.' wait 1s mecho %self.name% says, 'Legend has it the last copy of Ice Shards was in the mecho &0fabled lost library of Shiran.  But perhaps the spell survived in some ancient mecho &0text.' wait 3s mecho %self.name% says, 'I've heard of four books that could potentially hold the information:' mecho &3&bthe Book of Kings&0 mecho &3&bthe Book of Discipline&0 mecho &3&bThe Xapizan Codex&0 mecho &3&bthe Enchiridion&0 mecho mecho %self.name% says, 'Maybe if I could get my hands on each of them, between mecho &0them I could piece together fragments of the spell!' wait 3s say Will you track down these books and bring them to me? endif "
+        },
+        {
+            "id": 10312,
+            "name": "ice_shards_khysan_speech3",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "yes sure yep okay",
+            "commands": "wait 2 if %actor.class% /= Cryomancer if %actor.level% > 88 && %actor.quest_stage[ice_shards]% == 0 quest start ice_shards %actor.name% beam say Excellent!  I'm excited! wait 2s mecho %self.name% says, 'If you need, you can check your &6&b[ice shards progress]&0 with me.' elseif %actor.level% > 88 && %actor.quest_stage[ice_shards]% > 0 say Oh please do share! elseif %actor.level% =< 88 mecho %self.name% says, 'I appreciate your enthusiasm, but it's probably too mecho &0dangerous, right?' endif endif "
+        },
+        {
+            "id": 10313,
+            "name": "ice_shards_khysan_receive1",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "16209 18505 55003 58415",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 1 if %actor.quest_variable[ice_shards:%object.vnum%]% == 1 return 0 mecho %self.name% refuses %object.shortdesc%. wait 2 say Thanks, but you already delivered %object.shortdesc% to me. else quest variable ice_shards %actor.name% %object.vnum% 1 mjunk book wait 2 mecho %self.name%'s eyes grow wide. mecho say This is incredible!  I never imagined I'd be holding a copy of %object.shortdesc%! wait 2 set book1 %actor.quest_variable[ice_shards:16209]% set book2 %actor.quest_variable[ice_shards:18505]% set book3 %actor.quest_variable[ice_shards:55003]% set book4 %actor.quest_variable[ice_shards:58415]% if %book1% && %book2% && %book3% && %book4% quest advance ice_shards %actor.name% emote slowly reads through the contents of each book. wait 4s emote takes copious notes. wait 1s say Hmmmm, I wonder if... wait 1s say No, that won't work... wait 4s emote sighs with frustration. say I hate to say it, but this isn't going to cut it.  The texts just don't have enough information about the spell. wait 3s ponder mecho %self.name% says, 'There is a mention of Shiran being near Mt. Frostbite in the Xapizan Codex however.  It also mentions a brother codex called &3&b\"The Codex of War\"&0. wait 2s say Supposedly, the Codex of War contains a detailed history of battles in the region.  Maybe if Shiran was destroyed in some kind of conflict, the Codex of War might have more clues. wait 2s say Try to find a copy and bring it back so we can take a look at it! else say Did you manage to find any of the other books? endif endif endif "
+        },
+        {
+            "id": 10314,
+            "name": "ice_shards_pawnbroker_speech",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "butcher",
+            "commands": "wait 2 if %actor.quest_stage[ice_shards]% == 4 say Sorry, never heard of 'im. wait 1s cough emote very conspicuously lays his open hand on the counter. wait 2s mecho %self.name% says, 'I have some great old boots for sale though. mecho &0Only &7&b100 platinum&0.' else say Ya might not wanna be so loud with that name round 'ere. endif "
+        },
+        {
+            "id": 10315,
+            "name": "ice_shards_pawnbroker_bribe",
+            "attach_type": "Object",
+            "flags": [
+                "Bribe"
+            ],
+            "number_of_arguments": 100000,
+            "argument_list": "",
+            "commands": "if %actor.quest_stage[ice_shards]% == 4 quest advance ice_shards %actor.name% wait 2 mecho %self.name% says, 'I don't know much, but I do know someone paid me to help mecho &0'im slip outta the city.  I'm talkin', they paid A LOT.  Was a dark-skinned elf mecho &0with a buncha orcs.' wait 5s mecho %self.name% says, 'Not the guy ya see skulkin' round the neighborhood or mecho &0nothin' neither, nah.  This guy looked like 'e worked with money.' wait 4s mecho %self.name% says, 'Dunno where they was goin' but I got a feelin' it were mecho &0pretty far.  They was all talkin' 'bout Ogakh or some such.  I dunno, my Orcish mecho &0ain't too good these days.' wait 4s say Best of luck catchin' 'im.  Now get out. mecho emote points towards the door. endif "
+        },
+        {
+            "id": 10316,
+            "name": "ice_shards_slevvirik_speech",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "butcher",
+            "commands": "if %actor.quest_stage[ice_shards]% == 5 quest advance ice_shards %actor.name% wait 2 sigh mecho %self.name% says, 'Yes, I do know where he is and before you ask, no I don't mind mecho &0telling you.  My contractual obligation to him is fulfilled and if I do tell mecho &0you where he is, I doubt it will make much of a difference.' wait 5s mecho %self.name% says, 'That beast knew his reputation was going to catch up to him mecho &0sooner or later.  He paid us to hide him where no one in the world would find mecho &0him.  So we hid him off world.' wait 6s mecho %self.name% says, 'We opened a gateway to the Plane of Earth and sent him on his mecho &0way.  I suppose he's still there.' wait 4s say If he's still alive. wait 1s tip %actor% endif "
+        },
+        {
+            "id": 10317,
+            "name": "ice_shards_library_search",
+            "attach_type": "Mobile",
+            "flags": [
+                "Command"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "search",
+            "commands": "if %actor.quest_stage[ice_shards]% == 9 quest advance ice_shards %actor.name% wload obj 10325 wsend %actor% You find %get.obj_shortdesc[10325]%! wechoaround %actor% %actor.name% finds %get.obj_shortdesc[10325]%! else return 0 endif "
+        },
+        {
+            "id": 10318,
+            "name": "ice_shards_status_tracker",
+            "attach_type": "Object",
+            "flags": [
+                "Speech"
+            ],
+            "number_of_arguments": 0,
+            "argument_list": "ice shards progress",
+            "commands": "wait 2 set stage %actor.quest_stage[ice_shards]% if %stage% == 1 set book1 %actor.quest_variable[ice_shards:16209]% set book2 %actor.quest_variable[ice_shards:18505]% set book3 %actor.quest_variable[ice_shards:55003]% set book4 %actor.quest_variable[ice_shards:58415]% say You are looking for four books of mystic knowledge. if %book1% || %book2% || %book3% || %book4% mecho mecho You have brought me: if %book1% mecho - &3&b%get.obj_shortdesc[16209]%&0 endif if %book2% mecho - &3&b%get.obj_shortdesc[18505]%&0 endif if %book3% mecho - &3&b%get.obj_shortdesc[55003]%&0 endif if %book4% mecho - &3&b %get.obj_shortdesc[58415]%&0 endif endif mecho mecho You still need to find: if !%book1% mecho - &3&b%get.obj_shortdesc[16209]%&0 endif if !%book2% mecho - &3&b%get.obj_shortdesc[18505]%&0 endif if !%book3% mecho - &3&b%get.obj_shortdesc[55003]%&0 endif if !%book4% mecho - &3&b%get.obj_shortdesc[58415]%&0 endif elseif %stage% == 2 say I need you to find the Codex of War. elseif %stage% == 3 mecho %self.name% says, 'You are looking for any records or journals Commander mecho &0Thraja keeps.' elseif %stage% == 4 mecho %self.name% says, 'Talk to the pawnbroker in Anduin about the Butcher of mecho &0Anduin so you can find his map.' elseif %stage% == 5 mecho %self.name% says, 'Talk to Slevvirik in Ogakh about the Butcher of Anduin mecho &0so you can find his map.' elseif %stage% == 6 say Bring the map of Ickle from the Butcher of Anduin. elseif %stage% == 7 mecho %self.name% says, 'You are looking for any kind of written clues about the mecho &0library at Shiran in Ysgarran's Keep in Frost Valley.' elseif %stage% == 8 mecho %self.name% says, 'You are looking for the Book of Redemption, whatever mecho &0that is.' elseif %stage% == 9 mecho %self.name% says, 'You are looking for the lost library of Shiran in Frost mecho &0Valley!' elseif %stage% == 10 say Have you found the magic book in the lost library?? elseif %actor.has_completed[ice_shards]% mecho %self.name% says, 'You've already done a miraculous thing by bring the mecho &0Aqua Mundi to me! elseif !%stage% say Progress on what?  There's no fee to use the springs. smile %actor% endif "
+        },
+        {
+            "id": 10319,
+            "name": "ice_shards_khysan_receive2",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "55004",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 2 wait 2 quest advance ice_shards %actor.name% mjunk book emote cautiously takes %object.shortdesc% and places it on the reception desk. wait 2 say Yikes, this looks pretty dangerous. emote opens %object.shortdesc% and begins to read. wait 3s emote quietly continues to read. wait 2s say The Codex talks extensively about the wars fought in Frost Valley and the surrounding areas.  It says the Frost Elves have been here since long before people arrived in Technitzitlan. wait 1s say The Codex also says something catastrophic happened to the elves' majestic city Shiran \"ages ago,\" though it doesn't say what or when exactly. wait 7s emote closes %object.shortdesc%. wait 3s say But the fact that the elves are still here must mean something, right? wait 3s say Frost Valley is one of the only places left in Caelia where elves are frequently spotted. wait 3s say They've been locked in combat with a group of Amazons just east of here.  Why, I don't know, but I do know they've been skirmishing for a long time. wait 4s say The commander of the ice warriors, Thraja, certainly knows more.  Go and see if she keeps any records or journals. wait 3s say Bring back anything you find and we can look over it together. endif "
+        },
+        {
+            "id": 10320,
+            "name": "ice_shards_khysan_receive3",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "58806",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 3 wait 2 quest advance ice_shards %actor.name% mjunk book emote sits down and reads through Commander Thraja's journal. wait 3s say There is quite a lot of detail about the Frost Elves and their general movements, but it doesn't look like Thraja ever figured out where they were coming from.  She also notes the elves don't seem to be invading so much as patrolling the area. wait 3s emote flips a few more pages. wait 3s say Thraja also notes maps of the region are unreliable as the terrain can subtly shift, almost like the valley is changing somehow. wait 3s say She says the best map she ever had of the region was a slightly magical one she received from Kara-Sithri but it was stolen by someone called \"The Butcher of Anduin.\" wait 6s emote looks up from the journal. say Oh my, that's not a subtle name at all is it? wait 3s say Apparently some kind of serial killer, the Butcher may have wanted the map to expand his reign of terror into the region around Ickle.  Or he may have just been looking for some valuables to pawn near his hideout. wait 6s say Thraja hasn't seen the map since. wait 4s emote closes the journal. wait 3s say Well if this map really was some kind of ancient magical device, it might help us determine where Shiran was. wait 4s say I guess you could ask around the pawnshop in Anduin, see if you can figure out what the Butcher did with the map. endif "
+        },
+        {
+            "id": 10321,
+            "name": "ice_shards_khysan_receive4",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "48502",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 6 wait 2 quest advance ice_shards %actor.name% mjunk map say Incredible, you found it! emote excitedly lays out the map. wait 1s emote scours every tiny detail of the map. wait 3s say Let me compare... mecho emote opens to a passage in the Codex of War. emote glances between the Codex and the map. wait 4s say And in Thraja's journal... emote compares a passage in Thraja's journal. wait 3s say The Codex mentions a site of incredible significance in the middle of Frost Lake, and both the map and Thraja's journal point to the remains of a tower of some kind on an island in the lake. wait 6s say The map indicates the edges of a huge city that once overlooked the plateau at the west edge of the valley.  Thraja notes a man named Ysgarran built some kind of fortification over a preexisting structure out there... wait 7s say Go check it out.  Assuming that was Shiran, maybe there's a clue there?  Bring back anything you find, especially if you find any written records of the region. endif "
+        },
+        {
+            "id": 10322,
+            "name": "ice_shards_khysan_receive5",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "53423",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 7 wait 2 quest advance ice_shards %actor.name% mjunk book mecho %self.name% reads aloud, '\"The Lost Library of Shiran\".' say I... can't believe it's that obvious. wait 3s emote combs through the pages of the book. wait 4s say Okay, it's not that obvious. The book does talk about the library being destroyed for being a repository of too much mystical knowledge.  But it doesn't definitively say it was in Frost Valley. wait 6s say It does say the gods destroyed the library, claiming it was out of an abundance of caution, but was really an act of jealousy. wait 5s say What's even more interesting is what happened after!  A few of the gods repented and sought to atone for their crimes against Shiran.  They chronicled stories of good and evil as parables for what they had done and wrote those stories down into something called the \"Book of Redemption.\" wait 7s say This book serves as the basis for a mystic path to salvation for wayward beings.  The writings themselves are so powerful they pose to drive the reader insane if they're unable to withstand the strain on their will. wait 6s say I hate to say it, but this sounds like a 'no stone unturned' situation.  If you can find a copy of this book, I'm willing to try to read it. endif "
+        },
+        {
+            "id": 10323,
+            "name": "ice_shards_khysan_receive6",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "43013",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 8 wait 2 quest advance ice_shards %actor.name% mecho Khysan carefully opens %object.shortdesc% and starts to read. wait 2s mecho &3&bLetters and images float up out of %object.shortdesc% and begin to dance around Khysan.&0 mjunk book wait 3s mecho Khysan's eyes glaze over and his jaw goes slack. zone wait 5s mecho Khysan shakes his head and snaps back into reality. wait 2s say Here's what it says: The gods were so afraid of the sheer amount of mystical knowledge in Shiran they tried to destroy it. wait 3s say Only it turns out, by then the library was so magically defended even the gods couldn't just obliterate it. wait 2s say So instead, they ripped open the time stream and tossed the library into it, causing the Time Cataclysm that destroyed Shiran and loosed the Time Elementals on Ethilien! wait 6s say But according to the book, the people trapped in the library were eventually able to create a sort of \"time key\".  They convinced a mighty Time Elemental Lord to bring it to our epoch where, in theory, it should still be!  By bringing the key to the ruins of the tower and somehow activating it, one can traverse between the ages!! wait 9s say WHAT?! bounce wait 2s say This is AMAZING!! wait 3s say Well, I guess that means there's one more place to go!  Find that key, travel into the past, find a copy of Ice Shards, and bring it back to the future! wait 2s salute %actor.name% say Good luck my friend! endif "
+        },
+        {
+            "id": 10324,
+            "name": "ice_shards_khysan_receive7",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "10325",
+            "commands": "set stage %actor.quest_stage[ice_shards]% if %stage% == 10 wait 2 mjunk book hug %actor.name% say I don't know how I can ever express my gratitude to you for bringing this to me.  The Sunfire clan will be sure this knowledge is never lost again. wait 4s say Come, let's read this together. emote opens the book and flips forward a few pages. wait 3s emote points to a page. mecho say Here it is! wait 2s msend %actor% Although the spell is written in ancient Elvish, the intent and meaning are clear enough to replicate it! mecho quest complete ice_shards %actor.name% mskillset %actor.name% ice shards msend %actor% &6&bYou have learned Ice Shards!&0 endif "
+        },
+        {
+            "id": 10325,
+            "name": "Khysan refuse",
+            "attach_type": "Object",
+            "flags": [
+                "Receive"
+            ],
+            "number_of_arguments": 100,
+            "argument_list": "",
+            "commands": "switch %object.vnum% case %wandgem% case %wandtask3% case %wandtask4% case %wandvnum% halt break default set stage %actor.quest_stage[ice_shards]% switch %stage% case 1 switch %object.vnum% case 16209 case 18505 case 55003 case 58415 halt break default set response This isn't one of the four books I need to consult. done break case 2 if %object.vnum% != 55004 set response This isn't the Codex of War. endif break case 3 if %object.vnum% != 58806 set response This isn't Commander Thraja's journal... endif break case 6 if %object.vnum% != 48502 set response Weird, this doesn't look like a map of Ickle. endif break case 7 if %object.vnum% != 53423 set response Do you think we can get new information from %object.shortdesc%?  I doubt it... endif break case 8 if %object.vnum% != 43013 set response Is this a book? endif break case 10 if %object.vnum% != 10325 set response Is this all you could find? endif break default set response Oh, is this a gift for me?  I appreciate it, but I'm fine for now. done done if %response% return 0 mecho %self.name% refuses %object.shortdesc%. wait 2 say %response% endif "
+        }
+    ],
+    "rooms": [
+        {
+            "id": "10300",
+            "name": "Before the Gates of a Stone Building",
+            "description": "A crushed gravel path leads away from the great road carved into the ice that lies north and towards a stone building.  Large metal gates with wooden handles block entry into the building, but beyond them is a cheerful light that seems to welcome anyone who comes out this far.  A strange smell, almost reminiscent of rotten eggs, comes from the south and, beyond the building, what looks like clouds of smoke or steam is barely visible.  In any event, the inside of the building must surely be warmer than the chill of this frozen land, so investigating it might not be a bad idea. ",
+            "flags": [
+                "NOMOB",
+                "NOTRACK",
+                "NOSUMMON"
+            ],
+            "sector": "ROAD",
+            "exits": {
+                "North": {
+                    "description": "Sirestis' Folly, leading back to the Arctic Village of Ickle, lies to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "36421"
+                },
+                "South": {
+                    "description": "Grand gates, made of metal but with wooden handles so the chill of the northern climate won't freeze the hands of anyone who tries to open them, lead into a warmly lit stone building to the south.  Carved into the gates in the Common script is the word \"Welcome\". ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10301"
+                }
+            }
+        },
+        {
+            "id": "10301",
+            "name": "The Coat Room",
+            "description": "The gate to the north opens up into this pleasant room.  Benches on either side of the hall provide a place to sit and take off heavy, snow-covered boots and cloaks, and brass hangars are attached to the walls to hold heavy outer garments.  Written on the wall above the passageway to the large room that lies south are the words \"Phoenix Feather Resort\" in large, blocky letters of the Common script.  A short flight of steps leads there as well, no doubt so that the floors of the building aren't resting directly on the cold ground. Indeed, it is much warmer in here than it is outside, and the light of a fire beckons travelers with the promise of comfort. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "Wind sneaks in from time to time, but the metal gates leading north to Sirestis' Folly and the resort's exit are likely magically enchanted not to let any cold air pass their boundary, since the room stays nice and warm regardless of whether or not they're closed. ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10300"
+                },
+                "South": {
+                    "description": "The narrow confines of the coat room open up into a great hall to the south. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10303"
+                }
+            }
+        },
+        {
+            "id": "10302",
+            "name": "The Hearth",
+            "description": "Set into the western wall is a massive stone hearth.  Taking up nearly the entire wall, it is constructed of stones collected from everywhere in the world.  Obsidian from Fiery Island, jade from Odaishyozen, granite from the quarries near Toldar's Keep, basalt from Anduin, marble from Nikozia, and even the rare crystals from Technitzitlan can all be found here.  A shelf above the fire holds small sculptures of many styles, and the fire itself has the rich scent of juniper wood.  Cushions scattered on the ground invite people to sit and watch the fire or read by its light, and low tables further encourage sitting on the floor.  Many rugs made from the pelts of local animals keep the floor soft, for it is bare wood underneath.  The great hall lies to the east, and there is a smaller room to the south. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "To the east is the main hall of the resort, which branches out to all other sections including the exit. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10303"
+                },
+                "South": {
+                    "description": "To the south is a parlor with odd-looking chairs and the scent of incense. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10306"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "sculptures"
+                    ],
+                    "text": "One sculpture really catches the eye: a purple teardrop shed from a blue eye.  The artist's signature on the piece says \"Kourrya 2006\". "
+                }
+            ]
+        },
+        {
+            "id": "10303",
+            "name": "The Great Hall",
+            "description": "Lush, imported carpets cover the pine floorboards in this spacious hall. Comfortable-looking chairs and low tables provide several places to relax and hold conversations, and the walls are hung with paintings and tapestries. Delicious smells come in from the east, where the hall opens up into a dining room.  The crackle of a fire comes from the great hearth to the west, and fresh air sneaks in whenever the gates past the coat room to the north are opened. To the south, a counter detailing the various services the resort offers can be seen.  This particular hall is active even at the strangest hours, whether being utilized by visiting guests or cleaned by the impeccable staff, but it is never too racous. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "Leading out of the building, the smaller hallway to the north ends in a coat room, where travelers can prepare themselves for the frigid temperatures outside without getting in the way of those who just want to relax in the Great Hall. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10301"
+                },
+                "East": {
+                    "description": "The hall narrows a bit, then widens up again into a large dining room set with many tables to the east. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10304"
+                },
+                "South": {
+                    "description": "To the south, a large desk is visible. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10307"
+                },
+                "West": {
+                    "description": "To the west, the warm glow of a large hearth invites a tired traveler to sit down and relax. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10302"
+                }
+            }
+        },
+        {
+            "id": "10304",
+            "name": "The Dining Hall",
+            "description": "A large, well-lit hall stretches out here and to the east and south, filled with wide tables and high-backed chairs placed around them in a comfortable arrangement for dining.  The tables are set with fine, white silk tablecoths and beautiful plates from around the world.  Pitchers of sweet water and pots of hot tea are on carts around the room in case a visitor gets thirsty, and delicious smells are coming from the south.  The main hall lies back to the west. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "The dining hall stretches off to the east. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10305"
+                },
+                "South": {
+                    "description": "The dining hall continues to the south. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10308"
+                },
+                "West": {
+                    "description": "To the west, the hall narrows a bit before opening up wider into the main hall of the resort.  Far off, the hearth sheds its inviting glow. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10303"
+                }
+            }
+        },
+        {
+            "id": "10305",
+            "name": "The Dining Hall Overlooking the Cold Hills",
+            "description": "Set with many small tables, this section of the dining hall looks like it was designed with smaller parties in mind.  Soft velvet curtains line the glass windows that overlook the hills blanketed in pure, white snow rising to the east.  The chilly-looking, snow-covered view is beautiful, especially when viewed from the comfortable, warm interior of the resort.  A small hearth is set in the south wall, keeping many pots of tea at the perfect drinking temperature.  The only exit is to the west, where the dining hall continues before opening up into the main hall. ",
+            "flags": [
+                "INDOORS",
+                "PEACEFUL",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "Snow-covered hills begin to rise to the southeast through a set of large glass windows hung with warm-looking velvet curtains.  A birdfeeder set right outside the window is almost constantly visited by hardy songbirds that live up here as well as the rare Northern White Raven.  Small, hardy pine trees line the hills. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "The dining hall continues to the west, where it opens up onto the main hall. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10304"
+                }
+            }
+        },
+        {
+            "id": "10306",
+            "name": "The Massage Parlor",
+            "description": "This peaceful room is, unlike the rest of the resort, fully carpeted with a grey shag that muffles the sound of footsteps.  A window on the western wall is bordered by thick white velvet curtains, and the entire room seems to be lit by a white, magical light.  A cushioned table rests in one corner and there are three oddly-shaped chairs, all suitable for relaxing in when being given a massage.  Several folded-up tables and chairs on the south wall suggest that this room can be used as a conference room if necessary.  In the southeastern corner is a large altar made of striped black-and-white marble where incense burns, filling the room with its pleasant smoke.  Yellow light from the north illuminates the room's only exit. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "The great hearth lies to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10302"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "altar"
+                    ],
+                    "text": "A single flame has been carved into the stone of the altar and embossed with silver.  Below it in tiny Elven runes is the inscription: \"Lost, but never forgotten.  Rick Sala 6-21-2006\" "
+                }
+            ]
+        },
+        {
+            "id": "10307",
+            "name": "The Counter",
+            "description": "This spacious, warm extension of the Great Hall leads to a polished wooden counter set near the middle of the room that blocks passage south.  A large sign on the wall lists the various services available for purchase here, and a few chairs line the walls for those who wish to rest and consider before deciding on an activity.  Candles in tall glass casings provide a warm, yellow light, and the skylight lets in the light of moon or sun to help brighten the room as well.  The main hall of the resort is back to the north. ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "PEACEFUL",
+                "NOMAGIC",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "To the north is the Great Hall.  The carpeted floor between here and there looks like it has seen quite a bit of use. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10303"
+                },
+                "South": {
+                    "description": "A low, swinging wooden gate leads to the south and what looks like a small shop. ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10311"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "sign",
+                        "list",
+                        "prices",
+                        "price",
+                        "services"
+                    ],
+                    "text": "Hot Springs -    Red Token Massage -        Blue Token Gourmet Meal -   Green Token "
+                }
+            ]
+        },
+        {
+            "id": "10308",
+            "name": "The Dining Hall",
+            "description": "Brightly colored paintings and tapestries line the walls in this busy section of the dining hall.  Booths set into the wall offer privacy for those who wish to dine here, but a large festival table on the south wall looks big enough to hold even the most populous party.  The light in this room comes from a gorgeous, crystalline chandelier as well as smaller candles set on each table.  The hall stretches out to the north, but a set of swinging doors constantly in use block the way east. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "The dining hall continues to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10304"
+                },
+                "East": {
+                    "description": "A great set of swinging, metal doors lies to the east.  Light and heat and delicious smells come from the other side at all hours of day and night, and a small window is set into the center of each door.  Through the window can be seen the shine of metal and many scurrying figures bent on activity.  It's probably the resort's kitchen. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10309"
+                }
+            }
+        },
+        {
+            "id": "10309",
+            "name": "The Kitchen",
+            "description": "Activity surrounds every part of this large, clean kitchen.  Cabinets upon cabinets of supplies, pots and pans, utensils, and more line the walls.  Three different range tops make it possible to work on many different dishes at once, and a bread oven set into the east wall sends out tantalizing scents to tempt travelers.  Though seemingly chaotic, this kitchen is in fact quite orderly - it must be, or it would surely collapse under the weight of all that bustling around.  A set of swinging doors leads back west into the dining hall. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "Through a slight maze of boxes, kitchen tools, and other paraphanelia, a door blends in with the stone walls. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10313"
+                },
+                "West": {
+                    "description": "To the east, a set of large metal double-doors seperates the kitchen from the dining hall.  Windows set in each of the doors give a decent view of diners, wooden tables, and the decorations of the room, though occasionally the windows cloud up due to the humidity in the kitchen.  Their main function is to block the noise of the kitchen from intruding on the peaceful atmosphere of the dining hall. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10308"
+                }
+            }
+        },
+        {
+            "id": "10310",
+            "name": "Women's Dressing Room",
+            "description": "Several curtained stalls provide privacy for those who wish to change into bathing outfits (or out of them as the case may be).  A vent of warm air blows down from the ceiling to dry off people and clothing, and tubs of warm and cool water rest along the east wall for anyone wishing to rinse off before entering the hot springs.  A solid pine door blocks intrusion from those of the male persuasion to the east and a crisscrossing wooden barrier lies to the south, obstructing view but not movement. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "East": {
+                    "description": "A solid pine door leads back to the main hall of the resort, away from the hot springs. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10311"
+                },
+                "South": {
+                    "description": "A crisscrossing series of wooden panels blocks direct vision, but the fresh air coming in from the south suggests that it leads outside to the springs. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10315"
+                }
+            }
+        },
+        {
+            "id": "10311",
+            "name": "Gift Shop",
+            "description": "Warm, humid air only occasionally interrupted by a cool draft from the north pervades this spacious room, which lies between the counter to the north and the dressing rooms to the east and west.  Towels, soap, and other bathing accessories are displayed on the walls for purchase in case a prospective customer has forgotten to bring such necessaries to the resort.  The women's room is to the west; its counterpart lies to the east.  Both dressing rooms are blocked by large doors and a twisting hall so that they cannot be intruded.  A few wicker chairs are set in the room in case guests wish to pause before entering or exiting the dressing rooms. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "A low wooden gate at one end of the counter leads out to the Great Hall. ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10307"
+                },
+                "East": {
+                    "description": "A large symbol - a circle with a slightly off-center arrow pointing upwards - is followed by the Elven rune for \"male\", marking this as the door to the men's room. ",
+                    "keyword": "door",
+                    "type": "Pick-proof Door",
+                    "key": "0",
+                    "destination": "10312"
+                },
+                "West": {
+                    "description": "The large symbol of a circle atop a cross is followed by the Elven rune for \"female\", marking this as the door to the women's room. ",
+                    "keyword": "door",
+                    "type": "Pick-proof Door",
+                    "key": "0",
+                    "destination": "10310"
+                }
+            }
+        },
+        {
+            "id": "10312",
+            "name": "Men's Dressing Room",
+            "description": "Used towels litter the floor in this dressing room, making it rather difficult to navigate.  Curtained stalls line the east wall, for those who wish to have a little privacy while changing, and a full-length mirror is hanging on one of the walls in case anyone needs to inspect their physique before joining the rest of the hot springs.  Tubs of water both warm and cool sit in one corner for anyone who feels the need to rinse off before or after their visit to the mineral springs.  A heavy pine door leading back to the gift shop guards the western wall, and a crisscrossing series of wooden panels prevents vision but not progress to the south, where the pools lie. ",
+            "flags": [
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "South": {
+                    "description": "A crisscrossing series of wooden panels blocks direct vision, but the fresh air coming in from the south suggests that it leads outside to the springs. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10317"
+                },
+                "West": {
+                    "description": "A solid pine door leads away from the springs and back into the main hall of the resort. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10311"
+                }
+            }
+        },
+        {
+            "id": "10313",
+            "name": "The Pantry",
+            "description": "Cool despite its proximity to the kitchen fires, the pantry is dark and stocked full of supplies both from the north and from far away lands.  Shelves full of vegetables and dried fruits cover the walls and cured meats hang from the ceiling, with grains in bags stacked on the floor.  A niche in the eastern wall looks like it has been dug into the surrounding permafrost, and that is where perishable items like fresh fruits and some vegetables are kept.  Faint scents permeate the cool air, of spices and sweets and other tantalizing tastes.  The kitchen lies through a door to the north. ",
+            "flags": [
+                "INDOORS"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "North": {
+                    "description": "To the north, a small door leads out of the quiet pantry and back into the noisy kitchen. ",
+                    "keyword": "door",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10309"
+                }
+            }
+        },
+        {
+            "id": "10314",
+            "name": "A Private Pool",
+            "description": "Chill air feels delightfully cold against the warm waters of the private pool, screened by stone walls on three sides and a wooden panel to the east that blocks view but allows entrance by walking along its twisted path.  Stone ledges in the pool itslef on the north and south edges provide benches for those who wish to sit and relax in the water, and it gets slightly deeper near the middle in case one wants to go for full-body submersion.  Pitchers of cold water are available near the steps leading into the pool so that bathers won't get dehydrated - a common pitfall of hot springs. ",
+            "flags": [
+                "ALWAYSLIT"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "Shallow stone steps lead up to interweaving panels of wood and away from the private spring back up to the wooden walkway.  The panels block vision but allow passage. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10315"
+                }
+            }
+        },
+        {
+            "id": "10315",
+            "name": "A Wooden Walkway",
+            "description": "This wooden walkway is warm on bare feet, heated from below by some magic or perhaps some clever use of the area's geothermal heat.  If it weren't, it would soon become quite icy and slick from the steam and the water dripping off guests, but as it is the walkway remains dry.  It is constructed of a dark-hued wood that doesn't seem to come from around here, smoothly lacquered so as to prevent splinters on bare feet.  There is a private pool to the west, and the main pool is through a gate to the south.  North is the women's dressing room. The dressing room and the private pool are both obscured by wooden panels, but the main pool can be seen clearly. ",
+            "flags": [],
+            "sector": "CITY",
+            "exits": {
+                "North": {
+                    "description": "A mazelike series of panels blocks sight north but allows passage back into the dressing room.  The panels are made of white pine - a soft, yet abundant, wood that emits a slight fragrance.  The steam from the hot springs has left a slight layer of ice on the wood, however. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10310"
+                },
+                "South": {
+                    "description": "A gate made of thin branches of wood leads south.  The branches are spaced enough apart that the shallow steps down to the main hot pool are clearly visible through the slats, and it latches with a wooden mechanism rather than a metal one.  This is likely due to the cold temperatures of the air and the probability of wet hands - freezing one's fingers to a metal gate would be quite unpleasant! ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10319"
+                },
+                "West": {
+                    "description": "A series of interweaving wooden panels blocks the view west, but steam billows in from that direction and a sign on the panels reads, in Common, \"Private Pool\". ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10314"
+                }
+            }
+        },
+        {
+            "id": "10316",
+            "name": "A Bubbling Hotspring",
+            "description": "It is dangerously hot here at the source of the Phoenix Feather Hot Springs. Still, from time to time the brave, foolish, or pyromantic guests decide they want to experience the pinnacle of heat.  For them, the resort has formed the hot spring into a cozy little pool.  A great cloud of steam rises up as the scalding water touches the chill air, covering the nearby walls of the resort with condensation that sometimes turns to ice and sometimes simply falls back into the pool.  A stone shelf on the north wall, which is the south wall of the resort, holds a pitcher of drinking water so that foolish patrons don't get dehydrated and pass out.  After a guest has reached their limit, they may retreat into the main pool down the cascade to the south. ",
+            "flags": [
+                "NOMOB",
+                "NOSCAN"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "South": {
+                    "description": "Tumbling cheerfully down a series of slightly slippery stones, the hot water goes out from here to the rest of the pool, supplying the resort with the mineral water this place is famous for. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10320"
+                }
+            }
+        },
+        {
+            "id": "10317",
+            "name": "A Wooden Walkway",
+            "description": "This railed walkway is set several feet above the ground, for this far north the earth is cold no matter what season it is.  The wooden panels of the walkway are made from a dark, imported wood that has been lacquered to prevent it from letting any splinters into a guest's bare feet.  Magic keeps it warm and dry - or perhaps it is only a clever use of this place's natural geothermal energy.  In any case, it is neither icy nor slippery.  The resort building and the men's dressing room lies to the north, blocked from view by a series of wooden panels, and there is a private pool to the east beyond a similar barrier.  The main pool lies through a gate to the south and down a few steps. There seems to be quite a bit of noise coming from that direction. ",
+            "flags": [],
+            "sector": "CITY",
+            "exits": {
+                "North": {
+                    "description": "A mazelike series of panels blocks sight north but allows passage back into the dressing room.  The panels are made of white pine - a soft, yet abundant, wood that emits a slight fragrance.  The steam from the hot springs has left a slight layer of ice on the wood, however. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10312"
+                },
+                "East": {
+                    "description": "A series of interweaving wooden panels blocks the view east, but steam billows in from that direction and a sign on the panels reads, in Common, \"Private Pool\". ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10318"
+                },
+                "South": {
+                    "description": "A gate made of thin branches of wood leads south.  The branches are spaced enough apart that the shallow steps down to the main hot pool are clearly visible through the slats, and it latches with a wooden mechanism rather than a metal one.  This is likely due to the cold temperatures of the air and the probability of wet hands - freezing one's fingers to a metal gate would be quite unpleasant! ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10321"
+                }
+            }
+        },
+        {
+            "id": "10318",
+            "name": "A Private Pool",
+            "description": "A wooden panel blocks view to the west, the southern wall of the resort lies north, and a bamboo divider seperates this private pool from the one to the south, but the eastern view is open, giving a view of the rising hills that stretch from north to south here.  The occasional caribou or camouflaged rabbit can be seen weaving in and out of the pine forests if one stops to look, and occasionally there are glimpses of rarer animals like the arctic fox.  The pool itself is blissfully hot, steaming at all hours of day and night.  Stone ledges around the sides provide places to sit and relax, or the center of the pool is deep enough for full-body immersion.  It is nice and quiet here, perfect for a moment's reflection on the joys of life. ",
+            "flags": [
+                "ALWAYSLIT"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "West": {
+                    "description": "",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10317"
+                }
+            }
+        },
+        {
+            "id": "10319",
+            "name": "A Steaming Pool",
+            "description": "Shallow, grooved wooden stheps lead down from the gate to the north, turning to stone steps about a foot above the water's surface and continuing to the bottom of the pool.  The water is gloriously warm in contrast to the chill air, and the pool here is quite deep.  The bottom is a rough sand, not unpleasant to walk on and surely less prone to accidets than a smooth floor would be.  The water coming in from the east is very hot, but it is both cooler and shallower to the south.  The women's dressing rooms lie to the north through a gate. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "Shallow, grooved wooden steps lead up to a wooden gate with a sign.  The sign has the symbol of a circle atop a cross, and the elven rune for \"Female\". ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10315"
+                },
+                "East": {
+                    "description": "The water coming in from the east is hotter than that circulating in this particular section of the pool, and it looks like it continues for a while in that direction. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10320"
+                },
+                "South": {
+                    "description": "The pool continues south, but gets a little shallower in that direction. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10323"
+                }
+            }
+        },
+        {
+            "id": "10320",
+            "name": "A Very Hot Section of the Steaming Pool",
+            "description": "A beautiful cascade of water sends billows of steam down from the north, and the water it adds to the pool is HOT!  Though blissfully theraputic, it's dangerous to stay in water this hot without working your way up to it by spending some time in the cooler sections of the pool first.  Still, for the adventurous, there is no greater thrill than standing right underneath the pounding waterfall.  Rocks have been piled up to direct the force of the water into that one cascade, probably to encourage this kind of behavior.  The pool gets a little deeper, but cooler, to the east and west.  South is a little island to dry off on if the hot water should become too much to bear. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The scalding waterfall comes down from a steep, yet probably scaleable, series of rocks placed to look like a natural waterfall.  The water for the entire pool looks like it's coming from that direction, so entering the hot spring might not be the brightest idea. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10316"
+                },
+                "East": {
+                    "description": "The pool gets a little bit deeper to the east, but the water isn't quite as scalding hot in that direction. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10321"
+                },
+                "South": {
+                    "description": "To the south is a little sandy island where one could get out of the hot water for a while and cool down. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10324"
+                },
+                "West": {
+                    "description": "The pool is a little deeper and a little cooler - though still quite pleasantly warm!  - to the west. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10319"
+                }
+            }
+        },
+        {
+            "id": "10321",
+            "name": "A Steaming Pool",
+            "description": "Ahh, the hot springs at last!  Shallow wooden steps lead down from the northern gate into the pool, becoming stone once they are near, and then under, the water.  The air is chilly and full of steam from the springs, making it hard to see too far.  The smell of sulphur is strong, but one gets acclimated to it after a few minutes.  The water circulating in from the west is very warm.  The pool also continues south, though it is fairly shallow in that direction - perfect for easing one's way in so as not to overheat. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "Shallow, grooved wooden steps lead up to a wooden gate with a sign.  The sign has the symbol of a circle with a slightly off-center arrow pointing upwards and the elven rune for \"Male\". ",
+                    "keyword": "gate",
+                    "type": "Door",
+                    "key": "0",
+                    "destination": "10317"
+                },
+                "South": {
+                    "description": "The pool gets a little shallower to the south. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10325"
+                },
+                "West": {
+                    "description": "Hot water seems to be flowing in from the west, where the pool continues for some distance. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10320"
+                }
+            }
+        },
+        {
+            "id": "10322",
+            "name": "A Steaming Pool",
+            "description": "Narrow, yet ledged, this place is ideal for semi-private conversation or the simple joys of being nice and warm while all around you it's nice and cold. The surrounding landscape is a light pine forest, usually snowbound but full of gorgeous colors and scents in the summer.  A hush seems to cover the land, and loud noises are swallowed up by the forest.  The pool continues back to the east. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "The pool widens up to the east, and a little ways out there is a sandy island. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10323"
+                }
+            }
+        },
+        {
+            "id": "10323",
+            "name": "A Steaming Pool",
+            "description": "This wide section of the hot pool is somewhat shallower than the sections around it, and to the east it breaks free of the water entirely to form a small, sandy island.  The swirling waters move in a general north-south direction, washing away dirt and cares alike, relaxing body and soul.  An isolated arm lies to the west, and the pool continues north and south.  To the south the sound of cascading water is strong. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The water coming in from the north is slightly warmer, and the pool seems a little deeper in that direction as well. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10319"
+                },
+                "East": {
+                    "description": "To the east is a little sandy island. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10324"
+                },
+                "South": {
+                    "description": "The water flows south into a holding pool for a little waterfall, from which the pool drains out into a river farther south. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10327"
+                },
+                "West": {
+                    "description": "A little arm of the pool stretches off to the west. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10322"
+                }
+            }
+        },
+        {
+            "id": "10324",
+            "name": "The Sandy Island",
+            "description": "This little island is set with chairs for those who wish to escape the warm water for a little bit before jumping back in.  The sand is large-grained, so it doesn't stick to wet guests as much as one might think.  This spot also offers a great vantage point for all the different parts of the hot springs, from the gates to the north to the waterfall southwest.  The sand itself is warm, heated by the surrounding waters.  The island deepens into water again in all directions. ",
+            "flags": [],
+            "sector": "BEACH",
+            "exits": {
+                "North": {
+                    "description": "The hottest section of the pool is to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10320"
+                },
+                "East": {
+                    "description": "The pool extends for a ways east, a bit shallower and cooler than the section to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10325"
+                },
+                "South": {
+                    "description": "A secluded pool lies to the south, excellent for those who prefer partial privacy. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10328"
+                },
+                "West": {
+                    "description": "An arm of the pool reaches out to the west, looking a bit shallower than the section to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10323"
+                }
+            }
+        },
+        {
+            "id": "10325",
+            "name": "A Steaming Pool",
+            "description": "The hot pool is rather shallow here, its gritty bottom rising towards the small island to the west.  Hot steam rises, ghostlike, but it only provides a slight barrier to sight.  To the east, an isolated arm of the pool gets deeper again, and the gate to the Men's Dressing Room lies a little ways north.  To the south is a lip of the pool, and a view of the serene cold fields that make the water seem warmer by comparison. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "A little deeper and warmer, the pool continues to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10321"
+                },
+                "East": {
+                    "description": "An isolated arm of the hot pool stretches out to the east. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10326"
+                },
+                "West": {
+                    "description": "There's a sandy island to the west that looks like it would be fun to cool off on when the water gets too hot. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10324"
+                }
+            }
+        },
+        {
+            "id": "10326",
+            "name": "A Steaming Pool",
+            "description": "The hot springs have been shaped into a small, oval arm here which overlooks the scenery in all directions.  The mass of the resort lies north, shedding its warm glow on the countryside.  A series of mountains rises to the east, eventually turning into the familiar peaks of Nikozia far to the south.  Small hills and pine groves dot the land, verdant in summer but snowbound the rest of the year.  The pool itself is designed for relaxation, with stone ledges on the side to sit on and getting quite deep elsewhere for full submersion. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "West": {
+                    "description": "The pool continues to the east.  A little ways off, there is a sandy island. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10325"
+                }
+            }
+        },
+        {
+            "id": "10327",
+            "name": "The Steaming Falls",
+            "description": "The pool ends here.  A wooden sluice acts as a wall on the southern end of the pool, but the water continues down in a beautiful cascade before joining the creek which heads off to the south.  A set of stairs leads down for those patrons who feel inclined to follow the waters for a little ways.  Billows of steam rise up from the cascade, making it difficult to see exactly what lies along the creek. ",
+            "flags": [
+                "NOMOB"
+            ],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The hot pool continues to the north, where it widens up quite a bit. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10323"
+                },
+                "Down": {
+                    "description": "A gentle cascade leads down into a much cooler-looking creek and away from the resort.  There is a bit of a wooden sluice rigged up to prevent any important items from floating downstream, but it doesn't impede the water too much unless completely blocked. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10330"
+                }
+            }
+        },
+        {
+            "id": "10328",
+            "name": "A Secluded Pool",
+            "description": "The ground below slopes down dramatically, leaving this secluded pool on something of a cliff.  Trickles of mineral water flow down the sides of the cliff, forming oddly smooth-looking rivulets.  Far to the south, a creek can be seen winding through the mountains and forests to some unknown destination. The pool itself is deep and has several terraced ledges for sitting, and the sandy island is to the north. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "There's a little sandy island to the north. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10324"
+                }
+            }
+        },
+        {
+            "id": "10329",
+            "name": "A Warm, Icy Stream",
+            "description": "Though the creek is shallow, its current begins to pick up a bit here.  The water is warm, even steaming a bit from the hot springs, but near the slower-moving water of the creekside it loses its heat quickly and may even turn into patches of ice.  The water is flowing in from the east and turns sharply to the south as it continues downstream. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "The water flows in from the east, and the resort lies farther upstream. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10330"
+                },
+                "South": {
+                    "description": "The creek continues to the south. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10331"
+                }
+            }
+        },
+        {
+            "id": "10330",
+            "name": "A Warm, Icy Stream",
+            "description": "Someone has set rocks into a circle under the falls here, marking the last boundaries of the comfort of the hot springs.  The water is about waist-deep within the circle, though it shallows out quickly as it continues to flow west. As it gets farther away from the resort, the water begins to take on the chill of the northlands, so that here and there are patches of ice along the very edge of the creek.  Stairs cut into the stone lead back up to the resort. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "West": {
+                    "description": "The stream continues of to the west, each bank covered with eager, green plants that seek the heat of the warm water. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10329"
+                },
+                "Up": {
+                    "description": "A slender wooden sluice stands firmly in the path of the water, but it looks like you could scramble up the rocks on either side of the cascade without much difficulty.  It would be just as much fun to sit under the waterfall, though. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10327"
+                }
+            }
+        },
+        {
+            "id": "10331",
+            "name": "A Warm, Icy Stream",
+            "description": "The stream takes another sharp turn here, leading east.  The chill bite of cold air is more apparent here, and there is more ice along the sides of the stream, but the main current is still comfortably warm from the hot springs, though it smells slightly of sulphur.  The resort lies upstream to the north. The creekbed turns again not too far downstream, so it's difficult to tell where exactly it is leading. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "To the northeast, above a small cascade, the lights of a building glimmer. It would be easy to reach it from here by simply heading upstream. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10329"
+                },
+                "East": {
+                    "description": "The stream bends again here, leading to the east. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10332"
+                }
+            }
+        },
+        {
+            "id": "10332",
+            "name": "A Warm, Icy Stream",
+            "description": "It's definately getting chillier as the water loses heat this far from its warm source, but it's still fairly comfortable.  Bending again here, the stream is coming in from the west and then heading south.  Chunks of ice occasionally break away from the sides of the creek and flow a little ways in the main current before melting under the heat. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "South": {
+                    "description": "The stream continues south for a little ways before turning again. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10333"
+                },
+                "West": {
+                    "description": "The water flowing in from the west is quite warm. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10331"
+                }
+            }
+        },
+        {
+            "id": "10333",
+            "name": "A Warm, Icy River",
+            "description": "A gorgeous cascade of water from the east adds enough to this little stream that it becomes a little river.  The chilly cascade mingles with the warm flow of the main current, making a little steam to mix with the mist of the waterfall.  As a result, all the surrounding plants and rocks are covered in tiny ice crystals that form when the mist touches them.  It is very beautiful. The stream is passable both north and south. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The current from the north is not too strong to make headway against, should one wish to continue in that direction. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10332"
+                },
+                "East": {
+                    "description": "Another creek, perhaps a little smaller than the one to the north, find its way to the lip of a cliff here and falls crashing down into the river.  A few large rocks break it up into several small cascades, but it still represents a good amount of water.  It's quite loud, but very pretty. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "South": {
+                    "description": "The creek goes south for a little ways before bending again. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10334"
+                }
+            }
+        },
+        {
+            "id": "10334",
+            "name": "An Icy River",
+            "description": "This river is tough to navigate - it's deep, the current is fast, there are rocks everywhere, and there is barely a trace of warmth left from the hot springs far to the north.  Trees hang along the steep banks of the river, some looking quite strange with trunks going in all directions - probably a result of heavy snows as a sapling.  This chilly river heads downstream to the east and upstream to the north. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "North": {
+                    "description": "The water flowing in from the north is warmer than one would expect for this climate. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10333"
+                },
+                "East": {
+                    "description": "The river chills off as it heads east. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10335"
+                }
+            }
+        },
+        {
+            "id": "10335",
+            "name": "Icy Rapids",
+            "description": "Here at last is the end of the passable section of the icy river.  To the east lie sharp rocks and swift rapids, too many and too dangerous to navigate around.  The water is cold, very cold, and there is ice along its edges where the water moves slowly.  Though the current moves steadily, it is not too strong to swim against.  The only exit is upstream, to the west. ",
+            "flags": [],
+            "sector": "SHALLOWS",
+            "exits": {
+                "East": {
+                    "description": "The ice-filled rapids look much too dangerous to navigate, especially for someone without a canoe. ",
+                    "keyword": "",
+                    "type": "Description only",
+                    "key": "-1",
+                    "destination": "-1"
+                },
+                "West": {
+                    "description": "It should be possible to continue upstream for some distance, as the water looks much calmer than it does downstream. ",
+                    "keyword": "",
+                    "key": "0",
+                    "destination": "10334"
+                }
+            }
+        },
+        {
+            "id": "10336",
+            "name": "A Guest Room at Phoenix Feather Resort",
+            "description": "This is one of the rooms that Phoenix Feather Resort rents out to its patrons for a small fee, since many of them travel here to vacation from much farther away than Ickle.  Narrow windows along each wall provide a glimpse of the excellent views without letting too much cold in, though the south window is rather foggy from overlooking the hot springs.  On the east wall is an extension of the main hearth with a happily burning fire lending its warmth to the room.  Set into the wall is a cute little cubby-bed piled high with quilts and pillows that just begs to be napped in.  The staircase leading down isn't very noticeable from below...  For that matter, how does one get into this room in the first place? ",
+            "flags": [
+                "NOMOB",
+                "INDOORS",
+                "ALWAYSLIT"
+            ],
+            "sector": "STRUCTURE",
+            "exits": {
+                "Down": {
+                    "description": "A discreet staircase leads down t the main hall of the resort. ",
+                    "keyword": "",
+                    "key": "-1",
+                    "destination": "10303"
+                }
+            },
+            "extras": [
+                {
+                    "keywords": [
+                        "bed",
+                        "pillow",
+                        "pillows",
+                        "quilt",
+                        "quilts"
+                    ],
+                    "text": "This single bed is set into the wall of the room under the north window. Piled high with handmade quilts and embroidered pillows, it would make a superb reading nook or napping spot.  The colors of the quilts and pillows don't seem to have any pattern to them, as nearly every color imaginable is represented. "
+                }
+            ]
+        }
+    ]
+}
