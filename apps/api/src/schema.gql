@@ -7,13 +7,26 @@ type AuthPayload {
   user: User!
 }
 
+enum Climate {
+  ALPINE
+  ARCTIC
+  ARID
+  NONE
+  OCEANIC
+  SEMIARID
+  SUBARCTIC
+  SUBTROPICAL
+  TEMPERATE
+  TROPICAL
+}
+
 input CreateZoneInput {
-  climate: String! = "NONE"
-  hemisphere: String! = "NORTHWEST"
+  climate: Climate! = NONE
+  hemisphere: Hemisphere! = NORTHWEST
   id: Int!
   lifespan: Int! = 30
   name: String!
-  resetMode: String! = "NORMAL"
+  resetMode: ResetMode! = NORMAL
   top: Int!
 }
 
@@ -21,6 +34,13 @@ input CreateZoneInput {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum Hemisphere {
+  NORTHEAST
+  NORTHWEST
+  SOUTHEAST
+  SOUTHWEST
+}
 
 input LoginInput {
   identifier: String!
@@ -51,12 +71,18 @@ input RegisterInput {
   username: String!
 }
 
+enum ResetMode {
+  EMPTY
+  NEVER
+  NORMAL
+}
+
 input UpdateZoneInput {
-  climate: String
-  hemisphere: String
+  climate: Climate
+  hemisphere: Hemisphere
   lifespan: Int
   name: String
-  resetMode: String
+  resetMode: ResetMode
   top: Int
 }
 
@@ -88,13 +114,13 @@ type ZoneCountsDto {
 
 type ZoneDto {
   _count: ZoneCountsDto
-  climate: String!
+  climate: Climate!
   createdAt: DateTime!
-  hemisphere: String!
+  hemisphere: Hemisphere!
   id: Int!
   lifespan: Int!
   name: String!
-  resetMode: String!
+  resetMode: ResetMode!
   top: Int!
   updatedAt: DateTime!
 }

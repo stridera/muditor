@@ -1,4 +1,4 @@
-import { UserRole } from '@muditor/db';
+import { UserRole } from '@prisma/client';
 
 export interface JwtPayload {
   sub: string; // User ID

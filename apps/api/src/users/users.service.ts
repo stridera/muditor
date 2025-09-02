@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { UserRole } from '@muditor/db';
+import { UserRole } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()

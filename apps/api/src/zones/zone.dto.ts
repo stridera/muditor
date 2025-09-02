@@ -1,6 +1,6 @@
 import { ObjectType, Field, Int, InputType, registerEnumType } from '@nestjs/graphql';
 import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
-import { ResetMode, Hemisphere, Climate } from '@muditor/db';
+import { ResetMode, Hemisphere, Climate } from '@prisma/client';
 
 // Enums for GraphQL
 export enum ResetModeEnum {

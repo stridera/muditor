@@ -1,6 +1,6 @@
 import { createParamDecorator, ExecutionContext } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { User } from '@muditor/db';
+import { User } from '@prisma/client';
 
 export const CurrentUser = createParamDecorator(
   (data: keyof User | undefined, context: ExecutionContext): User | any => {
