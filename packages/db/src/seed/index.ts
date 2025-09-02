@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import { seedUsers } from './users';
+import { seedGameSystem } from './game-system';
 import { seedWorldData } from './world-data';
 
 const prisma = new PrismaClient();
@@ -11,6 +12,10 @@ async function main() {
     // Seed users and authentication data
     console.log('👤 Seeding users...');
     await seedUsers(prisma);
+    
+    // Seed game system (races, classes, spells, skills)
+    console.log('🎮 Seeding game system...');
+    await seedGameSystem(prisma);
     
     // Seed world data from JSON files
     console.log('🌍 Seeding world data...');

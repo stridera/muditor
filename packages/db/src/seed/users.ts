@@ -1,4 +1,4 @@
-import { PrismaClient, UserRole } from '@prisma/client';
+import { PrismaClient, UserRole, Race } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 
 export async function seedUsers(prisma: PrismaClient) {
@@ -48,7 +48,7 @@ export async function seedUsers(prisma: PrismaClient) {
   
   console.log(`  ✅ Created users: ${admin.username}, ${builder.username}, ${player.username}`);
   
-  // Create some test characters
+  // Create some test characters (will set race/class after game system is seeded)
   await prisma.character.upsert({
     where: { name: 'Gandalf' },
     update: {},
@@ -56,8 +56,7 @@ export async function seedUsers(prisma: PrismaClient) {
       name: 'Gandalf',
       userId: admin.id,
       level: 50,
-      race: 'Human',
-      class: 'Sorcerer',
+      raceLegacy: Race.HUMAN, // Legacy field for transition
       alignment: 900,
       strength: 18,
       intelligence: 25,
@@ -76,8 +75,7 @@ export async function seedUsers(prisma: PrismaClient) {
       name: 'Legolas',
       userId: builder.id,
       level: 25,
-      race: 'Elf',
-      class: 'Ranger',
+      raceLegacy: Race.ELF, // Legacy field for transition
       alignment: 500,
       strength: 16,
       intelligence: 18,
