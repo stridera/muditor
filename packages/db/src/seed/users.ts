@@ -56,7 +56,7 @@ export async function seedUsers(prisma: PrismaClient) {
       name: 'Gandalf',
       userId: admin.id,
       level: 50,
-      raceLegacy: Race.HUMAN, // Legacy field for transition
+      // raceLegacy: Race.HUMAN, // Skip for now, will be set after game system seeding
       alignment: 900,
       strength: 18,
       intelligence: 25,
@@ -75,7 +75,7 @@ export async function seedUsers(prisma: PrismaClient) {
       name: 'Legolas',
       userId: builder.id,
       level: 25,
-      raceLegacy: Race.ELF, // Legacy field for transition
+      // raceLegacy: Race.ELF, // Skip for now, will be set after game system seeding
       alignment: 500,
       strength: 16,
       intelligence: 18,
