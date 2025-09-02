@@ -1,6 +1,6 @@
 import { Injectable, UnauthorizedException, ConflictException, Logger } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '@muditor/db';
+import { UserRole } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from '../database/database.service';
 import { RegisterInput } from './dto/register.input';

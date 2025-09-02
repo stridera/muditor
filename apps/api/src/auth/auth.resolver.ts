@@ -7,7 +7,7 @@ import { AuthPayload } from './dto/auth.payload';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
-import { User as PrismaUser } from '@muditor/db';
+import { User as PrismaUser } from '@prisma/client';
 
 @Resolver()
 export class AuthResolver {

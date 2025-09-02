@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { Zone, Prisma } from '@muditor/db';
+import { Zone, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ZonesService {

@@ -5,7 +5,7 @@ import { User } from './entities/user.entity';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
 import { Roles } from '../auth/decorators/roles.decorator';
-import { UserRole } from '@muditor/db';
+import { UserRole } from '@prisma/client';
 
 @Resolver(() => User)
 @UseGuards(JwtAuthGuard)
