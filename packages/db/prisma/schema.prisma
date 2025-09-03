@@ -1,6 +1,3 @@
-// This is your Prisma schema file.
-// Learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -10,28 +7,659 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// ============================================================================
-// User Management & Authentication
-// ============================================================================
-
 model User {
-  id          String   @id @default(cuid())
-  email       String   @unique
-  username    String   @unique
+  id           String      @id @default(cuid())
+  email        String      @unique
+  username     String      @unique
   passwordHash String
-  role        UserRole @default(PLAYER)
-  godLevel    Int      @default(0)
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  lastLoginAt DateTime?
-  
-  // Relations
-  characters  Character[]
-  auditLogs   AuditLog[]
-  
+  role         UserRole    @default(PLAYER)
+  godLevel     Int         @default(0)
+  createdAt    DateTime    @default(now())
+  updatedAt    DateTime    @updatedAt
+  lastLoginAt  DateTime?
+  auditLogs    AuditLog[]
+  characters   Character[]
+
   @@map("users")
+}
+
+model Character {
+  id           String           @id @default(cuid())
+  name         String           @unique
+  level        Int              @default(1)
+  alignment    Int              @default(0)
+  strength     Int              @default(13)
+  intelligence Int              @default(13)
+  wisdom       Int              @default(13)
+  dexterity    Int              @default(13)
+  constitution Int              @default(13)
+  charisma     Int              @default(13)
+  hitPoints    Int              @default(100)
+  mana         Int              @default(100)
+  movement     Int              @default(100)
+  copper       Int              @default(0)
+  silver       Int              @default(0)
+  gold         Int              @default(0)
+  platinum     Int              @default(0)
+  userId       String
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  classId      Int?
+  raceId       Int?
+  raceLegacy   Race?            @default(HUMAN) @map("race_legacy")
+  skills       CharacterSkill[]
+  spells       CharacterSpell[]
+  class        Class?           @relation(fields: [classId], references: [id])
+  race         RaceData?        @relation(fields: [raceId], references: [id])
+  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("characters")
+}
+
+model Zone {
+  id         Int        @id
+  name       String
+  top        Int
+  lifespan   Int        @default(30)
+  resetMode  ResetMode  @default(NORMAL)
+  hemisphere Hemisphere @default(NORTHWEST)
+  climate    Climate    @default(NONE)
+  createdAt  DateTime   @default(now())
+  updatedAt  DateTime   @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  mobResets  MobReset[]
+  mobs       Mob[]
+  objects    Object[]
+  rooms      Room[]
+  shops      Shop[]
+  triggers   Trigger[]
+
+  @@map("zones")
+}
+
+model Room {
+  id          Int                    @id
+  name        String
+  description String
+  sector      Sector                 @default(STRUCTURE)
+  zoneId      Int
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+  createdBy   String?
+  updatedBy   String?
+  flags       RoomFlag[]
+  mobResets   MobReset[]
+  exits       RoomExit[]
+  extraDescs  RoomExtraDescription[]
+  zone        Zone                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@map("rooms")
+}
+
+model RoomExit {
+  id          String    @id @default(cuid())
+  direction   Direction
+  description String?
+  keyword     String?
+  key         String?
+  destination Int?
+  roomId      Int
+  room        Room      @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@unique([roomId, direction])
+  @@map("room_exits")
+}
+
+model RoomExtraDescription {
+  id          String @id @default(cuid())
+  keyword     String
+  description String
+  roomId      Int
+  room        Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
+
+  @@map("room_extra_descriptions")
+}
+
+model Mob {
+  id              Int          @id
+  keywords        String
+  mobClass        String
+  shortDesc       String
+  longDesc        String
+  desc            String
+  alignment       Int          @default(0)
+  level           Int          @default(1)
+  armorClass      Int          @default(0)
+  hitRoll         Int          @default(0)
+  move            Int          @default(0)
+  hpDiceNum       Int          @default(0)
+  hpDiceSize      Int          @default(0)
+  hpDiceBonus     Int          @default(0)
+  damageDiceNum   Int          @default(0)
+  damageDiceSize  Int          @default(0)
+  damageDiceBonus Int          @default(0)
+  copper          Int          @default(0)
+  silver          Int          @default(0)
+  gold            Int          @default(0)
+  platinum        Int          @default(0)
+  raceAlign       Int          @default(0)
+  strength        Int          @default(13)
+  intelligence    Int          @default(13)
+  wisdom          Int          @default(13)
+  dexterity       Int          @default(13)
+  constitution    Int          @default(13)
+  charisma        Int          @default(13)
+  perception      Int          @default(0)
+  concealment     Int          @default(0)
+  zoneId          Int
+  createdAt       DateTime     @default(now())
+  updatedAt       DateTime     @updatedAt
+  createdBy       String?
+  updatedBy       String?
+  classId         Int?
+  raceId          Int?
+  raceLegacy      Race?        @default(HUMAN) @map("race_legacy")
+  mobFlags        MobFlag[]
+  effectFlags     EffectFlag[]
+  position        Position     @default(STANDING)
+  defaultPosition Position     @default(STANDING)
+  gender          Gender       @default(NEUTRAL)
+  size            Size         @default(MEDIUM)
+  lifeForce       LifeForce    @default(LIFE)
+  composition     Composition  @default(FLESH)
+  stance          Stance       @default(ALERT)
+  damageType      DamageType   @default(HIT)
+  resets          MobReset[]
+  skills          MobSkill[]
+  spells          MobSpell[]
+  class           Class?       @relation(fields: [classId], references: [id])
+  race            RaceData?    @relation(fields: [raceId], references: [id])
+  zone            Zone         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  shops           Shop[]
+  triggers        Trigger[]
+
+  @@map("mobs")
+}
+
+model MobSkill {
+  id      Int   @id @default(autoincrement())
+  mobId   Int
+  skillId Int
+  level   Int   @default(1)
+  mob     Mob   @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  skill   Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([mobId, skillId])
+  @@map("mob_skills")
+}
+
+model MobSpell {
+  id      Int     @id @default(autoincrement())
+  mobId   Int
+  spellId Int
+  circle  Int     @default(1)
+  known   Boolean @default(true)
+  mob     Mob     @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  spell   Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@unique([mobId, spellId])
+  @@map("mob_spells")
+}
+
+model MobReset {
+  id       String        @id @default(cuid())
+  max      Int           @default(1)
+  name     String?
+  mobId    Int
+  roomId   Int
+  zoneId   Int
+  carrying MobCarrying[]
+  equipped MobEquipped[]
+  mob      Mob           @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  room     Room          @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  zone     Zone          @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@map("mob_resets")
+}
+
+model MobCarrying {
+  id       String   @id @default(cuid())
+  max      Int      @default(1)
+  name     String?
+  resetId  String
+  objectId Int
+  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
+
+  @@map("mob_carrying")
+}
+
+model MobEquipped {
+  id       String   @id @default(cuid())
+  max      Int      @default(1)
+  location String
+  name     String?
+  resetId  String
+  objectId Int
+  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
+
+  @@map("mob_equipped")
+}
+
+model Object {
+  id             Int                      @id
+  type           ObjectType               @default(NOTHING)
+  keywords       String
+  shortDesc      String
+  description    String
+  actionDesc     String?
+  weight         Float                    @default(0.0)
+  cost           Int                      @default(0)
+  timer          Int                      @default(0)
+  decomposeTimer Int                      @default(0)
+  level          Int                      @default(1)
+  concealment    Int                      @default(0)
+  values         Json                     @default("{}")
+  zoneId         Int
+  createdAt      DateTime                 @default(now())
+  updatedAt      DateTime                 @updatedAt
+  createdBy      String?
+  updatedBy      String?
+  flags          ObjectFlag[]
+  effectFlags    EffectFlag[]
+  wearFlags      WearFlag[]
+  mobCarrying    MobCarrying[]
+  mobEquipped    MobEquipped[]
+  affects        ObjectAffect[]
+  extraDescs     ObjectExtraDescription[]
+  spells         ObjectSpell[]
+  zone           Zone                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  shopItems      ShopItem[]
+  triggers       Trigger[]
+
+  @@map("objects")
+}
+
+model ObjectExtraDescription {
+  id          String @id @default(cuid())
+  keyword     String
+  description String
+  objectId    Int
+  object      Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+
+  @@map("object_extra_descriptions")
+}
+
+model ObjectAffect {
+  id       String @id @default(cuid())
+  location String
+  modifier Int
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+
+  @@map("object_affects")
+}
+
+model ObjectSpell {
+  id       String @id @default(cuid())
+  spell    String
+  level    Int    @default(1)
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+
+  @@map("object_spells")
+}
+
+model Shop {
+  id              Int              @id
+  buyProfit       Float            @default(1.0)
+  sellProfit      Float            @default(1.0)
+  temper1         Int              @default(0)
+  noSuchItem1     String?
+  noSuchItem2     String?
+  doNotBuy        String?
+  missingCash1    String?
+  missingCash2    String?
+  messageBuy      String?
+  messageSell     String?
+  keeperId        Int?
+  zoneId          Int
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  createdBy       String?
+  updatedBy       String?
+  flags           ShopFlag[]
+  tradesWithFlags ShopTradesWith[]
+  accepts         ShopAccept[]
+  hours           ShopHour[]
+  items           ShopItem[]
+  rooms           ShopRoom[]
+  keeper          Mob?             @relation(fields: [keeperId], references: [id])
+  zone            Zone             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@map("shops")
+}
+
+model ShopItem {
+  id       String @id @default(cuid())
+  amount   Int    @default(0)
+  shopId   Int
+  objectId Int
+  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  shop     Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, objectId])
+  @@map("shop_items")
+}
+
+model ShopAccept {
+  id       String  @id @default(cuid())
+  type     String
+  keywords String?
+  shopId   Int
+  shop     Shop    @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("shop_accepts")
+}
+
+model ShopRoom {
+  id     String @id @default(cuid())
+  roomId Int
+  shopId Int
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@unique([shopId, roomId])
+  @@map("shop_rooms")
+}
+
+model ShopHour {
+  id     String @id @default(cuid())
+  open   Int
+  close  Int
+  shopId Int
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@map("shop_hours")
+}
+
+model Trigger {
+  id         String        @id @default(cuid())
+  name       String
+  attachType ScriptType
+  numArgs    Int           @default(0)
+  argList    String?
+  commands   String
+  zoneId     Int?
+  mobId      Int?
+  objectId   Int?
+  variables  Json          @default("{}")
+  createdAt  DateTime      @default(now())
+  updatedAt  DateTime      @updatedAt
+  createdBy  String?
+  updatedBy  String?
+  flags      TriggerFlag[]
+  mob        Mob?          @relation(fields: [mobId], references: [id], onDelete: Cascade)
+  object     Object?       @relation(fields: [objectId], references: [id], onDelete: Cascade)
+  zone       Zone?         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@map("triggers")
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  action     String
+  entityType String
+  entityId   String
+  oldValues  Json?
+  newValues  Json?
+  userId     String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("audit_logs")
+}
+
+model RaceData {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  description String?
+  size        Size        @default(MEDIUM)
+  lifespan    Int?
+  statBonuses Json?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  characters  Character[]
+  mobs        Mob[]
+  skills      RaceSkill[]
+
+  @@map("races")
+}
+
+model Class {
+  id           Int                @id @default(autoincrement())
+  name         String             @unique
+  description  String?
+  hitDice      String             @default("1d8")
+  primaryStat  String?
+  createdAt    DateTime           @default(now())
+  updatedAt    DateTime           @updatedAt
+  characters   Character[]
+  skillAccess  ClassSkill[]
+  mobs         Mob[]
+  spellCircles SpellClassCircle[]
+
+  @@map("classes")
+}
+
+model Spell {
+  id              Int                @id @default(autoincrement())
+  name            String             @unique
+  schoolId        Int?
+  minPosition     Position           @default(STANDING)
+  violent         Boolean            @default(false)
+  castTimeRounds  Int                @default(1)
+  cooldownMs      Int                @default(0)
+  inCombatOnly    Boolean            @default(false)
+  isArea          Boolean            @default(false)
+  notes           String?
+  createdAt       DateTime           @default(now())
+  updatedAt       DateTime           @updatedAt
+  characterSpells CharacterSpell[]
+  mobSpells       MobSpell[]
+  classCircles    SpellClassCircle[]
+  components      SpellComponent[]
+  effects         SpellEffect[]
+  messages        SpellMessage?
+  restrictions    SpellRestriction?
+  savingThrows    SpellSavingThrow[]
+  targeting       SpellTargeting?
+  school          SpellSchool?       @relation(fields: [schoolId], references: [id])
+
+  @@map("spells")
+}
+
+model SpellSchool {
+  id          Int     @id @default(autoincrement())
+  name        String  @unique
+  description String?
+  spells      Spell[]
+
+  @@map("spell_schools")
+}
+
+model SpellClassCircle {
+  id              Int   @id @default(autoincrement())
+  spellId         Int
+  classId         Int
+  circle          Int
+  minLevel        Int?
+  proficiencyGain Int?
+  class           Class @relation(fields: [classId], references: [id], onDelete: Cascade)
+  spell           Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@unique([spellId, classId])
+  @@map("spell_class_circles")
+}
+
+model SpellTargeting {
+  id                 Int         @id @default(autoincrement())
+  spellId            Int         @unique
+  allowedTargetsMask Int
+  targetScope        TargetScope @default(SINGLE)
+  maxTargets         Int         @default(1)
+  range              SpellRange  @default(ROOM)
+  requireLos         Boolean     @default(false)
+  filtersMask        Int?
+  spell              Spell       @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@map("spell_targeting")
+}
+
+model SpellSavingThrow {
+  id               Int        @id @default(autoincrement())
+  spellId          Int
+  saveType         SaveType   @default(SPELL)
+  onSave           SaveResult @default(NEGATE)
+  dcFormula        String
+  saveModifierMask Int?
+  spell            Spell      @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@map("spell_saving_throws")
+}
+
+model SpellMessage {
+  id              Int     @id @default(autoincrement())
+  spellId         Int     @unique
+  startToCaster   String?
+  startToVictim   String?
+  startToRoom     String?
+  successToCaster String?
+  successToVictim String?
+  successToRoom   String?
+  failToCaster    String?
+  failToVictim    String?
+  failToRoom      String?
+  wearoffToTarget String?
+  wearoffToRoom   String?
+  spell           Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@map("spell_messages")
+}
+
+model SpellComponent {
+  id       Int     @id @default(autoincrement())
+  spellId  Int
+  objectId Int
+  consumed Boolean @default(false)
+  required Boolean @default(true)
+  spell    Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@map("spell_components")
+}
+
+model SpellRestriction {
+  id                  Int     @id @default(autoincrement())
+  spellId             Int     @unique
+  indoorsOnly         Boolean @default(false)
+  outdoorsOnly        Boolean @default(false)
+  noSafeRooms         Boolean @default(false)
+  noTeleportFlagsMask Int?
+  terrainMask         Int?
+  disallowStatesMask  Int?
+  spell               Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@map("spell_restrictions")
+}
+
+model SpellEffect {
+  id              Int            @id @default(autoincrement())
+  spellId         Int
+  effectType      EffectType
+  order           Int            @default(0)
+  chancePct       Int            @default(100)
+  trigger         EffectTrigger? @default(ON_CAST)
+  durationFormula String?
+  stackingRule    StackingRule   @default(REFRESH)
+  conditionFilter Json?
+  params          Json
+  spell           Spell          @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@index([spellId, order])
+  @@map("spell_effects")
+}
+
+model Skill {
+  id              Int              @id @default(autoincrement())
+  name            String           @unique
+  description     String?
+  type            SkillType
+  category        SkillCategory    @default(SECONDARY)
+  maxLevel        Int              @default(100)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+  characterSkills CharacterSkill[]
+  classSkills     ClassSkill[]
+  mobSkills       MobSkill[]
+  raceSkills      RaceSkill[]
+
+  @@map("skills")
+}
+
+model ClassSkill {
+  id       Int           @id @default(autoincrement())
+  classId  Int
+  skillId  Int
+  category SkillCategory @default(SECONDARY)
+  minLevel Int           @default(1)
+  maxLevel Int           @default(100)
+  class    Class         @relation(fields: [classId], references: [id], onDelete: Cascade)
+  skill    Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, skillId])
+  @@map("class_skills")
+}
+
+model RaceSkill {
+  id       Int           @id @default(autoincrement())
+  raceId   Int
+  skillId  Int
+  category SkillCategory @default(SECONDARY)
+  bonus    Int           @default(0)
+  race     RaceData      @relation(fields: [raceId], references: [id], onDelete: Cascade)
+  skill    Skill         @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([raceId, skillId])
+  @@map("race_skills")
+}
+
+model CharacterSkill {
+  id          String    @id @default(cuid())
+  characterId String
+  skillId     Int
+  level       Int       @default(0)
+  experience  Int       @default(0)
+  lastUsed    DateTime?
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  skill       Skill     @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, skillId])
+  @@map("character_skills")
+}
+
+model CharacterSpell {
+  id          String    @id @default(cuid())
+  characterId String
+  spellId     Int
+  known       Boolean   @default(false)
+  proficiency Int       @default(0)
+  lastCast    DateTime?
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  spell       Spell     @relation(fields: [spellId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, spellId])
+  @@map("character_spells")
 }
 
 enum UserRole {
@@ -40,541 +668,6 @@ enum UserRole {
   CODER
   GOD
 }
-
-model Character {
-  id       String @id @default(cuid())
-  name     String @unique
-  
-  // Character Stats
-  level    Int    @default(1)
-  
-  // Race/Class as foreign keys (new system)
-  raceId   Int?   // Nullable for transition
-  race     RaceData? @relation(fields: [raceId], references: [id])
-  classId  Int?   // Nullable for transition  
-  class    Class? @relation(fields: [classId], references: [id])
-  
-  // Legacy race field (keep during transition)
-  raceLegacy Race? @default(HUMAN) @map("race_legacy")
-  
-  alignment Int   @default(0)
-  
-  // Attributes
-  strength     Int @default(13)
-  intelligence Int @default(13)
-  wisdom       Int @default(13)
-  dexterity    Int @default(13)
-  constitution Int @default(13)
-  charisma     Int @default(13)
-  
-  // Resources
-  hitPoints    Int @default(100)
-  mana         Int @default(100)
-  movement     Int @default(100)
-  
-  // Currency
-  copper   Int @default(0)
-  silver   Int @default(0)
-  gold     Int @default(0)
-  platinum Int @default(0)
-  
-  // Relations
-  userId    String
-  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // New progression systems
-  skills    CharacterSkill[]
-  spells    CharacterSpell[]
-  
-  // Metadata
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  
-  @@map("characters")
-}
-
-// ============================================================================
-// World Structure
-// ============================================================================
-
-model Zone {
-  id          Int     @id
-  name        String
-  top         Int     // Highest room number in zone
-  lifespan    Int     @default(30) // Minutes between resets
-  resetMode   ResetMode @default(NORMAL)
-  hemisphere  Hemisphere @default(NORTHWEST)
-  climate     Climate @default(NONE)
-  
-  // Relations
-  rooms       Room[]
-  mobs        Mob[]
-  objects     Object[]
-  shops       Shop[]
-  triggers    Trigger[]
-  mobResets   MobReset[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   String?
-  updatedBy   String?
-  
-  @@map("zones")
-}
-
-model Room {
-  id          Int    @id
-  name        String
-  description String @db.Text
-  sector      Sector @default(STRUCTURE)
-  flags       RoomFlag[] // RoomFlags as array
-  
-  // Relations
-  zoneId      Int
-  zone        Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  exits       RoomExit[]
-  extraDescs  RoomExtraDescription[]
-  mobResets   MobReset[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  createdBy   String?
-  updatedBy   String?
-  
-  @@map("rooms")
-}
-
-model RoomExit {
-  id          String @id @default(cuid())
-  direction   Direction
-  description String?
-  keyword     String?
-  key         String? // Key ID for locked exits
-  destination Int?    // Target room ID
-  
-  // Relations
-  roomId      Int
-  room        Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  
-  @@unique([roomId, direction])
-  @@map("room_exits")
-}
-
-model RoomExtraDescription {
-  id       String @id @default(cuid())
-  keyword  String
-  description String @db.Text
-  
-  // Relations
-  roomId   Int
-  room     Room @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  
-  @@map("room_extra_descriptions")
-}
-
-// ============================================================================
-// Mobs (NPCs)
-// ============================================================================
-
-model Mob {
-  id              Int    @id
-  keywords        String
-  mobClass        String
-  shortDesc       String
-  longDesc        String @db.Text
-  desc            String @db.Text
-  mobFlags        MobFlag[] // MobFlags as array
-  effectFlags     EffectFlag[] // EffectFlags as array
-  
-  // Combat Stats
-  alignment       Int    @default(0)
-  level           Int    @default(1)
-  armorClass      Int    @default(0)
-  hitRoll         Int    @default(0)
-  move            Int    @default(0)
-  
-  // Hit Points (dice-based)
-  hpDiceNum       Int    @default(0)
-  hpDiceSize      Int    @default(0)
-  hpDiceBonus     Int    @default(0)
-  
-  // Damage (dice-based)
-  damageDiceNum   Int    @default(0)
-  damageDiceSize  Int    @default(0)
-  damageDiceBonus Int    @default(0)
-  
-  // Currency
-  copper          Int    @default(0)
-  silver          Int    @default(0)
-  gold            Int    @default(0)
-  platinum        Int    @default(0)
-  
-  // Attributes
-  position        Position @default(STANDING)
-  defaultPosition Position @default(STANDING)
-  gender          Gender @default(NEUTRAL)
-  
-  // Race/Class as foreign keys (new system)
-  raceId   Int?   // Nullable for transition
-  race     RaceData? @relation(fields: [raceId], references: [id])
-  classId  Int?   // Nullable for transition  
-  class    Class? @relation(fields: [classId], references: [id])
-  
-  // Legacy race field (keep during transition)
-  raceLegacy Race? @default(HUMAN) @map("race_legacy")
-  
-  raceAlign       Int    @default(0)
-  size            Size @default(MEDIUM)
-  
-  // Stats
-  strength        Int    @default(13)
-  intelligence    Int    @default(13)
-  wisdom          Int    @default(13)
-  dexterity       Int    @default(13)
-  constitution    Int    @default(13)
-  charisma        Int    @default(13)
-  
-  // Skills
-  perception      Int    @default(0)
-  concealment     Int    @default(0)
-  
-  // Essence
-  lifeForce       LifeForce @default(LIFE)
-  composition     Composition @default(FLESH)
-  stance          Stance @default(ALERT)
-  damageType      DamageType @default(HIT)
-  
-  // Progression Systems
-  skills    MobSkill[]
-  spells    MobSpell[]
-  
-  // Relations
-  zoneId          Int
-  zone            Zone         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  resets          MobReset[]
-  shops           Shop[]       // Mobs can be shopkeepers
-  triggers        Trigger[]
-  
-  // Metadata
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       String?
-  updatedBy       String?
-  
-  @@map("mobs")
-}
-
-// ============================================================================
-// Mob Progression Models
-// ============================================================================
-
-model MobSkill {
-  id       Int  @id @default(autoincrement())
-  mobId    Int
-  mob      Mob  @relation(fields: [mobId], references: [id], onDelete: Cascade)
-  skillId  Int
-  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  level    Int  @default(1)
-  
-  @@unique([mobId, skillId])
-  @@map("mob_skills")
-}
-
-model MobSpell {
-  id       Int  @id @default(autoincrement())
-  mobId    Int
-  mob      Mob  @relation(fields: [mobId], references: [id], onDelete: Cascade)
-  spellId  Int
-  spell    Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  circle   Int  @default(1)
-  known    Boolean @default(true)
-  
-  @@unique([mobId, spellId])
-  @@map("mob_spells")
-}
-
-model MobReset {
-  id       String @id @default(cuid())
-  max      Int    @default(1)    // Maximum instances to spawn
-  name     String?               // Human-readable name
-  
-  // Relations
-  mobId    Int
-  mob      Mob    @relation(fields: [mobId], references: [id], onDelete: Cascade)
-  roomId   Int
-  room     Room   @relation(fields: [roomId], references: [id], onDelete: Cascade)
-  zoneId   Int
-  zone     Zone   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  
-  // Equipment and Inventory
-  carrying MobCarrying[]
-  equipped MobEquipped[]
-  
-  @@map("mob_resets")
-}
-
-model MobCarrying {
-  id       String @id @default(cuid())
-  max      Int    @default(1)
-  name     String?
-  
-  // Relations
-  resetId  String
-  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
-  objectId Int
-  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@map("mob_carrying")
-}
-
-model MobEquipped {
-  id       String @id @default(cuid())
-  max      Int    @default(1)
-  location String // Equipment slot
-  name     String?
-  
-  // Relations
-  resetId  String
-  reset    MobReset @relation(fields: [resetId], references: [id], onDelete: Cascade)
-  objectId Int
-  object   Object   @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@map("mob_equipped")
-}
-
-// ============================================================================
-// Objects (Items)
-// ============================================================================
-
-model Object {
-  id              Int      @id
-  type            ObjectType @default(NOTHING)
-  keywords        String
-  shortDesc       String
-  description     String   @db.Text
-  actionDesc      String?  @db.Text
-  flags           ObjectFlag[] // ObjectFlags as array
-  effectFlags     EffectFlag[] // EffectFlags as array
-  wearFlags       WearFlag[] // WearFlags as array
-  
-  // Properties
-  weight          Float    @default(0.0)
-  cost            Int      @default(0)
-  timer           Int      @default(0)
-  decomposeTimer  Int      @default(0)
-  level           Int      @default(1)
-  concealment     Int      @default(0)
-  
-  // Type-specific values (stored as JSON for flexibility)
-  values          Json     @default("{}")
-  
-  // Relations
-  zoneId          Int
-  zone            Zone             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  extraDescs      ObjectExtraDescription[]
-  affects         ObjectAffect[]
-  spells          ObjectSpell[]
-  triggers        Trigger[]
-  shopItems       ShopItem[]
-  mobCarrying     MobCarrying[]
-  mobEquipped     MobEquipped[]
-  
-  // Metadata
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  createdBy       String?
-  updatedBy       String?
-  
-  @@map("objects")
-}
-
-model ObjectExtraDescription {
-  id          String @id @default(cuid())
-  keyword     String
-  description String @db.Text
-  
-  // Relations
-  objectId    Int
-  object      Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@map("object_extra_descriptions")
-}
-
-model ObjectAffect {
-  id       String @id @default(cuid())
-  location String // Apply location (e.g., "STRENGTH", "HIT_ROLL")
-  modifier Int    // Modifier value
-  
-  // Relations
-  objectId Int
-  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@map("object_affects")
-}
-
-model ObjectSpell {
-  id       String @id @default(cuid())
-  spell    String
-  level    Int    @default(1)
-  
-  // Relations
-  objectId Int
-  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@map("object_spells")
-}
-
-// ============================================================================
-// Shops
-// ============================================================================
-
-model Shop {
-  id             Int     @id
-  buyProfit      Float   @default(1.0)
-  sellProfit     Float   @default(1.0)
-  temper1        Int     @default(0)
-  flags          ShopFlag[] // ShopFlags as array
-  tradesWithFlags ShopTradesWith[] // ShopTradesWith as array
-  
-  // Messages
-  noSuchItem1    String?
-  noSuchItem2    String?
-  doNotBuy       String?
-  missingCash1   String?
-  missingCash2   String?
-  messageBuy     String?
-  messageSell    String?
-  
-  // Relations
-  keeperId       Int?
-  keeper         Mob?    @relation(fields: [keeperId], references: [id], onDelete: SetNull)
-  zoneId         Int
-  zone           Zone    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  
-  items          ShopItem[]
-  accepts        ShopAccept[]
-  rooms          ShopRoom[]
-  hours          ShopHour[]
-  
-  // Metadata
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
-  createdBy      String?
-  updatedBy      String?
-  
-  @@map("shops")
-}
-
-model ShopItem {
-  id       String @id @default(cuid())
-  amount   Int    @default(0) // 0 = infinite
-  
-  // Relations
-  shopId   Int
-  shop     Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  objectId Int
-  object   Object @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  @@unique([shopId, objectId])
-  @@map("shop_items")
-}
-
-model ShopAccept {
-  id       String @id @default(cuid())
-  type     String
-  keywords String?
-  
-  // Relations
-  shopId   Int
-  shop     Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  
-  @@map("shop_accepts")
-}
-
-model ShopRoom {
-  id     String @id @default(cuid())
-  roomId Int
-  
-  // Relations
-  shopId Int
-  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  
-  @@unique([shopId, roomId])
-  @@map("shop_rooms")
-}
-
-model ShopHour {
-  id    String @id @default(cuid())
-  open  Int
-  close Int
-  
-  // Relations
-  shopId Int
-  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
-  
-  @@map("shop_hours")
-}
-
-// ============================================================================
-// Scripts & Triggers
-// ============================================================================
-
-model Trigger {
-  id               String      @id @default(cuid())
-  name             String
-  attachType       ScriptType
-  flags            TriggerFlag[]    // TriggerFlags as array
-  numArgs          Int         @default(0)
-  argList          String?
-  commands         String      @db.Text
-  
-  // Relations - polymorphic association
-  zoneId           Int?
-  zone             Zone?       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  mobId            Int?
-  mob              Mob?        @relation(fields: [mobId], references: [id], onDelete: Cascade)
-  objectId         Int?
-  object           Object?     @relation(fields: [objectId], references: [id], onDelete: Cascade)
-  
-  // Script Variables (JSON for flexibility)
-  variables        Json        @default("{}")
-  
-  // Metadata
-  createdAt        DateTime    @default(now())
-  updatedAt        DateTime    @updatedAt
-  createdBy        String?
-  updatedBy        String?
-  
-  @@map("triggers")
-}
-
-// ============================================================================
-// Audit & Logging
-// ============================================================================
-
-model AuditLog {
-  id        String    @id @default(cuid())
-  action    String    // Action type (CREATE, UPDATE, DELETE)
-  entityType String   // Entity type (Zone, Room, Mob, etc.)
-  entityId  String    // Entity ID
-  oldValues Json?     // Previous values (for updates)
-  newValues Json?     // New values
-  
-  // Relations
-  userId    String
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
-  
-  // Metadata
-  createdAt DateTime  @default(now())
-  
-  @@map("audit_logs")
-}
-
-// ============================================================================
-// Enums
-// ============================================================================
 
 enum ResetMode {
   NEVER
@@ -1068,13 +1161,9 @@ enum WearFlag {
   HOVER
 }
 
-// =============================================================================
-// SPELL SYSTEM ENUMS (Circle-Based, No Mana)
-// =============================================================================
-
 enum TargetScope {
   SINGLE
-  ROOM 
+  ROOM
   GROUP
   AREA
   CHAIN
@@ -1139,331 +1228,20 @@ enum StackingRule {
 }
 
 enum SkillType {
-  WEAPON      // Weapon proficiencies
-  COMBAT      // Combat techniques
-  MAGIC       // Magical skills
-  STEALTH     // Sneaking, hiding
-  SOCIAL      // Persuasion, intimidation
-  CRAFTING    // Creating items
-  SURVIVAL    // Wilderness skills
-  KNOWLEDGE   // Lore, identification
-  UTILITY     // General utility
+  WEAPON
+  COMBAT
+  MAGIC
+  STEALTH
+  SOCIAL
+  CRAFTING
+  SURVIVAL
+  KNOWLEDGE
+  UTILITY
 }
 
 enum SkillCategory {
-  PRIMARY     // Core class skill
-  SECONDARY   // Available to class
-  RESTRICTED  // Special requirements
-  FORBIDDEN   // Cannot learn
+  PRIMARY
+  SECONDARY
+  RESTRICTED
+  FORBIDDEN
 }
-
-// =============================================================================
-// RACE SYSTEM (Converting from Enum to Table)
-// =============================================================================
-
-model RaceData {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  description String?  @db.Text
-  
-  // Racial traits
-  size        Size     @default(MEDIUM)
-  lifespan    Int?     // Average lifespan
-  
-  // Stat modifiers (JSON for flexibility)
-  statBonuses Json?    // {"strength": 2, "dexterity": -1}
-  
-  // Relationships
-  characters  Character[]
-  mobs        Mob[]
-  skills      RaceSkill[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@map("races")
-}
-
-// =============================================================================
-// CLASS SYSTEM
-// =============================================================================
-
-model Class {
-  id              Int      @id @default(autoincrement())
-  name            String   @unique
-  description     String?  @db.Text
-  hitDice         String   @default("1d8") // "1d10", "1d6+2"
-  primaryStat     String?  // "STR", "INT", "WIS"
-  
-  // Relationships
-  spellCircles    SpellClassCircle[]
-  skillAccess     ClassSkill[]
-  characters      Character[]
-  mobs            Mob[]
-  
-  // Metadata
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  
-  @@map("classes")
-}
-
-// =============================================================================
-// SPELL SYSTEM (Circle-Based, No Mana)
-// =============================================================================
-
-model Spell {
-  id                Int      @id @default(autoincrement())
-  name              String   @unique
-  schoolId          Int?     // Optional spell school
-  school            SpellSchool? @relation(fields: [schoolId], references: [id])
-  
-  // Casting requirements
-  minPosition       Position @default(STANDING)
-  violent           Boolean  @default(false)
-  castTimeRounds    Int      @default(1)
-  cooldownMs        Int      @default(0)
-  inCombatOnly      Boolean  @default(false)
-  isArea            Boolean  @default(false)
-  
-  notes             String?  @db.Text
-  
-  // Relationships
-  classCircles      SpellClassCircle[]
-  targeting         SpellTargeting?
-  savingThrows      SpellSavingThrow[]
-  messages          SpellMessage?
-  components        SpellComponent[]
-  restrictions      SpellRestriction?
-  effects           SpellEffect[]
-  
-  // Relations
-  characterSpells   CharacterSpell[]
-  mobSpells         MobSpell[]
-  
-  // Metadata
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-  
-  @@map("spells")
-}
-
-model SpellSchool {
-  id          Int     @id @default(autoincrement())
-  name        String  @unique // evocation, necromancy, etc.
-  description String? @db.Text
-  
-  spells      Spell[]
-  
-  @@map("spell_schools")
-}
-
-// Circle-based spell access per class
-model SpellClassCircle {
-  id              Int   @id @default(autoincrement())
-  spellId         Int
-  spell           Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  classId         Int
-  class           Class @relation(fields: [classId], references: [id], onDelete: Cascade)
-  
-  circle          Int   // 1..N (replaces mana costs)
-  minLevel        Int?  // Optional level requirement
-  proficiencyGain Int?  // How much proficiency gained per cast
-  
-  @@unique([spellId, classId])
-  @@map("spell_class_circles")
-}
-
-// =============================================================================
-// SPELL MECHANICS
-// =============================================================================
-
-model SpellTargeting {
-  id                    Int      @id @default(autoincrement())
-  spellId               Int      @unique
-  spell                 Spell    @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  allowedTargetsMask    Int      // Bitmask: self|ally|enemy|npc|pc|object|room|corpse
-  targetScope           TargetScope @default(SINGLE)
-  maxTargets            Int      @default(1)
-  range                 SpellRange @default(ROOM)
-  requireLos            Boolean  @default(false)
-  filtersMask           Int?     // undead_only|living_only|summoned|same_group
-  
-  @@map("spell_targeting")
-}
-
-model SpellSavingThrow {
-  id               Int       @id @default(autoincrement())
-  spellId          Int
-  spell            Spell     @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  saveType         SaveType  @default(SPELL)
-  onSave           SaveResult @default(NEGATE)
-  dcFormula        String    // "10 + caster_level/2"
-  saveModifierMask Int?      // Optional modifiers
-  
-  @@map("spell_saving_throws")
-}
-
-model SpellMessage {
-  id                Int    @id @default(autoincrement())
-  spellId           Int    @unique
-  spell             Spell  @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  startToCaster     String? @db.Text
-  startToVictim     String? @db.Text
-  startToRoom       String? @db.Text
-  successToCaster   String? @db.Text
-  successToVictim   String? @db.Text
-  successToRoom     String? @db.Text
-  failToCaster      String? @db.Text
-  failToVictim      String? @db.Text
-  failToRoom        String? @db.Text
-  wearoffToTarget   String? @db.Text
-  wearoffToRoom     String? @db.Text
-  
-  @@map("spell_messages")
-}
-
-model SpellComponent {
-  id        Int     @id @default(autoincrement())
-  spellId   Int
-  spell     Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  objectId  Int     // Required object/component
-  consumed  Boolean @default(false)
-  required  Boolean @default(true)
-  
-  @@map("spell_components")
-}
-
-model SpellRestriction {
-  id                     Int     @id @default(autoincrement())
-  spellId                Int     @unique
-  spell                  Spell   @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  indoorsOnly            Boolean @default(false)
-  outdoorsOnly           Boolean @default(false)
-  noSafeRooms            Boolean @default(false)
-  noTeleportFlagsMask    Int?    // Room flags that block
-  terrainMask            Int?    // Required terrain types
-  disallowStatesMask     Int?    // Blocked character states
-  
-  @@map("spell_restrictions")
-}
-
-// =============================================================================
-// UNIFIED EFFECTS SYSTEM (JSONB-based)
-// =============================================================================
-
-model SpellEffect {
-  id              Int         @id @default(autoincrement())
-  spellId         Int
-  spell           Spell       @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  effectType      EffectType
-  order           Int         @default(0)
-  chancePct       Int         @default(100)
-  trigger         EffectTrigger? @default(ON_CAST)
-  durationFormula String?     // Formula for duration
-  stackingRule    StackingRule @default(REFRESH)
-  conditionFilter Json?       // JSONB conditions
-  params          Json        // JSONB effect parameters
-  
-  @@index([spellId, order])
-  @@map("spell_effects")
-}
-
-// =============================================================================
-// SKILLS SYSTEM
-// =============================================================================
-
-model Skill {
-  id          Int      @id @default(autoincrement())
-  name        String   @unique
-  description String?  @db.Text
-  type        SkillType
-  category    SkillCategory @default(SECONDARY)
-  maxLevel    Int      @default(100)
-  
-  // Relationships
-  classSkills     ClassSkill[]
-  raceSkills      RaceSkill[]
-  characterSkills CharacterSkill[]
-  mobSkills       MobSkill[]
-  
-  // Metadata
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  
-  @@map("skills")
-}
-
-model ClassSkill {
-  id       Int   @id @default(autoincrement())
-  classId  Int
-  class    Class @relation(fields: [classId], references: [id], onDelete: Cascade)
-  skillId  Int
-  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  
-  category SkillCategory @default(SECONDARY)
-  minLevel Int           @default(1)
-  maxLevel Int           @default(100)
-  
-  @@unique([classId, skillId])
-  @@map("class_skills")
-}
-
-model RaceSkill {
-  id       Int   @id @default(autoincrement())
-  raceId   Int
-  race     RaceData @relation(fields: [raceId], references: [id], onDelete: Cascade)
-  skillId  Int
-  skill    Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  
-  category SkillCategory @default(SECONDARY)
-  bonus    Int           @default(0) // Racial bonus to skill
-  
-  @@unique([raceId, skillId])
-  @@map("race_skills")
-}
-
-// =============================================================================
-// CHARACTER PROGRESSION
-// =============================================================================
-
-model CharacterSkill {
-  id          String @id @default(cuid())
-  characterId String
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  skillId     Int
-  skill       Skill @relation(fields: [skillId], references: [id], onDelete: Cascade)
-  
-  level       Int @default(0)
-  experience  Int @default(0)
-  lastUsed    DateTime?
-  
-  @@unique([characterId, skillId])
-  @@map("character_skills")
-}
-
-model CharacterSpell {
-  id          String @id @default(cuid())
-  characterId String
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  spellId     Int
-  spell       Spell @relation(fields: [spellId], references: [id], onDelete: Cascade)
-  
-  known       Boolean @default(false)
-  proficiency Int     @default(0)
-  lastCast    DateTime?
-  
-  @@unique([characterId, spellId])
-  @@map("character_spells")
-}
-
-// =============================================================================
-// REFERENCE DATA TABLES
-// =============================================================================
