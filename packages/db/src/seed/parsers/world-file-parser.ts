@@ -712,9 +712,12 @@ export class WorldFileParser {
         case 'AGGRESSIVE': return MobFlag.AGGRESSIVE;
         case 'STAY_ZONE': return MobFlag.STAY_ZONE;
         case 'WIMPY': return MobFlag.WIMPY;
-        case 'AGGRO_EVIL': return MobFlag.AGGRO_EVIL;
-        case 'AGGRO_GOOD': return MobFlag.AGGRO_GOOD;
-        case 'AGGRO_NEUTRAL': return MobFlag.AGGRO_NEUTRAL;
+        case 'AGGRO_EVIL': 
+        case 'AGGR_EVIL': return MobFlag.AGGRO_EVIL;
+        case 'AGGRO_GOOD': 
+        case 'AGGR_GOOD': return MobFlag.AGGRO_GOOD;
+        case 'AGGRO_NEUTRAL': 
+        case 'AGGR_NEUTRAL': return MobFlag.AGGRO_NEUTRAL;
         case 'MEMORY': return MobFlag.MEMORY;
         case 'HELPER': return MobFlag.HELPER;
         case 'NO_CHARM': return MobFlag.NO_CHARM;
@@ -745,9 +748,17 @@ export class WorldFileParser {
         case 'MONK': return MobFlag.MONK;
         case 'BERSERKER': return MobFlag.BERSERKER;
         case 'DIABOLIST': return MobFlag.DIABOLIST;
-        default: return MobFlag.ISNPC; // Default fallback
+        // Handle some legacy/unknown flags by mapping to closest equivalent or skipping
+        case 'TEACHER': return MobFlag.SPEC; // Teachers are special mobs
+        case 'NOSUMMON': return null; // Skip unknown flags
+        case 'NOSILENCE': return null; // Skip unknown flags  
+        case 'NOVICIOUS': return null; // Skip unknown flags
+        case 'NO_CLASS_AI': return null; // Skip unknown flags
+        default: 
+          console.warn(`Unknown mob flag: ${upperFlag}, skipping`);
+          return null; // Skip unknown flags instead of defaulting
       }
-    }).filter(flag => flag !== undefined);
+    }).filter(flag => flag !== null && flag !== undefined);
   }
 
   private mapEffectFlags(flags: any): EffectFlag[] {
