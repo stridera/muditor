@@ -20,6 +20,15 @@ enum Climate {
   TROPICAL
 }
 
+input CreateRoomInput {
+  description: String!
+  flags: [RoomFlag!]! = []
+  id: Int!
+  name: String!
+  sector: Sector! = STRUCTURE
+  zoneId: Int!
+}
+
 input CreateZoneInput {
   climate: Climate! = NONE
   hemisphere: Hemisphere! = NORTHWEST
@@ -35,6 +44,15 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+enum Direction {
+  DOWN
+  EAST
+  NORTH
+  SOUTH
+  UP
+  WEST
+}
+
 enum Hemisphere {
   NORTHEAST
   NORTHWEST
@@ -48,16 +66,23 @@ input LoginInput {
 }
 
 type Mutation {
+  createRoom(data: CreateRoomInput!): RoomDto!
   createZone(data: CreateZoneInput!): ZoneDto!
+  deleteRoom(id: Int!): RoomDto!
   deleteZone(id: Int!): ZoneDto!
   login(input: LoginInput!): AuthPayload!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
+  updateRoom(data: UpdateRoomInput!, id: Int!): RoomDto!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
 }
 
 type Query {
   me: User!
+  room(id: Int!): RoomDto!
+  rooms(skip: Int, take: Int, zoneId: Int): [RoomDto!]!
+  roomsByZone(zoneId: Int!): [RoomDto!]!
+  roomsCount(zoneId: Int): Int!
   user(id: ID!): User!
   users: [User!]!
   zone(id: Int!): ZoneDto!
@@ -75,6 +100,100 @@ enum ResetMode {
   EMPTY
   NEVER
   NORMAL
+}
+
+type RoomDto {
+  createdAt: DateTime!
+  createdBy: String
+  description: String!
+  exits: [RoomExitDto!]!
+  extraDescs: [RoomExtraDescriptionDto!]!
+  flags: [RoomFlag!]!
+  id: Int!
+  name: String!
+  sector: Sector!
+  updatedAt: DateTime!
+  updatedBy: String
+  zoneId: Int!
+}
+
+type RoomExitDto {
+  description: String
+  destination: Int
+  direction: Direction!
+  id: String!
+  key: String
+  keyword: String
+}
+
+type RoomExtraDescriptionDto {
+  description: String!
+  id: String!
+  keyword: String!
+}
+
+enum RoomFlag {
+  ARENA
+  ATRIUM
+  BFS_MARK
+  DARK
+  DEATH
+  EFFECTS_NEXT
+  FERRY_DEST
+  GODROOM
+  HOUSE
+  HOUSECRASH
+  INDOORS
+  ISOLATED
+  LARGE
+  MEDIUM
+  MEDIUM_LARGE
+  MEDIUM_SMALL
+  NOMAGIC
+  NOMOB
+  NOTRACK
+  OLC
+  ONE_PERSON
+  PEACEFUL
+  PRIVATE
+  SMALL
+  SOUNDPROOF
+  TUNNEL
+  VERY_SMALL
+  WORLDMAP
+}
+
+enum Sector {
+  AIR
+  AIRPLANE
+  ASTRALPLANE
+  AVERNUS
+  BEACH
+  CAVE
+  CITY
+  EARTHPLANE
+  ETHEREALPLANE
+  FIELD
+  FIREPLANE
+  FOREST
+  GRASSLANDS
+  HILLS
+  MOUNTAIN
+  ROAD
+  RUINS
+  SHALLOWS
+  STRUCTURE
+  SWAMP
+  UNDERDARK
+  UNDERWATER
+  WATER
+}
+
+input UpdateRoomInput {
+  description: String
+  flags: [RoomFlag!]
+  name: String
+  sector: Sector
 }
 
 input UpdateZoneInput {

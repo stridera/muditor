@@ -180,15 +180,15 @@ export default function ZonesPage() {
               </div>
               
               <div className="flex items-center space-x-2 ml-4">
-                <button 
+                <Link
+                  href={`/dashboard/zones/editor?zone=${zone.id}`}
                   className="text-blue-600 hover:text-blue-800 text-sm"
                   onClick={(e) => {
-                    e.preventDefault()
-                    // TODO: Add to visual editor
+                    e.stopPropagation()
                   }}
                 >
                   Edit
-                </button>
+                </Link>
               </div>
             </div>
           </Link>

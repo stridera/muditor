@@ -270,8 +270,8 @@ export class WorldImporter {
         shortDesc: mobData.short_desc || mobData.short_description || '',
         longDesc: mobData.long_desc || mobData.long_description || '',
         desc: mobData.desc || mobData.description || '',
-        mobFlags: mob.mob_flags.map(flag => this.mapMobFlag(flag)),
-        effectFlags: mob.effect_flags.map(flag => this.mapEffectFlag(flag)),
+        mobFlags: mob.mob_flags.map(flag => this.mapMobFlag(flag)).filter(flag => flag !== null),
+        effectFlags: mob.effect_flags.map(flag => this.mapEffectFlag(flag)).filter(flag => flag !== null),
         alignment: mob.alignment,
         level: mob.level,
         armorClass: mob.ac,
@@ -315,8 +315,8 @@ export class WorldImporter {
         shortDesc: mobData.short_desc || mobData.short_description || '',
         longDesc: mobData.long_desc || mobData.long_description || '',
         desc: mobData.desc || mobData.description || '',
-        mobFlags: mob.mob_flags.map(flag => this.mapMobFlag(flag)),
-        effectFlags: mob.effect_flags.map(flag => this.mapEffectFlag(flag)),
+        mobFlags: mob.mob_flags.map(flag => this.mapMobFlag(flag)).filter(flag => flag !== null),
+        effectFlags: mob.effect_flags.map(flag => this.mapEffectFlag(flag)).filter(flag => flag !== null),
         alignment: mob.alignment,
         level: mob.level,
         armorClass: mob.ac,
@@ -869,5 +869,54 @@ export class WorldImporter {
     // Handle aliases
     if (flag === 'DEATH_TRIGGER') return 'DEATH';
     return flag as any;
+  }
+
+  private mapMobFlag(flag: string): string | null {
+    const upperFlag = flag.toUpperCase();
+    
+    // Known aliases
+    const aliases: Record<string, string> = {
+      'AGGR_EVIL': 'AGGRO_EVIL',
+      'AGGR_GOOD': 'AGGRO_GOOD', 
+      'AGGR_NEUTRAL': 'AGGRO_NEUTRAL',
+      'TEACHER': 'SPEC' // Map teacher to spec
+    };
+    
+    if (aliases[upperFlag]) {
+      return aliases[upperFlag];
+    }
+    
+    // Skip unknown/legacy flags
+    const skipFlags = ['NOVICIOUS', 'NOSUMMON', 'NOSILENCE', 'NO_CLASS_AI'];
+    if (skipFlags.includes(upperFlag)) {
+      console.warn(`Skipping unknown mob flag: ${upperFlag}`);
+      return null;
+    }
+    
+    return upperFlag;
+  }
+
+  private mapEffectFlag(flag: string): string | null {
+    const upperFlag = flag.toUpperCase();
+    
+    // Remove EFF_ prefix if present
+    const normalizedFlag = upperFlag.startsWith('EFF_') ? upperFlag.substring(4) : upperFlag;
+    
+    // Skip unknown flags
+    const knownFlags = [
+      'BLIND', 'INVISIBLE', 'DETECT_ALIGN', 'DETECT_INVIS', 'DETECT_MAGIC',
+      'SENSE_LIFE', 'WATERWALK', 'SANCTUARY', 'GROUP', 'CURSE', 'INFRAVISION',
+      'POISON', 'PROTECT_EVIL', 'PROTECT_GOOD', 'SLEEP', 'NO_TRACK', 'SNEAK',
+      'HIDE', 'CHARM', 'FLYING', 'WATERBREATH', 'ANGELIC_AURA', 'ETHEREAL',
+      'MAGICONLY', 'NEXTPARTIAL', 'NEXTNOATTACK', 'SPELL_TURNING',
+      'COMPREHEND_LANG', 'FIRESHIELD', 'DEATH_FIELD'
+    ];
+    
+    if (knownFlags.includes(normalizedFlag)) {
+      return normalizedFlag;
+    }
+    
+    console.warn(`Skipping unknown effect flag: ${normalizedFlag}`);
+    return null;
   }
 }
