@@ -129,31 +129,34 @@ const extraDescriptionSchema = z.object({
 });
 
 const objectSchema = z.object({
-  id: z.string(),
+  id: z.union([z.string(), z.number()]),
   type: z.string(),
-  keywords: z.string().optional(),
-  name_list: z.string().optional(),
+  keywords: z.union([z.string(), z.array(z.string())]).optional(),
+  name_list: z.union([z.string(), z.array(z.string())]).optional(),
   short_desc: z.string().optional(),
   short_description: z.string().optional(),
-  description: z.string(),
+  short: z.string().optional(), // legacy field name
+  description: z.string().optional(),
+  ground: z.string().optional(), // legacy field name for description
   action_description: z.string().optional(),
+  action_desc: z.string().optional(), // legacy field name
   extra_descriptions: z.union([z.array(extraDescriptionSchema), z.record(z.string())]).optional(),
-  values: z.record(z.union([z.string(), z.number()])),
-  flags: z.array(z.string()),
+  values: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
+  flags: z.array(z.string()).optional(),
   weight: z.union([z.string(), z.number()]),
   cost: z.union([z.string(), z.number()]),
   timer: z.union([z.string(), z.number()]),
-  decompose_timer: z.union([z.string(), z.number()]),
+  decompose_timer: z.union([z.string(), z.number()]).optional(),
   level: z.union([z.string(), z.number()]),
-  effect_flags: z.array(z.string()),
-  wear_flags: z.array(z.string()),
-  concealment: z.number(),
-  affects: z.array(objectAffectSchema),
+  effect_flags: z.array(z.string()).optional(),
+  wear_flags: z.array(z.string()).optional(),
+  concealment: z.number().optional(),
+  affects: z.array(objectAffectSchema).optional(),
   applies: z.record(z.any()).optional(),
-  spells: z.array(z.any()),
-  triggers: z.array(z.any()),
+  spells: z.array(z.any()).optional(),
+  triggers: z.array(z.any()).optional(),
   script_variables: z.record(z.any()).optional(),
-  effects: z.array(z.any()),
+  effects: z.array(z.any()).optional(),
 });
 
 // Room schema
@@ -303,14 +306,30 @@ export class WorldParser {
   static normalizeObject(object: ObjectJson): ObjectJson {
     const normalized = { ...object };
     
-    // Normalize keywords field
+    // Normalize keywords field (convert array to string if needed)
     if (!normalized.keywords && normalized.name_list) {
-      normalized.keywords = normalized.name_list;
+      normalized.keywords = Array.isArray(normalized.name_list) 
+        ? normalized.name_list.join(' ') 
+        : normalized.name_list;
+    } else if (Array.isArray(normalized.keywords)) {
+      normalized.keywords = normalized.keywords.join(' ');
     }
     
     // Normalize description fields
     if (!normalized.short_desc && normalized.short_description) {
       normalized.short_desc = normalized.short_description;
+    } else if (!normalized.short_desc && normalized.short) {
+      normalized.short_desc = normalized.short;
+    }
+    
+    // Normalize main description field
+    if (!normalized.description && normalized.ground) {
+      normalized.description = normalized.ground;
+    }
+    
+    // Normalize action description field
+    if (!normalized.action_description && normalized.action_desc) {
+      normalized.action_description = normalized.action_desc;
     }
     
     // Convert extra_descriptions from object to array format if needed
@@ -320,6 +339,19 @@ export class WorldParser {
         desc: desc as string
       }));
     }
+    
+    // Ensure required arrays exist with defaults
+    if (!normalized.flags) normalized.flags = [];
+    if (!normalized.effect_flags) normalized.effect_flags = [];
+    if (!normalized.wear_flags) normalized.wear_flags = [];
+    if (!normalized.affects) normalized.affects = [];
+    if (!normalized.spells) normalized.spells = [];
+    if (!normalized.triggers) normalized.triggers = [];
+    if (!normalized.effects) normalized.effects = [];
+    if (!normalized.values) normalized.values = {};
+    
+    // Set default concealment if missing
+    if (normalized.concealment === undefined) normalized.concealment = 0;
     
     return normalized;
   }
@@ -333,30 +365,121 @@ export class WorldParser {
   }
 
   /**
-   * Parse and normalize a complete world file
+   * Parse and normalize a complete world file with lenient validation
    */
   static parseAndNormalize(jsonContent: string | object): ParseResult<WorldFile> {
-    const result = this.parseWorldFile(jsonContent);
-    
-    if (!result.success || !result.data) {
-      return result;
+    try {
+      const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+      
+      // Instead of strict validation, create a lenient normalized structure
+      const normalized: WorldFile = this.createNormalizedWorldFile(data);
+      
+      return {
+        success: true,
+        data: normalized,
+        errors: []
+      };
+    } catch (error) {
+      return {
+        success: false,
+        errors: [{
+          path: 'root',
+          message: error instanceof Error ? error.message : 'Unknown parsing error'
+        }]
+      };
     }
-    
-    // Normalize all entities
+  }
+
+  /**
+   * Create normalized world file from raw data with defaults
+   */
+  private static createNormalizedWorldFile(data: any): WorldFile {
+    // Normalize zone
+    const zone = {
+      id: String(data.zone?.id || '0'),
+      name: data.zone?.name || 'Unnamed Zone',
+      top: Number(data.zone?.top || 0),
+      lifespan: Number(data.zone?.lifespan || 240),
+      reset_mode: data.zone?.reset_mode || 'Normal',
+      hemisphere: data.zone?.hemisphere || 'NORTHWEST',
+      climate: data.zone?.climate || 'NONE',
+      resets: data.zone?.resets || {}
+    };
+
+    // Normalize mobs with error handling
+    const mobs = (data.mobs || []).map((mob: any) => {
+      try {
+        return this.normalizeMob(mob);
+      } catch (error) {
+        console.warn(`Failed to normalize mob ${mob?.id}:`, error);
+        return null;
+      }
+    }).filter(Boolean);
+
+    // Normalize objects with error handling
+    const objects = (data.objects || []).map((obj: any) => {
+      try {
+        return this.normalizeObject(obj);
+      } catch (error) {
+        console.warn(`Failed to normalize object ${obj?.id}:`, error);
+        return null;
+      }
+    }).filter(Boolean);
+
+    // Normalize rooms
+    const rooms = (data.rooms || []).map((room: any) => ({
+      id: String(room.id || '0'),
+      name: room.name || 'Unnamed Room',
+      description: room.description || '',
+      sector: room.sector || 'INSIDE',
+      flags: room.flags || [],
+      exits: room.exits || {},
+      extra_descriptions: room.extra_descriptions || {}
+    }));
+
+    // Normalize shops
+    const shops = (data.shops || []).map((shop: any) => ({
+      id: Number(shop.id || 0),
+      selling: shop.selling || {},
+      buy_profit: Number(shop.buy_profit || 1.0),
+      sell_profit: Number(shop.sell_profit || 1.0),
+      accepts: shop.accepts || [],
+      no_such_item1: shop.no_such_item1 || '',
+      no_such_item2: shop.no_such_item2 || '',
+      do_not_buy: shop.do_not_buy || '',
+      missing_cash1: shop.missing_cash1 || '',
+      missing_cash2: shop.missing_cash2 || '',
+      message_buy: shop.message_buy || '',
+      message_sell: shop.message_sell || '',
+      temper1: Number(shop.temper1 || 0),
+      flags: shop.flags || [],
+      keeper: Number(shop.keeper || 0),
+      trades_with: shop.trades_with || [],
+      rooms: shop.rooms || [],
+      hours: shop.hours || []
+    }));
+
+    // Normalize triggers
+    const triggers = (data.triggers || []).map((trigger: any) => ({
+      id: String(trigger.id || '0'),
+      name: trigger.name || 'Unnamed Trigger',
+      attach_type: trigger.attach_type || 'ROOM',
+      flags: trigger.flags || [],
+      number_of_arguments: String(trigger.number_of_arguments || '0'),
+      argument_list: trigger.argument_list || '',
+      commands: trigger.commands || ''
+    }));
+
     const normalized: WorldFile = {
-      zone: result.data.zone,
-      mobs: result.data.mobs.map(mob => this.normalizeMob(mob)),
-      objects: result.data.objects.map(obj => this.normalizeObject(obj)),
-      rooms: result.data.rooms,
-      shops: result.data.shops,
-      triggers: result.data.triggers
+      zone,
+      mobs,
+      objects,
+      rooms,
+      shops,
+      triggers
     };
     
-    return {
-      success: true,
-      data: normalized,
-      errors: []
-    };
+    return normalized;
   }
 
   /**

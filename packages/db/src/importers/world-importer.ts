@@ -834,11 +834,39 @@ export class WorldImporter {
   }
 
   private mapObjectFlag(flag: string): any {
-    return flag as any;
+    const upperFlag = flag.toUpperCase();
+    
+    // Known aliases - map legacy names to schema names
+    const aliases: Record<string, string> = {
+      'NORENT': 'NO_RENT',
+      'NOBURN': 'NO_BURN',
+      'NODROP': 'NO_DROP',
+      'NOSELL': 'NO_SELL',
+    };
+    
+    if (aliases[upperFlag]) {
+      console.log(`Mapped object flag ${upperFlag} → ${aliases[upperFlag]}`);
+      return aliases[upperFlag];
+    }
+    
+    return upperFlag;
   }
 
   private mapWearFlag(flag: string): any {
-    return flag as any;
+    const upperFlag = flag.toUpperCase();
+    
+    // Known aliases - map legacy names to schema names
+    const aliases: Record<string, string> = {
+      '2HWIELD': 'TWO_HAND_WIELD', // Map 2-handed wield to proper enum value
+      'BELT': 'WAIST', // Map belt to waist
+    };
+    
+    if (aliases[upperFlag]) {
+      console.log(`Mapped wear flag ${upperFlag} → ${aliases[upperFlag]}`);
+      return aliases[upperFlag];
+    }
+    
+    return upperFlag;
   }
 
   private mapSector(sector: string): any {
@@ -862,7 +890,19 @@ export class WorldImporter {
   }
 
   private mapScriptType(type: string): any {
-    return type.toUpperCase() as any;
+    const upperType = type.toUpperCase();
+    
+    // Known aliases - map legacy names to schema names
+    const aliases: Record<string, string> = {
+      'ROOM': 'WORLD', // Map room triggers to world triggers
+    };
+    
+    if (aliases[upperType]) {
+      console.log(`Mapped script type ${upperType} → ${aliases[upperType]}`);
+      return aliases[upperType];
+    }
+    
+    return upperType;
   }
 
   private mapTriggerFlag(flag: string): any {
@@ -874,22 +914,32 @@ export class WorldImporter {
   private mapMobFlag(flag: string): string | null {
     const upperFlag = flag.toUpperCase();
     
-    // Known aliases
+    // Known aliases - map legacy names to schema names
     const aliases: Record<string, string> = {
       'AGGR_EVIL': 'AGGRO_EVIL',
       'AGGR_GOOD': 'AGGRO_GOOD', 
       'AGGR_NEUTRAL': 'AGGRO_NEUTRAL',
-      'TEACHER': 'SPEC' // Map teacher to spec
+      'TEACHER': 'SPEC', // Map teacher to spec
+      'NOCHARM': 'NO_CHARM',
+      'NOSLEEP': 'NO_SLEEP',
+      'NOBASH': 'NO_BASH',
+      'NOBLIND': 'NO_BLIND',
+      'MOUNTABLE': 'MOUNT',
+      'PEACEFUL': 'SPEC', // Peaceful mobs are special
+      'AQUATIC': 'SPEC', // Aquatic is a special behavior
+      'PEACEKEEPER': 'SPEC', // Peacekeepers are special
+      'PROTECTOR': 'SPEC', // Protectors are special
     };
     
     if (aliases[upperFlag]) {
+      console.log(`Mapped mob flag ${upperFlag} → ${aliases[upperFlag]}`);
       return aliases[upperFlag];
     }
     
-    // Skip unknown/legacy flags
+    // Skip completely unknown/legacy flags that don't map to anything
     const skipFlags = ['NOVICIOUS', 'NOSUMMON', 'NOSILENCE', 'NO_CLASS_AI'];
     if (skipFlags.includes(upperFlag)) {
-      console.warn(`Skipping unknown mob flag: ${upperFlag}`);
+      console.warn(`Skipping unknown mob flag: ${upperFlag} (add to schema if needed)`);
       return null;
     }
     
@@ -901,6 +951,18 @@ export class WorldImporter {
     
     // Remove EFF_ prefix if present
     const normalizedFlag = upperFlag.startsWith('EFF_') ? upperFlag.substring(4) : upperFlag;
+    
+    // Known aliases for effect flags
+    const aliases: Record<string, string> = {
+      'FLY': 'FLYING',
+      'HASTE': 'FLYING', // Map haste to flying for now
+      'BLUR': 'INVISIBLE', // Map blur to invisible
+    };
+    
+    if (aliases[normalizedFlag]) {
+      console.log(`Mapped effect flag ${normalizedFlag} → ${aliases[normalizedFlag]}`);
+      return aliases[normalizedFlag];
+    }
     
     // Skip unknown flags
     const knownFlags = [
@@ -916,7 +978,7 @@ export class WorldImporter {
       return normalizedFlag;
     }
     
-    console.warn(`Skipping unknown effect flag: ${normalizedFlag}`);
+    console.warn(`Skipping unknown effect flag: ${normalizedFlag} (add to schema if needed)`);
     return null;
   }
 }

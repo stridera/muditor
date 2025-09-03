@@ -7,6 +7,9 @@ import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
 import { ZonesModule } from './zones/zones.module';
 import { RoomsModule } from './rooms/rooms.module';
+import { MobsModule } from './mobs/mobs.module';
+import { ObjectsModule } from './objects/objects.module';
+import { ShopsModule } from './shops/shops.module';
 
 @Module({
   imports: [
@@ -48,6 +51,9 @@ import { RoomsModule } from './rooms/rooms.module';
     UsersModule,
     ZonesModule,
     RoomsModule,
+    MobsModule,
+    ObjectsModule,
+    ShopsModule,
   ],
 })
 export class AppModule {}
