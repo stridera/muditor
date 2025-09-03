@@ -51,7 +51,7 @@ muditor/
 │   └── ui/           # Shared UI components
 ├── world/            # Legacy MUD world files (125+ zones)
 ├── docs/             # Documentation and specifications
-├── plan.md           # Comprehensive development roadmap
+├── task.md           # Comprehensive development roadmap
 └── CLAUDE.md         # AI assistant guidance
 ```
 
@@ -86,7 +86,7 @@ Visit `http://localhost:3000` to access the web interface and `http://localhost:
 
 ## Documentation
 
-- **[Development Plan](plan.md)** - Comprehensive roadmap with milestones and timelines
+- **[Development Plan](task.md)** - Comprehensive roadmap with milestones and timelines
 - **[World Data Format](docs/WORLD_JSON_FORMAT.md)** - Legacy MUD file format specification
 - **[Development Rules](rules.md)** - Safety guidelines and best practices
 - **[AI Assistant Guide](CLAUDE.md)** - Context for AI-powered development
@@ -95,7 +95,7 @@ Visit `http://localhost:3000` to access the web interface and `http://localhost:
 
 🚧 **In Development** - Currently implementing Phase 1 (Foundation & Data)
 
-See [plan.md](plan.md) for detailed milestones and progress tracking.
+See [task.md](task.md) for detailed milestones and progress tracking.
 
 ## Key Features in Development
 
