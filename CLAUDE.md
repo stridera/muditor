@@ -9,7 +9,9 @@ Muditor is a database-driven MUD (Multi-User Dungeon) interface and editor tool 
 ## Architecture and Structure
 
 ### Planned Monorepo Structure
+
 The project is designed as a monorepo with the following planned structure:
+
 - `/apps/web` - Next.js web application (dashboard, editor interface)
 - `/apps/api` - NestJS GraphQL API server
 - `/packages/db` - Prisma schema and database client
@@ -17,6 +19,7 @@ The project is designed as a monorepo with the following planned structure:
 - `/packages/ui` - Shared UI components library
 
 ### Current Data Structure
+
 - `/world/` - Contains legacy MUD world files in JSON format (zones 0-625)
 - `/docs/WORLD_JSON_FORMAT.md` - Detailed documentation of the JSON schema
 - `rules.md` - Development safety guidelines and best practices
@@ -24,6 +27,7 @@ The project is designed as a monorepo with the following planned structure:
 ## World Data Format
 
 The project works with FieryMUD world files containing:
+
 - **Zones**: Area definitions with reset timers, climate, and spawning rules
 - **Rooms**: Connected areas with descriptions, exits, and terrain types
 - **Mobs**: NPCs with stats, equipment, AI behaviors, and spawn configurations
@@ -32,6 +36,7 @@ The project works with FieryMUD world files containing:
 - **Triggers**: Lua script attachments for interactive behaviors
 
 ### Key Data Relationships
+
 - Zones contain rooms (by ID ranges) and define mob/object spawn rules
 - Rooms connect via directional exits and contain environmental details
 - Mobs can carry/wear objects and have complex stat systems
@@ -41,6 +46,7 @@ The project works with FieryMUD world files containing:
 ## Development Context
 
 ### Technology Stack (Planned)
+
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS, shadcn/ui
 - **Backend**: NestJS, GraphQL with subscriptions, Prisma ORM
 - **Database**: PostgreSQL with migrations
@@ -49,7 +55,9 @@ The project works with FieryMUD world files containing:
 - **Infrastructure**: Docker Compose for development, Redis for real-time features
 
 ### Development Commands (When Implemented)
+
 Based on the planned architecture, these commands would be available:
+
 ```bash
 # Setup
 pnpm install                    # Install dependencies
@@ -72,24 +80,28 @@ pnpm import:world             # Import world JSON files to database
 ## Key Development Considerations
 
 ### Data Migration Strategy
+
 - Import existing world JSON files into PostgreSQL via Prisma
 - Maintain referential integrity during import process
 - Handle ID mapping between legacy (zone-based) and modern (global) systems
 - Zone 0 special case: converts to zone ID 1000 in modern system
 
 ### Editor Features Implementation
+
 - **Zone Editor**: Visual graph with React Flow showing rooms as nodes, exits as edges
 - **Room Editor**: Side panels for editing descriptions, terrain, mobs, objects
 - **Script Editor**: Monaco editor with Lua syntax highlighting and sandboxed testing
 - **Mob/Object Editors**: CRUD interfaces with type-specific field validation
 
 ### Safety and Validation
+
 - Validate zone integrity (check for orphaned rooms, one-way exits)
 - Sandbox Lua script execution for testing
 - Version control for world content with rollback capabilities
 - Environment separation (Prod/Test/Dev) with promotion workflows
 
 ### Integration Points
+
 - **MUD Bridge**: Secure API to reload zones on live server
 - **Real-time Updates**: GraphQL subscriptions for collaborative editing
 - **Permission System**: God-level access controls for different environments
@@ -112,3 +124,5 @@ pnpm import:world             # Import world JSON files to database
 5. Implement script editor with Lua support
 6. Add real-time collaboration features
 7. Create deployment pipeline with environment promotion
+
+- The main database table for zones is named 'zones'

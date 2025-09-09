@@ -1,0 +1,22 @@
+/* Zone Editor specific CSS overrides */
+
+/* Ensure React Flow nodes can show popups */
+.react-flow__node {
+  overflow: visible !important;
+}
+
+/* Ensure React Flow pane doesn't clip popups */
+.react-flow__renderer {
+  overflow: visible;
+}
+
+/* High z-index for popups to appear above React Flow elements */
+.zone-editor-popup {
+  z-index: 10001 !important;
+  position: absolute;
+}
+
+/* Ensure node containers don't clip hover effects */
+.react-flow__nodes {
+  overflow: visible;
+}

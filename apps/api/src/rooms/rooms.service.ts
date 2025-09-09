@@ -1,14 +1,24 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
-import { RoomDto, CreateRoomInput, UpdateRoomInput, CreateRoomExitInput } from './room.dto';
+import {
+  RoomDto,
+  CreateRoomInput,
+  UpdateRoomInput,
+  CreateRoomExitInput,
+  UpdateRoomPositionInput,
+} from './room.dto';
 
 @Injectable()
 export class RoomsService {
   constructor(private readonly db: DatabaseService) {}
 
-  async findAll(params?: { skip?: number; take?: number; zoneId?: number }): Promise<RoomDto[]> {
+  async findAll(params?: {
+    skip?: number;
+    take?: number;
+    zoneId?: number;
+  }): Promise<RoomDto[]> {
     const { skip, take, zoneId } = params || {};
-    
+
     const rooms = await this.db.room.findMany({
       where: zoneId ? { zoneId } : undefined,
       skip,
@@ -62,6 +72,7 @@ export class RoomsService {
     const room = await this.db.room.create({
       data: {
         id: data.id,
+        vnum: data.vnum,
         name: data.name,
         description: data.description,
         sector: data.sector || 'STRUCTURE',
@@ -128,5 +139,25 @@ export class RoomsService {
     });
 
     return exit;
+  }
+
+  async updatePosition(
+    id: number,
+    position: UpdateRoomPositionInput
+  ): Promise<RoomDto> {
+    const room = await this.db.room.update({
+      where: { id },
+      data: {
+        layoutX: position.layoutX,
+        layoutY: position.layoutY,
+        layoutZ: position.layoutZ,
+      },
+      include: {
+        exits: true,
+        extraDescs: true,
+      },
+    });
+
+    return room;
   }
 }

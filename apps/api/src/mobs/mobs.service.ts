@@ -123,4 +123,11 @@ export class MobsService {
       where: { id },
     });
   }
+
+  async deleteMany(ids: number[]): Promise<number> {
+    const result = await this.database.mob.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return result.count;
+  }
 }

@@ -1,8 +1,16 @@
-import { Injectable, Logger, OnModuleDestroy, OnModuleInit } from '@nestjs/common';
+import {
+  Injectable,
+  Logger,
+  OnModuleDestroy,
+  OnModuleInit,
+} from '@nestjs/common';
 import { PrismaClient } from '@prisma/client';
 
 @Injectable()
-export class DatabaseService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+export class DatabaseService
+  extends PrismaClient
+  implements OnModuleInit, OnModuleDestroy
+{
   private readonly logger = new Logger(DatabaseService.name);
 
   constructor() {
@@ -31,22 +39,20 @@ export class DatabaseService extends PrismaClient implements OnModuleInit, OnMod
   async onModuleInit() {
     // Log Prisma events in development
     if (process.env.NODE_ENV === 'development') {
-      // @ts-expect-error - Prisma event types
       this.$on('query', (e: any) => {
-        this.logger.debug(`Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration}ms`);
+        this.logger.debug(
+          `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration}ms`
+        );
       });
 
-      // @ts-expect-error - Prisma event types
       this.$on('error', (e: any) => {
         this.logger.error('Database error:', e);
       });
 
-      // @ts-expect-error - Prisma event types
       this.$on('warn', (e: any) => {
         this.logger.warn('Database warning:', e);
       });
 
-      // @ts-expect-error - Prisma event types
       this.$on('info', (e: any) => {
         this.logger.log('Database info:', e);
       });
@@ -75,9 +81,9 @@ export class DatabaseService extends PrismaClient implements OnModuleInit, OnMod
       await this.$queryRaw`SELECT 1`;
       return { healthy: true, message: 'Database is healthy' };
     } catch (error) {
-      return { 
-        healthy: false, 
-        message: `Database health check failed: ${error}` 
+      return {
+        healthy: false,
+        message: `Database health check failed: ${error}`,
       };
     }
   }

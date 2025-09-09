@@ -1,6 +1,24 @@
-import { ObjectType, Field, Int, InputType, registerEnumType, Float } from '@nestjs/graphql';
-import { IsOptional, IsString, IsNumber, IsEnum, IsArray } from 'class-validator';
-import { ObjectType as ObjectTypeEnum, ObjectFlag, EffectFlag, WearFlag } from '@prisma/client';
+import {
+  ObjectType,
+  Field,
+  Int,
+  InputType,
+  registerEnumType,
+  Float,
+} from '@nestjs/graphql';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsArray,
+} from 'class-validator';
+import {
+  ObjectType as ObjectTypeEnum,
+  ObjectFlag,
+  EffectFlag,
+  WearFlag,
+} from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
 
 // Register GraphQL enums
@@ -74,6 +92,10 @@ export class CreateObjectInput {
   @Field(() => Int)
   @IsNumber()
   id: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  vnum: number;
 
   @Field(() => ObjectTypeEnum, { defaultValue: ObjectTypeEnum.NOTHING })
   @IsOptional()

@@ -112,3 +112,12 @@ temp/
 # MUD-specific ignores
 world/*.backup
 world/*.orig
+
+# Playwright test results
+test-results/
+playwright-report/
+blob-report/
+playwright/.cache/
+
+# Serena Memories
+.serena/

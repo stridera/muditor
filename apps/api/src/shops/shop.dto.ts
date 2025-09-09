@@ -1,5 +1,18 @@
-import { ObjectType, Field, Int, InputType, registerEnumType, Float } from '@nestjs/graphql';
-import { IsOptional, IsString, IsNumber, IsEnum, IsArray } from 'class-validator';
+import {
+  ObjectType,
+  Field,
+  Int,
+  InputType,
+  registerEnumType,
+  Float,
+} from '@nestjs/graphql';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsArray,
+} from 'class-validator';
 import { ShopFlag, ShopTradesWith } from '@prisma/client';
 
 // Register GraphQL enums
@@ -65,6 +78,10 @@ export class CreateShopInput {
   @Field(() => Int)
   @IsNumber()
   id: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  vnum: number;
 
   @Field(() => Float, { defaultValue: 1.0 })
   @IsOptional()

@@ -7,38 +7,141 @@ Muditor transforms legacy MUD world building from text-based file editing to a v
 ## Features
 
 ### 🎮 Dual-Mode Interface
+
 - **Player Mode**: Character management, inventory, banking, and stats viewing
 - **God Mode**: World building, server administration, and content management
-- **Environment Management**: Seamless switching between Development, Test, and Production environments
+- **Role-Based Access**: PLAYER → IMMORTAL → BUILDER → CODER → GOD hierarchy
 
 ### 🗺️ Visual World Editor
+
 - **Zone Editor**: Interactive zone maps with drag-and-drop room creation using React Flow
 - **Room Editor**: Comprehensive room editing with descriptions, exits, terrain, and object placement
-- **Real-time Collaboration**: Multiple builders can work simultaneously with conflict resolution
+- **Real-time Updates**: Live GraphQL mutations with immediate UI feedback
 
 ### 🤖 Entity Management
+
 - **Mob Editor**: Complete NPC creation with stats, equipment, AI behaviors, and spawn rules
 - **Object Editor**: Item creation with type-specific properties, magical effects, and interactions
 - **Shop Editor**: Merchant configuration with inventory, pricing, and trading rules
 
 ### 📝 Advanced Scripting
+
 - **Lua Script Editor**: Monaco-powered editor with syntax highlighting and autocomplete
 - **Sandbox Testing**: Safe script execution with resource limits and debugging tools
 - **Trigger System**: Attach scripts to any entity for custom behaviors
 
-### 🔄 Live Integration
-- **MUD Bridge**: Secure API integration for real-time world updates
-- **Server Management**: Remote server controls, monitoring, and emergency procedures
-- **Version Control**: Track changes, publish updates, and rollback when needed
+### 🔒 Authentication & Security
+
+- **Role-Based Access Control**: Comprehensive permission system with five role levels
+- **JWT Authentication**: Secure token-based authentication with refresh capabilities
+- **User Management**: Registration, password reset, ban system, and admin controls
+- **Audit Logging**: Complete change tracking with user attribution
 
 ## Technology Stack
 
 - **Frontend**: Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, React Flow
 - **Backend**: NestJS, GraphQL, Prisma ORM, PostgreSQL, Redis
+- **Authentication**: JWT with role-based permissions
 - **Scripting**: Lua with sandboxed execution
-- **Deployment**: Docker, CI/CD pipelines
+- **Testing**: Playwright for E2E testing
+- **Deployment**: Docker, Docker Compose
 
-## Project Structure
+## Quick Start
+
+### Prerequisites
+
+- Node.js 18+ (LTS recommended)
+- Docker and Docker Compose
+- pnpm (recommended) or npm/yarn
+
+### Development Setup
+
+**Option 1: Automated Setup (Recommended)**
+
+```bash
+# Clone repository
+git clone <repository-url>
+cd muditor
+
+# Install dependencies
+pnpm install
+
+# Start entire system with automated scripts
+./scripts/start-system.sh
+```
+
+**Option 2: Manual Setup**
+
+```bash
+# Start database and services
+docker compose up -d
+
+# Start GraphQL API server
+pnpm dev:api &
+
+# Start Next.js web application
+pnpm dev:web
+```
+
+### Database Setup
+
+```bash
+# Generate Prisma client
+pnpm prisma generate
+
+# Apply database migrations
+pnpm prisma migrate dev
+
+# Import sample world data (optional)
+pnpm seed
+```
+
+### System Management Scripts
+
+```bash
+./scripts/start-system.sh   # Start all services with health checks
+./scripts/stop-system.sh    # Stop all services cleanly
+./scripts/check-system.sh   # Verify system health
+```
+
+## Usage
+
+### Access Points
+
+Once running, access these URLs:
+
+- **Main Dashboard**: http://localhost:3002/dashboard
+- **Login**: http://localhost:3002/login
+- **GraphQL Playground**: http://localhost:4000/graphql
+- **Database Admin**: http://localhost:8080 (Adminer)
+
+### Entity Management
+
+- **Zones**: http://localhost:3002/dashboard/zones
+- **Rooms**: http://localhost:3002/dashboard/rooms
+- **Mobs**: http://localhost:3002/dashboard/mobs
+- **Objects**: http://localhost:3002/dashboard/objects
+- **Shops**: http://localhost:3002/dashboard/shops
+- **Scripts**: http://localhost:3002/dashboard/scripts
+
+### System Verification
+
+```bash
+# Check Docker containers
+docker compose ps
+
+# Test API connectivity
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ zones { id name } }"}'
+
+# Verify web application
+curl -I http://localhost:3002
+```
+
+## Development
+
+### Project Structure
 
 ```
 muditor/
@@ -49,124 +152,158 @@ muditor/
 │   ├── db/           # Prisma schema and database client
 │   ├── types/        # Shared TypeScript types
 │   └── ui/           # Shared UI components
-├── world/            # Legacy MUD world files (130 zones)
+├── world/            # Legacy MUD world files (130+ zones)
 ├── docs/             # Documentation and specifications
-├── task.md           # Comprehensive development roadmap
-└── CLAUDE.md         # AI assistant guidance
+├── scripts/          # System management scripts
+└── tests/            # E2E and integration tests
 ```
 
-## Quick Start
+### Common Tasks
 
-### Prerequisites
-- Node.js 18+ (LTS recommended)
-- Docker and Docker Compose
-- pnpm or yarn
-
-### Development Setup
 ```bash
-# Clone repository
-git clone <repository-url>
-cd muditor
+# Database operations
+pnpm prisma studio          # Open database GUI
+pnpm prisma migrate reset   # Reset database
+pnpm prisma generate        # Regenerate client
 
-# Install dependencies
-pnpm install
+# Development
+pnpm dev:api                # Start API server only
+pnpm dev:web                # Start web app only
+pnpm build                  # Build all applications
+pnpm type-check             # Check TypeScript
 
-# Start database and services
-docker compose up -d
-
-# Initialize database and import world data
-pnpm db:setup
-pnpm db:seed
-
-# Start development servers
-pnpm dev
+# Testing
+pnpm test:e2e               # Run E2E tests
+pnpm test:e2e:ui           # Interactive test runner
+pnpm test:e2e:debug        # Debug tests
 ```
 
-Visit the application at these URLs:
-- **Zone Editor**: `http://localhost:3000/dashboard/zones/editor?zone=511`
-- **Entity Lists**: `http://localhost:3000/dashboard/mobs` (or /objects, /shops, /rooms)
-- **GraphQL Playground**: `http://localhost:4000/graphql`
+### Role Hierarchy
 
-**Note:** The web app auto-detects available ports (currently running on 3000).
+1. **PLAYER**: Basic user access, character management
+2. **IMMORTAL**: Enhanced player features, basic admin tools
+3. **BUILDER**: World building permissions, zone editing
+4. **CODER**: Advanced admin features, script management
+5. **GOD**: Full system access, user management
 
-## Documentation
+## API Reference
 
-- **[Development Plan](task.md)** - Comprehensive roadmap with milestones and timelines
-- **[World Data Format](docs/WORLD_JSON_FORMAT.md)** - Legacy MUD file format specification
-- **[Development Rules](rules.md)** - Safety guidelines and best practices
-- **[AI Assistant Guide](CLAUDE.md)** - Context for AI-powered development
+### Authentication
 
-## Development Status
+```bash
+# Register new user
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { register(input: { username: \"user\", email: \"user@example.com\", password: \"password\" }) { accessToken user { id username role } } }"}'
 
-🎉 **MAJOR MILESTONE: VISUAL ZONE EDITOR IS WORKING!**
+# Login
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"mutation { login(input: { identifier: \"user\", password: \"password\" }) { accessToken user { id username role } } }"}'
+```
 
-**Current Status (Updated September 3, 2025):**
-- **Phase 1: Foundation & Data** ✅ **100% COMPLETE**
-- **Phase 2: API Foundation** ✅ **98% COMPLETE** 
-- **Phase 3: Frontend Foundation** ✅ **95% COMPLETE**
-- **Phase 4: Visual Editors** 🚀 **98% COMPLETE** with **ZONE EDITOR EXCEEDING ALL EXPECTATIONS!**
+### Entity Queries
 
-See [task.md](task.md) for detailed milestones and progress tracking.
+```bash
+# Get zones
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ zones { id name description } }"}'
 
-## 🚀 Currently Working Features
-
-### ✅ **Fully Functional Right Now:**
-- **INCREDIBLY ADVANCED Visual Zone Editor** with React Flow:
-  - Interactive room editing with drag-and-drop positioning
-  - **Room Creation** - Create new rooms with auto-generated IDs and comprehensive form editor
-  - **Exit Management** - Add, remove, and modify room exits with visual connections and real-time updates
-  - **Smart Room Layout** - Intelligent positioning algorithm for optimal visualization
-  - **Real-time GraphQL Integration** - Live mutations with immediate UI feedback and error handling
-  - **Professional Controls** - Minimap, zoom, pan, and responsive sidebar design
-  - **Context-Sensitive Editing** - Click rooms to edit, dynamic form panels, live saving
-- **Entity List Pages** - Browse and manage all MUD entities:
-  - **Mobs** with stats, levels, and zone information
-  - **Objects** with type badges, weight, and cost details
-  - **Shops** with profit rates and keeper information
-  - **Rooms** with sector types and zone links
-- **Complete GraphQL API** - All CRUD operations for zones, rooms, mobs, objects, shops, exits
-- **PostgreSQL Database** with comprehensive MUD schema (1400+ lines)
-- **Data Import System** - 7 zones with 218 rooms and 83 objects imported (verified working)
-- **Professional UI** with Tailwind CSS, responsive design, and intuitive navigation
-
-### 🚧 **In Development:**
-- Authentication and user management
-- Advanced entity editors with full CRUD forms
-- Real-time collaboration with GraphQL subscriptions
-- Script editor with Lua support
-- Search and filtering across all entity types
-
-## Contributing
-
-This project is designed to be **AI-friendly** with:
-- Comprehensive TypeScript typing throughout
-- Prisma schema as single source of truth
-- Consistent patterns and conventions
-- Detailed documentation and planning
-
-See [CLAUDE.md](CLAUDE.md) for AI assistant context and [plan.md](plan.md) for development priorities.
+# Get mobs with filters
+curl -X POST http://localhost:4000/graphql \
+  -H "Content-Type: application/json" \
+  -d '{"query":"{ mobs(zoneId: 511) { id shortDesc level } }"}'
+```
 
 ## Data Architecture
 
 Muditor manages complex MUD world data including:
-- **125+ Zones** with climate, reset rules, and spawning configuration
-- **Thousands of Rooms** with descriptions, exits, and environmental details
-- **NPCs (Mobs)** with stats, equipment, AI behaviors, and relationships
-- **Objects** with type-specific properties, magical effects, and interactions
-- **Shops** with inventory, pricing, and merchant behaviors
-- **Scripts** with Lua code for custom game logic and triggers
 
-Data will be imported from legacy JSON files and transformed into a modern PostgreSQL schema with full referential integrity. Currently, sample data from 7 zones is available for testing the editors.
+- **Zones**: Areas with climate, reset rules, and spawning configuration
+- **Rooms**: Connected spaces with descriptions, exits, and environmental details
+- **Mobs**: NPCs with stats, equipment, AI behaviors, and spawn rules
+- **Objects**: Items with type-specific properties, magical effects, and interactions
+- **Shops**: Merchants with inventory, pricing, and trading behaviors
+- **Scripts**: Lua code for custom game logic and interactive triggers
 
-## Security & Safety
+## Testing
 
-- **Sandboxed Script Execution**: Lua scripts run in controlled environments
-- **Permission-Based Access**: Granular controls based on user roles
-- **Audit Logging**: Complete change tracking with user attribution
-- **Environment Isolation**: Separate development, test, and production data
-- **Backup & Recovery**: Automated backups with point-in-time restoration
+### E2E Testing with Playwright
+
+```bash
+# Run all tests
+pnpm test:e2e
+
+# Run specific test suite
+pnpm test:e2e tests/dashboard.spec.ts
+
+# Interactive test runner
+pnpm test:e2e:ui
+
+# Generate test report
+pnpm test:e2e:report
+```
+
+### Test Coverage
+
+- Authentication flows and role-based access
+- Entity CRUD operations
+- Visual editors and form validation
+- API connectivity and error handling
+- Cross-browser compatibility
+
+## Deployment
+
+### Docker Production Build
+
+```bash
+# Build production images
+docker build -f apps/api/Dockerfile -t muditor-api .
+docker build -f apps/web/Dockerfile -t muditor-web .
+
+# Run production stack
+docker compose -f docker-compose.prod.yml up -d
+```
+
+### Environment Configuration
+
+Required environment variables:
+
+```env
+# Database
+DATABASE_URL="postgresql://user:password@localhost:5432/muditor"
+
+# Authentication
+JWT_SECRET="your-secret-key"
+JWT_EXPIRES_IN="7d"
+
+# Redis (optional)
+REDIS_URL="redis://localhost:6379"
+
+# Email (optional)
+SMTP_HOST="smtp.example.com"
+SMTP_PORT="587"
+SMTP_USER="username"
+SMTP_PASS="password"
+```
+
+## Contributing
+
+This project follows modern development practices:
+
+- **TypeScript**: Full type safety throughout the stack
+- **Code Quality**: ESLint, Prettier, and strict TypeScript configuration
+- **Testing**: Comprehensive E2E and unit test coverage
+- **Documentation**: Inline code documentation and architectural decisions
+- **Git Workflow**: Feature branches, pull requests, and automated CI/CD
+
+See [plan.md](plan.md) for development priorities and roadmap.
+
+## License
+
+[Add your license here]
 
 ---
 
 **Muditor** - Modernizing MUD development for the next generation of world builders.
-

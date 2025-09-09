@@ -50,9 +50,9 @@ export async function checkDatabaseHealth() {
     await prisma.$queryRaw`SELECT 1`;
     return { healthy: true, message: 'Database is healthy' };
   } catch (error) {
-    return { 
-      healthy: false, 
-      message: `Database health check failed: ${error}` 
+    return {
+      healthy: false,
+      message: `Database health check failed: ${error}`,
     };
   }
 }
@@ -60,3 +60,6 @@ export async function checkDatabaseHealth() {
 // World parsing and import utilities
 export * from './parsers/world-parser';
 export * from './importers/world-importer';
+
+// Lua sandbox utilities
+// export * from './sandbox/lua-sandbox'; // TODO: Implement when needed

@@ -2,6 +2,7 @@ import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { join } from 'path';
+import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -10,9 +11,13 @@ import { RoomsModule } from './rooms/rooms.module';
 import { MobsModule } from './mobs/mobs.module';
 import { ObjectsModule } from './objects/objects.module';
 import { ShopsModule } from './shops/shops.module';
+import { TriggersModule } from './triggers/triggers.module';
+import { ValidationModule } from './validation/validation.module';
+import { CharactersModule } from './characters/characters.module';
 
 @Module({
   imports: [
+    CommonModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
@@ -26,7 +31,9 @@ import { ShopsModule } from './shops/shops.module';
             return {
               req: {
                 headers: {
-                  authorization: connectionParams.Authorization || connectionParams.authorization,
+                  authorization:
+                    connectionParams.Authorization ||
+                    connectionParams.authorization,
                 },
               },
             };
@@ -38,7 +45,9 @@ import { ShopsModule } from './shops/shops.module';
             return {
               req: {
                 headers: {
-                  authorization: connectionParams.Authorization || connectionParams.authorization,
+                  authorization:
+                    connectionParams.Authorization ||
+                    connectionParams.authorization,
                 },
               },
             };
@@ -54,6 +63,9 @@ import { ShopsModule } from './shops/shops.module';
     MobsModule,
     ObjectsModule,
     ShopsModule,
+    TriggersModule,
+    ValidationModule,
+    CharactersModule,
   ],
 })
 export class AppModule {}
