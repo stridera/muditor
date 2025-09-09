@@ -1,4 +1,10 @@
-import { ObjectType, Field, Int, InputType, registerEnumType } from '@nestjs/graphql';
+import {
+  ObjectType,
+  Field,
+  Int,
+  InputType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
 import { ResetMode, Hemisphere, Climate } from '@prisma/client';
 
@@ -48,6 +54,21 @@ export class ZoneCountsDto {
 }
 
 @ObjectType()
+export class ZoneRoomDto {
+  @Field(() => Int)
+  id: number;
+
+  @Field()
+  name: string;
+
+  @Field()
+  description: string;
+
+  @Field()
+  sector: string;
+}
+
+@ObjectType()
 export class ZoneDto {
   @Field(() => Int)
   id: number;
@@ -75,6 +96,9 @@ export class ZoneDto {
 
   @Field(() => Date)
   updatedAt: Date;
+
+  @Field(() => [ZoneRoomDto], { nullable: true })
+  rooms?: ZoneRoomDto[];
 
   @Field(() => ZoneCountsDto, { nullable: true })
   _count?: ZoneCountsDto;

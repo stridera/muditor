@@ -8,54 +8,126 @@ datasource db {
 }
 
 model User {
-  id           String      @id @default(cuid())
-  email        String      @unique
-  username     String      @unique
-  passwordHash String
-  role         UserRole    @default(PLAYER)
-  godLevel     Int         @default(0)
-  createdAt    DateTime    @default(now())
-  updatedAt    DateTime    @updatedAt
-  lastLoginAt  DateTime?
-  auditLogs    AuditLog[]
-  characters   Character[]
+  id                  String      @id @default(cuid())
+  email               String      @unique
+  username            String      @unique
+  passwordHash        String
+  role                UserRole    @default(PLAYER)
+  createdAt           DateTime    @default(now())
+  updatedAt           DateTime    @updatedAt
+  lastLoginAt         DateTime?
+  resetToken          String?     @map("reset_token")
+  resetTokenExpiry    DateTime?   @map("reset_token_expiry")
+  failedLoginAttempts Int         @default(0) @map("failed_login_attempts")
+  lockedUntil         DateTime?   @map("locked_until")
+  lastFailedLogin     DateTime?   @map("last_failed_login")
+  auditLogs           AuditLog[]
+  changeLogs          ChangeLog[]
+  characters          Character[]
+  banRecords          BanRecord[] @relation("BannedUser")
+  issuedBans          BanRecord[] @relation("BanningAdmin")
 
   @@map("users")
 }
 
 model Character {
-  id           String           @id @default(cuid())
-  name         String           @unique
-  level        Int              @default(1)
-  alignment    Int              @default(0)
-  strength     Int              @default(13)
-  intelligence Int              @default(13)
-  wisdom       Int              @default(13)
-  dexterity    Int              @default(13)
-  constitution Int              @default(13)
-  charisma     Int              @default(13)
-  hitPoints    Int              @default(100)
-  mana         Int              @default(100)
-  movement     Int              @default(100)
-  copper       Int              @default(0)
-  silver       Int              @default(0)
-  gold         Int              @default(0)
-  platinum     Int              @default(0)
-  userId       String
-  createdAt    DateTime         @default(now())
-  updatedAt    DateTime         @updatedAt
-  classId      Int?
-  raceId       Int?
-  raceLegacy   Race?            @default(HUMAN) @map("race_legacy")
-  skills       CharacterSkill[]
-  spells       CharacterSpell[]
-  class        Class?           @relation(fields: [classId], references: [id])
-  race         RaceData?        @relation(fields: [raceId], references: [id])
-  user         User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id        String @id @default(cuid())
+  name      String @unique
+  level     Int    @default(1)
+  alignment Int    @default(0)
+
+  // Core stats
+  strength     Int @default(13)
+  intelligence Int @default(13)
+  wisdom       Int @default(13)
+  dexterity    Int @default(13)
+  constitution Int @default(13)
+  charisma     Int @default(13)
+  luck         Int @default(13)
+
+  // Health/Resources
+  hitPoints    Int @default(100)
+  movement     Int @default(100)
+  hitPointsMax Int @default(100)
+  movementMax  Int @default(100)
+
+  // Currency
+  copper       Int @default(0)
+  silver       Int @default(0)
+  gold         Int @default(0)
+  platinum     Int @default(0)
+  bankCopper   Int @default(0) @map("bank_copper")
+  bankSilver   Int @default(0) @map("bank_silver")
+  bankGold     Int @default(0) @map("bank_gold")
+  bankPlatinum Int @default(0) @map("bank_platinum")
+
+  // Character identity
+  passwordHash String? @map("password_hash")
+  raceType     String  @default("human") @map("race_type")
+  gender       String  @default("neutral")
+  playerClass  String? @map("player_class")
+
+  // Physical attributes
+  height      Int?
+  weight      Int?
+  baseSize    Int  @default(0) @map("base_size")
+  currentSize Int  @default(0) @map("current_size")
+
+  // Combat stats
+  hitRoll    Int @default(0) @map("hit_roll")
+  damageRoll Int @default(0) @map("damage_roll")
+  armorClass Int @default(10) @map("armor_class")
+
+  // Location & session
+  currentRoom Int?      @map("current_room")
+  saveRoom    Int?      @map("save_room")
+  homeRoom    Int?      @map("home_room")
+  lastLogin   DateTime? @map("last_login")
+  timePlayed  Int       @default(0) @map("time_played")
+  isOnline    Boolean   @default(false) @map("is_online")
+
+  // Biological needs
+  hunger Int @default(0)
+  thirst Int @default(0)
+
+  // Display/UI
+  description String?
+  title       String?
+  prompt      String  @default("<%h/%Hhp %v/%Vmv>")
+  pageLength  Int     @default(25) @map("page_length")
+
+  // Flags (using arrays)
+  playerFlags    String[] @default([]) @map("player_flags")
+  effectFlags    String[] @default([]) @map("effect_flags")
+  privilegeFlags String[] @default([]) @map("privilege_flags")
+
+  // Builder/God specific
+  olcZones   Int[] @default([]) @map("olc_zones")
+  invisLevel Int   @default(0) @map("invis_level")
+
+  // Timestamps
+  birthTime   DateTime @default(now()) @map("birth_time")
+  userId      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  classId     Int?
+  raceId      Int
+  experience  Int      @default(0)
+  skillPoints Int      @default(0)
+
+  // Relations
+  skills  CharacterSkill[]
+  spells  CharacterSpell[]
+  items   CharacterItem[]
+  effects CharacterEffect[]
+  class   Class?            @relation(fields: [classId], references: [id])
+  race    RaceData          @relation(fields: [raceId], references: [id])
+  user    User              @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("characters")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Zone {
   id         Int        @id
   name       String
@@ -78,8 +150,10 @@ model Zone {
   @@map("zones")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Room {
   id          Int                    @id
+  vnum        Int // Virtual number within zone
   name        String
   description String
   sector      Sector                 @default(STRUCTURE)
@@ -89,11 +163,15 @@ model Room {
   createdBy   String?
   updatedBy   String?
   flags       RoomFlag[]
+  layoutX     Int?                   @map("layout_x")
+  layoutY     Int?                   @map("layout_y")
+  layoutZ     Int?                   @default(0) @map("layout_z")
   mobResets   MobReset[]
   exits       RoomExit[]
   extraDescs  RoomExtraDescription[]
   zone        Zone                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
+  @@unique([zoneId, vnum], name: "zone_vnum_unique")
   @@map("rooms")
 }
 
@@ -121,8 +199,10 @@ model RoomExtraDescription {
   @@map("room_extra_descriptions")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Mob {
   id              Int          @id
+  vnum            Int // Virtual number within zone
   keywords        String
   mobClass        String
   shortDesc       String
@@ -179,6 +259,7 @@ model Mob {
   shops           Shop[]
   triggers        Trigger[]
 
+  @@unique([zoneId, vnum], name: "zone_vnum_unique")
   @@map("mobs")
 }
 
@@ -248,8 +329,10 @@ model MobEquipped {
   @@map("mob_equipped")
 }
 
+/// This model contains an expression index which requires additional setup for migrations. Visit https://pris.ly/d/expression-indexes for more info.
 model Object {
   id             Int                      @id
+  vnum           Int // Virtual number within zone
   type           ObjectType               @default(NOTHING)
   keywords       String
   shortDesc      String
@@ -278,7 +361,9 @@ model Object {
   zone           Zone                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shopItems      ShopItem[]
   triggers       Trigger[]
+  characterItems CharacterItem[]
 
+  @@unique([zoneId, vnum], name: "zone_vnum_unique")
   @@map("objects")
 }
 
@@ -314,6 +399,7 @@ model ObjectSpell {
 
 model Shop {
   id              Int              @id
+  vnum            Int // Virtual number within zone
   buyProfit       Float            @default(1.0)
   sellProfit      Float            @default(1.0)
   temper1         Int              @default(0)
@@ -339,6 +425,7 @@ model Shop {
   keeper          Mob?             @relation(fields: [keeperId], references: [id])
   zone            Zone             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
+  @@unique([zoneId, vnum], name: "zone_vnum_unique")
   @@map("shops")
 }
 
@@ -662,9 +749,48 @@ model CharacterSpell {
   @@map("character_spells")
 }
 
+model ChangeLog {
+  id          String   @id @default(cuid())
+  entityType  String
+  entityId    String
+  action      String
+  changes     Json     @default("{}")
+  userId      String
+  timestamp   DateTime @default(now())
+  description String?
+  user        User     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([userId, timestamp])
+  @@index([timestamp])
+  @@map("change_logs")
+}
+
+model BanRecord {
+  id         String    @id @default(cuid())
+  userId     String
+  bannedBy   String
+  reason     String
+  bannedAt   DateTime  @default(now())
+  expiresAt  DateTime?
+  unbannedAt DateTime?
+  unbannedBy String?
+  active     Boolean   @default(true)
+
+  user  User @relation("BannedUser", fields: [userId], references: [id], onDelete: Cascade)
+  admin User @relation("BanningAdmin", fields: [bannedBy], references: [id])
+
+  @@index([userId])
+  @@index([bannedBy])
+  @@index([active])
+  @@index([bannedAt])
+  @@map("ban_records")
+}
+
 enum UserRole {
   PLAYER
   IMMORTAL
+  BUILDER
   CODER
   GOD
 }
@@ -812,6 +938,22 @@ enum MobFlag {
   MONK
   BERSERKER
   DIABOLIST
+  SLOW_TRACK
+  NOSILENCE
+  PEACEFUL
+  PROTECTOR
+  PEACEKEEPER
+  HASTE
+  BLUR
+  TEACHER
+  MOUNTABLE
+  NOVICIOUS
+  NO_CLASS_AI
+  FAST_TRACK
+  AQUATIC
+  NO_EQ_RESTRICT
+  SUMMONED_MOUNT
+  NOPOISON
 }
 
 enum EffectFlag {
@@ -886,6 +1028,36 @@ enum EffectFlag {
   CALM
   ENTANGLE
   ANIMAL_KIN
+  BLUR
+  ULTRAVISION
+  LIGHT
+  PROT_COLD
+  PROT_AIR
+  PROT_FIRE
+  PROT_EARTH
+  FARSEE
+  STONE_SKIN
+  DETECT_POISON
+  SOULSHIELD
+  TAMED
+  GLORY
+  STEALTH
+  NEGATE_HEAT
+  NEGATE_EARTH
+  NEGATE_COLD
+  NEGATE_AIR
+  MAJOR_GLOBE
+  INSANITY
+  COLDSHIELD
+  CAMOUFLAGED
+  UNUSED
+  REMOTE_AGGR
+  MESMERIZED
+  HARNESS
+  FAMILIARITY
+  DISPLACEMENT
+  BLESS
+  AWARE
 }
 
 enum RoomFlag {
@@ -917,6 +1089,17 @@ enum RoomFlag {
   VERY_SMALL
   ONE_PERSON
   EFFECTS_NEXT
+  ALWAYSLIT
+  GUILDHALL
+  NOWELL
+  NOSUMMON
+  NOSCAN
+  UNDERDARK
+  NOSHIFT
+  NORECALL
+  ALT_EXIT
+  OBSERVATORY
+  HOUSE_CRASH
 }
 
 enum TriggerFlag {
@@ -940,17 +1123,27 @@ enum TriggerFlag {
   Door
   Time
   Auto
+  SpeechTo
+  Look
 }
 
 enum ShopFlag {
   WILL_FIGHT
   USES_BANK
+  WILL_BANK_MONEY
+  WILL_START_FIGHT
 }
 
 enum ShopTradesWith {
   ALIGNMENT
   RACE
   CLASS
+  TRADE_NOGOOD
+  TRADE_NOEVIL
+  TRADE_NONEUTRAL
+  TRADE_NOCLERIC
+  TRADE_NOTHIEF
+  TRADE_NOWARRIOR
 }
 
 enum Gender {
@@ -1244,4 +1437,49 @@ enum SkillCategory {
   SECONDARY
   RESTRICTED
   FORBIDDEN
+}
+
+// Character Item Instances (prototype vs instance system)
+model CharacterItem {
+  id                String   @id @default(cuid())
+  characterId       String   @map("character_id")
+  objectPrototypeId Int      @map("object_prototype_id")
+  containerId       String?  @map("container_id")
+  equippedLocation  String?  @map("equipped_location")
+  condition         Int      @default(100) // 0-100
+  charges           Int      @default(-1) // -1 unlimited, 0+ for consumables
+  instanceFlags     String[] @default([]) @map("instance_flags")
+  customShortDesc   String?  @map("custom_short_desc")
+  customLongDesc    String?  @map("custom_long_desc")
+  customValues      Json     @default("{}") @map("custom_values")
+  createdAt         DateTime @default(now()) @map("created_at")
+  updatedAt         DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  character       Character       @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  objectPrototype Object          @relation(fields: [objectPrototypeId], references: [id], onDelete: Cascade)
+  container       CharacterItem?  @relation("ItemContainer", fields: [containerId], references: [id])
+  containedItems  CharacterItem[] @relation("ItemContainer")
+
+  @@map("character_items")
+}
+
+// Character Active Effects (buffs/debuffs)
+model CharacterEffect {
+  id           String    @id @default(cuid())
+  characterId  String    @map("character_id")
+  effectName   String    @map("effect_name")
+  effectType   String?   @map("effect_type") // 'spell', 'poison', 'disease', etc.
+  duration     Int? // seconds remaining, -1 for permanent
+  strength     Int       @default(1) // effect strength/level
+  modifierData Json      @default("{}") @map("modifier_data")
+  sourceType   String?   @map("source_type") // 'spell', 'item', 'room', etc.
+  sourceId     Int?      @map("source_id") // reference to source object/spell/etc.
+  appliedAt    DateTime  @default(now()) @map("applied_at")
+  expiresAt    DateTime? @map("expires_at")
+
+  // Relations
+  character Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("character_effects")
 }

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import { useZone } from '@/contexts/zone-context';
 import {
   Plus,
   Edit,
@@ -76,14 +77,12 @@ interface Mob {
 export default function MobsPage() {
   const searchParams = useSearchParams();
   const zoneParam = searchParams.get('zone');
+  const { selectedZone, setSelectedZone } = useZone();
 
   const [mobs, setMobs] = useState<Mob[]>([]);
   const [mobsCount, setMobsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [selectedZone, setSelectedZone] = useState<number | null>(
-    zoneParam ? parseInt(zoneParam) : null
-  );
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchTerm: '',
   });
@@ -98,6 +97,16 @@ export default function MobsPage() {
   const [itemsPerPage, setItemsPerPage] = useState(25);
   const [sortBy, setSortBy] = useState('level');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+
+  // Handle initial zone parameter from URL
+  useEffect(() => {
+    if (zoneParam && selectedZone === null) {
+      const zoneId = parseInt(zoneParam);
+      if (!isNaN(zoneId)) {
+        setSelectedZone(zoneId);
+      }
+    }
+  }, [zoneParam, selectedZone, setSelectedZone]);
 
   useEffect(() => {
     const fetchMobs = async () => {
@@ -1066,12 +1075,35 @@ export default function MobsPage() {
             </button>
 
             <div className='flex items-center gap-1'>
-              {[...Array(Math.min(5, totalPages))].map((_, i) => {
-                const pageNum = Math.max(
-                  1,
-                  Math.min(totalPages, currentPage - 2 + i)
-                );
-                return (
+              {(() => {
+                const pages = [];
+                const maxVisiblePages = 5;
+
+                if (totalPages <= maxVisiblePages) {
+                  // Show all pages if total pages is 5 or less
+                  for (let i = 1; i <= totalPages; i++) {
+                    pages.push(i);
+                  }
+                } else {
+                  // Show pages with ellipsis logic
+                  const halfVisible = Math.floor(maxVisiblePages / 2);
+                  let startPage = Math.max(1, currentPage - halfVisible);
+                  const endPage = Math.min(
+                    totalPages,
+                    startPage + maxVisiblePages - 1
+                  );
+
+                  // Adjust start page if we're near the end
+                  if (endPage - startPage < maxVisiblePages - 1) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                  }
+
+                  for (let i = startPage; i <= endPage; i++) {
+                    pages.push(i);
+                  }
+                }
+
+                return pages.map(pageNum => (
                   <button
                     key={pageNum}
                     onClick={() => setCurrentPage(pageNum)}
@@ -1083,8 +1115,8 @@ export default function MobsPage() {
                   >
                     {pageNum}
                   </button>
-                );
-              })}
+                ));
+              })()}
               {totalPages > 5 && currentPage < totalPages - 2 && (
                 <>
                   <span className='px-2 text-gray-500'>...</span>

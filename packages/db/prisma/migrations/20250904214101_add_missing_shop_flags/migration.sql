@@ -1,0 +1,5 @@
+-- AlterEnum
+ALTER TYPE "ShopFlag" ADD VALUE 'WILL_START_FIGHT';
+
+-- AlterEnum
+ALTER TYPE "ShopTradesWith" ADD VALUE 'TRADE_NOGOOD';

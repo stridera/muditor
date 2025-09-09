@@ -1,16 +1,28 @@
-import { ObjectType, Field, Int, InputType, registerEnumType } from '@nestjs/graphql';
-import { IsOptional, IsString, IsNumber, IsEnum, IsArray } from 'class-validator';
-import { 
-  MobFlag, 
-  EffectFlag, 
-  Gender, 
-  Race, 
-  DamageType, 
-  Position, 
-  LifeForce, 
-  Composition, 
-  Stance, 
-  Size 
+import {
+  ObjectType,
+  Field,
+  Int,
+  InputType,
+  registerEnumType,
+} from '@nestjs/graphql';
+import {
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+  IsArray,
+} from 'class-validator';
+import {
+  MobFlag,
+  EffectFlag,
+  Gender,
+  Race,
+  DamageType,
+  Position,
+  LifeForce,
+  Composition,
+  Stance,
+  Size,
 } from '@prisma/client';
 
 // Register GraphQL enums
@@ -165,6 +177,10 @@ export class CreateMobInput {
   @Field(() => Int)
   @IsNumber()
   id: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  vnum: number;
 
   @Field()
   @IsString()

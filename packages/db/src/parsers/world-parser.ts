@@ -8,17 +8,18 @@ import type {
   ShopJson,
   TriggerJson,
   ParseResult,
-  ValidationError
+  ValidationError,
 } from '@muditor/types';
+import { ResetMode, Hemisphere, Climate } from '@muditor/types';
 
 // ============================================================================
 // Zod Schemas for Validation
 // ============================================================================
 
 // Enum validations
-const resetModeSchema = z.enum(['Never', 'Empty', 'Normal']);
-const hemisphereSchema = z.enum(['NORTHWEST', 'NORTHEAST', 'SOUTHWEST', 'SOUTHEAST']);
-const climateSchema = z.enum(['NONE', 'SEMIARID', 'ARID', 'OCEANIC', 'TEMPERATE', 'SUBTROPICAL', 'TROPICAL', 'SUBARCTIC', 'ARCTIC', 'ALPINE']);
+const resetModeSchema = z.nativeEnum(ResetMode);
+const hemisphereSchema = z.nativeEnum(Hemisphere);
+const climateSchema = z.nativeEnum(Climate);
 
 // Utility schemas
 const diceExpressionSchema = z.object({
@@ -140,7 +141,9 @@ const objectSchema = z.object({
   ground: z.string().optional(), // legacy field name for description
   action_description: z.string().optional(),
   action_desc: z.string().optional(), // legacy field name
-  extra_descriptions: z.union([z.array(extraDescriptionSchema), z.record(z.string())]).optional(),
+  extra_descriptions: z
+    .union([z.array(extraDescriptionSchema), z.record(z.string())])
+    .optional(),
   values: z.record(z.union([z.string(), z.number(), z.boolean()])).optional(),
   flags: z.array(z.string()).optional(),
   weight: z.union([z.string(), z.number()]),
@@ -240,35 +243,39 @@ export class WorldParser {
    */
   static parseWorldFile(jsonContent: string | object): ParseResult<WorldFile> {
     try {
-      const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
-      
+      const data =
+        typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+
       const result = worldFileSchema.safeParse(data);
-      
+
       if (result.success) {
         return {
           success: true,
-          data: result.data,
-          errors: []
+          data: result.data as any, // Type assertion to bypass complex enum issues
+          errors: [],
         };
       } else {
         const errors: ValidationError[] = result.error.errors.map(err => ({
           path: err.path.join('.'),
           message: err.message,
-          value: err.code === 'invalid_type' ? err.received : undefined
+          value: err.code === 'invalid_type' ? err.received : undefined,
         }));
-        
+
         return {
           success: false,
-          errors
+          errors,
         };
       }
     } catch (error) {
       return {
         success: false,
-        errors: [{
-          path: 'root',
-          message: error instanceof Error ? error.message : 'Unknown parsing error'
-        }]
+        errors: [
+          {
+            path: 'root',
+            message:
+              error instanceof Error ? error.message : 'Unknown parsing error',
+          },
+        ],
       };
     }
   }
@@ -278,25 +285,25 @@ export class WorldParser {
    */
   static normalizeMob(mob: MobJson): MobJson {
     const normalized = { ...mob };
-    
+
     // Normalize keywords field
     if (!normalized.keywords && normalized.name_list) {
       normalized.keywords = normalized.name_list;
     }
-    
+
     // Normalize description fields
     if (!normalized.short_desc && normalized.short_description) {
       normalized.short_desc = normalized.short_description;
     }
-    
+
     if (!normalized.long_desc && normalized.long_description) {
       normalized.long_desc = normalized.long_description;
     }
-    
+
     if (!normalized.desc && normalized.description) {
       normalized.desc = normalized.description;
     }
-    
+
     return normalized;
   }
 
@@ -305,41 +312,47 @@ export class WorldParser {
    */
   static normalizeObject(object: ObjectJson): ObjectJson {
     const normalized = { ...object };
-    
+
     // Normalize keywords field (convert array to string if needed)
     if (!normalized.keywords && normalized.name_list) {
-      normalized.keywords = Array.isArray(normalized.name_list) 
-        ? normalized.name_list.join(' ') 
+      normalized.keywords = Array.isArray(normalized.name_list)
+        ? normalized.name_list.join(' ')
         : normalized.name_list;
     } else if (Array.isArray(normalized.keywords)) {
       normalized.keywords = normalized.keywords.join(' ');
     }
-    
+
     // Normalize description fields
     if (!normalized.short_desc && normalized.short_description) {
       normalized.short_desc = normalized.short_description;
-    } else if (!normalized.short_desc && normalized.short) {
-      normalized.short_desc = normalized.short;
+    } else if (!normalized.short_desc && (normalized as any).short) {
+      normalized.short_desc = (normalized as any).short;
     }
-    
+
     // Normalize main description field
-    if (!normalized.description && normalized.ground) {
-      normalized.description = normalized.ground;
+    if (!normalized.description && (normalized as any).ground) {
+      normalized.description = (normalized as any).ground;
     }
-    
+
     // Normalize action description field
-    if (!normalized.action_description && normalized.action_desc) {
-      normalized.action_description = normalized.action_desc;
+    if (!normalized.action_description && (normalized as any).action_desc) {
+      normalized.action_description = (normalized as any).action_desc;
     }
-    
+
     // Convert extra_descriptions from object to array format if needed
-    if (normalized.extra_descriptions && typeof normalized.extra_descriptions === 'object' && !Array.isArray(normalized.extra_descriptions)) {
-      normalized.extra_descriptions = Object.entries(normalized.extra_descriptions).map(([keyword, desc]) => ({
+    if (
+      normalized.extra_descriptions &&
+      typeof normalized.extra_descriptions === 'object' &&
+      !Array.isArray(normalized.extra_descriptions)
+    ) {
+      normalized.extra_descriptions = Object.entries(
+        normalized.extra_descriptions
+      ).map(([keyword, desc]) => ({
         keyword,
-        desc: desc as string
+        desc: desc as string,
       }));
     }
-    
+
     // Ensure required arrays exist with defaults
     if (!normalized.flags) normalized.flags = [];
     if (!normalized.effect_flags) normalized.effect_flags = [];
@@ -349,10 +362,10 @@ export class WorldParser {
     if (!normalized.triggers) normalized.triggers = [];
     if (!normalized.effects) normalized.effects = [];
     if (!normalized.values) normalized.values = {};
-    
+
     // Set default concealment if missing
     if (normalized.concealment === undefined) normalized.concealment = 0;
-    
+
     return normalized;
   }
 
@@ -367,25 +380,31 @@ export class WorldParser {
   /**
    * Parse and normalize a complete world file with lenient validation
    */
-  static parseAndNormalize(jsonContent: string | object): ParseResult<WorldFile> {
+  static parseAndNormalize(
+    jsonContent: string | object
+  ): ParseResult<WorldFile> {
     try {
-      const data = typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
-      
+      const data =
+        typeof jsonContent === 'string' ? JSON.parse(jsonContent) : jsonContent;
+
       // Instead of strict validation, create a lenient normalized structure
       const normalized: WorldFile = this.createNormalizedWorldFile(data);
-      
+
       return {
         success: true,
         data: normalized,
-        errors: []
+        errors: [],
       };
     } catch (error) {
       return {
         success: false,
-        errors: [{
-          path: 'root',
-          message: error instanceof Error ? error.message : 'Unknown parsing error'
-        }]
+        errors: [
+          {
+            path: 'root',
+            message:
+              error instanceof Error ? error.message : 'Unknown parsing error',
+          },
+        ],
       };
     }
   }
@@ -403,28 +422,32 @@ export class WorldParser {
       reset_mode: data.zone?.reset_mode || 'Normal',
       hemisphere: data.zone?.hemisphere || 'NORTHWEST',
       climate: data.zone?.climate || 'NONE',
-      resets: data.zone?.resets || {}
+      resets: data.zone?.resets || {},
     };
 
     // Normalize mobs with error handling
-    const mobs = (data.mobs || []).map((mob: any) => {
-      try {
-        return this.normalizeMob(mob);
-      } catch (error) {
-        console.warn(`Failed to normalize mob ${mob?.id}:`, error);
-        return null;
-      }
-    }).filter(Boolean);
+    const mobs = (data.mobs || [])
+      .map((mob: any) => {
+        try {
+          return this.normalizeMob(mob);
+        } catch (error) {
+          console.warn(`Failed to normalize mob ${mob?.id}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     // Normalize objects with error handling
-    const objects = (data.objects || []).map((obj: any) => {
-      try {
-        return this.normalizeObject(obj);
-      } catch (error) {
-        console.warn(`Failed to normalize object ${obj?.id}:`, error);
-        return null;
-      }
-    }).filter(Boolean);
+    const objects = (data.objects || [])
+      .map((obj: any) => {
+        try {
+          return this.normalizeObject(obj);
+        } catch (error) {
+          console.warn(`Failed to normalize object ${obj?.id}:`, error);
+          return null;
+        }
+      })
+      .filter(Boolean);
 
     // Normalize rooms
     const rooms = (data.rooms || []).map((room: any) => ({
@@ -434,7 +457,7 @@ export class WorldParser {
       sector: room.sector || 'INSIDE',
       flags: room.flags || [],
       exits: room.exits || {},
-      extra_descriptions: room.extra_descriptions || {}
+      extra_descriptions: room.extra_descriptions || {},
     }));
 
     // Normalize shops
@@ -456,7 +479,7 @@ export class WorldParser {
       keeper: Number(shop.keeper || 0),
       trades_with: shop.trades_with || [],
       rooms: shop.rooms || [],
-      hours: shop.hours || []
+      hours: shop.hours || [],
     }));
 
     // Normalize triggers
@@ -467,7 +490,7 @@ export class WorldParser {
       flags: trigger.flags || [],
       number_of_arguments: String(trigger.number_of_arguments || '0'),
       argument_list: trigger.argument_list || '',
-      commands: trigger.commands || ''
+      commands: trigger.commands || '',
     }));
 
     const normalized: WorldFile = {
@@ -476,9 +499,9 @@ export class WorldParser {
       objects,
       rooms,
       shops,
-      triggers
+      triggers,
     };
-    
+
     return normalized;
   }
 
@@ -487,23 +510,23 @@ export class WorldParser {
    */
   static validateZone(zone: any): ParseResult<ZoneJson> {
     const result = zoneSchema.safeParse(zone);
-    
+
     if (result.success) {
       return {
         success: true,
-        data: result.data,
-        errors: []
+        data: result.data as any, // Type assertion for enum compatibility
+        errors: [],
       };
     } else {
       const errors: ValidationError[] = result.error.errors.map(err => ({
         path: err.path.join('.'),
         message: err.message,
-        value: err.code === 'invalid_type' ? err.received : undefined
+        value: err.code === 'invalid_type' ? err.received : undefined,
       }));
-      
+
       return {
         success: false,
-        errors
+        errors,
       };
     }
   }
@@ -511,13 +534,17 @@ export class WorldParser {
   /**
    * Extract zone ID ranges for validation
    */
-  static getZoneRanges(worldFile: WorldFile): { rooms: number[], mobs: number[], objects: number[] } {
+  static getZoneRanges(worldFile: WorldFile): {
+    rooms: number[];
+    mobs: number[];
+    objects: number[];
+  } {
     const ranges = {
       rooms: worldFile.rooms.map(room => parseInt(room.id, 10)),
       mobs: worldFile.mobs.map(mob => mob.id),
-      objects: worldFile.objects.map(obj => parseInt(obj.id, 10))
+      objects: worldFile.objects.map(obj => parseInt(obj.id, 10)),
     };
-    
+
     return ranges;
   }
 
@@ -529,21 +556,21 @@ export class WorldParser {
     const ranges = this.getZoneRanges(worldFile);
     const zoneTop = worldFile.zone.top;
     const zoneId = parseInt(worldFile.zone.id, 10);
-    
+
     // Check if all rooms are within zone range
     const minRoomId = zoneId === 0 ? 0 : zoneId * 100; // Zone 0 is special case
     const maxRoomId = zoneTop;
-    
+
     ranges.rooms.forEach(roomId => {
       if (roomId < minRoomId || roomId > maxRoomId) {
         errors.push({
           path: `rooms[${roomId}]`,
           message: `Room ID ${roomId} is outside zone range ${minRoomId}-${maxRoomId}`,
-          value: roomId
+          value: roomId,
         });
       }
     });
-    
+
     // Check for room exit destinations that don't exist
     worldFile.rooms.forEach((room, index) => {
       Object.entries(room.exits || {}).forEach(([direction, exit]) => {
@@ -554,24 +581,24 @@ export class WorldParser {
             errors.push({
               path: `rooms[${index}].exits.${direction}.destination`,
               message: `Exit destination ${destId} does not exist in this zone`,
-              value: destId
+              value: destId,
             });
           }
         }
       });
     });
-    
+
     // Check mob resets reference valid rooms
     worldFile.zone.resets.mob?.forEach((reset, index) => {
       if (!ranges.rooms.includes(reset.room)) {
         errors.push({
           path: `zone.resets.mob[${index}].room`,
           message: `Mob reset references non-existent room ${reset.room}`,
-          value: reset.room
+          value: reset.room,
         });
       }
     });
-    
+
     return errors;
   }
 }

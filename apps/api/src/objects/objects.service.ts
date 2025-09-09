@@ -127,4 +127,11 @@ export class ObjectsService {
       where: { id },
     });
   }
+
+  async deleteMany(ids: number[]): Promise<number> {
+    const result = await this.database.object.deleteMany({
+      where: { id: { in: ids } },
+    });
+    return result.count;
+  }
 }

@@ -2,9 +2,173 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type AdminUser {
+  id: ID!
+  role: UserRole!
+  username: String!
+}
+
+input AttachTriggerInput {
+  attachType: ScriptType!
+  mobId: Int
+  objectId: Int
+  triggerId: String!
+  zoneId: Int
+}
+
 type AuthPayload {
   accessToken: String!
   user: User!
+}
+
+type BanRecord {
+  active: Boolean!
+
+  """The admin who issued the ban"""
+  admin: AdminUser
+  bannedAt: DateTime!
+  bannedBy: ID!
+  expiresAt: DateTime
+  id: ID!
+  reason: String!
+  unbannedAt: DateTime
+  unbannedBy: ID
+
+  """The admin who lifted the ban"""
+  unbanner: AdminUser
+  userId: ID!
+}
+
+input BanUserInput {
+  """ISO string for ban expiration. If not provided, ban is permanent"""
+  expiresAt: String
+  reason: String!
+  userId: ID!
+}
+
+input ChangePasswordInput {
+  currentPassword: String!
+  newPassword: String!
+}
+
+type CharacterDto {
+  alignment: Int!
+  armorClass: Int!
+  bankCopper: Int!
+  bankGold: Int!
+  bankPlatinum: Int!
+  bankSilver: Int!
+  baseSize: Int!
+  birthTime: DateTime!
+  charisma: Int!
+  classId: Int
+  constitution: Int!
+  copper: Int!
+  createdAt: DateTime!
+  currentRoom: Int
+  currentSize: Int!
+  damageRoll: Int!
+  description: String
+  dexterity: Int!
+  effectFlags: [String!]!
+  effects: [CharacterEffectDto!]!
+  experience: Int!
+  gender: String!
+  gold: Int!
+  height: Int
+  hitPoints: Int!
+  hitPointsMax: Int!
+  hitRoll: Int!
+  homeRoom: Int
+  hunger: Int!
+  id: ID!
+  intelligence: Int!
+  invisLevel: Int!
+  isOnline: Boolean!
+  items: [CharacterItemDto!]!
+  lastLogin: DateTime
+  level: Int!
+  luck: Int!
+  movement: Int!
+  movementMax: Int!
+  name: String!
+  olcZones: [Int!]!
+  pageLength: Int!
+  platinum: Int!
+  playerClass: String
+  playerFlags: [String!]!
+  privilegeFlags: [String!]!
+  prompt: String!
+  raceId: Int!
+  raceType: String
+  saveRoom: Int
+  silver: Int!
+  skillPoints: Int!
+  strength: Int!
+  thirst: Int!
+  timePlayed: Int!
+  title: String
+  updatedAt: DateTime!
+  userId: String!
+  weight: Int
+  wisdom: Int!
+}
+
+type CharacterEffectDto {
+  appliedAt: DateTime!
+  character: CharacterDto!
+  characterId: String!
+  duration: Int
+  effectName: String!
+  effectType: String
+  expiresAt: DateTime
+  id: ID!
+  modifierData: JSON!
+  sourceId: Int
+  sourceType: String
+  strength: Int!
+}
+
+type CharacterItemDto {
+  character: CharacterDto!
+  characterId: String!
+  charges: Int!
+  condition: Int!
+  containedItems: [CharacterItemDto!]!
+  container: CharacterItemDto
+  containerId: String
+  createdAt: DateTime!
+  customLongDesc: String
+  customShortDesc: String
+  customValues: JSON!
+  equippedLocation: String
+  id: ID!
+  instanceFlags: [String!]!
+  objectPrototype: ObjectSummaryDto!
+  objectPrototypeId: Int!
+  updatedAt: DateTime!
+}
+
+type CharacterLinkingInfoDto {
+  class: String
+  hasPassword: Boolean!
+  id: ID!
+  isLinked: Boolean!
+  isOnline: Boolean!
+  lastLogin: DateTime
+  level: Int!
+  name: String!
+  race: String
+  timePlayed: Int!
+}
+
+type CharacterSessionInfoDto {
+  currentSessionTime: Int!
+  id: ID!
+  isOnline: Boolean!
+  lastLogin: DateTime
+  name: String!
+  totalTimePlayed: Int!
 }
 
 enum Climate {
@@ -34,6 +198,60 @@ enum Composition {
   PLANT
   STONE
   WATER
+}
+
+input CreateCharacterEffectInput {
+  characterId: String!
+  duration: Int
+  effectName: String!
+  effectType: String
+  sourceId: Int
+  sourceType: String
+  strength: Int! = 1
+}
+
+input CreateCharacterInput {
+  alignment: Int! = 0
+  charisma: Int! = 13
+  constitution: Int! = 13
+  description: String
+  dexterity: Int! = 13
+  gender: String! = "neutral"
+  intelligence: Int! = 13
+  level: Int! = 1
+  luck: Int! = 13
+  name: String!
+  playerClass: String
+  raceId: Int! = 1
+  raceType: String! = "human"
+  strength: Int! = 13
+  title: String
+  wisdom: Int! = 13
+}
+
+input CreateCharacterItemInput {
+  characterId: String!
+  charges: Int! = -1
+  condition: Int! = 100
+  containerId: String
+  customLongDesc: String
+  customShortDesc: String
+  equippedLocation: String
+  instanceFlags: [String!]! = []
+  objectPrototypeId: Int!
+}
+
+input CreateMobCarryingInput {
+  max: Int! = 1
+  name: String
+  objectId: Int!
+}
+
+input CreateMobEquippedInput {
+  location: String!
+  max: Int! = 1
+  name: String
+  objectId: Int!
 }
 
 input CreateMobInput {
@@ -77,7 +295,18 @@ input CreateMobInput {
   size: Size! = MEDIUM
   stance: Stance! = ALERT
   strength: Int! = 13
+  vnum: Int!
   wisdom: Int! = 13
+  zoneId: Int!
+}
+
+input CreateMobResetInput {
+  carrying: [CreateMobCarryingInput!]! = []
+  equipped: [CreateMobEquippedInput!]! = []
+  max: Int! = 1
+  mobId: Int!
+  name: String
+  roomId: Int!
   zoneId: Int!
 }
 
@@ -96,6 +325,7 @@ input CreateObjectInput {
   timer: Int! = 0
   type: ObjectType! = NOTHING
   values: JSON
+  vnum: Int!
   wearFlags: [WearFlag!]! = []
   weight: Float! = 0
   zoneId: Int!
@@ -116,6 +346,7 @@ input CreateRoomInput {
   id: Int!
   name: String!
   sector: Sector! = STRUCTURE
+  vnum: Int!
   zoneId: Int!
 }
 
@@ -134,7 +365,21 @@ input CreateShopInput {
   sellProfit: Float! = 1
   temper1: Int! = 0
   tradesWithFlags: [ShopTradesWith!]! = []
+  vnum: Int!
   zoneId: Int!
+}
+
+input CreateTriggerInput {
+  argList: String
+  attachType: ScriptType!
+  commands: String!
+  flags: [TriggerFlag!]! = []
+  mobId: Int
+  name: String!
+  numArgs: Int! = 0
+  objectId: Int
+  variables: String! = "{}"
+  zoneId: Int
 }
 
 input CreateZoneInput {
@@ -189,11 +434,16 @@ enum EffectFlag {
   ANGELIC_AURA
   ANIMAL_KIN
   ASH_EYES
+  AWARE
   BARKSKIN
+  BLESS
   BLIND
+  BLUR
   BURNING_HANDS
   CALM
+  CAMOUFLAGED
   CHARM
+  COLDSHIELD
   COMPREHEND_LANG
   CONFUSION
   COSMIC_TRAVEL
@@ -204,13 +454,17 @@ enum EffectFlag {
   DETECT_ALIGN
   DETECT_INVIS
   DETECT_MAGIC
+  DETECT_POISON
   DILATE_PUPILS
   DISEASE
+  DISPLACEMENT
   DRAGON_RIDE
   EARTHMAW
   ENTANGLE
   ETHEREAL
   FAERIE_FIRE
+  FAMILIARITY
+  FARSEE
   FEBLEMIND
   FIRESHIELD
   FIRESTORM
@@ -218,19 +472,29 @@ enum EffectFlag {
   FLOOD
   FLUORESCENCE
   FLYING
+  GLORY
   GROUP
+  HARNESS
   HASTE
   HIDE
   INFRAVISION
+  INSANITY
   INVISIBLE
   INVISIBLE_STALKER
+  LIGHT
   MAGICONLY
+  MAJOR_GLOBE
   MAJOR_PARALYSIS
   MENTAL_BARRIER
+  MESMERIZED
   METEOR
   MINOR_PARALYSIS
   MIST_WALK
   MOON_BEAM
+  NEGATE_AIR
+  NEGATE_COLD
+  NEGATE_EARTH
+  NEGATE_HEAT
   NEXTNOATTACK
   NEXTPARTIAL
   NO_TRACK
@@ -239,6 +503,11 @@ enum EffectFlag {
   POISON
   PROTECT_EVIL
   PROTECT_GOOD
+  PROT_AIR
+  PROT_COLD
+  PROT_EARTH
+  PROT_FIRE
+  REMOTE_AGGR
   RESTLESS
   SANCTUARY
   SCOURGE
@@ -248,10 +517,16 @@ enum EffectFlag {
   SLEEP
   SLOW
   SNEAK
+  SOULSHIELD
   SPELL_TURNING
+  STEALTH
+  STONE_SKIN
   SUN_RAY
+  TAMED
   TORNADO
+  ULTRAVISION
   ULTRA_DAMAGE
+  UNUSED
   VAMPIRIC_DRAIN
   VITALITY
   WATERBREATH
@@ -287,9 +562,24 @@ enum LifeForce {
   UNDEAD
 }
 
+input LinkCharacterInput {
+  characterName: String!
+  characterPassword: String!
+}
+
 input LoginInput {
   identifier: String!
   password: String!
+}
+
+type MobCarryingDto {
+  id: ID!
+  max: Int!
+  name: String
+
+  """The object being carried"""
+  object: ObjectSummaryDto!
+  objectId: Int!
 }
 
 type MobDto {
@@ -339,19 +629,34 @@ type MobDto {
   zoneId: Int!
 }
 
+type MobEquippedDto {
+  id: ID!
+  location: String!
+  max: Int!
+  name: String
+
+  """The object being equipped"""
+  object: ObjectSummaryDto!
+  objectId: Int!
+}
+
 enum MobFlag {
   AGGRESSIVE
   AGGRO_EVIL
   AGGRO_GOOD
   AGGRO_NEUTRAL
   ANTI_PALADIN
+  AQUATIC
   ASSASSIN
   AWARE
   BERSERKER
+  BLUR
   CLERIC
   CONJURER
   DIABOLIST
   DRUID
+  FAST_TRACK
+  HASTE
   HATES_SUN
   HELPER
   ILLUSION
@@ -360,49 +665,113 @@ enum MobFlag {
   MERCENARY
   MONK
   MOUNT
+  MOUNTABLE
   NECROMANCER
+  NOPOISON
+  NOSILENCE
+  NOVICIOUS
   NO_BASH
   NO_BLIND
   NO_CHARM
+  NO_CLASS_AI
+  NO_EQ_RESTRICT
   NO_KILL
   NO_SLEEP
   NO_SUMMOM
   PALADIN
+  PEACEFUL
+  PEACEKEEPER
   POISON_BITE
+  PROTECTOR
   RANGER
   SCAVENGER
   SENTINEL
   SHAMAN
+  SLOW_TRACK
   SORCERER
   SPEC
   STAY_SECT
   STAY_ZONE
+  SUMMONED_MOUNT
+  TEACHER
   THIEF
   TRACK
   WARRIOR
   WIMPY
 }
 
+type MobResetDto {
+  carrying: [MobCarryingDto!]!
+  equipped: [MobEquippedDto!]!
+  id: ID!
+  max: Int!
+  mobId: Int!
+  name: String
+  roomId: Int!
+  zoneId: Int!
+}
+
 type Mutation {
+  attachTrigger(input: AttachTriggerInput!): TriggerDto!
+  banUser(input: BanUserInput!): BanRecord!
+  changePassword(input: ChangePasswordInput!): PasswordResetResponse!
+  createCharacter(data: CreateCharacterInput!): CharacterDto!
+  createCharacterEffect(data: CreateCharacterEffectInput!): CharacterEffectDto!
+  createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createMob(data: CreateMobInput!): MobDto!
+  createMobReset(data: CreateMobResetInput!): MobResetDto!
   createObject(data: CreateObjectInput!): ObjectDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
   createShop(data: CreateShopInput!): ShopDto!
+  createTrigger(input: CreateTriggerInput!): TriggerDto!
   createZone(data: CreateZoneInput!): ZoneDto!
+  deleteCharacter(id: ID!): CharacterDto!
+  deleteCharacterEffect(id: ID!): Boolean!
+  deleteCharacterItem(id: ID!): Boolean!
   deleteMob(id: Int!): MobDto!
+  deleteMobCarrying(id: ID!): Boolean!
+  deleteMobEquipped(id: ID!): Boolean!
+  deleteMobReset(id: ID!): Boolean!
+  deleteMobs(ids: [Int!]!): Int!
   deleteObject(id: Int!): ObjectDto!
+  deleteObjects(ids: [Int!]!): Int!
   deleteRoom(id: Int!): RoomDto!
   deleteRoomExit(exitId: String!): RoomExitDto!
   deleteShop(id: Int!): ShopDto!
+  deleteTrigger(id: String!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
+  detachTrigger(triggerId: String!): TriggerDto!
+
+  """Link an existing game character to your user account"""
+  linkCharacter(data: LinkCharacterInput!): CharacterDto!
   login(input: LoginInput!): AuthPayload!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
+
+  """Remove expired effects for a character or all characters"""
+  removeExpiredEffects(characterId: ID): Int!
+  requestPasswordReset(input: RequestPasswordResetInput!): PasswordResetResponse!
+  resetPassword(input: ResetPasswordInput!): PasswordResetResponse!
+  setCharacterOffline(characterId: ID!): Boolean!
+  setCharacterOnline(characterId: ID!): Boolean!
+  unbanUser(input: UnbanUserInput!): BanRecord!
+
+  """Unlink a character from your user account"""
+  unlinkCharacter(data: UnlinkCharacterInput!): Boolean!
+  updateCharacter(data: UpdateCharacterInput!, id: ID!): CharacterDto!
+  updateCharacterActivity(characterId: ID!): Boolean!
+  updateCharacterEffect(data: UpdateCharacterEffectInput!, id: ID!): CharacterEffectDto!
+  updateCharacterItem(data: UpdateCharacterItemInput!, id: ID!): CharacterItemDto!
   updateMob(data: UpdateMobInput!, id: Int!): MobDto!
+  updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateObject(data: UpdateObjectInput!, id: Int!): ObjectDto!
+  updateProfile(input: UpdateProfileInput!): User!
   updateRoom(data: UpdateRoomInput!, id: Int!): RoomDto!
+  updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!): ShopDto!
+  updateTrigger(id: String!, input: UpdateTriggerInput!): TriggerDto!
+  updateUser(input: UpdateUserInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
 }
 
@@ -484,6 +853,12 @@ enum ObjectFlag {
   WAS_DISARMED
 }
 
+type ObjectSummaryDto {
+  id: Int!
+  shortDesc: String!
+  type: String!
+}
+
 enum ObjectType {
   ARMOR
   BOARD
@@ -518,6 +893,22 @@ enum ObjectType {
   WORN
 }
 
+type OnlineCharacterDto {
+  id: ID!
+  isOnline: Boolean!
+  lastLogin: DateTime
+  level: Int!
+  name: String!
+  playerClass: String
+  raceType: String
+  user: UserSummaryDto!
+}
+
+type PasswordResetResponse {
+  message: String!
+  success: Boolean!
+}
+
 enum Position {
   FLYING
   KNEELING
@@ -527,16 +918,36 @@ enum Position {
 }
 
 type Query {
+  activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
+  banHistory(userId: ID!): [BanRecord!]!
+  character(id: ID!): CharacterDto!
+  characterEffect(id: ID!): CharacterEffectDto!
+  characterEffects(characterId: ID!): [CharacterEffectDto!]!
+  characterItem(id: ID!): CharacterItemDto!
+  characterItems(characterId: ID!): [CharacterItemDto!]!
+  characterLinkingInfo(characterName: String!): CharacterLinkingInfoDto!
+  characterSessionInfo(characterId: ID!): CharacterSessionInfoDto!
+  characters(skip: Int, take: Int): [CharacterDto!]!
+  charactersCount: Int!
+
+  """Get validation summary statistics"""
+  getValidationSummary: ValidationSummaryType!
   me: User!
   mob(id: Int!): MobDto!
+  mobReset(id: ID!): MobResetDto
+  mobResets(mobId: Int!): [MobResetDto!]!
   mobs(skip: Int, take: Int): [MobDto!]!
   mobsByZone(zoneId: Int!): [MobDto!]!
   mobsCount: Int!
+  myCharacters: [CharacterDto!]!
+  myOnlineCharacters: [OnlineCharacterDto!]!
+  myPermissions: UserPermissions!
   object(id: Int!): ObjectDto!
   objects(skip: Int, take: Int): [ObjectDto!]!
   objectsByType(type: String!): [ObjectDto!]!
   objectsByZone(zoneId: Int!): [ObjectDto!]!
   objectsCount: Int!
+  onlineCharacters(userId: ID): [OnlineCharacterDto!]!
   room(id: Int!): RoomDto!
   rooms(skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(zoneId: Int!): [RoomDto!]!
@@ -546,8 +957,19 @@ type Query {
   shops(skip: Int, take: Int): [ShopDto!]!
   shopsByZone(zoneId: Int!): [ShopDto!]!
   shopsCount: Int!
+  trigger(id: String!): TriggerDto!
+  triggers: [TriggerDto!]!
+  triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
   user(id: ID!): User!
+  userPermissions(userId: ID!): UserPermissions!
   users: [User!]!
+
+  """Get validation reports for all zones"""
+  validateAllZones: [ValidationReportType!]!
+  validateCharacterPassword(characterName: String!, password: String!): Boolean!
+
+  """Get validation report for a specific zone"""
+  validateZone(zoneId: Int!): ValidationReportType!
   zone(id: Int!): ZoneDto!
   zones(skip: Int, take: Int): [ZoneDto!]!
   zonesCount: Int!
@@ -598,10 +1020,19 @@ input RegisterInput {
   username: String!
 }
 
+input RequestPasswordResetInput {
+  email: String!
+}
+
 enum ResetMode {
   EMPTY
   NEVER
   NORMAL
+}
+
+input ResetPasswordInput {
+  newPassword: String!
+  token: String!
 }
 
 type RoomDto {
@@ -612,6 +1043,9 @@ type RoomDto {
   extraDescs: [RoomExtraDescriptionDto!]!
   flags: [RoomFlag!]!
   id: Int!
+  layoutX: Int
+  layoutY: Int
+  layoutZ: Int
   name: String!
   sector: Sector!
   updatedAt: DateTime!
@@ -635,6 +1069,8 @@ type RoomExtraDescriptionDto {
 }
 
 enum RoomFlag {
+  ALT_EXIT
+  ALWAYSLIT
   ARENA
   ATRIUM
   BFS_MARK
@@ -643,8 +1079,10 @@ enum RoomFlag {
   EFFECTS_NEXT
   FERRY_DEST
   GODROOM
+  GUILDHALL
   HOUSE
   HOUSECRASH
+  HOUSE_CRASH
   INDOORS
   ISOLATED
   LARGE
@@ -653,7 +1091,13 @@ enum RoomFlag {
   MEDIUM_SMALL
   NOMAGIC
   NOMOB
+  NORECALL
+  NOSCAN
+  NOSHIFT
+  NOSUMMON
   NOTRACK
+  NOWELL
+  OBSERVATORY
   OLC
   ONE_PERSON
   PEACEFUL
@@ -661,8 +1105,15 @@ enum RoomFlag {
   SMALL
   SOUNDPROOF
   TUNNEL
+  UNDERDARK
   VERY_SMALL
   WORLDMAP
+}
+
+enum ScriptType {
+  MOB
+  OBJECT
+  WORLD
 }
 
 enum Sector {
@@ -713,13 +1164,21 @@ type ShopDto {
 
 enum ShopFlag {
   USES_BANK
+  WILL_BANK_MONEY
   WILL_FIGHT
+  WILL_START_FIGHT
 }
 
 enum ShopTradesWith {
   ALIGNMENT
   CLASS
   RACE
+  TRADE_NOCLERIC
+  TRADE_NOEVIL
+  TRADE_NOGOOD
+  TRADE_NONEUTRAL
+  TRADE_NOTHIEF
+  TRADE_NOWARRIOR
 }
 
 enum Size {
@@ -744,6 +1203,120 @@ enum Stance {
   RESTING
   SLEEPING
   STUNNED
+}
+
+type TriggerDto {
+  argList: String
+  attachType: ScriptType!
+  commands: String!
+  createdAt: DateTime!
+  createdBy: String
+  flags: [TriggerFlag!]!
+  id: String!
+  mobId: Int
+  name: String!
+  numArgs: Int!
+  objectId: Int
+  updatedAt: DateTime!
+  updatedBy: String
+  variables: String!
+  zoneId: Int
+}
+
+enum TriggerFlag {
+  Act
+  Auto
+  Bribe
+  Cast
+  Command
+  Death
+  Door
+  Entry
+  Fight
+  Global
+  Greet
+  GreetAll
+  HitPrcnt
+  Leave
+  Load
+  Look
+  Memory
+  Random
+  Receive
+  Speech
+  SpeechTo
+  Time
+}
+
+input UnbanUserInput {
+  userId: ID!
+}
+
+input UnlinkCharacterInput {
+  characterId: ID!
+}
+
+input UpdateCharacterEffectInput {
+  duration: Int
+  strength: Int
+}
+
+input UpdateCharacterInput {
+  alignment: Int
+  charisma: Int
+  constitution: Int
+  currentRoom: Int
+  description: String
+  dexterity: Int
+  gender: String
+  height: Int
+  hitPoints: Int
+  hitPointsMax: Int
+  homeRoom: Int
+  intelligence: Int
+  invisLevel: Int
+  level: Int
+  luck: Int
+  movement: Int
+  movementMax: Int
+  name: String
+  olcZones: [Int!]
+  pageLength: Int
+  playerClass: String
+  playerFlags: [String!]
+  privilegeFlags: [String!]
+  prompt: String
+  raceType: String
+  saveRoom: Int
+  strength: Int
+  title: String
+  weight: Int
+  wisdom: Int
+}
+
+input UpdateCharacterItemInput {
+  charges: Int
+  condition: Int
+  containerId: String
+  customLongDesc: String
+  customShortDesc: String
+  equippedLocation: String
+  instanceFlags: [String!]
+}
+
+input UpdateMobCarryingInput {
+  id: ID
+  max: Int
+  name: String
+  objectId: Int
+}
+
+input UpdateMobEquippedInput {
+  id: ID
+  location: String
+  max: Int
+  name: String
+  objectId: Int
 }
 
 input UpdateMobInput {
@@ -790,6 +1363,14 @@ input UpdateMobInput {
   zoneId: Int
 }
 
+input UpdateMobResetInput {
+  carrying: [UpdateMobCarryingInput!]
+  equipped: [UpdateMobEquippedInput!]
+  max: Int
+  name: String
+  roomId: Int
+}
+
 input UpdateObjectInput {
   actionDesc: String
   concealment: Int
@@ -809,11 +1390,24 @@ input UpdateObjectInput {
   zoneId: Int
 }
 
+input UpdateProfileInput {
+  email: String
+}
+
 input UpdateRoomInput {
   description: String
   flags: [RoomFlag!]
+  layoutX: Int
+  layoutY: Int
+  layoutZ: Int
   name: String
   sector: Sector
+}
+
+input UpdateRoomPositionInput {
+  layoutX: Int
+  layoutY: Int
+  layoutZ: Int
 }
 
 input UpdateShopInput {
@@ -833,6 +1427,25 @@ input UpdateShopInput {
   zoneId: Int
 }
 
+input UpdateTriggerInput {
+  argList: String
+  attachType: ScriptType
+  commands: String
+  flags: [TriggerFlag!]
+  mobId: Int
+  name: String
+  numArgs: Int
+  objectId: Int
+  variables: String
+  zoneId: Int
+}
+
+input UpdateUserInput {
+  email: String
+  id: ID!
+  role: UserRole
+}
+
 input UpdateZoneInput {
   climate: Climate
   hemisphere: Hemisphere
@@ -843,22 +1456,109 @@ input UpdateZoneInput {
 }
 
 type User {
+  """Ban records for this user"""
+  banRecords: [BanRecord!]
   createdAt: DateTime!
   email: String!
-  godLevel: Float!
   id: ID!
+
+  """Whether the user is currently banned"""
+  isBanned: Boolean!
   lastLoginAt: DateTime
   role: UserRole!
   updatedAt: DateTime!
   username: String!
 }
 
+type UserPermissions {
+  canAccessDashboard: Boolean!
+  canManageUsers: Boolean!
+  canViewValidation: Boolean!
+  isBuilder: Boolean!
+  isCoder: Boolean!
+  isGod: Boolean!
+  isImmortal: Boolean!
+  isPlayer: Boolean!
+  maxCharacterLevel: Float!
+  role: UserRole!
+}
+
 """User role in the MUD system"""
 enum UserRole {
+  BUILDER
   CODER
   GOD
   IMMORTAL
   PLAYER
+}
+
+type UserSummaryDto {
+  id: ID!
+  role: String!
+  username: String!
+}
+
+"""The category of validation issue"""
+enum ValidationCategory {
+  CONSISTENCY
+  INTEGRITY
+  QUALITY
+}
+
+"""The type of entity being validated"""
+enum ValidationEntity {
+  MOB
+  OBJECT
+  ROOM
+  SHOP
+  ZONE
+}
+
+type ValidationIssue {
+  category: ValidationCategory!
+  description: String!
+  entity: ValidationEntity!
+  entityId: Int!
+  id: String!
+  severity: ValidationSeverity!
+  suggestion: String
+  title: String!
+  type: ValidationIssueType!
+}
+
+"""The type of validation issue"""
+enum ValidationIssueType {
+  ERROR
+  INFO
+  WARNING
+}
+
+type ValidationReportType {
+  errorCount: Int!
+  generatedAt: DateTime!
+  infoCount: Int!
+  issues: [ValidationIssue!]!
+  totalIssues: Int!
+  warningCount: Int!
+  zoneId: Int!
+  zoneName: String!
+}
+
+"""The severity level of the validation issue"""
+enum ValidationSeverity {
+  CRITICAL
+  HIGH
+  LOW
+  MEDIUM
+}
+
+type ValidationSummaryType {
+  errorCount: Int!
+  infoCount: Int!
+  totalIssues: Int!
+  totalZones: Int!
+  warningCount: Int!
+  zonesWithIssues: Int!
 }
 
 enum WearFlag {
@@ -902,6 +1602,14 @@ type ZoneDto {
   lifespan: Int!
   name: String!
   resetMode: ResetMode!
+  rooms: [ZoneRoomDto!]
   top: Int!
   updatedAt: DateTime!
+}
+
+type ZoneRoomDto {
+  description: String!
+  id: Int!
+  name: String!
+  sector: String!
 }

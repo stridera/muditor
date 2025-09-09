@@ -11,18 +11,22 @@ export class MobsResolver {
   @Query(() => [MobDto], { name: 'mobs' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<MobDto[]> {
     return this.mobsService.findAll({ skip, take });
   }
 
   @Query(() => MobDto, { name: 'mob' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<MobDto | null> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<MobDto | null> {
     return this.mobsService.findOne(id);
   }
 
   @Query(() => [MobDto], { name: 'mobsByZone' })
-  async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number): Promise<MobDto[]> {
+  async findByZone(
+    @Args('zoneId', { type: () => Int }) zoneId: number
+  ): Promise<MobDto[]> {
     return this.mobsService.findByZone(zoneId);
   }
 
@@ -38,8 +42,8 @@ export class MobsResolver {
     return this.mobsService.create({
       ...mobData,
       zone: {
-        connect: { id: zoneId }
-      }
+        connect: { id: zoneId },
+      },
     });
   }
 
@@ -47,14 +51,24 @@ export class MobsResolver {
   @UseGuards(JwtAuthGuard)
   async updateMob(
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateMobInput,
+    @Args('data') data: UpdateMobInput
   ): Promise<MobDto> {
     return this.mobsService.update(id, data);
   }
 
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
-  async deleteMob(@Args('id', { type: () => Int }) id: number): Promise<MobDto> {
+  async deleteMob(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<MobDto> {
     return this.mobsService.delete(id);
+  }
+
+  @Mutation(() => Int, { name: 'deleteMobs' })
+  @UseGuards(JwtAuthGuard)
+  async deleteMobs(
+    @Args('ids', { type: () => [Int] }) ids: number[]
+  ): Promise<number> {
+    return this.mobsService.deleteMany(ids);
   }
 }

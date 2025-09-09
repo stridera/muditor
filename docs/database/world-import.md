@@ -4,37 +4,43 @@ Comprehensive guide to importing legacy FieryMUD world data from JSON files into
 
 ## Overview
 
-The world data import system transforms 130+ legacy JSON zone files into normalized PostgreSQL database records. The import process handles data validation, enum conversion, relationship mapping, and error recovery.
+The world data import system transforms all 130 legacy JSON zone files into normalized PostgreSQL database records. The import process handles data validation, enum conversion, relationship mapping, and error recovery.
 
 ## Architecture
 
 ```
 JSON Files → WorldFileParser → Enum Mapping → Database Records
     ↓              ↓               ↓              ↓
-125+ files    Type conversion   Flag mapping   Relational data
+130 files    Type conversion   Flag mapping   Relational data
 ```
 
 ## Import Process Flow
 
 ### 1. File Discovery
+
 ```typescript
 // Scans world/ directory for JSON files
-const worldFiles = fs.readdirSync(worldDir)
+const worldFiles = fs
+  .readdirSync(worldDir)
   .filter(file => file.endsWith('.json'))
   .sort((a, b) => parseInt(a) - parseInt(b)); // Numeric sort
 ```
 
 ### 2. Zone ID Mapping
+
 Special handling for legacy Zone 0:
+
 ```typescript
 // Zone 0 → Zone 1000 (database constraints require non-zero IDs)
 const actualZoneId = zoneId === 0 ? 1000 : zoneId;
 ```
 
 ### 3. Data Parsing Order
+
 Critical order to maintain referential integrity:
+
 1. **Zone** - Parent container
-2. **Mobs** - NPC definitions  
+2. **Mobs** - NPC definitions
 3. **Objects** - Item definitions
 4. **Rooms** - Location definitions
 5. **Shops** - Commerce definitions
@@ -46,6 +52,7 @@ Critical order to maintain referential integrity:
 ## Data Transformation
 
 ### Zone Data
+
 ```json
 // Legacy JSON format
 {
@@ -75,19 +82,22 @@ const zoneData: Prisma.ZoneCreateInput = {
 ```
 
 ### Mob Data
+
 ```json
 // Legacy JSON format
 {
-  "mobs": [{
-    "id": 3100,
-    "name_list": "half-elven maid servant",
-    "short_desc": "a half-elven maid",
-    "mob_flags": ["SENTINEL", "ISNPC"],
-    "effect_flags": ["DETECT_INVIS"],
-    "race": 0,
-    "gender": 2,
-    "position": 3
-  }]
+  "mobs": [
+    {
+      "id": 3100,
+      "name_list": "half-elven maid servant",
+      "short_desc": "a half-elven maid",
+      "mob_flags": ["SENTINEL", "ISNPC"],
+      "effect_flags": ["DETECT_INVIS"],
+      "race": 0,
+      "gender": 2,
+      "position": 3
+    }
+  ]
 }
 ```
 
@@ -97,31 +107,34 @@ const mobData: Prisma.MobCreateInput = {
   id: mob.id,
   keywords: this.ensureString(mob.name_list),
   shortDesc: mob.short_desc,
-  mobFlags: this.mapMobFlags(mob.mob_flags),     // String[] → MobFlag[]
+  mobFlags: this.mapMobFlags(mob.mob_flags), // String[] → MobFlag[]
   effectFlags: this.mapEffectFlags(mob.effect_flags), // String[] → EffectFlag[]
-  race: this.mapRace(mob.race),                  // Int → Race enum
-  gender: this.mapGender(mob.gender),            // Int → Gender enum
-  position: this.mapPosition(mob.position),      // Int → Position enum
+  race: this.mapRace(mob.race), // Int → Race enum
+  gender: this.mapGender(mob.gender), // Int → Gender enum
+  position: this.mapPosition(mob.position), // Int → Position enum
   // ... other fields
 };
 ```
 
 ### Object Data
+
 ```json
 // Legacy JSON format
 {
-  "objects": [{
-    "id": "3000",
-    "type": "DRINKCON",
-    "flags": ["FLOAT"],
-    "effect_flags": [],
-    "wear_flags": ["TAKE", "HOLD"],
-    "values": {
-      "Capacity": "512",
-      "Remaining": "512", 
-      "Liquid": "BEER"
+  "objects": [
+    {
+      "id": "3000",
+      "type": "DRINKCON",
+      "flags": ["FLOAT"],
+      "effect_flags": [],
+      "wear_flags": ["TAKE", "HOLD"],
+      "values": {
+        "Capacity": "512",
+        "Remaining": "512",
+        "Liquid": "BEER"
+      }
     }
-  }]
+  ]
 }
 ```
 
@@ -139,22 +152,25 @@ const objectData: Prisma.ObjectCreateInput = {
 ```
 
 ### Room Data
+
 ```json
 // Legacy JSON format
 {
-  "rooms": [{
-    "id": "3001",
-    "name": "The Forest Temple of Mielikki",
-    "sector": "STRUCTURE",
-    "flags": ["NOMOB", "INDOORS"],
-    "exits": {
-      "North": {
-        "destination": "3002",
-        "keyword": "",
-        "key": "-1"
+  "rooms": [
+    {
+      "id": "3001",
+      "name": "The Forest Temple of Mielikki",
+      "sector": "STRUCTURE",
+      "flags": ["NOMOB", "INDOORS"],
+      "exits": {
+        "North": {
+          "destination": "3002",
+          "keyword": "",
+          "key": "-1"
+        }
       }
     }
-  }]
+  ]
 }
 ```
 
@@ -165,7 +181,7 @@ const roomData: Prisma.RoomCreateInput = {
   name: room.name,
   sector: this.mapSector(room.sector),
   flags: this.mapRoomFlags(room.flags),
-  zone: { connect: { id: zoneId } }
+  zone: { connect: { id: zoneId } },
 };
 
 // Separate exit creation
@@ -175,7 +191,7 @@ for (const [direction, exit] of Object.entries(room.exits)) {
       direction: this.mapDirection(direction),
       destination: exit.destination ? parseInt(exit.destination) : null,
       roomId: createdRoom.id,
-    }
+    },
   });
 }
 ```
@@ -185,6 +201,7 @@ for (const [direction, exit] of Object.entries(room.exits)) {
 ## Enum Mapping System
 
 ### Flag Array Processing
+
 ```typescript
 private ensureArray(value: any): string[] {
   if (Array.isArray(value)) {
@@ -198,6 +215,7 @@ private ensureArray(value: any): string[] {
 ```
 
 ### Mob Flags
+
 ```typescript
 private mapMobFlags(flags: any): MobFlag[] {
   const flagArray = this.ensureArray(flags);
@@ -215,13 +233,14 @@ private mapMobFlags(flags: any): MobFlag[] {
 ```
 
 ### Effect Flags
+
 ```typescript
 private mapEffectFlags(flags: any): EffectFlag[] {
   return flagArray.map(flag => {
     const upperFlag = flag.toUpperCase();
     // Handle both prefixed and non-prefixed formats
-    const normalizedFlag = upperFlag.startsWith('EFF_') 
-      ? upperFlag.substring(4) 
+    const normalizedFlag = upperFlag.startsWith('EFF_')
+      ? upperFlag.substring(4)
       : upperFlag;
     switch (normalizedFlag) {
       case 'INVISIBLE': return EffectFlag.INVISIBLE;
@@ -234,6 +253,7 @@ private mapEffectFlags(flags: any): EffectFlag[] {
 ```
 
 ### Attribute Mapping
+
 ```typescript
 private mapRace(race: any): Race {
   if (typeof race === 'number') {
@@ -256,21 +276,22 @@ private mapRace(race: any): Race {
 ## Relationship Management
 
 ### Mob Reset System
+
 ```json
 // Legacy format with inline equipment
 {
   "resets": {
-    "mob": [{
-      "id": 3100,
-      "max": 1,
-      "room": 3052,
-      "carrying": [
-        { "id": 3100, "max": 500, "name": "(a cup)" }
-      ],
-      "equipped": [
-        { "id": 3077, "max": 99, "location": "Head", "name": "(ribbon)" }
-      ]
-    }]
+    "mob": [
+      {
+        "id": 3100,
+        "max": 1,
+        "room": 3052,
+        "carrying": [{ "id": 3100, "max": 500, "name": "(a cup)" }],
+        "equipped": [
+          { "id": 3077, "max": 99, "location": "Head", "name": "(ribbon)" }
+        ]
+      }
+    ]
   }
 }
 ```
@@ -282,8 +303,8 @@ const mobReset = await this.prisma.mobReset.create({
     max: reset.max,
     mob: { connect: { id: reset.id } },
     room: { connect: { id: reset.room } },
-    zone: { connect: { id: zoneId } }
-  }
+    zone: { connect: { id: zoneId } },
+  },
 });
 
 // Separate carrying/equipment records
@@ -292,23 +313,26 @@ for (const item of reset.carrying) {
     data: {
       max: item.max,
       resetId: mobReset.id,
-      objectId: item.id
-    }
+      objectId: item.id,
+    },
   });
 }
 ```
 
 ### Shop System
+
 ```json
 // Legacy shop format
 {
-  "shops": [{
-    "id": 3000,
-    "keeper": 3000,
-    "selling": { "3001": 0 },
-    "trades_with": ["TRADES_WITH_ANYONE"],
-    "flags": ["WILL_BUY_SAME_ITEM"]
-  }]
+  "shops": [
+    {
+      "id": 3000,
+      "keeper": 3000,
+      "selling": { "3001": 0 },
+      "trades_with": ["TRADES_WITH_ANYONE"],
+      "flags": ["WILL_BUY_SAME_ITEM"]
+    }
+  ]
 }
 ```
 
@@ -319,8 +343,8 @@ const shop = await this.prisma.shop.create({
     id: shop.id,
     keeper: shop.keeper ? { connect: { id: shop.keeper } } : undefined,
     flags: this.mapShopFlags(shop.flags),
-    tradesWithFlags: this.mapShopTradesWithFlags(shop.trades_with)
-  }
+    tradesWithFlags: this.mapShopTradesWithFlags(shop.trades_with),
+  },
 });
 
 // Separate inventory items
@@ -329,8 +353,8 @@ for (const [objectId, amount] of Object.entries(shop.selling)) {
     data: {
       shopId: shop.id,
       objectId: parseInt(objectId),
-      amount: amount as number
-    }
+      amount: amount as number,
+    },
   });
 }
 ```
@@ -340,15 +364,15 @@ for (const [objectId, amount] of Object.entries(shop.selling)) {
 ## Error Handling
 
 ### Graceful Degradation
+
 ```typescript
 try {
   const worldData = JSON.parse(fs.readFileSync(filePath, 'utf-8'));
   const result = await parser.parseWorldFile(worldData, actualZoneId);
-  
+
   processedZones += result.zonesCreated;
   processedRooms += result.roomsCreated;
   // ... track all entity counts
-  
 } catch (error) {
   console.error(`❌ Error processing ${file}:`, error);
   // Continue with other files - don't fail entire import
@@ -356,6 +380,7 @@ try {
 ```
 
 ### Data Validation
+
 ```typescript
 private ensureString(value: any): string {
   if (Array.isArray(value)) {
@@ -369,11 +394,12 @@ private ensureString(value: any): string {
 ```
 
 ### Foreign Key Recovery
+
 ```typescript
 // Handle missing mob references
 if (shop.keeper) {
   shopData.keeper = {
-    connect: { id: shop.keeper }
+    connect: { id: shop.keeper },
   };
 }
 // If keeper doesn't exist, shop is created without one (SetNull constraint)
@@ -384,6 +410,7 @@ if (shop.keeper) {
 ## Performance Optimization
 
 ### Upsert Strategy
+
 ```typescript
 await this.prisma.mob.upsert({
   where: { id: mob.id },
@@ -393,6 +420,7 @@ await this.prisma.mob.upsert({
 ```
 
 ### Batch Processing
+
 ```typescript
 // Process all files in sequence to maintain referential integrity
 for (const file of worldFiles) {
@@ -401,6 +429,7 @@ for (const file of worldFiles) {
 ```
 
 ### Connection Management
+
 ```typescript
 // Single persistent connection throughout import
 const parser = new WorldFileParser(prisma);
@@ -411,12 +440,13 @@ const parser = new WorldFileParser(prisma);
 ## Data Statistics
 
 After successful import, the system reports:
-- **Zones**: 100+ world areas
-- **Rooms**: 10,000+ locations  
-- **Mobs**: 5,000+ NPCs
-- **Objects**: 8,000+ items
-- **Shops**: 500+ commerce locations
-- **Triggers**: 1,000+ scripts
+
+- **Zones**: 130 world areas (100% complete)
+- **Rooms**: 9,963 locations
+- **Mobs**: 2,070 NPCs
+- **Objects**: 3,472 items
+- **Shops**: 41 commerce locations
+- **Triggers**: 2,653 scripts
 
 ---
 
@@ -425,43 +455,52 @@ After successful import, the system reports:
 ### Common Issues
 
 **Foreign Key Violations**:
+
 ```
 No 'Mob' record(s) found for a nested connect on 'Shop' record(s)
 ```
+
 - **Cause**: Shop references non-existent keeper
 - **Solution**: Import mobs before shops, use conditional connections
 
 **Type Validation Errors**:
+
 ```
 Invalid value provided. Expected Race, provided String.
 ```
+
 - **Cause**: Enum mapping not applied
 - **Solution**: Ensure all parsers use enum mapping functions
 
 **Data Format Issues**:
+
 ```
 Argument `location`: Invalid value provided. Expected String, provided Int.
 ```
+
 - **Cause**: Legacy numeric values for string fields
 - **Solution**: Add type conversion in mapping functions
 
 ### Debugging Tools
 
 **Enable detailed logging**:
+
 ```typescript
 console.log(`🔄 Processing ${entity.name} (${entity.id})...`);
 ```
 
 **Validate enum mappings**:
+
 ```typescript
 const mappedFlags = this.mapMobFlags(mob.mob_flags);
 console.log(`Mapped ${mob.mob_flags} to ${mappedFlags}`);
 ```
 
 **Check foreign key existence**:
+
 ```typescript
-const existingMob = await this.prisma.mob.findUnique({ 
-  where: { id: shop.keeper } 
+const existingMob = await this.prisma.mob.findUnique({
+  where: { id: shop.keeper },
 });
 if (!existingMob) {
   console.warn(`Keeper ${shop.keeper} not found for shop ${shop.id}`);
@@ -473,16 +512,19 @@ if (!existingMob) {
 ## Future Enhancements
 
 ### Incremental Updates
+
 - Delta import for changed files only
 - Timestamp-based change detection
 - Selective entity updates
 
 ### Validation Improvements
+
 - Pre-import validation phase
 - Dependency graph analysis
 - Automatic reference resolution
 
 ### Performance Optimization
+
 - Parallel processing where safe
 - Bulk insert operations
 - Connection pooling

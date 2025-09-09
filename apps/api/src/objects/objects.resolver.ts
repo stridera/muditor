@@ -11,18 +11,22 @@ export class ObjectsResolver {
   @Query(() => [ObjectDto], { name: 'objects' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<ObjectDto[]> {
     return this.objectsService.findAll({ skip, take });
   }
 
   @Query(() => ObjectDto, { name: 'object' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<ObjectDto | null> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ObjectDto | null> {
     return this.objectsService.findOne(id);
   }
 
   @Query(() => [ObjectDto], { name: 'objectsByZone' })
-  async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number): Promise<ObjectDto[]> {
+  async findByZone(
+    @Args('zoneId', { type: () => Int }) zoneId: number
+  ): Promise<ObjectDto[]> {
     return this.objectsService.findByZone(zoneId);
   }
 
@@ -38,13 +42,15 @@ export class ObjectsResolver {
 
   @Mutation(() => ObjectDto)
   @UseGuards(JwtAuthGuard)
-  async createObject(@Args('data') data: CreateObjectInput): Promise<ObjectDto> {
+  async createObject(
+    @Args('data') data: CreateObjectInput
+  ): Promise<ObjectDto> {
     const { zoneId, ...objectData } = data;
     return this.objectsService.create({
       ...objectData,
       zone: {
-        connect: { id: zoneId }
-      }
+        connect: { id: zoneId },
+      },
     });
   }
 
@@ -52,14 +58,24 @@ export class ObjectsResolver {
   @UseGuards(JwtAuthGuard)
   async updateObject(
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateObjectInput,
+    @Args('data') data: UpdateObjectInput
   ): Promise<ObjectDto> {
     return this.objectsService.update(id, data);
   }
 
   @Mutation(() => ObjectDto)
   @UseGuards(JwtAuthGuard)
-  async deleteObject(@Args('id', { type: () => Int }) id: number): Promise<ObjectDto> {
+  async deleteObject(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ObjectDto> {
     return this.objectsService.delete(id);
+  }
+
+  @Mutation(() => Int, { name: 'deleteObjects' })
+  @UseGuards(JwtAuthGuard)
+  async deleteObjects(
+    @Args('ids', { type: () => [Int] }) ids: number[]
+  ): Promise<number> {
+    return this.objectsService.deleteMany(ids);
   }
 }
