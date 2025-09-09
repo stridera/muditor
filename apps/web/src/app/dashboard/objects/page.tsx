@@ -6,6 +6,7 @@ import { useQuery, useMutation } from '@apollo/client/react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useZone } from '@/contexts/zone-context';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import {
   Plus,
   Edit,
@@ -72,6 +73,14 @@ const DELETE_OBJECTS = gql`
 `;
 
 export default function ObjectsPage() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <ObjectsContent />
+    </PermissionGuard>
+  );
+}
+
+function ObjectsContent() {
   const searchParams = useSearchParams();
   const zoneParam = searchParams.get('zone');
   const { selectedZone, setSelectedZone } = useZone();

@@ -2,12 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Save, ArrowLeft, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import {
   useRealTimeValidation,
   ValidationHelpers,
@@ -196,7 +197,7 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
   },
 ];
 
-export default function ShopEditor() {
+function ShopEditorContent() {
   const searchParams = useSearchParams();
   const shopId = searchParams.get('id');
   const isNew = !shopId;
@@ -984,5 +985,15 @@ export default function ShopEditor() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ShopEditor() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <Suspense fallback={<div className='p-6'>Loading shop editor...</div>}>
+        <ShopEditorContent />
+      </Suspense>
+    </PermissionGuard>
   );
 }

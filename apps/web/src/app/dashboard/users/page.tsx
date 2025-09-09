@@ -71,7 +71,6 @@ const USERS_QUERY = gql`
       username
       email
       role
-      godLevel
       isBanned
       createdAt
       lastLoginAt
@@ -95,7 +94,6 @@ const UPDATE_USER_MUTATION = gql`
       username
       email
       role
-      godLevel
     }
   }
 `;
@@ -129,8 +127,7 @@ interface User {
   id: string;
   username: string;
   email: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'CODER' | 'GOD';
-  godLevel: number;
+  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD';
   isBanned: boolean;
   createdAt: string;
   lastLoginAt?: string;
@@ -222,8 +219,12 @@ function UsersContent() {
         return 'bg-purple-100 text-purple-800 border-purple-200';
       case 'CODER':
         return 'bg-red-100 text-red-800 border-red-200';
-      case 'IMMORTAL':
+      case 'BUILDER':
         return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'IMMORTAL':
+        return 'bg-green-100 text-green-800 border-green-200';
+      case 'PLAYER':
+        return 'bg-gray-100 text-gray-800 border-gray-200';
       default:
         return 'bg-gray-100 text-gray-800 border-gray-200';
     }
@@ -235,8 +236,12 @@ function UsersContent() {
         return <Crown className='w-3 h-3' />;
       case 'CODER':
         return <Shield className='w-3 h-3' />;
+      case 'BUILDER':
+        return <ShieldCheck className='w-3 h-3' />;
       case 'IMMORTAL':
         return <ShieldCheck className='w-3 h-3' />;
+      case 'PLAYER':
+        return <User className='w-3 h-3' />;
       default:
         return <User className='w-3 h-3' />;
     }
@@ -279,9 +284,6 @@ function UsersContent() {
                   <Badge className={getRoleBadgeColor(user.role)}>
                     {getRoleIcon(user.role)}
                     <span className='ml-1'>{user.role}</span>
-                    {user.godLevel > 0 && (
-                      <span className='ml-1'>({user.godLevel})</span>
-                    )}
                   </Badge>
                 </TableCell>
                 <TableCell>
@@ -417,14 +419,12 @@ function EditUserDialog({
 }) {
   const [email, setEmail] = useState(user.email);
   const [role, setRole] = useState(user.role);
-  const [godLevel, setGodLevel] = useState(user.godLevel.toString());
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onUpdate(user.id, {
       email,
       role,
-      godLevel: parseInt(godLevel),
     });
   };
 
@@ -459,22 +459,11 @@ function EditUserDialog({
             <SelectContent>
               <SelectItem value='PLAYER'>Player</SelectItem>
               <SelectItem value='IMMORTAL'>Immortal</SelectItem>
+              <SelectItem value='BUILDER'>Builder</SelectItem>
               <SelectItem value='CODER'>Coder</SelectItem>
               <SelectItem value='GOD'>God</SelectItem>
             </SelectContent>
           </Select>
-        </div>
-        <div>
-          <Label htmlFor='godLevel'>God Level (0-100)</Label>
-          <Input
-            id='godLevel'
-            type='number'
-            min='0'
-            max='100'
-            value={godLevel}
-            onChange={e => setGodLevel(e.target.value)}
-            required
-          />
         </div>
         <div className='flex justify-end space-x-2'>
           <Button type='button' variant='outline' onClick={onClose}>

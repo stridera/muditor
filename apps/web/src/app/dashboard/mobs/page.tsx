@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useZone } from '@/contexts/zone-context';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { DualInterface } from '@/components/dashboard/dual-interface';
 import {
   Plus,
   Edit,
@@ -75,6 +77,14 @@ interface Mob {
 }
 
 export default function MobsPage() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <MobsContent />
+    </PermissionGuard>
+  );
+}
+
+function MobsContent() {
   const searchParams = useSearchParams();
   const zoneParam = searchParams.get('zone');
   const { selectedZone, setSelectedZone } = useZone();
@@ -596,7 +606,7 @@ export default function MobsPage() {
       </div>
     );
 
-  return (
+  const adminView = (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
         <div>
@@ -1144,5 +1154,15 @@ export default function MobsPage() {
         </div>
       )}
     </div>
+  );
+
+  return (
+    <DualInterface
+      title='Mobs'
+      description='View and manage mob configurations'
+      adminView={adminView}
+    >
+      <div></div>
+    </DualInterface>
   );
 }

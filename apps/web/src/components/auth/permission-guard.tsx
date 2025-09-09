@@ -22,7 +22,6 @@ interface PermissionGuardProps {
   requireGod?: boolean;
   requireUserManagement?: boolean;
   requireValidation?: boolean;
-  requireMinGodLevel?: number;
   fallback?: ReactNode;
   showFallback?: boolean;
 }
@@ -34,7 +33,6 @@ export function PermissionGuard({
   requireGod = false,
   requireUserManagement = false,
   requireValidation = false,
-  requireMinGodLevel = 0,
   fallback,
   showFallback = true,
 }: PermissionGuardProps) {
@@ -68,7 +66,6 @@ export function PermissionGuard({
     requireGod,
     requireUserManagement,
     requireValidation,
-    requireMinGodLevel,
     isImmortal,
     isCoder,
     isGod,
@@ -110,9 +107,6 @@ export function PermissionGuard({
             {requireImmortal && <li>• Immortal role or higher</li>}
             {requireUserManagement && <li>• User management permissions</li>}
             {requireValidation && <li>• Validation access permissions</li>}
-            {requireMinGodLevel > 0 && (
-              <li>• God Level {requireMinGodLevel} or higher</li>
-            )}
           </ul>
         </div>
 
@@ -144,7 +138,6 @@ interface PermissionCheckOptions {
   requireGod: boolean;
   requireUserManagement: boolean;
   requireValidation: boolean;
-  requireMinGodLevel: number;
   isImmortal: boolean;
   isCoder: boolean;
   isGod: boolean;
@@ -157,7 +150,6 @@ function checkPermissions({
   requireGod,
   requireUserManagement,
   requireValidation,
-  requireMinGodLevel,
   isImmortal,
   isCoder,
   isGod,
