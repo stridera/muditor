@@ -43,7 +43,6 @@ const ME_QUERY = gql`
       username
       email
       role
-      godLevel
       createdAt
     }
   }

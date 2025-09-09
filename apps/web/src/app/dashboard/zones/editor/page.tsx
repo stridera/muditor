@@ -4,6 +4,7 @@ export const dynamic = 'force-dynamic';
 
 import { useSearchParams } from 'next/navigation';
 import { EnhancedZoneEditor } from '@/components/ZoneEditor/EnhancedZoneEditor';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import Link from 'next/link';
 import { Suspense } from 'react';
 
@@ -83,8 +84,10 @@ function ZoneEditorContent() {
 
 export default function ZoneEditorPage() {
   return (
-    <Suspense fallback={<div className='p-6'>Loading zone editor...</div>}>
-      <ZoneEditorContent />
-    </Suspense>
+    <PermissionGuard requireImmortal={true}>
+      <Suspense fallback={<div className='p-6'>Loading zone editor...</div>}>
+        <ZoneEditorContent />
+      </Suspense>
+    </PermissionGuard>
   );
 }

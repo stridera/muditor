@@ -2,12 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import MobEquipmentManager from '../../../../components/mob-equipment-manager';
 import {
   useRealTimeValidation,
@@ -174,7 +175,7 @@ const mobValidationRules: ValidationRules<MobFormData> = [
   },
 ];
 
-export default function MobEditor() {
+function MobEditorContent() {
   const searchParams = useSearchParams();
   const mobId = searchParams.get('id');
   const isNew = !mobId;
@@ -1154,5 +1155,15 @@ export default function MobEditor() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function MobEditor() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <Suspense fallback={<div className='p-6'>Loading mob editor...</div>}>
+        <MobEditorContent />
+      </Suspense>
+    </PermissionGuard>
   );
 }

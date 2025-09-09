@@ -13,6 +13,8 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
 import { Button } from '@/components/ui/button';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { authenticatedFetch } from '@/lib/authenticated-fetch';
 import {
   AlertTriangle,
   AlertCircle,
@@ -100,7 +102,7 @@ const VALIDATE_ALL_ZONES_QUERY = `
   }
 `;
 
-export default function ValidationPage() {
+function ValidationPageContent() {
   const [validationSummary, setValidationSummary] =
     useState<ValidationSummary | null>(null);
   const [zoneReports, setZoneReports] = useState<ValidationReport[]>([]);
@@ -119,13 +121,15 @@ export default function ValidationPage() {
 
     try {
       // Fetch validation summary
-      const summaryResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: VALIDATION_SUMMARY_QUERY,
-        }),
-      });
+      const summaryResponse = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: VALIDATION_SUMMARY_QUERY,
+          }),
+        }
+      );
 
       const summaryResult = await summaryResponse.json();
       if (summaryResult.errors) {
@@ -135,13 +139,15 @@ export default function ValidationPage() {
       setValidationSummary(summaryResult.data.getValidationSummary);
 
       // Fetch detailed zone reports
-      const zonesResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: VALIDATE_ALL_ZONES_QUERY,
-        }),
-      });
+      const zonesResponse = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: VALIDATE_ALL_ZONES_QUERY,
+          }),
+        }
+      );
 
       const zonesResult = await zonesResponse.json();
       if (zonesResult.errors) {
@@ -630,5 +636,13 @@ export default function ValidationPage() {
         </TabsContent>
       </Tabs>
     </div>
+  );
+}
+
+export default function ValidationPage() {
+  return (
+    <PermissionGuard requireValidation={true}>
+      <ValidationPageContent />
+    </PermissionGuard>
   );
 }

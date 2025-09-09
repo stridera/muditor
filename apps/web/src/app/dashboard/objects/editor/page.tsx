@@ -2,12 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import { Save, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import {
   useRealTimeValidation,
   ValidationHelpers,
@@ -214,7 +215,7 @@ const objectValidationRules: ValidationRules<ObjectFormData> = [
   },
 ];
 
-export default function ObjectEditor() {
+function ObjectEditorContent() {
   const searchParams = useSearchParams();
   const objectId = searchParams.get('id');
   const isNew = !objectId;
@@ -1190,5 +1191,15 @@ export default function ObjectEditor() {
         )}
       </div>
     </div>
+  );
+}
+
+export default function ObjectEditor() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <Suspense fallback={<div className='p-6'>Loading object editor...</div>}>
+        <ObjectEditorContent />
+      </Suspense>
+    </PermissionGuard>
   );
 }

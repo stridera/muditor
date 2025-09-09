@@ -14,6 +14,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Search, Plus, Edit, Trash2, FileText, Database } from 'lucide-react';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import ScriptEditor, { Script } from '@/components/ScriptEditor';
 
 interface PageScript {
@@ -50,7 +51,7 @@ const convertScriptToPageScript = (
   author: existingScript?.author,
 });
 
-export default function ScriptsPage() {
+function ScriptsPageContent() {
   const { user } = useAuth();
   const [scripts, setScripts] = useState<PageScript[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -336,5 +337,13 @@ export default function ScriptsPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ScriptsPage() {
+  return (
+    <PermissionGuard requireCoder={true}>
+      <ScriptsPageContent />
+    </PermissionGuard>
   );
 }

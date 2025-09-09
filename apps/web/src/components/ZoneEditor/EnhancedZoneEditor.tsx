@@ -32,6 +32,8 @@ import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
 import { PropertyPanel } from './PropertyPanel';
 import { EntityPalette } from './EntityPalette';
+import { authenticatedFetch } from '@/lib/authenticated-fetch';
+import { usePermissions } from '@/hooks/use-permissions';
 
 // Grid Configuration
 const GRID_SIZE = 180; // Grid cell size in pixels (matches room size)
@@ -111,6 +113,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   zoneId,
 }) => {
   const reactFlowInstance = useReactFlow();
+  const { canEditZone, isBuilder, isCoder, isGod } = usePermissions();
 
   // State
   const [zone, setZone] = useState<Zone | null>(null);
@@ -126,7 +129,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const [saving, setSaving] = useState(false);
   const [managingExits, setManagingExits] = useState(false);
   const [showEntityPalette, setShowEntityPalette] = useState(true);
-  const [viewMode, setViewMode] = useState<'edit' | 'view' | 'layout'>('edit');
+  const [viewMode, setViewMode] = useState<'edit' | 'view' | 'layout'>(
+    canEditZone(zoneId) ? 'edit' : 'view'
+  );
   const [currentZLevel, setCurrentZLevel] = useState<number>(0); // Current floor being viewed
 
   // React Flow State
@@ -147,9 +152,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         // Fetch zone, rooms, mobs, and objects in parallel
         const [zoneResponse, roomsResponse, mobsResponse, objectsResponse] =
           await Promise.allSettled([
-            fetch('http://localhost:4000/graphql', {
+            authenticatedFetch('http://localhost:4000/graphql', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `
                 query GetZone($id: Int!) {
@@ -163,9 +167,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 variables: { id: zoneId },
               }),
             }),
-            fetch('http://localhost:4000/graphql', {
+            authenticatedFetch('http://localhost:4000/graphql', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `
                 query GetRoomsByZone($zoneId: Int!) {
@@ -190,9 +193,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 variables: { zoneId: zoneId },
               }),
             }),
-            fetch('http://localhost:4000/graphql', {
+            authenticatedFetch('http://localhost:4000/graphql', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `
                 query GetMobsByZone($zoneId: Int!) {
@@ -212,9 +214,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 variables: { zoneId: zoneId },
               }),
             }),
-            fetch('http://localhost:4000/graphql', {
+            authenticatedFetch('http://localhost:4000/graphql', {
               method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify({
                 query: `
                 query GetObjectsByZone($zoneId: Int!) {
@@ -484,11 +485,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           const currentRoom = rooms.find(r => r.id === parseInt(node.id));
           const currentZ = currentRoom?.layoutZ ?? 0;
 
-          const response = await fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: `
+          const response = await authenticatedFetch(
+            'http://localhost:4000/graphql',
+            {
+              method: 'POST',
+              body: JSON.stringify({
+                query: `
               mutation UpdateRoomPosition($id: Int!, $position: UpdateRoomPositionInput!) {
                 updateRoomPosition(id: $id, position: $position) {
                   id
@@ -498,16 +500,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 }
               }
             `,
-              variables: {
-                id: parseInt(node.id),
-                position: {
-                  layoutX: gridX,
-                  layoutY: gridY,
-                  layoutZ: currentZ, // Preserve current Z level
+                variables: {
+                  id: parseInt(node.id),
+                  position: {
+                    layoutX: gridX,
+                    layoutY: gridY,
+                    layoutZ: currentZ, // Preserve current Z level
+                  },
                 },
-              },
-            }),
-          });
+              }),
+            }
+          );
 
           if (response.ok) {
             const data = await response.json();
@@ -559,14 +562,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   const handleSaveRoom = async () => {
     if (!editedRoom || !selectedRoomId) return;
+    if (!canEditZone(zoneId)) {
+      setError('You do not have permission to edit this zone.');
+      return;
+    }
 
     setSaving(true);
     try {
-      const response = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
+      const response = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `
             mutation UpdateRoom($id: Int!, $data: UpdateRoomInput!) {
               updateRoom(id: $id, data: $data) {
                 id
@@ -576,16 +584,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-          variables: {
-            id: selectedRoomId,
-            data: {
-              name: editedRoom.name,
-              description: editedRoom.description,
-              sector: editedRoom.sector,
+            variables: {
+              id: selectedRoomId,
+              data: {
+                name: editedRoom.name,
+                description: editedRoom.description,
+                sector: editedRoom.sector,
+              },
             },
-          },
-        }),
-      });
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.errors) {
@@ -615,6 +624,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     destination: number;
   }) => {
     if (!selectedRoomId) return;
+    if (!canEditZone(zoneId)) {
+      setError('You do not have permission to edit this zone.');
+      return;
+    }
 
     setManagingExits(true);
     try {
@@ -651,6 +664,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   const handleDeleteExit = async (exitId: string) => {
     if (!selectedRoomId) return;
+    if (!canEditZone(zoneId)) {
+      setError('You do not have permission to edit this zone.');
+      return;
+    }
 
     setManagingExits(true);
     try {
@@ -685,11 +702,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     console.log(`Updating room ${roomId} Z-level to ${newZLevel}`);
 
     try {
-      const response = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
+      const response = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `
             mutation UpdateRoomPosition($id: Int!, $position: UpdateRoomPositionInput!) {
               updateRoomPosition(id: $id, position: $position) {
                 id
@@ -699,14 +717,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-          variables: {
-            id: roomId,
-            position: {
-              layoutZ: newZLevel,
+            variables: {
+              id: roomId,
+              position: {
+                layoutZ: newZLevel,
+              },
             },
-          },
-        }),
-      });
+          }),
+        }
+      );
 
       if (response.ok) {
         // Update local state
@@ -910,8 +929,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   return (
     <div className='h-screen flex bg-gray-50'>
-      {/* Entity Palette */}
-      {showEntityPalette && (
+      {/* Entity Palette - Only show for users with edit permissions */}
+      {showEntityPalette && canEditZone(zoneId) && (
         <EntityPalette
           mobs={mobs}
           objects={objects}
@@ -1030,12 +1049,28 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 </div>
 
                 <div className='flex items-center gap-2'>
+                  {/* Role/Permission Indicator */}
+                  {!canEditZone(zoneId) && (
+                    <div className='px-3 py-1.5 text-sm text-amber-700 bg-amber-100 rounded-lg'>
+                      👁️ Read-Only Access
+                    </div>
+                  )}
+                  {canEditZone(zoneId) && (
+                    <div className='px-3 py-1.5 text-sm text-green-700 bg-green-100 rounded-lg'>
+                      ✏️ Edit Access
+                    </div>
+                  )}
+
                   {/* View Mode Toggle */}
                   <div className='flex bg-gray-100 p-1 rounded-lg'>
                     {[
-                      { key: 'edit', label: 'Edit', icon: '✏️' },
+                      ...(canEditZone(zoneId)
+                        ? [{ key: 'edit', label: 'Edit', icon: '✏️' }]
+                        : []),
                       { key: 'view', label: 'View', icon: '👁️' },
-                      { key: 'layout', label: 'Layout', icon: '📐' },
+                      ...(canEditZone(zoneId)
+                        ? [{ key: 'layout', label: 'Layout', icon: '📐' }]
+                        : []),
                     ].map(mode => (
                       <button
                         key={mode.key}
@@ -1091,17 +1126,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     </div>
                   )}
 
-                  {/* Toggle Entity Palette */}
-                  <button
-                    onClick={() => setShowEntityPalette(!showEntityPalette)}
-                    className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
-                      showEntityPalette
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600 hover:text-gray-800'
-                    }`}
-                  >
-                    🎨 Palette
-                  </button>
+                  {/* Toggle Entity Palette - Only show for users with edit permissions */}
+                  {canEditZone(zoneId) && (
+                    <button
+                      onClick={() => setShowEntityPalette(!showEntityPalette)}
+                      className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                        showEntityPalette
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-600 hover:text-gray-800'
+                      }`}
+                    >
+                      🎨 Palette
+                    </button>
+                  )}
                 </div>
               </div>
             </div>
