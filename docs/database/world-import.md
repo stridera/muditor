@@ -73,7 +73,6 @@ Critical order to maintain referential integrity:
 const zoneData: Prisma.ZoneCreateInput = {
   id: zoneId,
   name: zone.name || `Zone ${zoneId}`,
-  top: zone.top || 0,
   lifespan: zone.lifespan || 30,
   resetMode: this.mapResetMode(zone.reset_mode),
   hemisphere: this.mapHemisphere(zone.hemisphere),

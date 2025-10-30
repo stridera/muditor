@@ -84,9 +84,7 @@ const GET_CHARACTER_DETAILS = gql`
         objectPrototype {
           id
           shortDesc
-          name
           type
-          extraFlags
         }
       }
       effects {

@@ -4,40 +4,42 @@ import {
   MobResetDto,
   CreateMobResetInput,
   UpdateMobResetInput,
-  CreateMobCarryingInput,
-  CreateMobEquippedInput,
-  UpdateMobCarryingInput,
-  UpdateMobEquippedInput,
+  CreateMobResetEquipmentInput,
+  UpdateMobResetEquipmentInput,
 } from './mob-reset.dto';
 
 @Injectable()
 export class MobResetService {
   constructor(private prisma: DatabaseService) {}
 
-  async findByMob(mobId: number): Promise<MobResetDto[]> {
+  async findByMob(mobZoneId: number, mobId: number): Promise<MobResetDto[]> {
     const resets = await this.prisma.mobReset.findMany({
-      where: { mobId },
+      where: { mobZoneId, mobId },
       include: {
-        carrying: {
+        equipment: {
           include: {
             object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
             },
           },
         },
-        equipped: {
-          include: {
-            object: {
-              select: {
-                id: true,
-                shortDesc: true,
-                type: true,
-              },
-            },
+        mob: {
+          select: {
+            id: true,
+            zoneId: true,
+            shortDesc: true,
+          },
+        },
+        room: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
           },
         },
       },
@@ -50,26 +52,30 @@ export class MobResetService {
     const reset = await this.prisma.mobReset.findUnique({
       where: { id },
       include: {
-        carrying: {
+        equipment: {
           include: {
             object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
             },
           },
         },
-        equipped: {
-          include: {
-            object: {
-              select: {
-                id: true,
-                shortDesc: true,
-                type: true,
-              },
-            },
+        mob: {
+          select: {
+            id: true,
+            zoneId: true,
+            shortDesc: true,
+          },
+        },
+        room: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
           },
         },
       },
@@ -81,48 +87,51 @@ export class MobResetService {
   async create(data: CreateMobResetInput): Promise<MobResetDto> {
     const reset = await this.prisma.mobReset.create({
       data: {
-        max: data.max,
-        name: data.name,
+        maxInstances: data.maxInstances || 1,
+        probability: data.probability || 1.0,
+        comment: data.comment,
+        mobZoneId: data.mobZoneId,
         mobId: data.mobId,
+        roomZoneId: data.roomZoneId,
         roomId: data.roomId,
         zoneId: data.zoneId,
-        carrying: {
-          create: data.carrying.map(carrying => ({
-            max: carrying.max,
-            name: carrying.name,
-            objectId: carrying.objectId,
-          })),
-        },
-        equipped: {
-          create: data.equipped.map(equipped => ({
-            max: equipped.max,
-            location: equipped.location,
-            name: equipped.name,
-            objectId: equipped.objectId,
-          })),
-        },
+        equipment: data.equipment
+          ? {
+              create: data.equipment.map((eq) => ({
+                objectZoneId: eq.objectZoneId,
+                objectId: eq.objectId,
+                wearLocation: eq.wearLocation,
+                maxInstances: eq.maxInstances || 1,
+                probability: eq.probability || 1.0,
+              })),
+            }
+          : undefined,
       },
       include: {
-        carrying: {
+        equipment: {
           include: {
             object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
             },
           },
         },
-        equipped: {
-          include: {
-            object: {
-              select: {
-                id: true,
-                shortDesc: true,
-                type: true,
-              },
-            },
+        mob: {
+          select: {
+            id: true,
+            zoneId: true,
+            shortDesc: true,
+          },
+        },
+        room: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
           },
         },
       },
@@ -132,54 +141,30 @@ export class MobResetService {
   }
 
   async update(id: string, data: UpdateMobResetInput): Promise<MobResetDto> {
-    // Handle carrying updates
-    const carryingOperations =
-      data.carrying?.map(carrying => {
-        if (carrying.id) {
+    // Handle equipment updates
+    const equipmentOperations =
+      data.equipment?.map((eq) => {
+        if (eq.id) {
           // Update existing
-          return this.prisma.mobCarrying.update({
-            where: { id: carrying.id },
+          return this.prisma.mobResetEquipment.update({
+            where: { id: eq.id },
             data: {
-              max: carrying.max,
-              name: carrying.name,
-              objectId: carrying.objectId,
+              objectZoneId: eq.objectZoneId,
+              objectId: eq.objectId,
+              wearLocation: eq.wearLocation,
+              maxInstances: eq.maxInstances,
+              probability: eq.probability,
             },
           });
         } else {
           // Create new
-          return this.prisma.mobCarrying.create({
+          return this.prisma.mobResetEquipment.create({
             data: {
-              max: carrying.max || 1,
-              name: carrying.name,
-              objectId: carrying.objectId!,
-              resetId: id,
-            },
-          });
-        }
-      }) || [];
-
-    // Handle equipped updates
-    const equippedOperations =
-      data.equipped?.map(equipped => {
-        if (equipped.id) {
-          // Update existing
-          return this.prisma.mobEquipped.update({
-            where: { id: equipped.id },
-            data: {
-              max: equipped.max,
-              location: equipped.location,
-              name: equipped.name,
-              objectId: equipped.objectId,
-            },
-          });
-        } else {
-          // Create new
-          return this.prisma.mobEquipped.create({
-            data: {
-              max: equipped.max || 1,
-              location: equipped.location!,
-              name: equipped.name,
-              objectId: equipped.objectId!,
+              objectZoneId: eq.objectZoneId!,
+              objectId: eq.objectId!,
+              wearLocation: eq.wearLocation,
+              maxInstances: eq.maxInstances || 1,
+              probability: eq.probability || 1.0,
               resetId: id,
             },
           });
@@ -188,13 +173,14 @@ export class MobResetService {
 
     // Execute all operations in transaction
     await this.prisma.$transaction([
-      ...carryingOperations,
-      ...equippedOperations,
+      ...equipmentOperations,
       this.prisma.mobReset.update({
         where: { id },
         data: {
-          max: data.max,
-          name: data.name,
+          maxInstances: data.maxInstances,
+          probability: data.probability,
+          comment: data.comment,
+          roomZoneId: data.roomZoneId,
           roomId: data.roomId,
         },
       }),
@@ -216,20 +202,9 @@ export class MobResetService {
     }
   }
 
-  async deleteCarrying(id: string): Promise<boolean> {
+  async deleteEquipment(id: string): Promise<boolean> {
     try {
-      await this.prisma.mobCarrying.delete({
-        where: { id },
-      });
-      return true;
-    } catch {
-      return false;
-    }
-  }
-
-  async deleteEquipped(id: string): Promise<boolean> {
-    try {
-      await this.prisma.mobEquipped.delete({
+      await this.prisma.mobResetEquipment.delete({
         where: { id },
       });
       return true;
@@ -241,26 +216,25 @@ export class MobResetService {
   private mapToDto(reset: any): MobResetDto {
     return {
       id: reset.id,
-      max: reset.max,
-      name: reset.name,
-      mobId: reset.mobId,
-      roomId: reset.roomId,
       zoneId: reset.zoneId,
-      carrying: reset.carrying.map((carrying: any) => ({
-        id: carrying.id,
-        max: carrying.max,
-        name: carrying.name,
-        objectId: carrying.objectId,
-        object: carrying.object,
+      mobZoneId: reset.mobZoneId,
+      mobId: reset.mobId,
+      roomZoneId: reset.roomZoneId,
+      roomId: reset.roomId,
+      maxInstances: reset.maxInstances,
+      probability: reset.probability,
+      comment: reset.comment,
+      equipment: reset.equipment.map((eq: any) => ({
+        id: eq.id,
+        objectZoneId: eq.objectZoneId,
+        objectId: eq.objectId,
+        wearLocation: eq.wearLocation,
+        maxInstances: eq.maxInstances,
+        probability: eq.probability,
+        object: eq.object,
       })),
-      equipped: reset.equipped.map((equipped: any) => ({
-        id: equipped.id,
-        max: equipped.max,
-        location: equipped.location,
-        name: equipped.name,
-        objectId: equipped.objectId,
-        object: equipped.object,
-      })),
+      mob: reset.mob,
+      room: reset.room,
     };
   }
 }

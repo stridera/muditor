@@ -1,51 +1,73 @@
-import { ObjectType, Field, ID, Int, InputType } from '@nestjs/graphql';
+import { ObjectType, Field, ID, Int, InputType, Float } from '@nestjs/graphql';
+import { WearFlag } from '@prisma/client';
+import { registerEnumType } from '@nestjs/graphql';
+
+// Register WearFlag enum for GraphQL
+registerEnumType(WearFlag, {
+  name: 'WearFlag',
+});
 
 @ObjectType()
 export class ObjectSummaryDto {
   @Field(() => Int)
   id: number;
 
+  @Field(() => Int)
+  zoneId: number;
+
   @Field()
   shortDesc: string;
 
   @Field()
   type: string;
+
+  @Field(() => Int, { nullable: true })
+  cost?: number;
 }
 
 @ObjectType()
-export class MobCarryingDto {
-  @Field(() => ID)
-  id: string;
+export class MobSummaryDto {
+  @Field(() => Int)
+  id: number;
 
   @Field(() => Int)
-  max: number;
-
-  @Field({ nullable: true })
-  name?: string;
-
-  @Field(() => Int)
-  objectId: number;
-
-  @Field(() => ObjectSummaryDto, { description: 'The object being carried' })
-  object: ObjectSummaryDto;
-}
-
-@ObjectType()
-export class MobEquippedDto {
-  @Field(() => ID)
-  id: string;
-
-  @Field(() => Int)
-  max: number;
+  zoneId: number;
 
   @Field()
-  location: string;
+  shortDesc: string;
+}
 
-  @Field({ nullable: true })
-  name?: string;
+@ObjectType()
+export class RoomSummaryDto {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => Int)
+  zoneId: number;
+
+  @Field()
+  name: string;
+}
+
+@ObjectType()
+export class MobResetEquipmentDto {
+  @Field(() => ID)
+  id: string;
+
+  @Field(() => Int)
+  objectZoneId: number;
 
   @Field(() => Int)
   objectId: number;
+
+  @Field(() => WearFlag, { nullable: true })
+  wearLocation?: WearFlag;
+
+  @Field(() => Int)
+  maxInstances: number;
+
+  @Field(() => Float)
+  probability: number;
 
   @Field(() => ObjectSummaryDto, { description: 'The object being equipped' })
   object: ObjectSummaryDto;
@@ -57,126 +79,126 @@ export class MobResetDto {
   id: string;
 
   @Field(() => Int)
-  max: number;
+  zoneId: number;
 
-  @Field({ nullable: true })
-  name?: string;
+  @Field(() => Int)
+  mobZoneId: number;
 
   @Field(() => Int)
   mobId: number;
 
   @Field(() => Int)
+  roomZoneId: number;
+
+  @Field(() => Int)
   roomId: number;
 
   @Field(() => Int)
-  zoneId: number;
+  maxInstances: number;
 
-  @Field(() => [MobCarryingDto])
-  carrying: MobCarryingDto[];
+  @Field(() => Float)
+  probability: number;
 
-  @Field(() => [MobEquippedDto])
-  equipped: MobEquippedDto[];
+  @Field({ nullable: true })
+  comment?: string;
+
+  @Field(() => [MobResetEquipmentDto])
+  equipment: MobResetEquipmentDto[];
+
+  @Field(() => MobSummaryDto, { nullable: true })
+  mob?: MobSummaryDto;
+
+  @Field(() => RoomSummaryDto, { nullable: true })
+  room?: RoomSummaryDto;
 }
 
 // Input types for creating/updating equipment
 @InputType()
-export class CreateMobCarryingInput {
+export class CreateMobResetEquipmentInput {
   @Field(() => Int)
-  max: number = 1;
-
-  @Field({ nullable: true })
-  name?: string;
+  objectZoneId: number;
 
   @Field(() => Int)
   objectId: number;
-}
 
-@InputType()
-export class CreateMobEquippedInput {
-  @Field(() => Int)
-  max: number = 1;
+  @Field(() => WearFlag, { nullable: true })
+  wearLocation?: WearFlag;
 
-  @Field()
-  location: string;
+  @Field(() => Int, { defaultValue: 1 })
+  maxInstances: number = 1;
 
-  @Field({ nullable: true })
-  name?: string;
-
-  @Field(() => Int)
-  objectId: number;
+  @Field(() => Float, { defaultValue: 1.0 })
+  probability: number = 1.0;
 }
 
 @InputType()
 export class CreateMobResetInput {
   @Field(() => Int)
-  max: number = 1;
+  zoneId: number;
 
-  @Field({ nullable: true })
-  name?: string;
+  @Field(() => Int)
+  mobZoneId: number;
 
   @Field(() => Int)
   mobId: number;
 
   @Field(() => Int)
-  roomId: number;
+  roomZoneId: number;
 
   @Field(() => Int)
-  zoneId: number;
+  roomId: number;
 
-  @Field(() => [CreateMobCarryingInput], { defaultValue: [] })
-  carrying: CreateMobCarryingInput[] = [];
+  @Field(() => Int, { defaultValue: 1 })
+  maxInstances: number = 1;
 
-  @Field(() => [CreateMobEquippedInput], { defaultValue: [] })
-  equipped: CreateMobEquippedInput[] = [];
+  @Field(() => Float, { defaultValue: 1.0 })
+  probability: number = 1.0;
+
+  @Field({ nullable: true })
+  comment?: string;
+
+  @Field(() => [CreateMobResetEquipmentInput], { nullable: true, defaultValue: [] })
+  equipment?: CreateMobResetEquipmentInput[];
 }
 
 @InputType()
-export class UpdateMobCarryingInput {
+export class UpdateMobResetEquipmentInput {
   @Field(() => ID, { nullable: true })
   id?: string;
 
   @Field(() => Int, { nullable: true })
-  max?: number;
-
-  @Field({ nullable: true })
-  name?: string;
+  objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   objectId?: number;
-}
 
-@InputType()
-export class UpdateMobEquippedInput {
-  @Field(() => ID, { nullable: true })
-  id?: string;
+  @Field(() => WearFlag, { nullable: true })
+  wearLocation?: WearFlag;
 
   @Field(() => Int, { nullable: true })
-  max?: number;
+  maxInstances?: number;
 
-  @Field({ nullable: true })
-  location?: string;
-
-  @Field({ nullable: true })
-  name?: string;
-
-  @Field(() => Int, { nullable: true })
-  objectId?: number;
+  @Field(() => Float, { nullable: true })
+  probability?: number;
 }
 
 @InputType()
 export class UpdateMobResetInput {
   @Field(() => Int, { nullable: true })
-  max?: number;
+  maxInstances?: number;
+
+  @Field(() => Float, { nullable: true })
+  probability?: number;
 
   @Field({ nullable: true })
-  name?: string;
+  comment?: string;
+
+  @Field(() => Int, { nullable: true })
+  roomZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   roomId?: number;
 
-  @Field(() => [UpdateMobCarryingInput], { nullable: true })
-  carrying?: UpdateMobCarryingInput[];
-
-  @Field(() => [UpdateMobEquippedInput], { nullable: true })
-  equipped?: UpdateMobEquippedInput[];
+  @Field(() => [UpdateMobResetEquipmentInput], { nullable: true })
+  equipment?: UpdateMobResetEquipmentInput[];
 }

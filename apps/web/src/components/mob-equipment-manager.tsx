@@ -3,10 +3,10 @@
 import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
-import { Plus, Trash2, Package, Shield, Search } from 'lucide-react';
+import { Plus, Trash2, Package, Shield, Search, Settings, Layers } from 'lucide-react';
 
 const GET_MOB_RESETS = gql`
-  query GetMobResets($mobId: Int!) {
+  query GetMobResetsForMob($mobId: Int!) {
     mobResets(mobId: $mobId) {
       id
       max
@@ -39,8 +39,29 @@ const GET_MOB_RESETS = gql`
   }
 `;
 
+const GET_EQUIPMENT_SETS = gql`
+  query GetEquipmentSetsForMob {
+    equipmentSets {
+      id
+      name
+      description
+      createdAt
+      items {
+        id
+        slot
+        probability
+        object {
+          id
+          shortDesc
+          type
+        }
+      }
+    }
+  }
+`;
+
 const GET_OBJECTS = gql`
-  query GetObjects($skip: Int, $take: Int) {
+  query GetObjectsForMob($skip: Int, $take: Int) {
     objects(skip: $skip, take: $take) {
       id
       shortDesc
@@ -51,37 +72,28 @@ const GET_OBJECTS = gql`
   }
 `;
 
-const CREATE_MOB_RESET = gql`
-  mutation CreateMobReset($data: CreateMobResetInput!) {
-    createMobReset(data: $data) {
+const CREATE_EQUIPMENT_SET = gql`
+  mutation CreateEquipmentSetForMob($data: CreateEquipmentSetInput!) {
+    createEquipmentSet(data: $data) {
       id
-      max
       name
-      roomId
+      description
     }
   }
 `;
 
-const UPDATE_MOB_RESET = gql`
-  mutation UpdateMobReset($id: ID!, $data: UpdateMobResetInput!) {
-    updateMobReset(id: $id, data: $data) {
+const ADD_MOB_EQUIPMENT_SET = gql`
+  mutation AddMobEquipmentSet($data: CreateMobEquipmentSetInput!) {
+    createMobEquipmentSet(data: $data) {
       id
-      max
-      name
-      roomId
+      probability
     }
   }
 `;
 
-const DELETE_MOB_CARRYING = gql`
-  mutation DeleteMobCarrying($id: ID!) {
-    deleteMobCarrying(id: $id)
-  }
-`;
-
-const DELETE_MOB_EQUIPPED = gql`
-  mutation DeleteMobEquipped($id: ID!) {
-    deleteMobEquipped(id: $id)
+const REMOVE_MOB_EQUIPMENT_SET = gql`
+  mutation RemoveMobEquipmentSet($id: ID!) {
+    deleteMobEquipmentSet(id: $id)
   }
 `;
 
@@ -90,34 +102,45 @@ interface MobEquipmentManagerProps {
   zoneId: number;
 }
 
+interface EquipmentSetItem {
+  id: string;
+  slot: string;
+  probability: number;
+  object: {
+    id: number;
+    shortDesc: string;
+    type: string;
+  };
+}
+
+interface EquipmentSet {
+  id: string;
+  name: string;
+  description?: string;
+  createdAt: string;
+  items: EquipmentSetItem[];
+}
+
+interface MobEquipmentSet {
+  id: string;
+  probability: number;
+  equipmentSet: EquipmentSet;
+}
+
+interface SpawnCondition {
+  id: string;
+  type: string;
+  parameters: string;
+}
+
 interface MobReset {
   id: string;
   max: number;
   name?: string;
   roomId: number;
-  carrying: Array<{
-    id: string;
-    max: number;
-    name?: string;
-    objectId: number;
-    object: {
-      id: number;
-      shortDesc: string;
-      type: string;
-    };
-  }>;
-  equipped: Array<{
-    id: string;
-    max: number;
-    location: string;
-    name?: string;
-    objectId: number;
-    object: {
-      id: number;
-      shortDesc: string;
-      type: string;
-    };
-  }>;
+  probability: number;
+  equipmentSets: MobEquipmentSet[];
+  conditions: SpawnCondition[];
 }
 
 interface GameObject {
@@ -128,26 +151,11 @@ interface GameObject {
   wearFlags: string[];
 }
 
-const EQUIPMENT_LOCATIONS = [
-  'light',
-  'finger_r',
-  'finger_l',
-  'neck_1',
-  'neck_2',
-  'body',
-  'head',
-  'legs',
-  'feet',
-  'hands',
-  'arms',
-  'shield',
-  'about',
-  'waist',
-  'wrist_r',
-  'wrist_l',
-  'wield',
-  'hold',
-  'dual_wield',
+const EQUIPMENT_SLOTS = [
+  'Light', 'FingerRight', 'FingerLeft', 'Neck1', 'Neck2',
+  'Body', 'Head', 'Legs', 'Feet', 'Hands', 'Arms', 'Shield',
+  'About', 'Waist', 'WristRight', 'WristLeft', 'Wield', 'Hold',
+  'Float', 'Eyes', 'Face', 'Ear', 'Belt'
 ];
 
 export default function MobEquipmentManager({
@@ -155,9 +163,10 @@ export default function MobEquipmentManager({
   zoneId,
 }: MobEquipmentManagerProps) {
   const [activeReset, setActiveReset] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedObjects, setSelectedObjects] = useState<GameObject[]>([]);
-  const [showObjectSearch, setShowObjectSearch] = useState(false);
+  const [showEquipmentSets, setShowEquipmentSets] = useState(false);
+  const [showCreateSet, setShowCreateSet] = useState(false);
+  const [newSetName, setNewSetName] = useState('');
+  const [newSetDescription, setNewSetDescription] = useState('');
 
   const {
     data: resetsData,
@@ -168,176 +177,222 @@ export default function MobEquipmentManager({
     skip: !mobId,
   });
 
-  const { data: objectsData, loading: objectsLoading } = useQuery(GET_OBJECTS, {
-    variables: { skip: 0, take: 100 },
+  const {
+    data: equipmentSetsData,
+    loading: equipmentSetsLoading,
+    refetch: refetchEquipmentSets,
+  } = useQuery(GET_EQUIPMENT_SETS);
+
+  const [createEquipmentSet] = useMutation(CREATE_EQUIPMENT_SET, {
+    onCompleted: () => {
+      refetchEquipmentSets();
+      setShowCreateSet(false);
+      setNewSetName('');
+      setNewSetDescription('');
+    },
   });
 
-  const [createMobReset] = useMutation(CREATE_MOB_RESET, {
+  const [addMobEquipmentSet] = useMutation(ADD_MOB_EQUIPMENT_SET, {
     onCompleted: () => {
       refetchResets();
     },
   });
 
-  const [updateMobReset] = useMutation(UPDATE_MOB_RESET, {
-    onCompleted: () => {
-      refetchResets();
-    },
-  });
-
-  const [deleteMobCarrying] = useMutation(DELETE_MOB_CARRYING, {
-    onCompleted: () => {
-      refetchResets();
-    },
-  });
-
-  const [deleteMobEquipped] = useMutation(DELETE_MOB_EQUIPPED, {
+  const [removeMobEquipmentSet] = useMutation(REMOVE_MOB_EQUIPMENT_SET, {
     onCompleted: () => {
       refetchResets();
     },
   });
 
   const resets: MobReset[] = (resetsData as any)?.mobResets || [];
-  const objects: GameObject[] = (objectsData as any)?.objects || [];
+  const equipmentSets: EquipmentSet[] = (equipmentSetsData as any)?.equipmentSets || [];
 
-  const filteredObjects = objects.filter(
-    obj =>
-      obj.shortDesc.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      obj.keywords.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const handleCreateEquipmentSet = async () => {
+    if (!newSetName.trim()) return;
 
-  const handleCreateReset = async () => {
     try {
-      await createMobReset({
+      await createEquipmentSet({
         variables: {
           data: {
-            mobId,
-            zoneId,
-            roomId: 0, // Default room, user can change later
-            max: 1,
-            name: 'New Reset',
-            carrying: [],
-            equipped: [],
+            name: newSetName,
+            description: newSetDescription || undefined,
           },
         },
       });
     } catch (error) {
-      console.error('Failed to create mob reset:', error);
+      console.error('Failed to create equipment set:', error);
     }
   };
 
-  const handleAddCarrying = async (resetId: string, objectId: number) => {
-    const reset = resets.find(r => r.id === resetId);
-    if (!reset) return;
-
+  const handleAddEquipmentSet = async (resetId: string, equipmentSetId: string) => {
     try {
-      await updateMobReset({
+      await addMobEquipmentSet({
         variables: {
-          id: resetId,
           data: {
-            carrying: [
-              ...reset.carrying.map(c => ({
-                id: c.id,
-                max: c.max,
-                name: c.name,
-                objectId: c.objectId,
-              })),
-              { objectId, max: 1 },
-            ],
+            mobResetId: resetId,
+            equipmentSetId,
+            probability: 1.0,
           },
         },
       });
     } catch (error) {
-      console.error('Failed to add carrying item:', error);
+      console.error('Failed to add equipment set:', error);
     }
   };
 
-  const handleAddEquipped = async (
-    resetId: string,
-    objectId: number,
-    location: string
-  ) => {
-    const reset = resets.find(r => r.id === resetId);
-    if (!reset) return;
-
+  const handleRemoveEquipmentSet = async (mobEquipmentSetId: string) => {
     try {
-      await updateMobReset({
-        variables: {
-          id: resetId,
-          data: {
-            equipped: [
-              ...reset.equipped.map(e => ({
-                id: e.id,
-                max: e.max,
-                name: e.name,
-                objectId: e.objectId,
-                location: e.location,
-              })),
-              { objectId, max: 1, location },
-            ],
-          },
-        },
+      await removeMobEquipmentSet({
+        variables: { id: mobEquipmentSetId },
       });
     } catch (error) {
-      console.error('Failed to add equipped item:', error);
+      console.error('Failed to remove equipment set:', error);
     }
   };
 
-  if (resetsLoading)
-    return <div className='p-4'>Loading equipment data...</div>;
+  const getAvailableEquipmentSets = (reset: MobReset) => {
+    const assignedSetIds = new Set(reset.equipmentSets.map(mes => mes.equipmentSet.id));
+    return equipmentSets.filter(set => !assignedSetIds.has(set.id));
+  };
+
+  if (resetsLoading) return <div className="p-4">Loading equipment data...</div>;
 
   return (
-    <div className='space-y-6'>
+    <div className="space-y-6">
       {/* Header */}
-      <div className='flex items-center justify-between'>
+      <div className="flex items-center justify-between">
         <div>
-          <h3 className='text-lg font-medium text-gray-900'>
-            Equipment & Spawn Resets
+          <h3 className="text-lg font-medium text-gray-900">
+            Equipment Sets & Spawn Configuration
           </h3>
-          <p className='text-sm text-gray-500'>
-            Configure where and how this mob spawns, and what equipment it
-            carries
+          <p className="text-sm text-gray-500">
+            Manage equipment sets and spawn conditions for this mob
           </p>
         </div>
-        <button
-          onClick={handleCreateReset}
-          className='inline-flex items-center px-3 py-2 border border-transparent text-sm leading-4 font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
-        >
-          <Plus className='w-4 h-4 mr-2' />
-          Add Spawn Location
-        </button>
+        <div className="flex gap-2">
+          <button
+            onClick={() => setShowEquipmentSets(!showEquipmentSets)}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
+          >
+            <Layers className="w-4 h-4 mr-2" />
+            Manage Sets
+          </button>
+        </div>
       </div>
+
+      {/* Equipment Sets Management */}
+      {showEquipmentSets && (
+        <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
+          <div className="flex items-center justify-between mb-4">
+            <h4 className="text-md font-medium text-blue-900">Equipment Sets Library</h4>
+            <button
+              onClick={() => setShowCreateSet(!showCreateSet)}
+              className="inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200"
+            >
+              <Plus className="w-4 h-4 mr-2" />
+              Create New Set
+            </button>
+          </div>
+
+          {/* Create New Set Form */}
+          {showCreateSet && (
+            <div className="bg-white rounded-lg p-4 mb-4 border border-blue-200">
+              <h5 className="text-sm font-medium text-gray-900 mb-3">Create Equipment Set</h5>
+              <div className="space-y-3">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Set Name
+                  </label>
+                  <input
+                    type="text"
+                    value={newSetName}
+                    onChange={(e) => setNewSetName(e.target.value)}
+                    placeholder="e.g., Guard Captain Set, Mage Robes"
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">
+                    Description (optional)
+                  </label>
+                  <input
+                    type="text"
+                    value={newSetDescription}
+                    onChange={(e) => setNewSetDescription(e.target.value)}
+                    placeholder="Brief description of the equipment set"
+                    className="block w-full px-3 py-2 border border-gray-300 rounded-md text-sm"
+                  />
+                </div>
+                <div className="flex gap-2">
+                  <button
+                    onClick={handleCreateEquipmentSet}
+                    disabled={!newSetName.trim()}
+                    className="px-3 py-2 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 disabled:opacity-50"
+                  >
+                    Create Set
+                  </button>
+                  <button
+                    onClick={() => setShowCreateSet(false)}
+                    className="px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Equipment Sets List */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {equipmentSets.map((set) => (
+              <div key={set.id} className="bg-white rounded-lg p-3 border border-gray-200">
+                <div className="flex items-center justify-between mb-2">
+                  <h5 className="text-sm font-medium text-gray-900">{set.name}</h5>
+                  <span className="text-xs text-gray-500">{set.items.length} items</span>
+                </div>
+                {set.description && (
+                  <p className="text-xs text-gray-600 mb-2">{set.description}</p>
+                )}
+                <div className="text-xs text-gray-500">
+                  Items: {set.items.map(item => item.object.shortDesc).join(', ')}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Resets List */}
       {resets.length === 0 ? (
-        <div className='text-center py-8'>
-          <Package className='mx-auto h-12 w-12 text-gray-400' />
-          <h3 className='mt-2 text-sm font-medium text-gray-900'>
+        <div className="text-center py-8">
+          <Package className="mx-auto h-12 w-12 text-gray-400" />
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
             No spawn locations
           </h3>
-          <p className='mt-1 text-sm text-gray-500'>
-            Get started by creating a spawn location for this mob.
+          <p className="mt-1 text-sm text-gray-500">
+            This mob has no configured spawn locations.
           </p>
         </div>
       ) : (
-        <div className='space-y-4'>
-          {resets.map(reset => (
-            <div key={reset.id} className='bg-white shadow rounded-lg border'>
+        <div className="space-y-4">
+          {resets.map((reset) => (
+            <div key={reset.id} className="bg-white shadow rounded-lg border">
               {/* Reset Header */}
-              <div className='px-4 py-3 border-b border-gray-200 bg-gray-50'>
-                <div className='flex items-center justify-between'>
+              <div className="px-4 py-3 border-b border-gray-200 bg-gray-50">
+                <div className="flex items-center justify-between">
                   <div>
-                    <h4 className='text-sm font-medium text-gray-900'>
+                    <h4 className="text-sm font-medium text-gray-900">
                       {reset.name || `Spawn Location #${reset.id.slice(-8)}`}
                     </h4>
-                    <p className='text-sm text-gray-500'>
-                      Room {reset.roomId} • Max spawns: {reset.max}
+                    <p className="text-sm text-gray-500">
+                      Room {reset.roomId} • Max spawns: {reset.max} • Probability: {(reset.probability * 100).toFixed(0)}%
                     </p>
                   </div>
                   <button
                     onClick={() =>
                       setActiveReset(activeReset === reset.id ? null : reset.id)
                     }
-                    className='text-sm text-blue-600 hover:text-blue-800'
+                    className="text-sm text-blue-600 hover:text-blue-800"
                   >
                     {activeReset === reset.id ? 'Collapse' : 'Manage Equipment'}
                   </button>
@@ -346,180 +401,111 @@ export default function MobEquipmentManager({
 
               {/* Reset Details */}
               {activeReset === reset.id && (
-                <div className='p-4 space-y-6'>
-                  {/* Carrying Items */}
+                <div className="p-4 space-y-6">
+                  {/* Equipment Sets */}
                   <div>
-                    <div className='flex items-center justify-between mb-3'>
-                      <h5 className='text-sm font-medium text-gray-900 flex items-center'>
-                        <Package className='w-4 h-4 mr-2 text-gray-400' />
-                        Carrying Items ({reset.carrying.length})
+                    <div className="flex items-center justify-between mb-3">
+                      <h5 className="text-sm font-medium text-gray-900 flex items-center">
+                        <Shield className="w-4 h-4 mr-2 text-gray-400" />
+                        Equipment Sets ({reset.equipmentSets.length})
                       </h5>
-                      <button
-                        onClick={() => setShowObjectSearch(!showObjectSearch)}
-                        className='text-xs text-blue-600 hover:text-blue-800'
-                      >
-                        Add Item
-                      </button>
                     </div>
 
-                    {reset.carrying.length === 0 ? (
-                      <p className='text-sm text-gray-500 italic'>
-                        No items being carried
+                    {reset.equipmentSets.length === 0 ? (
+                      <p className="text-sm text-gray-500 italic">
+                        No equipment sets assigned
                       </p>
                     ) : (
-                      <div className='space-y-2'>
-                        {reset.carrying.map(carrying => (
+                      <div className="space-y-3">
+                        {reset.equipmentSets.map((mobEquipmentSet) => (
                           <div
-                            key={carrying.id}
-                            className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                            key={mobEquipmentSet.id}
+                            className="border border-gray-200 rounded-lg p-3"
                           >
-                            <div>
-                              <span className='text-sm font-medium'>
-                                {carrying.object.shortDesc}
-                              </span>
-                              <span className='ml-2 text-xs text-gray-500'>
-                                ({carrying.object.type})
-                              </span>
-                              {carrying.max > 1 && (
-                                <span className='ml-2 text-xs text-blue-600'>
-                                  Max: {carrying.max}
+                            <div className="flex items-center justify-between mb-2">
+                              <h6 className="text-sm font-medium text-gray-900">
+                                {mobEquipmentSet.equipmentSet.name}
+                              </h6>
+                              <div className="flex items-center gap-2">
+                                <span className="text-xs text-gray-500">
+                                  {(mobEquipmentSet.probability * 100).toFixed(0)}% chance
                                 </span>
-                              )}
-                            </div>
-                            <button
-                              onClick={() =>
-                                deleteMobCarrying({
-                                  variables: { id: carrying.id },
-                                })
-                              }
-                              className='text-red-600 hover:text-red-800'
-                            >
-                              <Trash2 className='w-4 h-4' />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Equipped Items */}
-                  <div>
-                    <div className='flex items-center justify-between mb-3'>
-                      <h5 className='text-sm font-medium text-gray-900 flex items-center'>
-                        <Shield className='w-4 h-4 mr-2 text-gray-400' />
-                        Equipped Items ({reset.equipped.length})
-                      </h5>
-                    </div>
-
-                    {reset.equipped.length === 0 ? (
-                      <p className='text-sm text-gray-500 italic'>
-                        No equipment worn or wielded
-                      </p>
-                    ) : (
-                      <div className='grid grid-cols-2 gap-2'>
-                        {reset.equipped.map(equipped => (
-                          <div
-                            key={equipped.id}
-                            className='flex items-center justify-between p-2 bg-gray-50 rounded'
-                          >
-                            <div>
-                              <div className='text-sm font-medium'>
-                                {equipped.object.shortDesc}
-                              </div>
-                              <div className='text-xs text-gray-500'>
-                                {equipped.location} • {equipped.object.type}
-                              </div>
-                            </div>
-                            <button
-                              onClick={() =>
-                                deleteMobEquipped({
-                                  variables: { id: equipped.id },
-                                })
-                              }
-                              className='text-red-600 hover:text-red-800'
-                            >
-                              <Trash2 className='w-4 h-4' />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Object Search Panel */}
-                  {showObjectSearch && (
-                    <div className='border-t pt-4'>
-                      <div className='mb-3'>
-                        <label className='block text-sm font-medium text-gray-700 mb-1'>
-                          Search Objects
-                        </label>
-                        <div className='relative'>
-                          <Search className='absolute left-3 top-2.5 h-4 w-4 text-gray-400' />
-                          <input
-                            type='text'
-                            value={searchTerm}
-                            onChange={e => setSearchTerm(e.target.value)}
-                            placeholder='Search by name or keywords...'
-                            className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm'
-                          />
-                        </div>
-                      </div>
-
-                      {objectsLoading ? (
-                        <p className='text-sm text-gray-500'>
-                          Loading objects...
-                        </p>
-                      ) : (
-                        <div className='max-h-64 overflow-y-auto space-y-1'>
-                          {filteredObjects.slice(0, 20).map(obj => (
-                            <div
-                              key={obj.id}
-                              className='flex items-center justify-between p-2 hover:bg-gray-50 rounded'
-                            >
-                              <div>
-                                <div className='text-sm font-medium'>
-                                  {obj.shortDesc}
-                                </div>
-                                <div className='text-xs text-gray-500'>
-                                  {obj.type} • {obj.keywords}
-                                </div>
-                              </div>
-                              <div className='flex gap-1'>
                                 <button
-                                  onClick={() =>
-                                    handleAddCarrying(reset.id, obj.id)
-                                  }
-                                  className='text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700'
+                                  onClick={() => handleRemoveEquipmentSet(mobEquipmentSet.id)}
+                                  className="text-red-600 hover:text-red-800"
                                 >
-                                  Carry
+                                  <Trash2 className="w-4 h-4" />
                                 </button>
-                                {obj.wearFlags?.length > 0 && (
-                                  <select
-                                    onChange={e => {
-                                      if (e.target.value) {
-                                        handleAddEquipped(
-                                          reset.id,
-                                          obj.id,
-                                          e.target.value
-                                        );
-                                        e.target.value = '';
-                                      }
-                                    }}
-                                    className='text-xs px-2 py-1 border border-gray-300 rounded'
-                                  >
-                                    <option value=''>Equip...</option>
-                                    {EQUIPMENT_LOCATIONS.map(location => (
-                                      <option key={location} value={location}>
-                                        {location.replace('_', ' ')}
-                                      </option>
-                                    ))}
-                                  </select>
-                                )}
                               </div>
                             </div>
+                            {mobEquipmentSet.equipmentSet.description && (
+                              <p className="text-xs text-gray-600 mb-2">
+                                {mobEquipmentSet.equipmentSet.description}
+                              </p>
+                            )}
+                            <div className="grid grid-cols-2 gap-2">
+                              {mobEquipmentSet.equipmentSet.items.map((item) => (
+                                <div
+                                  key={item.id}
+                                  className="text-xs p-2 bg-gray-50 rounded"
+                                >
+                                  <div className="font-medium">{item.object.shortDesc}</div>
+                                  <div className="text-gray-500">
+                                    {item.slot} • {(item.probability * 100).toFixed(0)}%
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+
+                    {/* Add Equipment Set */}
+                    {getAvailableEquipmentSets(reset).length > 0 && (
+                      <div className="mt-3">
+                        <select
+                          onChange={(e) => {
+                            if (e.target.value) {
+                              handleAddEquipmentSet(reset.id, e.target.value);
+                              e.target.value = '';
+                            }
+                          }}
+                          className="text-sm px-3 py-2 border border-gray-300 rounded-md"
+                        >
+                          <option value="">Add Equipment Set...</option>
+                          {getAvailableEquipmentSets(reset).map((set) => (
+                            <option key={set.id} value={set.id}>
+                              {set.name} ({set.items.length} items)
+                            </option>
                           ))}
-                        </div>
-                      )}
+                        </select>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Spawn Conditions */}
+                  {reset.conditions.length > 0 && (
+                    <div>
+                      <h5 className="text-sm font-medium text-gray-900 flex items-center mb-3">
+                        <Settings className="w-4 h-4 mr-2 text-gray-400" />
+                        Spawn Conditions ({reset.conditions.length})
+                      </h5>
+                      <div className="space-y-2">
+                        {reset.conditions.map((condition) => (
+                          <div
+                            key={condition.id}
+                            className="p-2 bg-yellow-50 border border-yellow-200 rounded text-sm"
+                          >
+                            <span className="font-medium text-yellow-800">
+                              {condition.type}
+                            </span>
+                            <span className="ml-2 text-yellow-700">
+                              {JSON.stringify(JSON.parse(condition.parameters), null, 0)}
+                            </span>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

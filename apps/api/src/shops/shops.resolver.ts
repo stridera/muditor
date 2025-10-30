@@ -1,34 +1,91 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { ShopsService } from './shops.service';
-import { ShopDto, CreateShopInput, UpdateShopInput } from './shop.dto';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateShopInput, ShopDto, UpdateShopInput } from './shop.dto';
+import { ShopsService } from './shops.service';
 
 @Resolver(() => ShopDto)
 export class ShopsResolver {
-  constructor(private readonly shopsService: ShopsService) {}
+  constructor(private readonly shopsService: ShopsService) { }
+
+  private mapShopToDto(shop: any): ShopDto {
+    const messages = (shop.messages || {}) as any;
+    return {
+      id: shop.id,
+      buyProfit: shop.buyProfit,
+      sellProfit: shop.sellProfit,
+      temper1: shop.temper,
+      flags: shop.flags || [],
+      tradesWithFlags: shop.tradesWith || [],
+      noSuchItem1: messages.noSuchItem1,
+      noSuchItem2: messages.noSuchItem2,
+      doNotBuy: messages.doNotBuy,
+      missingCash1: messages.missingCash1,
+      missingCash2: messages.missingCash2,
+      messageBuy: messages.messageBuy,
+      messageSell: messages.messageSell,
+      keeperId: shop.keeperId,
+      keeper: shop.keeper ? {
+        id: shop.keeper.id,
+        zoneId: shop.keeper.zoneId,
+        shortDesc: shop.keeper.shortDesc,
+        keywords: shop.keeper.keywords || [],
+      } : undefined,
+      zoneId: shop.zoneId,
+      createdAt: shop.createdAt,
+      updatedAt: shop.updatedAt,
+      items: shop.items?.map((item: any) => ({
+        id: item.id,
+        amount: item.stockLimit,
+        objectId: item.objectId,
+        object: item.object,
+      })) || [],
+      accepts: shop.accepts?.map((accept: any) => ({
+        id: accept.id,
+        type: accept.itemType,
+        keywords: accept.keywords || [],
+      })) || [],
+      hours: shop.hours?.map((hour: any) => ({
+        id: hour.id,
+        open: hour.openHour,
+        close: hour.closeHour,
+      })) || [],
+    };
+  }
 
   @Query(() => [ShopDto], { name: 'shops' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<ShopDto[]> {
-    return this.shopsService.findAll({ skip, take });
+    const shops = await this.shopsService.findAll({ skip, take });
+    return shops.map(shop => this.mapShopToDto(shop));
   }
 
   @Query(() => ShopDto, { name: 'shop' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<ShopDto | null> {
-    return this.shopsService.findOne(id);
+  async findOne(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ShopDto | null> {
+    const shop = await this.shopsService.findOne(zoneId, id);
+    return shop ? this.mapShopToDto(shop) : null;
   }
 
   @Query(() => [ShopDto], { name: 'shopsByZone' })
-  async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number): Promise<ShopDto[]> {
-    return this.shopsService.findByZone(zoneId);
+  async findByZone(
+    @Args('zoneId', { type: () => Int }) zoneId: number
+  ): Promise<ShopDto[]> {
+    const shops = await this.shopsService.findByZone(zoneId);
+    return shops.map(shop => this.mapShopToDto(shop));
   }
 
   @Query(() => ShopDto, { name: 'shopByKeeper' })
-  async findByKeeper(@Args('keeperId', { type: () => Int }) keeperId: number): Promise<ShopDto | null> {
-    return this.shopsService.findByKeeper(keeperId);
+  async findByKeeper(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ShopDto | null> {
+    const shop = await this.shopsService.findByKeeper(zoneId, id);
+    return shop ? this.mapShopToDto(shop) : null;
   }
 
   @Query(() => Int, { name: 'shopsCount' })
@@ -40,26 +97,33 @@ export class ShopsResolver {
   @UseGuards(JwtAuthGuard)
   async createShop(@Args('data') data: CreateShopInput): Promise<ShopDto> {
     const { zoneId, ...shopData } = data;
-    return this.shopsService.create({
+    const shop = await this.shopsService.create({
       ...shopData,
       zone: {
-        connect: { id: zoneId }
-      }
+        connect: { id: zoneId },
+      },
     });
+    return this.mapShopToDto(shop);
   }
 
   @Mutation(() => ShopDto)
   @UseGuards(JwtAuthGuard)
   async updateShop(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateShopInput,
+    @Args('data') data: UpdateShopInput
   ): Promise<ShopDto> {
-    return this.shopsService.update(id, data);
+    const shop = await this.shopsService.update(zoneId, id, data);
+    return this.mapShopToDto(shop);
   }
 
   @Mutation(() => ShopDto)
   @UseGuards(JwtAuthGuard)
-  async deleteShop(@Args('id', { type: () => Int }) id: number): Promise<ShopDto> {
-    return this.shopsService.delete(id);
+  async deleteShop(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ShopDto> {
+    const shop = await this.shopsService.delete(zoneId, id);
+    return this.mapShopToDto(shop);
   }
 }

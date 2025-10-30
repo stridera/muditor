@@ -41,28 +41,20 @@ const GET_SHOP = gql`
         objectId
         object {
           id
-          keywords
           shortDesc
           type
           cost
         }
       }
-      rooms {
+      accepts {
         id
-        roomId
-        room {
-          id
-          name
-        }
+        type
+        keywords
       }
       hours {
         id
-        openHour
-        closeHour
-      }
-      accepts {
-        id
-        objectType
+        open
+        close
       }
     }
   }

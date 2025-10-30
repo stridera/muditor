@@ -77,9 +77,6 @@ export class ZoneDto {
   name: string;
 
   @Field(() => Int)
-  top: number;
-
-  @Field(() => Int)
   lifespan: number;
 
   @Field(() => ResetMode)
@@ -113,10 +110,6 @@ export class CreateZoneInput {
   @Field()
   @IsString()
   name: string;
-
-  @Field(() => Int)
-  @IsNumber()
-  top: number;
 
   @Field(() => Int, { defaultValue: 30 })
   @IsOptional()

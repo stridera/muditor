@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
-import { DatabaseService } from '../database/database.service';
 import { Object, Prisma } from '@prisma/client';
+import { DatabaseService } from '../database/database.service';
 
 @Injectable()
 export class ObjectsService {
@@ -20,9 +20,14 @@ export class ObjectsService {
     });
   }
 
-  async findOne(id: number): Promise<Object | null> {
+  async findOne(zoneId: number, id: number): Promise<Object | null> {
     return this.database.object.findUnique({
-      where: { id },
+      where: {
+        zoneId_id: {
+          zoneId,
+          id,
+        },
+      },
       include: {
         zone: {
           select: {
@@ -43,30 +48,31 @@ export class ObjectsService {
             },
           },
         },
-        mobCarrying: {
+        resetEquip: {
           include: {
             reset: {
               include: {
                 mob: {
                   select: {
                     id: true,
+                    zoneId: true,
                     shortDesc: true,
+                  },
+                },
+                room: {
+                  select: {
+                    id: true,
+                    zoneId: true,
+                    name: true,
                   },
                 },
               },
             },
-          },
-        },
-        mobEquipped: {
-          include: {
-            reset: {
-              include: {
-                mob: {
-                  select: {
-                    id: true,
-                    shortDesc: true,
-                  },
-                },
+            object: {
+              select: {
+                id: true,
+                zoneId: true,
+                shortDesc: true,
               },
             },
           },
@@ -115,16 +121,20 @@ export class ObjectsService {
     return this.database.object.create({ data });
   }
 
-  async update(id: number, data: Prisma.ObjectUpdateInput): Promise<Object> {
+  async update(
+    zoneId: number,
+    id: number,
+    data: Prisma.ObjectUpdateInput
+  ): Promise<Object> {
     return this.database.object.update({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
       data,
     });
   }
 
-  async delete(id: number): Promise<Object> {
+  async delete(zoneId: number, id: number): Promise<Object> {
     return this.database.object.delete({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
     });
   }
 

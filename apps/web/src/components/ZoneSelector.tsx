@@ -19,7 +19,7 @@ interface ZonesQueryData {
 }
 
 const GET_ZONES = gql`
-  query GetZones {
+  query GetZonesForSelector {
     zones {
       id
       name

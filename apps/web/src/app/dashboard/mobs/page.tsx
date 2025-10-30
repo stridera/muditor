@@ -1,31 +1,30 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { useZone } from '@/contexts/zone-context';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
+import { useZone } from '@/contexts/zone-context';
 import {
-  Plus,
-  Edit,
-  Trash2,
+  ArrowDown,
+  ArrowUp,
   CheckSquare,
-  Square,
-  Download,
-  Copy,
+  ChevronDown,
   ChevronLeft,
   ChevronRight,
-  ArrowUp,
-  ArrowDown,
-  ChevronDown,
   ChevronUp,
-  Eye,
+  Copy,
+  Download,
+  Edit,
+  Plus,
+  Square,
+  Trash2,
 } from 'lucide-react';
-import ZoneSelector from '../../../components/ZoneSelector';
+import Link from 'next/link';
+import { useSearchParams, useRouter } from 'next/navigation';
+import { useEffect, useState } from 'react';
 import EnhancedSearch, {
   SearchFilters,
 } from '../../../components/EnhancedSearch';
+import ZoneSelector from '../../../components/ZoneSelector';
 import {
   applySearchFilters,
   createMobPresets,
@@ -33,46 +32,28 @@ import {
 
 interface Mob {
   id: number;
-  keywords: string;
+  keywords: string[];
   shortDesc: string;
   longDesc: string;
-  detailedDesc?: string;
+  description: string;
   level: number;
   alignment?: number;
-  hpDiceNum: number;
-  hpDiceSize: number;
-  hpDiceBonus: number;
-  manaDiceNum?: number;
-  manaDiceSize?: number;
-  manaDiceBonus?: number;
-  damDiceNum?: number;
-  damDiceSize?: number;
-  damDiceBonus?: number;
-  mobClass?: string;
+  hpDice: string;
+  damageDice: string;
   race?: string;
   lifeForce?: string;
-  mobType?: string;
-  aiPackage?: string;
-  spec?: string;
   damageType?: string;
-  height?: number;
-  weight?: number;
-  pos?: string;
-  defpos?: string;
-  bareHandDamage?: number;
-  hitroll?: number;
+  hitRoll?: number;
   armorClass?: number;
-  str?: number;
-  intel?: number;
-  wis?: number;
-  dex?: number;
-  con?: number;
-  cha?: number;
-  luck?: number;
-  maxAge?: number;
-  raceAlign?: number;
-  mobflags?: string[];
-  affflags?: string[];
+  strength?: number;
+  intelligence?: number;
+  wisdom?: number;
+  dexterity?: number;
+  constitution?: number;
+  charisma?: number;
+  wealth?: number;
+  mobFlags?: string[];
+  effectFlags?: string[];
   zoneId: number;
 }
 
@@ -86,7 +67,9 @@ export default function MobsPage() {
 
 function MobsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const zoneParam = searchParams.get('zone');
+  const idParam = searchParams.get('id');
   const { selectedZone, setSelectedZone } = useZone();
 
   const [mobs, setMobs] = useState<Mob[]>([]);
@@ -108,6 +91,17 @@ function MobsContent() {
   const [sortBy, setSortBy] = useState('level');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
+  // Redirect to mob editor if id parameter is provided
+  useEffect(() => {
+    if (idParam && zoneParam) {
+      const mobId = parseInt(idParam);
+      const zoneId = parseInt(zoneParam);
+      if (!isNaN(mobId) && !isNaN(zoneId)) {
+        router.push(`/dashboard/mobs/editor?zone=${zoneId}&id=${mobId}`);
+      }
+    }
+  }, [idParam, zoneParam, router]);
+
   // Handle initial zone parameter from URL
   useEffect(() => {
     if (zoneParam && selectedZone === null) {
@@ -123,52 +117,76 @@ function MobsContent() {
       try {
         const query = selectedZone
           ? `
-              query GetMobsByZone($zoneId: Int!, $offset: Int, $limit: Int, $orderBy: String, $orderDirection: String) {
-                mobsByZone(zoneId: $zoneId, offset: $offset, limit: $limit, orderBy: $orderBy, orderDirection: $orderDirection) {
+              query GetMobsByZone($zoneId: Int!) {
+                mobsByZone(zoneId: $zoneId) {
                   id
                   keywords
                   shortDesc
                   longDesc
-                  hpDiceNum
-                  hpDiceSize
-                  hpDiceBonus
+                  description
+                  hpDice
+                  damageDice
                   level
+                  race
+                  hitRoll
+                  armorClass
+                  alignment
+                  lifeForce
+                  damageType
+                  strength
+                  intelligence
+                  wisdom
+                  dexterity
+                  constitution
+                  charisma
+                  wealth
+                  mobFlags
+                  effectFlags
                   zoneId
                 }
-                mobsCount(zoneId: $zoneId)
+                mobsCount
               }
             `
           : `
-              query GetMobs($offset: Int, $limit: Int, $orderBy: String, $orderDirection: String) {
-                mobs(offset: $offset, limit: $limit, orderBy: $orderBy, orderDirection: $orderDirection) {
+              query GetMobs($skip: Int, $take: Int) {
+                mobs(skip: $skip, take: $take) {
                   id
                   keywords
                   shortDesc
                   longDesc
-                  hpDiceNum
-                  hpDiceSize
-                  hpDiceBonus
+                  description
+                  hpDice
+                  damageDice
                   level
+                  race
+                  hitRoll
+                  armorClass
+                  alignment
+                  lifeForce
+                  damageType
+                  strength
+                  intelligence
+                  wisdom
+                  dexterity
+                  constitution
+                  charisma
+                  wealth
+                  mobFlags
+                  effectFlags
                   zoneId
                 }
                 mobsCount
               }
             `;
 
-        const offset = (currentPage - 1) * itemsPerPage;
+        const skip = (currentPage - 1) * itemsPerPage;
         const variables = selectedZone
           ? {
               zoneId: selectedZone,
-              offset,
-              limit: itemsPerPage,
-              orderBy: sortBy,
-              orderDirection: sortOrder,
             }
           : {
-              offset,
-              limit: itemsPerPage,
-              orderBy: sortBy,
-              orderDirection: sortOrder,
+              skip,
+              take: itemsPerPage,
             };
 
         const response = await fetch('http://localhost:4000/graphql', {
@@ -185,8 +203,8 @@ function MobsContent() {
             result.errors[0].message
           );
           const fallbackQuery = selectedZone
-            ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords shortDesc longDesc hpDiceNum hpDiceSize hpDiceBonus level zoneId } mobsCount }`
-            : `query { mobs { id keywords shortDesc longDesc hpDiceNum hpDiceSize hpDiceBonus level zoneId } mobsCount }`;
+            ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords shortDesc longDesc description level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`
+            : `query { mobs { id keywords shortDesc longDesc description level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
 
           const fallbackResponse = await fetch(
             'http://localhost:4000/graphql',
@@ -217,13 +235,40 @@ function MobsContent() {
                 : 1;
           });
 
+          const offset = (currentPage - 1) * itemsPerPage;
           setMobs(allMobs.slice(offset, offset + itemsPerPage));
           setMobsCount(fallbackResult.data.mobsCount || allMobs.length);
           return;
         }
 
-        setMobs(result.data.mobs || result.data.mobsByZone || []);
-        setMobsCount(result.data.mobsCount || 0);
+        if (selectedZone && result.data.mobsByZone) {
+          // For zone-specific queries, apply client-side pagination and sorting
+          const allMobs = result.data.mobsByZone;
+
+          // Apply sorting
+          allMobs.sort((a: Mob, b: Mob) => {
+            const aVal = a[sortBy as keyof Mob] || 0;
+            const bVal = b[sortBy as keyof Mob] || 0;
+            return sortOrder === 'asc'
+              ? aVal < bVal
+                ? -1
+                : 1
+              : aVal > bVal
+                ? -1
+                : 1;
+          });
+
+          // Apply pagination
+          const skip = (currentPage - 1) * itemsPerPage;
+          const paginatedMobs = allMobs.slice(skip, skip + itemsPerPage);
+
+          setMobs(paginatedMobs);
+          setMobsCount(allMobs.length); // Use actual filtered count
+        } else {
+          // For general queries, use server response directly
+          setMobs(result.data.mobs || []);
+          setMobsCount(result.data.mobsCount || 0);
+        }
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Failed to fetch mobs');
       } finally {
@@ -323,43 +368,30 @@ function MobsContent() {
             keywords
             shortDesc
             longDesc
-            detailedDesc
+            desc
             level
             alignment
             hpDiceNum
             hpDiceSize
             hpDiceBonus
-            manaDiceNum
-            manaDiceSize
-            manaDiceBonus
-            damDiceNum
-            damDiceSize
-            damDiceBonus
+            damageDiceNum
+            damageDiceSize
+            damageDiceBonus
             mobClass
             race
             lifeForce
-            mobType
-            aiPackage
-            spec
             damageType
-            height
-            weight
-            pos
-            defpos
-            bareHandDamage
-            hitroll
+            hitRoll
             armorClass
-            str
-            intel
-            wis
-            dex
-            con
-            cha
-            luck
-            maxAge
+            strength
+            intelligence
+            wisdom
+            dexterity
+            constitution
+            charisma
             raceAlign
-            mobflags
-            affflags
+            mobFlags
+            effectFlags
             zoneId
           }
         }
@@ -389,43 +421,30 @@ function MobsContent() {
         keywords: originalMob.keywords,
         shortDesc: `${originalMob.shortDesc} (Copy)`,
         longDesc: originalMob.longDesc,
-        detailedDesc: originalMob.detailedDesc,
+        desc: originalMob.desc,
         level: originalMob.level,
         alignment: originalMob.alignment,
         hpDiceNum: originalMob.hpDiceNum,
         hpDiceSize: originalMob.hpDiceSize,
         hpDiceBonus: originalMob.hpDiceBonus,
-        manaDiceNum: originalMob.manaDiceNum,
-        manaDiceSize: originalMob.manaDiceSize,
-        manaDiceBonus: originalMob.manaDiceBonus,
-        damDiceNum: originalMob.damDiceNum,
-        damDiceSize: originalMob.damDiceSize,
-        damDiceBonus: originalMob.damDiceBonus,
+        damageDiceNum: originalMob.damageDiceNum,
+        damageDiceSize: originalMob.damageDiceSize,
+        damageDiceBonus: originalMob.damageDiceBonus,
         mobClass: originalMob.mobClass,
         race: originalMob.race,
         lifeForce: originalMob.lifeForce,
-        mobType: originalMob.mobType,
-        aiPackage: originalMob.aiPackage,
-        spec: originalMob.spec,
         damageType: originalMob.damageType,
-        height: originalMob.height,
-        weight: originalMob.weight,
-        pos: originalMob.pos,
-        defpos: originalMob.defpos,
-        bareHandDamage: originalMob.bareHandDamage,
-        hitroll: originalMob.hitroll,
+        hitRoll: originalMob.hitRoll,
         armorClass: originalMob.armorClass,
-        str: originalMob.str,
-        intel: originalMob.intel,
-        wis: originalMob.wis,
-        dex: originalMob.dex,
-        con: originalMob.con,
-        cha: originalMob.cha,
-        luck: originalMob.luck,
-        maxAge: originalMob.maxAge,
+        strength: originalMob.strength,
+        intelligence: originalMob.intelligence,
+        wisdom: originalMob.wisdom,
+        dexterity: originalMob.dexterity,
+        constitution: originalMob.constitution,
+        charisma: originalMob.charisma,
         raceAlign: originalMob.raceAlign,
-        mobflags: originalMob.mobflags,
-        affflags: originalMob.affflags,
+        mobFlags: originalMob.mobFlags,
+        effectFlags: originalMob.effectFlags,
         zoneId: originalMob.zoneId,
       };
 
@@ -504,7 +523,7 @@ function MobsContent() {
 
       // Load detailed data if not already loaded
       const mob = mobs.find(m => m.id === mobId);
-      if (mob && !mob.detailedDesc) {
+      if (mob && !mob.desc) {
         setLoadingDetails(new Set(loadingDetails).add(mobId));
         try {
           const getMobQuery = `
@@ -514,44 +533,46 @@ function MobsContent() {
                 keywords
                 shortDesc
                 longDesc
-                detailedDesc
+                desc
                 level
                 alignment
                 hpDiceNum
                 hpDiceSize
                 hpDiceBonus
-                manaDiceNum
-                manaDiceSize
-                manaDiceBonus
-                damDiceNum
-                damDiceSize
-                damDiceBonus
+                damageDiceNum
+                damageDiceSize
+                damageDiceBonus
                 mobClass
                 race
                 lifeForce
-                mobType
-                aiPackage
-                spec
                 damageType
-                height
-                weight
-                pos
-                defpos
-                bareHandDamage
-                hitroll
+                position
+                defaultPosition
+                hitRoll
                 armorClass
-                str
-                intel
-                wis
-                dex
-                con
-                cha
-                luck
-                maxAge
+                move
+                strength
+                intelligence
+                wisdom
+                dexterity
+                constitution
+                charisma
+                perception
+                concealment
                 raceAlign
-                mobflags
-                affflags
+                gender
+                size
+                composition
+                stance
+                copper
+                silver
+                gold
+                platinum
+                mobFlags
+                effectFlags
                 zoneId
+                createdAt
+                updatedAt
               }
             }
           `;
@@ -591,11 +612,6 @@ function MobsContent() {
       }
     }
     setExpandedMobs(newExpanded);
-  };
-
-  const formatDice = (num: number, size: number, bonus: number) => {
-    if (num === 0 && size === 0 && bonus === 0) return '0';
-    return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
   };
 
   if (loading) return <div className='p-4'>Loading mobs...</div>;
@@ -768,13 +784,17 @@ function MobsContent() {
           {filteredMobs.map(mob => (
             <div
               key={mob.id}
-              className='bg-white border rounded-lg p-4 hover:shadow-md transition-shadow'
+              className='bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
+              onClick={() => toggleMobExpanded(mob.id)}
             >
               <div className='flex items-start justify-between'>
                 {/* Checkbox for selection */}
                 <div className='flex items-start gap-3'>
                   <button
-                    onClick={() => toggleMobSelection(mob.id)}
+                    onClick={e => {
+                      e.stopPropagation();
+                      toggleMobSelection(mob.id);
+                    }}
                     className='mt-1 text-gray-400 hover:text-blue-600'
                   >
                     {selectedMobs.has(mob.id) ? (
@@ -786,13 +806,10 @@ function MobsContent() {
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
                       <h3 className='font-semibold text-lg text-gray-900'>
-                        {mob.shortDesc}
+                        #{mob.id} - {mob.shortDesc}
                       </h3>
-                      <button
-                        onClick={() => toggleMobExpanded(mob.id)}
-                        className='text-gray-400 hover:text-blue-600 p-1'
-                        disabled={loadingDetails.has(mob.id)}
-                      >
+                      {/* Visual indicator for expand state */}
+                      <div className='text-gray-400'>
                         {loadingDetails.has(mob.id) ? (
                           <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin' />
                         ) : expandedMobs.has(mob.id) ? (
@@ -800,7 +817,7 @@ function MobsContent() {
                         ) : (
                           <ChevronDown className='w-4 h-4' />
                         )}
-                      </button>
+                      </div>
                     </div>
                     <p className='text-sm text-gray-600 mb-2'>
                       Keywords: {mob.keywords}
@@ -810,14 +827,7 @@ function MobsContent() {
                     </p>
                     <div className='flex items-center gap-4 text-sm text-gray-500'>
                       <span>Level {mob.level}</span>
-                      <span>
-                        HP:{' '}
-                        {formatDice(
-                          mob.hpDiceNum,
-                          mob.hpDiceSize,
-                          mob.hpDiceBonus
-                        )}
-                      </span>
+                      <span>HP: {mob.hpDice}</span>
                       <span>Zone {mob.zoneId}</span>
                     </div>
 
@@ -866,35 +876,19 @@ function MobsContent() {
                             <div className='space-y-1 text-sm'>
                               <div>
                                 <span className='text-gray-500'>HP:</span>{' '}
-                                {formatDice(
-                                  mob.hpDiceNum,
-                                  mob.hpDiceSize,
-                                  mob.hpDiceBonus
-                                )}
-                              </div>
-                              <div>
-                                <span className='text-gray-500'>Mana:</span>{' '}
-                                {formatDice(
-                                  mob.manaDiceNum || 0,
-                                  mob.manaDiceSize || 0,
-                                  mob.manaDiceBonus || 0
-                                )}
+                                {mob.hpDice}
                               </div>
                               <div>
                                 <span className='text-gray-500'>Damage:</span>{' '}
-                                {formatDice(
-                                  mob.damDiceNum || 0,
-                                  mob.damDiceSize || 0,
-                                  mob.damDiceBonus || 0
-                                )}
+                                {mob.damageDice}
                               </div>
                               <div>
                                 <span className='text-gray-500'>AC:</span>{' '}
                                 {mob.armorClass || 0}
                               </div>
                               <div>
-                                <span className='text-gray-500'>Hitroll:</span>{' '}
-                                {mob.hitroll || 0}
+                                <span className='text-gray-500'>Hit Roll:</span>{' '}
+                                {mob.hitRoll || 0}
                               </div>
                               <div>
                                 <span className='text-gray-500'>
@@ -913,80 +907,46 @@ function MobsContent() {
                             <div className='grid grid-cols-2 gap-1 text-sm'>
                               <div>
                                 <span className='text-gray-500'>STR:</span>{' '}
-                                {mob.str || 13}
+                                {mob.strength || 13}
                               </div>
                               <div>
                                 <span className='text-gray-500'>INT:</span>{' '}
-                                {mob.intel || 13}
+                                {mob.intelligence || 13}
                               </div>
                               <div>
                                 <span className='text-gray-500'>WIS:</span>{' '}
-                                {mob.wis || 13}
+                                {mob.wisdom || 13}
                               </div>
                               <div>
                                 <span className='text-gray-500'>DEX:</span>{' '}
-                                {mob.dex || 13}
+                                {mob.dexterity || 13}
                               </div>
                               <div>
                                 <span className='text-gray-500'>CON:</span>{' '}
-                                {mob.con || 13}
+                                {mob.constitution || 13}
                               </div>
                               <div>
                                 <span className='text-gray-500'>CHA:</span>{' '}
-                                {mob.cha || 13}
+                                {mob.charisma || 13}
                               </div>
                             </div>
                           </div>
 
-                          {/* Physical */}
-                          {(mob.height || mob.weight) && (
-                            <div>
-                              <h4 className='font-semibold text-sm text-gray-700 mb-2'>
-                                Physical
-                              </h4>
-                              <div className='space-y-1 text-sm'>
-                                {mob.height && (
-                                  <div>
-                                    <span className='text-gray-500'>
-                                      Height:
-                                    </span>{' '}
-                                    {mob.height}
-                                  </div>
-                                )}
-                                {mob.weight && (
-                                  <div>
-                                    <span className='text-gray-500'>
-                                      Weight:
-                                    </span>{' '}
-                                    {mob.weight}
-                                  </div>
-                                )}
-                                {mob.pos && (
-                                  <div>
-                                    <span className='text-gray-500'>
-                                      Position:
-                                    </span>{' '}
-                                    {mob.pos}
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
-
                           {/* Flags */}
-                          {(mob.mobflags?.length || mob.affflags?.length) && (
+                          {(mob.mobFlags?.length ||
+                            mob.effectFlags?.length) && (
                             <div className='md:col-span-2'>
                               <h4 className='font-semibold text-sm text-gray-700 mb-2'>
                                 Flags
                               </h4>
                               <div className='space-y-2'>
-                                {mob.mobflags && mob.mobflags.length > 0 && (
+                                {mob.mobFlags && mob.mobFlags.length > 0 && (
                                   <div>
                                     <span className='text-xs text-gray-500 block'>
                                       Mob Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1'>
-                                      {mob.mobflags.map((flag, index) => (
+                                      {mob.mobFlags.map((flag, index) => (
                                         <span
                                           key={index}
                                           className='inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'
@@ -997,37 +957,36 @@ function MobsContent() {
                                     </div>
                                   </div>
                                 )}
-                                {mob.affflags && mob.affflags.length > 0 && (
-                                  <div>
-                                    <span className='text-xs text-gray-500 block'>
-                                      Effect Flags:
-                                    </span>
-                                    <div className='flex flex-wrap gap-1'>
-                                      {mob.affflags.map((flag, index) => (
-                                        <span
-                                          key={index}
-                                          className='inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded'
-                                        >
-                                          {flag}
-                                        </span>
-                                      ))}
+                                {mob.effectFlags &&
+                                  mob.effectFlags.length > 0 && (
+                                    <div>
+                                      <span className='text-xs text-gray-500 block'>
+                                        Effect Flags:
+                                      </span>
+                                      <div className='flex flex-wrap gap-1'>
+                                        {mob.effectFlags.map((flag, index) => (
+                                          <span
+                                            key={index}
+                                            className='inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded'
+                                          >
+                                            {flag}
+                                          </span>
+                                        ))}
+                                      </div>
                                     </div>
-                                  </div>
-                                )}
+                                  )}
                               </div>
                             </div>
                           )}
                         </div>
 
                         {/* Detailed Description */}
-                        {mob.detailedDesc && (
+                        {mob.desc && (
                           <div className='mt-4 pt-4 border-t border-gray-200'>
                             <h4 className='font-semibold text-sm text-gray-700 mb-2'>
                               Detailed Description
                             </h4>
-                            <p className='text-sm text-gray-700'>
-                              {mob.detailedDesc}
-                            </p>
+                            <p className='text-sm text-gray-700'>{mob.desc}</p>
                           </div>
                         )}
                       </div>
@@ -1035,29 +994,30 @@ function MobsContent() {
                   </div>
                 </div>
                 <div className='flex items-center gap-2 ml-4'>
-                  <button
-                    onClick={() => toggleMobExpanded(mob.id)}
-                    className='inline-flex items-center text-purple-600 hover:text-purple-800 px-3 py-1 text-sm'
-                    disabled={loadingDetails.has(mob.id)}
-                  >
-                    <Eye className='w-3 h-3 mr-1' />
-                    {expandedMobs.has(mob.id) ? 'Collapse' : 'Expand'}
-                  </button>
-                  <Link href={`/dashboard/mobs/editor?id=${mob.id}`}>
-                    <button className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'>
+                  <Link href={`/dashboard/mobs/editor?zone=${mob.zoneId}&id=${mob.id}`}>
+                    <button
+                      onClick={e => e.stopPropagation()}
+                      className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
+                    >
                       <Edit className='w-3 h-3 mr-1' />
                       Edit
                     </button>
                   </Link>
                   <button
-                    onClick={() => handleCloneMob(mob.id)}
+                    onClick={e => {
+                      e.stopPropagation();
+                      handleCloneMob(mob.id);
+                    }}
                     disabled={cloningId === mob.id}
                     className='inline-flex items-center text-green-600 hover:text-green-800 px-3 py-1 text-sm disabled:opacity-50'
                   >
                     <Copy className='w-3 h-3 mr-1' />
                     {cloningId === mob.id ? 'Cloning...' : 'Clone'}
                   </button>
-                  <button className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm'>
+                  <button
+                    onClick={e => e.stopPropagation()}
+                    className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm'
+                  >
                     <Trash2 className='w-3 h-3 mr-1' />
                     Delete
                   </button>

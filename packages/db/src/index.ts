@@ -57,9 +57,17 @@ export async function checkDatabaseHealth() {
   }
 }
 
-// World parsing and import utilities
-export * from './parsers/world-parser';
-export * from './importers/world-importer';
+// REMOVED: Import and parsing functionality moved to FieryLib
+// All world data import operations should now be performed using FieryLib:
+//   cd ../fierylib
+//   poetry run fierylib import-legacy
+//
+// This database package now only provides:
+//   - Prisma client and types
+//   - Database connection utilities
+//   - Health check functions
+//
+// Game system seeding (races, classes, spells, skills) remains in ./seed/
 
 // Lua sandbox utilities
 // export * from './sandbox/lua-sandbox'; // TODO: Implement when needed

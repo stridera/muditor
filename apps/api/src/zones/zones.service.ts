@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma, Zone } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
-import { Zone, Prisma } from '@prisma/client';
 
 @Injectable()
 export class ZonesService {
@@ -27,6 +27,7 @@ export class ZonesService {
         rooms: {
           select: {
             id: true,
+            zoneId: true,
             name: true,
             description: true,
             sector: true,

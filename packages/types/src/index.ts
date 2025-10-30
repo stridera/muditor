@@ -3,3 +3,4 @@ export * from './world';
 export * from './world-json';
 export * from './user';
 export * from './api';
+export * from './auto-layout';

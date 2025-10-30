@@ -1,4 +1,4 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
+import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
 import { RoomsService } from './rooms.service';
 import {
@@ -8,34 +8,46 @@ import {
   CreateRoomExitInput,
   RoomExitDto,
   UpdateRoomPositionInput,
+  BatchUpdateRoomPositionsInput,
+  BatchUpdateResult,
 } from './room.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { MobDto } from '../mobs/mob.dto';
+import { ObjectDto } from '../objects/object.dto';
+import { ShopDto } from '../shops/shop.dto';
+import { ShopsService } from '../shops/shops.service';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 
 @Resolver(() => RoomDto)
 export class RoomsResolver {
-  constructor(private readonly roomsService: RoomsService) {}
+  constructor(
+    private readonly roomsService: RoomsService,
+    private readonly shopsService: ShopsService,
+  ) {}
 
   @Query(() => [RoomDto], { name: 'rooms' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
-    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @Args('lightweight', { type: () => Boolean, nullable: true, defaultValue: false }) lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findAll({ skip, take, zoneId });
+    return this.roomsService.findAll({ skip, take, zoneId, lightweight }) as unknown as RoomDto[];
   }
 
   @Query(() => RoomDto, { name: 'room' })
   async findOne(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<RoomDto | null> {
-    return this.roomsService.findOne(id);
+    return this.roomsService.findOne(zoneId, id) as unknown as RoomDto | null;
   }
 
   @Query(() => [RoomDto], { name: 'roomsByZone' })
   async findByZone(
-    @Args('zoneId', { type: () => Int }) zoneId: number
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('lightweight', { type: () => Boolean, nullable: true, defaultValue: false }) lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findByZone(zoneId);
+    return this.roomsService.findByZone(zoneId, lightweight) as unknown as RoomDto[];
   }
 
   @Query(() => Int, { name: 'roomsCount' })
@@ -46,30 +58,32 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async createRoom(@Args('data') data: CreateRoomInput): Promise<RoomDto> {
-    return this.roomsService.create(data);
+    return this.roomsService.create(data) as unknown as RoomDto;
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async updateRoom(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateRoomInput
   ): Promise<RoomDto> {
-    return this.roomsService.update(id, data);
+    return this.roomsService.update(zoneId, id, data) as unknown as RoomDto;
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async deleteRoom(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<RoomDto> {
-    return this.roomsService.delete(id);
+    return this.roomsService.delete(zoneId, id) as unknown as RoomDto;
   }
 
   @Mutation(() => RoomExitDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async createRoomExit(
     @Args('data') data: CreateRoomExitInput
   ): Promise<RoomExitDto> {
@@ -77,17 +91,128 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomExitDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async deleteRoomExit(@Args('exitId') exitId: string): Promise<RoomExitDto> {
     return this.roomsService.deleteExit(exitId);
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(JwtAuthGuard)
+  @UseGuards(GraphQLJwtAuthGuard)
   async updateRoomPosition(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
     @Args('position') position: UpdateRoomPositionInput
   ): Promise<RoomDto> {
-    return this.roomsService.updatePosition(id, position);
+    return this.roomsService.updatePosition(zoneId, id, position) as unknown as RoomDto;
+  }
+
+  @Mutation(() => BatchUpdateResult)
+  @UseGuards(GraphQLJwtAuthGuard)
+  async batchUpdateRoomPositions(
+    @Args('input') input: BatchUpdateRoomPositionsInput
+  ): Promise<BatchUpdateResult> {
+    return this.roomsService.batchUpdatePositions(input.updates);
+  }
+
+  @ResolveField(() => [MobDto])
+  mobs(@Parent() room: any): MobDto[] {
+    if (!room.mobResets || room.mobResets.length === 0) {
+      return [];
+    }
+    
+    // Deduplicate mobs by ID since multiple resets can reference the same mob
+    const uniqueMobs = new Map<number, any>();
+    room.mobResets.forEach((reset: any) => {
+      if (reset.mob) {
+        uniqueMobs.set(reset.mob.id, reset.mob);
+      }
+    });
+    
+    return Array.from(uniqueMobs.values());
+  }
+
+  @ResolveField(() => [ObjectDto])
+  objects(@Parent() room: any): ObjectDto[] {
+    if (!room.objectResets || room.objectResets.length === 0) {
+      return [];
+    }
+
+    // Deduplicate objects by ID since multiple resets can reference the same object
+    const uniqueObjects = new Map<number, any>();
+    room.objectResets.forEach((reset: any) => {
+      if (reset.object) {
+        uniqueObjects.set(reset.object.id, reset.object);
+      }
+    });
+
+    return Array.from(uniqueObjects.values());
+  }
+
+  @ResolveField(() => [ShopDto])
+  async shops(@Parent() room: any): Promise<ShopDto[]> {
+    if (!room.mobResets || room.mobResets.length === 0) {
+      return [];
+    }
+
+    // Get unique mobs from room (need both zoneId and id)
+    const uniqueMobs = new Map<string, { zoneId: number; id: number }>();
+    room.mobResets.forEach((reset: any) => {
+      if (reset.mob) {
+        const key = `${reset.mob.zoneId}-${reset.mob.id}`;
+        uniqueMobs.set(key, { zoneId: reset.mob.zoneId, id: reset.mob.id });
+      }
+    });
+
+    // Find shops for each mob in the room
+    const shops: ShopDto[] = [];
+    for (const mob of uniqueMobs.values()) {
+      const shop = await this.shopsService.findByKeeper(mob.zoneId, mob.id);
+      if (shop) {
+        const messages = (shop.messages || {}) as any;
+        shops.push({
+          id: shop.id,
+          buyProfit: shop.buyProfit,
+          sellProfit: shop.sellProfit,
+          temper1: shop.temper,
+          flags: shop.flags || [],
+          tradesWithFlags: shop.tradesWith || [],
+          noSuchItem1: messages.noSuchItem1,
+          noSuchItem2: messages.noSuchItem2,
+          doNotBuy: messages.doNotBuy,
+          missingCash1: messages.missingCash1,
+          missingCash2: messages.missingCash2,
+          messageBuy: messages.messageBuy,
+          messageSell: messages.messageSell,
+          keeperId: shop.keeperId,
+          keeper: shop.keeper ? {
+            id: shop.keeper.id,
+            zoneId: shop.keeper.zoneId,
+            shortDesc: shop.keeper.shortDesc,
+            keywords: shop.keeper.keywords || [],
+          } : undefined,
+          zoneId: shop.zoneId,
+          createdAt: shop.createdAt,
+          updatedAt: shop.updatedAt,
+          items: shop.items?.map((item: any) => ({
+            id: item.id,
+            amount: item.stockLimit,
+            objectId: item.objectId,
+            object: item.object,
+          })) || [],
+          accepts: shop.accepts?.map((accept: any) => ({
+            id: accept.id,
+            type: accept.itemType,
+            keywords: '',
+          })) || [],
+          hours: shop.hours?.map((hour: any) => ({
+            id: hour.id,
+            open: hour.openHour,
+            close: hour.closeHour,
+          })) || [],
+        });
+      }
+    }
+
+    return shops;
   }
 }

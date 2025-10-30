@@ -1,21 +1,24 @@
 import {
-  ObjectType,
   Field,
-  Int,
   InputType,
+  Int,
+  ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { Direction, RoomFlag, Sector } from '@prisma/client';
 import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNumber,
   IsOptional,
   IsString,
-  IsNumber,
-  IsEnum,
-  IsArray,
-  IsInt,
-  Min,
   Max,
+  Min,
 } from 'class-validator';
-import { Sector, Direction, RoomFlag } from '@prisma/client';
+import { MobDto } from '../mobs/mob.dto';
+import { ObjectDto } from '../objects/object.dto';
+import { ShopDto } from '../shops/shop.dto';
 
 // Register GraphQL enums
 registerEnumType(Sector, { name: 'Sector' });
@@ -40,7 +43,10 @@ export class RoomExitDto {
   key?: string;
 
   @Field(() => Int, { nullable: true })
-  destination?: number;
+  toZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  toRoomId?: number;
 }
 
 @ObjectType()
@@ -48,8 +54,8 @@ export class RoomExtraDescriptionDto {
   @Field()
   id: string;
 
-  @Field()
-  keyword: string;
+  @Field(() => [String])
+  keywords: string[];
 
   @Field()
   description: string;
@@ -102,6 +108,16 @@ export class RoomDto {
 
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   layoutZ?: number;
+
+  // Related entities (populated by GraphQL field resolvers)
+  @Field(() => [MobDto], { defaultValue: [] })
+  mobs?: MobDto[];
+
+  @Field(() => [ObjectDto], { defaultValue: [] })
+  objects?: ObjectDto[];
+
+  @Field(() => [ShopDto], { defaultValue: [] })
+  shops?: ShopDto[];
 }
 
 @InputType()
@@ -109,10 +125,6 @@ export class CreateRoomInput {
   @Field(() => Int)
   @IsNumber()
   id: number;
-
-  @Field(() => Int)
-  @IsNumber()
-  vnum: number;
 
   @Field()
   @IsString()
@@ -203,6 +215,54 @@ export class UpdateRoomPositionInput {
 }
 
 @InputType()
+export class BatchRoomPositionUpdateInput {
+  @Field(() => Int)
+  @IsInt()
+  zoneId: number;
+
+  @Field(() => Int)
+  @IsInt()
+  roomId: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(-1000, { message: 'X coordinate must be between -1000 and 1000' })
+  @Max(1000, { message: 'X coordinate must be between -1000 and 1000' })
+  layoutX?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(-1000, { message: 'Y coordinate must be between -1000 and 1000' })
+  @Max(1000, { message: 'Y coordinate must be between -1000 and 1000' })
+  layoutY?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(-100, { message: 'Z coordinate must be between -100 and 100' })
+  @Max(100, { message: 'Z coordinate must be between -100 and 100' })
+  layoutZ?: number;
+}
+
+@InputType()
+export class BatchUpdateRoomPositionsInput {
+  @Field(() => [BatchRoomPositionUpdateInput])
+  @IsArray()
+  updates: BatchRoomPositionUpdateInput[];
+}
+
+@ObjectType()
+export class BatchUpdateResult {
+  @Field(() => Int)
+  updatedCount: number;
+
+  @Field(() => [String], { nullable: true })
+  errors?: string[];
+}
+
+@InputType()
 export class CreateRoomExitInput {
   @Field(() => Direction)
   @IsEnum(Direction)
@@ -227,6 +287,20 @@ export class CreateRoomExitInput {
   @IsOptional()
   @IsNumber()
   destination?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  toZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  toRoomId?: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  roomZoneId: number;
 
   @Field(() => Int)
   @IsNumber()

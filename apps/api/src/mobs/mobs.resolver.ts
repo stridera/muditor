@@ -1,8 +1,9 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { MobsService } from './mobs.service';
-import { MobDto, CreateMobInput, UpdateMobInput } from './mob.dto';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Prisma } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateMobInput, MobDto, UpdateMobInput } from './mob.dto';
+import { MobsService } from './mobs.service';
 
 @Resolver(() => MobDto)
 export class MobsResolver {
@@ -13,21 +14,22 @@ export class MobsResolver {
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<MobDto[]> {
-    return this.mobsService.findAll({ skip, take });
+    return this.mobsService.findAll({ skip, take }) as any; // TODO: Map database fields to DTO
   }
 
   @Query(() => MobDto, { name: 'mob' })
   async findOne(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<MobDto | null> {
-    return this.mobsService.findOne(id);
+    return this.mobsService.findOne(zoneId, id) as any; // TODO: Map database fields to DTO
   }
 
   @Query(() => [MobDto], { name: 'mobsByZone' })
   async findByZone(
     @Args('zoneId', { type: () => Int }) zoneId: number
   ): Promise<MobDto[]> {
-    return this.mobsService.findByZone(zoneId);
+    return this.mobsService.findByZone(zoneId) as any; // TODO: Map database fields to DTO
   }
 
   @Query(() => Int, { name: 'mobsCount' })
@@ -38,30 +40,39 @@ export class MobsResolver {
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
-    const { zoneId, ...mobData } = data;
-    return this.mobsService.create({
-      ...mobData,
-      zone: {
-        connect: { id: zoneId },
-      },
-    });
+    const { zoneId, race, ...rest } = data;
+    const createData: Prisma.MobCreateInput = {
+      ...rest,
+      zone: { connect: { id: zoneId } },
+    };
+    if (race) {
+      createData.race = race as any;
+    }
+    return this.mobsService.create(createData) as any; // TODO: Map database fields to DTO
   }
 
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async updateMob(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateMobInput
   ): Promise<MobDto> {
-    return this.mobsService.update(id, data);
+    const { race, ...rest } = data;
+    const updateData: Prisma.MobUpdateInput = { ...rest };
+    if (race) {
+      updateData.race = race as any;
+    }
+    return this.mobsService.update(zoneId, id, updateData) as any; // TODO: Map database fields to DTO
   }
 
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async deleteMob(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<MobDto> {
-    return this.mobsService.delete(id);
+    return this.mobsService.delete(zoneId, id) as any; // TODO: Map database fields to DTO
   }
 
   @Mutation(() => Int, { name: 'deleteMobs' })

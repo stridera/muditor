@@ -14,17 +14,14 @@ export async function seedCharacters(
 ) {
   console.log('  Creating test characters...');
 
-  // Get race and class data
-  const humanRace = await prisma.raceData.findFirst({
-    where: { name: 'Human' },
-  });
+  // Get class data (races are now enums)
   const mageClass = await prisma.class.findFirst({
     where: { name: 'Sorcerer' },
   });
 
-  if (!humanRace || !mageClass) {
+  if (!mageClass) {
     console.log(
-      '  ⚠️ Skipping character creation - race or class data not found'
+      '  ⚠️ Skipping character creation - class data not found'
     );
     return;
   }
@@ -35,7 +32,7 @@ export async function seedCharacters(
     update: {
       userId: users.admin.id,
       level: 110, // Max god level
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',
@@ -68,7 +65,7 @@ export async function seedCharacters(
       name: 'GodAdmin',
       userId: users.admin.id,
       level: 110,
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',
@@ -100,7 +97,7 @@ export async function seedCharacters(
     update: {
       userId: users.builder.id,
       level: 50,
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',
@@ -127,7 +124,7 @@ export async function seedCharacters(
       name: 'BuilderChar',
       userId: users.builder.id,
       level: 50,
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',
@@ -158,7 +155,7 @@ export async function seedCharacters(
     update: {
       userId: users.player.id,
       level: 1,
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',
@@ -185,7 +182,7 @@ export async function seedCharacters(
       name: 'TestPlayer',
       userId: users.player.id,
       level: 1,
-      raceId: humanRace.id,
+      race: 'HUMAN',
       classId: mageClass.id,
       raceType: 'Human',
       playerClass: 'Sorcerer',

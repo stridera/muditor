@@ -10,9 +10,8 @@ import { Suspense } from 'react';
 
 function ZoneEditorContent() {
   const searchParams = useSearchParams();
-  const zoneId = searchParams.get('zone')
-    ? parseInt(searchParams.get('zone')!)
-    : null;
+  const zoneIdParam = searchParams.get('zone');
+  const zoneId = zoneIdParam ? parseInt(zoneIdParam) : null;
 
   if (!zoneId) {
     return (

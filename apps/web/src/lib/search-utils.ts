@@ -186,21 +186,31 @@ export const createObjectPresets = () => [
   {
     id: 'weapons',
     name: 'Weapons',
-    filters: { searchTerm: '', types: ['weapon'] },
+    filters: { searchTerm: '', types: ['WEAPON'] },
   },
   {
     id: 'armor',
     name: 'Armor & Clothing',
-    filters: { searchTerm: '', types: ['armor', 'clothing'] },
+    filters: { searchTerm: '', types: ['ARMOR'] },
   },
   {
     id: 'valuable-items',
     name: 'Valuable Items (1000+ cost)',
-    filters: { searchTerm: '', customFilters: { minCost: 1000 } },
+    filters: { searchTerm: '', customFilters: { isValuable: true } },
   },
   {
     id: 'lightweight',
     name: 'Lightweight (≤5 lbs)',
-    filters: { searchTerm: '', customFilters: { maxWeight: 5 } },
+    filters: { searchTerm: '', customFilters: { isLightweight: true } },
+  },
+  {
+    id: 'containers',
+    name: 'Containers',
+    filters: { searchTerm: '', types: ['CONTAINER'] },
+  },
+  {
+    id: 'food-drink',
+    name: 'Food & Potions',
+    filters: { searchTerm: '', types: ['FOOD', 'POTION'] },
   },
 ];

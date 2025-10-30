@@ -2,13 +2,34 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useQuery } from '@apollo/client/react';
+import { gql } from '@apollo/client';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
+import { LoadingError } from '@/components/ui/error-display';
+import { Loading } from '@/components/ui/loading';
+
+const ZONES_QUERY = gql`
+  query GetZonesDashboard {
+    zones {
+      id
+      name
+      climate
+    }
+    roomsCount
+  }
+`;
 
 interface Zone {
   id: number;
   name: string;
   climate: string;
+}
+
+interface ZonesQueryResult {
+  zones: Zone[];
+  roomsCount: number;
 }
 
 export default function ZonesPage() {
@@ -20,46 +41,14 @@ export default function ZonesPage() {
 }
 
 function ZonesContent() {
-  const [zones, setZones] = useState<Zone[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClimate, setSelectedClimate] = useState('all');
 
-  useEffect(() => {
-    const fetchZones = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `
-              query GetZones {
-                zones {
-                  id
-                  name
-                  climate
-                }
-              }
-            `,
-          }),
-        });
+  const { data, loading, error, refetch } = useQuery<ZonesQueryResult>(ZONES_QUERY);
 
-        const data = await response.json();
-        if (data.errors) {
-          throw new Error(data.errors[0].message);
-        }
-
-        setZones(data.data.zones);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch zones');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchZones();
-  }, []);
+  const zones = data?.zones || [];
+  const roomsCount = data?.roomsCount || 0;
 
   const filteredZones = useMemo(() => {
     return zones.filter(zone => {
@@ -99,12 +88,7 @@ function ZonesContent() {
   }
 
   if (error) {
-    return (
-      <div className='bg-red-50 border border-red-200 rounded-md p-4'>
-        <h3 className='text-red-800 font-medium'>Error loading zones</h3>
-        <p className='text-red-600 text-sm mt-1'>{error}</p>
-      </div>
-    );
+    return <LoadingError error={error} onRetry={() => refetch()} resource="zones" />;
   }
 
   const adminView = (
@@ -113,15 +97,29 @@ function ZonesContent() {
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>Zones</h1>
           <p className='text-gray-600 mt-1'>
-            {filteredZones.length} of {zones.length} zones
+            {filteredZones.length} of {zones.length} zones, {roomsCount.toLocaleString()} rooms total
           </p>
         </div>
-        <Link
-          href='/dashboard/zones/new'
-          className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-        >
-          Create Zone
-        </Link>
+        <div className='flex items-center gap-3'>
+          <Link
+            href='/dashboard/zones/layout-test'
+            className='bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors'
+          >
+            🧪 Layout Test
+          </Link>
+          <Link
+            href='/dashboard/zones/world-map'
+            className='bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors'
+          >
+            🗺️ World Map
+          </Link>
+          <Link
+            href='/dashboard/zones/new'
+            className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+          >
+            Create Zone
+          </Link>
+        </div>
       </div>
 
       <div className='bg-white rounded-lg shadow mb-6 p-4'>
@@ -208,15 +206,16 @@ function ZonesContent() {
               </div>
 
               <div className='flex items-center space-x-2 ml-4'>
-                <Link
-                  href={`/dashboard/zones/editor?zone=${zone.id}`}
-                  className='text-blue-600 hover:text-blue-800 text-sm'
+                <button
                   onClick={e => {
+                    e.preventDefault();
                     e.stopPropagation();
+                    router.push(`/dashboard/zones/editor?zone=${zone.id}`);
                   }}
+                  className='text-blue-600 hover:text-blue-800 text-sm'
                 >
                   Edit
-                </Link>
+                </button>
               </div>
             </div>
           </Link>

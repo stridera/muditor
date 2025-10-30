@@ -269,7 +269,6 @@ if char and obj then
     
     -- Add your custom effects here
     -- heal(char, dice(2, 8))     -- Healing potion
-    -- restore_mana(char, 50)     -- Mana restoration
 end`,
   },
 

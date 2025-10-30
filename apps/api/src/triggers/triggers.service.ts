@@ -1,11 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { TriggerAttachType } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
+  AttachTriggerInput,
   CreateTriggerInput,
   UpdateTriggerInput,
-  AttachTriggerInput,
 } from './trigger.dto';
-import { ScriptType } from '@prisma/client';
 
 @Injectable()
 export class TriggersService {
@@ -17,12 +17,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -46,12 +48,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -71,7 +75,7 @@ export class TriggersService {
     return trigger;
   }
 
-  async findByAttachment(attachType: ScriptType, entityId: number) {
+  async findByAttachment(attachType: TriggerAttachType, entityId: number) {
     const whereClause = this.buildWhereClauseForAttachment(
       attachType,
       entityId
@@ -83,12 +87,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -109,20 +115,20 @@ export class TriggersService {
     const triggerData: any = {
       name: data.name,
       attachType: data.attachType,
-      numArgs: data.numArgs || 0,
-      argList: data.argList,
-      commands: data.commands,
-      variables: JSON.parse(data.variables || '{}'),
-      flags: data.flags || [],
+      triggerTypes: data.triggerTypes || [],
+      script: data.commands,
+      arguments: data.argList ? data.argList.split(' ') : [],
       createdBy: userId,
     };
 
     // Set the appropriate attachment based on attachType
-    if (data.mobId && data.attachType === ScriptType.MOB) {
+    if (data.mobId) {
+      triggerData.mobZoneId = data.zoneId;
       triggerData.mobId = data.mobId;
-    } else if (data.objectId && data.attachType === ScriptType.OBJECT) {
+    } else if (data.objectId) {
+      triggerData.objectZoneId = data.zoneId;
       triggerData.objectId = data.objectId;
-    } else if (data.zoneId && data.attachType === ScriptType.WORLD) {
+    } else if (data.zoneId) {
       triggerData.zoneId = data.zoneId;
     }
 
@@ -132,12 +138,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -186,12 +194,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -227,11 +237,11 @@ export class TriggersService {
     updateData.zoneId = null;
 
     // Set the appropriate attachment
-    if (data.mobId && data.attachType === ScriptType.MOB) {
+    if (data.mobId && data.attachType === TriggerAttachType.MOB) {
       updateData.mobId = data.mobId;
-    } else if (data.objectId && data.attachType === ScriptType.OBJECT) {
+    } else if (data.objectId && data.attachType === TriggerAttachType.OBJECT) {
       updateData.objectId = data.objectId;
-    } else if (data.zoneId && data.attachType === ScriptType.WORLD) {
+    } else if (data.zoneId && data.attachType === TriggerAttachType.ZONE) {
       updateData.zoneId = data.zoneId;
     }
 
@@ -242,12 +252,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -265,7 +277,9 @@ export class TriggersService {
     return this.prisma.trigger.update({
       where: { id: triggerId },
       data: {
+        mobZoneId: null,
         mobId: null,
+        objectZoneId: null,
         objectId: null,
         zoneId: null,
         updatedBy: userId,
@@ -274,12 +288,14 @@ export class TriggersService {
         mob: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
         object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
           },
         },
@@ -294,23 +310,23 @@ export class TriggersService {
   }
 
   private buildWhereClauseForAttachment(
-    attachType: ScriptType,
+    attachType: TriggerAttachType,
     entityId: number
   ) {
     switch (attachType) {
-      case ScriptType.MOB:
+      case TriggerAttachType.MOB:
         return {
-          attachType: ScriptType.MOB,
+          attachType: TriggerAttachType.MOB,
           mobId: entityId,
         };
-      case ScriptType.OBJECT:
+      case TriggerAttachType.OBJECT:
         return {
-          attachType: ScriptType.OBJECT,
+          attachType: TriggerAttachType.OBJECT,
           objectId: entityId,
         };
-      case ScriptType.WORLD:
+      case TriggerAttachType.ZONE:
         return {
-          attachType: ScriptType.WORLD,
+          attachType: TriggerAttachType.ZONE,
           zoneId: entityId,
         };
       default:

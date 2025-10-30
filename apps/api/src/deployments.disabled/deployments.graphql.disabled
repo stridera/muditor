@@ -1,0 +1,118 @@
+type DeploymentPackage {
+  id: ID!
+  name: String!
+  description: String
+  status: DeploymentStatus!
+  sourceEnv: String!
+  targetEnv: String!
+  version: String!
+  createdBy: String!
+  createdAt: DateTime!
+  deployedAt: DateTime
+  deployedBy: String
+  completedAt: DateTime
+  rolledBackAt: DateTime
+  rolledBackBy: String
+  changes: [DeploymentChange!]!
+  validations: [DeploymentValidation!]!
+}
+
+type DeploymentChange {
+  id: ID!
+  packageId: String!
+  entityType: String!
+  entityId: String!
+  changeType: DeploymentChangeType!
+  beforeSnapshot: JSON
+  afterSnapshot: JSON
+  conflicts: [String!]!
+}
+
+type DeploymentValidation {
+  id: ID!
+  packageId: String!
+  type: DeploymentValidationType!
+  severity: DeploymentValidationSeverity!
+  message: String!
+  details: JSON
+}
+
+type ZoneVersion {
+  zoneId: Int!
+  version: Int!
+  checksum: String!
+  lastDeployedFrom: String
+  lastDeployedAt: DateTime
+}
+
+enum DeploymentStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  FAILED
+  ROLLED_BACK
+  ROLLING_BACK
+  VALIDATION_FAILED
+}
+
+enum DeploymentChangeType {
+  CREATE
+  MODIFY
+  DELETE
+}
+
+enum DeploymentValidationType {
+  REFERENTIAL_INTEGRITY
+  CONFLICT_DETECTION
+  ZONE_CONSISTENCY
+  SCRIPT_SYNTAX
+  DATA_INTEGRITY
+}
+
+enum DeploymentValidationSeverity {
+  ERROR
+  WARNING
+  INFO
+}
+
+input CreateDeploymentPackageInput {
+  name: String!
+  description: String
+  zoneIds: [Int!]!
+}
+
+input ExecuteDeploymentInput {
+  packageId: ID!
+}
+
+input RollbackDeploymentInput {
+  packageId: ID!
+}
+
+type Query {
+  deploymentPackages(
+    status: DeploymentStatus
+    limit: Int
+    offset: Int
+  ): [DeploymentPackage!]!
+
+  deploymentPackage(id: ID!): DeploymentPackage
+
+  zoneVersions(zoneIds: [Int!]): [ZoneVersion!]!
+
+  zoneVersion(zoneId: Int!): ZoneVersion
+}
+
+type Mutation {
+  createDeploymentPackage(
+    input: CreateDeploymentPackageInput!
+  ): DeploymentPackage!
+
+  executeDeployment(
+    input: ExecuteDeploymentInput!
+  ): DeploymentPackage!
+
+  rollbackDeployment(
+    input: RollbackDeploymentInput!
+  ): DeploymentPackage!
+}

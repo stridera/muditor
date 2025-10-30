@@ -4,22 +4,26 @@ import React, { useState } from 'react';
 import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
 
-interface Mob {
+export interface Mob {
   id: number;
   name: string;
+  shortDesc: string;
   level: number;
   race?: string;
   class?: string;
+  mobClass?: string;
   hitpoints?: number;
   alignment?: string;
   difficulty?: 'easy' | 'medium' | 'hard' | 'boss';
   roomId?: number;
 }
 
-interface Object {
+export interface Object {
   id: number;
   name: string;
+  shortDesc: string;
   type: string;
+  keywords?: string[];
   value?: number;
   weight?: number;
   level?: number;

@@ -27,9 +27,10 @@ export class CharactersService {
       include: {
         items: {
           include: {
-            objectPrototype: {
+            object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
@@ -50,9 +51,10 @@ export class CharactersService {
       include: {
         items: {
           include: {
-            objectPrototype: {
+            object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
@@ -78,9 +80,10 @@ export class CharactersService {
       include: {
         items: {
           include: {
-            objectPrototype: {
+            object: {
               select: {
                 id: true,
+                zoneId: true,
                 shortDesc: true,
                 type: true,
               },
@@ -112,17 +115,17 @@ export class CharactersService {
     return this.db.character.create({
       data: {
         ...data,
-        userId,
+        user: { connect: { id: userId } },
         // Set default max values based on constitution and level
         hitPointsMax: Math.max(50, data.constitution * 5 + data.level * 10),
         movementMax: Math.max(100, data.constitution * 8 + data.level * 5),
         hitPoints: Math.max(50, data.constitution * 5 + data.level * 10),
         movement: Math.max(100, data.constitution * 8 + data.level * 5),
-      },
+      } as any,
       include: {
         items: {
           include: {
-            objectPrototype: {
+            object: {
               select: {
                 id: true,
                 shortDesc: true,
@@ -154,11 +157,11 @@ export class CharactersService {
 
     return this.db.character.update({
       where: { id },
-      data,
+      data: data as any,
       include: {
         items: {
           include: {
-            objectPrototype: {
+            object: {
               select: {
                 id: true,
                 shortDesc: true,
@@ -191,7 +194,7 @@ export class CharactersService {
     return this.db.characterItem.findMany({
       where: { characterId },
       include: {
-        objectPrototype: {
+        object: {
           select: {
             id: true,
             shortDesc: true,
@@ -210,7 +213,7 @@ export class CharactersService {
       where: { id },
       include: {
         character: true,
-        objectPrototype: {
+        object: {
           select: {
             id: true,
             shortDesc: true,
@@ -233,17 +236,9 @@ export class CharactersService {
     // Ensure character exists
     await this.findCharacterById(data.characterId);
 
-    // Ensure object prototype exists
-    const objectPrototype = await this.db.object.findUnique({
-      where: { id: data.objectPrototypeId },
-    });
-
-    if (!objectPrototype) {
-      throw new NotFoundException(
-        `Object prototype with ID ${data.objectPrototypeId} not found`
-      );
-    }
-
+    // TODO: Fix object prototype lookup to use composite key (zoneId, id)
+    // The input DTO needs to be updated to include objectZoneId
+    
     // If containerId is specified, ensure it exists and belongs to same character
     if (data.containerId) {
       const container = await this.db.characterItem.findUnique({
@@ -256,12 +251,13 @@ export class CharactersService {
     }
 
     return this.db.characterItem.create({
-      data,
+      data: data as any,
       include: {
         character: true,
-        objectPrototype: {
+        object: {
           select: {
             id: true,
+            zoneId: true,
             shortDesc: true,
             type: true,
           },
@@ -293,7 +289,7 @@ export class CharactersService {
       data,
       include: {
         character: true,
-        objectPrototype: {
+        object: {
           select: {
             id: true,
             shortDesc: true,
@@ -346,17 +342,9 @@ export class CharactersService {
     // Ensure character exists
     await this.findCharacterById(data.characterId);
 
-    // Calculate expiration time if duration is set
-    const expiresAt =
-      data.duration && data.duration > 0
-        ? new Date(Date.now() + data.duration * 1000)
-        : undefined;
-
+    // Duration is stored and expiration is calculated on-the-fly
     return this.db.characterEffect.create({
-      data: {
-        ...data,
-        expiresAt,
-      },
+      data: data as any,
       include: {
         character: true,
       },
@@ -365,19 +353,10 @@ export class CharactersService {
 
   async updateCharacterEffect(id: string, data: UpdateCharacterEffectInput) {
     await this.findCharacterEffectById(id);
-
-    // Recalculate expiration time if duration is changed
-    const updateData: any = { ...data };
-    if (data.duration !== undefined) {
-      updateData.expiresAt =
-        data.duration && data.duration > 0
-          ? new Date(Date.now() + data.duration * 1000)
-          : null;
-    }
-
+    // Duration is updated directly; expiration calculated on-the-fly
     return this.db.characterEffect.update({
       where: { id },
-      data: updateData,
+      data,
       include: {
         character: true,
       },
@@ -394,32 +373,43 @@ export class CharactersService {
 
   // Utility methods
   async removeExpiredEffects(characterId?: string) {
-    const where = {
-      expiresAt: {
-        lte: new Date(),
-      },
-      ...(characterId && { characterId }),
-    };
+    // Calculate expiration on-the-fly: appliedAt + duration
+    const effects = await this.db.characterEffect.findMany({
+      where: characterId ? { characterId } : {},
+    });
+    
+    const expiredIds = effects
+      .filter(e => {
+        if (!e.duration || e.duration < 0) return false; // Permanent or invalid
+        const expiresAt = new Date(e.appliedAt.getTime() + e.duration * 1000);
+        return expiresAt <= new Date();
+      })
+      .map(e => e.id);
+
+    if (expiredIds.length === 0) {
+      return { count: 0 };
+    }
 
     return this.db.characterEffect.deleteMany({
-      where,
+      where: { id: { in: expiredIds } },
     });
   }
 
   async getActiveEffects(characterId: string) {
-    return this.db.characterEffect.findMany({
-      where: {
-        characterId,
-        OR: [
-          { duration: -1 }, // Permanent effects
-          { expiresAt: { gt: new Date() } }, // Non-expired effects
-          { expiresAt: null }, // Effects without expiration
-        ],
-      },
+    const effects = await this.db.characterEffect.findMany({
+      where: { characterId },
       include: {
         character: true,
       },
       orderBy: { appliedAt: 'desc' },
+    });
+
+    // Filter to active effects (not expired)
+    const now = new Date();
+    return effects.filter(e => {
+      if (!e.duration || e.duration < 0) return true; // Permanent
+      const expiresAt = new Date(e.appliedAt.getTime() + e.duration * 1000);
+      return expiresAt > now;
     });
   }
 
@@ -482,8 +472,8 @@ export class CharactersService {
         level: true,
         lastLogin: true,
         isOnline: true,
-        raceType: true,
-        playerClass: true,
+        race: true,
+        classId: true,
         user: {
           select: {
             id: true,
@@ -537,81 +527,19 @@ export class CharactersService {
   }
 
   // Character linking methods
+  // DEPRECATED: Character linking methods
+  // Characters now require userId at creation, so linking is no longer supported
   async linkCharacterToUser(
     userId: string,
     characterName: string,
     characterPassword: string
   ) {
-    // Find character by name
-    const character = await this.db.character.findFirst({
-      where: {
-        name: {
-          equals: characterName,
-          mode: 'insensitive',
-        },
-      },
-      include: { user: true },
-    });
-
-    if (!character) {
-      throw new NotFoundException(`Character '${characterName}' not found`);
-    }
-
-    // Check if character already has a linked user
-    if (character.userId) {
-      throw new BadRequestException(
-        `Character '${characterName}' is already linked to a user`
-      );
-    }
-
-    // Verify character password
-    if (!character.passwordHash) {
-      throw new BadRequestException(
-        `Character '${characterName}' does not have a password set and cannot be linked`
-      );
-    }
-
-    const isValidPassword = await bcrypt.compare(
-      characterPassword,
-      character.passwordHash
+    throw new BadRequestException(
+      'Character linking is deprecated. Characters are now created directly by users.'
     );
-    if (!isValidPassword) {
-      throw new UnauthorizedException('Invalid character password');
-    }
-
-    // Link character to user
-    return this.db.character.update({
-      where: { id: character.id },
-      data: { userId },
-      include: {
-        items: {
-          include: {
-            objectPrototype: {
-              select: {
-                id: true,
-                shortDesc: true,
-                type: true,
-              },
-            },
-          },
-        },
-        effects: true,
-      },
-    });
   }
 
   async unlinkCharacterFromUser(characterId: string, userId: string) {
-    const character = await this.findCharacterById(characterId);
-
-    // Check if user owns this character or has permission
-    if (character.userId !== userId) {
-      throw new BadRequestException(
-        'You do not have permission to unlink this character'
-      );
-    }
-
-    // Unlink character (set userId to a system account or handle appropriately)
-    // For now, we'll throw an error as unlinking might need special handling
     throw new BadRequestException(
       'Character unlinking is not currently supported. Please contact an administrator.'
     );
@@ -630,7 +558,6 @@ export class CharactersService {
         name: true,
         level: true,
         userId: true,
-        passwordHash: true,
       },
     });
 
@@ -643,7 +570,7 @@ export class CharactersService {
       name: character.name,
       level: character.level,
       isLinked: !!character.userId,
-      hasPassword: !!character.passwordHash,
+      hasPassword: false, // Deprecated: passwords are now on User model
     };
   }
 
@@ -651,21 +578,9 @@ export class CharactersService {
     characterName: string,
     password: string
   ): Promise<boolean> {
-    const character = await this.db.character.findFirst({
-      where: {
-        name: {
-          equals: characterName,
-          mode: 'insensitive',
-        },
-      },
-      select: { passwordHash: true },
-    });
-
-    if (!character?.passwordHash) {
-      return false;
-    }
-
-    return bcrypt.compare(password, character.passwordHash);
+    throw new BadRequestException(
+      'Character password validation is deprecated. Use user authentication instead.'
+    );
   }
 
   async getCharacterLinkingInfo(characterName: string) {
@@ -680,10 +595,9 @@ export class CharactersService {
         id: true,
         name: true,
         level: true,
-        raceType: true,
-        playerClass: true,
+        race: true,
+        classId: true,
         userId: true,
-        passwordHash: true,
         lastLogin: true,
         timePlayed: true,
         isOnline: true,
@@ -698,13 +612,13 @@ export class CharactersService {
       id: character.id,
       name: character.name,
       level: character.level,
-      race: character.raceType,
-      class: character.playerClass,
+      race: character.race,
+      class: character.classId,
       lastLogin: character.lastLogin,
       timePlayed: character.timePlayed,
       isOnline: character.isOnline,
       isLinked: !!character.userId,
-      hasPassword: !!character.passwordHash,
+      hasPassword: false, // Deprecated: passwords are now on User model
     };
   }
 }

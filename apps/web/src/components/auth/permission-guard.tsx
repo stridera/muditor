@@ -18,6 +18,7 @@ import Link from 'next/link';
 interface PermissionGuardProps {
   children: ReactNode;
   requireImmortal?: boolean;
+  requireBuilder?: boolean;
   requireCoder?: boolean;
   requireGod?: boolean;
   requireUserManagement?: boolean;
@@ -29,6 +30,7 @@ interface PermissionGuardProps {
 export function PermissionGuard({
   children,
   requireImmortal = false,
+  requireBuilder = false,
   requireCoder = false,
   requireGod = false,
   requireUserManagement = false,
@@ -37,7 +39,7 @@ export function PermissionGuard({
   showFallback = true,
 }: PermissionGuardProps) {
   const { user } = useAuth();
-  const { permissions, loading, isImmortal, isCoder, isGod } = usePermissions();
+  const { permissions, loading, isImmortal, isBuilder, isCoder, isGod } = usePermissions();
 
   if (loading) {
     return (
@@ -62,11 +64,13 @@ export function PermissionGuard({
   const hasPermission = checkPermissions({
     permissions,
     requireImmortal,
+    requireBuilder,
     requireCoder,
     requireGod,
     requireUserManagement,
     requireValidation,
     isImmortal,
+    isBuilder,
     isCoder,
     isGod,
   });
@@ -104,6 +108,7 @@ export function PermissionGuard({
           <ul className='text-sm text-red-700 space-y-1'>
             {requireGod && <li>• God role</li>}
             {requireCoder && <li>• Coder role or higher</li>}
+            {requireBuilder && <li>• Builder role or higher</li>}
             {requireImmortal && <li>• Immortal role or higher</li>}
             {requireUserManagement && <li>• User management permissions</li>}
             {requireValidation && <li>• Validation access permissions</li>}
@@ -134,11 +139,13 @@ export function PermissionGuard({
 interface PermissionCheckOptions {
   permissions: any;
   requireImmortal: boolean;
+  requireBuilder: boolean;
   requireCoder: boolean;
   requireGod: boolean;
   requireUserManagement: boolean;
   requireValidation: boolean;
   isImmortal: boolean;
+  isBuilder: boolean;
   isCoder: boolean;
   isGod: boolean;
 }
@@ -146,17 +153,20 @@ interface PermissionCheckOptions {
 function checkPermissions({
   permissions,
   requireImmortal,
+  requireBuilder,
   requireCoder,
   requireGod,
   requireUserManagement,
   requireValidation,
   isImmortal,
+  isBuilder,
   isCoder,
   isGod,
 }: PermissionCheckOptions): boolean {
   // Check role requirements
   if (requireGod && !isGod) return false;
   if (requireCoder && !isCoder) return false;
+  if (requireBuilder && !isBuilder) return false;
   if (requireImmortal && !isImmortal) return false;
 
   // Check specific permissions

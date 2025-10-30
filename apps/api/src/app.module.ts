@@ -14,6 +14,7 @@ import { ShopsModule } from './shops/shops.module';
 import { TriggersModule } from './triggers/triggers.module';
 import { ValidationModule } from './validation/validation.module';
 import { CharactersModule } from './characters/characters.module';
+import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { CharactersModule } from './characters/characters.module';
     TriggersModule,
     ValidationModule,
     CharactersModule,
+    EquipmentSetsModule,
   ],
 })
 export class AppModule {}

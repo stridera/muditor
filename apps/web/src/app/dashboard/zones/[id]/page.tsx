@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 
 interface Room {
   id: number;
@@ -14,7 +15,6 @@ interface Room {
 interface ZoneDetail {
   id: number;
   name: string;
-  top: number;
   lifespan: number;
   climate: string;
   resetMode: string;
@@ -28,6 +28,14 @@ interface ZoneDetail {
 }
 
 export default function ZoneDetailPage() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <ZoneDetailContent />
+    </PermissionGuard>
+  );
+}
+
+function ZoneDetailContent() {
   const params = useParams();
   const zoneId = params.id as string;
   const [zone, setZone] = useState<ZoneDetail | null>(null);
@@ -46,7 +54,6 @@ export default function ZoneDetailPage() {
                 zone(id: $id) {
                   id
                   name
-                  top
                   lifespan
                   climate
                   resetMode
@@ -166,12 +173,6 @@ export default function ZoneDetailPage() {
           </h2>
           <div className='space-y-4'>
             <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Top Room ID
-                </label>
-                <p className='text-gray-900 mt-1'>{zone.top}</p>
-              </div>
               <div>
                 <label className='block text-sm font-medium text-gray-700'>
                   Lifespan

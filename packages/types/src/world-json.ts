@@ -21,7 +21,6 @@ export interface WorldFile {
 export interface ZoneJson {
   id: string;
   name: string;
-  top: number;
   lifespan: number;
   reset_mode: ResetMode;
   hemisphere: Hemisphere;
@@ -706,7 +705,7 @@ export enum TriggerFlag {
   ENTRY = 'Entry',
   RECEIVE = 'Receive',
   FIGHT = 'Fight',
-  HIT_PRCNT = 'HitPrcnt',
+  HIT_PERCENT = 'HitPrcnt',
   BRIBE = 'Bribe',
   LOAD = 'Load',
   MEMORY = 'Memory',
