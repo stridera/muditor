@@ -35,8 +35,8 @@ export class ObjectDto {
   @Field(() => ObjectTypeEnum)
   type: ObjectTypeEnum;
 
-  @Field()
-  keywords: string;
+  @Field(() => [String])
+  keywords: string[];
 
   @Field()
   shortDesc: string;
@@ -95,16 +95,16 @@ export class CreateObjectInput {
 
   @Field(() => Int)
   @IsNumber()
-  vnum: number;
+  zoneId: number;
 
   @Field(() => ObjectTypeEnum, { defaultValue: ObjectTypeEnum.NOTHING })
   @IsOptional()
   @IsEnum(ObjectTypeEnum)
   type?: ObjectTypeEnum;
 
-  @Field()
-  @IsString()
-  keywords: string;
+  @Field(() => [String])
+  @IsArray()
+  keywords: string[];
 
   @Field()
   @IsString()
@@ -170,10 +170,6 @@ export class CreateObjectInput {
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
   values?: any;
-
-  @Field(() => Int)
-  @IsNumber()
-  zoneId: number;
 }
 
 @InputType()
@@ -183,10 +179,10 @@ export class UpdateObjectInput {
   @IsEnum(ObjectTypeEnum)
   type?: ObjectTypeEnum;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  keywords?: string;
+  @IsArray()
+  keywords?: string[];
 
   @Field({ nullable: true })
   @IsOptional()

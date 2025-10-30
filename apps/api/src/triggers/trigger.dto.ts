@@ -13,11 +13,11 @@ import {
   IsArray,
   IsObject,
 } from 'class-validator';
-import { ScriptType, TriggerFlag } from '@prisma/client';
+import { TriggerAttachType, TriggerType } from '@prisma/client';
 
 // Register GraphQL enums
-registerEnumType(ScriptType, { name: 'ScriptType' });
-registerEnumType(TriggerFlag, { name: 'TriggerFlag' });
+registerEnumType(TriggerAttachType, { name: 'TriggerAttachType' });
+registerEnumType(TriggerType, { name: 'TriggerType' });
 
 @ObjectType()
 export class TriggerDto {
@@ -27,8 +27,8 @@ export class TriggerDto {
   @Field()
   name: string;
 
-  @Field(() => ScriptType)
-  attachType: ScriptType;
+  @Field(() => TriggerAttachType)
+  attachType: TriggerAttachType;
 
   @Field(() => Int)
   numArgs: number;
@@ -51,8 +51,8 @@ export class TriggerDto {
   @Field(() => String)
   variables: string; // JSON stringified
 
-  @Field(() => [TriggerFlag])
-  flags: TriggerFlag[];
+  @Field(() => [TriggerType])
+  triggerTypes: TriggerType[];
 
   @Field(() => Date)
   createdAt: Date;
@@ -73,9 +73,9 @@ export class CreateTriggerInput {
   @IsString()
   name: string;
 
-  @Field(() => ScriptType)
-  @IsEnum(ScriptType)
-  attachType: ScriptType;
+  @Field(() => TriggerAttachType)
+  @IsEnum(TriggerAttachType)
+  attachType: TriggerAttachType;
 
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
@@ -111,11 +111,11 @@ export class CreateTriggerInput {
   @IsString()
   variables?: string;
 
-  @Field(() => [TriggerFlag], { defaultValue: [] })
+  @Field(() => [TriggerType], { defaultValue: [] })
   @IsOptional()
   @IsArray()
-  @IsEnum(TriggerFlag, { each: true })
-  flags?: TriggerFlag[];
+  @IsEnum(TriggerType, { each: true })
+  triggerTypes?: TriggerType[];
 }
 
 @InputType()
@@ -125,10 +125,10 @@ export class UpdateTriggerInput {
   @IsString()
   name?: string;
 
-  @Field(() => ScriptType, { nullable: true })
+  @Field(() => TriggerAttachType, { nullable: true })
   @IsOptional()
-  @IsEnum(ScriptType)
-  attachType?: ScriptType;
+  @IsEnum(TriggerAttachType)
+  attachType?: TriggerAttachType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -165,11 +165,11 @@ export class UpdateTriggerInput {
   @IsString()
   variables?: string;
 
-  @Field(() => [TriggerFlag], { nullable: true })
+  @Field(() => [TriggerType], { nullable: true })
   @IsOptional()
   @IsArray()
-  @IsEnum(TriggerFlag, { each: true })
-  flags?: TriggerFlag[];
+  @IsEnum(TriggerType, { each: true })
+  triggerTypes?: TriggerType[];
 }
 
 @InputType()
@@ -178,9 +178,9 @@ export class AttachTriggerInput {
   @IsString()
   triggerId: string;
 
-  @Field(() => ScriptType)
-  @IsEnum(ScriptType)
-  attachType: ScriptType;
+  @Field(() => TriggerAttachType)
+  @IsEnum(TriggerAttachType)
+  attachType: TriggerAttachType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

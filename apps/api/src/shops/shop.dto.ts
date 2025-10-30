@@ -14,10 +14,26 @@ import {
   IsArray,
 } from 'class-validator';
 import { ShopFlag, ShopTradesWith } from '@prisma/client';
+import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
 
 // Register GraphQL enums
 registerEnumType(ShopFlag, { name: 'ShopFlag' });
 registerEnumType(ShopTradesWith, { name: 'ShopTradesWith' });
+
+@ObjectType()
+export class KeeperDto {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => Int)
+  zoneId: number;
+
+  @Field()
+  shortDesc: string;
+
+  @Field(() => [String])
+  keywords: string[];
+}
 
 @ObjectType()
 export class ShopDto {
@@ -63,6 +79,9 @@ export class ShopDto {
   @Field(() => Int, { nullable: true })
   keeperId?: number;
 
+  @Field(() => KeeperDto, { nullable: true })
+  keeper?: KeeperDto;
+
   @Field(() => Int)
   zoneId: number;
 
@@ -71,6 +90,15 @@ export class ShopDto {
 
   @Field(() => Date)
   updatedAt: Date;
+
+  @Field(() => [ShopItemDto], { defaultValue: [] })
+  items: ShopItemDto[];
+
+  @Field(() => [ShopAcceptDto], { defaultValue: [] })
+  accepts: ShopAcceptDto[];
+
+  @Field(() => [ShopHourDto], { defaultValue: [] })
+  hours: ShopHourDto[];
 }
 
 @InputType()
@@ -78,10 +106,6 @@ export class CreateShopInput {
   @Field(() => Int)
   @IsNumber()
   id: number;
-
-  @Field(() => Int)
-  @IsNumber()
-  vnum: number;
 
   @Field(() => Float, { defaultValue: 1.0 })
   @IsOptional()
@@ -228,4 +252,43 @@ export class UpdateShopInput {
   @IsOptional()
   @IsNumber()
   zoneId?: number;
+}
+
+@ObjectType()
+export class ShopItemDto {
+  @Field()
+  id: string;
+
+  @Field(() => Int)
+  amount: number;
+
+  @Field(() => Int)
+  objectId: number;
+
+  @Field(() => ObjectSummaryDto, { nullable: true })
+  object?: ObjectSummaryDto;
+}
+
+@ObjectType()
+export class ShopAcceptDto {
+  @Field()
+  id: string;
+
+  @Field()
+  type: string;
+
+  @Field({ nullable: true })
+  keywords?: string;
+}
+
+@ObjectType()
+export class ShopHourDto {
+  @Field()
+  id: string;
+
+  @Field(() => Int)
+  open: number;
+
+  @Field(() => Int)
+  close: number;
 }

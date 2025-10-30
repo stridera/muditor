@@ -2,7 +2,7 @@
 
 ## Current Concerns
 
-We currently store items by ID, moving away from having a separate vnum. However, I'm rethinking this. We'll need a away to handle specific items separate from the prototypes. For example, a character can get a torch and use it until it's dead, or drink the liquid in a drink container. We also want to be able to add flags like cursed, blessed, etc. We need a way to store the current state of an item held by a character that is separate from the prototype item.
+We currently store items by ID, moving away from having a separate id. However, I'm rethinking this. We'll need a away to handle specific items separate from the prototypes. For example, a character can get a torch and use it until it's dead, or drink the liquid in a drink container. We also want to be able to add flags like cursed, blessed, etc. We need a way to store the current state of an item held by a character that is separate from the prototype item.
 
 ## New tables
 

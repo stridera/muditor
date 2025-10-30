@@ -1,0 +1,81 @@
+import { Resolver, Query, Mutation, Args, Context } from '@nestjs/graphql';
+import { UseGuards } from '@nestjs/common';
+import { DeploymentsService } from './deployments.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { RolesGuard } from '../auth/guards/roles.guard';
+import { Roles } from '../auth/decorators/roles.decorator';
+import { UserRole } from '@prisma/client';
+
+@Resolver('DeploymentPackage')
+@UseGuards(JwtAuthGuard, RolesGuard)
+export class DeploymentsResolver {
+  constructor(private readonly deploymentsService: DeploymentsService) {}
+
+  @Query('deploymentPackages')
+  @Roles(UserRole.BUILDER, UserRole.CODER, UserRole.GOD)
+  async getDeploymentPackages(
+    @Args('status') status?: string,
+    @Args('limit') limit?: number,
+    @Args('offset') offset?: number,
+    @Context() context?: any,
+  ) {
+    // For now, return all packages - implement filtering in production
+    return this.deploymentsService.findAll({ status, limit, offset });
+  }
+
+  @Query('deploymentPackage')
+  @Roles(UserRole.BUILDER, UserRole.CODER, UserRole.GOD)
+  async getDeploymentPackage(@Args('id') id: string) {
+    return this.deploymentsService.findOne(id);
+  }
+
+  @Query('zoneVersions')
+  @Roles(UserRole.BUILDER, UserRole.CODER, UserRole.GOD)
+  async getZoneVersions(@Args('zoneIds') zoneIds?: number[]) {
+    return this.deploymentsService.findZoneVersions(zoneIds);
+  }
+
+  @Query('zoneVersion')
+  @Roles(UserRole.BUILDER, UserRole.CODER, UserRole.GOD)
+  async getZoneVersion(@Args('zoneId') zoneId: number) {
+    return this.deploymentsService.findZoneVersion(zoneId);
+  }
+
+  @Mutation('createDeploymentPackage')
+  @Roles(UserRole.BUILDER, UserRole.CODER, UserRole.GOD)
+  async createDeploymentPackage(
+    @Args('input') input: { name: string; description?: string; zoneIds: number[] },
+    @Context() context: any,
+  ) {
+    const userId = context.req.user.sub;
+    const user = await this.deploymentsService.getUser(userId);
+    return this.deploymentsService.createDeploymentPackage(
+      input.name,
+      input.description || '',
+      input.zoneIds,
+      user.name,
+    );
+  }
+
+  @Mutation('executeDeployment')
+  @Roles(UserRole.CODER, UserRole.GOD)
+  async executeDeployment(
+    @Args('input') input: { packageId: string },
+    @Context() context: any,
+  ) {
+    const userId = context.req.user.sub;
+    const user = await this.deploymentsService.getUser(userId);
+    return this.deploymentsService.executeDeployment(input.packageId, user.name);
+  }
+
+  @Mutation('rollbackDeployment')
+  @Roles(UserRole.CODER, UserRole.GOD)
+  async rollbackDeployment(
+    @Args('input') input: { packageId: string },
+    @Context() context: any,
+  ) {
+    const userId = context.req.user.sub;
+    const user = await this.deploymentsService.getUser(userId);
+    return this.deploymentsService.rollbackDeployment(input.packageId, user.name);
+  }
+}

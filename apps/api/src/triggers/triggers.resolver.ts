@@ -10,7 +10,7 @@ import {
   UpdateTriggerInput,
   AttachTriggerInput,
 } from './trigger.dto';
-import { ScriptType } from '@prisma/client';
+import { TriggerAttachType } from '@prisma/client';
 
 @Resolver(() => TriggerDto)
 @UseGuards(JwtAuthGuard)
@@ -22,7 +22,7 @@ export class TriggersResolver {
     const triggers = await this.triggersService.findAll();
     return triggers.map(trigger => ({
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     }));
   }
 
@@ -31,13 +31,13 @@ export class TriggersResolver {
     const trigger = await this.triggersService.findOne(id);
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })
   async findByAttachment(
-    @Args('attachType', { type: () => ScriptType }) attachType: ScriptType,
+    @Args('attachType', { type: () => TriggerAttachType }) attachType: TriggerAttachType,
     @Args('entityId', { type: () => Int }) entityId: number
   ) {
     const triggers = await this.triggersService.findByAttachment(
@@ -46,7 +46,7 @@ export class TriggersResolver {
     );
     return triggers.map(trigger => ({
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     }));
   }
 
@@ -58,7 +58,7 @@ export class TriggersResolver {
     const trigger = await this.triggersService.create(input, user.id);
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 
@@ -71,7 +71,7 @@ export class TriggersResolver {
     const trigger = await this.triggersService.update(id, input, user.id);
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 
@@ -80,7 +80,7 @@ export class TriggersResolver {
     const trigger = await this.triggersService.delete(id);
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 
@@ -92,7 +92,7 @@ export class TriggersResolver {
     const trigger = await this.triggersService.attachToEntity(input, user.id);
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 
@@ -107,7 +107,7 @@ export class TriggersResolver {
     );
     return {
       ...trigger,
-      variables: JSON.stringify(trigger.variables),
+      variables: '{}',
     };
   }
 }

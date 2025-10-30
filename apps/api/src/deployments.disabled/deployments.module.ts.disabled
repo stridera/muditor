@@ -1,0 +1,23 @@
+import { Module } from '@nestjs/common';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import { DeploymentsService } from './deployments.service';
+import { DeploymentsResolver } from './deployments.resolver';
+import { DatabaseModule } from '../database/database.module';
+
+@Module({
+  imports: [DatabaseModule, ConfigModule],
+  providers: [
+    DeploymentsService,
+    DeploymentsResolver,
+    {
+      provide: 'DEPLOYMENT_CONFIG',
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        devDatabaseUrl: configService.get<string>('DEV_DATABASE_URL'),
+        prodDatabaseUrl: configService.get<string>('PROD_DATABASE_URL'),
+      }),
+    },
+  ],
+  exports: [DeploymentsService],
+})
+export class DeploymentsModule {}

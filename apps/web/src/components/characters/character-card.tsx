@@ -213,7 +213,7 @@ export function CharacterCard({
                       <span>{character.intelligence}</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>Intelligence: Affects mana and spell power</p>
+                      <p>Intelligence: Affects spell power</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -225,9 +225,7 @@ export function CharacterCard({
                       <span>{character.wisdom}</span>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <p>
-                        Wisdom: Affects mana regeneration and spell resistance
-                      </p>
+                      <p>Wisdom: Affects spell resistance</p>
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>

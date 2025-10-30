@@ -14,26 +14,28 @@ This directory contains comprehensive documentation for the Muditor database sch
 
 Muditor uses PostgreSQL with Prisma ORM to store MUD world data in a normalized relational structure. The database supports:
 
-- **Multi-user System**: User management with roles (Player, Immortal, Coder, God)
-- **World Structure**: Zones, Rooms, Exits with full relationship mapping
-- **NPCs (Mobs)**: Complete mob definitions with stats, flags, and equipment
-- **Objects**: Items with type-specific properties and effects
-- **Commerce**: Shop system with keepers, inventory, and trading rules
-- **Scripting**: Lua trigger system for dynamic content
-- **Audit Trail**: Complete change tracking for all modifications
+- **Multi-user System**: User management with enhanced security, roles, and ban system
+- **Character System**: Comprehensive character progression with skills, spells, and items
+- **World Structure**: Zones, Rooms, Exits with 3D layout coordinates and full relationship mapping
+- **NPCs (Mobs)**: Complete mob definitions with stats, flags, equipment, and AI classes
+- **Objects**: Items with type-specific properties, effects, and instance customization
+- **Commerce**: Shop system with keepers, inventory, trading rules, and hours
+- **Game Logic**: Class system, spell system, skill progression, and character advancement
+- **Scripting**: Lua trigger system for dynamic content and interactive behaviors
+- **Security & Audit**: Complete change tracking, ban management, and security features
 
 ## Database Architecture
 
 ```
-┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│     Users       │    │     World       │    │   Game Logic    │
-├─────────────────┤    ├─────────────────┤    ├─────────────────┤
-│ • User          │    │ • Zone          │    │ • MobReset      │
-│ • Character     │    │ • Room          │    │ • MobCarrying   │
-│ • AuditLog      │    │ • RoomExit      │    │ • MobEquipped   │
-└─────────────────┘    │ • Mob           │    │ • Shop          │
-                       │ • Object        │    │ • ShopItem      │
-                       │ • Trigger       │    │ • Trigger       │
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│     Users       │    │     World       │    │   Game Logic    │    │   Character     │
+├─────────────────┤    ├─────────────────┤    ├─────────────────┤    ├─────────────────┤
+│ • User          │    │ • Zone          │    │ • Class         │    │ • Character     │
+│ • BanRecord     │    │ • Room (3D)     │    │ • Spell         │    │ • CharacterItem │
+│ • AuditLog      │    │ • RoomExit      │    │ • SpellSchool   │    │ • CharacterSkill│
+│ • ChangeLog     │    │ • Mob           │    │ • Skill         │    │ • CharacterSpell│
+└─────────────────┘    │ • Object        │    │ • MobReset      │    │ • CharacterEffect│
+                       │ • Trigger       │    │ • Shop          │    └─────────────────┘
                        └─────────────────┘    └─────────────────┘
 ```
 

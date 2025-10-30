@@ -54,7 +54,7 @@ The new format uses inline equipment and inventory specification:
                 "name": "(a cup)"
             },
             {
-                "id": 3101, 
+                "id": 3101,
                 "max": 500,
                 "name": "(a cup)"
             }
@@ -246,7 +246,7 @@ Used in object `affects` to specify what character attribute is modified.
 
 - `Str`, `Dex`, `Int`, `Wis`, `Con`, `Cha`
 - `Class`, `Level`, `Age`, `CharacterWeight`, `CharacterHeight`
-- `Mana`, `Hit`, `Move`, `Gold`, `Exp`
+- `Hit`, `Move`, `Gold`, `Exp`
 - `AC`, `HitRoll`, `DamRoll`
 - `SavingParalysis`, `SavingRod`, `SavingPetrification`, `SavingBreath`, `SavingSpell`
 - `Size`, `Regeneration`, `Focus`, `Perception`, `Concealment`, `Composition`
@@ -287,7 +287,7 @@ Equipment slot names used in the `equipped` section. These correspond to the Equ
 
 - `Light` (0) - Light source slot
 - `FingerRight` (1) - Right finger
-- `FingerLeft` (2) - Left finger  
+- `FingerLeft` (2) - Left finger
 - `Neck1` (3) - First neck slot
 - `Neck2` (4) - Second neck slot
 - `Body` (5) - Main body armor
@@ -391,15 +391,15 @@ Determines where an object can be worn.
 
 Key differences between legacy and modern field names:
 
-| JSON Field | Modern Field | Notes |
-|------------|--------------|-------|
-| `name_list` | `name` | Keywords for targeting |
-| `short_description` | `short_desc` | Brief description |
-| `long_description` | `long_desc` | Room presence description |
-| `action_description` | `action_desc` | Special action text |
-| `extra_descriptions` | `extra_descs` | Array vs object structure |
-| `mob_flags` | `flags` | Comma-separated string vs. array of strings |
-| `effect_flags` | `effects` | Magical effects |
+| JSON Field           | Modern Field  | Notes                                       |
+| -------------------- | ------------- | ------------------------------------------- |
+| `name_list`          | `name`        | Keywords for targeting                      |
+| `short_description`  | `short_desc`  | Brief description                           |
+| `long_description`   | `long_desc`   | Room presence description                   |
+| `action_description` | `action_desc` | Special action text                         |
+| `extra_descriptions` | `extra_descs` | Array vs object structure                   |
+| `mob_flags`          | `flags`       | Comma-separated string vs. array of strings |
+| `effect_flags`       | `effects`     | Magical effects                             |
 
 ## ID Handling
 

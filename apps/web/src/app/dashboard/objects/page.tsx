@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
 import { useQuery, useMutation } from '@apollo/client/react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useSearchParams, useRouter } from 'next/navigation';
 import { useZone } from '@/contexts/zone-context';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import {
@@ -19,6 +19,7 @@ import {
   ChevronRight,
   ArrowUp,
   ArrowDown,
+  ChevronDown,
 } from 'lucide-react';
 import ZoneSelector from '../../../components/ZoneSelector';
 import EnhancedSearch, {
@@ -31,7 +32,7 @@ import {
 } from '../../../lib/search-utils';
 
 const GET_OBJECTS = gql`
-  query GetObjects {
+  query GetObjectsDashboard {
     objects(take: 100) {
       id
       type
@@ -41,12 +42,13 @@ const GET_OBJECTS = gql`
       weight
       cost
       zoneId
+      values
     }
   }
 `;
 
 const GET_OBJECTS_BY_ZONE = gql`
-  query GetObjectsByZone($zoneId: Int!) {
+  query GetObjectsByZoneDashboard($zoneId: Int!) {
     objectsByZone(zoneId: $zoneId) {
       id
       type
@@ -56,13 +58,16 @@ const GET_OBJECTS_BY_ZONE = gql`
       weight
       cost
       zoneId
+      values
     }
   }
 `;
 
 const DELETE_OBJECT = gql`
   mutation DeleteObject($id: Int!) {
-    deleteObject(id: $id)
+    deleteObject(id: $id) {
+      id
+    }
   }
 `;
 
@@ -82,7 +87,9 @@ export default function ObjectsPage() {
 
 function ObjectsContent() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const zoneParam = searchParams.get('zone');
+  const idParam = searchParams.get('id');
   const { selectedZone, setSelectedZone } = useZone();
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -94,6 +101,9 @@ function ObjectsContent() {
   );
   const [isDeleting, setIsDeleting] = useState(false);
   const [cloningId, setCloningId] = useState<number | null>(null);
+  const [expandedObjects, setExpandedObjects] = useState<Set<number>>(new Set());
+  const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
+  const [objectDetails, setObjectDetails] = useState<Record<number, any>>({});
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,6 +126,17 @@ function ObjectsContent() {
   const [deleteObject] = useMutation(DELETE_OBJECT);
   const [deleteObjects] = useMutation(DELETE_OBJECTS);
 
+  // Redirect to object editor if id parameter is provided
+  useEffect(() => {
+    if (idParam && zoneParam) {
+      const objectId = parseInt(idParam);
+      const zoneId = parseInt(zoneParam);
+      if (!isNaN(objectId) && !isNaN(zoneId)) {
+        router.push(`/dashboard/objects/editor?zone=${zoneId}&id=${objectId}`);
+      }
+    }
+  }, [idParam, zoneParam, router]);
+
   // Handle initial zone parameter from URL
   useEffect(() => {
     if (zoneParam && selectedZone === null) {
@@ -125,6 +146,78 @@ function ObjectsContent() {
       }
     }
   }, [zoneParam, selectedZone, setSelectedZone]);
+
+  const toggleObjectExpanded = async (objectId: number) => {
+    if (expandedObjects.has(objectId)) {
+      setExpandedObjects(new Set([...expandedObjects].filter(id => id !== objectId)));
+      return;
+    }
+
+    // Add to expanded set
+    setExpandedObjects(new Set(expandedObjects).add(objectId));
+
+    // Load detailed data if not already loaded
+    const object = objects.find((obj: any) => obj.id === objectId);
+    if (object && !objectDetails[objectId] && !object.description) {
+      setLoadingDetails(new Set(loadingDetails).add(objectId));
+      try {
+        const getObjectQuery = `
+          query GetObject($id: Int!) {
+            object(id: $id) {
+              id
+              type
+              keywords
+              shortDesc
+              description
+              actionDesc
+              flags
+              effectFlags
+              wearFlags
+              weight
+              cost
+              timer
+              decomposeTimer
+              level
+              concealment
+              values
+              zoneId
+              createdAt
+              updatedAt
+            }
+          }
+        `;
+
+        const response = await fetch('http://localhost:4000/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: getObjectQuery,
+            variables: { id: objectId },
+          }),
+        });
+
+        const result = await response.json();
+        if (result.errors) {
+          console.error(
+            'Error loading object details:',
+            result.errors[0].message
+          );
+        } else if (result.data.object) {
+          console.log('Object data received:', result.data.object);
+          console.log('Object values:', result.data.object.values);
+          // Store detailed data separately to trigger re-render
+          setObjectDetails(prev => ({
+            ...prev,
+            [objectId]: result.data.object
+          }));
+        }
+      } catch (err) {
+        console.error('Error loading object details:', err);
+      } finally {
+        setLoadingDetails(new Set([...loadingDetails].filter(id => id !== objectId)));
+      }
+    }
+  };
 
   const handleDelete = async (id: number, shortDesc: string) => {
     if (
@@ -534,72 +627,365 @@ function ObjectsContent() {
         </div>
       ) : (
         <div className='grid gap-4'>
-          {paginatedObjects.map((object: any) => (
-            <div
-              key={object.id}
-              className='bg-white border rounded-lg p-4 hover:shadow-md transition-shadow'
-            >
-              <div className='flex items-start justify-between'>
-                {/* Checkbox for selection */}
-                <div className='flex items-start gap-3'>
-                  <button
-                    onClick={() => toggleObjectSelection(object.id)}
-                    className='mt-1 text-gray-400 hover:text-blue-600'
-                  >
-                    {selectedObjects.has(object.id) ? (
-                      <CheckSquare className='w-5 h-5 text-blue-600' />
-                    ) : (
-                      <Square className='w-5 h-5' />
-                    )}
-                  </button>
-                  <div className='flex-1'>
-                    <div className='flex items-center gap-2 mb-1'>
-                      <h3 className='font-semibold text-lg text-gray-900'>
-                        {object.shortDesc}
-                      </h3>
-                      <span className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full uppercase'>
-                        {object.type.replace('_', ' ')}
-                      </span>
-                    </div>
-                    <p className='text-sm text-gray-600 mb-2'>
-                      Keywords: {object.keywords}
-                    </p>
-                    <div className='flex items-center gap-4 text-sm text-gray-500'>
-                      <span>Level {object.level}</span>
-                      <span>{object.weight} lbs</span>
-                      <span>{object.cost} coins</span>
-                      <span>Zone {object.zoneId}</span>
+          {paginatedObjects.map((object: any) => {
+            // Merge object with detailed data if available
+            const fullObject = objectDetails[object.id] ? { ...object, ...objectDetails[object.id] } : object;
+            return (
+            <div key={fullObject.id} className='bg-white border rounded-lg hover:shadow-md transition-shadow'>
+              <div
+                className='p-4 cursor-pointer'
+                onClick={() => toggleObjectExpanded(fullObject.id)}
+              >
+                <div className='flex items-start justify-between'>
+                  {/* Checkbox for selection */}
+                  <div className='flex items-start gap-3'>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        toggleObjectSelection(fullObject.id);
+                      }}
+                      className='mt-1 text-gray-400 hover:text-blue-600'
+                    >
+                      {selectedObjects.has(fullObject.id) ? (
+                        <CheckSquare className='w-5 h-5 text-blue-600' />
+                      ) : (
+                        <Square className='w-5 h-5' />
+                      )}
+                    </button>
+                    <div className='flex-1'>
+                      <div className='flex items-center gap-2 mb-1'>
+                        <h3 className='font-semibold text-lg text-gray-900'>
+                          #{fullObject.id} - {fullObject.shortDesc}
+                        </h3>
+                        <span className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full uppercase'>
+                          {fullObject.type.replace('_', ' ')}
+                        </span>
+                        <ChevronDown
+                          className={`w-4 h-4 text-gray-400 transition-transform ${
+                            expandedObjects.has(fullObject.id) ? 'rotate-180' : ''
+                          }`}
+                        />
+                      </div>
+                      <p className='text-sm text-gray-600 mb-2'>
+                        Keywords: {Array.isArray(fullObject.keywords) ? fullObject.keywords.join(', ') : fullObject.keywords}
+                      </p>
+                      <div className='flex items-center gap-4 text-sm text-gray-500'>
+                        <span>Level {fullObject.level}</span>
+                        <span>{fullObject.weight} lbs</span>
+                        <span>{fullObject.cost} coins</span>
+                        <span>Zone {fullObject.zoneId}</span>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className='flex items-center gap-2 ml-4'>
-                  <Link
-                    href={`/dashboard/objects/editor?id=${object.id}`}
-                    className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
-                  >
-                    <Edit className='w-3 h-3 mr-1' />
-                    Edit
-                  </Link>
-                  <button
-                    onClick={() => handleCloneObject(object.id)}
-                    disabled={cloningId === object.id}
-                    className='inline-flex items-center text-green-600 hover:text-green-800 px-3 py-1 text-sm disabled:opacity-50'
-                  >
-                    <Copy className='w-3 h-3 mr-1' />
-                    {cloningId === object.id ? 'Cloning...' : 'Clone'}
-                  </button>
-                  <button
-                    onClick={() => handleDelete(object.id, object.shortDesc)}
-                    disabled={deletingId === object.id}
-                    className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm disabled:opacity-50'
-                  >
-                    <Trash2 className='w-3 h-3 mr-1' />
-                    {deletingId === object.id ? 'Deleting...' : 'Delete'}
-                  </button>
+                  <div className='flex items-center gap-2 ml-4'>
+                    <Link
+                      href={`/dashboard/objects/editor?id=${fullObject.id}`}
+                      className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <Edit className='w-3 h-3 mr-1' />
+                      Edit
+                    </Link>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleCloneObject(fullObject.id);
+                      }}
+                      disabled={cloningId === fullObject.id}
+                      className='inline-flex items-center text-green-600 hover:text-green-800 px-3 py-1 text-sm disabled:opacity-50'
+                    >
+                      <Copy className='w-3 h-3 mr-1' />
+                      {cloningId === fullObject.id ? 'Cloning...' : 'Clone'}
+                    </button>
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDelete(fullObject.id, fullObject.shortDesc);
+                      }}
+                      disabled={deletingId === fullObject.id}
+                      className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm disabled:opacity-50'
+                    >
+                      <Trash2 className='w-3 h-3 mr-1' />
+                      {deletingId === fullObject.id ? 'Deleting...' : 'Delete'}
+                    </button>
+                  </div>
                 </div>
               </div>
+
+              {/* Expanded Details */}
+              {expandedObjects.has(fullObject.id) && (
+                <div className='border-t border-gray-200 p-4 bg-gray-50'>
+                  {loadingDetails.has(fullObject.id) ? (
+                    <div className='text-center py-4'>
+                      <div className='inline-flex items-center'>
+                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2'></div>
+                        <span className='text-sm text-gray-600'>Loading object details...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='space-y-4'>
+                      {/* Full Description */}
+                      {fullObject.description && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Description</h4>
+                          <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                            {fullObject.description}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Action Description */}
+                      {fullObject.actionDesc && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Action Description</h4>
+                          <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                            {fullObject.actionDesc}
+                          </p>
+                        </div>
+                      )}
+
+                      {/* Technical Details */}
+                      <div>
+                        <h4 className='font-medium text-gray-900 mb-2'>Technical Details</h4>
+                        <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                          <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                            <div>
+                              <span className='text-gray-600'>Weight:</span>
+                              <span className='ml-1 font-medium'>{fullObject.weight} lbs</span>
+                            </div>
+                            <div>
+                              <span className='text-gray-600'>Cost:</span>
+                              <span className='ml-1 font-medium'>{fullObject.cost} coins</span>
+                            </div>
+                            <div>
+                              <span className='text-gray-600'>Level:</span>
+                              <span className='ml-1 font-medium'>{fullObject.level}</span>
+                            </div>
+                            <div>
+                              <span className='text-gray-600'>Concealment:</span>
+                              <span className='ml-1 font-medium'>{fullObject.concealment || 0}</span>
+                            </div>
+                            {fullObject.timer > 0 && (
+                              <div>
+                                <span className='text-gray-600'>Timer:</span>
+                                <span className='ml-1 font-medium'>{fullObject.timer}</span>
+                              </div>
+                            )}
+                            {fullObject.decomposeTimer > 0 && (
+                              <div>
+                                <span className='text-gray-600'>Decompose Timer:</span>
+                                <span className='ml-1 font-medium'>{fullObject.decomposeTimer}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Flags */}
+                      {(fullObject.flags?.length > 0 || fullObject.effectFlags?.length > 0 || fullObject.wearFlags?.length > 0) && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Flags</h4>
+                          <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                            {fullObject.flags?.length > 0 && (
+                              <div>
+                                <span className='text-gray-600'>Object Flags:</span>
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {fullObject.flags.map((flag: string) => (
+                                    <span key={flag} className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'>
+                                      {flag.replace('_', ' ')}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {fullObject.effectFlags?.length > 0 && (
+                              <div>
+                                <span className='text-gray-600'>Effect Flags:</span>
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {fullObject.effectFlags.map((flag: string) => (
+                                    <span key={flag} className='px-2 py-1 bg-green-100 text-green-700 text-xs rounded'>
+                                      {flag.replace('_', ' ')}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                            {fullObject.wearFlags?.length > 0 && (
+                              <div>
+                                <span className='text-gray-600'>Wear Flags:</span>
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {fullObject.wearFlags.map((flag: string) => (
+                                    <span key={flag} className='px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded'>
+                                      {flag.replace('_', ' ')}
+                                    </span>
+                                  ))}
+                                </div>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Type-Specific Information */}
+                      <div>
+                        <h4 className='font-medium text-gray-900 mb-2'>Type Details</h4>
+                        <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                          {(() => {
+                            console.log(`Object ${fullObject.id} values:`, fullObject.values);
+                            console.log(`Has values:`, fullObject.values && Object.keys(fullObject.values).length > 0);
+                            return fullObject.values && Object.keys(fullObject.values).length > 0;
+                          })() ? (
+                            <>
+                              {/* Weapon-specific */}
+                              {fullObject.type === 'WEAPON' && fullObject.values['Hit Dice'] && (
+                                <>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Damage:</span>
+                                    <span>{fullObject.values['Hit Dice'].num}d{fullObject.values['Hit Dice'].size}{fullObject.values['Hit Dice'].bonus >= 0 ? '+' : ''}{fullObject.values['Hit Dice'].bonus}</span>
+                                  </div>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Average Damage:</span>
+                                    <span>{fullObject.values.Average}</span>
+                                  </div>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Damage Type:</span>
+                                    <span>{fullObject.values['Damage Type']}</span>
+                                  </div>
+                                  {fullObject.values.HitRoll !== 0 && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Hit Bonus:</span>
+                                      <span>{fullObject.values.HitRoll >= 0 ? '+' : ''}{fullObject.values.HitRoll}</span>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {/* Container-specific */}
+                              {(fullObject.type === 'CONTAINER' || fullObject.type === 'DRINKCONTAINER') && (
+                                <>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Capacity:</span>
+                                    <span>{fullObject.values.Capacity}</span>
+                                  </div>
+                                  {fullObject.values.Remaining !== undefined && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Remaining:</span>
+                                      <span>{fullObject.values.Remaining}</span>
+                                    </div>
+                                  )}
+                                  {fullObject.values.Liquid && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Contains:</span>
+                                      <span>{fullObject.values.Liquid}</span>
+                                    </div>
+                                  )}
+                                  {fullObject.values.Poisoned !== undefined && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Poisoned:</span>
+                                      <span className={fullObject.values.Poisoned ? 'text-red-600' : 'text-green-600'}>
+                                        {fullObject.values.Poisoned ? 'Yes' : 'No'}
+                                      </span>
+                                    </div>
+                                  )}
+                                  {fullObject.values['Weight Reduction'] !== undefined && fullObject.values['Weight Reduction'] > 0 && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Weight Reduction:</span>
+                                      <span>{fullObject.values['Weight Reduction']}%</span>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {/* Light-specific */}
+                              {fullObject.type === 'LIGHT' && (
+                                <>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Duration:</span>
+                                    <span>{fullObject.values.Remaining}/{fullObject.values.Capacity}</span>
+                                  </div>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Status:</span>
+                                    <span className={fullObject.values['Is_Lit:'] ? 'text-yellow-600' : 'text-gray-600'}>
+                                      {fullObject.values['Is_Lit:'] ? 'Lit' : 'Unlit'}
+                                    </span>
+                                  </div>
+                                </>
+                              )}
+                              
+                              {/* Food-specific */}
+                              {fullObject.type === 'FOOD' && (
+                                <>
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>Filling:</span>
+                                    <span>{fullObject.values.Filling}</span>
+                                  </div>
+                                  {fullObject.values.Poisoned !== undefined && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>Poisoned:</span>
+                                      <span className={fullObject.values.Poisoned ? 'text-red-600' : 'text-green-600'}>
+                                        {fullObject.values.Poisoned ? 'Yes' : 'No'}
+                                      </span>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {/* Armor-specific */}
+                              {fullObject.type === 'ARMOR' && (
+                                <>
+                                  {fullObject.values['AC Apply'] && (
+                                    <div className='flex justify-between'>
+                                      <span className='text-gray-600'>AC Bonus:</span>
+                                      <span>{fullObject.values['AC Apply'] >= 0 ? '+' : ''}{fullObject.values['AC Apply']}</span>
+                                    </div>
+                                  )}
+                                </>
+                              )}
+                              
+                              {/* Generic values for other types */}
+                              {!['WEAPON', 'CONTAINER', 'DRINKCONTAINER', 'LIGHT', 'FOOD', 'ARMOR'].includes(fullObject.type) && (
+                                <div className='space-y-1'>
+                                  {Object.entries(fullObject.values).map(([key, value]) => (
+                                    <div key={key} className='flex justify-between'>
+                                      <span className='text-gray-600'>{key}:</span>
+                                      <span>{typeof value === 'object' ? JSON.stringify(value) : String(value)}</span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+                            </>
+                          ) : (
+                            <div className='text-gray-500 italic'>No additional type-specific details available</div>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Timestamps */}
+                      {(fullObject.createdAt || fullObject.updatedAt) && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Timestamps</h4>
+                          <div className='bg-white p-3 rounded border text-sm space-y-1'>
+                            {fullObject.createdAt && (
+                              <div className='flex justify-between'>
+                                <span className='text-gray-600'>Created:</span>
+                                <span>{new Date(fullObject.createdAt).toLocaleString()}</span>
+                              </div>
+                            )}
+                            {fullObject.updatedAt && (
+                              <div className='flex justify-between'>
+                                <span className='text-gray-600'>Updated:</span>
+                                <span>{new Date(fullObject.updatedAt).toLocaleString()}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
-          ))}
+          );})}
         </div>
       )}
 

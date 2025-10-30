@@ -14,9 +14,10 @@ export class MobResetResolver {
 
   @Query(() => [MobResetDto], { name: 'mobResets' })
   async findByMob(
+    @Args('mobZoneId', { type: () => Int }) mobZoneId: number,
     @Args('mobId', { type: () => Int }) mobId: number
   ): Promise<MobResetDto[]> {
-    return this.mobResetService.findByMob(mobId);
+    return this.mobResetService.findByMob(mobZoneId, mobId);
   }
 
   @Query(() => MobResetDto, { name: 'mobReset', nullable: true })
@@ -53,17 +54,9 @@ export class MobResetResolver {
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
-  async deleteMobCarrying(
+  async deleteMobResetEquipment(
     @Args('id', { type: () => ID }) id: string
   ): Promise<boolean> {
-    return this.mobResetService.deleteCarrying(id);
-  }
-
-  @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
-  async deleteMobEquipped(
-    @Args('id', { type: () => ID }) id: string
-  ): Promise<boolean> {
-    return this.mobResetService.deleteEquipped(id);
+    return this.mobResetService.deleteEquipment(id);
   }
 }

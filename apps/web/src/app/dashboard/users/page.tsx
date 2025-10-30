@@ -63,6 +63,9 @@ import {
   Calendar,
 } from 'lucide-react';
 import { toast } from 'sonner';
+import { useErrorHandler } from '@/lib/error-utils';
+import { LoadingError } from '@/components/ui/error-display';
+import { Loading } from '@/components/ui/loading';
 
 const USERS_QUERY = gql`
   query Users {
@@ -104,9 +107,7 @@ const BAN_USER_MUTATION = gql`
       id
       reason
       bannedAt
-      user {
-        username
-      }
+      userId
     }
   }
 `;
@@ -116,9 +117,7 @@ const UNBAN_USER_MUTATION = gql`
     unbanUser(input: $input) {
       id
       unbannedAt
-      user {
-        username
-      }
+      userId
     }
   }
 `;
@@ -164,6 +163,7 @@ function UsersContent() {
   const [updateUser] = useMutation(UPDATE_USER_MUTATION);
   const [banUser] = useMutation(BAN_USER_MUTATION);
   const [unbanUser] = useMutation(UNBAN_USER_MUTATION);
+  const { handleError } = useErrorHandler();
 
   const handleUpdateUser = async (userId: string, updates: any) => {
     try {
@@ -176,7 +176,8 @@ function UsersContent() {
       refetch();
       setEditDialogOpen(false);
     } catch (err: any) {
-      toast.error(`Failed to update user: ${err.message}`);
+      const errorDisplay = handleError(err, 'updating user');
+      toast.error(errorDisplay.message);
     }
   };
 
@@ -195,7 +196,8 @@ function UsersContent() {
       refetch();
       setBanDialogOpen(false);
     } catch (err: any) {
-      toast.error(`Failed to ban user: ${err.message}`);
+      const errorDisplay = handleError(err, 'banning user');
+      toast.error(errorDisplay.message);
     }
   };
 
@@ -209,7 +211,8 @@ function UsersContent() {
       toast.success('User unbanned successfully');
       refetch();
     } catch (err: any) {
-      toast.error(`Failed to unban user: ${err.message}`);
+      const errorDisplay = handleError(err, 'unbanning user');
+      toast.error(errorDisplay.message);
     }
   };
 
@@ -247,8 +250,8 @@ function UsersContent() {
     }
   };
 
-  if (loading) return <div>Loading users...</div>;
-  if (error) return <div>Error loading users: {error.message}</div>;
+  if (loading) return <Loading text="Loading users..." className="py-8" />;
+  if (error) return <LoadingError error={error} onRetry={() => refetch()} resource="users" />;
 
   const users = data?.users || [];
 

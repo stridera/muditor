@@ -2,13 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { Save, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { ArrowLeft, Save } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import MobEquipmentManager from '../../../../components/mob-equipment-manager';
 import {
   useRealTimeValidation,
@@ -17,30 +17,21 @@ import {
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_MOB = gql`
-  query GetMob($id: Int!) {
-    mob(id: $id) {
+  query GetMob($zoneId: Int!, $id: Int!) {
+    mob(zoneId: $zoneId, id: $id) {
       id
+      zoneId
       keywords
-      mobClass
       shortDesc
       longDesc
-      desc
-      alignment
+      description
       level
-      armorClass
+      alignment
       hitRoll
-      move
-      hpDiceNum
-      hpDiceSize
-      hpDiceBonus
-      damageDiceNum
-      damageDiceSize
-      damageDiceBonus
-      copper
-      silver
-      gold
-      platinum
-      raceAlign
+      armorClass
+      hpDice
+      damageDice
+      damageType
       strength
       intelligence
       wisdom
@@ -49,20 +40,13 @@ const GET_MOB = gql`
       charisma
       perception
       concealment
-      zoneId
-      classId
-      raceId
-      raceLegacy
-      mobFlags
-      effectFlags
+      race
       position
-      defaultPosition
       gender
       size
       lifeForce
       composition
       stance
-      damageType
       createdAt
       updatedAt
     }
@@ -70,13 +54,13 @@ const GET_MOB = gql`
 `;
 
 const UPDATE_MOB = gql`
-  mutation UpdateMob($id: Int!, $data: UpdateMobInput!) {
-    updateMob(id: $id, data: $data) {
+  mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
+    updateMob(zoneId: $zoneId, id: $id, data: $data) {
       id
       keywords
       shortDesc
       longDesc
-      desc
+      description
     }
   }
 `;
@@ -121,7 +105,7 @@ interface MobFormData {
   perception: number;
   concealment: number;
   zoneId: number;
-  raceLegacy: string;
+  race: string;
   position: string;
   defaultPosition: string;
   gender: string;
@@ -178,7 +162,8 @@ const mobValidationRules: ValidationRules<MobFormData> = [
 function MobEditorContent() {
   const searchParams = useSearchParams();
   const mobId = searchParams.get('id');
-  const isNew = !mobId;
+  const zoneId = searchParams.get('zone');
+  const isNew = !mobId || !zoneId;
 
   const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState<MobFormData>({
@@ -211,7 +196,7 @@ function MobEditorContent() {
     perception: 0,
     concealment: 0,
     zoneId: 511,
-    raceLegacy: 'HUMAN',
+    race: 'HUMAN',
     position: 'STANDING',
     defaultPosition: 'STANDING',
     gender: 'NEUTRAL',
@@ -230,38 +215,73 @@ function MobEditorContent() {
   const [generalError, setGeneralError] = useState<string>('');
 
   const { loading, error, data } = useQuery(GET_MOB, {
-    variables: { id: parseInt(mobId || '0') },
+    variables: {
+      zoneId: parseInt(zoneId || '0'),
+      id: parseInt(mobId || '0')
+    },
     skip: isNew,
+    onCompleted: (data) => {
+      console.log('Query completed successfully:', data);
+    },
+    onError: (error) => {
+      console.error('Query error:', error);
+    },
+  });
+
+  console.log('Query state:', {
+    loading,
+    error: error?.message,
+    hasData: !!data,
+    hasMob: !!data?.mob,
+    isNew,
+    mobId,
+    zoneId
   });
 
   const [updateMob, { loading: updateLoading }] = useMutation(UPDATE_MOB);
   const [createMob, { loading: createLoading }] = useMutation(CREATE_MOB);
 
+  // Helper function to parse dice notation (e.g., "1d8+0" -> {num: 1, size: 8, bonus: 0})
+  const parseDice = (diceStr: string) => {
+    const match = diceStr.match(/(\d+)d(\d+)([\+\-]\d+)?/);
+    if (match) {
+      return {
+        num: parseInt(match[1]),
+        size: parseInt(match[2]),
+        bonus: parseInt(match[3] || '0'),
+      };
+    }
+    return { num: 1, size: 8, bonus: 0 };
+  };
+
   useEffect(() => {
     const typedData = data as any;
     if (typedData?.mob) {
-      const mob = typedData.mob; // Use any for now since we don't have proper GraphQL codegen
+      const mob = typedData.mob;
+      const hpDice = parseDice(mob.hpDice || '1d8+0');
+      const damageDice = parseDice(mob.damageDice || '1d4+0');
+
       setFormData({
-        keywords: mob.keywords || '',
-        mobClass: mob.mobClass || 'warrior',
+        keywords: mob.keywords?.join(' ') || '',
+        mobClass: 'warrior', // Not in schema
         shortDesc: mob.shortDesc || '',
         longDesc: mob.longDesc || '',
-        desc: mob.desc || '',
+        desc: mob.description || '',
         alignment: mob.alignment || 0,
         level: mob.level || 1,
         armorClass: mob.armorClass || 0,
         hitRoll: mob.hitRoll || 0,
-        move: mob.move || 0,
-        hpDiceNum: mob.hpDiceNum || 1,
-        hpDiceSize: mob.hpDiceSize || 8,
-        hpDiceBonus: mob.hpDiceBonus || 0,
-        damageDiceNum: mob.damageDiceNum || 1,
-        damageDiceSize: mob.damageDiceSize || 4,
-        damageDiceBonus: mob.damageDiceBonus || 0,
-        copper: mob.copper || 0,
-        silver: mob.silver || 0,
-        gold: mob.gold || 0,
-        platinum: mob.platinum || 0,
+        move: 0, // Not in schema
+        hpDiceNum: hpDice.num,
+        hpDiceSize: hpDice.size,
+        hpDiceBonus: hpDice.bonus,
+        damageDiceNum: damageDice.num,
+        damageDiceSize: damageDice.size,
+        damageDiceBonus: damageDice.bonus,
+        copper: 0, // Not in schema
+        silver: 0, // Not in schema
+        gold: 0, // Not in schema
+        platinum: 0, // Not in schema
         strength: mob.strength || 13,
         intelligence: mob.intelligence || 13,
         wisdom: mob.wisdom || 13,
@@ -271,9 +291,9 @@ function MobEditorContent() {
         perception: mob.perception || 0,
         concealment: mob.concealment || 0,
         zoneId: mob.zoneId || 511,
-        raceLegacy: mob.raceLegacy || 'HUMAN',
+        race: mob.race || 'HUMAN',
         position: mob.position || 'STANDING',
-        defaultPosition: mob.defaultPosition || 'STANDING',
+        defaultPosition: mob.position || 'STANDING', // Use position since defaultPosition doesn't exist
         gender: mob.gender || 'NEUTRAL',
         size: mob.size || 'MEDIUM',
         lifeForce: mob.lifeForce || 'LIFE',
@@ -313,17 +333,48 @@ function MobEditorContent() {
     if (!validateForm()) return;
 
     try {
+      // Convert form data to backend format
+      const saveData = {
+        keywords: formData.keywords.split(/\s+/).filter(k => k.length > 0),
+        shortDesc: formData.shortDesc,
+        longDesc: formData.longDesc,
+        description: formData.desc,
+        level: formData.level,
+        alignment: formData.alignment,
+        hitRoll: formData.hitRoll,
+        armorClass: formData.armorClass,
+        hpDice: `${formData.hpDiceNum}d${formData.hpDiceSize}${formData.hpDiceBonus >= 0 ? '+' : ''}${formData.hpDiceBonus}`,
+        damageDice: `${formData.damageDiceNum}d${formData.damageDiceSize}${formData.damageDiceBonus >= 0 ? '+' : ''}${formData.damageDiceBonus}`,
+        damageType: formData.damageType,
+        strength: formData.strength,
+        intelligence: formData.intelligence,
+        wisdom: formData.wisdom,
+        dexterity: formData.dexterity,
+        constitution: formData.constitution,
+        charisma: formData.charisma,
+        perception: formData.perception,
+        concealment: formData.concealment,
+        race: formData.race,
+        position: formData.position,
+        gender: formData.gender,
+        size: formData.size,
+        lifeForce: formData.lifeForce,
+        composition: formData.composition,
+        stance: formData.stance,
+      };
+
       if (isNew) {
         await createMob({
           variables: {
-            data: formData,
+            data: { ...saveData, zoneId: formData.zoneId },
           },
         });
       } else {
         await updateMob({
           variables: {
+            zoneId: parseInt(zoneId!),
             id: parseInt(mobId!),
-            data: formData,
+            data: saveData,
           },
         });
       }
@@ -348,9 +399,23 @@ function MobEditorContent() {
     );
   };
 
+  // Show loading state while query is running
   if (loading) return <div className='p-4'>Loading mob data...</div>;
-  if (error)
-    return <div className='p-4 text-red-600'>Error: {error.message}</div>;
+
+  // Show error if query failed
+  if (error) {
+    console.error('GraphQL Error:', error);
+    return <div className='p-4 text-red-600'>Error loading mob: {error.message}</div>;
+  }
+
+  // If we have params but no data, the mob might not exist
+  if (!isNew && !loading && !data?.mob) {
+    return (
+      <div className='p-4 text-red-600'>
+        Mob not found (Zone: {zoneId}, ID: {mobId}). It may not exist in the database.
+      </div>
+    );
+  }
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
@@ -366,10 +431,12 @@ function MobEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>
-            {isNew ? 'Create New Mob' : `Edit Mob ${mobId}`}
+            {isNew ? 'Create New Mob' : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
           </h1>
           <p className='text-gray-600 mt-1'>
-            Configure mob stats, appearance, and behavior
+            {isNew
+              ? 'Create a new mob with custom stats, appearance, and behavior'
+              : data?.mob?.shortDesc || 'Loading mob details...'}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -951,17 +1018,15 @@ function MobEditorContent() {
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
                     <label
-                      htmlFor='raceLegacy'
+                      htmlFor='race'
                       className='block text-sm font-medium text-gray-700 mb-1'
                     >
                       Race
                     </label>
                     <select
-                      id='raceLegacy'
-                      value={formData.raceLegacy}
-                      onChange={e =>
-                        handleInputChange('raceLegacy', e.target.value)
-                      }
+                      id='race'
+                      value={formData.race}
+                      onChange={e => handleInputChange('race', e.target.value)}
                       className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     >
                       <option value='HUMAN'>Human</option>

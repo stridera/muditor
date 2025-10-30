@@ -7,9 +7,11 @@ import { NodeProps } from 'reactflow';
 interface MobData {
   id: number;
   name: string;
+  shortDesc?: string;
   level: number;
   race?: string;
   class?: string;
+  mobClass?: string;
   hitpoints?: number;
   alignment?: string;
   difficulty?: 'easy' | 'medium' | 'hard' | 'boss';
@@ -111,7 +113,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
           </div>
 
           <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-            {data.name}
+            {data.shortDesc || data.name}
           </h3>
         </div>
 
@@ -123,9 +125,9 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
                 {data.race}
               </span>
             )}
-            {data.class && (
+            {data.mobClass && (
               <span className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full'>
-                {data.class}
+                {data.mobClass}
               </span>
             )}
           </div>
@@ -164,9 +166,9 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
                   <span className='text-gray-400'>Race:</span> {data.race}
                 </div>
               )}
-              {data.class && (
+              {data.mobClass && (
                 <div>
-                  <span className='text-gray-400'>Class:</span> {data.class}
+                  <span className='text-gray-400'>Class:</span> {data.mobClass}
                 </div>
               )}
               {data.hitpoints && (

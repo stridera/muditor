@@ -1,0 +1,11 @@
+# Seed/import logs (deprecated - seeding moved to FieryLib)
+*.log
+*.err
+seed-output.log
+latest-import.log
+
+# Generated Prisma client
+node_modules/.prisma/
+
+# Migrations (tracked separately)
+# prisma/migrations/

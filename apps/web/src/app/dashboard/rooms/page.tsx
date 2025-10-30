@@ -4,7 +4,24 @@ import { useState, useEffect, useMemo } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useZone } from '@/contexts/zone-context';
+import { PermissionGuard } from '@/components/auth/permission-guard';
 import ZoneSelector from '../../../components/ZoneSelector';
+import { ChevronDown } from 'lucide-react';
+
+interface RoomExit {
+  id: string;
+  direction: string;
+  description?: string;
+  keyword?: string;
+  key?: string;
+  destination?: number;
+}
+
+interface RoomExtraDescription {
+  id: string;
+  keyword: string;
+  description: string;
+}
 
 interface Room {
   id: number;
@@ -13,9 +30,26 @@ interface Room {
   sector: string;
   flags: string[];
   zoneId: number;
+  exits?: RoomExit[];
+  extraDescs?: RoomExtraDescription[];
+  createdAt?: string;
+  updatedAt?: string;
+  createdBy?: string;
+  updatedBy?: string;
+  layoutX?: number;
+  layoutY?: number;
+  layoutZ?: number;
 }
 
 export default function RoomsPage() {
+  return (
+    <PermissionGuard requireImmortal={true}>
+      <RoomsContent />
+    </PermissionGuard>
+  );
+}
+
+function RoomsContent() {
   const searchParams = useSearchParams();
   const zoneParam = searchParams.get('zone');
   const { selectedZone, setSelectedZone } = useZone();
@@ -26,6 +60,8 @@ export default function RoomsPage() {
   const [error, setError] = useState<string | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedSector, setSelectedSector] = useState('all');
+  const [expandedRooms, setExpandedRooms] = useState<Set<number>>(new Set());
+  const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
 
   // Handle initial zone parameter from URL
   useEffect(() => {
@@ -94,6 +130,85 @@ export default function RoomsPage() {
 
     fetchRooms();
   }, [selectedZone]);
+
+  const toggleRoomExpanded = async (roomId: number) => {
+    if (expandedRooms.has(roomId)) {
+      setExpandedRooms(new Set([...expandedRooms].filter(id => id !== roomId)));
+      return;
+    }
+
+    // Add to expanded set
+    setExpandedRooms(new Set(expandedRooms).add(roomId));
+
+    // Load detailed data if not already loaded
+    const room = rooms.find(r => r.id === roomId);
+    if (room && !room.exits) {
+      setLoadingDetails(new Set(loadingDetails).add(roomId));
+      try {
+        const getRoomQuery = `
+          query GetRoom($id: Int!) {
+            room(id: $id) {
+              id
+              name
+              description
+              sector
+              flags
+              zoneId
+              exits {
+                id
+                direction
+                description
+                keyword
+                key
+                destination
+              }
+              extraDescs {
+                id
+                keyword
+                description
+              }
+              createdAt
+              updatedAt
+              createdBy
+              updatedBy
+              layoutX
+              layoutY
+              layoutZ
+            }
+          }
+        `;
+
+        const response = await fetch('http://localhost:4000/graphql', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: getRoomQuery,
+            variables: { id: roomId },
+          }),
+        });
+
+        const result = await response.json();
+        if (result.errors) {
+          console.error(
+            'Error loading room details:',
+            result.errors[0].message
+          );
+        } else if (result.data.room) {
+          console.log('Room data received:', result.data.room);
+          // Update the room in the list with detailed data
+          setRooms(prevRooms =>
+            prevRooms.map(r =>
+              r.id === roomId ? { ...r, ...result.data.room } : r
+            )
+          );
+        }
+      } catch (err) {
+        console.error('Error loading room details:', err);
+      } finally {
+        setLoadingDetails(new Set([...loadingDetails].filter(id => id !== roomId)));
+      }
+    }
+  };
 
   const filteredRooms = useMemo(() => {
     return rooms.filter(room => {
@@ -226,73 +341,210 @@ export default function RoomsPage() {
       ) : (
         <div className='grid gap-4'>
           {filteredRooms.map(room => (
-            <div
-              key={room.id}
-              className='bg-white border rounded-lg shadow hover:shadow-md transition-shadow p-4'
-            >
-              <div className='flex items-start justify-between'>
-                <div className='flex-1'>
-                  <div className='flex items-center gap-2 mb-1'>
-                    <h3 className='font-semibold text-lg text-gray-900'>
-                      {room.name}
-                    </h3>
-                    <span
-                      className={`px-2 py-1 text-xs rounded-full font-medium ${
-                        room.sector === 'INSIDE'
-                          ? 'bg-blue-100 text-blue-700'
-                          : room.sector === 'CITY'
-                            ? 'bg-green-100 text-green-700'
-                            : room.sector === 'FIELD'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : room.sector === 'FOREST'
-                                ? 'bg-green-200 text-green-800'
-                                : room.sector === 'HILLS'
-                                  ? 'bg-orange-100 text-orange-700'
-                                  : room.sector === 'MOUNTAIN'
-                                    ? 'bg-gray-100 text-gray-700'
-                                    : room.sector === 'WATER_SWIM'
-                                      ? 'bg-cyan-100 text-cyan-700'
-                                      : room.sector === 'WATER_NOSWIM'
-                                        ? 'bg-blue-200 text-blue-800'
-                                        : room.sector === 'FLYING'
-                                          ? 'bg-purple-100 text-purple-700'
-                                          : room.sector === 'UNDERWATER'
-                                            ? 'bg-teal-100 text-teal-700'
-                                            : 'bg-gray-100 text-gray-700'
-                      }`}
+            <div key={room.id} className='bg-white border rounded-lg shadow hover:shadow-md transition-shadow'>
+              <div
+                className='p-4 cursor-pointer'
+                onClick={() => toggleRoomExpanded(room.id)}
+              >
+                <div className='flex items-start justify-between'>
+                  <div className='flex-1'>
+                    <div className='flex items-center gap-2 mb-1'>
+                      <h3 className='font-semibold text-lg text-gray-900'>
+                        #{room.id} - {room.name}
+                      </h3>
+                      <span
+                        className={`px-2 py-1 text-xs rounded-full font-medium ${
+                          room.sector === 'INSIDE'
+                            ? 'bg-blue-100 text-blue-700'
+                            : room.sector === 'CITY'
+                              ? 'bg-green-100 text-green-700'
+                              : room.sector === 'FIELD'
+                                ? 'bg-yellow-100 text-yellow-700'
+                                : room.sector === 'FOREST'
+                                  ? 'bg-green-200 text-green-800'
+                                  : room.sector === 'HILLS'
+                                    ? 'bg-orange-100 text-orange-700'
+                                    : room.sector === 'MOUNTAIN'
+                                      ? 'bg-gray-100 text-gray-700'
+                                      : room.sector === 'WATER_SWIM'
+                                        ? 'bg-cyan-100 text-cyan-700'
+                                        : room.sector === 'WATER_NOSWIM'
+                                          ? 'bg-blue-200 text-blue-800'
+                                          : room.sector === 'FLYING'
+                                            ? 'bg-purple-100 text-purple-700'
+                                            : room.sector === 'UNDERWATER'
+                                              ? 'bg-teal-100 text-teal-700'
+                                              : 'bg-gray-100 text-gray-700'
+                        }`}
+                      >
+                        {room.sector}
+                      </span>
+                      <ChevronDown
+                        className={`w-4 h-4 text-gray-400 transition-transform ${
+                          expandedRooms.has(room.id) ? 'rotate-180' : ''
+                        }`}
+                      />
+                    </div>
+                    <p className='text-gray-700 mb-2 line-clamp-2'>
+                      {room.description}
+                    </p>
+                    <div className='flex items-center gap-4 text-sm text-gray-500'>
+                      <span>Room #{room.id}</span>
+                      <span>Zone {room.zoneId}</span>
+                      {room.flags && room.flags.length > 0 && (
+                        <>
+                          <span>•</span>
+                          <span>Flags: {room.flags.join(', ')}</span>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                  <div className='flex items-center gap-2 ml-4'>
+                    <Link
+                      href={`/dashboard/zones/${room.zoneId}`}
+                      className='text-gray-600 hover:text-gray-800 px-3 py-1 text-sm'
+                      onClick={(e) => e.stopPropagation()}
                     >
-                      {room.sector}
-                    </span>
+                      Zone
+                    </Link>
+                    <Link
+                      href={`/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`}
+                      className='text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      Edit
+                    </Link>
                   </div>
-                  <p className='text-gray-700 mb-2 line-clamp-2'>
-                    {room.description}
-                  </p>
-                  <div className='flex items-center gap-4 text-sm text-gray-500'>
-                    <span>Room #{room.id}</span>
-                    <span>Zone {room.zoneId}</span>
-                    {room.flags && room.flags.length > 0 && (
-                      <>
-                        <span>•</span>
-                        <span>Flags: {room.flags.join(', ')}</span>
-                      </>
-                    )}
-                  </div>
-                </div>
-                <div className='flex items-center gap-2 ml-4'>
-                  <Link
-                    href={`/dashboard/zones/${room.zoneId}`}
-                    className='text-gray-600 hover:text-gray-800 px-3 py-1 text-sm'
-                  >
-                    Zone
-                  </Link>
-                  <Link
-                    href={`/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`}
-                    className='text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
-                  >
-                    Edit
-                  </Link>
                 </div>
               </div>
+
+              {/* Expanded Details */}
+              {expandedRooms.has(room.id) && (
+                <div className='border-t border-gray-200 p-4 bg-gray-50'>
+                  {loadingDetails.has(room.id) ? (
+                    <div className='text-center py-4'>
+                      <div className='inline-flex items-center'>
+                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2'></div>
+                        <span className='text-sm text-gray-600'>Loading room details...</span>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='space-y-4'>
+                      {/* Full Description */}
+                      <div>
+                        <h4 className='font-medium text-gray-900 mb-2'>Full Description</h4>
+                        <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                          {room.description}
+                        </p>
+                      </div>
+
+                      {/* Exits */}
+                      {room.exits && room.exits.length > 0 && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Exits ({room.exits.length})</h4>
+                          <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
+                            {room.exits.map((exit) => (
+                              <div key={exit.id} className='bg-white p-3 rounded border text-sm'>
+                                <div className='font-medium text-gray-900'>{exit.direction.toUpperCase()}</div>
+                                {exit.toRoomId != null && (
+                                  <div className='text-blue-600'>→ Room {exit.toRoomId}</div>
+                                )}
+                                {exit.description && (
+                                  <div className='text-gray-600 mt-1'>{exit.description}</div>
+                                )}
+                                {exit.keyword && (
+                                  <div className='text-gray-500 mt-1'>Keyword: {exit.keyword}</div>
+                                )}
+                                {exit.key && (
+                                  <div className='text-orange-600 mt-1'>Key Required: {exit.key}</div>
+                                )}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Extra Descriptions */}
+                      {room.extraDescs && room.extraDescs.length > 0 && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Extra Descriptions ({room.extraDescs.length})</h4>
+                          <div className='space-y-2'>
+                            {room.extraDescs.map((desc) => (
+                              <div key={desc.id} className='bg-white p-3 rounded border text-sm'>
+                                <div className='font-medium text-gray-900'>"{desc.keyword}"</div>
+                                <div className='text-gray-700 mt-1'>{desc.description}</div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Layout Coordinates */}
+                      {(room.layoutX !== undefined || room.layoutY !== undefined || room.layoutZ !== undefined) && (
+                        <div>
+                          <h4 className='font-medium text-gray-900 mb-2'>Layout Coordinates</h4>
+                          <div className='bg-white p-3 rounded border text-sm'>
+                            <div className='grid grid-cols-3 gap-4'>
+                              <div>X: {room.layoutX ?? 'N/A'}</div>
+                              <div>Y: {room.layoutY ?? 'N/A'}</div>
+                              <div>Z: {room.layoutZ ?? 'N/A'}</div>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Room Information */}
+                      <div>
+                        <h4 className='font-medium text-gray-900 mb-2'>Room Information</h4>
+                        <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                          <div className='flex justify-between'>
+                            <span className='text-gray-600'>Sector Type:</span>
+                            <span className='font-medium'>{room.sector?.replace('_', ' ') || 'N/A'}</span>
+                          </div>
+                          <div className='flex justify-between'>
+                            <span className='text-gray-600'>Zone ID:</span>
+                            <span>{room.zoneId || 'N/A'}</span>
+                          </div>
+                          <div className='flex justify-between'>
+                            <span className='text-gray-600'>Exit Count:</span>
+                            <span>{room.exits?.length || 0}</span>
+                          </div>
+                          <div className='flex justify-between'>
+                            <span className='text-gray-600'>Extra Descriptions:</span>
+                            <span>{room.extraDescs?.length || 0}</span>
+                          </div>
+                          {room.flags && room.flags.length > 0 && (
+                            <div>
+                              <span className='text-gray-600'>Room Flags:</span>
+                              <div className='flex flex-wrap gap-1 mt-1'>
+                                {room.flags.map((flag: string) => (
+                                  <span key={flag} className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'>
+                                    {flag.replace('_', ' ')}
+                                  </span>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div className='border-t pt-2 mt-2'>
+                            {room.createdAt && (
+                              <div className='flex justify-between'>
+                                <span className='text-gray-600'>Created:</span>
+                                <span>{new Date(room.createdAt).toLocaleString()}</span>
+                              </div>
+                            )}
+                            {room.updatedAt && (
+                              <div className='flex justify-between'>
+                                <span className='text-gray-600'>Updated:</span>
+                                <span>{new Date(room.updatedAt).toLocaleString()}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
           ))}
         </div>

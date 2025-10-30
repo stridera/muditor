@@ -10,7 +10,8 @@ interface Room {
   exits: {
     id: string;
     direction: string;
-    destination: number;
+    toZoneId?: number | null;
+    toRoomId?: number | null;
     description?: string;
   }[];
 }
@@ -98,7 +99,7 @@ export function RoomConnectionHelper({
         room =>
           room.id !== selectedRoomId &&
           room.exits.length < 4 &&
-          !selectedRoom.exits.some(exit => exit.destination === room.id)
+          !selectedRoom.exits.some(exit => exit.toRoomId === room.id)
       )
       .slice(0, 5);
   };

@@ -1,4 +1,4 @@
-import { Injectable, Logger, LogLevel } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -165,9 +165,20 @@ export class LoggingService {
 
       // Rotate large files
       for (const file of logFiles) {
+        // Skip files that are already archived (contain a timestamp suffix) to avoid name growth
+        const alreadyArchived = /-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}/.test(
+          file.name
+        );
+        if (alreadyArchived) continue;
+
         if (file.stats.size > this.maxLogSize) {
           const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-          const archivedName = file.name.replace('.log', `-${timestamp}.log`);
+          // Ensure we only ever append one timestamp by always starting from the base (remove any prior timestamp if present accidentally)
+          const baseName = file.name.replace(
+            /-\d{4}-\d{2}-\d{2}T\d{2}-\d{2}-\d{2}(?:-\d{3}Z)?/,
+            ''
+          );
+          const archivedName = baseName.replace('.log', `-${timestamp}.log`);
           const archivedPath = path.join(this.logDir, archivedName);
 
           fs.renameSync(file.path, archivedPath);

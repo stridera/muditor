@@ -1,29 +1,29 @@
 import {
-  ObjectType,
   Field,
-  Int,
   InputType,
+  Int,
+  ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
 import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsArray,
-} from 'class-validator';
-import {
-  MobFlag,
+  Composition,
+  DamageType,
   EffectFlag,
   Gender,
-  Race,
-  DamageType,
-  Position,
   LifeForce,
-  Composition,
-  Stance,
+  MobFlag,
+  Position,
+  Race,
   Size,
+  Stance,
 } from '@prisma/client';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+} from 'class-validator';
 
 // Register GraphQL enums
 registerEnumType(MobFlag, { name: 'MobFlag' });
@@ -37,16 +37,17 @@ registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(Stance, { name: 'Stance' });
 registerEnumType(Size, { name: 'Size' });
 
+// This DTO matches the actual Prisma Mob model
 @ObjectType()
 export class MobDto {
   @Field(() => Int)
   id: number;
 
-  @Field()
-  keywords: string;
+  @Field(() => Int)
+  zoneId: number;
 
-  @Field()
-  mobClass: string;
+  @Field(() => [String])
+  keywords: string[];
 
   @Field()
   shortDesc: string;
@@ -55,76 +56,28 @@ export class MobDto {
   longDesc: string;
 
   @Field()
-  desc: string;
-
-  @Field(() => [MobFlag])
-  mobFlags: MobFlag[];
-
-  @Field(() => [EffectFlag])
-  effectFlags: EffectFlag[];
-
-  @Field(() => Int)
-  alignment: number;
+  description: string;
 
   @Field(() => Int)
   level: number;
 
   @Field(() => Int)
-  armorClass: number;
+  alignment: number;
 
   @Field(() => Int)
   hitRoll: number;
 
   @Field(() => Int)
-  move: number;
+  armorClass: number;
 
-  @Field(() => Int)
-  hpDiceNum: number;
+  @Field()
+  hpDice: string;
 
-  @Field(() => Int)
-  hpDiceSize: number;
+  @Field()
+  damageDice: string;
 
-  @Field(() => Int)
-  hpDiceBonus: number;
-
-  @Field(() => Int)
-  damageDiceNum: number;
-
-  @Field(() => Int)
-  damageDiceSize: number;
-
-  @Field(() => Int)
-  damageDiceBonus: number;
-
-  @Field(() => Int)
-  copper: number;
-
-  @Field(() => Int)
-  silver: number;
-
-  @Field(() => Int)
-  gold: number;
-
-  @Field(() => Int)
-  platinum: number;
-
-  @Field(() => Position)
-  position: Position;
-
-  @Field(() => Position)
-  defaultPosition: Position;
-
-  @Field(() => Gender)
-  gender: Gender;
-
-  @Field(() => Race, { nullable: true })
-  raceLegacy?: Race;
-
-  @Field(() => Int)
-  raceAlign: number;
-
-  @Field(() => Size)
-  size: Size;
+  @Field(() => DamageType)
+  damageType: DamageType;
 
   @Field(() => Int)
   strength: number;
@@ -150,20 +103,38 @@ export class MobDto {
   @Field(() => Int)
   concealment: number;
 
+  @Field(() => Int)
+  wealth: number;
+
+  @Field(() => Race)
+  race: Race;
+
+  @Field(() => Gender)
+  gender: Gender;
+
+  @Field(() => Size)
+  size: Size;
+
   @Field(() => LifeForce)
   lifeForce: LifeForce;
 
   @Field(() => Composition)
   composition: Composition;
 
+  @Field(() => [MobFlag])
+  mobFlags: MobFlag[];
+
+  @Field(() => [EffectFlag])
+  effectFlags: EffectFlag[];
+
+  @Field(() => Position)
+  position: Position;
+
   @Field(() => Stance)
   stance: Stance;
 
-  @Field(() => DamageType)
-  damageType: DamageType;
-
-  @Field(() => Int)
-  zoneId: number;
+  @Field(() => Int, { nullable: true })
+  classId?: number;
 
   @Field(() => Date)
   createdAt: Date;
@@ -180,15 +151,11 @@ export class CreateMobInput {
 
   @Field(() => Int)
   @IsNumber()
-  vnum: number;
+  zoneId: number;
 
-  @Field()
-  @IsString()
-  keywords: string;
-
-  @Field()
-  @IsString()
-  mobClass: string;
+  @Field(() => [String])
+  @IsArray()
+  keywords: string[];
 
   @Field()
   @IsString()
@@ -200,24 +167,7 @@ export class CreateMobInput {
 
   @Field()
   @IsString()
-  desc: string;
-
-  @Field(() => [MobFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(MobFlag, { each: true })
-  mobFlags?: MobFlag[];
-
-  @Field(() => [EffectFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  alignment?: number;
+  description: string;
 
   @Field(() => Int, { defaultValue: 1 })
   @IsOptional()
@@ -227,7 +177,7 @@ export class CreateMobInput {
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsNumber()
-  armorClass?: number;
+  alignment?: number;
 
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
@@ -237,87 +187,22 @@ export class CreateMobInput {
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsNumber()
-  move?: number;
+  armorClass?: number;
 
-  @Field(() => Int, { defaultValue: 0 })
+  @Field({ defaultValue: "1d8+0" })
   @IsOptional()
-  @IsNumber()
-  hpDiceNum?: number;
+  @IsString()
+  hpDice?: string;
 
-  @Field(() => Int, { defaultValue: 0 })
+  @Field({ defaultValue: "1d4+0" })
   @IsOptional()
-  @IsNumber()
-  hpDiceSize?: number;
+  @IsString()
+  damageDice?: string;
 
-  @Field(() => Int, { defaultValue: 0 })
+  @Field(() => DamageType, { defaultValue: DamageType.HIT })
   @IsOptional()
-  @IsNumber()
-  hpDiceBonus?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  damageDiceNum?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  damageDiceSize?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  damageDiceBonus?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  copper?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  silver?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  gold?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  platinum?: number;
-
-  @Field(() => Position, { defaultValue: Position.STANDING })
-  @IsOptional()
-  @IsEnum(Position)
-  position?: Position;
-
-  @Field(() => Position, { defaultValue: Position.STANDING })
-  @IsOptional()
-  @IsEnum(Position)
-  defaultPosition?: Position;
-
-  @Field(() => Gender, { defaultValue: Gender.NEUTRAL })
-  @IsOptional()
-  @IsEnum(Gender)
-  gender?: Gender;
-
-  @Field(() => Race, { nullable: true })
-  @IsOptional()
-  @IsEnum(Race)
-  raceLegacy?: Race;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  raceAlign?: number;
-
-  @Field(() => Size, { defaultValue: Size.MEDIUM })
-  @IsOptional()
-  @IsEnum(Size)
-  size?: Size;
+  @IsEnum(DamageType)
+  damageType?: DamageType;
 
   @Field(() => Int, { defaultValue: 13 })
   @IsOptional()
@@ -359,6 +244,26 @@ export class CreateMobInput {
   @IsNumber()
   concealment?: number;
 
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  wealth?: number;
+
+  @Field(() => Race, { defaultValue: Race.HUMANOID })
+  @IsOptional()
+  @IsEnum(Race)
+  race?: Race;
+
+  @Field(() => Gender, { defaultValue: Gender.NEUTRAL })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
+
+  @Field(() => Size, { defaultValue: Size.MEDIUM })
+  @IsOptional()
+  @IsEnum(Size)
+  size?: Size;
+
   @Field(() => LifeForce, { defaultValue: LifeForce.LIFE })
   @IsOptional()
   @IsEnum(LifeForce)
@@ -369,32 +274,40 @@ export class CreateMobInput {
   @IsEnum(Composition)
   composition?: Composition;
 
+  @Field(() => [MobFlag], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobFlag, { each: true })
+  mobFlags?: MobFlag[];
+
+  @Field(() => [EffectFlag], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(EffectFlag, { each: true })
+  effectFlags?: EffectFlag[];
+
+  @Field(() => Position, { defaultValue: Position.STANDING })
+  @IsOptional()
+  @IsEnum(Position)
+  position?: Position;
+
   @Field(() => Stance, { defaultValue: Stance.ALERT })
   @IsOptional()
   @IsEnum(Stance)
   stance?: Stance;
 
-  @Field(() => DamageType, { defaultValue: DamageType.HIT })
+  @Field(() => Int, { nullable: true })
   @IsOptional()
-  @IsEnum(DamageType)
-  damageType?: DamageType;
-
-  @Field(() => Int)
   @IsNumber()
-  zoneId: number;
+  classId?: number;
 }
 
 @InputType()
 export class UpdateMobInput {
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  keywords?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  mobClass?: string;
+  @IsArray()
+  keywords?: string[];
 
   @Field({ nullable: true })
   @IsOptional()
@@ -409,24 +322,7 @@ export class UpdateMobInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  desc?: string;
-
-  @Field(() => [MobFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(MobFlag, { each: true })
-  mobFlags?: MobFlag[];
-
-  @Field(() => [EffectFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  alignment?: number;
+  description?: string;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -436,7 +332,7 @@ export class UpdateMobInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  armorClass?: number;
+  alignment?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -446,87 +342,22 @@ export class UpdateMobInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  move?: number;
+  armorClass?: number;
 
-  @Field(() => Int, { nullable: true })
+  @Field({ nullable: true })
   @IsOptional()
-  @IsNumber()
-  hpDiceNum?: number;
+  @IsString()
+  hpDice?: string;
 
-  @Field(() => Int, { nullable: true })
+  @Field({ nullable: true })
   @IsOptional()
-  @IsNumber()
-  hpDiceSize?: number;
+  @IsString()
+  damageDice?: string;
 
-  @Field(() => Int, { nullable: true })
+  @Field(() => DamageType, { nullable: true })
   @IsOptional()
-  @IsNumber()
-  hpDiceBonus?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  damageDiceNum?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  damageDiceSize?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  damageDiceBonus?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  copper?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  silver?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  gold?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  platinum?: number;
-
-  @Field(() => Position, { nullable: true })
-  @IsOptional()
-  @IsEnum(Position)
-  position?: Position;
-
-  @Field(() => Position, { nullable: true })
-  @IsOptional()
-  @IsEnum(Position)
-  defaultPosition?: Position;
-
-  @Field(() => Gender, { nullable: true })
-  @IsOptional()
-  @IsEnum(Gender)
-  gender?: Gender;
-
-  @Field(() => Race, { nullable: true })
-  @IsOptional()
-  @IsEnum(Race)
-  raceLegacy?: Race;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  raceAlign?: number;
-
-  @Field(() => Size, { nullable: true })
-  @IsOptional()
-  @IsEnum(Size)
-  size?: Size;
+  @IsEnum(DamageType)
+  damageType?: DamageType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -568,6 +399,26 @@ export class UpdateMobInput {
   @IsNumber()
   concealment?: number;
 
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  wealth?: number;
+
+  @Field(() => Race, { nullable: true })
+  @IsOptional()
+  @IsEnum(Race)
+  race?: Race;
+
+  @Field(() => Gender, { nullable: true })
+  @IsOptional()
+  @IsEnum(Gender)
+  gender?: Gender;
+
+  @Field(() => Size, { nullable: true })
+  @IsOptional()
+  @IsEnum(Size)
+  size?: Size;
+
   @Field(() => LifeForce, { nullable: true })
   @IsOptional()
   @IsEnum(LifeForce)
@@ -578,18 +429,30 @@ export class UpdateMobInput {
   @IsEnum(Composition)
   composition?: Composition;
 
+  @Field(() => [MobFlag], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobFlag, { each: true })
+  mobFlags?: MobFlag[];
+
+  @Field(() => [EffectFlag], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(EffectFlag, { each: true })
+  effectFlags?: EffectFlag[];
+
+  @Field(() => Position, { nullable: true })
+  @IsOptional()
+  @IsEnum(Position)
+  position?: Position;
+
   @Field(() => Stance, { nullable: true })
   @IsOptional()
   @IsEnum(Stance)
   stance?: Stance;
 
-  @Field(() => DamageType, { nullable: true })
-  @IsOptional()
-  @IsEnum(DamageType)
-  damageType?: DamageType;
-
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  zoneId?: number;
+  classId?: number;
 }

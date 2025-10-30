@@ -60,13 +60,8 @@ export async function seedGameSystem(prisma: PrismaClient) {
     { name: 'Other', size: 'MEDIUM' as const, lifespan: 50, description: 'Miscellaneous creatures not fitting other categories.' },
   ];
 
-  for (const raceData of races) {
-    await prisma.raceData.upsert({
-      where: { name: raceData.name },
-      update: raceData,
-      create: raceData,
-    });
-  }
+  // Races are now handled as enums directly on Character/Mob models
+  // No need to seed race data as it's defined in the schema
 
   // ===========================================================================
   // CLASS DATA
@@ -356,28 +351,26 @@ export async function seedGameSystem(prisma: PrismaClient) {
   console.log('🔄 Updating existing characters with new race/class relationships...');
   
   // Update Gandalf to use Human race and Mage class (closest to Sorcerer)
-  const humanRace = await prisma.raceData.findFirst({ where: { name: 'Human' } });
   const mageClass = await prisma.class.findFirst({ where: { name: 'Mage' } });
   
-  if (humanRace && mageClass) {
+  if (mageClass) {
     await prisma.character.updateMany({
       where: { name: 'Gandalf' },
       data: { 
-        raceId: humanRace.id,
+        race: 'HUMAN',
         classId: mageClass.id 
       },
     });
   }
   
   // Update Legolas to use Elf race and Ranger class
-  const elfRace = await prisma.raceData.findFirst({ where: { name: 'Elf' } });
   const rangerClass = await prisma.class.findFirst({ where: { name: 'Ranger' } });
   
-  if (elfRace && rangerClass) {
+  if (rangerClass) {
     await prisma.character.updateMany({
       where: { name: 'Legolas' },
       data: { 
-        raceId: elfRace.id,
+        race: 'ELF',
         classId: rangerClass.id 
       },
     });

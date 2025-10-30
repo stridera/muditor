@@ -1,0 +1,1234 @@
+import { Injectable, Logger, BadRequestException, NotFoundException } from '@nestjs/common';
+import { DatabaseService } from '../database/database.service';
+import {
+  DeploymentPackage,
+  DeploymentStatus,
+  Prisma,
+  ChangeType,
+} from '@prisma/client';
+import { createHash } from 'crypto';
+
+interface DeploymentConfig {
+  devDatabaseUrl: string;
+  prodDatabaseUrl: string;
+}
+
+interface ChangeDetection {
+  entityType: string;
+  entityId: string;
+  changeType: ChangeType;
+  beforeSnapshot?: any;
+  afterSnapshot?: any;
+  conflicts?: string[];
+}
+
+interface ValidationResult {
+  type: DeploymentValidationType;
+  severity: DeploymentValidationSeverity;
+  message: string;
+  details?: any;
+}
+
+@Injectable()
+export class DeploymentsService {
+  private readonly logger = new Logger(DeploymentsService.name);
+  private devPrisma: DatabaseService;
+  private prodPrisma: DatabaseService;
+
+  constructor(
+    private readonly prisma: DatabaseService,
+    private readonly config: DeploymentConfig,
+  ) {
+    // Initialize separate Prisma clients for dev and prod
+    this.devPrisma = new DatabaseService({ datasources: { db: { url: config.devDatabaseUrl } } });
+    this.prodPrisma = new DatabaseService({ datasources: { db: { url: config.prodDatabaseUrl } } });
+  }
+
+  /**
+   * Create a new deployment package by detecting changes between dev and prod
+   */
+  async createDeploymentPackage(
+    name: string,
+    description: string,
+    zoneIds: number[],
+    createdBy: string,
+  ): Promise<DeploymentPackage> {
+    this.logger.log(`Creating deployment package: ${name} for zones ${zoneIds.join(', ')}`);
+
+    // Detect changes for specified zones
+    const changes = await this.detectChanges(zoneIds);
+
+    if (changes.length === 0) {
+      throw new BadRequestException('No changes detected between dev and prod environments');
+    }
+
+    // Run validation checks
+    const validations = await this.validateChanges(changes, zoneIds);
+
+    // Check for blocking validations
+    const blockingValidations = validations.filter(
+      (v) => v.severity === DeploymentValidationSeverity.ERROR,
+    );
+
+    const status =
+      blockingValidations.length > 0 ? DeploymentStatus.FAILED : DeploymentStatus.READY;
+
+    // Calculate version and checksums
+    const version = await this.calculateNextVersion();
+    const checksums = await this.calculateZoneChecksums(zoneIds, 'dev');
+
+    // Create deployment package
+    const deploymentPackage = await this.prisma.deploymentPackage.create({
+      data: {
+        id: this.generateId(),
+        name,
+        description,
+        status,
+        sourceEnv: 'dev',
+        targetEnv: 'prod',
+        version,
+        createdBy,
+        createdAt: new Date(),
+        changes: {
+          create: changes.map((change) => ({
+            entityType: change.entityType,
+            entityId: change.entityId,
+            changeType: change.changeType,
+            beforeSnapshot: change.beforeSnapshot || Prisma.JsonNull,
+            afterSnapshot: change.afterSnapshot || Prisma.JsonNull,
+            conflicts: change.conflicts || [],
+          })),
+        },
+        validations: {
+          create: validations.map((validation) => ({
+            type: validation.type,
+            severity: validation.severity,
+            message: validation.message,
+            details: validation.details || Prisma.JsonNull,
+          })),
+        },
+      },
+      include: {
+        changes: true,
+        validations: true,
+      },
+    });
+
+    this.logger.log(
+      `Created deployment package ${deploymentPackage.id} with ${changes.length} changes and ${validations.length} validations`,
+    );
+
+    return deploymentPackage;
+  }
+
+  /**
+   * Execute a deployment package (promote from dev to prod)
+   */
+  async executeDeployment(packageId: string, executedBy: string): Promise<DeploymentPackage> {
+    this.logger.log(`Executing deployment package: ${packageId}`);
+
+    const deploymentPackage = await this.prisma.deploymentPackage.findUnique({
+      where: { id: packageId },
+      include: { changes: true, validations: true },
+    });
+
+    if (!deploymentPackage) {
+      throw new NotFoundException(`Deployment package ${packageId} not found`);
+    }
+
+    if (deploymentPackage.status !== DeploymentStatus.READY) {
+      throw new BadRequestException(
+        `Cannot execute deployment package with status ${deploymentPackage.status}`,
+      );
+    }
+
+    // Check for blocking validations
+    const blockingValidations = deploymentPackage.validations.filter(
+      (v) => v.severity === DeploymentValidationSeverity.ERROR,
+    );
+
+    if (blockingValidations.length > 0) {
+      throw new BadRequestException(
+        `Cannot execute deployment package with ${blockingValidations.length} blocking validation errors`,
+      );
+    }
+
+    // Update status to IN_PROGRESS
+    await this.prisma.deploymentPackage.update({
+      where: { id: packageId },
+      data: {
+        status: DeploymentStatus.DEPLOYING,
+        deployedAt: new Date(),
+        deployedBy: executedBy,
+      },
+    });
+
+    try {
+      // Apply changes to prod database
+      await this.applyChanges(deploymentPackage.changes);
+
+      // Update zone versions
+      const affectedZoneIds = await this.extractZoneIds(deploymentPackage.changes);
+      await this.updateZoneVersions(affectedZoneIds, deploymentPackage.version);
+
+      // Mark as completed
+      await this.prisma.deploymentPackage.update({
+        where: { id: packageId },
+        data: {
+          status: DeploymentStatus.DEPLOYED,
+          deployedAt: new Date(),
+        },
+      });
+
+      this.logger.log(`Successfully deployed package ${packageId}`);
+
+      return await this.prisma.deploymentPackage.findUnique({
+        where: { id: packageId },
+        include: { changes: true, validations: true },
+      });
+    } catch (error) {
+      this.logger.error(`Deployment failed: ${(error as Error).message}`, (error as Error).stack);
+
+      // Mark as failed
+      await this.prisma.deploymentPackage.update({
+        where: { id: packageId },
+        data: {
+          status: DeploymentStatus.FAILED,
+          deployedAt: new Date(),
+        },
+      });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Rollback a completed deployment
+   */
+  async rollbackDeployment(packageId: string, rolledBackBy: string): Promise<DeploymentPackage> {
+    this.logger.log(`Rolling back deployment package: ${packageId}`);
+
+    const deploymentPackage = await this.prisma.deploymentPackage.findUnique({
+      where: { id: packageId },
+      include: { changes: true },
+    });
+
+    if (!deploymentPackage) {
+      throw new NotFoundException(`Deployment package ${packageId} not found`);
+    }
+
+    if (deploymentPackage.status !== DeploymentStatus.DEPLOYED) {
+      throw new BadRequestException(
+        `Cannot rollback deployment package with status ${deploymentPackage.status}`,
+      );
+    }
+
+    // Update status to ROLLING_BACK
+    await this.prisma.deploymentPackage.update({
+      where: { id: packageId },
+      data: { status: DeploymentStatus.ROLLED_BACK },
+    });
+
+    try {
+      // Apply reverse changes (before snapshots)
+      await this.applyRollback(deploymentPackage.changes);
+
+      // Revert zone versions
+      const affectedZoneIds = await this.extractZoneIds(deploymentPackage.changes);
+      await this.revertZoneVersions(affectedZoneIds);
+
+      // Mark as rolled back
+      await this.prisma.deploymentPackage.update({
+        where: { id: packageId },
+        data: {
+          status: DeploymentStatus.ROLLED_BACK,
+          deployedAt: new Date(),
+          deployedBy: rolledBackBy,
+        },
+      });
+
+      this.logger.log(`Successfully rolled back package ${packageId}`);
+
+      return await this.prisma.deploymentPackage.findUnique({
+        where: { id: packageId },
+        include: { changes: true, validations: true },
+      });
+    } catch (error) {
+      this.logger.error(`Rollback failed: ${(error as Error).message}`, (error as Error).stack);
+
+      // Mark as failed
+      await this.prisma.deploymentPackage.update({
+        where: { id: packageId },
+        data: { status: DeploymentStatus.FAILED },
+      });
+
+      throw error;
+    }
+  }
+
+  /**
+   * Detect changes between dev and prod for specified zones
+   */
+  private async detectChanges(zoneIds: number[]): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    for (const zoneId of zoneIds) {
+      // Detect zone changes
+      changes.push(...(await this.detectZoneChanges(zoneId)));
+
+      // Detect room changes
+      changes.push(...(await this.detectRoomChanges(zoneId)));
+
+      // Detect mob changes
+      changes.push(...(await this.detectMobChanges(zoneId)));
+
+      // Detect object changes
+      changes.push(...(await this.detectObjectChanges(zoneId)));
+
+      // Detect shop changes
+      changes.push(...(await this.detectShopChanges(zoneId)));
+
+      // Detect script changes
+      changes.push(...(await this.detectScriptChanges(zoneId)));
+    }
+
+    return changes;
+  }
+
+  private async detectZoneChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const devZone = await this.devPrisma.zone.findUnique({
+      where: { id: zoneId },
+      include: {
+        // climate removed,
+        // resetRules removed,
+      },
+    });
+
+    const prodZone = await this.prodPrisma.zone.findUnique({
+      where: { id: zoneId },
+      include: {
+        // climate removed,
+        // resetRules removed,
+      },
+    });
+
+    if (!devZone && !prodZone) {
+      return [];
+    }
+
+    if (!prodZone) {
+      return [
+        {
+          entityType: 'Zone',
+          entityId: `${zoneId}`,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devZone,
+        },
+      ];
+    }
+
+    if (!devZone) {
+      return [
+        {
+          entityType: 'Zone',
+          entityId: `${zoneId}`,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodZone,
+        },
+      ];
+    }
+
+    // Check for modifications
+    const devHash = this.hashObject(devZone);
+    const prodHash = this.hashObject(prodZone);
+
+    if (devHash !== prodHash) {
+      return [
+        {
+          entityType: 'Zone',
+          entityId: `${zoneId}`,
+          changeType: ChangeType.UPDATE,
+          beforeSnapshot: prodZone,
+          afterSnapshot: devZone,
+        },
+      ];
+    }
+
+    return [];
+  }
+
+  private async detectRoomChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    const devRooms = await this.devPrisma.room.findMany({
+      where: { zoneId },
+      include: {
+        exits: true,
+        extraDescs: true,
+      },
+    });
+
+    const prodRooms = await this.prodPrisma.room.findMany({
+      where: { zoneId },
+      include: {
+        exits: true,
+        extraDescs: true,
+      },
+    });
+
+    const devRoomMap = new Map(devRooms.map((r) => [`${r.zoneId}:${r.id}`, r]));
+    const prodRoomMap = new Map(prodRooms.map((r) => [`${r.zoneId}:${r.id}`, r]));
+
+    // Find created rooms
+    for (const [key, devRoom] of devRoomMap) {
+      if (!prodRoomMap.has(key)) {
+        changes.push({
+          entityType: 'Room',
+          entityId: key,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devRoom,
+        });
+      }
+    }
+
+    // Find deleted rooms
+    for (const [key, prodRoom] of prodRoomMap) {
+      if (!devRoomMap.has(key)) {
+        changes.push({
+          entityType: 'Room',
+          entityId: key,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodRoom,
+        });
+      }
+    }
+
+    // Find modified rooms
+    for (const [key, devRoom] of devRoomMap) {
+      const prodRoom = prodRoomMap.get(key);
+      if (prodRoom) {
+        const devHash = this.hashObject(devRoom);
+        const prodHash = this.hashObject(prodRoom);
+        if (devHash !== prodHash) {
+          changes.push({
+            entityType: 'Room',
+            entityId: key,
+            changeType: ChangeType.UPDATE,
+            beforeSnapshot: prodRoom,
+            afterSnapshot: devRoom,
+          });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  private async detectMobChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    const devMobs = await this.devPrisma.mob.findMany({
+      where: { zoneId },
+      include: {
+        skills: true,
+        spells: true,
+        affects: true,
+      },
+    });
+
+    const prodMobs = await this.prodPrisma.mob.findMany({
+      where: { zoneId },
+      include: {
+        skills: true,
+        spells: true,
+        affects: true,
+      },
+    });
+
+    const devMobMap = new Map(devMobs.map((m) => [`${m.zoneId}:${m.id}`, m]));
+    const prodMobMap = new Map(prodMobs.map((m) => [`${m.zoneId}:${m.id}`, m]));
+
+    // Find created mobs
+    for (const [key, devMob] of devMobMap) {
+      if (!prodMobMap.has(key)) {
+        changes.push({
+          entityType: 'Mob',
+          entityId: key,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devMob,
+        });
+      }
+    }
+
+    // Find deleted mobs
+    for (const [key, prodMob] of prodMobMap) {
+      if (!devMobMap.has(key)) {
+        changes.push({
+          entityType: 'Mob',
+          entityId: key,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodMob,
+        });
+      }
+    }
+
+    // Find modified mobs
+    for (const [key, devMob] of devMobMap) {
+      const prodMob = prodMobMap.get(key);
+      if (prodMob) {
+        const devHash = this.hashObject(devMob);
+        const prodHash = this.hashObject(prodMob);
+        if (devHash !== prodHash) {
+          changes.push({
+            entityType: 'Mob',
+            entityId: key,
+            changeType: ChangeType.UPDATE,
+            beforeSnapshot: prodMob,
+            afterSnapshot: devMob,
+          });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  private async detectObjectChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    const devObjects = await this.devPrisma.object.findMany({
+      where: { zoneId },
+      include: {
+        affects: true,
+        extraDescs: true,
+      },
+    });
+
+    const prodObjects = await this.prodPrisma.object.findMany({
+      where: { zoneId },
+      include: {
+        affects: true,
+        extraDescs: true,
+      },
+    });
+
+    const devObjectMap = new Map(devObjects.map((o) => [`${o.zoneId}:${o.id}`, o]));
+    const prodObjectMap = new Map(prodObjects.map((o) => [`${o.zoneId}:${o.id}`, o]));
+
+    // Find created objects
+    for (const [key, devObject] of devObjectMap) {
+      if (!prodObjectMap.has(key)) {
+        changes.push({
+          entityType: 'Object',
+          entityId: key,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devObject,
+        });
+      }
+    }
+
+    // Find deleted objects
+    for (const [key, prodObject] of prodObjectMap) {
+      if (!devObjectMap.has(key)) {
+        changes.push({
+          entityType: 'Object',
+          entityId: key,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodObject,
+        });
+      }
+    }
+
+    // Find modified objects
+    for (const [key, devObject] of devObjectMap) {
+      const prodObject = prodObjectMap.get(key);
+      if (prodObject) {
+        const devHash = this.hashObject(devObject);
+        const prodHash = this.hashObject(prodObject);
+        if (devHash !== prodHash) {
+          changes.push({
+            entityType: 'Object',
+            entityId: key,
+            changeType: ChangeType.UPDATE,
+            beforeSnapshot: prodObject,
+            afterSnapshot: devObject,
+          });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  private async detectShopChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    const devShops = await this.devPrisma.shop.findMany({
+      where: { zoneId },
+      include: {
+        items: true,
+        accepts: true,
+        hours: true,
+        rooms: true,
+      },
+    });
+
+    const prodShops = await this.prodPrisma.shop.findMany({
+      where: { zoneId },
+      include: {
+        items: true,
+        accepts: true,
+        hours: true,
+        rooms: true,
+      },
+    });
+
+    const devShopMap = new Map(devShops.map((s) => [`${s.zoneId}:${s.id}`, s]));
+    const prodShopMap = new Map(prodShops.map((s) => [`${s.zoneId}:${s.id}`, s]));
+
+    // Find created shops
+    for (const [key, devShop] of devShopMap) {
+      if (!prodShopMap.has(key)) {
+        changes.push({
+          entityType: 'Shop',
+          entityId: key,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devShop,
+        });
+      }
+    }
+
+    // Find deleted shops
+    for (const [key, prodShop] of prodShopMap) {
+      if (!devShopMap.has(key)) {
+        changes.push({
+          entityType: 'Shop',
+          entityId: key,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodShop,
+        });
+      }
+    }
+
+    // Find modified shops
+    for (const [key, devShop] of devShopMap) {
+      const prodShop = prodShopMap.get(key);
+      if (prodShop) {
+        const devHash = this.hashObject(devShop);
+        const prodHash = this.hashObject(prodShop);
+        if (devHash !== prodHash) {
+          changes.push({
+            entityType: 'Shop',
+            entityId: key,
+            changeType: ChangeType.UPDATE,
+            beforeSnapshot: prodShop,
+            afterSnapshot: devShop,
+          });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  private async detectScriptChanges(zoneId: number): Promise<ChangeDetection[]> {
+    const changes: ChangeDetection[] = [];
+
+    const devScripts = await this.devPrisma.script.findMany({
+      where: { zoneId },
+    });
+
+    const prodScripts = await this.prodPrisma.script.findMany({
+      where: { zoneId },
+    });
+
+    const devScriptMap = new Map(devScripts.map((s) => [`${s.zoneId}:${s.id}`, s]));
+    const prodScriptMap = new Map(prodScripts.map((s) => [`${s.zoneId}:${s.id}`, s]));
+
+    // Find created scripts
+    for (const [key, devScript] of devScriptMap) {
+      if (!prodScriptMap.has(key)) {
+        changes.push({
+          entityType: 'Script',
+          entityId: key,
+          changeType: ChangeType.CREATE,
+          afterSnapshot: devScript,
+        });
+      }
+    }
+
+    // Find deleted scripts
+    for (const [key, prodScript] of prodScriptMap) {
+      if (!devScriptMap.has(key)) {
+        changes.push({
+          entityType: 'Script',
+          entityId: key,
+          changeType: ChangeType.DELETE,
+          beforeSnapshot: prodScript,
+        });
+      }
+    }
+
+    // Find modified scripts
+    for (const [key, devScript] of devScriptMap) {
+      const prodScript = prodScriptMap.get(key);
+      if (prodScript) {
+        const devHash = this.hashObject(devScript);
+        const prodHash = this.hashObject(prodScript);
+        if (devHash !== prodHash) {
+          changes.push({
+            entityType: 'Script',
+            entityId: key,
+            changeType: ChangeType.UPDATE,
+            beforeSnapshot: prodScript,
+            afterSnapshot: devScript,
+          });
+        }
+      }
+    }
+
+    return changes;
+  }
+
+  /**
+   * Validate changes before deployment
+   */
+  private async validateChanges(
+    changes: ChangeDetection[],
+    zoneIds: number[],
+  ): Promise<ValidationResult[]> {
+    const validations: ValidationResult[] = [];
+
+    // Check for referential integrity
+    validations.push(...(await this.validateReferentialIntegrity(changes)));
+
+    // Check for conflicts
+    validations.push(...(await this.validateConflicts(changes)));
+
+    // Check for zone consistency
+    validations.push(...(await this.validateZoneConsistency(zoneIds)));
+
+    // Check for script syntax
+    validations.push(...(await this.validateScriptSyntax(changes)));
+
+    return validations;
+  }
+
+  private async validateReferentialIntegrity(
+    changes: ChangeDetection[],
+  ): Promise<ValidationResult[]> {
+    const validations: ValidationResult[] = [];
+
+    // Check for dangling references (e.g., room exits pointing to non-existent rooms)
+    for (const change of changes) {
+      if (change.entityType === 'Room' && change.afterSnapshot) {
+        const room = change.afterSnapshot;
+        for (const exit of room.exits || []) {
+          if (exit.targetRoomZoneId && exit.targetRoomId) {
+            const targetExists = changes.some(
+              (c) =>
+                c.entityType === 'Room' &&
+                c.entityId === `${exit.targetRoomZoneId}:${exit.targetRoomId}` &&
+                c.changeType !== ChangeType.DELETE,
+            );
+
+            if (!targetExists) {
+              const prodTargetExists = await this.prodPrisma.room.findUnique({
+                where: {
+                  zoneId_id: {
+                    zoneId: exit.targetRoomZoneId,
+                    id: exit.targetRoomId,
+                  },
+                },
+              });
+
+              if (!prodTargetExists) {
+                validations.push({
+                  type: DeploymentValidationType.REFERENTIAL_INTEGRITY,
+                  severity: DeploymentValidationSeverity.ERROR,
+                  message: `Room ${change.entityId} has exit to non-existent room ${exit.targetRoomZoneId}:${exit.targetRoomId}`,
+                  details: { exit },
+                });
+              }
+            }
+          }
+        }
+      }
+    }
+
+    return validations;
+  }
+
+  private async validateConflicts(changes: ChangeDetection[]): Promise<ValidationResult[]> {
+    const validations: ValidationResult[] = [];
+
+    // Check for conflicting changes (e.g., modifying deleted entities)
+    const entityChanges = new Map<string, ChangeDetection[]>();
+    for (const change of changes) {
+      const key = `${change.entityType}:${change.entityId}`;
+      if (!entityChanges.has(key)) {
+        entityChanges.set(key, []);
+      }
+      entityChanges.get(key)!.push(change);
+    }
+
+    for (const [key, entityChangeList] of entityChanges) {
+      if (entityChangeList.length > 1) {
+        validations.push({
+          type: DeploymentValidationType.CONFLICT_DETECTION,
+          severity: DeploymentValidationSeverity.WARNING,
+          message: `Entity ${key} has multiple conflicting changes`,
+          details: { changes: entityChangeList },
+        });
+      }
+    }
+
+    return validations;
+  }
+
+  private async validateZoneConsistency(zoneIds: number[]): Promise<ValidationResult[]> {
+    const validations: ValidationResult[] = [];
+
+    for (const zoneId of zoneIds) {
+      // Check that zone exists
+      const devZone = await this.devPrisma.zone.findUnique({ where: { id: zoneId } });
+      if (!devZone) {
+        validations.push({
+          type: DeploymentValidationType.ZONE_CONSISTENCY,
+          severity: DeploymentValidationSeverity.ERROR,
+          message: `Zone ${zoneId} not found in dev environment`,
+        });
+      }
+
+      // Check that zone has at least one room
+      const roomCount = await this.devPrisma.room.count({ where: { zoneId } });
+      if (roomCount === 0) {
+        validations.push({
+          type: DeploymentValidationType.ZONE_CONSISTENCY,
+          severity: DeploymentValidationSeverity.WARNING,
+          message: `Zone ${zoneId} has no rooms`,
+        });
+      }
+    }
+
+    return validations;
+  }
+
+  private async validateScriptSyntax(changes: ChangeDetection[]): Promise<ValidationResult[]> {
+    const validations: ValidationResult[] = [];
+
+    for (const change of changes) {
+      if (change.entityType === 'Script' && change.afterSnapshot) {
+        const script = change.afterSnapshot;
+        // Basic Lua syntax check (in production, use a proper Lua parser)
+        if (!script.code || script.code.trim() === '') {
+          validations.push({
+            type: DeploymentValidationType.SCRIPT_SYNTAX,
+            severity: DeploymentValidationSeverity.WARNING,
+            message: `Script ${change.entityId} has empty code`,
+          });
+        }
+      }
+    }
+
+    return validations;
+  }
+
+  /**
+   * Apply changes to prod database
+   */
+  private async applyChanges(changes: any[]): Promise<void> {
+    // Group changes by entity type and change type
+    const groupedChanges = this.groupChanges(changes);
+
+    // Apply in order: CREATE -> MODIFY -> DELETE
+    for (const changeType of [
+      ChangeType.CREATE,
+      ChangeType.UPDATE,
+      ChangeType.DELETE,
+    ]) {
+      for (const entityType of Object.keys(groupedChanges)) {
+        const entityChanges = groupedChanges[entityType][changeType] || [];
+        await this.applyEntityChanges(entityType, changeType, entityChanges);
+      }
+    }
+  }
+
+  private groupChanges(changes: any[]): Record<string, Record<string, any[]>> {
+    const grouped: Record<string, Record<string, any[]>> = {};
+
+    for (const change of changes) {
+      if (!grouped[change.entityType]) {
+        grouped[change.entityType] = {};
+      }
+      if (!grouped[change.entityType][change.changeType]) {
+        grouped[change.entityType][change.changeType] = [];
+      }
+      grouped[change.entityType][change.changeType].push(change);
+    }
+
+    return grouped;
+  }
+
+  private async applyEntityChanges(
+    entityType: string,
+    changeType: ChangeType,
+    changes: any[],
+  ): Promise<void> {
+    for (const change of changes) {
+      const snapshot =
+        changeType === ChangeType.DELETE ? change.beforeSnapshot : change.afterSnapshot;
+
+      switch (entityType) {
+        case 'Zone':
+          await this.applyZoneChange(changeType, snapshot);
+          break;
+        case 'Room':
+          await this.applyRoomChange(changeType, snapshot);
+          break;
+        case 'Mob':
+          await this.applyMobChange(changeType, snapshot);
+          break;
+        case 'Object':
+          await this.applyObjectChange(changeType, snapshot);
+          break;
+        case 'Shop':
+          await this.applyShopChange(changeType, snapshot);
+          break;
+        case 'Script':
+          await this.applyScriptChange(changeType, snapshot);
+          break;
+        default:
+          this.logger.warn(`Unknown entity type: ${entityType}`);
+      }
+    }
+  }
+
+  private async applyZoneChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.zone.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.zone.update({
+          where: { id: snapshot.id },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.zone.delete({ where: { id: snapshot.id } });
+        break;
+    }
+  }
+
+  private async applyRoomChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.room.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.room.update({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.room.delete({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+        });
+        break;
+    }
+  }
+
+  private async applyMobChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.mob.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.mob.update({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.mob.delete({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+        });
+        break;
+    }
+  }
+
+  private async applyObjectChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.object.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.object.update({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.object.delete({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+        });
+        break;
+    }
+  }
+
+  private async applyShopChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.shop.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.shop.update({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.shop.delete({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+        });
+        break;
+    }
+  }
+
+  private async applyScriptChange(changeType: ChangeType, snapshot: any): Promise<void> {
+    switch (changeType) {
+      case ChangeType.CREATE:
+        await this.prodPrisma.script.create({ data: snapshot });
+        break;
+      case ChangeType.UPDATE:
+        await this.prodPrisma.script.update({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+          data: snapshot,
+        });
+        break;
+      case ChangeType.DELETE:
+        await this.prodPrisma.script.delete({
+          where: { zoneId_id: { zoneId: snapshot.zoneId, id: snapshot.id } },
+        });
+        break;
+    }
+  }
+
+  /**
+   * Apply rollback (restore before snapshots)
+   */
+  private async applyRollback(changes: any[]): Promise<void> {
+    // Apply in reverse order: CREATE -> MODIFY -> DELETE
+    const groupedChanges = this.groupChanges(changes);
+
+    for (const changeType of [
+      ChangeType.DELETE,
+      ChangeType.UPDATE,
+      ChangeType.CREATE,
+    ]) {
+      for (const entityType of Object.keys(groupedChanges)) {
+        const entityChanges = groupedChanges[entityType][changeType] || [];
+        // Reverse the change type for rollback
+        const reverseChangeType =
+          changeType === ChangeType.CREATE
+            ? ChangeType.DELETE
+            : changeType === ChangeType.DELETE
+              ? ChangeType.CREATE
+              : ChangeType.UPDATE;
+
+        for (const change of entityChanges) {
+          const snapshot = change.beforeSnapshot;
+          await this.applyEntityChanges(entityType, reverseChangeType, [{ afterSnapshot: snapshot }]);
+        }
+      }
+    }
+  }
+
+  /**
+   * Update zone versions after deployment
+   */
+  private async updateZoneVersions(zoneIds: number[], version: string): Promise<void> {
+    for (const zoneId of zoneIds) {
+      const checksum = await this.calculateZoneChecksum(zoneId, 'prod');
+      await this.prisma.zoneVersion.upsert({
+        where: { zoneId },
+        create: {
+          zoneId,
+          version: 1,
+          checksum,
+          lastDeployedFrom: 'dev',
+          lastDeployedAt: new Date(),
+        },
+        update: {
+          version: { increment: 1 },
+          checksum,
+          lastDeployedFrom: 'dev',
+          lastDeployedAt: new Date(),
+        },
+      });
+    }
+  }
+
+  /**
+   * Revert zone versions after rollback
+   */
+  private async revertZoneVersions(zoneIds: number[]): Promise<void> {
+    for (const zoneId of zoneIds) {
+      await this.prisma.zoneVersion.update({
+        where: { zoneId },
+        data: {
+          version: { decrement: 1 },
+        },
+      });
+    }
+  }
+
+  /**
+   * Extract zone IDs from changes
+   */
+  private async extractZoneIds(changes: any[]): Promise<number[]> {
+    const zoneIds = new Set<number>();
+
+    for (const change of changes) {
+      const entityId = change.entityId;
+      if (entityId.includes(':')) {
+        const [zoneIdStr] = entityId.split(':');
+        zoneIds.add(parseInt(zoneIdStr, 10));
+      }
+    }
+
+    return Array.from(zoneIds);
+  }
+
+  /**
+   * Calculate next deployment version
+   */
+  private async calculateNextVersion(): Promise<string> {
+    const lastPackage = await this.prisma.deploymentPackage.findFirst({
+      orderBy: { createdAt: 'desc' },
+    });
+
+    if (!lastPackage) {
+      return '1.0.0';
+    }
+
+    const [major, minor, patch] = lastPackage.version.split('.').map((n) => parseInt(n, 10));
+    return `${major}.${minor}.${patch + 1}`;
+  }
+
+  /**
+   * Calculate zone checksums
+   */
+  private async calculateZoneChecksums(
+    zoneIds: number[],
+    env: 'dev' | 'prod',
+  ): Promise<Record<number, string>> {
+    const checksums: Record<number, string> = {};
+
+    for (const zoneId of zoneIds) {
+      checksums[zoneId] = await this.calculateZoneChecksum(zoneId, env);
+    }
+
+    return checksums;
+  }
+
+  private async calculateZoneChecksum(zoneId: number, env: 'dev' | 'prod'): Promise<string> {
+    const prisma = env === 'dev' ? this.devPrisma : this.prodPrisma;
+
+    const zone = await prisma.zone.findUnique({
+      where: { id: zoneId },
+      include: {
+        rooms: { include: { exits: true, extraDescs: true } },
+        mobs: { include: { skills: true, spells: true, affects: true } },
+        objects: { include: { affects: true, extraDescs: true } },
+        shops: { include: { items: true, accepts: true, hours: true, rooms: true } },
+        scripts: true,
+      },
+    });
+
+    return this.hashObject(zone);
+  }
+
+  /**
+   * Hash an object for comparison
+   */
+  private hashObject(obj: any): string {
+    const json = JSON.stringify(obj, Object.keys(obj).sort());
+    return createHash('sha256').update(json).digest('hex');
+  }
+
+  /**
+   * Generate unique ID for deployment packages
+   */
+  private generateId(): string {
+    return `dep_${Date.now()}_${Math.random().toString(36).substring(2, 9)}`;
+  }
+
+  /**
+   * Find all deployment packages with optional filtering
+   */
+  async findAll(filters: {
+    status?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<DeploymentPackage[]> {
+    const where = filters.status ? { status: filters.status as DeploymentStatus } : {};
+
+    return this.prisma.deploymentPackage.findMany({
+      where,
+      include: {
+        changes: true,
+        validations: true,
+      },
+      orderBy: { createdAt: 'desc' },
+      take: filters.limit || 50,
+      skip: filters.offset || 0,
+    });
+  }
+
+  /**
+   * Find a single deployment package by ID
+   */
+  async findOne(id: string): Promise<DeploymentPackage | null> {
+    return this.prisma.deploymentPackage.findUnique({
+      where: { id },
+      include: {
+        changes: true,
+        validations: true,
+      },
+    });
+  }
+
+  /**
+   * Find zone versions with optional filtering
+   */
+  async findZoneVersions(zoneIds?: number[]): Promise<any[]> {
+    if (zoneIds && zoneIds.length > 0) {
+      return this.prisma.zoneVersion.findMany({
+        where: { zoneId: { in: zoneIds } },
+      });
+    }
+
+    return this.prisma.zoneVersion.findMany();
+  }
+
+  /**
+   * Find a single zone version
+   */
+  async findZoneVersion(zoneId: number): Promise<any | null> {
+    return this.prisma.zoneVersion.findUnique({
+      where: { zoneId },
+    });
+  }
+
+  /**
+   * Get user by ID
+   */
+  async getUser(userId: string): Promise<any> {
+    return this.prisma.user.findUnique({
+      where: { id: userId },
+    });
+  }
+}

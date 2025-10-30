@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.15.1",
+  "packageManager": "pnpm@10.19.0",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
@@ -42,35 +42,42 @@
     "db:studio": "pnpm --filter @muditor/db studio",
     "db:seed": "pnpm --filter @muditor/db seed",
     "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
+    "codegen": "graphql-codegen --config codegen.ts",
+    "codegen:watch": "graphql-codegen --config codegen.ts --watch",
     "clean": "pnpm run --recursive clean && rm -rf node_modules",
-    "prepare": "husky install",
+    "prepare": "husky",
     "system:start": "./scripts/start-system.sh",
     "system:stop": "./scripts/stop-system.sh",
     "system:status": "./scripts/check-system.sh",
     "system:restart": "./scripts/stop-system.sh && ./scripts/start-system.sh"
   },
   "devDependencies": {
+    "@eslint/js": "^9.35.0",
+    "@graphql-codegen/cli": "^6.0.0",
+    "@graphql-codegen/client-preset": "^4.8.3",
+    "@graphql-codegen/typescript": "^5.0.0",
+    "@graphql-codegen/typescript-operations": "^5.0.0",
+    "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@playwright/test": "^1.55.0",
     "@types/node": "^24.3.1",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
-  "typescript-eslint": "^8.43.0",
     "eslint": "^9.35.0",
-  "@eslint/js": "^9.35.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
+    "eslint-plugin-prettier": "^5.2.1",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
-  "eslint-plugin-prettier": "^5.2.1",
-  "globals": "^15.11.0",
+    "globals": "^15.11.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.6",
     "prettier": "^3.6.2",
     "tsx": "^4.20.5",
     "turbo": "^2.5.6",
-    "typescript": "~5.9.2"
+    "typescript": "~5.9.2",
+    "typescript-eslint": "^8.43.0"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -91,5 +98,10 @@
     "react",
     "nextjs",
     "nestjs"
-  ]
+  ],
+  "pnpm": {
+    "overrides": {
+      "axios": "^1.12.0"
+    }
+  }
 }
