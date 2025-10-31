@@ -61,7 +61,7 @@ model BanRecords {
 }
 
 model ChangeLogs {
-  id          String   @id
+  id          Int   @id @default(autoincrement())
   entityType  String @map("entity_type")
   entityId    String @map("entity_id")
   action      String
@@ -77,7 +77,7 @@ model ChangeLogs {
 }
 
 model CharacterEffects {
-  id            String     @id
+  id            Int     @id @default(autoincrement())
   characterId  String @map("character_id")
   effectName   String @map("effect_name")
   effectType   String? @map("effect_type")
@@ -92,11 +92,11 @@ model CharacterEffects {
 }
 
 model CharacterItems {
-  id                    String            @id
+  id                    Int            @id @default(autoincrement())
   characterId          String @map("character_id")
   objectZoneId        Int @map("object_zone_id")
   objectId             Int @map("object_id")
-  containerId          String? @map("container_id")
+  containerId          Int? @map("container_id")
   equippedLocation     String? @map("equipped_location")
   condition             Int               @default(100)
   charges               Int               @default(-1)
@@ -113,7 +113,7 @@ model CharacterItems {
 }
 
 model CharacterSkills {
-  id          String     @id
+  id          Int     @id @default(autoincrement())
   characterId String @map("character_id")
   skillId     Int @map("skill_id")
   level       Int        @default(0)
@@ -126,7 +126,7 @@ model CharacterSkills {
 }
 
 model CharacterSpells {
-  id          String     @id
+  id          Int     @id @default(autoincrement())
   characterId String @map("character_id")
   spellId     Int @map("spell_id")
   known       Boolean    @default(false)
@@ -222,8 +222,8 @@ model ClassSkills {
 }
 
 model EquipmentSetItems {
-  id             String         @id
-  equipmentSetId String @map("equipment_set_id")
+  id             Int         @id @default(autoincrement())
+  equipmentSetId Int @map("equipment_set_id")
   objectZoneId   Int @map("object_zone_id")
   objectId       Int @map("object_id")
   slot           String?
@@ -234,7 +234,7 @@ model EquipmentSetItems {
 }
 
 model EquipmentSets {
-  id                  String                @id
+  id                  Int                @id @default(autoincrement())
   name                String
   description         String?
   createdAt           DateTime @map("created_at") @default(now())
@@ -244,20 +244,20 @@ model EquipmentSets {
 }
 
 model MobCarrying {
-  id           String     @id
+  id           Int     @id @default(autoincrement())
   max          Int        @default(1)
   name         String?
   objectZoneId Int @map("object_zone_id")
   objectId     Int @map("object_id")
-  resetId      String @map("reset_id")
+  resetId      Int @map("reset_id")
   objects      Objects    @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   mob_resets   MobResets @relation(fields: [resetId], references: [id], onDelete: Cascade)
 }
 
 model MobEquipmentSets {
-  id             String         @id
-  mobResetId     String @map("mob_reset_id")
-  equipmentSetId String @map("equipment_set_id")
+  id             Int         @id @default(autoincrement())
+  mobResetId     Int @map("mob_reset_id")
+  equipmentSetId Int @map("equipment_set_id")
   probability    Float          @default(1.0)
   equipment_sets EquipmentSets @relation(fields: [equipmentSetId], references: [id], onDelete: Cascade)
   mob_resets     MobResets     @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
@@ -266,19 +266,19 @@ model MobEquipmentSets {
 }
 
 model MobResetEquipment {
-  id           String     @id
+  id           Int     @id @default(autoincrement())
   maxInstances Int @map("max_instances") @default(1)
   wearLocation String? @map("wear_location")
   objectZoneId Int @map("object_zone_id")
   objectId     Int @map("object_id")
-  resetId      String @map("reset_id")
+  resetId      Int @map("reset_id")
   probability  Float      @default(1.0)
   objects      Objects    @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   mob_resets   MobResets @relation(fields: [resetId], references: [id], onDelete: Cascade)
 }
 
 model MobResets {
-  id                  String                @id
+  id                  Int                @id @default(autoincrement())
   maxInstances        Int @map("max_instances") @default(1)
   comment             String?
   mobZoneId           Int @map("mob_zone_id")
@@ -386,7 +386,7 @@ model Mobs {
 }
 
 model ObjectAffects {
-  id           String  @id
+  id           Int  @id @default(autoincrement())
   location     String
   modifier     Int
   objectZoneId Int @map("object_zone_id")
@@ -395,7 +395,7 @@ model ObjectAffects {
 }
 
 model ObjectExtraDescriptions {
-  id           String   @id
+  id           Int   @id @default(autoincrement())
   keywords     String[]
   description  String
   objectZoneId Int @map("object_zone_id")
@@ -404,14 +404,14 @@ model ObjectExtraDescriptions {
 }
 
 model ObjectResets {
-  id                  String             @id
+  id                  Int             @id @default(autoincrement())
   maxInstances        Int @map("max_instances") @default(1)
   comment             String?
   objectZoneId        Int @map("object_zone_id")
   objectId            Int @map("object_id")
   roomZoneId          Int? @map("room_zone_id")
   roomId              Int? @map("room_id")
-  containerResetId    String? @map("container_reset_id")
+  containerResetId    Int? @map("container_reset_id")
   zoneId              Int @map("zone_id")
   probability         Float              @default(1.0)
   resetBehavior       String @map("reset_behavior") @default("PERSISTENT")
@@ -424,7 +424,7 @@ model ObjectResets {
 }
 
 model ObjectSpells {
-  id           String  @id
+  id           Int  @id @default(autoincrement())
   spell        String
   level        Int     @default(1)
   objectZoneId Int @map("object_zone_id")
@@ -482,7 +482,7 @@ model RaceSkills {
 }
 
 model RoomExits {
-  id                                        String     @id
+  id                                        Int        @id @default(autoincrement())
   direction                                 Direction
   description                               String?
   keywords                                  String[]   @default([])
@@ -499,7 +499,7 @@ model RoomExits {
 }
 
 model RoomExtraDescriptions {
-  id          String   @id
+  id          Int   @id @default(autoincrement())
   keywords    String[]
   description String
   roomZoneId  Int @map("room_zone_id")
@@ -533,7 +533,7 @@ model Rooms {
 }
 
 model ShopAccepts {
-  id         String   @id
+  id         Int   @id @default(autoincrement())
   type       String
   keywords   String[]
   shopZoneId Int @map("shop_zone_id")
@@ -542,7 +542,7 @@ model ShopAccepts {
 }
 
 model ShopHours {
-  id         String @id
+  id         Int @id @default(autoincrement())
   open       Int
   close      Int
   shopZoneId Int @map("shop_zone_id")
@@ -551,7 +551,7 @@ model ShopHours {
 }
 
 model ShopItems {
-  id           String  @id
+  id           Int  @id @default(autoincrement())
   amount       Int     @default(0)
   shopZoneId   Int @map("shop_zone_id")
   shopId       Int @map("shop_id")
@@ -564,7 +564,7 @@ model ShopItems {
 }
 
 model ShopRooms {
-  id         String @id
+  id         Int @id @default(autoincrement())
   roomId     Int @map("room_id")
   shopZoneId Int @map("shop_zone_id")
   shopId     Int @map("shop_id")
@@ -620,11 +620,11 @@ model Skills {
 }
 
 model SpawnConditions {
-  id            String         @id
+  id            Int         @id @default(autoincrement())
   type          String
   parameters    Json           @default("{}")
-  mobResetId    String? @map("mob_reset_id")
-  objectResetId String? @map("object_reset_id")
+  mobResetId    Int? @map("mob_reset_id")
+  objectResetId Int? @map("object_reset_id")
   mob_resets    MobResets?    @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
   object_resets ObjectResets? @relation(fields: [objectResetId], references: [id], onDelete: Cascade)
 }
@@ -751,7 +751,7 @@ model Spells {
 }
 
 model Triggers {
-  id           String        @id
+  id           Int        @id @default(autoincrement())
   name         String
   attachType   ScriptType
   numArgs      Int @map("num_args") @default(0)
