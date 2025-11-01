@@ -176,7 +176,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
             data.isOverlapping &&
             data.overlappedRooms &&
             data.overlappedRooms.length > 1
-              ? 'ring-4 ring-orange-400 ring-offset-1 shadow-lg shadow-orange-300/50 animate-pulse-border'
+              ? 'ring-4 ring-orange-400 ring-offset-1 shadow-lg shadow-orange-300/50'
               : ''
           }
           border-2 rounded-xl ${depthEffects.shadow} hover:shadow-xl transition-all duration-200

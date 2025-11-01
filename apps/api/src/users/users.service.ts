@@ -1,25 +1,26 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
-import { UserRole, User } from '@prisma/client';
+import { UserRole, Users } from '@prisma/client';
+import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
-import { UpdateUserInput } from './dto/update-user.input';
 import { BanUserInput } from './dto/ban-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
 
 @Injectable()
 export class UsersService {
   constructor(private readonly databaseService: DatabaseService) {}
 
   async findAll() {
-    return this.databaseService.user.findMany({
+    return this.databaseService.users.findMany({
       orderBy: { createdAt: 'desc' },
     });
   }
 
   async findOne(id: string) {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.users.findUnique({
       where: { id },
     });
 
@@ -31,13 +32,13 @@ export class UsersService {
   }
 
   async findByEmail(email: string) {
-    return this.databaseService.user.findUnique({
+    return this.databaseService.users.findUnique({
       where: { email },
     });
   }
 
   async findByUsername(username: string) {
-    return this.databaseService.user.findUnique({
+    return this.databaseService.users.findUnique({
       where: { username },
     });
   }
@@ -45,14 +46,14 @@ export class UsersService {
   async updateRole(id: string, role: UserRole) {
     const user = await this.findOne(id);
 
-    return this.databaseService.user.update({
+    return this.databaseService.users.update({
       where: { id },
       data: { role },
     });
   }
 
   async getUsersWithCharacters() {
-    return this.databaseService.user.findMany({
+    return this.databaseService.users.findMany({
       include: {
         characters: true,
       },
@@ -68,7 +69,7 @@ export class UsersService {
 
     // Check if email is being updated and is unique
     if (updateData.email) {
-      const existingUser = await this.databaseService.user.findFirst({
+      const existingUser = await this.databaseService.users.findFirst({
         where: {
           email: updateData.email,
           id: { not: id },
@@ -82,7 +83,7 @@ export class UsersService {
       }
     }
 
-    const updatedUser = await this.databaseService.user.update({
+    const updatedUser = await this.databaseService.users.update({
       where: { id },
       data: updateData,
     });
@@ -101,7 +102,7 @@ export class UsersService {
     await this.findOne(userId);
 
     // Check if user is already banned
-    const existingBan = await this.databaseService.banRecord.findFirst({
+    const existingBan = await this.databaseService.banRecords.findFirst({
       where: {
         userId,
         active: true,
@@ -117,8 +118,9 @@ export class UsersService {
       throw new BadRequestException('You cannot ban yourself');
     }
 
-    const banRecord = await this.databaseService.banRecord.create({
+    const banRecord = await this.databaseService.banRecords.create({
       data: {
+        id: crypto.randomUUID(),
         userId,
         bannedBy: bannedById,
         reason,
@@ -126,7 +128,7 @@ export class UsersService {
       },
       include: {
         user: true,
-        admin: true,
+        bannedByUser: true,
       },
     });
 
@@ -138,7 +140,7 @@ export class UsersService {
         isBanned: true,
       },
       admin: {
-        ...banRecord.admin,
+        ...banRecord.bannedByUser,
         isBanned: false, // Admins shouldn't be banned
       },
     };
@@ -149,7 +151,7 @@ export class UsersService {
     await this.findOne(userId);
 
     // Find active ban
-    const activeBan = await this.databaseService.banRecord.findFirst({
+    const activeBan = await this.databaseService.banRecords.findFirst({
       where: {
         userId,
         active: true,
@@ -160,7 +162,7 @@ export class UsersService {
       throw new BadRequestException('User is not currently banned');
     }
 
-    const updatedBanRecord = await this.databaseService.banRecord.update({
+    const updatedBanRecord = await this.databaseService.banRecords.update({
       where: { id: activeBan.id },
       data: {
         active: false,
@@ -169,7 +171,7 @@ export class UsersService {
       },
       include: {
         user: true,
-        admin: true,
+        bannedByUser: true,
       },
     });
 
@@ -181,20 +183,20 @@ export class UsersService {
         isBanned: false,
       },
       admin: {
-        ...updatedBanRecord.admin,
+        ...updatedBanRecord.bannedByUser,
         isBanned: false,
       },
     };
   }
 
   async getUserWithBanStatus(id: string) {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.users.findUnique({
       where: { id },
       include: {
         banRecords: {
           where: { active: true },
           include: {
-            admin: {
+            bannedByUser: {
               select: {
                 id: true,
                 username: true,
@@ -217,12 +219,12 @@ export class UsersService {
   }
 
   async getAllUsersWithBanStatus() {
-    const users = await this.databaseService.user.findMany({
+    const users = await this.databaseService.users.findMany({
       include: {
         banRecords: {
           where: { active: true },
           include: {
-            admin: {
+            bannedByUser: {
               select: {
                 id: true,
                 username: true,
@@ -242,11 +244,11 @@ export class UsersService {
   }
 
   async getBanHistory(userId: string) {
-    const banRecords = await this.databaseService.banRecord.findMany({
+    const banRecords = await this.databaseService.banRecords.findMany({
       where: { userId },
       include: {
         user: true,
-        admin: {
+        bannedByUser: {
           select: {
             id: true,
             username: true,
@@ -266,9 +268,9 @@ export class UsersService {
             isBanned: record.active,
           }
         : undefined,
-      admin: record.admin
+      admin: record.bannedByUser
         ? {
-            ...record.admin,
+            ...record.bannedByUser,
             isBanned: false, // Admins shouldn't be banned
           }
         : undefined,
@@ -276,39 +278,39 @@ export class UsersService {
   }
 
   // Permission helper methods for user hierarchy
-  isPlayer(user: User): boolean {
+  isPlayer(user: Users): boolean {
     return user.role === UserRole.PLAYER;
   }
 
-  isImmortal(user: User): boolean {
+  isImmortal(user: Users): boolean {
     return user.role === UserRole.IMMORTAL || this.isHigherThanImmortal(user);
   }
 
-  isBuilder(user: User): boolean {
+  isBuilder(user: Users): boolean {
     return user.role === UserRole.BUILDER || this.isCoder(user);
   }
 
-  isCoder(user: User): boolean {
+  isCoder(user: Users): boolean {
     return user.role === UserRole.CODER || this.isGod(user);
   }
 
-  isGod(user: User): boolean {
+  isGod(user: Users): boolean {
     return user.role === UserRole.GOD;
   }
 
-  isHigherThanImmortal(user: User): boolean {
+  isHigherThanImmortal(user: Users): boolean {
     return user.role === UserRole.CODER || user.role === UserRole.GOD;
   }
 
-  canAccessDashboard(user: User): boolean {
+  canAccessDashboard(user: Users): boolean {
     return this.isImmortal(user);
   }
 
-  canManageUsers(user: User): boolean {
+  canManageUsers(user: Users): boolean {
     return this.isGod(user) || this.isCoder(user);
   }
 
-  canEditZone(user: User, zoneId?: number): boolean {
+  canEditZone(user: Users, zoneId?: number): boolean {
     if (this.isGod(user)) return true;
     if (this.isCoder(user)) return true;
 
@@ -322,7 +324,7 @@ export class UsersService {
     return false;
   }
 
-  canManageCharacters(user: User, characterOwnerId?: string): boolean {
+  canManageCharacters(user: Users, characterOwnerId?: string): boolean {
     // Gods can manage any character
     if (this.isGod(user)) return true;
 
@@ -335,12 +337,12 @@ export class UsersService {
     return false;
   }
 
-  canViewValidation(user: User): boolean {
+  canViewValidation(user: Users): boolean {
     return this.isImmortal(user);
   }
 
-  async getMaxCharacterLevel(user: User): Promise<number> {
-    const maxLevelResult = await this.databaseService.character.aggregate({
+  async getMaxCharacterLevel(user: Users): Promise<number> {
+    const maxLevelResult = await this.databaseService.characters.aggregate({
       where: { userId: user.id },
       _max: { level: true },
     });
@@ -348,7 +350,7 @@ export class UsersService {
     return maxLevelResult._max.level || 1; // Default to level 1 if no characters
   }
 
-  async getUserPermissions(user: User) {
+  async getUserPermissions(user: Users) {
     const maxCharacterLevel = await this.getMaxCharacterLevel(user);
 
     return {

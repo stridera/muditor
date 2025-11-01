@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Mob, Prisma } from '@prisma/client';
+import { Mobs, Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -9,10 +9,10 @@ export class MobsService {
   async findAll(args?: {
     skip?: number;
     take?: number;
-    where?: Prisma.MobWhereInput;
-    orderBy?: Prisma.MobOrderByWithRelationInput;
-  }): Promise<Mob[]> {
-    const mobs = await this.database.mob.findMany({
+    where?: Prisma.MobsWhereInput;
+    orderBy?: Prisma.MobsOrderByWithRelationInput;
+  }): Promise<Mobs[]> {
+    const mobs = await this.database.mobs.findMany({
       skip: args?.skip,
       take: args?.take,
       where: args?.where,
@@ -22,8 +22,8 @@ export class MobsService {
     return mobs;
   }
 
-  async findOne(zoneId: number, id: number): Promise<Mob | null> {
-    const mob = await this.database.mob.findUnique({
+  async findOne(zoneId: number, id: number): Promise<Mobs | null> {
+    const mob = await this.database.mobs.findUnique({
       where: {
         zoneId_id: {
           zoneId,
@@ -31,13 +31,13 @@ export class MobsService {
         },
       },
       include: {
-        skills: { include: { skill: true } },
-        spells: { include: { spell: true } },
-        resets: {
+        mob_skills: { include: { skills: true } },
+        mob_spells: { include: { spells: true } },
+        mob_resets: {
           include: {
-            room: { select: { id: true, zoneId: true, name: true } },
-            zone: { select: { id: true, name: true } },
-            equipment: true,
+            rooms: { select: { id: true, zoneId: true, name: true } },
+            zones: { select: { id: true, name: true } },
+            mob_reset_equipment: true,
           },
         },
       },
@@ -45,13 +45,13 @@ export class MobsService {
     return mob;
   }
 
-  async findByZone(zoneId: number): Promise<Mob[]> {
-    const mobs = await this.database.mob.findMany({
+  async findByZone(zoneId: number): Promise<Mobs[]> {
+    const mobs = await this.database.mobs.findMany({
       where: { zoneId },
       include: {
-        resets: {
+        mob_resets: {
           include: {
-            room: { select: { id: true, name: true } },
+            rooms: { select: { id: true, name: true } },
           },
         },
       },
@@ -59,12 +59,12 @@ export class MobsService {
     return mobs;
   }
 
-  async count(where?: Prisma.MobWhereInput): Promise<number> {
-    return this.database.mob.count({ where });
+  async count(where?: Prisma.MobsWhereInput): Promise<number> {
+    return this.database.mobs.count({ where });
   }
 
-  async create(data: Prisma.MobCreateInput): Promise<Mob> {
-    const mob = await this.database.mob.create({
+  async create(data: Prisma.MobsCreateInput): Promise<Mobs> {
+    const mob = await this.database.mobs.create({
       data,
       include: {},
     });
@@ -74,9 +74,9 @@ export class MobsService {
   async update(
     zoneId: number,
     id: number,
-    data: Prisma.MobUpdateInput
-  ): Promise<Mob> {
-    const mob = await this.database.mob.update({
+    data: Prisma.MobsUpdateInput
+  ): Promise<Mobs> {
+    const mob = await this.database.mobs.update({
       where: { zoneId_id: { zoneId, id } },
       data,
       include: {},
@@ -84,14 +84,14 @@ export class MobsService {
     return mob;
   }
 
-  async delete(zoneId: number, id: number): Promise<Mob> {
-    return this.database.mob.delete({
+  async delete(zoneId: number, id: number): Promise<Mobs> {
+    return this.database.mobs.delete({
       where: { zoneId_id: { zoneId, id } },
     });
   }
 
   async deleteMany(ids: number[]): Promise<number> {
-    const result = await this.database.mob.deleteMany({
+    const result = await this.database.mobs.deleteMany({
       where: { id: { in: ids } },
     });
     return result.count;

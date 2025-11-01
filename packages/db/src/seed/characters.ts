@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 
 interface UserData {
   id: string;
@@ -15,7 +16,7 @@ export async function seedCharacters(
   console.log('  Creating test characters...');
 
   // Get class data (races are now enums)
-  const mageClass = await prisma.class.findFirst({
+  const mageClass = await prisma.characterClass.findFirst({
     where: { name: 'Sorcerer' },
   });
 
@@ -27,7 +28,7 @@ export async function seedCharacters(
   }
 
   // Create god character for admin user
-  const godCharacter = await prisma.character.upsert({
+  const godCharacter = await prisma.characters.upsert({
     where: { name: 'GodAdmin' },
     update: {
       userId: users.admin.id,
@@ -62,6 +63,7 @@ export async function seedCharacters(
       passwordHash: await bcrypt.hash('godpass123', 12),
     },
     create: {
+      id: crypto.randomUUID(),
       name: 'GodAdmin',
       userId: users.admin.id,
       level: 110,
@@ -92,7 +94,7 @@ export async function seedCharacters(
   });
 
   // Create builder character for builder user
-  const builderCharacter = await prisma.character.upsert({
+  const builderCharacter = await prisma.characters.upsert({
     where: { name: 'BuilderChar' },
     update: {
       userId: users.builder.id,
@@ -121,6 +123,7 @@ export async function seedCharacters(
       passwordHash: await bcrypt.hash('buildpass123', 12),
     },
     create: {
+      id: crypto.randomUUID(),
       name: 'BuilderChar',
       userId: users.builder.id,
       level: 50,
@@ -150,7 +153,7 @@ export async function seedCharacters(
   });
 
   // Create test player character for player user
-  const playerCharacter = await prisma.character.upsert({
+  const playerCharacter = await prisma.characters.upsert({
     where: { name: 'TestPlayer' },
     update: {
       userId: users.player.id,
@@ -179,6 +182,7 @@ export async function seedCharacters(
       passwordHash: await bcrypt.hash('testpass123', 12),
     },
     create: {
+      id: crypto.randomUUID(),
       name: 'TestPlayer',
       userId: users.player.id,
       level: 1,

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { TriggerAttachType } from '@prisma/client';
+import { ScriptType } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -12,23 +12,23 @@ export class TriggersService {
   constructor(private prisma: DatabaseService) {}
 
   async findAll() {
-    return this.prisma.trigger.findMany({
+    return this.prisma.triggers.findMany({
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -41,25 +41,25 @@ export class TriggersService {
     });
   }
 
-  async findOne(id: string) {
-    const trigger = await this.prisma.trigger.findUnique({
+  async findOne(id: number) {
+    const trigger = await this.prisma.triggers.findUnique({
       where: { id },
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -75,30 +75,30 @@ export class TriggersService {
     return trigger;
   }
 
-  async findByAttachment(attachType: TriggerAttachType, entityId: number) {
+  async findByAttachment(attachType: ScriptType, entityId: number) {
     const whereClause = this.buildWhereClauseForAttachment(
       attachType,
       entityId
     );
 
-    return this.prisma.trigger.findMany({
+    return this.prisma.triggers.findMany({
       where: whereClause,
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -115,9 +115,8 @@ export class TriggersService {
     const triggerData: any = {
       name: data.name,
       attachType: data.attachType,
-      triggerTypes: data.triggerTypes || [],
       script: data.commands,
-      arguments: data.argList ? data.argList.split(' ') : [],
+      arguments: data.argList || [],
       createdBy: userId,
     };
 
@@ -132,24 +131,24 @@ export class TriggersService {
       triggerData.zoneId = data.zoneId;
     }
 
-    return this.prisma.trigger.create({
+    return this.prisma.triggers.create({
       data: triggerData,
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -159,7 +158,7 @@ export class TriggersService {
     });
   }
 
-  async update(id: string, data: UpdateTriggerInput, userId?: string) {
+  async update(id: number, data: UpdateTriggerInput, userId?: string) {
     const existing = await this.findOne(id);
 
     const updateData: any = {
@@ -187,25 +186,25 @@ export class TriggersService {
       updateData.objectId = null;
     }
 
-    return this.prisma.trigger.update({
+    return this.prisma.triggers.update({
       where: { id },
       data: updateData,
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -215,10 +214,10 @@ export class TriggersService {
     });
   }
 
-  async delete(id: string) {
+  async delete(id: number) {
     const existing = await this.findOne(id);
 
-    await this.prisma.trigger.delete({
+    await this.prisma.triggers.delete({
       where: { id },
     });
 
@@ -237,33 +236,33 @@ export class TriggersService {
     updateData.zoneId = null;
 
     // Set the appropriate attachment
-    if (data.mobId && data.attachType === TriggerAttachType.MOB) {
+    if (data.mobId && data.attachType === ScriptType.MOB) {
       updateData.mobId = data.mobId;
-    } else if (data.objectId && data.attachType === TriggerAttachType.OBJECT) {
+    } else if (data.objectId && data.attachType === ScriptType.OBJECT) {
       updateData.objectId = data.objectId;
-    } else if (data.zoneId && data.attachType === TriggerAttachType.ZONE) {
+    } else if (data.zoneId && data.attachType === ScriptType.WORLD) {
       updateData.zoneId = data.zoneId;
     }
 
-    return this.prisma.trigger.update({
+    return this.prisma.triggers.update({
       where: { id: data.triggerId },
       data: updateData,
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -273,8 +272,8 @@ export class TriggersService {
     });
   }
 
-  async detachFromEntity(triggerId: string, userId?: string) {
-    return this.prisma.trigger.update({
+  async detachFromEntity(triggerId: number, userId?: string) {
+    return this.prisma.triggers.update({
       where: { id: triggerId },
       data: {
         mobZoneId: null,
@@ -285,21 +284,21 @@ export class TriggersService {
         updatedBy: userId,
       },
       include: {
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
             shortDesc: true,
           },
         },
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -310,23 +309,23 @@ export class TriggersService {
   }
 
   private buildWhereClauseForAttachment(
-    attachType: TriggerAttachType,
+    attachType: ScriptType,
     entityId: number
   ) {
     switch (attachType) {
-      case TriggerAttachType.MOB:
+      case ScriptType.MOB:
         return {
-          attachType: TriggerAttachType.MOB,
+          attachType: ScriptType.MOB,
           mobId: entityId,
         };
-      case TriggerAttachType.OBJECT:
+      case ScriptType.OBJECT:
         return {
-          attachType: TriggerAttachType.OBJECT,
+          attachType: ScriptType.OBJECT,
           objectId: entityId,
         };
-      case TriggerAttachType.ZONE:
+      case ScriptType.WORLD:
         return {
-          attachType: TriggerAttachType.ZONE,
+          attachType: ScriptType.WORLD,
           zoneId: entityId,
         };
       default:

@@ -1,12 +1,12 @@
-import { Resolver, Query, Mutation, Args, Int, ID } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { MobResetService } from './mob-reset.service';
+import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
-  MobResetDto,
   CreateMobResetInput,
+  MobResetDto,
   UpdateMobResetInput,
 } from './mob-reset.dto';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { MobResetService } from './mob-reset.service';
 
 @Resolver(() => MobResetDto)
 export class MobResetResolver {
@@ -22,7 +22,7 @@ export class MobResetResolver {
 
   @Query(() => MobResetDto, { name: 'mobReset', nullable: true })
   async findOne(
-    @Args('id', { type: () => ID }) id: string
+    @Args('id', { type: () => ID }) id: number
   ): Promise<MobResetDto | null> {
     return this.mobResetService.findOne(id);
   }
@@ -38,7 +38,7 @@ export class MobResetResolver {
   @Mutation(() => MobResetDto)
   @UseGuards(JwtAuthGuard)
   async updateMobReset(
-    @Args('id', { type: () => ID }) id: string,
+    @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateMobResetInput
   ): Promise<MobResetDto> {
     return this.mobResetService.update(id, data);
@@ -47,7 +47,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
   async deleteMobReset(
-    @Args('id', { type: () => ID }) id: string
+    @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {
     return this.mobResetService.delete(id);
   }
@@ -55,7 +55,7 @@ export class MobResetResolver {
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
   async deleteMobResetEquipment(
-    @Args('id', { type: () => ID }) id: string
+    @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {
     return this.mobResetService.deleteEquipment(id);
   }

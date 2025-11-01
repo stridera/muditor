@@ -1,16 +1,15 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { ScriptType, Users } from '@prisma/client';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '@prisma/client';
-import { TriggersService } from './triggers.service';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
-  TriggerDto,
-  CreateTriggerInput,
-  UpdateTriggerInput,
   AttachTriggerInput,
+  CreateTriggerInput,
+  TriggerDto,
+  UpdateTriggerInput,
 } from './trigger.dto';
-import { TriggerAttachType } from '@prisma/client';
+import { TriggersService } from './triggers.service';
 
 @Resolver(() => TriggerDto)
 @UseGuards(JwtAuthGuard)
@@ -27,7 +26,7 @@ export class TriggersResolver {
   }
 
   @Query(() => TriggerDto, { name: 'trigger' })
-  async findOne(@Args('id') id: string) {
+  async findOne(@Args('id') id: number) {
     const trigger = await this.triggersService.findOne(id);
     return {
       ...trigger,
@@ -37,7 +36,7 @@ export class TriggersResolver {
 
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })
   async findByAttachment(
-    @Args('attachType', { type: () => TriggerAttachType }) attachType: TriggerAttachType,
+    @Args('attachType', { type: () => ScriptType }) attachType: ScriptType,
     @Args('entityId', { type: () => Int }) entityId: number
   ) {
     const triggers = await this.triggersService.findByAttachment(
@@ -53,7 +52,7 @@ export class TriggersResolver {
   @Mutation(() => TriggerDto)
   async createTrigger(
     @Args('input') input: CreateTriggerInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.create(input, user.id);
     return {
@@ -64,9 +63,9 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   async updateTrigger(
-    @Args('id') id: string,
+    @Args('id') id: number,
     @Args('input') input: UpdateTriggerInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.update(id, input, user.id);
     return {
@@ -76,7 +75,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  async deleteTrigger(@Args('id') id: string) {
+  async deleteTrigger(@Args('id') id: number) {
     const trigger = await this.triggersService.delete(id);
     return {
       ...trigger,
@@ -87,7 +86,7 @@ export class TriggersResolver {
   @Mutation(() => TriggerDto)
   async attachTrigger(
     @Args('input') input: AttachTriggerInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.attachToEntity(input, user.id);
     return {
@@ -98,8 +97,8 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   async detachTrigger(
-    @Args('triggerId') triggerId: string,
-    @CurrentUser() user: User
+    @Args('triggerId') triggerId: number,
+    @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.detachFromEntity(
       triggerId,

@@ -1,27 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Badge } from '@/components/ui/badge';
-import {
-  Plus,
-  Edit,
-  Trash,
-  Link,
-  Unlink,
-  Code,
-  PlayCircle,
-  AlertCircle,
-  Eye,
-  Copy,
-  Tag,
-  Clock,
-  Zap,
-} from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   Dialog,
   DialogContent,
@@ -30,7 +12,24 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
+import {
+  AlertCircle,
+  Clock,
+  Code,
+  Copy,
+  Edit,
+  Eye,
+  Link,
+  Plus,
+  Tag,
+  Trash,
+  Unlink,
+  Zap,
+} from 'lucide-react';
+import { useState } from 'react';
 import ScriptEditor, { Script } from './ScriptEditor';
 
 const GET_TRIGGERS = gql`
@@ -43,7 +42,6 @@ const GET_TRIGGERS = gql`
       argList
       commands
       variables
-      flags
       mobId
       objectId
       zoneId
@@ -63,7 +61,6 @@ const GET_TRIGGERS_BY_ATTACHMENT = gql`
       argList
       commands
       variables
-      flags
       mobId
       objectId
       zoneId
@@ -86,7 +83,7 @@ const CREATE_TRIGGER = gql`
 `;
 
 const UPDATE_TRIGGER = gql`
-  mutation UpdateTrigger($id: String!, $input: UpdateTriggerInput!) {
+  mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
     updateTrigger(id: $id, input: $input) {
       id
       name
@@ -98,7 +95,7 @@ const UPDATE_TRIGGER = gql`
 `;
 
 const DELETE_TRIGGER = gql`
-  mutation DeleteTrigger($id: String!) {
+  mutation DeleteTrigger($id: Float!) {
     deleteTrigger(id: $id) {
       id
     }
@@ -118,7 +115,7 @@ const ATTACH_TRIGGER = gql`
 `;
 
 const DETACH_TRIGGER = gql`
-  mutation DetachTrigger($triggerId: String!) {
+  mutation DetachTrigger($triggerId: Float!) {
     detachTrigger(triggerId: $triggerId) {
       id
       name

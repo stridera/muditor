@@ -2,13 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { Save, ArrowLeft, Plus, Trash2 } from 'lucide-react';
-import Link from 'next/link';
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import {
   useRealTimeValidation,
   ValidationHelpers,
@@ -16,8 +16,8 @@ import {
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_SHOP = gql`
-  query GetShop($id: Int!) {
-    shop(id: $id) {
+  query GetShop($id: Int!, $zoneId: Int!) {
+    shop(id: $id, zoneId: $zoneId) {
       id
       buyProfit
       sellProfit
@@ -85,8 +85,8 @@ const GET_AVAILABLE_MOBS = gql`
 `;
 
 const UPDATE_SHOP = gql`
-  mutation UpdateShop($id: Int!, $data: UpdateShopInput!) {
-    updateShop(id: $id, data: $data) {
+  mutation UpdateShop($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
+    updateShop(id: $id, zoneId: $zoneId, data: $data) {
       id
       buyProfit
       sellProfit

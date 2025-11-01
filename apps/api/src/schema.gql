@@ -9,10 +9,10 @@ type AdminUser {
 }
 
 input AttachTriggerInput {
-  attachType: TriggerAttachType!
+  attachType: ScriptType!
   mobId: Int
   objectId: Int
-  triggerId: String!
+  triggerId: Int!
   zoneId: Int
 }
 
@@ -153,7 +153,7 @@ type CharacterItemDto {
   condition: Int!
   containedItems: [CharacterItemDto!]!
   container: CharacterItemDto
-  containerId: String
+  containerId: Int
   createdAt: DateTime!
   customLongDesc: String
   customShortDesc: String
@@ -250,7 +250,7 @@ input CreateCharacterItemInput {
   characterId: String!
   charges: Int! = -1
   condition: Int! = 100
-  containerId: String
+  containerId: Int
   customLongDesc: String
   customShortDesc: String
   equippedLocation: String
@@ -365,7 +365,7 @@ input CreateRoomExitInput {
   destination: Int
   direction: Direction!
   key: String
-  keyword: String
+  keywords: [String!]
   roomId: Int!
   roomZoneId: Int!
   toRoomId: Int
@@ -400,14 +400,13 @@ input CreateShopInput {
 }
 
 input CreateTriggerInput {
-  argList: String
-  attachType: TriggerAttachType!
+  argList: [String!]! = []
+  attachType: ScriptType!
   commands: String!
   mobId: Int
   name: String!
   numArgs: Int! = 0
   objectId: Int
-  triggerTypes: [TriggerType!]! = []
   variables: String! = "{}"
   zoneId: Int
 }
@@ -564,6 +563,14 @@ type EquipmentSetItemDto {
   probability: Float!
   quantity: Int!
   slot: String
+}
+
+enum ExitFlag {
+  CLOSED
+  HIDDEN
+  IS_DOOR
+  LOCKED
+  PICKPROOF
 }
 
 enum Gender {
@@ -781,11 +788,11 @@ type Mutation {
   deleteObject(id: Int!, zoneId: Int!): ObjectDto!
   deleteObjects(ids: [Int!]!): Int!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
-  deleteRoomExit(exitId: String!): RoomExitDto!
+  deleteRoomExit(exitId: Float!): RoomExitDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
-  deleteTrigger(id: String!): TriggerDto!
+  deleteTrigger(id: Float!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
-  detachTrigger(triggerId: String!): TriggerDto!
+  detachTrigger(triggerId: Float!): TriggerDto!
 
   """Link an existing game character to your user account"""
   linkCharacter(data: LinkCharacterInput!): CharacterDto!
@@ -815,7 +822,7 @@ type Mutation {
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
-  updateTrigger(id: String!, input: UpdateTriggerInput!): TriggerDto!
+  updateTrigger(id: Float!, input: UpdateTriggerInput!): TriggerDto!
   updateUser(input: UpdateUserInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
 }
@@ -1006,9 +1013,9 @@ type Query {
   shops(skip: Int, take: Int): [ShopDto!]!
   shopsByZone(zoneId: Int!): [ShopDto!]!
   shopsCount: Int!
-  trigger(id: String!): TriggerDto!
+  trigger(id: Float!): TriggerDto!
   triggers: [TriggerDto!]!
-  triggersByAttachment(attachType: TriggerAttachType!, entityId: Int!): [TriggerDto!]!
+  triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
   user(id: ID!): User!
   userPermissions(userId: ID!): UserPermissions!
   users: [User!]!
@@ -1107,10 +1114,14 @@ type RoomDto {
 
 type RoomExitDto {
   description: String
+  destination: Int
   direction: Direction!
+  flags: [ExitFlag!]!
   id: String!
   key: String
-  keyword: String
+  keywords: [String!]
+  roomId: Int!
+  roomZoneId: Int!
   toRoomId: Int
   toZoneId: Int
 }
@@ -1166,6 +1177,12 @@ type RoomSummaryDto {
   id: Int!
   name: String!
   zoneId: Int!
+}
+
+enum ScriptType {
+  MOB
+  OBJECT
+  WORLD
 }
 
 enum Sector {
@@ -1280,15 +1297,9 @@ enum Stance {
   STUNNED
 }
 
-enum TriggerAttachType {
-  MOB
-  OBJECT
-  ZONE
-}
-
 type TriggerDto {
-  argList: String
-  attachType: TriggerAttachType!
+  argList: [String!]!
+  attachType: ScriptType!
   commands: String!
   createdAt: DateTime!
   createdBy: String
@@ -1297,36 +1308,10 @@ type TriggerDto {
   name: String!
   numArgs: Int!
   objectId: Int
-  triggerTypes: [TriggerType!]!
   updatedAt: DateTime!
   updatedBy: String
   variables: String!
   zoneId: Int
-}
-
-enum TriggerType {
-  ACT
-  AUTO
-  BRIBE
-  CAST
-  COMMAND
-  DEATH
-  DOOR
-  ENTRY
-  FIGHT
-  GLOBAL
-  GREET
-  GREET_ALL
-  HIT_PERCENT
-  LEAVE
-  LOAD
-  LOOK
-  MEMORY
-  RANDOM
-  RECEIVE
-  SPEECH
-  SPEECH_TO
-  TIME
 }
 
 input UnbanUserInput {
@@ -1378,7 +1363,7 @@ input UpdateCharacterInput {
 input UpdateCharacterItemInput {
   charges: Int
   condition: Int
-  containerId: String
+  containerId: Int
   customLongDesc: String
   customShortDesc: String
   equippedLocation: String
@@ -1498,14 +1483,13 @@ input UpdateShopInput {
 }
 
 input UpdateTriggerInput {
-  argList: String
-  attachType: TriggerAttachType
+  argList: [String!]
+  attachType: ScriptType
   commands: String
   mobId: Int
   name: String
   numArgs: Int
   objectId: Int
-  triggerTypes: [TriggerType!]
   variables: String
   zoneId: Int
 }

@@ -23,7 +23,8 @@
 
 /* Overlapping room highlighting */
 .room-overlapping {
-  animation: overlap-pulse 2s infinite;
+  /* Animation disabled - was causing visibility issues with transform/stacking context */
+  /* animation: overlap-pulse 2s infinite; */
 }
 
 @keyframes overlap-pulse {

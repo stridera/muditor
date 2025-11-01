@@ -2,13 +2,13 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useSearchParams } from 'next/navigation';
-import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { Save, ArrowLeft } from 'lucide-react';
-import Link from 'next/link';
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { ArrowLeft, Save } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 import {
   useRealTimeValidation,
   ValidationHelpers,
@@ -16,8 +16,8 @@ import {
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_OBJECT = gql`
-  query GetObject($id: Int!) {
-    object(id: $id) {
+  query GetObject($id: Int!, $zoneId: Int!) {
+    object(id: $id, zoneId: $zoneId) {
       id
       type
       keywords
@@ -42,8 +42,8 @@ const GET_OBJECT = gql`
 `;
 
 const UPDATE_OBJECT = gql`
-  mutation UpdateObject($id: Int!, $data: UpdateObjectInput!) {
-    updateObject(id: $id, data: $data) {
+  mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {
+    updateObject(id: $id, zoneId: $zoneId, data: $data) {
       id
       keywords
       shortDesc

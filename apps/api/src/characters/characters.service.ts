@@ -1,19 +1,17 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
-  UnauthorizedException,
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
-  CreateCharacterInput,
-  UpdateCharacterInput,
-  CreateCharacterItemInput,
-  UpdateCharacterItemInput,
   CreateCharacterEffectInput,
+  CreateCharacterInput,
+  CreateCharacterItemInput,
   UpdateCharacterEffectInput,
+  UpdateCharacterInput,
+  UpdateCharacterItemInput,
 } from './character.input';
-import * as bcrypt from 'bcrypt';
 
 @Injectable()
 export class CharactersService {
@@ -21,13 +19,13 @@ export class CharactersService {
 
   // Character operations
   async findAllCharacters(skip?: number, take?: number) {
-    return this.db.character.findMany({
+    return this.db.characters.findMany({
       skip,
       take,
       include: {
-        items: {
+        character_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -39,19 +37,19 @@ export class CharactersService {
             containedItems: true,
           },
         },
-        effects: true,
+        character_effects: true,
       },
       orderBy: { name: 'asc' },
     });
   }
 
   async findCharacterById(id: string) {
-    const character = await this.db.character.findUnique({
+    const character = await this.db.characters.findUnique({
       where: { id },
       include: {
-        items: {
+        character_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -63,7 +61,7 @@ export class CharactersService {
             containedItems: true,
           },
         },
-        effects: true,
+        character_effects: true,
       },
     });
 
@@ -75,12 +73,12 @@ export class CharactersService {
   }
 
   async findCharactersByUser(userId: string) {
-    return this.db.character.findMany({
+    return this.db.characters.findMany({
       where: { userId },
       include: {
-        items: {
+        character_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -90,19 +88,19 @@ export class CharactersService {
             },
           },
         },
-        effects: true,
+        character_effects: true,
       },
       orderBy: { name: 'asc' },
     });
   }
 
   async getCharactersCount() {
-    return this.db.character.count();
+    return this.db.characters.count();
   }
 
   async createCharacter(data: CreateCharacterInput, userId: string) {
     // Check if character name already exists
-    const existingCharacter = await this.db.character.findUnique({
+    const existingCharacter = await this.db.characters.findUnique({
       where: { name: data.name },
     });
 
@@ -112,10 +110,10 @@ export class CharactersService {
       );
     }
 
-    return this.db.character.create({
+    return this.db.characters.create({
       data: {
         ...data,
-        user: { connect: { id: userId } },
+        users: { connect: { id: userId } },
         // Set default max values based on constitution and level
         hitPointsMax: Math.max(50, data.constitution * 5 + data.level * 10),
         movementMax: Math.max(100, data.constitution * 8 + data.level * 5),
@@ -123,9 +121,9 @@ export class CharactersService {
         movement: Math.max(100, data.constitution * 8 + data.level * 5),
       } as any,
       include: {
-        items: {
+        character_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 shortDesc: true,
@@ -134,7 +132,7 @@ export class CharactersService {
             },
           },
         },
-        effects: true,
+        character_effects: true,
       },
     });
   }
@@ -144,7 +142,7 @@ export class CharactersService {
 
     // If name is being changed, check for duplicates
     if (data.name && data.name !== character.name) {
-      const existingCharacter = await this.db.character.findUnique({
+      const existingCharacter = await this.db.characters.findUnique({
         where: { name: data.name },
       });
 
@@ -155,13 +153,13 @@ export class CharactersService {
       }
     }
 
-    return this.db.character.update({
+    return this.db.characters.update({
       where: { id },
       data: data as any,
       include: {
-        items: {
+        character_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 shortDesc: true,
@@ -170,7 +168,7 @@ export class CharactersService {
             },
           },
         },
-        effects: true,
+        character_effects: true,
       },
     });
   }
@@ -178,11 +176,11 @@ export class CharactersService {
   async deleteCharacter(id: string) {
     await this.findCharacterById(id);
 
-    return this.db.character.delete({
+    return this.db.characters.delete({
       where: { id },
       include: {
-        items: true,
-        effects: true,
+        character_items: true,
+        character_effects: true,
       },
     });
   }
@@ -191,10 +189,10 @@ export class CharactersService {
   async findCharacterItems(characterId: string) {
     await this.findCharacterById(characterId); // Ensure character exists
 
-    return this.db.characterItem.findMany({
+    return this.db.characterItems.findMany({
       where: { characterId },
       include: {
-        object: {
+        objects: {
           select: {
             id: true,
             shortDesc: true,
@@ -208,12 +206,12 @@ export class CharactersService {
     });
   }
 
-  async findCharacterItemById(id: string) {
-    const item = await this.db.characterItem.findUnique({
+  async findCharacterItemById(id: number) {
+    const item = await this.db.characterItems.findUnique({
       where: { id },
       include: {
-        character: true,
-        object: {
+        characters: true,
+        objects: {
           select: {
             id: true,
             shortDesc: true,
@@ -238,10 +236,10 @@ export class CharactersService {
 
     // TODO: Fix object prototype lookup to use composite key (zoneId, id)
     // The input DTO needs to be updated to include objectZoneId
-    
+
     // If containerId is specified, ensure it exists and belongs to same character
     if (data.containerId) {
-      const container = await this.db.characterItem.findUnique({
+      const container = await this.db.characterItems.findUnique({
         where: { id: data.containerId },
       });
 
@@ -250,11 +248,11 @@ export class CharactersService {
       }
     }
 
-    return this.db.characterItem.create({
+    return this.db.characterItems.create({
       data: data as any,
       include: {
-        character: true,
-        object: {
+        characters: true,
+        objects: {
           select: {
             id: true,
             zoneId: true,
@@ -268,13 +266,13 @@ export class CharactersService {
     });
   }
 
-  async updateCharacterItem(id: string, data: UpdateCharacterItemInput) {
+  async updateCharacterItem(id: number, data: UpdateCharacterItemInput) {
     const item = await this.findCharacterItemById(id);
 
     // If containerId is being changed, validate it
     if (data.containerId !== undefined) {
       if (data.containerId) {
-        const container = await this.db.characterItem.findUnique({
+        const container = await this.db.characterItems.findUnique({
           where: { id: data.containerId },
         });
 
@@ -284,12 +282,12 @@ export class CharactersService {
       }
     }
 
-    return this.db.characterItem.update({
+    return this.db.characterItems.update({
       where: { id },
       data,
       include: {
-        character: true,
-        object: {
+        characters: true,
+        objects: {
           select: {
             id: true,
             shortDesc: true,
@@ -302,10 +300,10 @@ export class CharactersService {
     });
   }
 
-  async deleteCharacterItem(id: string) {
+  async deleteCharacterItem(id: number) {
     await this.findCharacterItemById(id);
 
-    return this.db.characterItem.delete({
+    return this.db.characterItems.delete({
       where: { id },
     });
   }
@@ -314,20 +312,20 @@ export class CharactersService {
   async findCharacterEffects(characterId: string) {
     await this.findCharacterById(characterId); // Ensure character exists
 
-    return this.db.characterEffect.findMany({
+    return this.db.characterEffects.findMany({
       where: { characterId },
       include: {
-        character: true,
+        characters: true,
       },
       orderBy: { appliedAt: 'desc' },
     });
   }
 
-  async findCharacterEffectById(id: string) {
-    const effect = await this.db.characterEffect.findUnique({
+  async findCharacterEffectById(id: number) {
+    const effect = await this.db.characterEffects.findUnique({
       where: { id },
       include: {
-        character: true,
+        characters: true,
       },
     });
 
@@ -343,30 +341,30 @@ export class CharactersService {
     await this.findCharacterById(data.characterId);
 
     // Duration is stored and expiration is calculated on-the-fly
-    return this.db.characterEffect.create({
+    return this.db.characterEffects.create({
       data: data as any,
       include: {
-        character: true,
+        characters: true,
       },
     });
   }
 
-  async updateCharacterEffect(id: string, data: UpdateCharacterEffectInput) {
+  async updateCharacterEffect(id: number, data: UpdateCharacterEffectInput) {
     await this.findCharacterEffectById(id);
     // Duration is updated directly; expiration calculated on-the-fly
-    return this.db.characterEffect.update({
+    return this.db.characterEffects.update({
       where: { id },
       data,
       include: {
-        character: true,
+        characters: true,
       },
     });
   }
 
-  async deleteCharacterEffect(id: string) {
+  async deleteCharacterEffect(id: number) {
     await this.findCharacterEffectById(id);
 
-    return this.db.characterEffect.delete({
+    return this.db.characterEffects.delete({
       where: { id },
     });
   }
@@ -374,10 +372,10 @@ export class CharactersService {
   // Utility methods
   async removeExpiredEffects(characterId?: string) {
     // Calculate expiration on-the-fly: appliedAt + duration
-    const effects = await this.db.characterEffect.findMany({
-      where: characterId ? { characterId } : {},
+    const effects = await this.db.characterEffects.findMany({
+      where: characterId ? { characterId: characterId } : {},
     });
-    
+
     const expiredIds = effects
       .filter(e => {
         if (!e.duration || e.duration < 0) return false; // Permanent or invalid
@@ -390,16 +388,16 @@ export class CharactersService {
       return { count: 0 };
     }
 
-    return this.db.characterEffect.deleteMany({
+    return this.db.characterEffects.deleteMany({
       where: { id: { in: expiredIds } },
     });
   }
 
   async getActiveEffects(characterId: string) {
-    const effects = await this.db.characterEffect.findMany({
+    const effects = await this.db.characterEffects.findMany({
       where: { characterId },
       include: {
-        character: true,
+        characters: true,
       },
       orderBy: { appliedAt: 'desc' },
     });
@@ -415,7 +413,7 @@ export class CharactersService {
 
   // Character online status tracking
   async setCharacterOnline(characterId: string): Promise<void> {
-    await this.db.character.update({
+    await this.db.characters.update({
       where: { id: characterId },
       data: {
         isOnline: true,
@@ -425,7 +423,7 @@ export class CharactersService {
   }
 
   async setCharacterOffline(characterId: string): Promise<void> {
-    const character = await this.db.character.findUnique({
+    const character = await this.db.characters.findUnique({
       where: { id: characterId },
       select: { lastLogin: true, timePlayed: true },
     });
@@ -435,7 +433,7 @@ export class CharactersService {
         (Date.now() - character.lastLogin.getTime()) / 1000
       );
 
-      await this.db.character.update({
+      await this.db.characters.update({
         where: { id: characterId },
         data: {
           isOnline: false,
@@ -445,7 +443,7 @@ export class CharactersService {
         },
       });
     } else {
-      await this.db.character.update({
+      await this.db.characters.update({
         where: { id: characterId },
         data: {
           isOnline: false,
@@ -464,7 +462,7 @@ export class CharactersService {
           isOnline: true,
         };
 
-    return this.db.character.findMany({
+    return this.db.characters.findMany({
       where,
       select: {
         id: true,
@@ -474,7 +472,7 @@ export class CharactersService {
         isOnline: true,
         race: true,
         classId: true,
-        user: {
+        users: {
           select: {
             id: true,
             username: true,
@@ -487,7 +485,7 @@ export class CharactersService {
   }
 
   async getCharacterSessionInfo(characterId: string) {
-    const character = await this.db.character.findUnique({
+    const character = await this.db.characters.findUnique({
       where: { id: characterId },
       select: {
         id: true,
@@ -518,7 +516,7 @@ export class CharactersService {
 
   async updateCharacterActivity(characterId: string): Promise<void> {
     // Update last activity timestamp - useful for idle detection
-    await this.db.character.update({
+    await this.db.characters.update({
       where: { id: characterId },
       data: {
         lastLogin: new Date(), // Update activity time
@@ -546,7 +544,7 @@ export class CharactersService {
   }
 
   async findCharacterByNameForLinking(characterName: string) {
-    const character = await this.db.character.findFirst({
+    const character = await this.db.characters.findFirst({
       where: {
         name: {
           equals: characterName,
@@ -584,7 +582,7 @@ export class CharactersService {
   }
 
   async getCharacterLinkingInfo(characterName: string) {
-    const character = await this.db.character.findFirst({
+    const character = await this.db.characters.findFirst({
       where: {
         name: {
           equals: characterName,

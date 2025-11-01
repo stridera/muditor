@@ -1,34 +1,29 @@
 'use client';
 
-import { useState, useEffect } from 'react';
 import { gql } from '@apollo/client';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { Plus, Trash2, Package, Shield, Search } from 'lucide-react';
+import { useMutation, useQuery } from '@apollo/client/react';
+import { Package, Plus, Search, Shield, Trash2 } from 'lucide-react';
+import { useState } from 'react';
 
 const GET_MOB_RESETS = gql`
-  query GetMobResetsLegacy($mobId: Int!) {
-    mobResets(mobId: $mobId) {
+  query GetMobResetsLegacy($mobId: Int!, $mobZoneId: Int!) {
+    mobResets(mobId: $mobId, mobZoneId: $mobZoneId) {
       id
-      max
-      name
+      maxInstances
+      probability
       roomId
-      carrying {
+      roomZoneId
+      mob {
         id
-        max
-        name
-        objectId
-        object {
-          id
-          shortDesc
-          type
-        }
+        shortDesc
       }
-      equipped {
+      equipment {
         id
-        max
-        location
-        name
+        maxInstances
+        probability
+        wearLocation
         objectId
+        objectZoneId
         object {
           id
           shortDesc
@@ -55,8 +50,8 @@ const CREATE_MOB_RESET = gql`
   mutation CreateMobReset($data: CreateMobResetInput!) {
     createMobReset(data: $data) {
       id
-      max
-      name
+      maxInstances
+      probability
       roomId
     }
   }
@@ -66,22 +61,22 @@ const UPDATE_MOB_RESET = gql`
   mutation UpdateMobReset($id: ID!, $data: UpdateMobResetInput!) {
     updateMobReset(id: $id, data: $data) {
       id
-      max
-      name
+      maxInstances
+      probability
       roomId
     }
   }
 `;
 
-const DELETE_MOB_CARRYING = gql`
-  mutation DeleteMobCarrying($id: ID!) {
-    deleteMobCarrying(id: $id)
+const DELETE_MOB_RESET = gql`
+  mutation DeleteMobReset($id: ID!) {
+    deleteMobReset(id: $id)
   }
 `;
 
-const DELETE_MOB_EQUIPPED = gql`
-  mutation DeleteMobEquipped($id: ID!) {
-    deleteMobEquipped(id: $id)
+const DELETE_MOB_EQUIPMENT = gql`
+  mutation DeleteMobResetEquipment($id: ID!) {
+    deleteMobResetEquipment(id: $id)
   }
 `;
 
@@ -184,13 +179,13 @@ export default function MobEquipmentManager({
     },
   });
 
-  const [deleteMobCarrying] = useMutation(DELETE_MOB_CARRYING, {
+  const [deleteMobReset] = useMutation(DELETE_MOB_RESET, {
     onCompleted: () => {
       refetchResets();
     },
   });
 
-  const [deleteMobEquipped] = useMutation(DELETE_MOB_EQUIPPED, {
+  const [deleteMobEquipment] = useMutation(DELETE_MOB_EQUIPMENT, {
     onCompleted: () => {
       refetchResets();
     },
@@ -388,7 +383,7 @@ export default function MobEquipmentManager({
                             </div>
                             <button
                               onClick={() =>
-                                deleteMobCarrying({
+                                deleteMobEquipment({
                                   variables: { id: carrying.id },
                                 })
                               }
@@ -432,7 +427,7 @@ export default function MobEquipmentManager({
                             </div>
                             <button
                               onClick={() =>
-                                deleteMobEquipped({
+                                deleteMobEquipment({
                                   variables: { id: equipped.id },
                                 })
                               }

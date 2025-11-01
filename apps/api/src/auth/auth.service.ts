@@ -27,7 +27,7 @@ export class AuthService {
   ) {}
 
   async validateUser(identifier: string, password: string): Promise<any> {
-    const user = await this.databaseService.user.findFirst({
+    const user = await this.databaseService.users.findFirst({
       where: {
         OR: [
           { username: { equals: identifier, mode: 'insensitive' } },
@@ -47,7 +47,7 @@ export class AuthService {
     const { username, email, password } = registerInput;
 
     // Check if user already exists (case-insensitive)
-    const existingUser = await this.databaseService.user.findFirst({
+    const existingUser = await this.databaseService.users.findFirst({
       where: {
         OR: [
           { username: { equals: username, mode: 'insensitive' } },
@@ -70,8 +70,9 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(password, saltRounds);
 
     // Create user
-    const user = await this.databaseService.user.create({
+    const user = await this.databaseService.users.create({
       data: {
+        id: crypto.randomUUID(),
         username,
         email,
         passwordHash,
@@ -119,7 +120,7 @@ export class AuthService {
     const accessToken = this.generateToken(user.id, user.username, user.role);
 
     // Update last login timestamp
-    await this.databaseService.user.update({
+    await this.databaseService.users.update({
       where: { id: user.id },
       data: { lastLoginAt: new Date() },
     });
@@ -136,7 +137,7 @@ export class AuthService {
   }
 
   async validateJwtPayload(payload: JwtPayload): Promise<any> {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.users.findUnique({
       where: { id: payload.sub },
     });
 
@@ -149,7 +150,7 @@ export class AuthService {
   }
 
   async refreshToken(userId: string): Promise<string> {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.users.findUnique({
       where: { id: userId },
     });
 
@@ -161,7 +162,7 @@ export class AuthService {
   }
 
   async requestPasswordReset(email: string): Promise<boolean> {
-    const user = await this.databaseService.user.findFirst({
+    const user = await this.databaseService.users.findFirst({
       where: { email: { equals: email, mode: 'insensitive' } },
     });
 
@@ -177,11 +178,11 @@ export class AuthService {
     const resetToken = crypto.randomBytes(32).toString('hex');
     const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
 
-    await this.databaseService.user.update({
+    await this.databaseService.users.update({
       where: { id: user.id },
       data: {
-        resetToken,
-        resetTokenExpiry,
+        resetToken: resetToken,
+        resetTokenExpiry: resetTokenExpiry,
       },
     });
 
@@ -200,7 +201,7 @@ export class AuthService {
   }
 
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
-    const user = await this.databaseService.user.findFirst({
+    const user = await this.databaseService.users.findFirst({
       where: {
         resetToken: token,
         resetTokenExpiry: {
@@ -218,7 +219,7 @@ export class AuthService {
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
 
     // Update password and clear reset token
-    await this.databaseService.user.update({
+    await this.databaseService.users.update({
       where: { id: user.id },
       data: {
         passwordHash,
@@ -235,7 +236,7 @@ export class AuthService {
   async updateProfile(userId: string, data: { email?: string }): Promise<any> {
     // Check if email is already taken by another user (case-insensitive)
     if (data.email) {
-      const existingUser = await this.databaseService.user.findFirst({
+      const existingUser = await this.databaseService.users.findFirst({
         where: {
           email: { equals: data.email, mode: 'insensitive' },
           id: { not: userId },
@@ -247,7 +248,7 @@ export class AuthService {
       }
     }
 
-    const user = await this.databaseService.user.update({
+    const user = await this.databaseService.users.update({
       where: { id: userId },
       data,
     });
@@ -261,7 +262,7 @@ export class AuthService {
     currentPassword: string,
     newPassword: string
   ): Promise<boolean> {
-    const user = await this.databaseService.user.findUnique({
+    const user = await this.databaseService.users.findUnique({
       where: { id: userId },
     });
 
@@ -282,7 +283,7 @@ export class AuthService {
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
 
-    await this.databaseService.user.update({
+    await this.databaseService.users.update({
       where: { id: userId },
       data: { passwordHash },
     });
@@ -293,7 +294,7 @@ export class AuthService {
   }
 
   private async checkBanStatus(userId: string): Promise<boolean> {
-    const activeBan = await this.databaseService.banRecord.findFirst({
+    const activeBan = await this.databaseService.banRecords.findFirst({
       where: {
         userId,
         active: true,

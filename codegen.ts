@@ -2,7 +2,7 @@ import type { CodegenConfig } from '@graphql-codegen/cli';
 
 const config: CodegenConfig = {
   // Point to your GraphQL API
-  schema: 'http://localhost:4000/graphql',
+  schema: './apps/api/src/schema.gql',
 
   // Find all GraphQL queries/mutations in your frontend
   documents: ['apps/web/src/**/*.tsx', 'apps/web/src/**/*.ts'],

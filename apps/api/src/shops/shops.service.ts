@@ -2,9 +2,9 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
-type ShopWithRelations = Prisma.ShopGetPayload<{
+type ShopWithRelations = Prisma.ShopsGetPayload<{
   include: {
-    keeper: {
+    mobs: {
       select: {
         id: true;
         zoneId: true;
@@ -12,9 +12,9 @@ type ShopWithRelations = Prisma.ShopGetPayload<{
         keywords: true;
       };
     };
-    items: {
+    shop_items: {
       include: {
-        object: {
+        objects: {
           select: {
             id: true;
             zoneId: true;
@@ -25,8 +25,8 @@ type ShopWithRelations = Prisma.ShopGetPayload<{
         };
       };
     };
-    accepts: true;
-    hours: true;
+    shop_accepts: true;
+    shop_hours: true;
   };
 }>;
 
@@ -37,16 +37,16 @@ export class ShopsService {
   async findAll(args?: {
     skip?: number;
     take?: number;
-    where?: Prisma.ShopWhereInput;
-    orderBy?: Prisma.ShopOrderByWithRelationInput;
+    where?: Prisma.ShopsWhereInput;
+    orderBy?: Prisma.ShopsOrderByWithRelationInput;
   }): Promise<ShopWithRelations[]> {
-    return this.database.shop.findMany({
+    return this.database.shops.findMany({
       skip: args?.skip,
       take: args?.take,
       where: args?.where,
       orderBy: args?.orderBy || { id: 'asc' },
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -54,9 +54,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -67,17 +67,14 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
 
-  async findOne(
-    zoneId: number,
-    id: number
-  ): Promise<ShopWithRelations | null> {
-    return this.database.shop.findUnique({
+  async findOne(zoneId: number, id: number): Promise<ShopWithRelations | null> {
+    return this.database.shops.findUnique({
       where: {
         zoneId_id: {
           zoneId,
@@ -85,7 +82,7 @@ export class ShopsService {
         },
       },
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -93,9 +90,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -106,19 +103,19 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
 
   async findByZone(zoneId: number): Promise<ShopWithRelations[]> {
-    return this.database.shop.findMany({
+    return this.database.shops.findMany({
       where: {
         zoneId: zoneId,
       },
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -126,9 +123,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -139,8 +136,8 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
@@ -149,13 +146,13 @@ export class ShopsService {
     keeperZoneId: number,
     keeperId: number
   ): Promise<ShopWithRelations | null> {
-    return this.database.shop.findFirst({
+    return this.database.shops.findFirst({
       where: {
         keeperZoneId,
         keeperId,
       },
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -163,9 +160,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -176,21 +173,21 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
 
-  async count(where?: Prisma.ShopWhereInput): Promise<number> {
-    return this.database.shop.count({ where });
+  async count(where?: Prisma.ShopsWhereInput): Promise<number> {
+    return this.database.shops.count({ where });
   }
 
-  async create(data: Prisma.ShopCreateInput): Promise<ShopWithRelations> {
-    return this.database.shop.create({
+  async create(data: Prisma.ShopsCreateInput): Promise<ShopWithRelations> {
+    return this.database.shops.create({
       data,
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -198,9 +195,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -211,8 +208,8 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
@@ -220,9 +217,9 @@ export class ShopsService {
   async update(
     zoneId: number,
     id: number,
-    data: Prisma.ShopUpdateInput
+    data: Prisma.ShopsUpdateInput
   ): Promise<ShopWithRelations> {
-    return this.database.shop.update({
+    return this.database.shops.update({
       where: {
         zoneId_id: {
           zoneId,
@@ -231,7 +228,7 @@ export class ShopsService {
       },
       data,
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -239,9 +236,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -252,14 +249,14 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }
 
   async delete(zoneId: number, id: number): Promise<ShopWithRelations> {
-    return this.database.shop.delete({
+    return this.database.shops.delete({
       where: {
         zoneId_id: {
           zoneId,
@@ -267,7 +264,7 @@ export class ShopsService {
         },
       },
       include: {
-        keeper: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -275,9 +272,9 @@ export class ShopsService {
             keywords: true,
           },
         },
-        items: {
+        shop_items: {
           include: {
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -288,8 +285,8 @@ export class ShopsService {
             },
           },
         },
-        accepts: true,
-        hours: true,
+        shop_accepts: true,
+        shop_hours: true,
       },
     });
   }

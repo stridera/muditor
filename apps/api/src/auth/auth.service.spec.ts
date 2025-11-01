@@ -64,7 +64,7 @@ describe('AuthService', () => {
     };
 
     it('should return user without password hash when credentials are valid', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.validateUser('testuser', 'password123');
@@ -75,7 +75,7 @@ describe('AuthService', () => {
         username: 'testuser',
         role: UserRole.PLAYER,
       });
-      expect(databaseService.user.findFirst).toHaveBeenCalledWith({
+      expect(databaseService.users.findFirst).toHaveBeenCalledWith({
         where: {
           OR: [
             { username: { equals: 'testuser', mode: 'insensitive' } },
@@ -86,7 +86,7 @@ describe('AuthService', () => {
     });
 
     it('should return null when user not found', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(null);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
 
       const result = await service.validateUser('nonexistent', 'password123');
 
@@ -94,7 +94,7 @@ describe('AuthService', () => {
     });
 
     it('should return null when password is incorrect', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const result = await service.validateUser('testuser', 'wrongpassword');
@@ -127,8 +127,8 @@ describe('AuthService', () => {
     });
 
     it('should successfully register a new user', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(null);
-      (databaseService.user.create as jest.Mock).mockResolvedValue(
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
+      (databaseService.users.create as jest.Mock).mockResolvedValue(
         mockCreatedUser
       );
 
@@ -141,7 +141,7 @@ describe('AuthService', () => {
           isBanned: false,
         },
       });
-      expect(databaseService.user.create).toHaveBeenCalledWith({
+      expect(databaseService.users.create).toHaveBeenCalledWith({
         data: {
           username: 'newuser',
           email: 'new@example.com',
@@ -156,7 +156,7 @@ describe('AuthService', () => {
     });
 
     it('should throw ConflictException when username already exists', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue({
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
         id: 'existing-id',
         username: 'newuser',
         email: 'other@example.com',
@@ -168,7 +168,7 @@ describe('AuthService', () => {
     });
 
     it('should throw ConflictException when email already exists', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue({
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
         id: 'existing-id',
         username: 'otheruser',
         email: 'new@example.com',
@@ -180,8 +180,8 @@ describe('AuthService', () => {
     });
 
     it('should still register user if welcome email fails', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(null);
-      (databaseService.user.create as jest.Mock).mockResolvedValue(
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
+      (databaseService.users.create as jest.Mock).mockResolvedValue(
         mockCreatedUser
       );
       emailService.sendWelcomeEmail.mockRejectedValue(
@@ -219,10 +219,10 @@ describe('AuthService', () => {
 
     it('should successfully login user when not banned', async () => {
       jest.spyOn(service, 'validateUser').mockResolvedValue(mockUser);
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue(
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
         null
       );
-      (databaseService.user.update as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.update as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.login(loginInput);
 
@@ -233,7 +233,7 @@ describe('AuthService', () => {
           isBanned: false,
         },
       });
-      expect(databaseService.user.update).toHaveBeenCalledWith({
+      expect(databaseService.users.update).toHaveBeenCalledWith({
         where: { id: 'user-id' },
         data: { lastLoginAt: expect.any(Date) },
       });
@@ -249,7 +249,7 @@ describe('AuthService', () => {
 
     it('should throw UnauthorizedException for banned user', async () => {
       jest.spyOn(service, 'validateUser').mockResolvedValue(mockUser);
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue({
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue({
         id: 'ban-id',
         userId: 'user-id',
         active: true,
@@ -266,10 +266,10 @@ describe('AuthService', () => {
       const pastDate = new Date();
       pastDate.setDate(pastDate.getDate() - 1);
 
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue(
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
         null
       );
-      (databaseService.user.update as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.update as jest.Mock).mockResolvedValue(mockUser);
 
       const result = await service.login(loginInput);
 
@@ -285,7 +285,7 @@ describe('AuthService', () => {
 
   describe('checkBanStatus', () => {
     it('should return true for active permanent ban', async () => {
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue({
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue({
         id: 'ban-id',
         userId: 'user-id',
         active: true,
@@ -302,7 +302,7 @@ describe('AuthService', () => {
       const futureDate = new Date();
       futureDate.setDate(futureDate.getDate() + 1);
 
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue({
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue({
         id: 'ban-id',
         userId: 'user-id',
         active: true,
@@ -315,7 +315,7 @@ describe('AuthService', () => {
     });
 
     it('should return false for no active ban', async () => {
-      (databaseService.banRecord.findFirst as jest.Mock).mockResolvedValue(
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
         null
       );
 
@@ -333,14 +333,14 @@ describe('AuthService', () => {
     };
 
     it('should generate reset token and send email for existing user', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(mockUser);
-      (databaseService.user.update as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.update as jest.Mock).mockResolvedValue(mockUser);
       emailService.sendPasswordResetEmail.mockResolvedValue(undefined);
 
       const result = await service.requestPasswordReset('test@example.com');
 
       expect(result).toBe(true);
-      expect(databaseService.user.update).toHaveBeenCalledWith({
+      expect(databaseService.users.update).toHaveBeenCalledWith({
         where: { id: 'user-id' },
         data: {
           resetToken: expect.any(String),
@@ -354,14 +354,14 @@ describe('AuthService', () => {
     });
 
     it('should return true for non-existent user to prevent enumeration', async () => {
-      (databaseService.user.findFirst as jest.Mock).mockResolvedValue(null);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
 
       const result = await service.requestPasswordReset(
         'nonexistent@example.com'
       );
 
       expect(result).toBe(true);
-      expect(databaseService.user.update).not.toHaveBeenCalled();
+      expect(databaseService.users.update).not.toHaveBeenCalled();
       expect(emailService.sendPasswordResetEmail).not.toHaveBeenCalled();
     });
   });

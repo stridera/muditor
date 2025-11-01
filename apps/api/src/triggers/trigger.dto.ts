@@ -1,23 +1,21 @@
 import {
-  ObjectType,
   Field,
-  Int,
   InputType,
+  Int,
+  ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
+import { ScriptType } from '@prisma/client';
 import {
+  IsArray,
+  IsEnum,
+  IsNumber,
   IsOptional,
   IsString,
-  IsNumber,
-  IsEnum,
-  IsArray,
-  IsObject,
 } from 'class-validator';
-import { TriggerAttachType, TriggerType } from '@prisma/client';
 
 // Register GraphQL enums
-registerEnumType(TriggerAttachType, { name: 'TriggerAttachType' });
-registerEnumType(TriggerType, { name: 'TriggerType' });
+registerEnumType(ScriptType, { name: 'ScriptType' });
 
 @ObjectType()
 export class TriggerDto {
@@ -27,14 +25,14 @@ export class TriggerDto {
   @Field()
   name: string;
 
-  @Field(() => TriggerAttachType)
-  attachType: TriggerAttachType;
+  @Field(() => ScriptType)
+  attachType: ScriptType;
 
   @Field(() => Int)
   numArgs: number;
 
-  @Field({ nullable: true })
-  argList?: string;
+  @Field(() => [String])
+  argList: string[];
 
   @Field()
   commands: string;
@@ -50,9 +48,6 @@ export class TriggerDto {
 
   @Field(() => String)
   variables: string; // JSON stringified
-
-  @Field(() => [TriggerType])
-  triggerTypes: TriggerType[];
 
   @Field(() => Date)
   createdAt: Date;
@@ -73,19 +68,19 @@ export class CreateTriggerInput {
   @IsString()
   name: string;
 
-  @Field(() => TriggerAttachType)
-  @IsEnum(TriggerAttachType)
-  attachType: TriggerAttachType;
+  @Field(() => ScriptType)
+  @IsEnum(ScriptType)
+  attachType: ScriptType;
 
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsNumber()
   numArgs?: number;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  argList?: string;
+  @IsArray()
+  argList?: string[];
 
   @Field()
   @IsString()
@@ -110,12 +105,6 @@ export class CreateTriggerInput {
   @IsOptional()
   @IsString()
   variables?: string;
-
-  @Field(() => [TriggerType], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(TriggerType, { each: true })
-  triggerTypes?: TriggerType[];
 }
 
 @InputType()
@@ -125,20 +114,20 @@ export class UpdateTriggerInput {
   @IsString()
   name?: string;
 
-  @Field(() => TriggerAttachType, { nullable: true })
+  @Field(() => ScriptType, { nullable: true })
   @IsOptional()
-  @IsEnum(TriggerAttachType)
-  attachType?: TriggerAttachType;
+  @IsEnum(ScriptType)
+  attachType?: ScriptType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
   numArgs?: number;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  argList?: string;
+  @IsArray()
+  argList?: string[];
 
   @Field({ nullable: true })
   @IsOptional()
@@ -164,23 +153,17 @@ export class UpdateTriggerInput {
   @IsOptional()
   @IsString()
   variables?: string;
-
-  @Field(() => [TriggerType], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(TriggerType, { each: true })
-  triggerTypes?: TriggerType[];
 }
 
 @InputType()
 export class AttachTriggerInput {
-  @Field()
-  @IsString()
-  triggerId: string;
+  @Field(() => Int)
+  @IsNumber()
+  triggerId: number;
 
-  @Field(() => TriggerAttachType)
-  @IsEnum(TriggerAttachType)
-  attachType: TriggerAttachType;
+  @Field(() => ScriptType)
+  @IsEnum(ScriptType)
+  attachType: ScriptType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

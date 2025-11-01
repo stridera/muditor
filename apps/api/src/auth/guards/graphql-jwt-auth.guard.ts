@@ -27,7 +27,7 @@ export class GraphQLJwtAuthGuard {
       const payload = this.jwtService.verify(token);
 
       // Validate user exists and get user data
-      const user = await this.databaseService.user.findUnique({
+      const user = await this.databaseService.users.findUnique({
         where: { id: payload.sub },
         select: {
           id: true,
