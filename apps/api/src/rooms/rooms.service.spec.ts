@@ -1,24 +1,26 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../database/database.service';
 import { RoomsService } from './rooms.service';
+import { RoomDto, CreateRoomInput, UpdateRoomInput } from './room.dto';
+import { Sector } from '@muditor/db';
 
 describe('RoomsService', () => {
   let service: RoomsService;
   let databaseService: jest.Mocked<DatabaseService>;
 
-  const mockRoom = {
+  const mockRoom: Partial<RoomDto> = {
     id: 1,
     name: 'Test Room',
     description: 'This is a test room for unit testing',
     zoneId: 511,
-    sector: 'CITY',
+    sector: Sector.CITY,
     flags: [],
     layoutX: 0,
     layoutY: 0,
     layoutZ: 0,
     exits: [],
     extraDescs: [],
-  } as any;
+  };
 
   beforeEach(async () => {
     const mockDatabaseService = {
@@ -34,7 +36,7 @@ describe('RoomsService', () => {
         create: jest.fn(),
         delete: jest.fn(),
       },
-    } as any;
+    } as unknown as jest.Mocked<DatabaseService>;
 
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -49,58 +51,187 @@ describe('RoomsService', () => {
 
   describe('findAll', () => {
     it('should return array of rooms', async () => {
-      (databaseService.room.findMany as jest.Mock).mockResolvedValue([
+      (databaseService.rooms.findMany as jest.Mock).mockResolvedValue([
         mockRoom,
       ]);
 
       const result = await service.findAll({});
 
       expect(result).toEqual([mockRoom]);
-      expect(databaseService.room.findMany).toHaveBeenCalledWith({
+      expect(databaseService.rooms.findMany).toHaveBeenCalledWith({
         where: undefined,
         skip: undefined,
         take: undefined,
         include: {
           exits: true,
           extraDescs: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { id: 'asc' },
       });
     });
 
     it('should apply skip and take parameters', async () => {
-      (databaseService.room.findMany as jest.Mock).mockResolvedValue([
+      (databaseService.rooms.findMany as jest.Mock).mockResolvedValue([
         mockRoom,
       ]);
 
       await service.findAll({ skip: 10, take: 5 });
 
-      expect(databaseService.room.findMany).toHaveBeenCalledWith({
+      expect(databaseService.rooms.findMany).toHaveBeenCalledWith({
         where: undefined,
         skip: 10,
         take: 5,
         include: {
           exits: true,
           extraDescs: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { id: 'asc' },
       });
     });
 
     it('should filter by zoneId when provided', async () => {
-      (databaseService.room.findMany as jest.Mock).mockResolvedValue([
+      (databaseService.rooms.findMany as jest.Mock).mockResolvedValue([
         mockRoom,
       ]);
 
       await service.findAll({ zoneId: 511 });
 
-      expect(databaseService.room.findMany).toHaveBeenCalledWith({
+      expect(databaseService.rooms.findMany).toHaveBeenCalledWith({
         where: { zoneId: 511 },
         skip: undefined,
         take: undefined,
         include: {
           exits: true,
           extraDescs: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { id: 'asc' },
       });
@@ -109,26 +240,67 @@ describe('RoomsService', () => {
 
   describe('findOne', () => {
     it('should return a room by id', async () => {
-      (databaseService.room.findUnique as jest.Mock).mockResolvedValue(
+      (databaseService.rooms.findUnique as jest.Mock).mockResolvedValue(
         mockRoom
       );
 
       const result = await service.findOne(511, 1);
 
       expect(result).toEqual(mockRoom);
-      expect(databaseService.room.findUnique).toHaveBeenCalledWith({
+      expect(databaseService.rooms.findUnique).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: {
           exits: true,
           extraDescs: true,
-          mobResets: true,
-          objResets: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
     });
 
     it('should throw NotFoundException when room not found', async () => {
-      (databaseService.room.findUnique as jest.Mock).mockResolvedValue(null);
+      (databaseService.rooms.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.findOne(511, 999)).rejects.toThrow(
         'Room with zoneId 511 and id 999 not found'
@@ -137,21 +309,21 @@ describe('RoomsService', () => {
   });
 
   describe('create', () => {
-    const createRoomInput = {
+    const createRoomInput: CreateRoomInput = {
       id: 1,
       name: 'New Room',
       description: 'A new room for testing',
       zoneId: 511,
-    } as any;
+    };
 
     it('should create a new room', async () => {
       const newRoom = { ...mockRoom, ...createRoomInput };
-      (databaseService.room.create as jest.Mock).mockResolvedValue(newRoom);
+      (databaseService.rooms.create as jest.Mock).mockResolvedValue(newRoom);
 
       const result = await service.create(createRoomInput);
 
       expect(result).toEqual(newRoom);
-      expect(databaseService.room.create).toHaveBeenCalledWith({
+      expect(databaseService.rooms.create).toHaveBeenCalledWith({
         data: {
           id: 1,
           name: 'New Room',
@@ -163,6 +335,49 @@ describe('RoomsService', () => {
         include: {
           exits: true,
           extraDescs: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
     });
@@ -175,12 +390,12 @@ describe('RoomsService', () => {
 
     it('should update a room', async () => {
       const updatedRoom = { ...mockRoom, ...updateRoomInput };
-      (databaseService.room.update as jest.Mock).mockResolvedValue(updatedRoom);
+      (databaseService.rooms.update as jest.Mock).mockResolvedValue(updatedRoom);
 
       const result = await service.update(511, 1, updateRoomInput);
 
       expect(result).toEqual(updatedRoom);
-      expect(databaseService.room.update).toHaveBeenCalledWith({
+      expect(databaseService.rooms.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         data: {
           name: undefined,
@@ -191,8 +406,49 @@ describe('RoomsService', () => {
         include: {
           exits: true,
           extraDescs: true,
-          mobResets: true,
-          objResets: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
     });
@@ -200,18 +456,59 @@ describe('RoomsService', () => {
 
   describe('delete', () => {
     it('should delete a room', async () => {
-      (databaseService.room.delete as jest.Mock).mockResolvedValue(mockRoom);
+      (databaseService.rooms.delete as jest.Mock).mockResolvedValue(mockRoom);
 
       const result = await service.delete(511, 1);
 
       expect(result).toEqual(mockRoom);
-      expect(databaseService.room.delete).toHaveBeenCalledWith({
+      expect(databaseService.rooms.delete).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: {
           exits: true,
           extraDescs: true,
-          mobResets: true,
-          objResets: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mob: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              object: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  shortDesc: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
     });
@@ -219,21 +516,21 @@ describe('RoomsService', () => {
 
   describe('count', () => {
     it('should return total count of rooms', async () => {
-      (databaseService.room.count as jest.Mock).mockResolvedValue(50);
+      (databaseService.rooms.count as jest.Mock).mockResolvedValue(50);
 
       const result = await service.count();
 
       expect(result).toBe(50);
-      expect(databaseService.room.count).toHaveBeenCalledWith({});
+      expect(databaseService.rooms.count).toHaveBeenCalledWith({});
     });
 
     it('should return count filtered by zoneId', async () => {
-      (databaseService.room.count as jest.Mock).mockResolvedValue(25);
+      (databaseService.rooms.count as jest.Mock).mockResolvedValue(25);
 
       const result = await service.count(511);
 
       expect(result).toBe(25);
-      expect(databaseService.room.count).toHaveBeenCalledWith({
+      expect(databaseService.rooms.count).toHaveBeenCalledWith({
         where: { zoneId: 511 },
       });
     });
@@ -248,17 +545,19 @@ describe('RoomsService', () => {
 
     it('should update room position', async () => {
       const updatedRoom = { ...mockRoom, ...positionInput };
-      (databaseService.room.update as jest.Mock).mockResolvedValue(updatedRoom);
+      (databaseService.rooms.update as jest.Mock).mockResolvedValue(updatedRoom);
 
       const result = await service.updatePosition(511, 1, positionInput);
 
       expect(result).toEqual(updatedRoom);
-      expect(databaseService.room.update).toHaveBeenCalledWith({
+      expect(databaseService.rooms.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         data: positionInput,
         include: {
           exits: true,
           extraDescs: true,
+          mobResets: true,
+          objectResets: true,
         },
       });
     });

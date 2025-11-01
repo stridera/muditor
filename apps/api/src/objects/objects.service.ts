@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Object, Prisma } from '@prisma/client';
+import { Objects, Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -9,10 +9,10 @@ export class ObjectsService {
   async findAll(args?: {
     skip?: number;
     take?: number;
-    where?: Prisma.ObjectWhereInput;
-    orderBy?: Prisma.ObjectOrderByWithRelationInput;
-  }): Promise<Object[]> {
-    return this.database.object.findMany({
+    where?: Prisma.ObjectsWhereInput;
+    orderBy?: Prisma.ObjectsOrderByWithRelationInput;
+  }): Promise<Objects[]> {
+    return this.database.objects.findMany({
       skip: args?.skip,
       take: args?.take,
       where: args?.where,
@@ -20,8 +20,8 @@ export class ObjectsService {
     });
   }
 
-  async findOne(zoneId: number, id: number): Promise<Object | null> {
-    return this.database.object.findUnique({
+  async findOne(zoneId: number, id: number): Promise<Objects | null> {
+    return this.database.objects.findUnique({
       where: {
         zoneId_id: {
           zoneId,
@@ -29,37 +29,36 @@ export class ObjectsService {
         },
       },
       include: {
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
           },
         },
-        extraDescs: true,
-        affects: true,
-        spells: true,
+        object_extra_descriptions: true,
+        object_affects: true,
         triggers: true,
-        shopItems: {
+        shop_items: {
           include: {
-            shop: {
+            shops: {
               select: {
                 id: true,
               },
             },
           },
         },
-        resetEquip: {
+        mob_reset_equipment: {
           include: {
-            reset: {
+            mob_resets: {
               include: {
-                mob: {
+                mobs: {
                   select: {
                     id: true,
                     zoneId: true,
                     shortDesc: true,
                   },
                 },
-                room: {
+                rooms: {
                   select: {
                     id: true,
                     zoneId: true,
@@ -68,7 +67,7 @@ export class ObjectsService {
                 },
               },
             },
-            object: {
+            objects: {
               select: {
                 id: true,
                 zoneId: true,
@@ -81,13 +80,13 @@ export class ObjectsService {
     });
   }
 
-  async findByZone(zoneId: number): Promise<Object[]> {
-    return this.database.object.findMany({
+  async findByZone(zoneId: number): Promise<Objects[]> {
+    return this.database.objects.findMany({
       where: {
         zoneId: zoneId,
       },
       include: {
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -97,13 +96,13 @@ export class ObjectsService {
     });
   }
 
-  async findByType(type: string): Promise<Object[]> {
-    return this.database.object.findMany({
+  async findByType(type: string): Promise<Objects[]> {
+    return this.database.objects.findMany({
       where: {
         type: type as any,
       },
       include: {
-        zone: {
+        zones: {
           select: {
             id: true,
             name: true,
@@ -113,33 +112,33 @@ export class ObjectsService {
     });
   }
 
-  async count(where?: Prisma.ObjectWhereInput): Promise<number> {
-    return this.database.object.count({ where });
+  async count(where?: Prisma.ObjectsWhereInput): Promise<number> {
+    return this.database.objects.count({ where });
   }
 
-  async create(data: Prisma.ObjectCreateInput): Promise<Object> {
-    return this.database.object.create({ data });
+  async create(data: Prisma.ObjectsCreateInput): Promise<Objects> {
+    return this.database.objects.create({ data });
   }
 
   async update(
     zoneId: number,
     id: number,
-    data: Prisma.ObjectUpdateInput
-  ): Promise<Object> {
-    return this.database.object.update({
+    data: Prisma.ObjectsUpdateInput
+  ): Promise<Objects> {
+    return this.database.objects.update({
       where: { zoneId_id: { zoneId, id } },
       data,
     });
   }
 
-  async delete(zoneId: number, id: number): Promise<Object> {
-    return this.database.object.delete({
+  async delete(zoneId: number, id: number): Promise<Objects> {
+    return this.database.objects.delete({
       where: { zoneId_id: { zoneId, id } },
     });
   }
 
   async deleteMany(ids: number[]): Promise<number> {
-    const result = await this.database.object.deleteMany({
+    const result = await this.database.objects.deleteMany({
       where: { id: { in: ids } },
     });
     return result.count;

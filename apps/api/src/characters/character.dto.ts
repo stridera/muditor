@@ -1,4 +1,4 @@
-import { Field, ObjectType, Int, ID, Float } from '@nestjs/graphql';
+import { Field, ID, Int, ObjectType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
 
@@ -201,7 +201,7 @@ export class CharacterDto {
 @ObjectType()
 export class CharacterItemDto {
   @Field(() => ID)
-  id: string;
+  id: number;
 
   @Field()
   characterId: string;
@@ -209,8 +209,8 @@ export class CharacterItemDto {
   @Field(() => Int)
   objectPrototypeId: number;
 
-  @Field({ nullable: true })
-  containerId?: string;
+  @Field(() => Int, { nullable: true })
+  containerId?: number;
 
   @Field({ nullable: true })
   equippedLocation?: string;
@@ -256,7 +256,7 @@ export class CharacterItemDto {
 @ObjectType()
 export class CharacterEffectDto {
   @Field(() => ID)
-  id: string;
+  id: number;
 
   @Field()
   characterId: string;

@@ -249,6 +249,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // UI State
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  const [overlaps, setOverlaps] = useState<OverlapInfo[]>([]);
+  const [activeOverlapRooms, setActiveOverlapRooms] = useState<
+    Record<string, number>
+  >({});
 
   // Wrapper for setSelectedRoomId
   const handleSelectRoom = useCallback(
@@ -256,8 +260,30 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       setSelectedRoomId(roomId);
       const room = rooms.find(r => r.id === roomId);
       setEditedRoom(room ? { ...room } : null);
+
+      // Update z-level to match selected room's floor
+      if (room) {
+        const roomZ = room.layoutZ ?? 0;
+        setCurrentZLevel(roomZ);
+        console.log(`🏢 Updated floor to Z${roomZ} (selected room ${roomId})`);
+      }
+
+      // Check if selected room is part of an overlap and make it visible
+      const selectedOverlap = overlaps.find(overlap =>
+        overlap.roomIds.includes(roomId)
+      );
+      if (selectedOverlap) {
+        const positionKey = `overlapped-${selectedOverlap.roomIds.join('-')}`;
+        setActiveOverlapRooms(prev => ({
+          ...prev,
+          [positionKey]: roomId,
+        }));
+        console.log(
+          `📚 Set room ${roomId} as active in overlap (via handleSelectRoom)`
+        );
+      }
     },
-    [rooms]
+    [rooms, overlaps]
   );
 
   // Handler for navigating to a different zone
@@ -312,15 +338,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const [selectedZoneId, setSelectedZoneId] = useState<number | undefined>(
     zoneId
   );
-  const [overlaps, setOverlaps] = useState<OverlapInfo[]>([]);
   const [showOverlapInfo, setShowOverlapInfo] = useState(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [showLayoutTools, setShowLayoutTools] = useState(false);
-
-  // Overlap management state - tracks which room is currently active in each overlapped position
-  const [activeOverlapRooms, setActiveOverlapRooms] = useState<
-    Record<string, number>
-  >({});
 
   // Helper functions for overlap management
   const getPositionKey = (x: number, y: number, z: number = 0) =>
@@ -333,8 +353,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const positionKey = `overlapped-${overlappedRoomIds.join('-')}`;
       const activeRoomId = activeOverlapRooms[positionKey];
 
+      // If there's an active room set, the active room gets index 0 (top of stack)
+      // and all other rooms are stacked behind it in order
       if (activeRoomId && overlappedRoomIds.includes(activeRoomId)) {
-        return overlappedRoomIds.indexOf(activeRoomId);
+        if (roomId === activeRoomId) {
+          return 0; // This room is the active one - top of stack
+        } else {
+          // This room is not active - position it behind the active room
+          // All non-active rooms get sequential indices 1, 2, 3, etc.
+          const thisRoomIndex = overlappedRoomIds.indexOf(roomId);
+          const activeRoomIndex = overlappedRoomIds.indexOf(activeRoomId);
+          // If this room was before the active room, keep its position + 1
+          // If this room was after the active room, keep its position
+          return thisRoomIndex < activeRoomIndex ? thisRoomIndex + 1 : thisRoomIndex;
+        }
       }
 
       // Default to first room if no active room is set
@@ -373,11 +405,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Update selected room to the new active room
       setSelectedRoomId(newActiveRoomId);
 
+      // Update edited room and z-level
+      const newActiveRoom = rooms.find(r => r.id === newActiveRoomId);
+      if (newActiveRoom) {
+        setEditedRoom({ ...newActiveRoom });
+        const roomZ = newActiveRoom.layoutZ ?? 0;
+        setCurrentZLevel(roomZ);
+        console.log(`🏢 Updated floor to Z${roomZ} (switched to room ${newActiveRoomId})`);
+      }
+
       console.log(
         `🔄 Switched overlap room from ${roomId} to ${newActiveRoomId} (direction: ${direction})`
       );
     },
-    [activeOverlapRooms, setSelectedRoomId]
+    [activeOverlapRooms, setSelectedRoomId, rooms]
   );
 
   // Undo system for room positions
@@ -1841,6 +1882,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           setSelectedRoomId(roomId);
           setEditedRoom({ ...targetRoom });
 
+          // Check if URL room is part of an overlap and make it visible
+          const urlOverlap = overlaps.find(overlap =>
+            overlap.roomIds.includes(roomId)
+          );
+          if (urlOverlap) {
+            const positionKey = `overlapped-${urlOverlap.roomIds.join('-')}`;
+            setActiveOverlapRooms(prev => ({
+              ...prev,
+              [positionKey]: roomId,
+            }));
+            console.log(
+              `📚 Set room ${roomId} as active in overlap (from URL)`
+            );
+          }
+
           // Update z-level to match the room's floor
           const roomZ = targetRoom.layoutZ ?? 0;
           setCurrentZLevel(roomZ);
@@ -1853,7 +1909,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         }
       }
     }
-  }, [rooms, selectedRoomId, zoneId]);
+  }, [rooms, selectedRoomId, zoneId, overlaps]);
 
   // Generate world map nodes for zone viewing
   const generateWorldMapNodes = useCallback(
@@ -2969,6 +3025,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     generateEnhancedWorldMapNodes,
   ]);
 
+
   // Convert rooms to React Flow nodes and edges
   useEffect(() => {
     console.log(
@@ -3029,6 +3086,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     }
 
     console.log(`🏠 Should show zone room view with ${rooms.length} rooms`);
+    console.log(`🔍 Current state: currentZLevel=${currentZLevel}, overlaps count=${overlaps.length}`, overlaps);
+
+    // Debug: Check if rooms 20 and 49 exist in rooms array
+    const room20 = rooms.find(r => r.id === 20);
+    const room49 = rooms.find(r => r.id === 49);
+    if (room20 || room49) {
+      console.log(`🔍 Found rooms 20/49 in array:`, {
+        room20: room20 ? `Position: (${room20.layoutX}, ${room20.layoutY}, ${room20.layoutZ})` : 'NOT IN ARRAY',
+        room49: room49 ? `Position: (${room49.layoutX}, ${room49.layoutY}, ${room49.layoutZ})` : 'NOT IN ARRAY',
+        overlap20_49: overlaps.find(o => o.roomIds.includes(20) || o.roomIds.includes(49)),
+        activeOverlapRooms,
+      });
+    }
 
     if (rooms.length === 0) {
       console.log(`⚠️ No rooms to generate nodes from - setting empty`);
@@ -3097,6 +3167,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const floorDifference = roomZ - currentZLevel;
       const isCurrentFloor = floorDifference === 0;
 
+      // Debug logging for rooms 20 and 49
+      if (room.id === 20 || room.id === 49) {
+        console.log(`🔍 Creating node for room ${room.id}:`, {
+          layoutX: room.layoutX,
+          layoutY: room.layoutY,
+          layoutZ: room.layoutZ,
+          currentZLevel,
+          isCurrentFloor,
+          overlappingWith: overlappingWith ? overlappingWith.roomIds : null,
+        });
+      }
+
       // Visual depth effects
       let opacity = 1;
       let offsetX = 0;
@@ -3114,11 +3196,24 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         overlapIndex = getActiveOverlapIndex(room.id, overlappingWith.roomIds);
         const totalOverlaps = overlappingWith.roomIds.length;
 
+        // Debug logging for rooms 20 and 49
+        if (room.id === 20 || room.id === 49) {
+          const positionKey = `overlapped-${overlappingWith.roomIds.join('-')}`;
+          console.log(`🔍 Overlap index for room ${room.id}:`, {
+            overlapIndex,
+            totalOverlaps,
+            overlappedWith: overlappingWith.roomIds,
+            activeRoomId: activeOverlapRooms[positionKey],
+          });
+        }
+
         // Staggered stack: cascade down-left (southwest) direction
-        // This is OPPOSITE to floor ghosting (up-left/down-right)
+        // This uses the upper-right/lower-left diagonal to distinguish from z-level ghosting
+        // Z-levels use upper-left/lower-right diagonal (up-left for upper floors, down-right for lower floors)
+        // Overlaps use the perpendicular diagonal (upper-right to lower-left)
         const OVERLAP_OFFSET = 30; // Pixels per card in stack
-        offsetX = -overlapIndex * OVERLAP_OFFSET; // Move LEFT
-        offsetY = overlapIndex * OVERLAP_OFFSET; // Move DOWN
+        offsetX = -overlapIndex * OVERLAP_OFFSET; // Move LEFT (toward lower-left)
+        offsetY = overlapIndex * OVERLAP_OFFSET; // Move DOWN (toward lower-left)
 
         // Distinct opacity for overlaps (85% for non-active, 100% for active)
         const isActiveOverlap = overlapIndex === 0;
@@ -3143,6 +3238,30 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       }
 
       const nodePosition = getNodePosition(room, index, rooms.length);
+
+      // Debug logging for rooms 20 and 49
+      if (room.id === 20 || room.id === 49) {
+        const finalX = nodePosition.x + offsetX;
+        const finalY = nodePosition.y + offsetY;
+        const viewport = reactFlowInstance ? {
+          zoom: reactFlowInstance.getZoom(),
+          viewport: reactFlowInstance.getViewport(),
+        } : null;
+
+        console.log(`🔍 Final node data for room ${room.id}:`, {
+          nodePosition,
+          offsetX,
+          offsetY,
+          finalPosition: { x: finalX, y: finalY },
+          opacity,
+          zIndex,
+          overlapIndex,
+          viewport,
+          likelyOffscreen: viewport ? (
+            Math.abs(finalX) > 50000 || Math.abs(finalY) > 50000
+          ) : 'unknown',
+        });
+      }
 
       return {
         id: room.id.toString(),
@@ -3358,6 +3477,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               (destRoomId != null && overlap.roomIds.includes(destRoomId))
           );
 
+          // Calculate edge z-index for overlapping rooms
+          // Edges should appear above background overlapping rooms but below/at active room
+          let edgeZIndex: number | undefined = undefined;
+          if (isOverlappingEdge) {
+            // Give overlapping edges a high z-index so they appear above background rooms
+            // Use 2003 to be above all overlapping room nodes (which are 2000-2002)
+            edgeZIndex = 2003;
+          }
+
           // Check if this is a one-way exit
           const oneWayExit = oneWayExits.find(
             owe => owe.fromRoom === room.id && owe.toRoom === destRoomId
@@ -3404,6 +3532,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             style: isExternalZone
               ? { ...edgeStyle, stroke: '#6366f1', strokeWidth: 2.5 } // Purple for external exits
               : edgeStyle,
+            zIndex: edgeZIndex, // Set z-index for overlapping room edges
             markerEnd: {
               type: MarkerType.ArrowClosed,
               width: isOneWay ? 18 : 15, // Larger arrow for one-way exits
@@ -3475,6 +3604,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     console.log(
       `✅ Generated ${newNodes.length} room nodes and ${newEdges.length} edges for zone view`
     );
+
+    // Debug: Check if rooms 20 and 49 are in the generated nodes
+    const room20Node = newNodes.find(n => n.id === '20');
+    const room49Node = newNodes.find(n => n.id === '49');
+    if (room20Node || room49Node) {
+      console.log('🔍 Rooms 20/49 nodes:', {
+        room20: room20Node ? `Position: (${room20Node.position.x}, ${room20Node.position.y}), Opacity: ${room20Node.style?.opacity}` : 'NOT FOUND',
+        room49: room49Node ? `Position: (${room49Node.position.x}, ${room49Node.position.y}), Opacity: ${room49Node.style?.opacity}` : 'NOT FOUND',
+      });
+    }
+
     setNodes(newNodes);
     setEdges(newEdges);
   }, [
@@ -3484,6 +3624,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     setEdges,
     currentZLevel,
     overlaps,
+    activeOverlapRooms, // Explicitly include to ensure re-render when active overlap changes
     worldMapMode,
     worldMapNodes,
     currentViewMode,
@@ -3504,18 +3645,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       nds.map(node => {
         if (node.type === 'room') {
           const roomId = parseInt(node.id);
+          const roomZ = node.data.layoutZ ?? 0;
+          const isCurrentFloor = roomZ === currentZLevel;
+
           return {
             ...node,
             data: {
               ...node.data,
               isSelected: roomId === selectedRoomId,
+              currentZLevel: currentZLevel, // Update to current floor state
+              isCurrentFloor: isCurrentFloor, // Recalculate based on current floor
             },
           };
         }
         return node;
       })
     );
-  }, [selectedRoomId, setNodes, worldMapMode, currentViewMode]);
+  }, [selectedRoomId, setNodes, worldMapMode, currentViewMode, currentZLevel]);
 
   // Event handlers
   const onConnect = useCallback(
@@ -3555,6 +3701,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (selectedRoomId !== roomId) {
             setSelectedRoomId(roomId);
             setEditedRoom({ ...room });
+
+            // Check if clicked room is part of an overlap and make it visible
+            const clickedOverlap = overlaps.find(overlap =>
+              overlap.roomIds.includes(roomId)
+            );
+            if (clickedOverlap) {
+              const positionKey = `overlapped-${clickedOverlap.roomIds.join('-')}`;
+              setActiveOverlapRooms(prev => ({
+                ...prev,
+                [positionKey]: roomId,
+              }));
+              console.log(
+                `📚 Set room ${roomId} as active in overlap (clicked)`
+              );
+            }
           }
         }
       } else if (node.type === 'zone') {
@@ -4742,11 +4903,27 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 setSelectedRoomId(destRoomId);
                 setEditedRoom({ ...destinationRoom });
 
-                // Update z-level when navigating UP/DOWN
-                if (direction === 'UP' || direction === 'DOWN') {
-                  const destZ = destinationRoom.layoutZ ?? 0;
+                // Always update z-level to match destination room's floor
+                const destZ = destinationRoom.layoutZ ?? 0;
+                if (destZ !== currentZLevel) {
                   setCurrentZLevel(destZ);
-                  console.log(`🏢 Followed to floor Z${destZ}`);
+                  console.log(`🏢 Followed to floor Z${destZ} (was Z${currentZLevel})`);
+                }
+
+                // Check if destination room is part of an overlap
+                const destinationOverlap = overlaps.find(overlap =>
+                  overlap.roomIds.includes(destRoomId)
+                );
+                if (destinationOverlap) {
+                  // Update activeOverlapRooms to make the destination room the visible one
+                  const positionKey = `overlapped-${destinationOverlap.roomIds.join('-')}`;
+                  setActiveOverlapRooms(prev => ({
+                    ...prev,
+                    [positionKey]: destRoomId,
+                  }));
+                  console.log(
+                    `📚 Set room ${destRoomId} as active in overlap (${destinationOverlap.roomIds.length} rooms)`
+                  );
                 }
 
                 // Auto-focus the node in the viewport
@@ -4754,11 +4931,24 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   n => n.id === destRoomId.toString()
                 );
                 if (targetNode && reactFlowInstance) {
+                  console.log(`🎯 Centering on room ${destRoomId} at position:`, targetNode.position);
                   reactFlowInstance.setCenter(
                     targetNode.position.x + 90, // Center of room node
                     targetNode.position.y + 60,
                     { zoom: 1.2, duration: 800 }
                   );
+                } else if (reactFlowInstance && destinationRoom.layoutX !== null && destinationRoom.layoutY !== null) {
+                  // Fallback: calculate position from room coordinates if node not found yet
+                  const roomX = destinationRoom.layoutX * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
+                  const roomY = -destinationRoom.layoutY * GRID_SIZE * ROOM_SPACING_MULTIPLIER; // Y is inverted
+                  console.log(`🎯 Node not found yet, centering on room ${destRoomId} at calculated position: (${roomX}, ${roomY})`);
+                  reactFlowInstance.setCenter(
+                    roomX + 90,
+                    roomY + 60,
+                    { zoom: 1.2, duration: 800 }
+                  );
+                } else {
+                  console.warn(`⚠️ Could not center on room ${destRoomId} - node not found and no coordinates`);
                 }
               } else {
                 console.log(
@@ -4993,10 +5183,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const overlaps: OverlapInfo[] = [];
       const positionMap = new Map<string, number[]>();
 
-      // Group rooms by position
+      // Group rooms by position (including Z level - rooms on different floors don't overlap)
       Object.entries(positions).forEach(([roomIdStr, pos]) => {
         const roomId = parseInt(roomIdStr);
-        const key = `${pos.x},${pos.y}`;
+        const z = pos.z ?? 0;
+        const key = `${pos.x},${pos.y},${z}`;
         if (!positionMap.has(key)) {
           positionMap.set(key, []);
         }
@@ -5006,7 +5197,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Find overlaps
       positionMap.forEach((roomIds, posKey) => {
         if (roomIds.length > 1) {
-          const [x, y] = posKey.split(',').map(Number);
+          const [x, y, z] = posKey.split(',').map(Number);
           overlaps.push({
             roomIds,
             position: { x, y },
@@ -5046,6 +5237,38 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     },
     [detectOverlaps]
   );
+
+  // Detect overlaps from room layout positions when rooms change
+  useEffect(() => {
+    if (rooms.length === 0) {
+      // Clear overlaps if no rooms
+      setOverlaps([]);
+      setShowOverlapInfo(false);
+      return;
+    }
+
+    const roomPositionsForOverlapDetection: Record<number, { x: number; y: number; z?: number }> = {};
+    rooms.forEach(room => {
+      if (room.layoutX !== null && room.layoutY !== null) {
+        roomPositionsForOverlapDetection[room.id] = {
+          x: room.layoutX!,
+          y: room.layoutY!,
+          z: room.layoutZ ?? 0,
+        };
+      }
+    });
+
+    const detectedOverlaps = detectOverlaps(roomPositionsForOverlapDetection);
+
+    // Always update overlaps to ensure they're in sync with rooms
+    setOverlaps(detectedOverlaps);
+    if (detectedOverlaps.length > 0) {
+      console.log(`📚 Detected ${detectedOverlaps.length} overlaps:`, detectedOverlaps);
+      setShowOverlapInfo(true);
+    } else {
+      setShowOverlapInfo(false);
+    }
+  }, [rooms, detectOverlaps]); // Remove overlaps from dependencies to avoid circular dependency
 
   // Track drag start positions for undo
   const dragStartPositions = useRef<Record<string, { x: number; y: number }>>(
@@ -6320,6 +6543,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                           key={roomId}
                           onClick={() => {
                             setSelectedRoomId(roomId);
+
+                            // Update edited room and z-level
+                            const room = rooms.find(r => r.id === roomId);
+                            if (room) {
+                              setEditedRoom({ ...room });
+                              const roomZ = room.layoutZ ?? 0;
+                              setCurrentZLevel(roomZ);
+                              console.log(`🏢 Updated floor to Z${roomZ} (overlap panel select room ${roomId})`);
+                            }
+
+                            // Make this room the active one in the overlap
+                            const positionKey = `overlapped-${overlap.roomIds.join('-')}`;
+                            setActiveOverlapRooms(prev => ({
+                              ...prev,
+                              [positionKey]: roomId,
+                            }));
+
                             // Focus on the room in the viewport
                             const roomNode = nodes.find(
                               n => n.id === roomId.toString()
@@ -6410,9 +6650,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       // Jump to first room in overlap
                       const firstRoomId = overlap.roomIds[0];
                       setSelectedRoomId(firstRoomId);
+
+                      // Make this room the active one in the overlap
+                      const positionKey = `overlapped-${overlap.roomIds.join('-')}`;
+                      setActiveOverlapRooms(prev => ({
+                        ...prev,
+                        [positionKey]: firstRoomId,
+                      }));
+
                       const firstRoom = rooms.find(r => r.id === firstRoomId);
                       if (firstRoom) {
                         setEditedRoom({ ...firstRoom });
+                        // Update z-level to match the room's floor
+                        const roomZ = firstRoom.layoutZ ?? 0;
+                        setCurrentZLevel(roomZ);
+                        console.log(`🏢 Updated floor to Z${roomZ} (overlap warning jump to room ${firstRoomId})`);
                         // Center on the room
                         const targetNode = nodes.find(
                           n => n.id === firstRoomId.toString()

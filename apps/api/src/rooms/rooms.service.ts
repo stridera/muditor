@@ -22,7 +22,7 @@ type RoomServiceResult = Omit<RoomDto, 'mobs' | 'objects' | 'shops'> & {
     roomZoneId: number;
     roomId: number;
   }>;
-  objResets: Array<{
+  objectResets: Array<{
     id: string;
     zoneId: number;
     maxInstances: number;
@@ -37,8 +37,8 @@ type RoomServiceResult = Omit<RoomDto, 'mobs' | 'objects' | 'shops'> & {
     id: string;
     direction: string;
     description?: string;
-    keywords: string[];
-    toRoomId?: number | null;
+    keywords?: string[];
+    destination?: number | null;
     roomZoneId: number;
     roomId: number;
   }>;
@@ -58,8 +58,8 @@ export class RoomsService {
   // Shared include pattern to prevent stack overflow from circular references
   private readonly roomInclude = {
     exits: true,
-    extraDescs: true,
-    mobResets: {
+    room_extra_descriptions: true,
+    mob_resets: {
       select: {
         id: true,
         zoneId: true,
@@ -70,7 +70,7 @@ export class RoomsService {
         mobId: true,
         roomZoneId: true,
         roomId: true,
-        mob: {
+        mobs: {
           select: {
             id: true,
             zoneId: true,
@@ -80,7 +80,7 @@ export class RoomsService {
         },
       },
     },
-    objResets: {
+    object_resets: {
       select: {
         id: true,
         zoneId: true,
@@ -91,7 +91,7 @@ export class RoomsService {
         objectId: true,
         roomZoneId: true,
         roomId: true,
-        object: {
+        objects: {
           select: {
             id: true,
             zoneId: true,
@@ -120,7 +120,7 @@ export class RoomsService {
       const offsetClause = skip ? `OFFSET ${skip}` : '';
 
       const rooms = await this.db.$queryRawUnsafe(`
-        SELECT 
+        SELECT
           r.id,
           r.zone_id as "zoneId",
           r.name,
@@ -140,9 +140,9 @@ export class RoomsService {
             ) FILTER (WHERE e.id IS NOT NULL),
             '[]'::json
           ) as exits
-        FROM rooms r
-        LEFT JOIN room_exits e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
-        LEFT JOIN rooms dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
+        FROM "Rooms" r
+        LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
+        LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
         ${whereClause}
         GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
         ORDER BY r.id
@@ -153,7 +153,7 @@ export class RoomsService {
     }
 
     // Full query with all data
-    const rooms = await this.db.room.findMany({
+    const rooms = await this.db.rooms.findMany({
       where: zoneId ? { zoneId } : undefined,
       skip,
       take,
@@ -161,11 +161,11 @@ export class RoomsService {
       orderBy: { id: 'asc' },
     });
 
-    return rooms;
+    return rooms as any;
   }
 
   async findOne(zoneId: number, id: number): Promise<RoomServiceResult | null> {
-    const room = await this.db.room.findUnique({
+    const room = await this.db.rooms.findUnique({
       where: {
         zoneId_id: {
           zoneId,
@@ -192,7 +192,7 @@ export class RoomsService {
     if (lightweight) {
       // Use raw query to avoid stack depth issues with large datasets and composite keys
       const rooms = await this.db.$queryRawUnsafe(`
-        SELECT 
+        SELECT
           r.id,
           r.zone_id as "zoneId",
           r.name,
@@ -212,9 +212,9 @@ export class RoomsService {
             ) FILTER (WHERE e.id IS NOT NULL),
             '[]'::json
           ) as exits
-        FROM rooms r
-        LEFT JOIN room_exits e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
-        LEFT JOIN rooms dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
+        FROM "Rooms" r
+        LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
+        LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
         WHERE r.zone_id = ${zoneId}
         GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
         ORDER BY r.id
@@ -223,7 +223,7 @@ export class RoomsService {
     }
 
     // Full query with all data
-    const rooms = await this.db.room.findMany({
+    const rooms = await this.db.rooms.findMany({
       where: { zoneId },
       include: this.roomInclude,
       orderBy: { id: 'asc' },
@@ -233,13 +233,13 @@ export class RoomsService {
   }
 
   async count(zoneId?: number): Promise<number> {
-    return this.db.room.count({
+    return this.db.rooms.count({
       where: zoneId ? { zoneId } : undefined,
     });
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {
-    const room = await this.db.room.create({
+    const room = await this.db.rooms.create({
       data: {
         id: data.id,
         zoneId: data.zoneId,
@@ -259,7 +259,7 @@ export class RoomsService {
     id: number,
     data: UpdateRoomInput
   ): Promise<RoomServiceResult> {
-    const room = await this.db.room.update({
+    const room = await this.db.rooms.update({
       where: { zoneId_id: { zoneId, id } },
       data: {
         name: data.name,
@@ -274,7 +274,7 @@ export class RoomsService {
   }
 
   async delete(zoneId: number, id: number): Promise<RoomServiceResult> {
-    const room = await this.db.room.delete({
+    const room = await this.db.rooms.delete({
       where: { zoneId_id: { zoneId, id } },
       include: this.roomInclude,
     });
@@ -283,23 +283,23 @@ export class RoomsService {
   }
 
   async createExit(data: CreateRoomExitInput): Promise<any> {
-    const exit = await this.db.roomExit.create({
+    const exit = await this.db.roomExits.create({
       data: {
-        roomZoneId: data.roomZoneId,
-        roomId: data.roomId,
         direction: data.direction,
         description: data.description,
-        keywords: data.keyword ? [data.keyword] : [],
+        keywords: data.keywords || [],
         toZoneId: data.toZoneId,
         toRoomId: data.toRoomId,
+        roomZoneId: data.roomZoneId,
+        roomId: data.roomId,
       },
     });
 
     return exit;
   }
 
-  async deleteExit(exitId: string): Promise<any> {
-    const exit = await this.db.roomExit.delete({
+  async deleteExit(exitId: number): Promise<any> {
+    const exit = await this.db.roomExits.delete({
       where: { id: exitId },
     });
 
@@ -311,7 +311,7 @@ export class RoomsService {
     id: number,
     position: UpdateRoomPositionInput
   ): Promise<RoomServiceResult> {
-    const room = await this.db.room.update({
+    const room = await this.db.rooms.update({
       where: { zoneId_id: { zoneId, id } },
       data: {
         layoutX: position.layoutX,
@@ -320,9 +320,9 @@ export class RoomsService {
       },
       include: {
         exits: true,
-        extraDescs: true,
-        mobResets: true,
-        objResets: true,
+        room_extra_descriptions: true,
+        mob_resets: true,
+        object_resets: true,
       },
     });
 
@@ -346,7 +346,7 @@ export class RoomsService {
       const result = await this.db.$transaction(async tx => {
         const updatePromises = updates.map(async update => {
           try {
-            await tx.room.update({
+            await tx.rooms.update({
               where: {
                 zoneId_id: { zoneId: update.zoneId, id: update.roomId },
               },

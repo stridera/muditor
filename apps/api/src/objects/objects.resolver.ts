@@ -49,7 +49,7 @@ export class ObjectsResolver {
     const { zoneId, ...objectData } = data;
     return this.objectsService.create({
       ...objectData,
-      zone: {
+      zones: {
         connect: { id: zoneId },
       },
     }) as any; // TODO: Map database fields to DTO

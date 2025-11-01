@@ -5,7 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Direction, RoomFlag, Sector } from '@prisma/client';
+import { Direction, ExitFlag, RoomFlag, Sector } from '@prisma/client';
 import {
   IsArray,
   IsEnum,
@@ -24,6 +24,7 @@ import { ShopDto } from '../shops/shop.dto';
 registerEnumType(Sector, { name: 'Sector' });
 registerEnumType(Direction, { name: 'Direction' });
 registerEnumType(RoomFlag, { name: 'RoomFlag' });
+registerEnumType(ExitFlag, { name: 'ExitFlag' });
 
 @ObjectType()
 export class RoomExitDto {
@@ -36,8 +37,8 @@ export class RoomExitDto {
   @Field({ nullable: true })
   description?: string;
 
-  @Field({ nullable: true })
-  keyword?: string;
+  @Field(() => [String], { nullable: true })
+  keywords?: string[];
 
   @Field({ nullable: true })
   key?: string;
@@ -47,6 +48,18 @@ export class RoomExitDto {
 
   @Field(() => Int, { nullable: true })
   toRoomId?: number;
+
+  @Field(() => [ExitFlag], { defaultValue: [] })
+  flags: ExitFlag[];
+
+  @Field(() => Int)
+  roomZoneId: number;
+
+  @Field(() => Int)
+  roomId: number;
+
+  @Field(() => Int, { nullable: true })
+  destination?: number;
 }
 
 @ObjectType()
@@ -273,10 +286,10 @@ export class CreateRoomExitInput {
   @IsString()
   description?: string;
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  keyword?: string;
+  @IsArray()
+  keywords?: string[];
 
   @Field({ nullable: true })
   @IsOptional()

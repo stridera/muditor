@@ -1,6 +1,13 @@
-import { ObjectType, Field, ID, Int, InputType, Float } from '@nestjs/graphql';
+import {
+  Field,
+  Float,
+  ID,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { WearFlag } from '@prisma/client';
-import { registerEnumType } from '@nestjs/graphql';
 
 // Register WearFlag enum for GraphQL
 registerEnumType(WearFlag, {
@@ -52,7 +59,7 @@ export class RoomSummaryDto {
 @ObjectType()
 export class MobResetEquipmentDto {
   @Field(() => ID)
-  id: string;
+  id: number;
 
   @Field(() => Int)
   objectZoneId: number;
@@ -76,7 +83,7 @@ export class MobResetEquipmentDto {
 @ObjectType()
 export class MobResetDto {
   @Field(() => ID)
-  id: string;
+  id: number;
 
   @Field(() => Int)
   zoneId: number;
@@ -157,14 +164,17 @@ export class CreateMobResetInput {
   @Field({ nullable: true })
   comment?: string;
 
-  @Field(() => [CreateMobResetEquipmentInput], { nullable: true, defaultValue: [] })
+  @Field(() => [CreateMobResetEquipmentInput], {
+    nullable: true,
+    defaultValue: [],
+  })
   equipment?: CreateMobResetEquipmentInput[];
 }
 
 @InputType()
 export class UpdateMobResetEquipmentInput {
   @Field(() => ID, { nullable: true })
-  id?: string;
+  id?: number;
 
   @Field(() => Int, { nullable: true })
   objectZoneId?: number;

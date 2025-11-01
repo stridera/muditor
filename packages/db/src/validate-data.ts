@@ -8,16 +8,16 @@ async function validateImportedData() {
   try {
     // Get basic counts
     const stats = {
-      users: await prisma.user.count(),
-      characters: await prisma.character.count(),
-      zones: await prisma.zone.count(),
-      rooms: await prisma.room.count(),
-      mobs: await prisma.mob.count(),
-      objects: await prisma.object.count(),
-      shops: await prisma.shop.count(),
-      triggers: await prisma.trigger.count(),
-      mobResets: await prisma.mobReset.count(),
-      roomExits: await prisma.roomExit.count(),
+      users: await prisma.users.count(),
+      characters: await prisma.characters.count(),
+      zones: await prisma.zones.count(),
+      rooms: await prisma.rooms.count(),
+      mobs: await prisma.mobs.count(),
+      objects: await prisma.objects.count(),
+      shops: await prisma.shops.count(),
+      triggers: await prisma.triggers.count(),
+      mobResets: await prisma.mobResets.count(),
+      roomExits: await prisma.roomExits.count(),
     };
     
     console.log('📊 Import Statistics:');
@@ -34,7 +34,7 @@ async function validateImportedData() {
     
     // Check some specific zones
     console.log('🔍 Zone Analysis:');
-    const zoneWithMostRooms = await prisma.zone.findFirst({
+    const zoneWithMostRooms = await prisma.zones.findFirst({
       include: {
         _count: {
           select: { rooms: true, mobs: true, objects: true }
@@ -53,9 +53,9 @@ async function validateImportedData() {
     }
     
     // Check room connectivity
-    const roomsWithExits = await prisma.room.count({
+    const roomsWithExits = await prisma.rooms.count({
       where: {
-        exits: {
+        room_exits_room_exits_roomZoneId_roomIdTorooms: {
           some: {}
         }
       }
@@ -64,9 +64,9 @@ async function validateImportedData() {
     console.log(`   🗺️  Rooms with exits: ${roomsWithExits}/${stats.rooms} (${Math.round(roomsWithExits/stats.rooms*100)}%)`);
     
     // Check shops with items
-    const shopsWithItems = await prisma.shop.count({
+    const shopsWithItems = await prisma.shops.count({
       where: {
-        items: {
+        shop_items: {
           some: {}
         }
       }
@@ -75,12 +75,11 @@ async function validateImportedData() {
     console.log(`   🛍️  Shops with items: ${shopsWithItems}/${stats.shops} (${Math.round(shopsWithItems/stats.shops*100)}%)`);
     
     // Check mobs with equipment
-    const mobsWithEquipment = await prisma.mobReset.count({
+    const mobsWithEquipment = await prisma.mobResets.count({
       where: {
-        OR: [
-          { carrying: { some: {} } },
-          { equipped: { some: {} } }
-        ]
+        mob_reset_equipment: {
+          some: {}
+        }
       }
     });
     
@@ -88,7 +87,7 @@ async function validateImportedData() {
     
     // Sample some data
     console.log('\n📋 Sample Data:');
-    const sampleZone = await prisma.zone.findFirst({
+    const sampleZone = await prisma.zones.findFirst({
       where: { id: 1 },
       include: {
         rooms: { take: 3 },

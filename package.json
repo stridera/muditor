@@ -45,7 +45,7 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
     "clean": "pnpm run --recursive clean && rm -rf node_modules",
-    "prepare": "husky",
+    "prepare:disabled": "husky",
     "system:start": "./scripts/start-system.sh",
     "system:stop": "./scripts/stop-system.sh",
     "system:status": "./scripts/check-system.sh",

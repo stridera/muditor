@@ -26,10 +26,10 @@ export interface ValidationReport {
 
 @Injectable()
 export class ValidationService {
-  constructor(private readonly prisma: DatabaseService) { }
+  constructor(private readonly prisma: DatabaseService) {}
 
   async validateZone(zoneId: number): Promise<ValidationReport> {
-    const zone = await this.prisma.zone.findUnique({
+    const zone = await this.prisma.zones.findUnique({
       where: { id: zoneId },
       include: {
         rooms: {
@@ -329,7 +329,7 @@ export class ValidationService {
   }
 
   async validateAllZones(): Promise<ValidationReport[]> {
-    const zones = await this.prisma.zone.findMany({
+    const zones = await this.prisma.zones.findMany({
       select: { id: true },
     });
 

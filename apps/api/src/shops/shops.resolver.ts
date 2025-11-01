@@ -99,7 +99,7 @@ export class ShopsResolver {
     const { zoneId, ...shopData } = data;
     const shop = await this.shopsService.create({
       ...shopData,
-      zone: {
+      zones: {
         connect: { id: zoneId },
       },
     });

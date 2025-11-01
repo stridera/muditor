@@ -35,7 +35,7 @@ async function main() {
   try {
     // Check if users exist
     console.log('👤 Checking for users...');
-    const userCount = await prisma.user.count();
+    const userCount = await prisma.users.count();
 
     if (userCount === 0) {
       console.log('⚠️  No users found. Please run FieryLib to seed users first:');
@@ -57,9 +57,9 @@ async function main() {
     console.log('');
     console.log('⚔️ Seeding test characters...');
     const users = {
-      admin: await prisma.user.findUnique({ where: { email: 'admin@muditor.dev' } }),
-      builder: await prisma.user.findUnique({ where: { email: 'builder@muditor.dev' } }),
-      player: await prisma.user.findUnique({ where: { email: 'player@muditor.dev' } }),
+      admin: await prisma.users.findUnique({ where: { email: 'admin@muditor.dev' } }),
+      builder: await prisma.users.findUnique({ where: { email: 'builder@muditor.dev' } }),
+      player: await prisma.users.findUnique({ where: { email: 'player@muditor.dev' } }),
     };
     await seedCharacters(prisma, users as any);
 

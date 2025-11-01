@@ -1,4 +1,4 @@
-import { InputType, Field, Int, ID } from '@nestjs/graphql';
+import { Field, ID, InputType, Int } from '@nestjs/graphql';
 
 @InputType()
 export class CreateCharacterInput {
@@ -162,8 +162,8 @@ export class CreateCharacterItemInput {
   @Field(() => Int)
   objectPrototypeId: number;
 
-  @Field({ nullable: true })
-  containerId?: string;
+  @Field(() => Int, { nullable: true })
+  containerId?: number;
 
   @Field({ nullable: true })
   equippedLocation?: string;
@@ -186,8 +186,8 @@ export class CreateCharacterItemInput {
 
 @InputType()
 export class UpdateCharacterItemInput {
-  @Field({ nullable: true })
-  containerId?: string;
+  @Field(() => Int, { nullable: true })
+  containerId?: number;
 
   @Field({ nullable: true })
   equippedLocation?: string;

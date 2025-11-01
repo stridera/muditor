@@ -110,7 +110,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
   ];
 
   for (const classData of classes) {
-    await prisma.class.upsert({
+    await prisma.characterClass.upsert({
       where: { name: classData.name },
       update: classData,
       create: classData,
@@ -135,7 +135,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
   ];
 
   for (const school of spellSchools) {
-    await prisma.spellSchool.upsert({
+    await prisma.spellSchools.upsert({
       where: { name: school.name },
       update: school,
       create: school,
@@ -188,11 +188,11 @@ export async function seedGameSystem(prisma: PrismaClient) {
   ];
 
   for (const spellData of spells) {
-    const school = await prisma.spellSchool.findFirst({
+    const school = await prisma.spellSchools.findFirst({
       where: { name: spellData.school }
     });
     
-    const spell = await prisma.spell.upsert({
+    const spell = await prisma.spells.upsert({
       where: { name: spellData.name },
       update: {
         schoolId: school?.id,
@@ -233,7 +233,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
 
     // Add sample effects based on FieryMUD system
     if (spellData.name === 'Fireball') {
-      await prisma.spellEffect.upsert({
+      await prisma.spellEffects.upsert({
         where: { id: spell.id * 100 }, // Unique ID approach
         update: {},
         create: {
@@ -274,11 +274,11 @@ export async function seedGameSystem(prisma: PrismaClient) {
   ];
 
   for (const data of classSpellData) {
-    const spell = await prisma.spell.findFirst({ where: { name: data.spellName } });
-    const spellClass = await prisma.class.findFirst({ where: { name: data.className } });
+    const spell = await prisma.spells.findFirst({ where: { name: data.spellName } });
+    const spellClass = await prisma.characterClass.findFirst({ where: { name: data.className } });
     
     if (spell && spellClass) {
-      await prisma.spellClassCircle.upsert({
+      await prisma.spellClassCircles.upsert({
         where: { 
           spellId_classId: { 
             spellId: spell.id, 
@@ -337,7 +337,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
   ];
 
   for (const skillData of skills) {
-    await prisma.skill.upsert({
+    await prisma.skills.upsert({
       where: { name: skillData.name },
       update: skillData,
       create: skillData,
@@ -351,10 +351,10 @@ export async function seedGameSystem(prisma: PrismaClient) {
   console.log('🔄 Updating existing characters with new race/class relationships...');
   
   // Update Gandalf to use Human race and Mage class (closest to Sorcerer)
-  const mageClass = await prisma.class.findFirst({ where: { name: 'Mage' } });
+  const mageClass = await prisma.characterClass.findFirst({ where: { name: 'Mage' } });
   
   if (mageClass) {
-    await prisma.character.updateMany({
+    await prisma.characters.updateMany({
       where: { name: 'Gandalf' },
       data: { 
         race: 'HUMAN',
@@ -364,10 +364,10 @@ export async function seedGameSystem(prisma: PrismaClient) {
   }
   
   // Update Legolas to use Elf race and Ranger class
-  const rangerClass = await prisma.class.findFirst({ where: { name: 'Ranger' } });
+  const rangerClass = await prisma.characterClass.findFirst({ where: { name: 'Ranger' } });
   
   if (rangerClass) {
-    await prisma.character.updateMany({
+    await prisma.characters.updateMany({
       where: { name: 'Legolas' },
       data: { 
         race: 'ELF',

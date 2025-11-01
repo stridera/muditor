@@ -5,6 +5,7 @@
 This project uses **two Prisma schemas** that point to the **same PostgreSQL database**:
 
 ### 1. Muditor Schema (TypeScript - **SOURCE OF TRUTH**)
+
 **Location**: `/home/strider/Code/mud/muditor/packages/db/prisma/schema.prisma`
 
 - **Generator**: `prisma-client-js` (TypeScript)
@@ -14,17 +15,19 @@ This project uses **two Prisma schemas** that point to the **same PostgreSQL dat
 **✨ This is the source of truth** - schema changes should be made here first.
 
 ### 2. FieryLib Schema (Python - Synced Copy)
+
 **Location**: `/home/strider/Code/mud/fierylib/prisma/schema/`
 
 - **Generator**: `prisma-client-py` (Python)
 - **Purpose**: One-time legacy data import, seed users
 - **Files**: `models.prisma` (synced from Muditor)
 
-**This is synced from Muditor** - FieryLib is a one-time import tool and becomes obsolete after initial database setup.
+**This is synced (symlink) from Muditor** - FieryLib is a one-time import tool and becomes obsolete after initial database setup.
 
 ## Why Two Schemas?
 
 Prisma clients are language-specific:
+
 - **TypeScript** (Muditor): Uses `prisma-client-js` for API/web app - **ongoing use**
 - **Python** (FieryLib): Uses `prisma-client-py` for one-time import - **becomes obsolete after seed**
 
@@ -38,6 +41,7 @@ Both connect to the same database, just with different client libraries.
 **FieryLib** is a one-time import tool and becomes obsolete after initial database setup.
 
 1. **Make changes in Muditor schema** (source of truth)
+
    ```bash
    cd /home/strider/Code/mud/muditor
    # Edit packages/db/prisma/schema.prisma
@@ -46,6 +50,7 @@ Both connect to the same database, just with different client libraries.
    ```
 
 2. **Sync changes to FieryLib** (only if you need to re-import)
+
    ```bash
    cd /home/strider/Code/mud
    ./scripts/sync-schema-to-fierylib.sh
@@ -79,6 +84,7 @@ npx prisma db pull
 ⚠️ **All seeding has moved to FieryLib** - see `SEEDING_DEPRECATED.md`
 
 The seed files in this package are deprecated:
+
 - `src/seed/users.ts` - ❌ Use FieryLib instead
 - `src/seed/world-data.ts` - ❌ Use FieryLib instead
 - `src/seed/game-system.ts` - ✅ Still works (races, classes, etc.)

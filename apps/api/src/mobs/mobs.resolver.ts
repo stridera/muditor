@@ -40,10 +40,33 @@ export class MobsResolver {
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
-    const { zoneId, race, ...rest } = data;
-    const createData: Prisma.MobCreateInput = {
+    const { zoneId, race, hpDice, damageDice, ...rest } = data;
+    
+    // Parse dice strings (e.g., "2d8+3" -> num=2, size=8, bonus=3)
+    const parseDice = (diceStr: string) => {
+      const match = diceStr.match(/^(\d+)d(\d+)([+-]\d+)?$/);
+      if (!match) return { num: 1, size: 8, bonus: 0 };
+      return {
+        num: parseInt(match[1]),
+        size: parseInt(match[2]),
+        bonus: parseInt(match[3] || '0'),
+      };
+    };
+    
+    const hp = parseDice(hpDice || '1d8+0');
+    const dmg = parseDice(damageDice || '1d4+0');
+    
+    const createData: Prisma.MobsCreateInput = {
       ...rest,
-      zone: { connect: { id: zoneId } },
+      mobClass: 'NORMAL', // Default mob class
+      desc: rest.description || '', // Use description as desc
+      hpDiceNum: hp.num,
+      hpDiceSize: hp.size,
+      hpDiceBonus: hp.bonus,
+      damageDiceNum: dmg.num,
+      damageDiceSize: dmg.size,
+      damageDiceBonus: dmg.bonus,
+      zones: { connect: { id: zoneId } },
     };
     if (race) {
       createData.race = race as any;
@@ -59,7 +82,7 @@ export class MobsResolver {
     @Args('data') data: UpdateMobInput
   ): Promise<MobDto> {
     const { race, ...rest } = data;
-    const updateData: Prisma.MobUpdateInput = { ...rest };
+    const updateData: Prisma.MobsUpdateInput = { ...rest };
     if (race) {
       updateData.race = race as any;
     }

@@ -1,27 +1,35 @@
-import { Resolver, Query, Mutation, Args, Int, ResolveField, Parent } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { RoomsService } from './rooms.service';
 import {
-  RoomDto,
-  CreateRoomInput,
-  UpdateRoomInput,
-  CreateRoomExitInput,
-  RoomExitDto,
-  UpdateRoomPositionInput,
-  BatchUpdateRoomPositionsInput,
-  BatchUpdateResult,
-} from './room.dto';
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MobDto } from '../mobs/mob.dto';
 import { ObjectDto } from '../objects/object.dto';
 import { ShopDto } from '../shops/shop.dto';
 import { ShopsService } from '../shops/shops.service';
-import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import {
+  BatchUpdateResult,
+  BatchUpdateRoomPositionsInput,
+  CreateRoomExitInput,
+  CreateRoomInput,
+  RoomDto,
+  RoomExitDto,
+  UpdateRoomInput,
+  UpdateRoomPositionInput,
+} from './room.dto';
+import { RoomsService } from './rooms.service';
 
 @Resolver(() => RoomDto)
 export class RoomsResolver {
   constructor(
     private readonly roomsService: RoomsService,
-    private readonly shopsService: ShopsService,
+    private readonly shopsService: ShopsService
   ) {}
 
   @Query(() => [RoomDto], { name: 'rooms' })
@@ -29,9 +37,19 @@ export class RoomsResolver {
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
     @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
-    @Args('lightweight', { type: () => Boolean, nullable: true, defaultValue: false }) lightweight?: boolean
+    @Args('lightweight', {
+      type: () => Boolean,
+      nullable: true,
+      defaultValue: false,
+    })
+    lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findAll({ skip, take, zoneId, lightweight }) as unknown as RoomDto[];
+    return this.roomsService.findAll({
+      skip,
+      take,
+      zoneId,
+      lightweight,
+    }) as unknown as RoomDto[];
   }
 
   @Query(() => RoomDto, { name: 'room' })
@@ -45,9 +63,17 @@ export class RoomsResolver {
   @Query(() => [RoomDto], { name: 'roomsByZone' })
   async findByZone(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('lightweight', { type: () => Boolean, nullable: true, defaultValue: false }) lightweight?: boolean
+    @Args('lightweight', {
+      type: () => Boolean,
+      nullable: true,
+      defaultValue: false,
+    })
+    lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findByZone(zoneId, lightweight) as unknown as RoomDto[];
+    return this.roomsService.findByZone(
+      zoneId,
+      lightweight
+    ) as unknown as RoomDto[];
   }
 
   @Query(() => Int, { name: 'roomsCount' })
@@ -92,7 +118,7 @@ export class RoomsResolver {
 
   @Mutation(() => RoomExitDto)
   @UseGuards(GraphQLJwtAuthGuard)
-  async deleteRoomExit(@Args('exitId') exitId: string): Promise<RoomExitDto> {
+  async deleteRoomExit(@Args('exitId') exitId: number): Promise<RoomExitDto> {
     return this.roomsService.deleteExit(exitId);
   }
 
@@ -103,7 +129,11 @@ export class RoomsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('position') position: UpdateRoomPositionInput
   ): Promise<RoomDto> {
-    return this.roomsService.updatePosition(zoneId, id, position) as unknown as RoomDto;
+    return this.roomsService.updatePosition(
+      zoneId,
+      id,
+      position
+    ) as unknown as RoomDto;
   }
 
   @Mutation(() => BatchUpdateResult)
@@ -119,7 +149,7 @@ export class RoomsResolver {
     if (!room.mobResets || room.mobResets.length === 0) {
       return [];
     }
-    
+
     // Deduplicate mobs by ID since multiple resets can reference the same mob
     const uniqueMobs = new Map<number, any>();
     room.mobResets.forEach((reset: any) => {
@@ -127,7 +157,7 @@ export class RoomsResolver {
         uniqueMobs.set(reset.mob.id, reset.mob);
       }
     });
-    
+
     return Array.from(uniqueMobs.values());
   }
 
@@ -168,47 +198,51 @@ export class RoomsResolver {
     for (const mob of uniqueMobs.values()) {
       const shop = await this.shopsService.findByKeeper(mob.zoneId, mob.id);
       if (shop) {
-        const messages = (shop.messages || {}) as any;
         shops.push({
           id: shop.id,
           buyProfit: shop.buyProfit,
           sellProfit: shop.sellProfit,
-          temper1: shop.temper,
+          temper1: shop.temper1,
           flags: shop.flags || [],
-          tradesWithFlags: shop.tradesWith || [],
-          noSuchItem1: messages.noSuchItem1,
-          noSuchItem2: messages.noSuchItem2,
-          doNotBuy: messages.doNotBuy,
-          missingCash1: messages.missingCash1,
-          missingCash2: messages.missingCash2,
-          messageBuy: messages.messageBuy,
-          messageSell: messages.messageSell,
+          tradesWithFlags: shop.tradesWithFlags || [],
+          noSuchItem1: shop.noSuchItem1,
+          noSuchItem2: shop.noSuchItem2,
+          doNotBuy: shop.doNotBuy,
+          missingCash1: shop.missingCash1,
+          missingCash2: shop.missingCash2,
+          messageBuy: shop.messageBuy,
+          messageSell: shop.messageSell,
           keeperId: shop.keeperId,
-          keeper: shop.keeper ? {
-            id: shop.keeper.id,
-            zoneId: shop.keeper.zoneId,
-            shortDesc: shop.keeper.shortDesc,
-            keywords: shop.keeper.keywords || [],
-          } : undefined,
+          keeper: shop.mobs
+            ? {
+                id: shop.mobs.id,
+                zoneId: shop.mobs.zoneId,
+                shortDesc: shop.mobs.shortDesc,
+                keywords: shop.mobs.keywords || [],
+              }
+            : undefined,
           zoneId: shop.zoneId,
           createdAt: shop.createdAt,
           updatedAt: shop.updatedAt,
-          items: shop.items?.map((item: any) => ({
-            id: item.id,
-            amount: item.stockLimit,
-            objectId: item.objectId,
-            object: item.object,
-          })) || [],
-          accepts: shop.accepts?.map((accept: any) => ({
-            id: accept.id,
-            type: accept.itemType,
-            keywords: '',
-          })) || [],
-          hours: shop.hours?.map((hour: any) => ({
-            id: hour.id,
-            open: hour.openHour,
-            close: hour.closeHour,
-          })) || [],
+          items:
+            shop.shop_items?.map((item: any) => ({
+              id: item.id,
+              amount: item.stockLimit,
+              objectId: item.objectId,
+              object: item.object,
+            })) || [],
+          accepts:
+            shop.shop_accepts?.map((accept: any) => ({
+              id: accept.id,
+              type: accept.itemType,
+              keywords: '',
+            })) || [],
+          hours:
+            shop.shop_hours?.map((hour: any) => ({
+              id: hour.id,
+              open: hour.openHour,
+              close: hour.closeHour,
+            })) || [],
         });
       }
     }

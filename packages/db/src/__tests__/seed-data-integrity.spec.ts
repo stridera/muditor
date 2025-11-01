@@ -14,7 +14,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Zone Data Validation', () => {
     it('should have valid zone data with proper ID ranges', async () => {
-      const zones = await prisma.zone.findMany({
+      const zones = await prisma.zones.findMany({
         orderBy: { id: 'asc' },
       });
 
@@ -35,7 +35,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have consistent room-to-zone relationships', async () => {
-      const zonesWithRooms = await prisma.zone.findMany({
+      const zonesWithRooms = await prisma.zones.findMany({
         include: {
           rooms: true,
         },
@@ -60,7 +60,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Mob Data Validation', () => {
     it('should have mobs with valid race enums', async () => {
-      const mobs = await prisma.mob.findMany({
+      const mobs = await prisma.mobs.findMany({
         take: 50, // Sample
       });
 
@@ -75,7 +75,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have valid mob flags', async () => {
-      const mobsWithFlags = await prisma.mob.findMany({
+      const mobsWithFlags = await prisma.mobs.findMany({
         where: {
           mobFlags: {
             not: [],
@@ -92,7 +92,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have consistent damage roll formats', async () => {
-      const mobsWithDamage = await prisma.mob.findMany({
+      const mobsWithDamage = await prisma.mobs.findMany({
         where: {
           damageRoll: {
             not: null,
@@ -113,7 +113,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Object Data Validation', () => {
     it('should have objects with valid item types', async () => {
-      const objects = await prisma.object.findMany({
+      const objects = await prisma.objects.findMany({
         take: 50,
       });
 
@@ -128,7 +128,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have type-specific properties for weapons', async () => {
-      const weapons = await prisma.object.findMany({
+      const weapons = await prisma.objects.findMany({
         where: {
           itemType: 'WEAPON',
         },
@@ -158,7 +158,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have valid container properties', async () => {
-      const containers = await prisma.object.findMany({
+      const containers = await prisma.objects.findMany({
         where: {
           itemType: 'CONTAINER',
         },
@@ -175,7 +175,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Room Data Validation', () => {
     it('should have rooms with valid sector types', async () => {
-      const rooms = await prisma.room.findMany({
+      const rooms = await prisma.rooms.findMany({
         take: 100,
       });
 
@@ -189,7 +189,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have valid exit relationships', async () => {
-      const roomsWithExits = await prisma.room.findMany({
+      const roomsWithExits = await prisma.rooms.findMany({
         include: {
           exits: true,
         },
@@ -218,7 +218,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Trigger Data Validation', () => {
     it('should have triggers with valid types and flags', async () => {
-      const triggers = await prisma.trigger.findMany({
+      const triggers = await prisma.triggers.findMany({
         take: 30,
       });
 
@@ -235,7 +235,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have valid script content', async () => {
-      const triggersWithScripts = await prisma.trigger.findMany({
+      const triggersWithScripts = await prisma.triggers.findMany({
         where: {
           script: {
             not: null,
@@ -256,7 +256,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Shop Data Validation', () => {
     it('should have shops with valid configurations', async () => {
-      const shops = await prisma.shop.findMany({
+      const shops = await prisma.shops.findMany({
         include: {
           keeper: true,
         },
@@ -278,7 +278,7 @@ describe('Seeded Data Integrity', () => {
 
   describe('Cross-Entity Relationships', () => {
     it('should have consistent mob-to-room relationships', async () => {
-      const mobsWithRooms = await prisma.mob.findMany({
+      const mobsWithRooms = await prisma.mobs.findMany({
         include: {
           zone: true,
         },
@@ -292,7 +292,7 @@ describe('Seeded Data Integrity', () => {
 
       for (const mob of mobsWithRooms) {
         if (mob.roomId !== null) {
-          const room = await prisma.room.findFirst({
+          const room = await prisma.rooms.findFirst({
             where: {
               id: mob.roomId,
               zoneId: mob.zoneId,
@@ -309,7 +309,7 @@ describe('Seeded Data Integrity', () => {
     });
 
     it('should have consistent object-to-room relationships', async () => {
-      const objectsWithRooms = await prisma.object.findMany({
+      const objectsWithRooms = await prisma.objects.findMany({
         where: {
           roomId: {
             not: null,
@@ -320,7 +320,7 @@ describe('Seeded Data Integrity', () => {
 
       for (const obj of objectsWithRooms) {
         if (obj.roomId !== null) {
-          const room = await prisma.room.findFirst({
+          const room = await prisma.rooms.findFirst({
             where: {
               id: obj.roomId,
               zoneId: obj.zoneId,
@@ -340,12 +340,12 @@ describe('Seeded Data Integrity', () => {
   describe('Data Completeness', () => {
     it('should have reasonable data distribution', async () => {
       const counts = await Promise.all([
-        prisma.zone.count(),
-        prisma.room.count(),
-        prisma.mob.count(),
-        prisma.object.count(),
-        prisma.trigger.count(),
-        prisma.shop.count(),
+        prisma.zones.count(),
+        prisma.rooms.count(),
+        prisma.mobs.count(),
+        prisma.objects.count(),
+        prisma.triggers.count(),
+        prisma.shops.count(),
       ]);
 
       const [

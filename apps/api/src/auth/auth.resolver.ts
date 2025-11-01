@@ -16,7 +16,7 @@ import { JwtAuthGuard } from './guards/jwt-auth.guard';
 import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { User } from '../users/entities/user.entity';
-import { User as PrismaUser } from '@prisma/client';
+import { Users as PrismaUser } from '@prisma/client';
 
 @Resolver()
 export class AuthResolver {
@@ -39,7 +39,7 @@ export class AuthResolver {
 
   @Query(() => User)
   @UseGuards(GraphQLJwtAuthGuard)
-  async me(@CurrentUser() user: PrismaUser): Promise<User> {
+  async me(@CurrentUser() user: PrismaUser): Promise<PrismaUser> {
     return this.usersService.getUserWithBanStatus(user.id);
   }
 
@@ -83,7 +83,7 @@ export class AuthResolver {
   async updateProfile(
     @CurrentUser('id') userId: string,
     @Args('input') input: UpdateProfileInput
-  ): Promise<User> {
+  ): Promise<PrismaUser> {
     return this.authService.updateProfile(userId, input);
   }
 

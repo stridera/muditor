@@ -1,27 +1,27 @@
-import { Resolver, Query, Mutation, Args, ID, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { CharactersService } from './characters.service';
+import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { Users } from '@prisma/client';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import {
   CharacterDto,
-  CharacterItemDto,
   CharacterEffectDto,
+  CharacterItemDto,
   CharacterLinkingInfoDto,
-  OnlineCharacterDto,
   CharacterSessionInfoDto,
+  OnlineCharacterDto,
 } from './character.dto';
 import {
-  CreateCharacterInput,
-  UpdateCharacterInput,
-  CreateCharacterItemInput,
-  UpdateCharacterItemInput,
   CreateCharacterEffectInput,
-  UpdateCharacterEffectInput,
+  CreateCharacterInput,
+  CreateCharacterItemInput,
   LinkCharacterInput,
   UnlinkCharacterInput,
+  UpdateCharacterEffectInput,
+  UpdateCharacterInput,
+  UpdateCharacterItemInput,
 } from './character.input';
-import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { User } from '@prisma/client';
+import { CharactersService } from './characters.service';
 
 @Resolver(() => CharacterDto)
 @UseGuards(GraphQLJwtAuthGuard)
@@ -43,7 +43,7 @@ export class CharactersResolver {
   }
 
   @Query(() => [CharacterDto], { name: 'myCharacters' })
-  async findMyCharacters(@CurrentUser() user: User) {
+  async findMyCharacters(@CurrentUser() user: Users) {
     return this.charactersService.findCharactersByUser(user.id);
   }
 
@@ -56,7 +56,7 @@ export class CharactersResolver {
   @Mutation(() => CharacterDto)
   async createCharacter(
     @Args('data') data: CreateCharacterInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     return this.charactersService.createCharacter(data, user.id);
   }
@@ -83,7 +83,7 @@ export class CharactersResolver {
   }
 
   @Query(() => CharacterItemDto, { name: 'characterItem' })
-  async findCharacterItemById(@Args('id', { type: () => ID }) id: string) {
+  async findCharacterItemById(@Args('id', { type: () => ID }) id: number) {
     return this.charactersService.findCharacterItemById(id);
   }
 
@@ -95,14 +95,14 @@ export class CharactersResolver {
 
   @Mutation(() => CharacterItemDto)
   async updateCharacterItem(
-    @Args('id', { type: () => ID }) id: string,
+    @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateCharacterItemInput
   ) {
     return this.charactersService.updateCharacterItem(id, data);
   }
 
   @Mutation(() => Boolean)
-  async deleteCharacterItem(@Args('id', { type: () => ID }) id: string) {
+  async deleteCharacterItem(@Args('id', { type: () => ID }) id: number) {
     await this.charactersService.deleteCharacterItem(id);
     return true;
   }
@@ -123,7 +123,7 @@ export class CharactersResolver {
   }
 
   @Query(() => CharacterEffectDto, { name: 'characterEffect' })
-  async findCharacterEffectById(@Args('id', { type: () => ID }) id: string) {
+  async findCharacterEffectById(@Args('id', { type: () => ID }) id: number) {
     return this.charactersService.findCharacterEffectById(id);
   }
 
@@ -135,14 +135,14 @@ export class CharactersResolver {
 
   @Mutation(() => CharacterEffectDto)
   async updateCharacterEffect(
-    @Args('id', { type: () => ID }) id: string,
+    @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateCharacterEffectInput
   ) {
     return this.charactersService.updateCharacterEffect(id, data);
   }
 
   @Mutation(() => Boolean)
-  async deleteCharacterEffect(@Args('id', { type: () => ID }) id: string) {
+  async deleteCharacterEffect(@Args('id', { type: () => ID }) id: number) {
     await this.charactersService.deleteCharacterEffect(id);
     return true;
   }
@@ -171,7 +171,7 @@ export class CharactersResolver {
   @UseGuards(GraphQLJwtAuthGuard)
   async linkCharacter(
     @Args('data') data: LinkCharacterInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     return this.charactersService.linkCharacterToUser(
       user.id,
@@ -186,7 +186,7 @@ export class CharactersResolver {
   @UseGuards(GraphQLJwtAuthGuard)
   async unlinkCharacter(
     @Args('data') data: UnlinkCharacterInput,
-    @CurrentUser() user: User
+    @CurrentUser() user: Users
   ) {
     await this.charactersService.unlinkCharacterFromUser(
       data.characterId,
@@ -215,7 +215,7 @@ export class CharactersResolver {
   }
 
   @Query(() => [OnlineCharacterDto], { name: 'myOnlineCharacters' })
-  async getMyOnlineCharacters(@CurrentUser() user: User) {
+  async getMyOnlineCharacters(@CurrentUser() user: Users) {
     return this.charactersService.getOnlineCharacters(user.id);
   }
 
