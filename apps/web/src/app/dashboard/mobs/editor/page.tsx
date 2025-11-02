@@ -3,10 +3,11 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { useMutation, useQuery } from '@apollo/client/react';
 import {
-  useCreateMobMutation,
-  useGetMobQuery,
-  useUpdateMobMutation,
+  CreateMobDocument,
+  GetMobDocument,
+  UpdateMobDocument,
 } from '@/generated/graphql';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
@@ -158,7 +159,7 @@ function MobEditorContent() {
   // Separate state for general/save errors
   const [generalError, setGeneralError] = useState<string>('');
 
-  const { loading, error, data } = useGetMobQuery({
+  const { loading, error, data } = useQuery(GetMobDocument, {
     variables: {
       zoneId: parseInt(zoneId || '0'),
       id: parseInt(mobId || '0'),
@@ -166,8 +167,8 @@ function MobEditorContent() {
     skip: isNew,
   });
 
-  const [updateMob, { loading: updateLoading }] = useUpdateMobMutation();
-  const [createMob, { loading: createLoading }] = useCreateMobMutation();
+  const [updateMob, { loading: updateLoading }] = useMutation(UpdateMobDocument);
+  const [createMob, { loading: createLoading }] = useMutation(CreateMobDocument);
 
   // Helper function to parse dice notation (e.g., "1d8+0" -> {num: 1, size: 8, bonus: 0})
   const parseDice = (diceStr: string) => {
@@ -273,7 +274,7 @@ function MobEditorContent() {
         armorClass: formData.armorClass,
         hpDice: `${formData.hpDiceNum}d${formData.hpDiceSize}${formData.hpDiceBonus >= 0 ? '+' : ''}${formData.hpDiceBonus}`,
         damageDice: `${formData.damageDiceNum}d${formData.damageDiceSize}${formData.damageDiceBonus >= 0 ? '+' : ''}${formData.damageDiceBonus}`,
-        damageType: formData.damageType,
+        damageType: formData.damageType as any,
         strength: formData.strength,
         intelligence: formData.intelligence,
         wisdom: formData.wisdom,
@@ -282,19 +283,23 @@ function MobEditorContent() {
         charisma: formData.charisma,
         perception: formData.perception,
         concealment: formData.concealment,
-        race: formData.race,
-        position: formData.position,
-        gender: formData.gender,
-        size: formData.size,
-        lifeForce: formData.lifeForce,
-        composition: formData.composition,
-        stance: formData.stance,
+        race: formData.race as any,
+        position: formData.position as any,
+        gender: formData.gender as any,
+        size: formData.size as any,
+        lifeForce: formData.lifeForce as any,
+        composition: formData.composition as any,
+        stance: formData.stance as any,
       };
 
       if (isNew) {
         await createMob({
           variables: {
-            data: { ...saveData, zoneId: formData.zoneId },
+            data: {
+              ...saveData,
+              id: parseInt(mobId || '1'), // Use provided ID or default to 1 for new mobs
+              zoneId: formData.zoneId
+            },
           },
         });
       } else {
@@ -302,7 +307,7 @@ function MobEditorContent() {
           variables: {
             zoneId: parseInt(zoneId!),
             id: parseInt(mobId!),
-            data: saveData,
+            data: saveData as any, // Type assertion needed due to enum string conversion
           },
         });
       }
