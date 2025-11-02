@@ -166,8 +166,8 @@ function ObjectsContent() {
       setLoadingDetails(new Set(loadingDetails).add(objectId));
       try {
         const getObjectQuery = `
-          query GetObject($id: Int!) {
-            object(id: $id) {
+          query GetObject($id: Int!, $zoneId: Int!) {
+            object(id: $id, zoneId: $zoneId) {
               id
               type
               keywords
@@ -196,7 +196,7 @@ function ObjectsContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: getObjectQuery,
-            variables: { id: objectId },
+            variables: { id: objectId, zoneId: object.zoneId },
           }),
         });
 
@@ -300,10 +300,16 @@ function ObjectsContent() {
   const handleCloneObject = async (objectId: number) => {
     setCloningId(objectId);
     try {
+      // Get the object's zoneId first
+      const object = objects.find((obj: any) => obj.id === objectId);
+      if (!object) {
+        throw new Error('Object not found');
+      }
+
       // First, fetch the complete object data
       const getObjectQuery = `
-        query GetObject($id: Int!) {
-          object(id: $id) {
+        query GetObject($id: Int!, $zoneId: Int!) {
+          object(id: $id, zoneId: $zoneId) {
             id
             keywords
             name
@@ -327,7 +333,7 @@ function ObjectsContent() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           query: getObjectQuery,
-          variables: { id: objectId },
+          variables: { id: objectId, zoneId: object.zoneId },
         }),
       });
 
@@ -695,7 +701,7 @@ function ObjectsContent() {
                     </div>
                     <div className='flex items-center gap-2 ml-4'>
                       <Link
-                        href={`/dashboard/objects/editor?id=${fullObject.id}`}
+                        href={`/dashboard/objects/editor?zone=${fullObject.zoneId}&id=${fullObject.id}`}
                         className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
                         onClick={e => e.stopPropagation()}
                       >

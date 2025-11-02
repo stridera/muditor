@@ -59,4 +59,44 @@ export class MobResetResolver {
   ): Promise<boolean> {
     return this.mobResetService.deleteEquipment(id);
   }
+
+  @Mutation(() => MobResetDto)
+  @UseGuards(JwtAuthGuard)
+  async addMobResetEquipment(
+    @Args('resetId', { type: () => ID }) resetId: number,
+    @Args('objectZoneId', { type: () => Int }) objectZoneId: number,
+    @Args('objectId', { type: () => Int }) objectId: number,
+    @Args('wearLocation', { type: () => String, nullable: true })
+    wearLocation?: string,
+    @Args('maxInstances', { type: () => Int, nullable: true })
+    maxInstances?: number,
+    @Args('probability', { type: () => Number, nullable: true })
+    probability?: number
+  ): Promise<MobResetDto> {
+    return this.mobResetService.addEquipment(resetId, {
+      objectZoneId,
+      objectId,
+      wearLocation,
+      maxInstances,
+      probability,
+    });
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(JwtAuthGuard)
+  async updateMobResetEquipment(
+    @Args('id', { type: () => ID }) id: number,
+    @Args('wearLocation', { type: () => String, nullable: true })
+    wearLocation?: string,
+    @Args('maxInstances', { type: () => Int, nullable: true })
+    maxInstances?: number,
+    @Args('probability', { type: () => Number, nullable: true })
+    probability?: number
+  ): Promise<boolean> {
+    return this.mobResetService.updateEquipment(id, {
+      wearLocation,
+      maxInstances,
+      probability,
+    });
+  }
 }

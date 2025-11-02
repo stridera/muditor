@@ -211,6 +211,55 @@ export class MobResetService {
     }
   }
 
+  async addEquipment(
+    resetId: number,
+    equipment: {
+      objectZoneId: number;
+      objectId: number;
+      wearLocation?: string;
+      maxInstances?: number;
+      probability?: number;
+    }
+  ): Promise<MobResetDto> {
+    await this.prisma.mobResetEquipment.create({
+      data: {
+        resetId,
+        objectZoneId: equipment.objectZoneId,
+        objectId: equipment.objectId,
+        wearLocation: equipment.wearLocation || null,
+        maxInstances: equipment.maxInstances || 1,
+        probability: equipment.probability || 1.0,
+      },
+    });
+
+    // Return updated reset
+    const updatedReset = await this.findOne(resetId);
+    return updatedReset!;
+  }
+
+  async updateEquipment(
+    equipmentId: number,
+    updates: {
+      wearLocation?: string;
+      maxInstances?: number;
+      probability?: number;
+    }
+  ): Promise<boolean> {
+    try {
+      await this.prisma.mobResetEquipment.update({
+        where: { id: equipmentId },
+        data: {
+          wearLocation: updates.wearLocation !== undefined ? updates.wearLocation : undefined,
+          maxInstances: updates.maxInstances,
+          probability: updates.probability,
+        },
+      });
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
   private mapToDto(reset: any): MobResetDto {
     return {
       id: reset.id,
@@ -230,7 +279,7 @@ export class MobResetService {
           wearLocation: eq.wearLocation,
           maxInstances: eq.maxInstances,
           probability: eq.probability,
-          objects: eq.objects,
+          object: eq.objects,
         })) || [],
       mob: reset.mobs,
       room: reset.rooms,
