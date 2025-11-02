@@ -6,7 +6,7 @@ import { ShopsService } from './shops.service';
 
 @Resolver(() => ShopDto)
 export class ShopsResolver {
-  constructor(private readonly shopsService: ShopsService) { }
+  constructor(private readonly shopsService: ShopsService) {}
 
   private mapShopToDto(shop: any): ShopDto {
     return {
@@ -22,31 +22,37 @@ export class ShopsResolver {
       buyMessages: shop.buyMessages || [],
       sellMessages: shop.sellMessages || [],
       keeperId: shop.keeperId,
-      keeper: shop.keeper ? {
-        id: shop.keeper.id,
-        zoneId: shop.keeper.zoneId,
-        name: shop.keeper.name,
-        keywords: shop.keeper.keywords || [],
-      } : undefined,
+      keeper: shop.mobs
+        ? {
+            id: shop.mobs.id,
+            zoneId: shop.mobs.zoneId,
+            name: shop.mobs.name,
+            keywords: shop.mobs.keywords || [],
+          }
+        : undefined,
       zoneId: shop.zoneId,
       createdAt: shop.createdAt,
       updatedAt: shop.updatedAt,
-      items: shop.items?.map((item: any) => ({
-        id: item.id,
-        amount: item.stockLimit,
-        objectId: item.objectId,
-        object: item.object,
-      })) || [],
-      accepts: shop.accepts?.map((accept: any) => ({
-        id: accept.id,
-        type: accept.itemType,
-        keywords: accept.keywords || [],
-      })) || [],
-      hours: shop.hours?.map((hour: any) => ({
-        id: hour.id,
-        open: hour.openHour,
-        close: hour.closeHour,
-      })) || [],
+      items:
+        shop.shopItems?.map((item: any) => ({
+          id: item.id,
+          amount: item.amount,
+          objectId: item.objectId,
+          objectZoneId: item.objectZoneId,
+          object: item.objects,
+        })) || [],
+      accepts:
+        shop.shopAccepts?.map((accept: any) => ({
+          id: accept.id,
+          type: accept.type,
+          keywords: accept.keywords || [],
+        })) || [],
+      hours:
+        shop.shopHours?.map((hour: any) => ({
+          id: hour.id,
+          open: hour.open,
+          close: hour.close,
+        })) || [],
     };
   }
 

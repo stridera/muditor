@@ -5,7 +5,7 @@ export const dynamic = 'force-dynamic';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
-import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react';
+import { ArrowLeft, Plus, Save, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -33,10 +33,16 @@ const GET_SHOP = gql`
       tradesWithFlags
       createdAt
       updatedAt
+      keeper {
+        id
+        name
+        zoneId
+      }
       items {
         id
         amount
         objectId
+        objectZoneId
         object {
           id
           name
@@ -59,8 +65,8 @@ const GET_SHOP = gql`
 `;
 
 const GET_AVAILABLE_OBJECTS = gql`
-  query GetAvailableObjects {
-    objects {
+  query GetAvailableObjects($zoneId: Int!) {
+    objectsByZone(zoneId: $zoneId) {
       id
       keywords
       name
@@ -72,12 +78,21 @@ const GET_AVAILABLE_OBJECTS = gql`
 `;
 
 const GET_AVAILABLE_MOBS = gql`
-  query GetAvailableMobs {
-    mobs {
+  query GetAvailableMobs($zoneId: Int!) {
+    mobsByZone(zoneId: $zoneId) {
       id
       keywords
       name
       zoneId
+    }
+  }
+`;
+
+const GET_ZONES = gql`
+  query GetZones {
+    zones {
+      id
+      name
     }
   }
 `;
@@ -121,6 +136,7 @@ interface ShopItem {
   id?: string;
   amount: number;
   objectId: number;
+  objectZoneId: number;
   object?: any;
 }
 
@@ -190,6 +206,7 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
 function ShopEditorContent() {
   const searchParams = useSearchParams();
   const shopId = searchParams.get('id');
+  const zoneId = searchParams.get('zoneId');
   const isNew = !shopId;
 
   const [activeTab, setActiveTab] = useState('basic');
@@ -218,6 +235,12 @@ function ShopEditorContent() {
     string[]
   >([]);
 
+  // Add Item Modal state
+  const [showAddItemModal, setShowAddItemModal] = useState(false);
+  const [modalSelectedZoneId, setModalSelectedZoneId] = useState<number>(0);
+  const [modalSelectedObjectId, setModalSelectedObjectId] = useState<number>(0);
+  const [modalAmount, setModalAmount] = useState<number>(0);
+
   // Initialize real-time validation
   const { errors, validateField, validateAllFields, clearError } =
     useRealTimeValidation<ShopFormData>(shopValidationRules);
@@ -226,15 +249,42 @@ function ShopEditorContent() {
   const [generalError, setGeneralError] = useState<string>('');
 
   const { loading, error, data } = useQuery(GET_SHOP, {
-    variables: { id: parseInt(shopId || '0') },
+    variables: {
+      id: parseInt(shopId || '0'),
+      zoneId: parseInt(zoneId || '0'),
+    },
     skip: isNew,
   }) as { loading: boolean; error?: any; data?: { shop?: any } };
 
-  const { data: objectsData } = useQuery(GET_AVAILABLE_OBJECTS) as {
-    data?: { objects?: any[] };
+  // Get the zone ID from the shop data or from query params/form data
+  const effectiveZoneId =
+    data?.shop?.zoneId || parseInt(zoneId || '0') || formData.zoneId;
+
+  const { data: objectsData } = useQuery(GET_AVAILABLE_OBJECTS, {
+    variables: { zoneId: effectiveZoneId },
+    skip: !effectiveZoneId,
+  }) as {
+    data?: { objectsByZone?: any[] };
   };
-  const { data: mobsData } = useQuery(GET_AVAILABLE_MOBS) as {
-    data?: { mobs?: any[] };
+  const { data: mobsData } = useQuery(GET_AVAILABLE_MOBS, {
+    variables: { zoneId: effectiveZoneId },
+    skip: !effectiveZoneId,
+  }) as {
+    data?: { mobsByZone?: any[] };
+  };
+
+  // Query for zones (for modal)
+  const { data: zonesData } = useQuery(GET_ZONES) as {
+    data?: { zones?: any[] };
+  };
+
+  // Query for objects in modal's selected zone
+  const { data: modalObjectsData } = useQuery(GET_AVAILABLE_OBJECTS, {
+    variables: { zoneId: modalSelectedZoneId },
+    skip: !modalSelectedZoneId || !showAddItemModal,
+    fetchPolicy: 'network-only', // Always fetch fresh data to avoid stale cache
+  }) as {
+    data?: { objectsByZone?: any[] };
   };
 
   const [updateShop, { loading: updateLoading }] = useMutation(UPDATE_SHOP);
@@ -303,8 +353,45 @@ function ShopEditorContent() {
     );
   };
 
-  const addShopItem = () => {
-    setShopItems(prev => [...prev, { amount: 0, objectId: 0 }]);
+  const openAddItemModal = () => {
+    setShowAddItemModal(true);
+  };
+
+  const closeAddItemModal = () => {
+    setShowAddItemModal(false);
+    setModalSelectedZoneId(0);
+    setModalSelectedObjectId(0);
+    setModalAmount(0);
+  };
+
+  // Reset modal state when opening
+  useEffect(() => {
+    if (showAddItemModal) {
+      setModalSelectedZoneId(effectiveZoneId);
+      setModalSelectedObjectId(0);
+      setModalAmount(0);
+    }
+  }, [showAddItemModal, effectiveZoneId]);
+
+  // Reset object selection when zone changes in modal
+  useEffect(() => {
+    if (showAddItemModal) {
+      setModalSelectedObjectId(0);
+    }
+  }, [modalSelectedZoneId, showAddItemModal]);
+
+  const confirmAddItem = () => {
+    if (modalSelectedObjectId && modalSelectedZoneId) {
+      setShopItems(prev => [
+        ...prev,
+        {
+          amount: modalAmount,
+          objectId: modalSelectedObjectId,
+          objectZoneId: modalSelectedZoneId,
+        },
+      ]);
+      closeAddItemModal();
+    }
   };
 
   const removeShopItem = (index: number) => {
@@ -392,7 +479,13 @@ function ShopEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>
-            {isNew ? 'Create New Shop' : `Edit Shop ${shopId}`}
+            {isNew
+              ? 'Create New Shop'
+              : data?.shop?.keeper
+                ? `${data.shop.keeper.name}'s Shop`
+                : formData.zoneId
+                  ? `Shop: Zone ${formData.zoneId}, ID ${shopId}`
+                  : `Shop ${shopId}`}
           </h1>
           <p className='text-gray-600 mt-1'>
             Configure shop inventory, pricing, and trading policies
@@ -566,8 +659,8 @@ function ShopEditorContent() {
                     className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                   >
                     <option value=''>No shopkeeper</option>
-                    {mobsData?.mobs?.map((mob: any) => (
-                      <option key={`${mob.zoneId}-${mob.id}`} value={mob.id}>
+                    {mobsData?.mobsByZone?.map((mob: any, index: number) => (
+                      <option key={index} value={mob.id}>
                         {mob.name} (#{mob.zoneId}:{mob.id})
                       </option>
                     ))}
@@ -668,7 +761,7 @@ function ShopEditorContent() {
                   Shop Inventory
                 </h3>
                 <button
-                  onClick={addShopItem}
+                  onClick={openAddItemModal}
                   className='inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
                 >
                   <Plus className='w-4 h-4 mr-1' />
@@ -687,18 +780,21 @@ function ShopEditorContent() {
                         Object
                       </label>
                       <select
-                        value={item.objectId || ''}
-                        onChange={e =>
-                          updateShopItem(
-                            index,
-                            'objectId',
-                            parseInt(e.target.value)
-                          )
-                        }
+                        value={`${item.objectZoneId}:${item.objectId}`}
+                        onChange={e => {
+                          const [zoneId, objId] = e.target.value.split(':');
+                          const newItems = [...shopItems];
+                          newItems[index] = {
+                            ...newItems[index],
+                            objectZoneId: parseInt(zoneId) || 0,
+                            objectId: parseInt(objId) || 0,
+                          };
+                          setShopItems(newItems);
+                        }}
                         className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                       >
-                        <option value=''>Select object</option>
-                        {objectsData?.objects?.map((obj: any) => (
+                        <option value='0:0'>Select object</option>
+                        {objectsData?.objectsByZone?.map((obj: any) => (
                           <option
                             key={`${obj.zoneId}-${obj.id}`}
                             value={`${obj.zoneId}:${obj.id}`}
@@ -974,6 +1070,102 @@ function ShopEditorContent() {
           </div>
         )}
       </div>
+
+      {/* Add Item Modal */}
+      {showAddItemModal && (
+        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+          <div className='bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'>
+            <div className='flex items-center justify-between mb-4'>
+              <h2 className='text-xl font-semibold text-gray-900'>
+                Add Item to Inventory
+              </h2>
+              <button
+                onClick={closeAddItemModal}
+                className='text-gray-400 hover:text-gray-600'
+              >
+                <X className='w-6 h-6' />
+              </button>
+            </div>
+
+            <div className='space-y-4'>
+              <div>
+                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  Select Zone
+                </label>
+                <select
+                  value={modalSelectedZoneId}
+                  onChange={e =>
+                    setModalSelectedZoneId(parseInt(e.target.value))
+                  }
+                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                >
+                  <option value={0}>Select a zone</option>
+                  {zonesData?.zones?.map((zone: any) => (
+                    <option key={zone.id} value={zone.id}>
+                      Zone {zone.id}: {zone.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              {modalSelectedZoneId > 0 && (
+                <>
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Select Object
+                    </label>
+                    <select
+                      value={modalSelectedObjectId}
+                      onChange={e =>
+                        setModalSelectedObjectId(parseInt(e.target.value))
+                      }
+                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    >
+                      <option value={0}>Select an object</option>
+                      {modalObjectsData?.objectsByZone?.map((obj: any) => (
+                        <option key={`${obj.zoneId}-${obj.id}`} value={obj.id}>
+                          {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div>
+                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      Initial Stock Amount
+                    </label>
+                    <input
+                      type='number'
+                      min='0'
+                      value={modalAmount}
+                      onChange={e =>
+                        setModalAmount(parseInt(e.target.value) || 0)
+                      }
+                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    />
+                  </div>
+                </>
+              )}
+            </div>
+
+            <div className='flex justify-end gap-3 mt-6'>
+              <button
+                onClick={closeAddItemModal}
+                className='px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50'
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmAddItem}
+                disabled={!modalSelectedObjectId || !modalSelectedZoneId}
+                className='px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+              >
+                Add Item
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -3,12 +3,12 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
-import { useMutation, useQuery } from '@apollo/client/react';
 import {
   CreateMobDocument,
   GetMobDocument,
   UpdateMobDocument,
 } from '@/generated/graphql';
+import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -167,8 +167,10 @@ function MobEditorContent() {
     skip: isNew,
   });
 
-  const [updateMob, { loading: updateLoading }] = useMutation(UpdateMobDocument);
-  const [createMob, { loading: createLoading }] = useMutation(CreateMobDocument);
+  const [updateMob, { loading: updateLoading }] =
+    useMutation(UpdateMobDocument);
+  const [createMob, { loading: createLoading }] =
+    useMutation(CreateMobDocument);
 
   // Helper function to parse dice notation (e.g., "1d8+0" -> {num: 1, size: 8, bonus: 0})
   const parseDice = (diceStr: string) => {
@@ -298,7 +300,7 @@ function MobEditorContent() {
             data: {
               ...saveData,
               id: parseInt(mobId || '1'), // Use provided ID or default to 1 for new mobs
-              zoneId: formData.zoneId
+              zoneId: formData.zoneId,
             },
           },
         });
@@ -369,7 +371,9 @@ function MobEditorContent() {
           <h1 className='text-3xl font-bold text-gray-900'>
             {isNew
               ? 'Create New Mob'
-              : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
+              : formData.name
+                ? `Edit Mob: ${formData.name}`
+                : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
           </h1>
           <p className='text-gray-600 mt-1'>
             {isNew
