@@ -14,17 +14,17 @@ datasource db {
 }
 
 model CharacterClass {
-  id                  Int                   @id @default(autoincrement())
-  name                String                @unique
-  description         String?
-  hitDice             String @map("hit_dice") @default("1d8")
-  primaryStat         String? @map("primary_stat")
-  createdAt           DateTime @map("created_at") @default(now())
-  updatedAt DateTime @map("updated_at") @updatedAt
-  characters          Characters[]
-  class_skills        ClassSkills[]
-  mobs                Mobs[]
-  spell_class_circles SpellClassCircles[]
+  id                 Int                   @id @default(autoincrement())
+  name               String                @unique
+  description        String?
+  hitDice            String @map("hit_dice") @default("1d8")
+  primaryStat        String? @map("primary_stat")
+  createdAt          DateTime @map("created_at") @default(now())
+  updatedAt          DateTime @map("updated_at") @updatedAt
+  characters         Characters[]
+  classSkills        ClassSkills[]
+  mobs               Mobs[]
+  spellClassCircles  SpellClassCircles[]
 
   @@map("Class")
 }
@@ -92,20 +92,20 @@ model CharacterEffects {
 }
 
 model CharacterItems {
-  id                    Int            @id @default(autoincrement())
-  characterId          String @map("character_id")
-  objectZoneId        Int @map("object_zone_id")
-  objectId             Int @map("object_id")
-  containerId          Int? @map("container_id")
-  equippedLocation     String? @map("equipped_location")
-  condition             Int               @default(100)
-  charges               Int               @default(-1)
-  instanceFlags        String[] @map("instance_flags") @default([])
-  customShortDesc     String? @map("custom_short_desc")
-  customLongDesc      String? @map("custom_long_desc")
-  customValues         Json @map("custom_values") @default("{}")
-  createdAt            DateTime @map("created_at") @default(now())
-  updatedAt            DateTime @map("updated_at")
+  id                       Int            @id @default(autoincrement())
+  characterId              String @map("character_id")
+  objectZoneId             Int @map("object_zone_id")
+  objectId                 Int @map("object_id")
+  containerId              Int? @map("container_id")
+  equippedLocation         String? @map("equipped_location")
+  condition                Int               @default(100)
+  charges                  Int               @default(-1)
+  instanceFlags            String[] @map("instance_flags") @default([])
+  customName               String? @map("custom_name")
+  customExamineDescription String? @map("custom_examine_description")
+  customValues             Json @map("custom_values") @default("{}")
+  createdAt                DateTime @map("created_at") @default(now())
+  updatedAt                DateTime @map("updated_at")
   characters     Characters       @relation(fields: [characterId], references: [id], onDelete: Cascade)
   container      CharacterItems?  @relation("itemContainer", fields: [containerId], references: [id])
   containedItems CharacterItems[] @relation("itemContainer")
@@ -200,10 +200,10 @@ model Characters {
   classId           Int? @map("class_id")
   experience        Int                 @default(0)
   skillPoints       Int @map("skill_points") @default(0)
-  character_effects CharacterEffects[]
-  character_items   CharacterItems[]
-  character_skills  CharacterSkills[]
-  character_spells  CharacterSpells[]
+  characterEffects CharacterEffects[]
+  characterItems   CharacterItems[]
+  characterSkills  CharacterSkills[]
+  characterSpells  CharacterSpells[]
   Class             CharacterClass?     @relation(fields: [classId], references: [id])
   users             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
@@ -234,13 +234,13 @@ model EquipmentSetItems {
 }
 
 model EquipmentSets {
-  id                  Int                @id @default(autoincrement())
-  name                String
-  description         String?
-  createdAt           DateTime @map("created_at") @default(now())
-  updatedAt DateTime @map("updated_at") @updatedAt
-  equipment_set_items EquipmentSetItems[]
-  mob_equipment_sets  MobEquipmentSets[]
+  id                 Int                @id @default(autoincrement())
+  name               String
+  description        String?
+  createdAt          DateTime @map("created_at") @default(now())
+  updatedAt          DateTime @map("updated_at") @updatedAt
+  equipmentSetItems  EquipmentSetItems[]
+  mobEquipmentSets   MobEquipmentSets[]
 }
 
 model MobCarrying {
@@ -278,23 +278,23 @@ model MobResetEquipment {
 }
 
 model MobResets {
-  id                  Int                @id @default(autoincrement())
-  maxInstances        Int @map("max_instances") @default(1)
-  comment             String?
-  mobZoneId           Int @map("mob_zone_id")
-  mobId               Int @map("mob_id")
-  roomZoneId          Int @map("room_zone_id")
-  roomId              Int @map("room_id")
-  zoneId              Int @map("zone_id")
-  probability         Float                 @default(1.0)
-  resetBehavior       String @map("reset_behavior") @default("PERSISTENT")
-  mob_carrying        MobCarrying[]
-  mob_equipment_sets  MobEquipmentSets[]
-  mob_reset_equipment MobResetEquipment[]
-  mobs                Mobs                  @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
-  rooms               Rooms                 @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
-  zones               Zones                 @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  spawn_conditions    SpawnConditions[]
+  id                 Int                @id @default(autoincrement())
+  maxInstances       Int @map("max_instances") @default(1)
+  comment            String?
+  mobZoneId          Int @map("mob_zone_id")
+  mobId              Int @map("mob_id")
+  roomZoneId         Int @map("room_zone_id")
+  roomId             Int @map("room_id")
+  zoneId             Int @map("zone_id")
+  probability        Float                 @default(1.0)
+  resetBehavior      String @map("reset_behavior") @default("PERSISTENT")
+  mobCarrying        MobCarrying[]
+  mobEquipmentSets   MobEquipmentSets[]
+  mobResetEquipment  MobResetEquipment[]
+  mobs               Mobs                  @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
+  rooms              Rooms                 @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  zones              Zones                 @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  spawnConditions    SpawnConditions[]
 }
 
 model MobSkills {
@@ -323,12 +323,13 @@ model MobSpells {
 }
 
 model Mobs {
-  id              Int
-  keywords        String[]
-  mobClass        String @map("mob_class")
-  shortDesc       String @map("short_desc")
-  longDesc        String @map("long_desc")
-  desc            String
+  id                  Int
+  keywords            String[]
+  mobClass            String @map("mob_class")
+  name                String @map("name") // Display name (e.g., "A Large Orc", "Helena")
+  roomDescription     String @map("room_description")  // Appears in room (e.g., "A large ogre stands here")
+  examineDescription  String @map("examine_description")       // Full description when examined
+
   alignment       Int          @default(0)
   level           Int          @default(1)
   armorClass      Int @map("armor_class") @default(0)
@@ -374,9 +375,9 @@ model Mobs {
   composition     Composition  @default(FLESH)
   stance          Stance       @default(ALERT)
   damageType      DamageType   @default(HIT)
-  mob_resets      MobResets[]
-  mob_skills      MobSkills[]
-  mob_spells      MobSpells[]
+  mobResets       MobResets[]
+  mobSkills       MobSkills[]
+  mobSpells       MobSpells[]
   Class           CharacterClass? @relation(fields: [classId], references: [id])
   zones           Zones           @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shops           Shops[]
@@ -404,23 +405,23 @@ model ObjectExtraDescriptions {
 }
 
 model ObjectResets {
-  id                  Int             @id @default(autoincrement())
-  maxInstances        Int @map("max_instances") @default(1)
-  comment             String?
-  objectZoneId        Int @map("object_zone_id")
-  objectId            Int @map("object_id")
-  roomZoneId          Int? @map("room_zone_id")
-  roomId              Int? @map("room_id")
-  containerResetId    Int? @map("container_reset_id")
-  zoneId              Int @map("zone_id")
-  probability         Float              @default(1.0)
-  resetBehavior       String @map("reset_behavior") @default("PERSISTENT")
-  containerReset         ObjectResets?     @relation("resetContainer", fields: [containerResetId], references: [id], onDelete: Cascade)
+  id               Int             @id @default(autoincrement())
+  maxInstances     Int @map("max_instances") @default(1)
+  comment          String?
+  objectZoneId     Int @map("object_zone_id")
+  objectId         Int @map("object_id")
+  roomZoneId       Int? @map("room_zone_id")
+  roomId           Int? @map("room_id")
+  containerResetId Int? @map("container_reset_id")
+  zoneId           Int @map("zone_id")
+  probability      Float              @default(1.0)
+  resetBehavior    String @map("reset_behavior") @default("PERSISTENT")
+  containerReset   ObjectResets?     @relation("resetContainer", fields: [containerResetId], references: [id], onDelete: Cascade)
   containedResets  ObjectResets[]    @relation("resetContainer")
-  objects                Objects           @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  rooms                  Rooms?            @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
-  zones                  Zones             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  spawn_conditions       SpawnConditions[]
+  objects          Objects           @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  rooms            Rooms?            @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  zones            Zones             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  spawnConditions  SpawnConditions[]
 }
 
 model ObjectSpells {
@@ -436,9 +437,9 @@ model Objects {
   id                        Int
   type                      ObjectType                  @default(NOTHING)
   keywords                  String[]
-  shortDesc                 String @map("short_desc")
-  description               String
-  actionDesc                String? @map("action_desc")
+  name                      String @map("name")      // Display name (e.g., "a sword", "a loaf of bread")
+  examineDescription        String @map("examine_description")     // Full description when examined
+  actionDesc                String? @map("action_desc")    // Action when worn/wielded (e.g., "<worn on body>")
   weight                    Float                       @default(0.0)
   cost                      Int                         @default(0)
   timer                     Int                         @default(0)
@@ -452,20 +453,20 @@ model Objects {
   deletedAt                DateTime? @map("deleted_at")
   createdBy                 String? @map("created_by")
   updatedBy                 String? @map("updated_by")
-  flags                     ObjectFlag[]
-  effectFlags               EffectFlag[]
-  wearFlags                 WearFlag[]
-  character_items           CharacterItems[]
-  equipment_set_items       EquipmentSetItems[]
-  mob_carrying              MobCarrying[]
-  mob_reset_equipment       MobResetEquipment[]
-  object_affects            ObjectAffects[]
-  object_extra_descriptions ObjectExtraDescriptions[]
-  object_resets             ObjectResets[]
-  object_spells             ObjectSpells[]
-  zones                     Zones                       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  shop_items                ShopItems[]
-  triggers                  Triggers[]
+  flags                    ObjectFlag[]
+  effectFlags              EffectFlag[]
+  wearFlags                WearFlag[]
+  characterItems           CharacterItems[]
+  equipmentSetItems        EquipmentSetItems[]
+  mobCarrying              MobCarrying[]
+  mobResetEquipment        MobResetEquipment[]
+  objectAffects            ObjectAffects[]
+  objectExtraDescriptions  ObjectExtraDescriptions[]
+  objectResets             ObjectResets[]
+  objectSpells             ObjectSpells[]
+  zones                    Zones                       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  shopItems                ShopItems[]
+  triggers                 Triggers[]
 
   @@id([zoneId, id])
 }
@@ -510,7 +511,7 @@ model RoomExtraDescriptions {
 model Rooms {
   id                                             Int
   name                                           String
-  description                                    String
+  roomDescription                                String @map("room_description")  // Room description when you look
   sector                                         Sector                    @default(STRUCTURE)
   zoneId                                         Int @map("zone_id")
   createdAt                                      DateTime @map("created_at") @default(now())
@@ -519,15 +520,15 @@ model Rooms {
   createdBy                                      String? @map("created_by")
   updatedBy                                      String? @map("updated_by")
   flags                                          RoomFlag[]
-  layoutX                                       Int? @map("layout_x")
-  layoutY                                       Int? @map("layout_y")
-  layoutZ                                       Int? @map("layout_z") @default(0)
-  mob_resets                                     MobResets[]
-  object_resets                                  ObjectResets[]
-  exits RoomExits[]              @relation("roomExits")
-  entrances RoomExits[]              @relation("roomEntrances")
-  room_extra_descriptions                        RoomExtraDescriptions[]
-  zones                                          Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  layoutX                 Int? @map("layout_x")
+  layoutY                 Int? @map("layout_y")
+  layoutZ                 Int? @map("layout_z") @default(0)
+  mobResets               MobResets[]
+  objectResets            ObjectResets[]
+  exits                   RoomExits[]              @relation("roomExits")
+  entrances               RoomExits[]              @relation("roomEntrances")
+  roomExtraDescriptions   RoomExtraDescriptions[]
+  zones                   Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@id([zoneId, id])
 }
@@ -574,49 +575,47 @@ model ShopRooms {
 }
 
 model Shops {
-  id              Int
-  buyProfit       Float @map("buy_profit") @default(1.0)
-  sellProfit      Float @map("sell_profit") @default(1.0)
-  temper1         Int              @default(0)
-  noSuchItem1     String? @map("no_such_item1")
-  noSuchItem2     String? @map("no_such_item2")
-  doNotBuy        String? @map("do_not_buy")
-  missingCash1    String? @map("missing_cash1")
-  missingCash2    String? @map("missing_cash2")
-  messageBuy      String? @map("message_buy")
-  messageSell     String? @map("message_sell")
-  keeperZoneId    Int? @map("keeper_zone_id")
-  keeperId        Int? @map("keeper_id")
-  zoneId          Int @map("zone_id")
-  createdAt       DateTime @map("created_at") @default(now())
+  id                    Int
+  buyProfit             Float @map("buy_profit") @default(1.0)
+  sellProfit            Float @map("sell_profit") @default(1.0)
+  temper                Int              @default(0)
+  noSuchItemMessages    String[] @map("no_such_item_messages") @default([])  // Messages when item not in stock
+  doNotBuyMessages      String[] @map("do_not_buy_messages") @default([])    // Messages when shop won't buy item
+  missingCashMessages   String[] @map("missing_cash_messages") @default([])  // Messages when customer/shop lacks funds
+  buyMessages           String[] @map("buy_messages") @default([])           // Messages on successful purchase
+  sellMessages          String[] @map("sell_messages") @default([])          // Messages on successful sale
+  keeperZoneId          Int? @map("keeper_zone_id")
+  keeperId              Int? @map("keeper_id")
+  zoneId                Int @map("zone_id")
+  createdAt             DateTime @map("created_at") @default(now())
   updatedAt DateTime @map("updated_at") @updatedAt
-  createdBy       String? @map("created_by")
-  updatedBy       String? @map("updated_by")
-  flags           ShopFlag[]
-  tradesWithFlags ShopTradesWith[]
-  shop_accepts    ShopAccepts[]
-  shop_hours      ShopHours[]
-  shop_items      ShopItems[]
-  shop_rooms      ShopRooms[]
-  mobs            Mobs?            @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
-  zones           Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  createdBy             String? @map("created_by")
+  updatedBy             String? @map("updated_by")
+  flags                 ShopFlag[]
+  tradesWithFlags       ShopTradesWith[]
+  shopAccepts           ShopAccepts[]
+  shopHours             ShopHours[]
+  shopItems             ShopItems[]
+  shopRooms             ShopRooms[]
+  mobs                  Mobs?            @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
+  zones                 Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@id([zoneId, id])
 }
 
 model Skills {
-  id               Int                @id @default(autoincrement())
-  name             String             @unique
-  description      String?
-  type             SkillType
-  category         SkillCategory      @default(SECONDARY)
-  maxLevel         Int @map("max_level") @default(100)
-  createdAt        DateTime @map("created_at") @default(now())
-  updatedAt DateTime @map("updated_at") @updatedAt
-  character_skills CharacterSkills[]
-  class_skills     ClassSkills[]
-  mob_skills       MobSkills[]
-  race_skills      RaceSkills[]
+  id              Int                @id @default(autoincrement())
+  name            String             @unique
+  description     String?
+  type            SkillType
+  category        SkillCategory      @default(SECONDARY)
+  maxLevel        Int @map("max_level") @default(100)
+  createdAt       DateTime @map("created_at") @default(now())
+  updatedAt       DateTime @map("updated_at") @updatedAt
+  characterSkills CharacterSkills[]
+  classSkills     ClassSkills[]
+  mobSkills       MobSkills[]
+  raceSkills      RaceSkills[]
 }
 
 model SpawnConditions {
@@ -625,8 +624,8 @@ model SpawnConditions {
   parameters    Json           @default("{}")
   mobResetId    Int? @map("mob_reset_id")
   objectResetId Int? @map("object_reset_id")
-  mob_resets    MobResets?    @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
-  object_resets ObjectResets? @relation(fields: [objectResetId], references: [id], onDelete: Cascade)
+  mobResets     MobResets?    @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
+  objectResets  ObjectResets? @relation(fields: [objectResetId], references: [id], onDelete: Cascade)
 }
 
 model SpellClassCircles {
@@ -735,19 +734,19 @@ model Spells {
   cooldownMs          Int @map("cooldown_ms") @default(0)
   inCombatOnly        Boolean @map("in_combat_only") @default(false)
   isArea              Boolean @map("is_area") @default(false)
-  notes               String?
-  createdAt           DateTime @map("created_at") @default(now())
-  updatedAt DateTime @map("updated_at") @updatedAt
-  character_spells    CharacterSpells[]
-  mob_spells          MobSpells[]
-  spell_class_circles SpellClassCircles[]
-  spell_components    SpellComponents[]
-  spell_effects       SpellEffects[]
-  spell_messages      SpellMessages?
-  spell_restrictions  SpellRestrictions?
-  spell_saving_throws SpellSavingThrows[]
-  spell_targeting     SpellTargeting?
-  spell_schools       SpellSchools?        @relation(fields: [schoolId], references: [id])
+  notes              String?
+  createdAt          DateTime @map("created_at") @default(now())
+  updatedAt          DateTime @map("updated_at") @updatedAt
+  characterSpells    CharacterSpells[]
+  mobSpells          MobSpells[]
+  spellClassCircles  SpellClassCircles[]
+  spellComponents    SpellComponents[]
+  spellEffects       SpellEffects[]
+  spellMessages      SpellMessages?
+  spellRestrictions  SpellRestrictions?
+  spellSavingThrows  SpellSavingThrows[]
+  spellTargeting     SpellTargeting?
+  spellSchools       SpellSchools?        @relation(fields: [schoolId], references: [id])
 }
 
 model Triggers {
@@ -787,32 +786,32 @@ model Users {
   failedLoginAttempts                   Int @map("failed_login_attempts") @default(0)
   lockedUntil                            DateTime? @map("locked_until")
   lastFailedLogin                       DateTime? @map("last_failed_login")
-  audit_logs   AuditLogs[]
-  banRecordsIssued  BanRecords[] @relation("bannedByUser")
-  banRecords   BanRecords[] @relation("userBanRecords")
-  change_logs  ChangeLogs[]
-  characters                              Characters[]
+  auditLogs        AuditLogs[]
+  banRecordsIssued BanRecords[] @relation("bannedByUser")
+  banRecords       BanRecords[] @relation("userBanRecords")
+  changeLogs       ChangeLogs[]
+  characters       Characters[]
 }
 
 model Zones {
-  id            Int             @id
-  name          String
-  lifespan      Int             @default(30)
-  resetMode     ResetMode       @default(NORMAL)
-  hemisphere    Hemisphere      @default(NORTHWEST)
-  climate       Climate         @default(NONE)
-  createdAt     DateTime @map("created_at") @default(now())
-  updatedAt DateTime @map("updated_at") @updatedAt
+  id           Int             @id
+  name         String
+  lifespan     Int             @default(30)
+  resetMode    ResetMode       @default(NORMAL)
+  hemisphere   Hemisphere      @default(NORTHWEST)
+  climate      Climate         @default(NONE)
+  createdAt    DateTime @map("created_at") @default(now())
+  updatedAt    DateTime @map("updated_at") @updatedAt
   deletedAt    DateTime? @map("deleted_at")
-  createdBy     String? @map("created_by")
-  updatedBy     String? @map("updated_by")
-  mob_resets    MobResets[]
-  mobs          Mobs[]
-  object_resets ObjectResets[]
-  objects       Objects[]
-  rooms         Rooms[]
-  shops         Shops[]
-  triggers      Triggers[]
+  createdBy    String? @map("created_by")
+  updatedBy    String? @map("updated_by")
+  mobResets    MobResets[]
+  mobs         Mobs[]
+  objectResets ObjectResets[]
+  objects      Objects[]
+  rooms        Rooms[]
+  shops        Shops[]
+  triggers     Triggers[]
 }
 
 enum Climate {
