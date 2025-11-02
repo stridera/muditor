@@ -18,14 +18,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -49,14 +49,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -88,14 +88,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -138,14 +138,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -194,14 +194,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -252,14 +252,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {
@@ -288,14 +288,14 @@ export class TriggersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         objects: {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         zones: {

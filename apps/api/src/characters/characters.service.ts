@@ -23,13 +23,13 @@ export class CharactersService {
       skip,
       take,
       include: {
-        character_items: {
+        characterItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
@@ -37,7 +37,7 @@ export class CharactersService {
             containedItems: true,
           },
         },
-        character_effects: true,
+        characterEffects: true,
       },
       orderBy: { name: 'asc' },
     });
@@ -47,13 +47,13 @@ export class CharactersService {
     const character = await this.db.characters.findUnique({
       where: { id },
       include: {
-        character_items: {
+        characterItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
@@ -61,7 +61,7 @@ export class CharactersService {
             containedItems: true,
           },
         },
-        character_effects: true,
+        characterEffects: true,
       },
     });
 
@@ -76,19 +76,19 @@ export class CharactersService {
     return this.db.characters.findMany({
       where: { userId },
       include: {
-        character_items: {
+        characterItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
           },
         },
-        character_effects: true,
+        characterEffects: true,
       },
       orderBy: { name: 'asc' },
     });
@@ -121,18 +121,18 @@ export class CharactersService {
         movement: Math.max(100, data.constitution * 8 + data.level * 5),
       } as any,
       include: {
-        character_items: {
+        characterItems: {
           include: {
             objects: {
               select: {
                 id: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
           },
         },
-        character_effects: true,
+        characterEffects: true,
       },
     });
   }
@@ -157,18 +157,18 @@ export class CharactersService {
       where: { id },
       data: data as any,
       include: {
-        character_items: {
+        characterItems: {
           include: {
             objects: {
               select: {
                 id: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
           },
         },
-        character_effects: true,
+        characterEffects: true,
       },
     });
   }
@@ -179,8 +179,8 @@ export class CharactersService {
     return this.db.characters.delete({
       where: { id },
       include: {
-        character_items: true,
-        character_effects: true,
+        characterItems: true,
+        characterEffects: true,
       },
     });
   }
@@ -195,7 +195,7 @@ export class CharactersService {
         objects: {
           select: {
             id: true,
-            shortDesc: true,
+            name: true,
             type: true,
           },
         },
@@ -214,7 +214,7 @@ export class CharactersService {
         objects: {
           select: {
             id: true,
-            shortDesc: true,
+            name: true,
             type: true,
           },
         },
@@ -256,7 +256,7 @@ export class CharactersService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             type: true,
           },
         },
@@ -290,7 +290,7 @@ export class CharactersService {
         objects: {
           select: {
             id: true,
-            shortDesc: true,
+            name: true,
             type: true,
           },
         },

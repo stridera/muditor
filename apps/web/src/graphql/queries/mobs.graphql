@@ -1,0 +1,93 @@
+query GetMob($id: Int!, $zoneId: Int!) {
+  mob(id: $id, zoneId: $zoneId) {
+    id
+    zoneId
+    keywords
+    name
+    roomDescription
+    examineDescription
+    level
+    alignment
+    hitRoll
+    armorClass
+    hpDice
+    damageDice
+    damageType
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    perception
+    concealment
+    race
+    gender
+    size
+    lifeForce
+    composition
+    mobFlags
+    effectFlags
+    position
+    stance
+    createdAt
+    updatedAt
+  }
+}
+
+query GetMobs($skip: Int, $take: Int) {
+  mobs(skip: $skip, take: $take) {
+    id
+    zoneId
+    keywords
+    name
+    roomDescription
+    examineDescription
+    level
+    alignment
+    race
+    hitRoll
+    armorClass
+    damageType
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    lifeForce
+    hpDice
+    damageDice
+    mobFlags
+    effectFlags
+  }
+}
+
+query GetMobsByZone($zoneId: Int!) {
+  mobsByZone(zoneId: $zoneId) {
+    id
+    zoneId
+    keywords
+    name
+    roomDescription
+    examineDescription
+    level
+    alignment
+    race
+    hitRoll
+    armorClass
+    damageType
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    wealth
+    hpDice
+    damageDice
+    mobFlags
+    effectFlags
+    lifeForce
+  }
+}

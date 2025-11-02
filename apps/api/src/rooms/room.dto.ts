@@ -83,7 +83,7 @@ export class RoomDto {
   name: string;
 
   @Field()
-  description: string;
+  roomDescription: string;
 
   @Field(() => Sector)
   sector: Sector;
@@ -145,7 +145,7 @@ export class CreateRoomInput {
 
   @Field()
   @IsString()
-  description: string;
+  roomDescription: string;
 
   @Field(() => Sector, { defaultValue: Sector.STRUCTURE })
   @IsOptional()
@@ -173,7 +173,7 @@ export class UpdateRoomInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  description?: string;
+  roomDescription?: string;
 
   @Field(() => Sector, { nullable: true })
   @IsOptional()

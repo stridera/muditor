@@ -21,14 +21,12 @@ const GET_SHOP = gql`
       id
       buyProfit
       sellProfit
-      temper1
-      noSuchItem1
-      noSuchItem2
-      doNotBuy
-      missingCash1
-      missingCash2
-      messageBuy
-      messageSell
+      temper
+      noSuchItemMessages
+      doNotBuyMessages
+      missingCashMessages
+      buyMessages
+      sellMessages
       keeperId
       zoneId
       flags
@@ -41,7 +39,7 @@ const GET_SHOP = gql`
         objectId
         object {
           id
-          shortDesc
+          name
           type
           cost
         }
@@ -65,7 +63,7 @@ const GET_AVAILABLE_OBJECTS = gql`
     objects {
       id
       keywords
-      shortDesc
+      name
       type
       cost
       zoneId
@@ -78,7 +76,7 @@ const GET_AVAILABLE_MOBS = gql`
     mobs {
       id
       keywords
-      shortDesc
+      name
       zoneId
     }
   }
@@ -107,7 +105,7 @@ const CREATE_SHOP = gql`
 interface ShopFormData {
   buyProfit: number;
   sellProfit: number;
-  temper1: number;
+  temper: number;
   noSuchItem1: string;
   noSuchItem2: string;
   doNotBuy: string;
@@ -183,7 +181,7 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
     debounceMs: 200,
   },
   {
-    field: 'temper1',
+    field: 'temper',
     validate: ValidationHelpers.min(0, 'Temper cannot be negative'),
     debounceMs: 200,
   },
@@ -198,7 +196,7 @@ function ShopEditorContent() {
   const [formData, setFormData] = useState<ShopFormData>({
     buyProfit: 1.0,
     sellProfit: 1.0,
-    temper1: 0,
+    temper: 0,
     noSuchItem1: '',
     noSuchItem2: '',
     doNotBuy: '',
@@ -248,7 +246,7 @@ function ShopEditorContent() {
       setFormData({
         buyProfit: shop.buyProfit || 1.0,
         sellProfit: shop.sellProfit || 1.0,
-        temper1: shop.temper1 || 0,
+        temper: shop.temper || 0,
         noSuchItem1: shop.noSuchItem1 || '',
         noSuchItem2: shop.noSuchItem2 || '',
         doNotBuy: shop.doNotBuy || '',
@@ -521,22 +519,19 @@ function ShopEditorContent() {
 
                 <div>
                   <label
-                    htmlFor='temper1'
+                    htmlFor='temper'
                     className='block text-sm font-medium text-gray-700 mb-1'
                   >
                     Shopkeeper Temper
                   </label>
                   <input
                     type='number'
-                    id='temper1'
+                    id='temper'
                     min='0'
                     max='100'
-                    value={formData.temper1}
+                    value={formData.temper}
                     onChange={e =>
-                      handleInputChange(
-                        'temper1',
-                        parseInt(e.target.value) || 0
-                      )
+                      handleInputChange('temper', parseInt(e.target.value) || 0)
                     }
                     className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                   />
@@ -572,8 +567,8 @@ function ShopEditorContent() {
                   >
                     <option value=''>No shopkeeper</option>
                     {mobsData?.mobs?.map((mob: any) => (
-                      <option key={mob.id} value={mob.id}>
-                        {mob.shortDesc} (#{mob.id})
+                      <option key={`${mob.zoneId}-${mob.id}`} value={mob.id}>
+                        {mob.name} (#{mob.zoneId}:{mob.id})
                       </option>
                     ))}
                   </select>
@@ -704,8 +699,11 @@ function ShopEditorContent() {
                       >
                         <option value=''>Select object</option>
                         {objectsData?.objects?.map((obj: any) => (
-                          <option key={obj.id} value={obj.id}>
-                            {obj.shortDesc} - {obj.cost}cp
+                          <option
+                            key={`${obj.zoneId}-${obj.id}`}
+                            value={`${obj.zoneId}:${obj.id}`}
+                          >
+                            {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
                           </option>
                         ))}
                       </select>

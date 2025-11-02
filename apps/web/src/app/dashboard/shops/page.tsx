@@ -20,21 +20,19 @@ const GET_SHOPS = gql`
       id
       buyProfit
       sellProfit
-      temper1
+      temper
       flags
       tradesWithFlags
-      noSuchItem1
-      noSuchItem2
-      doNotBuy
-      missingCash1
-      missingCash2
-      messageBuy
-      messageSell
+      noSuchItemMessages
+      doNotBuyMessages
+      missingCashMessages
+      buyMessages
+      sellMessages
       keeperId
       keeper {
         id
         zoneId
-        shortDesc
+        name
         keywords
       }
       zoneId
@@ -47,7 +45,7 @@ const GET_SHOPS = gql`
         object {
           id
           zoneId
-          shortDesc
+          name
           type
           cost
         }
@@ -67,21 +65,19 @@ const GET_SHOPS_BY_ZONE = gql`
       id
       buyProfit
       sellProfit
-      temper1
+      temper
       flags
       tradesWithFlags
-      noSuchItem1
-      noSuchItem2
-      doNotBuy
-      missingCash1
-      missingCash2
-      messageBuy
-      messageSell
+      noSuchItemMessages
+      doNotBuyMessages
+      missingCashMessages
+      buyMessages
+      sellMessages
       keeperId
       keeper {
         id
         zoneId
-        shortDesc
+        name
         keywords
       }
       zoneId
@@ -94,7 +90,7 @@ const GET_SHOPS_BY_ZONE = gql`
         object {
           id
           zoneId
-          shortDesc
+          name
           type
           cost
         }
@@ -301,7 +297,7 @@ function ShopsContent() {
                     <div className='flex items-center gap-4 text-sm text-gray-500 mb-2'>
                       <span>Buy: {(shop.buyProfit * 100).toFixed(0)}%</span>
                       <span>Sell: {(shop.sellProfit * 100).toFixed(0)}%</span>
-                      <span>Temper: {shop.temper1}</span>
+                      <span>Temper: {shop.temper}</span>
                     </div>
                     <div className='flex items-center gap-4 text-sm text-gray-500'>
                       {shop.keeper ? (
@@ -310,7 +306,7 @@ function ShopsContent() {
                           className='text-blue-600 hover:text-blue-800 hover:underline'
                           onClick={e => e.stopPropagation()}
                         >
-                          Keeper: {shop.keeper.shortDesc} (#{shop.keeper.id})
+                          Keeper: {shop.keeper.name} (#{shop.keeper.id})
                         </Link>
                       ) : shop.keeperId ? (
                         <span>Keeper ID: {shop.keeperId}</span>
@@ -362,8 +358,8 @@ function ShopsContent() {
                             className='text-blue-600 hover:text-blue-800 hover:underline font-medium'
                             onClick={e => e.stopPropagation()}
                           >
-                            {shop.keeper.shortDesc} (Zone {shop.keeper.zoneId},
-                            ID: {shop.keeper.id})
+                            {shop.keeper.name} (Zone {shop.keeper.zoneId}, ID:{' '}
+                            {shop.keeper.id})
                           </Link>
                           {shop.keeper.keywords?.length > 0 && (
                             <div className='mt-2'>
@@ -397,7 +393,7 @@ function ShopsContent() {
                                       className='text-blue-600 hover:text-blue-800 hover:underline font-medium'
                                       onClick={e => e.stopPropagation()}
                                     >
-                                      {item.object.shortDesc}
+                                      {item.object.name}
                                     </Link>
                                   ) : (
                                     <span className='text-gray-700'>
@@ -473,7 +469,7 @@ function ShopsContent() {
                           <div>
                             <span className='text-gray-600'>Temper Level:</span>
                             <span className='ml-1 font-medium'>
-                              {shop.temper1}
+                              {shop.temper}
                             </span>
                           </div>
                         </div>

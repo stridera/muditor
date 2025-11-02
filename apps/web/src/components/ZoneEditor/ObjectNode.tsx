@@ -7,7 +7,6 @@ import { NodeProps } from 'reactflow';
 interface ObjectData {
   id: number;
   name: string;
-  shortDesc: string;
   type: string;
   keywords?: string[];
   value?: number;

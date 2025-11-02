@@ -29,7 +29,7 @@ export class ZonesService {
             id: true,
             zoneId: true,
             name: true,
-            description: true,
+            roomDescription: true,
             sector: true,
           },
           orderBy: { id: 'asc' },

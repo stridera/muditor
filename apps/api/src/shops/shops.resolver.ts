@@ -9,26 +9,23 @@ export class ShopsResolver {
   constructor(private readonly shopsService: ShopsService) { }
 
   private mapShopToDto(shop: any): ShopDto {
-    const messages = (shop.messages || {}) as any;
     return {
       id: shop.id,
       buyProfit: shop.buyProfit,
       sellProfit: shop.sellProfit,
-      temper1: shop.temper,
+      temper: shop.temper,
       flags: shop.flags || [],
       tradesWithFlags: shop.tradesWith || [],
-      noSuchItem1: messages.noSuchItem1,
-      noSuchItem2: messages.noSuchItem2,
-      doNotBuy: messages.doNotBuy,
-      missingCash1: messages.missingCash1,
-      missingCash2: messages.missingCash2,
-      messageBuy: messages.messageBuy,
-      messageSell: messages.messageSell,
+      noSuchItemMessages: shop.noSuchItemMessages || [],
+      doNotBuyMessages: shop.doNotBuyMessages || [],
+      missingCashMessages: shop.missingCashMessages || [],
+      buyMessages: shop.buyMessages || [],
+      sellMessages: shop.sellMessages || [],
       keeperId: shop.keeperId,
       keeper: shop.keeper ? {
         id: shop.keeper.id,
         zoneId: shop.keeper.zoneId,
-        shortDesc: shop.keeper.shortDesc,
+        name: shop.keeper.name,
         keywords: shop.keeper.keywords || [],
       } : undefined,
       zoneId: shop.zoneId,

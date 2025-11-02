@@ -205,8 +205,8 @@ local char = get_character()
 local mob = get_mobile()
 
 if char and mob and is_pc(char) then
-    send_to_char(char, "The " .. mob.shortDesc .. " nods at you in greeting.")
-    send_to_room(mob.room, char.name .. " is greeted by the " .. mob.shortDesc .. ".", char)
+    send_to_char(char, "The " .. mob.name .. " nods at you in greeting.")
+    send_to_room(mob.room, char.name .. " is greeted by the " .. mob.name .. ".", char)
 end`,
   },
 
@@ -223,8 +223,8 @@ local mob = get_mobile()
 
 if char and mob and random(1, 100) <= 25 then  -- 25% chance
     local damage = dice(2, 8) + 5
-    send_to_char(char, "The " .. mob.shortDesc .. " unleashes a devastating attack!")
-    send_to_room(mob.room, "The " .. mob.shortDesc .. " glows with menacing energy!", char)
+    send_to_char(char, "The " .. mob.name .. " unleashes a devastating attack!")
+    send_to_room(mob.room, "The " .. mob.name .. " glows with menacing energy!", char)
     
     damage(char, damage, "special")
 end`,
@@ -242,8 +242,8 @@ local killer = get_character()
 local mob = get_mobile()
 
 if killer and mob then
-    send_to_char(killer, "As " .. mob.shortDesc .. " dies, you feel a strange energy surge through you.")
-    send_to_room(mob.room, "The air shimmers as " .. mob.shortDesc .. " breathes its last.", killer)
+    send_to_char(killer, "As " .. mob.name .. " dies, you feel a strange energy surge through you.")
+    send_to_room(mob.room, "The air shimmers as " .. mob.name .. " breathes its last.", killer)
     
     -- Special death effects here
     -- heal(killer, dice(3, 8))  -- Healing on kill
@@ -264,8 +264,8 @@ local char = get_character()
 local obj = get_object()
 
 if char and obj then
-    send_to_char(char, "You use the " .. obj.shortDesc .. ".")
-    send_to_room(char.room, char.name .. " uses " .. obj.shortDesc .. ".", char)
+    send_to_char(char, "You use the " .. obj.name .. ".")
+    send_to_room(char.room, char.name .. " uses " .. obj.name .. ".", char)
     
     -- Add your custom effects here
     -- heal(char, dice(2, 8))     -- Healing potion
@@ -284,8 +284,8 @@ local char = get_character()
 local obj = get_object()
 
 if char and obj then
-    send_to_char(char, "As you wear " .. obj.shortDesc .. ", you feel its power flow through you.")
-    send_to_room(char.room, char.name .. " is surrounded by a faint aura as they don " .. obj.shortDesc .. ".", char)
+    send_to_char(char, "As you wear " .. obj.name .. ", you feel its power flow through you.")
+    send_to_room(char.room, char.name .. " is surrounded by a faint aura as they don " .. obj.name .. ".", char)
     
     -- Add stat bonuses or special effects
     -- set_char_var(char, "magic_armor_bonus", 2)
@@ -310,7 +310,7 @@ if char and obj then
     set_obj_var(obj, "timer_ticks", ticks)
     
     if ticks % 10 == 0 then  -- Every 10 ticks
-        send_to_char(char, obj.shortDesc .. " pulses with magical energy.")
+        send_to_char(char, obj.name .. " pulses with magical energy.")
         heal(char, dice(1, 4))  -- Small healing over time
     end
 end`,

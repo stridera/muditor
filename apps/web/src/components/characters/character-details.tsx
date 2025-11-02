@@ -83,7 +83,7 @@ const GET_CHARACTER_DETAILS = gql`
         charges
         objectPrototype {
           id
-          shortDesc
+          name
           type
         }
       }
@@ -514,7 +514,7 @@ export function CharacterDetails({
                       >
                         <div className='flex-1'>
                           <div className='font-medium'>
-                            {item.objectPrototype.shortDesc}
+                            {item.objectPrototype.name}
                           </div>
                           <div className='text-sm text-muted-foreground'>
                             {item.equippedLocation} • Condition:{' '}
@@ -555,7 +555,7 @@ export function CharacterDetails({
                       >
                         <div className='flex-1'>
                           <div className='font-medium'>
-                            {item.objectPrototype.shortDesc}
+                            {item.objectPrototype.name}
                           </div>
                           <div className='text-sm text-muted-foreground'>
                             Condition: {item.condition}%

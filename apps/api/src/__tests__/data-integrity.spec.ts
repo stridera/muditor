@@ -30,10 +30,11 @@ describe('Data Integrity Tests', () => {
         id: 1,
         zoneId: 1000,
         keywords: ['goblin', 'warrior'],
-        shortDesc: 'a fierce goblin warrior',
-        longDesc:
+        name: 'a fierce goblin warrior',
+        roomDescription:
           'This goblin warrior stands ready for battle with scarred green skin and gleaming weapons.',
-        description: 'This is a test goblin warrior mob for data integrity testing.',
+        examineDescription:
+          'This is a test goblin warrior mob for data integrity testing.',
         level: 15,
         armorClass: -2,
         hitRoll: 8,
@@ -51,9 +52,9 @@ describe('Data Integrity Tests', () => {
                 id
                 zoneId
                 keywords
-                shortDesc
-                longDesc
-                description
+                name
+                roomDescription
+                examineDescription
                 level
                 armorClass
                 hitRoll
@@ -80,7 +81,7 @@ describe('Data Integrity Tests', () => {
       });
 
       expect(dbMob).toBeTruthy();
-      expect(dbMob?.shortDesc).toBe(testMobData.shortDesc);
+      expect(dbMob?.name).toBe(testMobData.name);
       expect(dbMob?.level).toBe(testMobData.level);
       expect(dbMob?.hpDiceNum).toBeDefined();
       expect(dbMob?.hpDiceSize).toBeDefined();
@@ -96,9 +97,9 @@ describe('Data Integrity Tests', () => {
                 id
                 zoneId
                 keywords
-                shortDesc
-                longDesc
-                description
+                name
+                roomDescription
+                examineDescription
                 level
                 armorClass
                 hitRoll
@@ -117,7 +118,7 @@ describe('Data Integrity Tests', () => {
       expect(queriedMob.keywords).toEqual(
         expect.arrayContaining(testMobData.keywords)
       );
-      expect(queriedMob.shortDesc).toBe(testMobData.shortDesc);
+      expect(queriedMob.name).toBe(testMobData.name);
       expect(queriedMob.level).toBe(testMobData.level);
     });
   });
@@ -129,8 +130,8 @@ describe('Data Integrity Tests', () => {
         zoneId: 1000,
         type: 'WEAPON',
         keywords: ['sword', 'steel', 'weapon'],
-        shortDesc: 'a gleaming steel sword',
-        description:
+        name: 'a gleaming steel sword',
+        examineDescription:
           'This masterfully crafted sword gleams with magical enchantments.',
         weight: 5,
         cost: 1000,
@@ -148,8 +149,8 @@ describe('Data Integrity Tests', () => {
                 zoneId
                 type
                 keywords
-                shortDesc
-                description
+                name
+                examineDescription
                 weight
                 cost
                 flags
@@ -190,7 +191,7 @@ describe('Data Integrity Tests', () => {
         id: 1,
         zoneId: 1000,
         name: 'Test Chamber',
-        description:
+        roomDescription:
           'A large stone chamber with ancient carvings on the walls.',
         flags: ['DARK', 'NO_MOB'],
         sector: 'INSIDE',
@@ -205,7 +206,7 @@ describe('Data Integrity Tests', () => {
                 id
                 zoneId
                 name
-                description
+                roomDescription
                 flags
                 sector
               }
@@ -220,7 +221,7 @@ describe('Data Integrity Tests', () => {
       expect(createdRoom.id).toBe(testRoomData.id);
       expect(createdRoom.zoneId).toBe(testRoomData.zoneId);
       expect(createdRoom.name).toBe(testRoomData.name);
-      expect(createdRoom.description).toBe(testRoomData.description);
+      expect(createdRoom.roomDescription).toBe(testRoomData.roomDescription);
       expect(createdRoom.sector).toBe(testRoomData.sector);
 
       // Verify in database
@@ -232,7 +233,7 @@ describe('Data Integrity Tests', () => {
 
       expect(dbRoom).toBeTruthy();
       expect(dbRoom?.name).toBe(testRoomData.name);
-      expect(dbRoom?.description).toBe(testRoomData.description);
+      expect(dbRoom?.roomDescription).toBe(testRoomData.roomDescription);
       expect(dbRoom?.sector).toBe(testRoomData.sector);
     });
   });
@@ -307,9 +308,9 @@ describe('Data Integrity Tests', () => {
         id: 2,
         zoneId: 1000,
         keywords: ['test', 'mob'],
-        shortDesc: 'a test mob',
-        longDesc: 'This is a test mob for flag testing.',
-        description: 'A basic test mob.',
+        name: 'a test mob',
+        roomDescription: 'This is a test mob for flag testing.',
+        examineDescription: 'A basic test mob.',
         level: 1,
       };
 
@@ -322,7 +323,7 @@ describe('Data Integrity Tests', () => {
                 id
                 zoneId
                 keywords
-                shortDesc
+                name
                 level
               }
             }

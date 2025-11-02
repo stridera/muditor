@@ -15,7 +15,7 @@ const GET_MOB_RESETS = gql`
       roomZoneId
       mob {
         id
-        shortDesc
+        name
       }
       equipment {
         id
@@ -26,7 +26,7 @@ const GET_MOB_RESETS = gql`
         objectZoneId
         object {
           id
-          shortDesc
+          name
           type
         }
       }
@@ -47,7 +47,7 @@ const GET_EQUIPMENT_SETS = gql`
         probability
         object {
           id
-          shortDesc
+          name
           type
         }
       }
@@ -59,7 +59,7 @@ const GET_OBJECTS = gql`
   query GetObjectsForMob($skip: Int, $take: Int) {
     objects(skip: $skip, take: $take) {
       id
-      shortDesc
+      name
       type
       keywords
       wearFlags
@@ -103,7 +103,7 @@ interface EquipmentSetItem {
   probability: number;
   object: {
     id: number;
-    shortDesc: string;
+    name: string;
     type: string;
   };
 }
@@ -140,7 +140,7 @@ interface MobReset {
 
 interface GameObject {
   id: number;
-  shortDesc: string;
+  name: string;
   type: string;
   keywords: string;
   wearFlags: string[];
@@ -389,7 +389,7 @@ export default function MobEquipmentManager({
                 )}
                 <div className='text-xs text-gray-500'>
                   Items:{' '}
-                  {set.items.map(item => item.object.shortDesc).join(', ')}
+                  {set.items.map(item => item.object.name).join(', ')}
                 </div>
               </div>
             ))}
@@ -491,7 +491,7 @@ export default function MobEquipmentManager({
                                   className='text-xs p-2 bg-gray-50 rounded'
                                 >
                                   <div className='font-medium'>
-                                    {item.object.shortDesc}
+                                    {item.object.name}
                                   </div>
                                   <div className='text-gray-500'>
                                     {item.slot} •{' '}

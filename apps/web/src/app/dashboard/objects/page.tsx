@@ -37,7 +37,7 @@ const GET_OBJECTS = gql`
       id
       type
       keywords
-      shortDesc
+      name
       level
       weight
       cost
@@ -53,7 +53,7 @@ const GET_OBJECTS_BY_ZONE = gql`
       id
       type
       keywords
-      shortDesc
+      name
       level
       weight
       cost
@@ -171,8 +171,8 @@ function ObjectsContent() {
               id
               type
               keywords
-              shortDesc
-              description
+              name
+              examineDescription
               actionDesc
               flags
               effectFlags
@@ -225,10 +225,10 @@ function ObjectsContent() {
     }
   };
 
-  const handleDelete = async (id: number, shortDesc: string) => {
+  const handleDelete = async (id: number, name: string) => {
     if (
       !confirm(
-        `Are you sure you want to delete "${shortDesc}"? This action cannot be undone.`
+        `Are you sure you want to delete "${name}"? This action cannot be undone.`
       )
     ) {
       return;
@@ -306,8 +306,8 @@ function ObjectsContent() {
           object(id: $id) {
             id
             keywords
-            shortDesc
-            description
+            name
+            examineDescription
             type
             cost
             weight
@@ -341,11 +341,11 @@ function ObjectsContent() {
         throw new Error('Object not found');
       }
 
-      // Create clone data (remove id and modify shortDesc)
+      // Create clone data (remove id and modify name)
       const cloneData = {
         keywords: originalObject.keywords,
-        shortDesc: `${originalObject.shortDesc} (Copy)`,
-        description: originalObject.description,
+        name: `${originalObject.name} (Copy)`,
+        examineDescription: originalObject.examineDescription,
         type: originalObject.type,
         cost: originalObject.cost,
         weight: originalObject.weight,
@@ -364,7 +364,7 @@ function ObjectsContent() {
           createObject(data: $data) {
             id
             keywords
-            shortDesc
+            name
             type
             cost
             weight
@@ -506,7 +506,7 @@ function ObjectsContent() {
             className='border border-gray-300 rounded px-2 py-1 text-sm'
           >
             <option value='level'>Level</option>
-            <option value='shortDesc'>Name</option>
+            <option value='name'>Name</option>
             <option value='type'>Type</option>
             <option value='cost'>Cost</option>
             <option value='weight'>Weight</option>
@@ -666,7 +666,7 @@ function ObjectsContent() {
                       <div className='flex-1'>
                         <div className='flex items-center gap-2 mb-1'>
                           <h3 className='font-semibold text-lg text-gray-900'>
-                            #{fullObject.id} - {fullObject.shortDesc}
+                            #{fullObject.id} - {fullObject.name}
                           </h3>
                           <span className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full uppercase'>
                             {fullObject.type.replace('_', ' ')}
@@ -716,7 +716,7 @@ function ObjectsContent() {
                       <button
                         onClick={e => {
                           e.stopPropagation();
-                          handleDelete(fullObject.id, fullObject.shortDesc);
+                          handleDelete(fullObject.id, fullObject.name);
                         }}
                         disabled={deletingId === fullObject.id}
                         className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm disabled:opacity-50'
@@ -745,13 +745,13 @@ function ObjectsContent() {
                     ) : (
                       <div className='space-y-4'>
                         {/* Full Description */}
-                        {fullObject.description && (
+                        {fullObject.examineDescription && (
                           <div>
                             <h4 className='font-medium text-gray-900 mb-2'>
-                              Description
+                              Examine Description
                             </h4>
                             <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
-                              {fullObject.description}
+                              {fullObject.examineDescription}
                             </p>
                           </div>
                         )}

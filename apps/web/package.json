@@ -17,7 +17,7 @@
     "clean": "rm -rf .next dist"
   },
   "dependencies": {
-    "@apollo/client": "^4.0.4",
+    "@apollo/client": "^4.0.9",
     "@graphql-typed-document-node/core": "^3.2.0",
     "@monaco-editor/react": "^4.7.0",
     "@radix-ui/react-alert-dialog": "^1.1.15",

@@ -31,13 +31,13 @@ export class MobsService {
         },
       },
       include: {
-        mob_skills: { include: { skills: true } },
-        mob_spells: { include: { spells: true } },
-        mob_resets: {
+        mobSkills: { include: { skills: true } },
+        mobSpells: { include: { spells: true } },
+        mobResets: {
           include: {
             rooms: { select: { id: true, zoneId: true, name: true } },
             zones: { select: { id: true, name: true } },
-            mob_reset_equipment: true,
+            mobResetEquipment: true,
           },
         },
       },
@@ -49,7 +49,7 @@ export class MobsService {
     const mobs = await this.database.mobs.findMany({
       where: { zoneId },
       include: {
-        mob_resets: {
+        mobResets: {
           include: {
             rooms: { select: { id: true, name: true } },
           },

@@ -3,8 +3,11 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
-import { gql } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client/react';
+import {
+  useCreateMobMutation,
+  useGetMobQuery,
+  useUpdateMobMutation,
+} from '@/generated/graphql';
 import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -16,71 +19,12 @@ import {
   ValidationRules,
 } from '../../../../hooks/useRealTimeValidation';
 
-const GET_MOB = gql`
-  query GetMob($zoneId: Int!, $id: Int!) {
-    mob(zoneId: $zoneId, id: $id) {
-      id
-      zoneId
-      keywords
-      shortDesc
-      longDesc
-      description
-      level
-      alignment
-      hitRoll
-      armorClass
-      hpDice
-      damageDice
-      damageType
-      strength
-      intelligence
-      wisdom
-      dexterity
-      constitution
-      charisma
-      perception
-      concealment
-      race
-      position
-      gender
-      size
-      lifeForce
-      composition
-      stance
-      createdAt
-      updatedAt
-    }
-  }
-`;
-
-const UPDATE_MOB = gql`
-  mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
-    updateMob(zoneId: $zoneId, id: $id, data: $data) {
-      id
-      keywords
-      shortDesc
-      longDesc
-      description
-    }
-  }
-`;
-
-const CREATE_MOB = gql`
-  mutation CreateMob($data: CreateMobInput!) {
-    createMob(data: $data) {
-      id
-      keywords
-      shortDesc
-    }
-  }
-`;
-
 interface MobFormData {
   keywords: string;
   mobClass: string;
-  shortDesc: string;
-  longDesc: string;
-  desc: string;
+  name: string;
+  roomDescription: string;
+  examineDescription: string;
   alignment: number;
   level: number;
   armorClass: number;
@@ -124,8 +68,8 @@ const mobValidationRules: ValidationRules<MobFormData> = [
     debounceMs: 500, // Longer debounce for text fields
   },
   {
-    field: 'shortDesc',
-    validate: ValidationHelpers.required('Short description is required'),
+    field: 'name',
+    validate: ValidationHelpers.required('Name is required'),
     debounceMs: 500,
   },
   {
@@ -169,9 +113,9 @@ function MobEditorContent() {
   const [formData, setFormData] = useState<MobFormData>({
     keywords: '',
     mobClass: 'warrior',
-    shortDesc: '',
-    longDesc: '',
-    desc: '',
+    name: '',
+    roomDescription: '',
+    examineDescription: '',
     alignment: 0,
     level: 1,
     armorClass: 0,
@@ -214,32 +158,16 @@ function MobEditorContent() {
   // Separate state for general/save errors
   const [generalError, setGeneralError] = useState<string>('');
 
-  const { loading, error, data } = useQuery(GET_MOB, {
+  const { loading, error, data } = useGetMobQuery({
     variables: {
       zoneId: parseInt(zoneId || '0'),
-      id: parseInt(mobId || '0')
+      id: parseInt(mobId || '0'),
     },
     skip: isNew,
-    onCompleted: (data) => {
-      console.log('Query completed successfully:', data);
-    },
-    onError: (error) => {
-      console.error('Query error:', error);
-    },
   });
 
-  console.log('Query state:', {
-    loading,
-    error: error?.message,
-    hasData: !!data,
-    hasMob: !!data?.mob,
-    isNew,
-    mobId,
-    zoneId
-  });
-
-  const [updateMob, { loading: updateLoading }] = useMutation(UPDATE_MOB);
-  const [createMob, { loading: createLoading }] = useMutation(CREATE_MOB);
+  const [updateMob, { loading: updateLoading }] = useUpdateMobMutation();
+  const [createMob, { loading: createLoading }] = useCreateMobMutation();
 
   // Helper function to parse dice notation (e.g., "1d8+0" -> {num: 1, size: 8, bonus: 0})
   const parseDice = (diceStr: string) => {
@@ -264,9 +192,9 @@ function MobEditorContent() {
       setFormData({
         keywords: mob.keywords?.join(' ') || '',
         mobClass: 'warrior', // Not in schema
-        shortDesc: mob.shortDesc || '',
-        longDesc: mob.longDesc || '',
-        desc: mob.description || '',
+        name: mob.name || '',
+        roomDescription: mob.roomDescription || '',
+        examineDescription: mob.examineDescription || '',
         alignment: mob.alignment || 0,
         level: mob.level || 1,
         armorClass: mob.armorClass || 0,
@@ -336,9 +264,9 @@ function MobEditorContent() {
       // Convert form data to backend format
       const saveData = {
         keywords: formData.keywords.split(/\s+/).filter(k => k.length > 0),
-        shortDesc: formData.shortDesc,
-        longDesc: formData.longDesc,
-        description: formData.desc,
+        name: formData.name,
+        roomDescription: formData.roomDescription,
+        examineDescription: formData.examineDescription,
         level: formData.level,
         alignment: formData.alignment,
         hitRoll: formData.hitRoll,
@@ -405,14 +333,17 @@ function MobEditorContent() {
   // Show error if query failed
   if (error) {
     console.error('GraphQL Error:', error);
-    return <div className='p-4 text-red-600'>Error loading mob: {error.message}</div>;
+    return (
+      <div className='p-4 text-red-600'>Error loading mob: {error.message}</div>
+    );
   }
 
   // If we have params but no data, the mob might not exist
   if (!isNew && !loading && !data?.mob) {
     return (
       <div className='p-4 text-red-600'>
-        Mob not found (Zone: {zoneId}, ID: {mobId}). It may not exist in the database.
+        Mob not found (Zone: {zoneId}, ID: {mobId}). It may not exist in the
+        database.
       </div>
     );
   }
@@ -431,12 +362,14 @@ function MobEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>
-            {isNew ? 'Create New Mob' : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
+            {isNew
+              ? 'Create New Mob'
+              : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
           </h1>
           <p className='text-gray-600 mt-1'>
             {isNew
               ? 'Create a new mob with custom stats, appearance, and behavior'
-              : data?.mob?.shortDesc || 'Loading mob details...'}
+              : data?.mob?.name || 'Loading mob details...'}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -544,58 +477,60 @@ function MobEditorContent() {
 
               <div>
                 <label
-                  htmlFor='shortDesc'
+                  htmlFor='name'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
-                  Short Description *
+                  Name *
                 </label>
                 <input
                   type='text'
-                  id='shortDesc'
-                  value={formData.shortDesc}
-                  onChange={e => handleInputChange('shortDesc', e.target.value)}
+                  id='name'
+                  value={formData.name}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   placeholder='e.g., a burly orc warrior'
                   className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.shortDesc ? 'border-red-300' : 'border-gray-300'
+                    errors.name ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
-                {errors.shortDesc && (
-                  <p className='text-red-500 text-xs mt-1'>
-                    {errors.shortDesc}
-                  </p>
+                {errors.name && (
+                  <p className='text-red-500 text-xs mt-1'>{errors.name}</p>
                 )}
               </div>
 
               <div>
                 <label
-                  htmlFor='longDesc'
+                  htmlFor='roomDescription'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
-                  Long Description
+                  Room Description
                 </label>
                 <textarea
-                  id='longDesc'
+                  id='roomDescription'
                   rows={4}
-                  value={formData.longDesc}
-                  onChange={e => handleInputChange('longDesc', e.target.value)}
-                  placeholder='Detailed appearance when examined'
+                  value={formData.roomDescription}
+                  onChange={e =>
+                    handleInputChange('roomDescription', e.target.value)
+                  }
+                  placeholder='How the mob appears in the room'
                   className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                 />
               </div>
 
               <div>
                 <label
-                  htmlFor='desc'
+                  htmlFor='examineDescription'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
-                  Room Description
+                  Examine Description
                 </label>
                 <textarea
-                  id='desc'
+                  id='examineDescription'
                   rows={4}
-                  value={formData.desc}
-                  onChange={e => handleInputChange('desc', e.target.value)}
-                  placeholder='How the mob appears in the room'
+                  value={formData.examineDescription}
+                  onChange={e =>
+                    handleInputChange('examineDescription', e.target.value)
+                  }
+                  placeholder='Detailed appearance when examined'
                   className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                 />
               </div>

@@ -58,8 +58,8 @@ export class RoomsService {
   // Shared include pattern to prevent stack overflow from circular references
   private readonly roomInclude = {
     exits: true,
-    room_extra_descriptions: true,
-    mob_resets: {
+    roomExtraDescriptions: true,
+    mobResets: {
       select: {
         id: true,
         zoneId: true,
@@ -75,12 +75,14 @@ export class RoomsService {
             id: true,
             zoneId: true,
             keywords: true,
-            shortDesc: true,
+            name: true,
+            level: true,
+            race: true,
           },
         },
       },
     },
-    object_resets: {
+    objectResets: {
       select: {
         id: true,
         zoneId: true,
@@ -96,7 +98,7 @@ export class RoomsService {
             id: true,
             zoneId: true,
             keywords: true,
-            shortDesc: true,
+            name: true,
             type: true,
           },
         },
@@ -244,7 +246,7 @@ export class RoomsService {
         id: data.id,
         zoneId: data.zoneId,
         name: data.name,
-        description: data.description,
+        roomDescription: data.roomDescription,
         sector: data.sector || 'STRUCTURE',
         flags: data.flags || [],
       },
@@ -263,7 +265,7 @@ export class RoomsService {
       where: { zoneId_id: { zoneId, id } },
       data: {
         name: data.name,
-        description: data.description,
+        roomDescription: data.roomDescription,
         sector: data.sector,
         flags: data.flags,
       },
@@ -320,9 +322,52 @@ export class RoomsService {
       },
       include: {
         exits: true,
-        room_extra_descriptions: true,
-        mob_resets: true,
-        object_resets: true,
+        roomExtraDescriptions: true,
+        mobResets: {
+          select: {
+            id: true,
+            zoneId: true,
+            maxInstances: true,
+            probability: true,
+            comment: true,
+            mobZoneId: true,
+            mobId: true,
+            roomZoneId: true,
+            roomId: true,
+            mobs: {
+              select: {
+                id: true,
+                zoneId: true,
+                keywords: true,
+                name: true,
+                level: true,
+                race: true,
+              },
+            },
+          },
+        },
+        objectResets: {
+          select: {
+            id: true,
+            zoneId: true,
+            maxInstances: true,
+            probability: true,
+            comment: true,
+            objectZoneId: true,
+            objectId: true,
+            roomZoneId: true,
+            roomId: true,
+            objects: {
+              select: {
+                id: true,
+                zoneId: true,
+                keywords: true,
+                name: true,
+                type: true,
+              },
+            },
+          },
+        },
       },
     });
 

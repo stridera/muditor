@@ -15,7 +15,7 @@ const GET_MOB_RESETS = gql`
       roomZoneId
       mob {
         id
-        shortDesc
+        name
       }
       equipment {
         id
@@ -26,7 +26,7 @@ const GET_MOB_RESETS = gql`
         objectZoneId
         object {
           id
-          shortDesc
+          name
           type
         }
       }
@@ -38,7 +38,7 @@ const GET_OBJECTS = gql`
   query GetObjectsLegacy($skip: Int, $take: Int) {
     objects(skip: $skip, take: $take) {
       id
-      shortDesc
+      name
       type
       keywords
       wearFlags
@@ -97,7 +97,7 @@ interface MobReset {
     objectId: number;
     object: {
       id: number;
-      shortDesc: string;
+      name: string;
       type: string;
     };
   }>;
@@ -109,7 +109,7 @@ interface MobReset {
     objectId: number;
     object: {
       id: number;
-      shortDesc: string;
+      name: string;
       type: string;
     };
   }>;
@@ -117,7 +117,7 @@ interface MobReset {
 
 interface GameObject {
   id: number;
-  shortDesc: string;
+  name: string;
   type: string;
   keywords: string;
   wearFlags: string[];
@@ -196,7 +196,7 @@ export default function MobEquipmentManager({
 
   const filteredObjects = objects.filter(
     obj =>
-      obj.shortDesc.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      obj.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       obj.keywords.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
@@ -370,7 +370,7 @@ export default function MobEquipmentManager({
                           >
                             <div>
                               <span className='text-sm font-medium'>
-                                {carrying.object.shortDesc}
+                                {carrying.object.name}
                               </span>
                               <span className='ml-2 text-xs text-gray-500'>
                                 ({carrying.object.type})
@@ -419,7 +419,7 @@ export default function MobEquipmentManager({
                           >
                             <div>
                               <div className='text-sm font-medium'>
-                                {equipped.object.shortDesc}
+                                {equipped.object.name}
                               </div>
                               <div className='text-xs text-gray-500'>
                                 {equipped.location} • {equipped.object.type}
@@ -473,7 +473,7 @@ export default function MobEquipmentManager({
                             >
                               <div>
                                 <div className='text-sm font-medium'>
-                                  {obj.shortDesc}
+                                  {obj.name}
                                 </div>
                                 <div className='text-xs text-gray-500'>
                                   {obj.type} • {obj.keywords}

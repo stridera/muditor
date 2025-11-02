@@ -50,13 +50,13 @@ export class MobDto {
   keywords: string[];
 
   @Field()
-  shortDesc: string;
+  name: string;
 
   @Field()
-  longDesc: string;
+  roomDescription: string;
 
   @Field()
-  description: string;
+  examineDescription: string;
 
   @Field(() => Int)
   level: number;
@@ -103,8 +103,8 @@ export class MobDto {
   @Field(() => Int)
   concealment: number;
 
-  @Field(() => Int)
-  wealth: number;
+  @Field(() => Int, { nullable: true })
+  wealth?: number;
 
   @Field(() => Race)
   race: Race;
@@ -159,15 +159,15 @@ export class CreateMobInput {
 
   @Field()
   @IsString()
-  shortDesc: string;
+  name: string;
 
   @Field()
   @IsString()
-  longDesc: string;
+  roomDescription: string;
 
   @Field()
   @IsString()
-  description: string;
+  examineDescription: string;
 
   @Field(() => Int, { defaultValue: 1 })
   @IsOptional()
@@ -189,12 +189,12 @@ export class CreateMobInput {
   @IsNumber()
   armorClass?: number;
 
-  @Field({ defaultValue: "1d8+0" })
+  @Field({ defaultValue: '1d8+0' })
   @IsOptional()
   @IsString()
   hpDice?: string;
 
-  @Field({ defaultValue: "1d4+0" })
+  @Field({ defaultValue: '1d4+0' })
   @IsOptional()
   @IsString()
   damageDice?: string;
@@ -312,17 +312,17 @@ export class UpdateMobInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  shortDesc?: string;
+  name?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  longDesc?: string;
+  roomDescription?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  description?: string;
+  examineDescription?: string;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

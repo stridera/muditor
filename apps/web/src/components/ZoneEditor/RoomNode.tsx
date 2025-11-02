@@ -14,7 +14,7 @@ interface RoomData {
   roomId: number;
   name: string;
   sector: string;
-  description: string;
+  roomDescription: string;
   mobs?: Array<{ id: number; name: string; level: number }>;
   objects?: Array<{ id: number; name: string; type: string }>;
   exits: Array<{
@@ -395,7 +395,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
         {/* Content */}
         <div className='px-3 py-2'>
           <div className='text-xs opacity-75 mb-2 line-clamp-2'>
-            {data.description}
+            {data.roomDescription}
           </div>
 
           {/* Entity indicators */}
@@ -442,7 +442,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
               {data.room?.layoutY ?? 'null'}, {data.layoutZ ?? 0})
             </div>
             <div className='text-gray-300 mb-2 leading-relaxed'>
-              {data.description}
+              {data.roomDescription}
             </div>
 
             {data.exits.length > 0 && (
@@ -457,16 +457,22 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                       ? `Room ${exit.toRoomId}`
                       : 'None';
 
-                  const isVertical = exit.direction === 'UP' || exit.direction === 'DOWN';
-                  const verticalClass = exit.direction === 'UP'
-                    ? 'text-blue-300 font-semibold'
-                    : exit.direction === 'DOWN'
-                      ? 'text-red-300 font-semibold'
-                      : 'text-gray-300';
+                  const isVertical =
+                    exit.direction === 'UP' || exit.direction === 'DOWN';
+                  const verticalClass =
+                    exit.direction === 'UP'
+                      ? 'text-blue-300 font-semibold'
+                      : exit.direction === 'DOWN'
+                        ? 'text-red-300 font-semibold'
+                        : 'text-gray-300';
 
                   return (
                     <div key={idx} className={verticalClass}>
-                      {exit.direction.toLowerCase()} {isVertical ? '⬆️⬇️'.charAt(exit.direction === 'UP' ? 0 : 1) : ''} → {displayText}
+                      {exit.direction.toLowerCase()}{' '}
+                      {isVertical
+                        ? '⬆️⬇️'.charAt(exit.direction === 'UP' ? 0 : 1)
+                        : ''}{' '}
+                      → {displayText}
                     </div>
                   );
                 })}

@@ -39,10 +39,10 @@ export class ObjectDto {
   keywords: string[];
 
   @Field()
-  shortDesc: string;
+  name: string;
 
   @Field()
-  description: string;
+  examineDescription: string;
 
   @Field({ nullable: true })
   actionDesc?: string;
@@ -108,11 +108,11 @@ export class CreateObjectInput {
 
   @Field()
   @IsString()
-  shortDesc: string;
+  name: string;
 
   @Field()
   @IsString()
-  description: string;
+  examineDescription: string;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -187,12 +187,12 @@ export class UpdateObjectInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  shortDesc?: string;
+  name?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  description?: string;
+  examineDescription?: string;
 
   @Field({ nullable: true })
   @IsOptional()

@@ -23,7 +23,7 @@ export class ObjectSummaryDto {
   zoneId: number;
 
   @Field()
-  shortDesc: string;
+  name: string;
 
   @Field()
   type: string;
@@ -41,7 +41,7 @@ export class MobSummaryDto {
   zoneId: number;
 
   @Field()
-  shortDesc: string;
+  name: string;
 }
 
 @ObjectType()

@@ -21,8 +21,8 @@ const GET_OBJECT = gql`
       id
       type
       keywords
-      shortDesc
-      description
+      name
+      examineDescription
       actionDesc
       weight
       cost
@@ -46,8 +46,8 @@ const UPDATE_OBJECT = gql`
     updateObject(id: $id, zoneId: $zoneId, data: $data) {
       id
       keywords
-      shortDesc
-      description
+      name
+      examineDescription
     }
   }
 `;
@@ -57,7 +57,7 @@ const CREATE_OBJECT = gql`
     createObject(data: $data) {
       id
       keywords
-      shortDesc
+      name
     }
   }
 `;
@@ -65,8 +65,8 @@ const CREATE_OBJECT = gql`
 interface ObjectFormData {
   type: string;
   keywords: string;
-  shortDesc: string;
-  description: string;
+  name: string;
+  examineDescription: string;
   actionDesc: string;
   weight: number;
   cost: number;
@@ -190,8 +190,8 @@ const objectValidationRules: ValidationRules<ObjectFormData> = [
     debounceMs: 500,
   },
   {
-    field: 'shortDesc',
-    validate: ValidationHelpers.required('Short description is required'),
+    field: 'name',
+    validate: ValidationHelpers.required('Name is required'),
     debounceMs: 500,
   },
   {
@@ -224,8 +224,8 @@ function ObjectEditorContent() {
   const [formData, setFormData] = useState<ObjectFormData>({
     type: 'NOTHING',
     keywords: '',
-    shortDesc: '',
-    description: '',
+    name: '',
+    examineDescription: '',
     actionDesc: '',
     weight: 0,
     cost: 0,
@@ -261,8 +261,8 @@ function ObjectEditorContent() {
       setFormData({
         type: object.type || 'NOTHING',
         keywords: object.keywords || '',
-        shortDesc: object.shortDesc || '',
-        description: object.description || '',
+        name: object.name || '',
+        examineDescription: object.examineDescription || '',
         actionDesc: object.actionDesc || '',
         weight: object.weight || 0,
         cost: object.cost || 0,
@@ -488,41 +488,39 @@ function ObjectEditorContent() {
 
               <div>
                 <label
-                  htmlFor='shortDesc'
+                  htmlFor='name'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
-                  Short Description *
+                  Name *
                 </label>
                 <input
                   type='text'
-                  id='shortDesc'
-                  value={formData.shortDesc}
-                  onChange={e => handleInputChange('shortDesc', e.target.value)}
+                  id='name'
+                  value={formData.name}
+                  onChange={e => handleInputChange('name', e.target.value)}
                   placeholder='e.g., a long iron sword'
                   className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.shortDesc ? 'border-red-300' : 'border-gray-300'
+                    errors.name ? 'border-red-300' : 'border-gray-300'
                   }`}
                 />
-                {errors.shortDesc && (
-                  <p className='text-red-500 text-xs mt-1'>
-                    {errors.shortDesc}
-                  </p>
+                {errors.name && (
+                  <p className='text-red-500 text-xs mt-1'>{errors.name}</p>
                 )}
               </div>
 
               <div>
                 <label
-                  htmlFor='description'
+                  htmlFor='examineDescription'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
-                  Long Description
+                  Examine Description
                 </label>
                 <textarea
-                  id='description'
+                  id='examineDescription'
                   rows={4}
-                  value={formData.description}
+                  value={formData.examineDescription}
                   onChange={e =>
-                    handleInputChange('description', e.target.value)
+                    handleInputChange('examineDescription', e.target.value)
                   }
                   placeholder='Detailed description when examined'
                   className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'

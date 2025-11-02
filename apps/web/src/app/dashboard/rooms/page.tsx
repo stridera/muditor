@@ -1,12 +1,12 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { useZone } from '@/contexts/zone-context';
+import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useZone } from '@/contexts/zone-context';
-import { PermissionGuard } from '@/components/auth/permission-guard';
+import { useEffect, useMemo, useState } from 'react';
 import ZoneSelector from '../../../components/ZoneSelector';
-import { ChevronDown } from 'lucide-react';
 
 interface RoomExit {
   id: string;
@@ -26,7 +26,7 @@ interface RoomExtraDescription {
 interface Room {
   id: number;
   name: string;
-  description: string;
+  roomDescription: string;
   sector: string;
   flags: string[];
   zoneId: number;
@@ -82,7 +82,7 @@ function RoomsContent() {
                 roomsByZone(zoneId: $zoneId) {
                   id
                   name
-                  description
+                  roomDescription
                   sector
                   flags
                   zoneId
@@ -95,7 +95,7 @@ function RoomsContent() {
                 rooms(take: $take) {
                   id
                   name
-                  description
+                  roomDescription
                   sector
                   flags
                   zoneId
@@ -150,7 +150,7 @@ function RoomsContent() {
             room(id: $id) {
               id
               name
-              description
+              roomDescription
               sector
               flags
               zoneId
@@ -205,7 +205,9 @@ function RoomsContent() {
       } catch (err) {
         console.error('Error loading room details:', err);
       } finally {
-        setLoadingDetails(new Set([...loadingDetails].filter(id => id !== roomId)));
+        setLoadingDetails(
+          new Set([...loadingDetails].filter(id => id !== roomId))
+        );
       }
     }
   };
@@ -215,7 +217,7 @@ function RoomsContent() {
       const matchesSearch =
         room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
         room.id.toString().includes(searchTerm) ||
-        room.description.toLowerCase().includes(searchTerm.toLowerCase());
+        room.roomDescription.toLowerCase().includes(searchTerm.toLowerCase());
       const matchesSector =
         selectedSector === 'all' || room.sector === selectedSector;
 
@@ -341,7 +343,10 @@ function RoomsContent() {
       ) : (
         <div className='grid gap-4'>
           {filteredRooms.map(room => (
-            <div key={room.id} className='bg-white border rounded-lg shadow hover:shadow-md transition-shadow'>
+            <div
+              key={room.id}
+              className='bg-white border rounded-lg shadow hover:shadow-md transition-shadow'
+            >
               <div
                 className='p-4 cursor-pointer'
                 onClick={() => toggleRoomExpanded(room.id)}
@@ -386,7 +391,7 @@ function RoomsContent() {
                       />
                     </div>
                     <p className='text-gray-700 mb-2 line-clamp-2'>
-                      {room.description}
+                      {room.roomDescription}
                     </p>
                     <div className='flex items-center gap-4 text-sm text-gray-500'>
                       <span>Room #{room.id}</span>
@@ -403,14 +408,14 @@ function RoomsContent() {
                     <Link
                       href={`/dashboard/zones/${room.zoneId}`}
                       className='text-gray-600 hover:text-gray-800 px-3 py-1 text-sm'
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     >
                       Zone
                     </Link>
                     <Link
                       href={`/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`}
                       className='text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
-                      onClick={(e) => e.stopPropagation()}
+                      onClick={e => e.stopPropagation()}
                     >
                       Edit
                     </Link>
@@ -425,38 +430,57 @@ function RoomsContent() {
                     <div className='text-center py-4'>
                       <div className='inline-flex items-center'>
                         <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2'></div>
-                        <span className='text-sm text-gray-600'>Loading room details...</span>
+                        <span className='text-sm text-gray-600'>
+                          Loading room details...
+                        </span>
                       </div>
                     </div>
                   ) : (
                     <div className='space-y-4'>
                       {/* Full Description */}
                       <div>
-                        <h4 className='font-medium text-gray-900 mb-2'>Full Description</h4>
+                        <h4 className='font-medium text-gray-900 mb-2'>
+                          Full Description
+                        </h4>
                         <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
-                          {room.description}
+                          {room.roomDescription}
                         </p>
                       </div>
 
                       {/* Exits */}
                       {room.exits && room.exits.length > 0 && (
                         <div>
-                          <h4 className='font-medium text-gray-900 mb-2'>Exits ({room.exits.length})</h4>
+                          <h4 className='font-medium text-gray-900 mb-2'>
+                            Exits ({room.exits.length})
+                          </h4>
                           <div className='grid grid-cols-1 md:grid-cols-2 gap-2'>
-                            {room.exits.map((exit) => (
-                              <div key={exit.id} className='bg-white p-3 rounded border text-sm'>
-                                <div className='font-medium text-gray-900'>{exit.direction.toUpperCase()}</div>
+                            {room.exits.map(exit => (
+                              <div
+                                key={exit.id}
+                                className='bg-white p-3 rounded border text-sm'
+                              >
+                                <div className='font-medium text-gray-900'>
+                                  {exit.direction.toUpperCase()}
+                                </div>
                                 {exit.toRoomId != null && (
-                                  <div className='text-blue-600'>→ Room {exit.toRoomId}</div>
+                                  <div className='text-blue-600'>
+                                    → Room {exit.toRoomId}
+                                  </div>
                                 )}
                                 {exit.description && (
-                                  <div className='text-gray-600 mt-1'>{exit.description}</div>
+                                  <div className='text-gray-600 mt-1'>
+                                    {exit.description}
+                                  </div>
                                 )}
                                 {exit.keyword && (
-                                  <div className='text-gray-500 mt-1'>Keyword: {exit.keyword}</div>
+                                  <div className='text-gray-500 mt-1'>
+                                    Keyword: {exit.keyword}
+                                  </div>
                                 )}
                                 {exit.key && (
-                                  <div className='text-orange-600 mt-1'>Key Required: {exit.key}</div>
+                                  <div className='text-orange-600 mt-1'>
+                                    Key Required: {exit.key}
+                                  </div>
                                 )}
                               </div>
                             ))}
@@ -467,12 +491,21 @@ function RoomsContent() {
                       {/* Extra Descriptions */}
                       {room.extraDescs && room.extraDescs.length > 0 && (
                         <div>
-                          <h4 className='font-medium text-gray-900 mb-2'>Extra Descriptions ({room.extraDescs.length})</h4>
+                          <h4 className='font-medium text-gray-900 mb-2'>
+                            Extra Descriptions ({room.extraDescs.length})
+                          </h4>
                           <div className='space-y-2'>
-                            {room.extraDescs.map((desc) => (
-                              <div key={desc.id} className='bg-white p-3 rounded border text-sm'>
-                                <div className='font-medium text-gray-900'>"{desc.keyword}"</div>
-                                <div className='text-gray-700 mt-1'>{desc.description}</div>
+                            {room.extraDescs.map(desc => (
+                              <div
+                                key={desc.id}
+                                className='bg-white p-3 rounded border text-sm'
+                              >
+                                <div className='font-medium text-gray-900'>
+                                  "{desc.keyword}"
+                                </div>
+                                <div className='text-gray-700 mt-1'>
+                                  {desc.description}
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -480,9 +513,13 @@ function RoomsContent() {
                       )}
 
                       {/* Layout Coordinates */}
-                      {(room.layoutX !== undefined || room.layoutY !== undefined || room.layoutZ !== undefined) && (
+                      {(room.layoutX !== undefined ||
+                        room.layoutY !== undefined ||
+                        room.layoutZ !== undefined) && (
                         <div>
-                          <h4 className='font-medium text-gray-900 mb-2'>Layout Coordinates</h4>
+                          <h4 className='font-medium text-gray-900 mb-2'>
+                            Layout Coordinates
+                          </h4>
                           <div className='bg-white p-3 rounded border text-sm'>
                             <div className='grid grid-cols-3 gap-4'>
                               <div>X: {room.layoutX ?? 'N/A'}</div>
@@ -495,11 +532,15 @@ function RoomsContent() {
 
                       {/* Room Information */}
                       <div>
-                        <h4 className='font-medium text-gray-900 mb-2'>Room Information</h4>
+                        <h4 className='font-medium text-gray-900 mb-2'>
+                          Room Information
+                        </h4>
                         <div className='bg-white p-3 rounded border text-sm space-y-2'>
                           <div className='flex justify-between'>
                             <span className='text-gray-600'>Sector Type:</span>
-                            <span className='font-medium'>{room.sector?.replace('_', ' ') || 'N/A'}</span>
+                            <span className='font-medium'>
+                              {room.sector?.replace('_', ' ') || 'N/A'}
+                            </span>
                           </div>
                           <div className='flex justify-between'>
                             <span className='text-gray-600'>Zone ID:</span>
@@ -510,7 +551,9 @@ function RoomsContent() {
                             <span>{room.exits?.length || 0}</span>
                           </div>
                           <div className='flex justify-between'>
-                            <span className='text-gray-600'>Extra Descriptions:</span>
+                            <span className='text-gray-600'>
+                              Extra Descriptions:
+                            </span>
                             <span>{room.extraDescs?.length || 0}</span>
                           </div>
                           {room.flags && room.flags.length > 0 && (
@@ -518,7 +561,10 @@ function RoomsContent() {
                               <span className='text-gray-600'>Room Flags:</span>
                               <div className='flex flex-wrap gap-1 mt-1'>
                                 {room.flags.map((flag: string) => (
-                                  <span key={flag} className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'>
+                                  <span
+                                    key={flag}
+                                    className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'
+                                  >
                                     {flag.replace('_', ' ')}
                                   </span>
                                 ))}
@@ -529,13 +575,17 @@ function RoomsContent() {
                             {room.createdAt && (
                               <div className='flex justify-between'>
                                 <span className='text-gray-600'>Created:</span>
-                                <span>{new Date(room.createdAt).toLocaleString()}</span>
+                                <span>
+                                  {new Date(room.createdAt).toLocaleString()}
+                                </span>
                               </div>
                             )}
                             {room.updatedAt && (
                               <div className='flex justify-between'>
                                 <span className='text-gray-600'>Updated:</span>
-                                <span>{new Date(room.updatedAt).toLocaleString()}</span>
+                                <span>
+                                  {new Date(room.updatedAt).toLocaleString()}
+                                </span>
                               </div>
                             )}
                           </div>

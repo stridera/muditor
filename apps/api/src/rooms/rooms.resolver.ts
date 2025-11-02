@@ -146,15 +146,16 @@ export class RoomsResolver {
 
   @ResolveField(() => [MobDto])
   mobs(@Parent() room: any): MobDto[] {
-    if (!room.mobResets || room.mobResets.length === 0) {
+    const resets = room.mob_resets;
+    if (!resets || resets.length === 0) {
       return [];
     }
 
     // Deduplicate mobs by ID since multiple resets can reference the same mob
     const uniqueMobs = new Map<number, any>();
-    room.mobResets.forEach((reset: any) => {
-      if (reset.mob) {
-        uniqueMobs.set(reset.mob.id, reset.mob);
+    resets.forEach((reset: any) => {
+      if (reset.mobs) {
+        uniqueMobs.set(reset.mobs.id, reset.mobs);
       }
     });
 
@@ -163,15 +164,16 @@ export class RoomsResolver {
 
   @ResolveField(() => [ObjectDto])
   objects(@Parent() room: any): ObjectDto[] {
-    if (!room.objectResets || room.objectResets.length === 0) {
+    const resets = room.objectResets;
+    if (!resets || resets.length === 0) {
       return [];
     }
 
     // Deduplicate objects by ID since multiple resets can reference the same object
     const uniqueObjects = new Map<number, any>();
-    room.objectResets.forEach((reset: any) => {
-      if (reset.object) {
-        uniqueObjects.set(reset.object.id, reset.object);
+    resets.forEach((reset: any) => {
+      if (reset.objects) {
+        uniqueObjects.set(reset.objects.id, reset.objects);
       }
     });
 
@@ -180,16 +182,17 @@ export class RoomsResolver {
 
   @ResolveField(() => [ShopDto])
   async shops(@Parent() room: any): Promise<ShopDto[]> {
-    if (!room.mobResets || room.mobResets.length === 0) {
+    const resets = room.mob_resets;
+    if (!resets || resets.length === 0) {
       return [];
     }
 
     // Get unique mobs from room (need both zoneId and id)
     const uniqueMobs = new Map<string, { zoneId: number; id: number }>();
-    room.mobResets.forEach((reset: any) => {
-      if (reset.mob) {
-        const key = `${reset.mob.zoneId}-${reset.mob.id}`;
-        uniqueMobs.set(key, { zoneId: reset.mob.zoneId, id: reset.mob.id });
+    resets.forEach((reset: any) => {
+      if (reset.mobs) {
+        const key = `${reset.mobs.zoneId}-${reset.mobs.id}`;
+        uniqueMobs.set(key, { zoneId: reset.mobs.zoneId, id: reset.mobs.id });
       }
     });
 
@@ -202,22 +205,20 @@ export class RoomsResolver {
           id: shop.id,
           buyProfit: shop.buyProfit,
           sellProfit: shop.sellProfit,
-          temper1: shop.temper1,
+          temper: shop.temper,
           flags: shop.flags || [],
           tradesWithFlags: shop.tradesWithFlags || [],
-          noSuchItem1: shop.noSuchItem1,
-          noSuchItem2: shop.noSuchItem2,
-          doNotBuy: shop.doNotBuy,
-          missingCash1: shop.missingCash1,
-          missingCash2: shop.missingCash2,
-          messageBuy: shop.messageBuy,
-          messageSell: shop.messageSell,
+          noSuchItemMessages: shop.noSuchItemMessages || [],
+          doNotBuyMessages: shop.doNotBuyMessages || [],
+          missingCashMessages: shop.missingCashMessages || [],
+          buyMessages: shop.buyMessages || [],
+          sellMessages: shop.sellMessages || [],
           keeperId: shop.keeperId,
           keeper: shop.mobs
             ? {
                 id: shop.mobs.id,
                 zoneId: shop.mobs.zoneId,
-                shortDesc: shop.mobs.shortDesc,
+                name: shop.mobs.name,
                 keywords: shop.mobs.keywords || [],
               }
             : undefined,
@@ -225,20 +226,20 @@ export class RoomsResolver {
           createdAt: shop.createdAt,
           updatedAt: shop.updatedAt,
           items:
-            shop.shop_items?.map((item: any) => ({
+            shop.shopItems?.map((item: any) => ({
               id: item.id,
               amount: item.stockLimit,
               objectId: item.objectId,
               object: item.object,
             })) || [],
           accepts:
-            shop.shop_accepts?.map((accept: any) => ({
+            shop.shopAccepts?.map((accept: any) => ({
               id: accept.id,
               type: accept.itemType,
               keywords: '',
             })) || [],
           hours:
-            shop.shop_hours?.map((hour: any) => ({
+            shop.shopHours?.map((hour: any) => ({
               id: hour.id,
               open: hour.openHour,
               close: hour.closeHour,

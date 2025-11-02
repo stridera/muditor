@@ -35,10 +35,10 @@ export class ObjectsService {
             name: true,
           },
         },
-        object_extra_descriptions: true,
-        object_affects: true,
+        objectExtraDescriptions: true,
+        objectAffects: true,
         triggers: true,
-        shop_items: {
+        shopItems: {
           include: {
             shops: {
               select: {
@@ -47,7 +47,7 @@ export class ObjectsService {
             },
           },
         },
-        mob_reset_equipment: {
+        mobResetEquipment: {
           include: {
             mob_resets: {
               include: {
@@ -55,7 +55,7 @@ export class ObjectsService {
                   select: {
                     id: true,
                     zoneId: true,
-                    shortDesc: true,
+                    name: true,
                   },
                 },
                 rooms: {
@@ -71,7 +71,7 @@ export class ObjectsService {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
               },
             },
           },

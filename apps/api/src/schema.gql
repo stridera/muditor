@@ -295,9 +295,9 @@ input CreateMobInput {
   constitution: Int! = 13
   damageDice: String! = "1d4+0"
   damageType: DamageType! = HIT
-  description: String!
   dexterity: Int! = 13
   effectFlags: [EffectFlag!]! = []
+  examineDescription: String!
   gender: Gender! = NEUTRAL
   hitRoll: Int! = 0
   hpDice: String! = "1d8+0"
@@ -306,12 +306,12 @@ input CreateMobInput {
   keywords: [String!]!
   level: Int! = 1
   lifeForce: LifeForce! = LIFE
-  longDesc: String!
   mobFlags: [MobFlag!]! = []
+  name: String!
   perception: Int! = 0
   position: Position! = STANDING
   race: Race! = HUMANOID
-  shortDesc: String!
+  roomDescription: String!
   size: Size! = MEDIUM
   stance: Stance! = ALERT
   strength: Int! = 13
@@ -345,13 +345,13 @@ input CreateObjectInput {
   concealment: Int! = 0
   cost: Int! = 0
   decomposeTimer: Int! = 0
-  description: String!
   effectFlags: [EffectFlag!]! = []
+  examineDescription: String!
   flags: [ObjectFlag!]! = []
   id: Int!
   keywords: [String!]!
   level: Int! = 1
-  shortDesc: String!
+  name: String!
   timer: Int! = 0
   type: ObjectType! = NOTHING
   values: JSON
@@ -373,28 +373,26 @@ input CreateRoomExitInput {
 }
 
 input CreateRoomInput {
-  description: String!
   flags: [RoomFlag!]! = []
   id: Int!
   name: String!
+  roomDescription: String!
   sector: Sector! = STRUCTURE
   zoneId: Int!
 }
 
 input CreateShopInput {
+  buyMessages: [String!]! = []
   buyProfit: Float! = 1
-  doNotBuy: String
+  doNotBuyMessages: [String!]! = []
   flags: [ShopFlag!]! = []
   id: Int!
   keeperId: Int
-  messageBuy: String
-  messageSell: String
-  missingCash1: String
-  missingCash2: String
-  noSuchItem1: String
-  noSuchItem2: String
+  missingCashMessages: [String!]! = []
+  noSuchItemMessages: [String!]! = []
+  sellMessages: [String!]! = []
   sellProfit: Float! = 1
-  temper1: Int! = 0
+  temper: Int! = 0
   tradesWithFlags: [ShopTradesWith!]! = []
   zoneId: Int!
 }
@@ -595,7 +593,7 @@ scalar JSON
 type KeeperDto {
   id: Int!
   keywords: [String!]!
-  shortDesc: String!
+  name: String!
   zoneId: Int!
 }
 
@@ -629,9 +627,9 @@ type MobDto {
   createdAt: DateTime!
   damageDice: String!
   damageType: DamageType!
-  description: String!
   dexterity: Int!
   effectFlags: [EffectFlag!]!
+  examineDescription: String!
   gender: Gender!
   hitRoll: Int!
   hpDice: String!
@@ -640,17 +638,17 @@ type MobDto {
   keywords: [String!]!
   level: Int!
   lifeForce: LifeForce!
-  longDesc: String!
   mobFlags: [MobFlag!]!
+  name: String!
   perception: Int!
   position: Position!
   race: Race!
-  shortDesc: String!
+  roomDescription: String!
   size: Size!
   stance: Stance!
   strength: Int!
   updatedAt: DateTime!
-  wealth: Int!
+  wealth: Int
   wisdom: Int!
   zoneId: Int!
 }
@@ -752,7 +750,7 @@ type MobResetEquipmentDto {
 
 type MobSummaryDto {
   id: Int!
-  shortDesc: String!
+  name: String!
   zoneId: Int!
 }
 
@@ -833,13 +831,13 @@ type ObjectDto {
   cost: Int!
   createdAt: DateTime!
   decomposeTimer: Int!
-  description: String!
   effectFlags: [EffectFlag!]!
+  examineDescription: String!
   flags: [ObjectFlag!]!
   id: Int!
   keywords: [String!]!
   level: Int!
-  shortDesc: String!
+  name: String!
   timer: Int!
   type: ObjectType!
   updatedAt: DateTime!
@@ -908,7 +906,7 @@ enum ObjectFlag {
 type ObjectSummaryDto {
   cost: Int
   id: Int!
-  shortDesc: String!
+  name: String!
   type: String!
   zoneId: Int!
 }
@@ -1094,7 +1092,6 @@ input ResetPasswordInput {
 type RoomDto {
   createdAt: DateTime!
   createdBy: String
-  description: String!
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
   flags: [RoomFlag!]!
@@ -1105,6 +1102,7 @@ type RoomDto {
   mobs: [MobDto!]!
   name: String!
   objects: [ObjectDto!]!
+  roomDescription: String!
   sector: Sector!
   shops: [ShopDto!]!
   updatedAt: DateTime!
@@ -1219,23 +1217,21 @@ type ShopAcceptDto {
 
 type ShopDto {
   accepts: [ShopAcceptDto!]!
+  buyMessages: [String!]!
   buyProfit: Float!
   createdAt: DateTime!
-  doNotBuy: String
+  doNotBuyMessages: [String!]!
   flags: [ShopFlag!]!
   hours: [ShopHourDto!]!
   id: Int!
   items: [ShopItemDto!]!
   keeper: KeeperDto
   keeperId: Int
-  messageBuy: String
-  messageSell: String
-  missingCash1: String
-  missingCash2: String
-  noSuchItem1: String
-  noSuchItem2: String
+  missingCashMessages: [String!]!
+  noSuchItemMessages: [String!]!
+  sellMessages: [String!]!
   sellProfit: Float!
-  temper1: Int!
+  temper: Int!
   tradesWithFlags: [ShopTradesWith!]!
   updatedAt: DateTime!
   zoneId: Int!
@@ -1385,9 +1381,9 @@ input UpdateMobInput {
   constitution: Int
   damageDice: String
   damageType: DamageType
-  description: String
   dexterity: Int
   effectFlags: [EffectFlag!]
+  examineDescription: String
   gender: Gender
   hitRoll: Int
   hpDice: String
@@ -1395,12 +1391,12 @@ input UpdateMobInput {
   keywords: [String!]
   level: Int
   lifeForce: LifeForce
-  longDesc: String
   mobFlags: [MobFlag!]
+  name: String
   perception: Int
   position: Position
   race: Race
-  shortDesc: String
+  roomDescription: String
   size: Size
   stance: Stance
   strength: Int
@@ -1431,12 +1427,12 @@ input UpdateObjectInput {
   concealment: Int
   cost: Int
   decomposeTimer: Int
-  description: String
   effectFlags: [EffectFlag!]
+  examineDescription: String
   flags: [ObjectFlag!]
   keywords: [String!]
   level: Int
-  shortDesc: String
+  name: String
   timer: Int
   type: ObjectType
   values: JSON
@@ -1450,12 +1446,12 @@ input UpdateProfileInput {
 }
 
 input UpdateRoomInput {
-  description: String
   flags: [RoomFlag!]
   layoutX: Int
   layoutY: Int
   layoutZ: Int
   name: String
+  roomDescription: String
   sector: Sector
 }
 
@@ -1466,18 +1462,16 @@ input UpdateRoomPositionInput {
 }
 
 input UpdateShopInput {
+  buyMessages: [String!]
   buyProfit: Float
-  doNotBuy: String
+  doNotBuyMessages: [String!]
   flags: [ShopFlag!]
   keeperId: Int
-  messageBuy: String
-  messageSell: String
-  missingCash1: String
-  missingCash2: String
-  noSuchItem1: String
-  noSuchItem2: String
+  missingCashMessages: [String!]
+  noSuchItemMessages: [String!]
+  sellMessages: [String!]
   sellProfit: Float
-  temper1: Int
+  temper: Int
   tradesWithFlags: [ShopTradesWith!]
   zoneId: Int
 }
