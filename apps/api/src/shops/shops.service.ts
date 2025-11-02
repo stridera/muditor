@@ -8,25 +8,25 @@ type ShopWithRelations = Prisma.ShopsGetPayload<{
       select: {
         id: true;
         zoneId: true;
-        shortDesc: true;
+        name: true;
         keywords: true;
       };
     };
-    shop_items: {
+    shopItems: {
       include: {
         objects: {
           select: {
             id: true;
             zoneId: true;
-            shortDesc: true;
+            name: true;
             type: true;
             cost: true;
           };
         };
       };
     };
-    shop_accepts: true;
-    shop_hours: true;
+    shopAccepts: true;
+    shopHours: true;
   };
 }>;
 
@@ -50,25 +50,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -86,25 +86,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -119,25 +119,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -156,25 +156,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -191,25 +191,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -232,25 +232,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }
@@ -268,25 +268,25 @@ export class ShopsService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
             keywords: true,
           },
         },
-        shop_items: {
+        shopItems: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
                 cost: true,
               },
             },
           },
         },
-        shop_accepts: true,
-        shop_hours: true,
+        shopAccepts: true,
+        shopHours: true,
       },
     });
   }

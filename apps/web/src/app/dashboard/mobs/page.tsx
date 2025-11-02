@@ -19,7 +19,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams, useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import EnhancedSearch, {
   SearchFilters,
@@ -32,11 +32,11 @@ import {
 
 interface Mob {
   id: number;
-  keywords: string[];
-  shortDesc: string;
-  longDesc: string;
-  description: string;
-  level: number;
+  keywords: string;
+  name: string;
+  roomDescription: string;
+  examineDescription: string;
+  level?: number;
   alignment?: number;
   hpDice: string;
   damageDice: string;
@@ -52,6 +52,7 @@ interface Mob {
   constitution?: number;
   charisma?: number;
   wealth?: number;
+  mobClass?: string;
   mobFlags?: string[];
   effectFlags?: string[];
   zoneId: number;
@@ -121,9 +122,9 @@ function MobsContent() {
                 mobsByZone(zoneId: $zoneId) {
                   id
                   keywords
-                  shortDesc
-                  longDesc
-                  description
+                  name
+                  roomDescription
+                  examineDescription
                   hpDice
                   damageDice
                   level
@@ -152,9 +153,9 @@ function MobsContent() {
                 mobs(skip: $skip, take: $take) {
                   id
                   keywords
-                  shortDesc
-                  longDesc
-                  description
+                  name
+                  roomDescription
+                  examineDescription
                   hpDice
                   damageDice
                   level
@@ -203,8 +204,8 @@ function MobsContent() {
             result.errors[0].message
           );
           const fallbackQuery = selectedZone
-            ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords shortDesc longDesc description level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`
-            : `query { mobs { id keywords shortDesc longDesc description level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
+            ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`
+            : `query { mobs { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
 
           const fallbackResponse = await fetch(
             'http://localhost:4000/graphql',
@@ -282,9 +283,9 @@ function MobsContent() {
   // Apply advanced search filters
   const filteredMobs = applySearchFilters(mobs, searchFilters, {
     // Custom field mappings for mob-specific filters
-    healthPoints: mob => mob.level * 10, // Use level-based HP since dice are all 0
-    isHighLevel: mob => mob.level >= 50,
-    isNewbie: mob => mob.level <= 10,
+    healthPoints: mob => (mob.level || 0) * 10, // Use level-based HP since dice are all 0
+    isHighLevel: mob => (mob.level || 0) >= 50,
+    isNewbie: mob => (mob.level || 0) <= 10,
   });
 
   // Calculate pagination
@@ -366,9 +367,9 @@ function MobsContent() {
           mob(id: $id) {
             id
             keywords
-            shortDesc
-            longDesc
-            desc
+            name
+            roomDescription
+            examineDescription
             level
             alignment
             hpDiceNum
@@ -416,12 +417,12 @@ function MobsContent() {
         throw new Error('Mob not found');
       }
 
-      // Create clone data (remove id and modify shortDesc)
+      // Create clone data (remove id and modify name)
       const cloneData = {
         keywords: originalMob.keywords,
-        shortDesc: `${originalMob.shortDesc} (Copy)`,
-        longDesc: originalMob.longDesc,
-        desc: originalMob.desc,
+        name: `${originalMob.name} (Copy)`,
+        roomDescription: originalMob.roomDescription,
+        examineDescription: originalMob.examineDescription,
         level: originalMob.level,
         alignment: originalMob.alignment,
         hpDiceNum: originalMob.hpDiceNum,
@@ -454,8 +455,8 @@ function MobsContent() {
           createMob(data: $data) {
             id
             keywords
-            shortDesc
-            longDesc
+            name
+            roomDescription
             level
             hpDiceNum
             hpDiceSize
@@ -523,7 +524,7 @@ function MobsContent() {
 
       // Load detailed data if not already loaded
       const mob = mobs.find(m => m.id === mobId);
-      if (mob && !mob.desc) {
+      if (mob && !mob.examineDescription) {
         setLoadingDetails(new Set(loadingDetails).add(mobId));
         try {
           const getMobQuery = `
@@ -531,9 +532,9 @@ function MobsContent() {
               mob(id: $id) {
                 id
                 keywords
-                shortDesc
-                longDesc
-                desc
+                name
+                roomDescription
+                examineDescription
                 level
                 alignment
                 hpDiceNum
@@ -664,7 +665,7 @@ function MobsContent() {
             className='border border-gray-300 rounded px-2 py-1 text-sm'
           >
             <option value='level'>Level</option>
-            <option value='shortDesc'>Name</option>
+            <option value='name'>Name</option>
             <option value='id'>ID</option>
             <option value='zoneId'>Zone</option>
           </select>
@@ -806,7 +807,7 @@ function MobsContent() {
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
                       <h3 className='font-semibold text-lg text-gray-900'>
-                        #{mob.id} - {mob.shortDesc}
+                        #{mob.id} - {mob.name}
                       </h3>
                       {/* Visual indicator for expand state */}
                       <div className='text-gray-400'>
@@ -823,7 +824,7 @@ function MobsContent() {
                       Keywords: {mob.keywords}
                     </p>
                     <p className='text-gray-700 mb-2 line-clamp-2'>
-                      {mob.longDesc}
+                      {mob.roomDescription}
                     </p>
                     <div className='flex items-center gap-4 text-sm text-gray-500'>
                       <span>Level {mob.level}</span>
@@ -946,14 +947,16 @@ function MobsContent() {
                                       Mob Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1'>
-                                      {mob.mobFlags.map((flag, index) => (
-                                        <span
-                                          key={index}
-                                          className='inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'
-                                        >
-                                          {flag}
-                                        </span>
-                                      ))}
+                                      {mob.mobFlags.map(
+                                        (flag: string, index: number) => (
+                                          <span
+                                            key={index}
+                                            className='inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'
+                                          >
+                                            {flag}
+                                          </span>
+                                        )
+                                      )}
                                     </div>
                                   </div>
                                 )}
@@ -964,14 +967,16 @@ function MobsContent() {
                                         Effect Flags:
                                       </span>
                                       <div className='flex flex-wrap gap-1'>
-                                        {mob.effectFlags.map((flag, index) => (
-                                          <span
-                                            key={index}
-                                            className='inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded'
-                                          >
-                                            {flag}
-                                          </span>
-                                        ))}
+                                        {mob.effectFlags.map(
+                                          (flag: string, index: number) => (
+                                            <span
+                                              key={index}
+                                              className='inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded'
+                                            >
+                                              {flag}
+                                            </span>
+                                          )
+                                        )}
                                       </div>
                                     </div>
                                   )}
@@ -981,12 +986,14 @@ function MobsContent() {
                         </div>
 
                         {/* Detailed Description */}
-                        {mob.desc && (
+                        {mob.examineDescription && (
                           <div className='mt-4 pt-4 border-t border-gray-200'>
                             <h4 className='font-semibold text-sm text-gray-700 mb-2'>
                               Detailed Description
                             </h4>
-                            <p className='text-sm text-gray-700'>{mob.desc}</p>
+                            <p className='text-sm text-gray-700'>
+                              {mob.examineDescription}
+                            </p>
                           </div>
                         )}
                       </div>
@@ -994,7 +1001,9 @@ function MobsContent() {
                   </div>
                 </div>
                 <div className='flex items-center gap-2 ml-4'>
-                  <Link href={`/dashboard/mobs/editor?zone=${mob.zoneId}&id=${mob.id}`}>
+                  <Link
+                    href={`/dashboard/mobs/editor?zone=${mob.zoneId}&id=${mob.id}`}
+                  >
                     <button
                       onClick={e => e.stopPropagation()}
                       className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'

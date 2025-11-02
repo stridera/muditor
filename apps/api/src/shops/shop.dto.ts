@@ -29,7 +29,7 @@ export class KeeperDto {
   zoneId: number;
 
   @Field()
-  shortDesc: string;
+  name: string;
 
   @Field(() => [String])
   keywords: string[];
@@ -47,7 +47,7 @@ export class ShopDto {
   sellProfit: number;
 
   @Field(() => Int)
-  temper1: number;
+  temper: number;
 
   @Field(() => [ShopFlag])
   flags: ShopFlag[];
@@ -55,26 +55,20 @@ export class ShopDto {
   @Field(() => [ShopTradesWith])
   tradesWithFlags: ShopTradesWith[];
 
-  @Field({ nullable: true })
-  noSuchItem1?: string;
+  @Field(() => [String], { defaultValue: [] })
+  noSuchItemMessages: string[];
 
-  @Field({ nullable: true })
-  noSuchItem2?: string;
+  @Field(() => [String], { defaultValue: [] })
+  doNotBuyMessages: string[];
 
-  @Field({ nullable: true })
-  doNotBuy?: string;
+  @Field(() => [String], { defaultValue: [] })
+  missingCashMessages: string[];
 
-  @Field({ nullable: true })
-  missingCash1?: string;
+  @Field(() => [String], { defaultValue: [] })
+  buyMessages: string[];
 
-  @Field({ nullable: true })
-  missingCash2?: string;
-
-  @Field({ nullable: true })
-  messageBuy?: string;
-
-  @Field({ nullable: true })
-  messageSell?: string;
+  @Field(() => [String], { defaultValue: [] })
+  sellMessages: string[];
 
   @Field(() => Int, { nullable: true })
   keeperId?: number;
@@ -120,7 +114,7 @@ export class CreateShopInput {
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsNumber()
-  temper1?: number;
+  temper?: number;
 
   @Field(() => [ShopFlag], { defaultValue: [] })
   @IsOptional()
@@ -134,40 +128,30 @@ export class CreateShopInput {
   @IsEnum(ShopTradesWith, { each: true })
   tradesWithFlags?: ShopTradesWith[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  noSuchItem1?: string;
+  @IsArray()
+  noSuchItemMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  noSuchItem2?: string;
+  @IsArray()
+  doNotBuyMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  doNotBuy?: string;
+  @IsArray()
+  missingCashMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  missingCash1?: string;
+  @IsArray()
+  buyMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { defaultValue: [] })
   @IsOptional()
-  @IsString()
-  missingCash2?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  messageBuy?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  messageSell?: string;
+  @IsArray()
+  sellMessages?: string[];
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -194,7 +178,7 @@ export class UpdateShopInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  temper1?: number;
+  temper?: number;
 
   @Field(() => [ShopFlag], { nullable: true })
   @IsOptional()
@@ -208,40 +192,30 @@ export class UpdateShopInput {
   @IsEnum(ShopTradesWith, { each: true })
   tradesWithFlags?: ShopTradesWith[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  noSuchItem1?: string;
+  @IsArray()
+  noSuchItemMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  noSuchItem2?: string;
+  @IsArray()
+  doNotBuyMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  doNotBuy?: string;
+  @IsArray()
+  missingCashMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  missingCash1?: string;
+  @IsArray()
+  buyMessages?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => [String], { nullable: true })
   @IsOptional()
-  @IsString()
-  missingCash2?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  messageBuy?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  messageSell?: string;
+  @IsArray()
+  sellMessages?: string[];
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

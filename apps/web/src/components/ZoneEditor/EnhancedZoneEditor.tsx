@@ -30,7 +30,11 @@ import './zone-editor.css';
 
 import { usePermissions } from '@/hooks/use-permissions';
 import { authenticatedFetch } from '@/lib/authenticated-fetch';
-import { hasValidDestination, getExitDestinationZone, isCrossZoneExit } from '@/lib/room-utils';
+import {
+  getExitDestinationZone,
+  hasValidDestination,
+  isCrossZoneExit,
+} from '@/lib/room-utils';
 import ZoneSelector from '../ZoneSelector';
 import {
   EntityPalette,
@@ -143,7 +147,7 @@ import {
 const convertToAutoLayoutRoom = (room: Room): AutoLayoutRoom => ({
   id: room.id,
   name: room.name,
-  description: room.description,
+  description: room.roomDescription,
   layoutX: room.layoutX,
   layoutY: room.layoutY,
   layoutZ: room.layoutZ,
@@ -183,7 +187,7 @@ const resolveOverlaps = (
 interface Room {
   id: number;
   name: string;
-  description: string;
+  roomDescription: string;
   sector: string;
   zoneId: number;
   layoutX?: number | null;
@@ -261,6 +265,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const room = rooms.find(r => r.id === roomId);
       setEditedRoom(room ? { ...room } : null);
 
+      // Update URL with selected room
+      const params = new URLSearchParams(window.location.search);
+      params.set('room', roomId.toString());
+      router.push(`?${params.toString()}`, { scroll: false });
+
       // Update z-level to match selected room's floor
       if (room) {
         const roomZ = room.layoutZ ?? 0;
@@ -283,7 +292,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         );
       }
     },
-    [rooms, overlaps]
+    [rooms, overlaps, router]
   );
 
   // Handler for navigating to a different zone
@@ -365,7 +374,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           const activeRoomIndex = overlappedRoomIds.indexOf(activeRoomId);
           // If this room was before the active room, keep its position + 1
           // If this room was after the active room, keep its position
-          return thisRoomIndex < activeRoomIndex ? thisRoomIndex + 1 : thisRoomIndex;
+          return thisRoomIndex < activeRoomIndex
+            ? thisRoomIndex + 1
+            : thisRoomIndex;
         }
       }
 
@@ -411,7 +422,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         setEditedRoom({ ...newActiveRoom });
         const roomZ = newActiveRoom.layoutZ ?? 0;
         setCurrentZLevel(roomZ);
-        console.log(`🏢 Updated floor to Z${roomZ} (switched to room ${newActiveRoomId})`);
+        console.log(
+          `🏢 Updated floor to Z${roomZ} (switched to room ${newActiveRoomId})`
+        );
       }
 
       console.log(
@@ -1664,13 +1677,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     }
                     mobs {
                       id
-                      shortDesc
+                      name
                       level
                       race
                     }
                     objects {
                       id
-                      shortDesc
+                      name
                       type
                       keywords
                     }
@@ -1694,8 +1707,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   mobsByZone(zoneId: $zoneId) {
                     id
                     keywords
-                    shortDesc
-                    longDesc
+                    name
+                    roomDescription
                     level
                     mobFlags
                     lifeForce
@@ -1714,8 +1727,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   objectsByZone(zoneId: $zoneId) {
                     id
                     keywords
-                    shortDesc
-                    description
+                    name
+                    examineDescription
                     type
                     cost
                     weight
@@ -1747,7 +1760,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               mobs:
                 room.mobs?.map((mob: any) => ({
                   ...mob,
-                  name: mob.shortDesc, // Add name field mapping from shortDesc
+                  name: mob.name, // Add name field mapping from name
                 })) || [],
             }));
             setRooms(transformedRooms);
@@ -1794,7 +1807,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const transformedMobs = mobsData.data.mobsByZone.map(
               (mob: any) => ({
                 id: mob.id,
-                name: mob.shortDesc,
+                name: mob.name,
                 level: mob.level,
                 race: mob.race || 'HUMAN',
                 class: mob.mobClass,
@@ -1828,8 +1841,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const transformedObjects = objectsData.data.objectsByZone.map(
               (obj: any) => ({
                 id: obj.id,
-                name: obj.shortDesc,
-                shortDesc: obj.shortDesc,
+                name: obj.name,
+                name: obj.name,
                 type: obj.type,
                 keywords: obj.keywords || [],
                 value: obj.cost,
@@ -3025,7 +3038,6 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     generateEnhancedWorldMapNodes,
   ]);
 
-
   // Convert rooms to React Flow nodes and edges
   useEffect(() => {
     console.log(
@@ -3086,16 +3098,25 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     }
 
     console.log(`🏠 Should show zone room view with ${rooms.length} rooms`);
-    console.log(`🔍 Current state: currentZLevel=${currentZLevel}, overlaps count=${overlaps.length}`, overlaps);
+    console.log(
+      `🔍 Current state: currentZLevel=${currentZLevel}, overlaps count=${overlaps.length}`,
+      overlaps
+    );
 
     // Debug: Check if rooms 20 and 49 exist in rooms array
     const room20 = rooms.find(r => r.id === 20);
     const room49 = rooms.find(r => r.id === 49);
     if (room20 || room49) {
       console.log(`🔍 Found rooms 20/49 in array:`, {
-        room20: room20 ? `Position: (${room20.layoutX}, ${room20.layoutY}, ${room20.layoutZ})` : 'NOT IN ARRAY',
-        room49: room49 ? `Position: (${room49.layoutX}, ${room49.layoutY}, ${room49.layoutZ})` : 'NOT IN ARRAY',
-        overlap20_49: overlaps.find(o => o.roomIds.includes(20) || o.roomIds.includes(49)),
+        room20: room20
+          ? `Position: (${room20.layoutX}, ${room20.layoutY}, ${room20.layoutZ})`
+          : 'NOT IN ARRAY',
+        room49: room49
+          ? `Position: (${room49.layoutX}, ${room49.layoutY}, ${room49.layoutZ})`
+          : 'NOT IN ARRAY',
+        overlap20_49: overlaps.find(
+          o => o.roomIds.includes(20) || o.roomIds.includes(49)
+        ),
         activeOverlapRooms,
       });
     }
@@ -3243,10 +3264,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       if (room.id === 20 || room.id === 49) {
         const finalX = nodePosition.x + offsetX;
         const finalY = nodePosition.y + offsetY;
-        const viewport = reactFlowInstance ? {
-          zoom: reactFlowInstance.getZoom(),
-          viewport: reactFlowInstance.getViewport(),
-        } : null;
+        const viewport = reactFlowInstance
+          ? {
+              zoom: reactFlowInstance.getZoom(),
+              viewport: reactFlowInstance.getViewport(),
+            }
+          : null;
 
         console.log(`🔍 Final node data for room ${room.id}:`, {
           nodePosition,
@@ -3257,9 +3280,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           zIndex,
           overlapIndex,
           viewport,
-          likelyOffscreen: viewport ? (
-            Math.abs(finalX) > 50000 || Math.abs(finalY) > 50000
-          ) : 'unknown',
+          likelyOffscreen: viewport
+            ? Math.abs(finalX) > 50000 || Math.abs(finalY) > 50000
+            : 'unknown',
         });
       }
 
@@ -3274,7 +3297,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           roomId: room.id,
           name: room.name,
           sector: room.sector,
-          description: room.description,
+          description: room.roomDescription,
           exits: room.exits,
           mobs: room.mobs || [],
           layoutZ: room.layoutZ,
@@ -3318,7 +3341,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     const autoLayoutRooms: AutoLayoutRoom[] = rooms.map(room => ({
       id: room.id,
       name: room.name,
-      description: room.description,
+      description: room.roomDescription,
       layoutX: room.layoutX,
       layoutY: room.layoutY,
       layoutZ: room.layoutZ,
@@ -3610,8 +3633,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     const room49Node = newNodes.find(n => n.id === '49');
     if (room20Node || room49Node) {
       console.log('🔍 Rooms 20/49 nodes:', {
-        room20: room20Node ? `Position: (${room20Node.position.x}, ${room20Node.position.y}), Opacity: ${room20Node.style?.opacity}` : 'NOT FOUND',
-        room49: room49Node ? `Position: (${room49Node.position.x}, ${room49Node.position.y}), Opacity: ${room49Node.style?.opacity}` : 'NOT FOUND',
+        room20: room20Node
+          ? `Position: (${room20Node.position.x}, ${room20Node.position.y}), Opacity: ${room20Node.style?.opacity}`
+          : 'NOT FOUND',
+        room49: room49Node
+          ? `Position: (${room49Node.position.x}, ${room49Node.position.y}), Opacity: ${room49Node.style?.opacity}`
+          : 'NOT FOUND',
       });
     }
 
@@ -3638,7 +3665,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Update node selection state without regenerating all nodes
   useEffect(() => {
-    if (selectedRoomId == null || worldMapMode || currentViewMode === 'world-map')
+    if (
+      selectedRoomId == null ||
+      worldMapMode ||
+      currentViewMode === 'world-map'
+    )
       return;
 
     setNodes(nds =>
@@ -3694,7 +3725,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           // If clicking a room on a different floor, switch to that floor
           if (roomZ !== currentZLevel) {
             setCurrentZLevel(roomZ);
-            console.log(`🏢 Switched to floor Z${roomZ} (clicked room on different floor)`);
+            console.log(
+              `🏢 Switched to floor Z${roomZ} (clicked room on different floor)`
+            );
           }
 
           // Only update selected room if it's actually different
@@ -3724,7 +3757,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         handleZoneSelect(zoneId);
       }
     },
-    [rooms, handleZoneSelect, handleRoomSelect, worldMapMode, selectedRoomId, currentZLevel]
+    [
+      rooms,
+      handleZoneSelect,
+      handleRoomSelect,
+      worldMapMode,
+      selectedRoomId,
+      currentZLevel,
+    ]
   );
 
   const onNodeDragStop = useCallback(
@@ -3896,7 +3936,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               id: selectedRoomId,
               data: {
                 name: editedRoom.name,
-                description: editedRoom.description,
+                roomDescription: editedRoom.roomDescription,
                 sector: editedRoom.sector,
               },
             },
@@ -4415,7 +4455,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 id: newRoomId,
                 id: newRoomId,
                 name: roomName,
-                description: roomDescription,
+                roomDescription: roomDescription,
                 sector: 'STRUCTURE',
                 zoneId: zoneId,
               },
@@ -4439,7 +4479,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           console.log(`✅ Room ${newRoom.id} created successfully`);
 
           // TODO: Add exit creation functionality between rooms when direction is specified
-          if (selectedRoomId != null && selectedDirection && selectedDirection.trim()) {
+          if (
+            selectedRoomId != null &&
+            selectedDirection &&
+            selectedDirection.trim()
+          ) {
             console.log(
               `📝 Note: Would create ${selectedDirection} exit from room ${selectedRoomId} to new room ${newRoom.id}`
             );
@@ -4907,7 +4951,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 const destZ = destinationRoom.layoutZ ?? 0;
                 if (destZ !== currentZLevel) {
                   setCurrentZLevel(destZ);
-                  console.log(`🏢 Followed to floor Z${destZ} (was Z${currentZLevel})`);
+                  console.log(
+                    `🏢 Followed to floor Z${destZ} (was Z${currentZLevel})`
+                  );
                 }
 
                 // Check if destination room is part of an overlap
@@ -4931,24 +4977,40 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   n => n.id === destRoomId.toString()
                 );
                 if (targetNode && reactFlowInstance) {
-                  console.log(`🎯 Centering on room ${destRoomId} at position:`, targetNode.position);
+                  console.log(
+                    `🎯 Centering on room ${destRoomId} at position:`,
+                    targetNode.position
+                  );
                   reactFlowInstance.setCenter(
                     targetNode.position.x + 90, // Center of room node
                     targetNode.position.y + 60,
                     { zoom: 1.2, duration: 800 }
                   );
-                } else if (reactFlowInstance && destinationRoom.layoutX !== null && destinationRoom.layoutY !== null) {
+                } else if (
+                  reactFlowInstance &&
+                  destinationRoom.layoutX !== null &&
+                  destinationRoom.layoutY !== null
+                ) {
                   // Fallback: calculate position from room coordinates if node not found yet
-                  const roomX = destinationRoom.layoutX * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
-                  const roomY = -destinationRoom.layoutY * GRID_SIZE * ROOM_SPACING_MULTIPLIER; // Y is inverted
-                  console.log(`🎯 Node not found yet, centering on room ${destRoomId} at calculated position: (${roomX}, ${roomY})`);
-                  reactFlowInstance.setCenter(
-                    roomX + 90,
-                    roomY + 60,
-                    { zoom: 1.2, duration: 800 }
+                  const roomX =
+                    destinationRoom.layoutX *
+                    GRID_SIZE *
+                    ROOM_SPACING_MULTIPLIER;
+                  const roomY =
+                    -destinationRoom.layoutY *
+                    GRID_SIZE *
+                    ROOM_SPACING_MULTIPLIER; // Y is inverted
+                  console.log(
+                    `🎯 Node not found yet, centering on room ${destRoomId} at calculated position: (${roomX}, ${roomY})`
                   );
+                  reactFlowInstance.setCenter(roomX + 90, roomY + 60, {
+                    zoom: 1.2,
+                    duration: 800,
+                  });
                 } else {
-                  console.warn(`⚠️ Could not center on room ${destRoomId} - node not found and no coordinates`);
+                  console.warn(
+                    `⚠️ Could not center on room ${destRoomId} - node not found and no coordinates`
+                  );
                 }
               } else {
                 console.log(
@@ -5134,10 +5196,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         const room = rooms.find(r => r.id === roomId);
         if (room?.exits) {
           room.exits.forEach(exit => {
-            if (
-              hasValidDestination(exit) &&
-              !visited.has(exit.toRoomId)
-            ) {
+            if (hasValidDestination(exit) && !visited.has(exit.toRoomId)) {
               const offset = directionOffsets[exit.direction] || {
                 x: 1,
                 y: 1,
@@ -5247,7 +5306,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       return;
     }
 
-    const roomPositionsForOverlapDetection: Record<number, { x: number; y: number; z?: number }> = {};
+    const roomPositionsForOverlapDetection: Record<
+      number,
+      { x: number; y: number; z?: number }
+    > = {};
     rooms.forEach(room => {
       if (room.layoutX !== null && room.layoutY !== null) {
         roomPositionsForOverlapDetection[room.id] = {
@@ -5263,7 +5325,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // Always update overlaps to ensure they're in sync with rooms
     setOverlaps(detectedOverlaps);
     if (detectedOverlaps.length > 0) {
-      console.log(`📚 Detected ${detectedOverlaps.length} overlaps:`, detectedOverlaps);
+      console.log(
+        `📚 Detected ${detectedOverlaps.length} overlaps:`,
+        detectedOverlaps
+      );
       setShowOverlapInfo(true);
     } else {
       setShowOverlapInfo(false);
@@ -6550,7 +6615,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                               setEditedRoom({ ...room });
                               const roomZ = room.layoutZ ?? 0;
                               setCurrentZLevel(roomZ);
-                              console.log(`🏢 Updated floor to Z${roomZ} (overlap panel select room ${roomId})`);
+                              console.log(
+                                `🏢 Updated floor to Z${roomZ} (overlap panel select room ${roomId})`
+                              );
                             }
 
                             // Make this room the active one in the overlap
@@ -6664,7 +6731,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                         // Update z-level to match the room's floor
                         const roomZ = firstRoom.layoutZ ?? 0;
                         setCurrentZLevel(roomZ);
-                        console.log(`🏢 Updated floor to Z${roomZ} (overlap warning jump to room ${firstRoomId})`);
+                        console.log(
+                          `🏢 Updated floor to Z${roomZ} (overlap warning jump to room ${firstRoomId})`
+                        );
                         // Center on the room
                         const targetNode = nodes.find(
                           n => n.id === firstRoomId.toString()
@@ -6690,7 +6759,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                           <div
                             key={roomId}
                             className='w-6 h-6 bg-white text-orange-600 rounded-full flex items-center justify-center font-bold text-xs border-2 border-orange-400'
-                            title={room ? `${idx + 1}: ${room.name}` : `${idx + 1}: Room ${roomId}`}
+                            title={
+                              room
+                                ? `${idx + 1}: ${room.name}`
+                                : `${idx + 1}: Room ${roomId}`
+                            }
                           >
                             {idx + 1}
                           </div>

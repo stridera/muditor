@@ -7,7 +7,6 @@ import { NodeProps } from 'reactflow';
 interface MobData {
   id: number;
   name: string;
-  shortDesc?: string;
   level: number;
   race?: string;
   class?: string;
@@ -113,7 +112,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
           </div>
 
           <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-            {data.shortDesc || data.name}
+            {data.name}
           </h3>
         </div>
 

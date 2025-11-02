@@ -55,7 +55,7 @@ async function validateImportedData() {
     // Check room connectivity
     const roomsWithExits = await prisma.rooms.count({
       where: {
-        room_exits_room_exits_roomZoneId_roomIdTorooms: {
+        exits: {
           some: {}
         }
       }
@@ -99,8 +99,8 @@ async function validateImportedData() {
     if (sampleZone) {
       console.log(`   Zone 1: "${sampleZone.name}"`);
       console.log(`   Sample rooms: ${sampleZone.rooms.map(r => `${r.id}:"${r.name}"`).join(', ')}`);
-      console.log(`   Sample mobs: ${sampleZone.mobs.map(m => `${m.id}:"${m.shortDesc}"`).join(', ')}`);
-      console.log(`   Sample objects: ${sampleZone.objects.map(o => `${o.id}:"${o.shortDesc}"`).join(', ')}`);
+      console.log(`   Sample mobs: ${sampleZone.mobs.map(m => `${m.id}:"${m.name}"`).join(', ')}`);
+      console.log(`   Sample objects: ${sampleZone.objects.map(o => `${o.id}:"${o.name}"`).join(', ')}`);
     }
     
     console.log('\n✅ Data validation completed successfully!');

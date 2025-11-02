@@ -1,5 +1,13 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Int,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import { Prisma } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateMobInput, MobDto, UpdateMobInput } from './mob.dto';
@@ -41,7 +49,7 @@ export class MobsResolver {
   @UseGuards(JwtAuthGuard)
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
     const { zoneId, race, hpDice, damageDice, ...rest } = data;
-    
+
     // Parse dice strings (e.g., "2d8+3" -> num=2, size=8, bonus=3)
     const parseDice = (diceStr: string) => {
       const match = diceStr.match(/^(\d+)d(\d+)([+-]\d+)?$/);
@@ -52,14 +60,13 @@ export class MobsResolver {
         bonus: parseInt(match[3] || '0'),
       };
     };
-    
+
     const hp = parseDice(hpDice || '1d8+0');
     const dmg = parseDice(damageDice || '1d4+0');
-    
+
     const createData: Prisma.MobsCreateInput = {
       ...rest,
       mobClass: 'NORMAL', // Default mob class
-      desc: rest.description || '', // Use description as desc
       hpDiceNum: hp.num,
       hpDiceSize: hp.size,
       hpDiceBonus: hp.bonus,
@@ -104,5 +111,28 @@ export class MobsResolver {
     @Args('ids', { type: () => [Int] }) ids: number[]
   ): Promise<number> {
     return this.mobsService.deleteMany(ids);
+  }
+
+  // Field resolvers to compute virtual fields from database
+  @ResolveField(() => String)
+  hpDice(@Parent() mob: any): string {
+    const num = mob.hpDiceNum || 1;
+    const size = mob.hpDiceSize || 8;
+    const bonus = mob.hpDiceBonus || 0;
+    return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
+  }
+
+  @ResolveField(() => String)
+  damageDice(@Parent() mob: any): string {
+    const num = mob.damageDiceNum || 1;
+    const size = mob.damageDiceSize || 4;
+    const bonus = mob.damageDiceBonus || 0;
+    return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
+  }
+
+  @ResolveField(() => Int, { nullable: true })
+  wealth(@Parent() mob: any): number | null {
+    // Map totalWealth from database to wealth in DTO
+    return mob.totalWealth ?? null;
   }
 }

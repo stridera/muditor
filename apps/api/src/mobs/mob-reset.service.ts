@@ -14,13 +14,13 @@ export class MobResetService {
     const resets = await this.prisma.mobResets.findMany({
       where: { mobZoneId, mobId },
       include: {
-        mob_reset_equipment: {
+        mobResetEquipment: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
@@ -30,7 +30,7 @@ export class MobResetService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         rooms: {
@@ -50,13 +50,13 @@ export class MobResetService {
     const reset = await this.prisma.mobResets.findUnique({
       where: { id },
       include: {
-        mob_reset_equipment: {
+        mobResetEquipment: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
@@ -66,7 +66,7 @@ export class MobResetService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         rooms: {
@@ -93,7 +93,7 @@ export class MobResetService {
         roomZoneId: data.roomZoneId,
         roomId: data.roomId,
         zoneId: data.zoneId,
-        mob_reset_equipment: data.equipment
+        mobResetEquipment: data.equipment
           ? {
               create: data.equipment.map(eq => ({
                 objectZoneId: eq.objectZoneId,
@@ -106,13 +106,13 @@ export class MobResetService {
           : undefined,
       },
       include: {
-        mob_reset_equipment: {
+        mobResetEquipment: {
           include: {
             objects: {
               select: {
                 id: true,
                 zoneId: true,
-                shortDesc: true,
+                name: true,
                 type: true,
               },
             },
@@ -122,7 +122,7 @@ export class MobResetService {
           select: {
             id: true,
             zoneId: true,
-            shortDesc: true,
+            name: true,
           },
         },
         rooms: {
@@ -223,7 +223,7 @@ export class MobResetService {
       probability: reset.probability,
       comment: reset.comment,
       equipment:
-        reset.mob_reset_equipment?.map((eq: any) => ({
+        reset.mobResetEquipment?.map((eq: any) => ({
           id: eq.id,
           objectZoneId: eq.objectZoneId,
           objectId: eq.objectId,

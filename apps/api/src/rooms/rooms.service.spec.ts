@@ -1,8 +1,8 @@
+import { Sector } from '@muditor/db';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../database/database.service';
+import { CreateRoomInput, RoomDto } from './room.dto';
 import { RoomsService } from './rooms.service';
-import { RoomDto, CreateRoomInput, UpdateRoomInput } from './room.dto';
-import { Sector } from '@muditor/db';
 
 describe('RoomsService', () => {
   let service: RoomsService;
@@ -11,7 +11,7 @@ describe('RoomsService', () => {
   const mockRoom: Partial<RoomDto> = {
     id: 1,
     name: 'Test Room',
-    description: 'This is a test room for unit testing',
+    roomDescription: 'This is a test room for unit testing',
     zoneId: 511,
     sector: Sector.CITY,
     flags: [],
@@ -24,7 +24,7 @@ describe('RoomsService', () => {
 
   beforeEach(async () => {
     const mockDatabaseService = {
-      room: {
+      rooms: {
         findMany: jest.fn(),
         findUnique: jest.fn(),
         create: jest.fn(),
@@ -32,7 +32,7 @@ describe('RoomsService', () => {
         delete: jest.fn(),
         count: jest.fn(),
       },
-      roomExit: {
+      roomExits: {
         create: jest.fn(),
         delete: jest.fn(),
       },
@@ -64,7 +64,7 @@ describe('RoomsService', () => {
         take: undefined,
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -76,12 +76,14 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -97,19 +99,21 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
             },
           },
         },
-        orderBy: { id: 'asc' },
+        orderBy: {
+          id: 'asc',
+        },
       });
     });
 
@@ -126,7 +130,7 @@ describe('RoomsService', () => {
         take: 5,
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -138,12 +142,14 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -159,12 +165,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -188,7 +194,7 @@ describe('RoomsService', () => {
         take: undefined,
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -200,12 +206,12 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                 },
               },
             },
@@ -221,12 +227,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -251,7 +257,7 @@ describe('RoomsService', () => {
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -263,12 +269,12 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                 },
               },
             },
@@ -284,12 +290,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -312,7 +318,7 @@ describe('RoomsService', () => {
     const createRoomInput: CreateRoomInput = {
       id: 1,
       name: 'New Room',
-      description: 'A new room for testing',
+      roomDescription: 'A new room for testing',
       zoneId: 511,
     };
 
@@ -327,14 +333,14 @@ describe('RoomsService', () => {
         data: {
           id: 1,
           name: 'New Room',
-          description: 'A new room for testing',
+          roomDescription: 'A new room for testing',
           sector: 'STRUCTURE',
           flags: [],
           zoneId: 511,
         },
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -346,12 +352,12 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                 },
               },
             },
@@ -367,12 +373,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -390,7 +396,9 @@ describe('RoomsService', () => {
 
     it('should update a room', async () => {
       const updatedRoom = { ...mockRoom, ...updateRoomInput };
-      (databaseService.rooms.update as jest.Mock).mockResolvedValue(updatedRoom);
+      (databaseService.rooms.update as jest.Mock).mockResolvedValue(
+        updatedRoom
+      );
 
       const result = await service.update(511, 1, updateRoomInput);
 
@@ -405,7 +413,7 @@ describe('RoomsService', () => {
         },
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -417,12 +425,12 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                 },
               },
             },
@@ -438,12 +446,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -465,7 +473,7 @@ describe('RoomsService', () => {
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: {
           exits: true,
-          extraDescs: true,
+          roomExtraDescriptions: true,
           mobResets: {
             select: {
               id: true,
@@ -477,12 +485,12 @@ describe('RoomsService', () => {
               mobId: true,
               roomZoneId: true,
               roomId: true,
-              mob: {
+              mobs: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                 },
               },
             },
@@ -498,12 +506,12 @@ describe('RoomsService', () => {
               objectId: true,
               roomZoneId: true,
               roomId: true,
-              object: {
+              objects: {
                 select: {
                   id: true,
                   zoneId: true,
                   keywords: true,
-                  shortDesc: true,
+                  name: true,
                   type: true,
                 },
               },
@@ -545,7 +553,9 @@ describe('RoomsService', () => {
 
     it('should update room position', async () => {
       const updatedRoom = { ...mockRoom, ...positionInput };
-      (databaseService.rooms.update as jest.Mock).mockResolvedValue(updatedRoom);
+      (databaseService.rooms.update as jest.Mock).mockResolvedValue(
+        updatedRoom
+      );
 
       const result = await service.updatePosition(511, 1, positionInput);
 
@@ -555,9 +565,52 @@ describe('RoomsService', () => {
         data: positionInput,
         include: {
           exits: true,
-          extraDescs: true,
-          mobResets: true,
-          objectResets: true,
+          roomExtraDescriptions: true,
+          mobResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              mobZoneId: true,
+              mobId: true,
+              roomZoneId: true,
+              roomId: true,
+              mobs: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  name: true,
+                  level: true,
+                  race: true,
+                },
+              },
+            },
+          },
+          objectResets: {
+            select: {
+              id: true,
+              zoneId: true,
+              maxInstances: true,
+              probability: true,
+              comment: true,
+              objectZoneId: true,
+              objectId: true,
+              roomZoneId: true,
+              roomId: true,
+              objects: {
+                select: {
+                  id: true,
+                  zoneId: true,
+                  keywords: true,
+                  name: true,
+                  type: true,
+                },
+              },
+            },
+          },
         },
       });
     });

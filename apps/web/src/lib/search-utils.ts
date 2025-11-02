@@ -7,8 +7,9 @@ import { SearchFilters } from '../components/EnhancedSearch';
 export interface Searchable {
   id: number;
   keywords?: string;
-  shortDesc?: string;
-  longDesc?: string;
+  name?: string;
+  roomDescription?: string;
+  examineDescription?: string;
   level?: number;
   type?: string;
   [key: string]: any;
@@ -34,8 +35,9 @@ export function applySearchFilters<T extends Searchable>(
 
       const searchFields = [
         item.keywords,
-        item.shortDesc,
-        item.longDesc,
+        item.name,
+        item.roomDescription,
+        item.examineDescription,
         item.id?.toString(),
         item.type,
       ]
@@ -144,10 +146,10 @@ export function generateSearchSuggestions<T extends Searchable>(
       });
     }
 
-    // Add matching short descriptions (first few words)
-    if (item.shortDesc) {
-      const words = item.shortDesc.split(' ').slice(0, 3);
-      words.forEach(word => {
+    // Add matching names (first few words)
+    if (item.name) {
+      const words = item.name.split(' ').slice(0, 3);
+      words.forEach((word: string) => {
         if (word.toLowerCase().includes(term) && word.length > 2) {
           suggestions.add(word.toLowerCase());
         }

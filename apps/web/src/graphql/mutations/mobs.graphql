@@ -1,0 +1,76 @@
+mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
+  updateMob(zoneId: $zoneId, id: $id, data: $data) {
+    id
+    zoneId
+    keywords
+    name
+    roomDescription
+    examineDescription
+    level
+    alignment
+    hitRoll
+    armorClass
+    hpDice
+    damageDice
+    damageType
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    perception
+    concealment
+    race
+    gender
+    size
+    lifeForce
+    composition
+    mobFlags
+    effectFlags
+    position
+    stance
+  }
+}
+
+mutation CreateMob($data: CreateMobInput!) {
+  createMob(data: $data) {
+    id
+    zoneId
+    keywords
+    name
+    roomDescription
+    examineDescription
+    level
+    alignment
+    hitRoll
+    armorClass
+    hpDice
+    damageDice
+    damageType
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    perception
+    concealment
+    race
+    gender
+    size
+    lifeForce
+    composition
+    mobFlags
+    effectFlags
+    position
+    stance
+  }
+}
+
+mutation DeleteMob($zoneId: Int!, $id: Int!) {
+  deleteMob(zoneId: $zoneId, id: $id) {
+    id
+    zoneId
+  }
+}

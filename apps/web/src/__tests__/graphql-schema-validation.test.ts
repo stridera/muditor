@@ -145,9 +145,9 @@ const mockSchema = buildSchema(`
     id: Int!
     keywords: String!
     mobClass: String!
-    shortDesc: String!
-    longDesc: String!
-    desc: String!
+    name: String!
+    roomDescription: String!
+    examineDescription: String!
     mobFlags: [MobFlag!]!
     effectFlags: [EffectFlag!]!
     alignment: Int!
@@ -155,12 +155,8 @@ const mockSchema = buildSchema(`
     armorClass: Int!
     hitRoll: Int!
     move: Int!
-    hpDiceNum: Int!
-    hpDiceSize: Int!
-    hpDiceBonus: Int!
-    damageDiceNum: Int!
-    damageDiceSize: Int!
-    damageDiceBonus: Int!
+    hpDice: String!
+    damageDice: String!
     copper: Int!
     silver: Int!
     gold: Int!
@@ -189,30 +185,26 @@ const mockSchema = buildSchema(`
   }
 
   type Query {
-    mob(id: Int!): MobDto
+    mob(id: Int!, zoneId: Int!): MobDto
     mobs: [MobDto!]!
   }
 `);
 
 // Extract GraphQL queries from frontend code
 const mobQueries = {
-  // Query from toggleMobExpanded function - only using fields that exist in schema
+  // Query from toggleMobExpanded function - using current schema field names
   getMobDetails: `
-    query GetMob($id: Int!) {
-      mob(id: $id) {
+    query GetMob($id: Int!, $zoneId: Int!) {
+      mob(id: $id, zoneId: $zoneId) {
         id
         keywords
-        shortDesc
-        longDesc
-        desc
+        name
+        roomDescription
+        examineDescription
         level
         alignment
-        hpDiceNum
-        hpDiceSize
-        hpDiceBonus
-        damageDiceNum
-        damageDiceSize
-        damageDiceBonus
+        hpDice
+        damageDice
         mobClass
         lifeForce
         damageType
@@ -233,13 +225,13 @@ const mobQueries = {
 
   // Simplified query with only confirmed schema fields
   getBasicMob: `
-    query GetMob($id: Int!) {
-      mob(id: $id) {
+    query GetMob($id: Int!, $zoneId: Int!) {
+      mob(id: $id, zoneId: $zoneId) {
         id
         keywords
-        shortDesc
-        longDesc
-        desc
+        name
+        roomDescription
+        examineDescription
         level
         alignment
         zoneId
@@ -277,12 +269,12 @@ describe('GraphQL Schema Validation', () => {
 
   describe('Field Mapping Validation', () => {
     test('should detect common field mismatches', () => {
-      // This test validates our error detection but shouldn't be extracted by the build script
-      // Test query with intentionally wrong field names (commented out to avoid build detection)
+      // Test query with OLD field names that should NOT work
       const badQuery = `
-        query GetMob($id: Int!) {
-          mob(id: $id) {
+        query GetMob($id: Int!, $zoneId: Int!) {
+          mob(id: $id, zoneId: $zoneId) {
             id
+            shortDesc
           }
         }
       `;
@@ -290,18 +282,19 @@ describe('GraphQL Schema Validation', () => {
       const document = parse(badQuery);
       const errors = validate(mockSchema, document);
 
-      // This is now a valid query (to avoid build script detection), so no errors expected
-      expect(errors.length).toBe(0);
+      // Should have validation errors because shortDesc doesn't exist
+      expect(errors.length).toBeGreaterThan(0);
+      expect(errors[0].message).toContain('shortDesc');
     });
 
     test('should pass with correct field names', () => {
       const goodQuery = `
-        query GetMob($id: Int!) {
-          mob(id: $id) {
+        query GetMob($id: Int!, $zoneId: Int!) {
+          mob(id: $id, zoneId: $zoneId) {
             id
-            desc
-            shortDesc
-            longDesc
+            examineDescription
+            name
+            roomDescription
           }
         }
       `;
@@ -317,8 +310,8 @@ describe('GraphQL Schema Validation', () => {
   describe('Type Safety Validation', () => {
     test('should validate enum values', () => {
       const enumQuery = `
-        query GetMob($id: Int!) {
-          mob(id: $id) {
+        query GetMob($id: Int!, $zoneId: Int!) {
+          mob(id: $id, zoneId: $zoneId) {
             id
             gender
             lifeForce
@@ -335,10 +328,10 @@ describe('GraphQL Schema Validation', () => {
 
     test('should catch invalid enum field references', () => {
       const badEnumQuery = `
-        query GetMob($id: Int!) {
-          mob(id: $id) {
+        query GetMob($id: Int!, $zoneId: Int!) {
+          mob(id: $id, zoneId: $zoneId) {
             id
-            invalidEnum  # This should fail
+            invalidEnum
           }
         }
       `;

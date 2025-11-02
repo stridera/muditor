@@ -1,12 +1,12 @@
 'use client';
 
+import { getExitDestinationZone, hasValidDestination } from '@/lib/room-utils';
 import React, { useEffect, useState } from 'react';
-import { hasValidDestination, getExitDestinationZone } from '@/lib/room-utils';
 
 interface Room {
   id: number;
   name: string;
-  description: string;
+  roomDescription: string;
   sector: string;
   zoneId: number;
   layoutX?: number | null;
@@ -16,22 +16,24 @@ interface Room {
   mobs?: Array<{
     id: number;
     name: string;
-    shortDesc: string;
     level: number;
     race?: string;
     mobClass?: string;
+    zoneId?: number;
   }>;
   objects?: Array<{
     id: number;
-    shortDesc: string;
+    name: string;
     type: string;
     keywords?: string[];
+    zoneId?: number;
   }>;
   shops?: Array<{
     id: number;
     buyProfit: number;
     sellProfit: number;
     keeperId: number;
+    zoneId?: number;
   }>;
 }
 
@@ -369,14 +371,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                 Description
               </label>
               <textarea
-                value={room.description}
-                onChange={e => onRoomChange('description', e.target.value)}
+                value={room.roomDescription}
+                onChange={e => onRoomChange('roomDescription', e.target.value)}
                 rows={5}
                 className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
                 placeholder='Describe what players see in this room'
               />
               <div className='text-xs text-gray-500 mt-1'>
-                {room.description?.length || 0}/1000 characters
+                {room.roomDescription?.length || 0}/1000 characters
               </div>
             </div>
 
@@ -434,7 +436,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                 <div className='space-y-2'>
                   {room.exits.map((exit, index) => {
                     // Use toZoneId and toRoomId if available
-                    const destZoneId = getExitDestinationZone(exit, room.zoneId);
+                    const destZoneId = getExitDestinationZone(
+                      exit,
+                      room.zoneId
+                    );
                     const destRoomId = exit.toRoomId;
                     const destRoom = allRooms.find(
                       r => r.id === destRoomId && r.zoneId === destZoneId
@@ -824,7 +829,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         <div className='flex-1'>
                           <div className='flex items-center gap-2 mb-1'>
                             <span className='font-medium text-sm'>
-                              {mob.shortDesc || mob.name}
+                              {mob.name}
                             </span>
                             <span className='text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded'>
                               Level {mob.level}
@@ -845,7 +850,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         </div>
                         <div className='flex gap-1'>
                           <a
-                            href={`/dashboard/mobs/editor?id=${mob.id}`}
+                            href={`/dashboard/mobs/editor?zoneId=${mob.zoneId}&id=${mob.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-blue-600 hover:text-blue-800 text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
@@ -893,7 +898,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         <div className='flex-1'>
                           <div className='flex items-center gap-2 mb-1'>
                             <span className='font-medium text-sm'>
-                              {obj.shortDesc}
+                              {obj.name}
                             </span>
                             <span className='text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded'>
                               {obj.type}
@@ -914,7 +919,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         </div>
                         <div className='flex gap-1'>
                           <a
-                            href={`/dashboard/objects/editor?id=${obj.id}`}
+                            href={`/dashboard/objects/editor?zoneId=${obj.zoneId}&id=${obj.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
                             className='text-purple-600 hover:text-purple-800 text-xs px-2 py-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors'
@@ -971,8 +976,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               </span>
                               {shopkeeper && (
                                 <span className='text-xs text-gray-600'>
-                                  Keeper:{' '}
-                                  {shopkeeper.shortDesc || shopkeeper.name}
+                                  Keeper: {shopkeeper.name}
                                 </span>
                               )}
                             </div>
@@ -987,7 +991,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           </div>
                           <div className='flex gap-1'>
                             <a
-                              href={`/dashboard/shops/editor?id=${shop.id}`}
+                              href={`/dashboard/shops/editor?zoneId=${shop.zoneId}&id=${shop.id}`}
                               target='_blank'
                               rel='noopener noreferrer'
                               className='text-amber-600 hover:text-amber-800 text-xs px-2 py-1 bg-amber-100 hover:bg-amber-200 rounded transition-colors'

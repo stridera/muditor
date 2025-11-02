@@ -7,7 +7,6 @@ import { ObjectNode } from './ObjectNode';
 export interface Mob {
   id: number;
   name: string;
-  shortDesc: string;
   level: number;
   race?: string;
   class?: string;
@@ -21,7 +20,6 @@ export interface Mob {
 export interface Object {
   id: number;
   name: string;
-  shortDesc: string;
   type: string;
   keywords?: string[];
   value?: number;

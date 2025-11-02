@@ -5,7 +5,11 @@ const config: CodegenConfig = {
   schema: './apps/api/src/schema.gql',
 
   // Find all GraphQL queries/mutations in your frontend
-  documents: ['apps/web/src/**/*.tsx', 'apps/web/src/**/*.ts'],
+  documents: [
+    'apps/web/src/**/*.tsx',
+    'apps/web/src/**/*.ts',
+    'apps/web/src/**/*.graphql',
+  ],
 
   // Generate types
   generates: {
@@ -21,13 +25,19 @@ const config: CodegenConfig = {
         withHooks: true,
         withHOC: false,
         withComponent: false,
-        // Add useful React Query options
+        // Disable newer Apollo Client features not available in v4.0.4
+        withRefetchFn: false,
+        // Explicitly specify which hooks to generate (exclude Suspense)
+        withQuery: true,
+        withMutation: true,
+        withLazyQuery: true,
+        // Don't generate Suspense-related hooks
+        withSuspenseQuery: false,
+        // Other options
         exposeQueryKeys: true,
         exposeFetcher: true,
-        // Make the generated code easier to read
         skipTypename: false,
-        // Add comments from GraphQL schema
-        addDocBlocks: true,
+        addDocBlocks: false,
       },
     },
   },
