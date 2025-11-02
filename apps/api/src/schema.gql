@@ -1257,6 +1257,7 @@ type ShopItemDto {
   id: String!
   object: ObjectSummaryDto
   objectId: Int!
+  objectZoneId: Int!
 }
 
 enum ShopTradesWith {

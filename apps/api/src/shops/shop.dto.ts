@@ -1,19 +1,13 @@
 import {
-  ObjectType,
   Field,
-  Int,
-  InputType,
-  registerEnumType,
   Float,
+  InputType,
+  Int,
+  ObjectType,
+  registerEnumType,
 } from '@nestjs/graphql';
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  IsEnum,
-  IsArray,
-} from 'class-validator';
 import { ShopFlag, ShopTradesWith } from '@prisma/client';
+import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
 
 // Register GraphQL enums
@@ -238,6 +232,9 @@ export class ShopItemDto {
 
   @Field(() => Int)
   objectId: number;
+
+  @Field(() => Int)
+  objectZoneId: number;
 
   @Field(() => ObjectSummaryDto, { nullable: true })
   object?: ObjectSummaryDto;

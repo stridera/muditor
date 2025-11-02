@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { TagInput } from '@/components/ui/tag-input';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -375,7 +376,11 @@ function ObjectEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>
-            {isNew ? 'Create New Object' : `Edit Object ${objectId}`}
+            {isNew
+              ? 'Create New Object'
+              : formData.name
+                ? `Edit Object: ${formData.name}`
+                : `Edit Object ${objectId}`}
           </h1>
           <p className='text-gray-600 mt-1'>
             Configure object properties, flags, and type-specific values
@@ -441,17 +446,11 @@ function ObjectEditorContent() {
                   >
                     Keywords *
                   </label>
-                  <input
-                    type='text'
-                    id='keywords'
+                  <TagInput
                     value={formData.keywords}
-                    onChange={e =>
-                      handleInputChange('keywords', e.target.value)
-                    }
+                    onChange={value => handleInputChange('keywords', value)}
                     placeholder='e.g., sword iron long'
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.keywords ? 'border-red-300' : 'border-gray-300'
-                    }`}
+                    error={!!errors.keywords}
                   />
                   {errors.keywords && (
                     <p className='text-red-500 text-xs mt-1'>
