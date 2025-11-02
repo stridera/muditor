@@ -755,6 +755,7 @@ type MobSummaryDto {
 }
 
 type Mutation {
+  addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: String): MobResetDto!
   attachTrigger(input: AttachTriggerInput!): TriggerDto!
   banUser(input: BanUserInput!): BanRecord!
   batchUpdateRoomPositions(input: BatchUpdateRoomPositionsInput!): BatchUpdateResult!
@@ -815,6 +816,7 @@ type Mutation {
   updateEquipmentSet(data: UpdateEquipmentSetInput!, id: ID!): EquipmentSetDto!
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
+  updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: String): Boolean!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
   updateProfile(input: UpdateProfileInput!): User!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!

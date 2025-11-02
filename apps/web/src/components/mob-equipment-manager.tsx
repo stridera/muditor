@@ -15,6 +15,7 @@ const GET_MOB_RESETS = gql`
       roomZoneId
       mob {
         id
+        zoneId
         name
       }
       equipment {
@@ -26,6 +27,7 @@ const GET_MOB_RESETS = gql`
         objectZoneId
         object {
           id
+          zoneId
           name
           type
         }
@@ -92,6 +94,64 @@ const REMOVE_MOB_EQUIPMENT_SET = gql`
   }
 `;
 
+const DELETE_MOB_RESET_EQUIPMENT = gql`
+  mutation DeleteMobResetEquipment($id: ID!) {
+    deleteMobResetEquipment(id: $id)
+  }
+`;
+
+const ADD_MOB_RESET_EQUIPMENT = gql`
+  mutation AddMobResetEquipment(
+    $resetId: ID!
+    $objectZoneId: Int!
+    $objectId: Int!
+    $wearLocation: String
+    $maxInstances: Int
+    $probability: Float
+  ) {
+    addMobResetEquipment(
+      resetId: $resetId
+      objectZoneId: $objectZoneId
+      objectId: $objectId
+      wearLocation: $wearLocation
+      maxInstances: $maxInstances
+      probability: $probability
+    ) {
+      id
+      equipment {
+        id
+        objectId
+        objectZoneId
+        wearLocation
+        maxInstances
+        probability
+        object {
+          id
+          zoneId
+          name
+          type
+        }
+      }
+    }
+  }
+`;
+
+const UPDATE_MOB_RESET_EQUIPMENT = gql`
+  mutation UpdateMobResetEquipment(
+    $id: ID!
+    $wearLocation: String
+    $maxInstances: Int
+    $probability: Float
+  ) {
+    updateMobResetEquipment(
+      id: $id
+      wearLocation: $wearLocation
+      maxInstances: $maxInstances
+      probability: $probability
+    )
+  }
+`;
+
 interface MobEquipmentManagerProps {
   mobId: number;
   zoneId: number;
@@ -130,12 +190,28 @@ interface SpawnCondition {
 
 interface MobReset {
   id: string;
-  max: number;
-  name?: string;
+  maxInstances: number;
   roomId: number;
+  roomZoneId: number;
   probability: number;
-  equipmentSets: MobEquipmentSet[];
-  conditions: SpawnCondition[];
+  equipmentSets?: MobEquipmentSet[];
+  mob: {
+    id: number;
+    name: string;
+  };
+  equipment: Array<{
+    id: string;
+    maxInstances: number;
+    probability: number;
+    wearLocation: string;
+    objectId: number;
+    objectZoneId: number;
+    object: {
+      id: number;
+      name: string;
+      type: string;
+    };
+  }>;
 }
 
 interface GameObject {
@@ -147,29 +223,28 @@ interface GameObject {
 }
 
 const EQUIPMENT_SLOTS = [
-  'Light',
-  'FingerRight',
-  'FingerLeft',
-  'Neck1',
-  'Neck2',
-  'Body',
-  'Head',
-  'Legs',
-  'Feet',
-  'Hands',
-  'Arms',
-  'Shield',
-  'About',
-  'Waist',
-  'WristRight',
-  'WristLeft',
-  'Wield',
-  'Hold',
-  'Float',
-  'Eyes',
-  'Face',
-  'Ear',
-  'Belt',
+  'TAKE',
+  'FINGER',
+  'NECK',
+  'BODY',
+  'HEAD',
+  'LEGS',
+  'FEET',
+  'HANDS',
+  'ARMS',
+  'SHIELD',
+  'ABOUT',
+  'WAIST',
+  'WRIST',
+  'WIELD',
+  'HOLD',
+  'TWO_HAND_WIELD',
+  'EYES',
+  'FACE',
+  'EAR',
+  'BADGE',
+  'BELT',
+  'HOVER',
 ];
 
 export default function MobEquipmentManager({
@@ -181,14 +256,30 @@ export default function MobEquipmentManager({
   const [showCreateSet, setShowCreateSet] = useState(false);
   const [newSetName, setNewSetName] = useState('');
   const [newSetDescription, setNewSetDescription] = useState('');
+  const [showAddEquipment, setShowAddEquipment] = useState<{
+    [resetId: string]: boolean;
+  }>({});
+  const [selectedObject, setSelectedObject] = useState<string>('');
+  const [selectedWearLocation, setSelectedWearLocation] = useState<string>('');
+  const [equipmentProbability, setEquipmentProbability] = useState<number>(1.0);
+  const [editingEquipment, setEditingEquipment] = useState<string | null>(null);
+  const [editValues, setEditValues] = useState<{
+    wearLocation: string;
+    maxInstances: number;
+    probability: number;
+  }>({
+    wearLocation: '',
+    maxInstances: 1,
+    probability: 1.0,
+  });
 
   const {
     data: resetsData,
     loading: resetsLoading,
     refetch: refetchResets,
   } = useQuery(GET_MOB_RESETS, {
-    variables: { mobId },
-    skip: !mobId,
+    variables: { mobId, mobZoneId: zoneId },
+    skip: !mobId || !zoneId,
   });
 
   const {
@@ -215,6 +306,28 @@ export default function MobEquipmentManager({
   const [removeMobEquipmentSet] = useMutation(REMOVE_MOB_EQUIPMENT_SET, {
     onCompleted: () => {
       refetchResets();
+    },
+  });
+
+  const [deleteMobResetEquipment] = useMutation(DELETE_MOB_RESET_EQUIPMENT, {
+    onCompleted: () => {
+      refetchResets();
+    },
+  });
+
+  const [addMobResetEquipment] = useMutation(ADD_MOB_RESET_EQUIPMENT, {
+    onCompleted: () => {
+      refetchResets();
+      setSelectedObject('');
+      setSelectedWearLocation('');
+      setEquipmentProbability(1.0);
+    },
+  });
+
+  const [updateMobResetEquipment] = useMutation(UPDATE_MOB_RESET_EQUIPMENT, {
+    onCompleted: () => {
+      refetchResets();
+      setEditingEquipment(null);
     },
   });
 
@@ -268,9 +381,69 @@ export default function MobEquipmentManager({
     }
   };
 
+  const handleDeleteEquipment = async (equipmentId: string) => {
+    try {
+      await deleteMobResetEquipment({
+        variables: { id: equipmentId },
+      });
+    } catch (error) {
+      console.error('Failed to delete equipment:', error);
+    }
+  };
+
+  const handleAddEquipment = async (resetId: string) => {
+    if (!selectedObject) return;
+
+    const [objectZoneId, objectId] = selectedObject.split(':').map(Number);
+
+    try {
+      await addMobResetEquipment({
+        variables: {
+          resetId,
+          objectZoneId,
+          objectId,
+          wearLocation: selectedWearLocation || null,
+          maxInstances: 1,
+          probability: equipmentProbability,
+        },
+      });
+      setShowAddEquipment({ ...showAddEquipment, [resetId]: false });
+    } catch (error) {
+      console.error('Failed to add equipment:', error);
+    }
+  };
+
+  const handleStartEdit = (item: any) => {
+    setEditingEquipment(item.id);
+    setEditValues({
+      wearLocation: item.wearLocation || '',
+      maxInstances: item.maxInstances,
+      probability: item.probability,
+    });
+  };
+
+  const handleSaveEdit = async (equipmentId: string) => {
+    try {
+      await updateMobResetEquipment({
+        variables: {
+          id: equipmentId,
+          wearLocation: editValues.wearLocation || null,
+          maxInstances: editValues.maxInstances,
+          probability: editValues.probability,
+        },
+      });
+    } catch (error) {
+      console.error('Failed to update equipment:', error);
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingEquipment(null);
+  };
+
   const getAvailableEquipmentSets = (reset: MobReset) => {
     const assignedSetIds = new Set(
-      reset.equipmentSets.map(mes => mes.equipmentSet.id)
+      (reset.equipmentSets || []).map(mes => mes.equipmentSet.id)
     );
     return equipmentSets.filter(set => !assignedSetIds.has(set.id));
   };
@@ -417,10 +590,10 @@ export default function MobEquipmentManager({
                 <div className='flex items-center justify-between'>
                   <div>
                     <h4 className='text-sm font-medium text-gray-900'>
-                      {reset.name || `Spawn Location #${reset.id.slice(-8)}`}
+                      {reset.mob.name} Spawn #{reset.id.slice(-8)}
                     </h4>
                     <p className='text-sm text-gray-500'>
-                      Room {reset.roomId} • Max spawns: {reset.max} •
+                      Room {reset.roomId} • Max spawns: {reset.maxInstances} •
                       Probability: {(reset.probability * 100).toFixed(0)}%
                     </p>
                   </div>
@@ -438,22 +611,262 @@ export default function MobEquipmentManager({
               {/* Reset Details */}
               {activeReset === reset.id && (
                 <div className='p-4 space-y-6'>
+                  {/* Direct Equipment */}
+                  <div>
+                    <div className='flex items-center justify-between mb-3'>
+                      <h5 className='text-sm font-medium text-gray-900 flex items-center'>
+                        <Package className='w-4 h-4 mr-2 text-gray-400' />
+                        Direct Equipment ({reset.equipment.length})
+                      </h5>
+                      <button
+                        onClick={() =>
+                          setShowAddEquipment({
+                            ...showAddEquipment,
+                            [reset.id]: !showAddEquipment[reset.id],
+                          })
+                        }
+                        className='inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded hover:bg-blue-200'
+                      >
+                        <Plus className='w-3 h-3 mr-1' />
+                        Add Item
+                      </button>
+                    </div>
+
+                    {/* Add Equipment Form */}
+                    {showAddEquipment[reset.id] && (
+                      <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
+                        <h6 className='text-sm font-medium text-gray-900 mb-3'>
+                          Add Equipment Item
+                        </h6>
+                        <div className='space-y-3'>
+                          <div>
+                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                              Object (Zone:ID)
+                            </label>
+                            <input
+                              type='text'
+                              value={selectedObject}
+                              onChange={e => setSelectedObject(e.target.value)}
+                              placeholder='e.g., 30:22'
+                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                            />
+                          </div>
+                          <div>
+                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                              Wear Location (optional)
+                            </label>
+                            <select
+                              value={selectedWearLocation}
+                              onChange={e => setSelectedWearLocation(e.target.value)}
+                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                            >
+                              <option value=''>None (carried)</option>
+                              {EQUIPMENT_SLOTS.map(slot => (
+                                <option key={slot} value={slot}>
+                                  {slot}
+                                </option>
+                              ))}
+                            </select>
+                          </div>
+                          <div>
+                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                              Probability
+                            </label>
+                            <input
+                              type='number'
+                              min='0'
+                              max='1'
+                              step='0.1'
+                              value={equipmentProbability}
+                              onChange={e =>
+                                setEquipmentProbability(
+                                  parseFloat(e.target.value) || 1.0
+                                )
+                              }
+                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                            />
+                          </div>
+                          <div className='flex gap-2'>
+                            <button
+                              onClick={() => handleAddEquipment(reset.id)}
+                              disabled={!selectedObject}
+                              className='px-3 py-1 text-sm font-medium text-white bg-blue-600 rounded hover:bg-blue-700 disabled:opacity-50'
+                            >
+                              Add
+                            </button>
+                            <button
+                              onClick={() =>
+                                setShowAddEquipment({
+                                  ...showAddEquipment,
+                                  [reset.id]: false,
+                                })
+                              }
+                              className='px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+
+                    {reset.equipment.length === 0 ? (
+                      <p className='text-sm text-gray-500 italic'>
+                        No direct equipment assigned
+                      </p>
+                    ) : (
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-3'>
+                        {reset.equipment.map(item => (
+                          <div
+                            key={item.id}
+                            className='border border-gray-200 rounded-lg p-3 bg-gray-50'
+                          >
+                            {editingEquipment === item.id ? (
+                              /* Edit Mode */
+                              <div className='space-y-2'>
+                                <div className='font-medium text-sm text-gray-900 mb-1'>
+                                  {item.object.name}
+                                  <span className='text-xs text-gray-500 ml-2'>
+                                    {item.object.zoneId}:{item.object.id}
+                                  </span>
+                                </div>
+                                <div>
+                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                    Wear Location
+                                  </label>
+                                  <select
+                                    value={editValues.wearLocation}
+                                    onChange={e =>
+                                      setEditValues({
+                                        ...editValues,
+                                        wearLocation: e.target.value,
+                                      })
+                                    }
+                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                  >
+                                    <option value=''>None (carried)</option>
+                                    {EQUIPMENT_SLOTS.map(slot => (
+                                      <option key={slot} value={slot}>
+                                        {slot}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                                <div>
+                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                    Max Instances
+                                  </label>
+                                  <input
+                                    type='number'
+                                    min='1'
+                                    value={editValues.maxInstances}
+                                    onChange={e =>
+                                      setEditValues({
+                                        ...editValues,
+                                        maxInstances: parseInt(e.target.value) || 1,
+                                      })
+                                    }
+                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                  />
+                                </div>
+                                <div>
+                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                    Probability
+                                  </label>
+                                  <input
+                                    type='number'
+                                    min='0'
+                                    max='1'
+                                    step='0.1'
+                                    value={editValues.probability}
+                                    onChange={e =>
+                                      setEditValues({
+                                        ...editValues,
+                                        probability: parseFloat(e.target.value) || 1.0,
+                                      })
+                                    }
+                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                  />
+                                </div>
+                                <div className='flex gap-2 pt-2'>
+                                  <button
+                                    onClick={() => handleSaveEdit(item.id)}
+                                    className='px-2 py-1 text-xs font-medium text-white bg-green-600 rounded hover:bg-green-700'
+                                  >
+                                    Save
+                                  </button>
+                                  <button
+                                    onClick={handleCancelEdit}
+                                    className='px-2 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300'
+                                  >
+                                    Cancel
+                                  </button>
+                                </div>
+                              </div>
+                            ) : (
+                              /* View Mode */
+                              <>
+                                <div className='flex items-center justify-between mb-2'>
+                                  <div className='flex-1'>
+                                    <div className='font-medium text-sm text-gray-900'>
+                                      {item.object.name}
+                                    </div>
+                                    <div className='text-xs text-gray-500'>
+                                      {item.object.zoneId}:{item.object.id} • {item.object.type}
+                                    </div>
+                                  </div>
+                                  <div className='flex gap-1'>
+                                    <button
+                                      onClick={() => handleStartEdit(item)}
+                                      className='text-blue-600 hover:text-blue-800'
+                                      title='Edit equipment'
+                                    >
+                                      <Settings className='w-4 h-4' />
+                                    </button>
+                                    <button
+                                      onClick={() => handleDeleteEquipment(item.id)}
+                                      className='text-red-600 hover:text-red-800'
+                                      title='Remove equipment'
+                                    >
+                                      <Trash2 className='w-4 h-4' />
+                                    </button>
+                                  </div>
+                                </div>
+                                <div className='flex items-center gap-3 text-xs text-gray-600'>
+                                  {item.wearLocation && (
+                                    <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded'>
+                                      {item.wearLocation}
+                                    </span>
+                                  )}
+                                  <span>Max: {item.maxInstances}</span>
+                                  <span>
+                                    Probability: {(item.probability * 100).toFixed(0)}%
+                                  </span>
+                                </div>
+                              </>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
                   {/* Equipment Sets */}
                   <div>
                     <div className='flex items-center justify-between mb-3'>
                       <h5 className='text-sm font-medium text-gray-900 flex items-center'>
                         <Shield className='w-4 h-4 mr-2 text-gray-400' />
-                        Equipment Sets ({reset.equipmentSets.length})
+                        Equipment Sets ({(reset.equipmentSets || []).length})
                       </h5>
                     </div>
 
-                    {reset.equipmentSets.length === 0 ? (
+                    {(reset.equipmentSets || []).length === 0 ? (
                       <p className='text-sm text-gray-500 italic'>
                         No equipment sets assigned
                       </p>
                     ) : (
                       <div className='space-y-3'>
-                        {reset.equipmentSets.map(mobEquipmentSet => (
+                        {(reset.equipmentSets || []).map(mobEquipmentSet => (
                           <div
                             key={mobEquipmentSet.id}
                             className='border border-gray-200 rounded-lg p-3'
@@ -528,34 +941,6 @@ export default function MobEquipmentManager({
                     )}
                   </div>
 
-                  {/* Spawn Conditions */}
-                  {reset.conditions.length > 0 && (
-                    <div>
-                      <h5 className='text-sm font-medium text-gray-900 flex items-center mb-3'>
-                        <Settings className='w-4 h-4 mr-2 text-gray-400' />
-                        Spawn Conditions ({reset.conditions.length})
-                      </h5>
-                      <div className='space-y-2'>
-                        {reset.conditions.map(condition => (
-                          <div
-                            key={condition.id}
-                            className='p-2 bg-yellow-50 border border-yellow-200 rounded text-sm'
-                          >
-                            <span className='font-medium text-yellow-800'>
-                              {condition.type}
-                            </span>
-                            <span className='ml-2 text-yellow-700'>
-                              {JSON.stringify(
-                                JSON.parse(condition.parameters),
-                                null,
-                                0
-                              )}
-                            </span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
             </div>

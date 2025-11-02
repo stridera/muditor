@@ -88,6 +88,7 @@ const getValueSafe = (
 };
 
 const OBJECT_TYPES = [
+  'NOTHING',
   'LIGHT',
   'SCROLL',
   'WAND',
@@ -104,28 +105,20 @@ const OBJECT_TYPES = [
   'TRAP',
   'CONTAINER',
   'NOTE',
-  'LIQUID_CONTAINER',
+  'DRINKCONTAINER',
   'KEY',
   'FOOD',
   'MONEY',
   'PEN',
   'BOAT',
   'FOUNTAIN',
-  'CLIMBING_EQ',
-  'VEHICLE',
-  'HATCH',
-  'HOUSE',
-  'BOARD',
-  'TREE',
-  'ROCK',
-  'CORPSE',
-  'PLANT',
-  'SPELLBOOK',
   'PORTAL',
-  'BOMB',
-  'THROWING',
-  'BEACON',
-  'NOTHING',
+  'ROPE',
+  'SPELLBOOK',
+  'WALL',
+  'TOUCHSTONE',
+  'BOARD',
+  'INSTRUMENT',
 ];
 
 const WEAR_FLAGS = [
@@ -218,6 +211,7 @@ const objectValidationRules: ValidationRules<ObjectFormData> = [
 function ObjectEditorContent() {
   const searchParams = useSearchParams();
   const objectId = searchParams.get('id');
+  const zoneIdParam = searchParams.get('zone');
   const isNew = !objectId;
 
   const [activeTab, setActiveTab] = useState('basic');
@@ -247,7 +241,10 @@ function ObjectEditorContent() {
   const [selectedWearFlags, setSelectedWearFlags] = useState<string[]>([]);
 
   const { loading, error, data } = useQuery(GET_OBJECT, {
-    variables: { id: parseInt(objectId || '0') },
+    variables: {
+      id: parseInt(objectId || '0'),
+      zoneId: parseInt(zoneIdParam || '0'),
+    },
     skip: isNew,
   });
 
