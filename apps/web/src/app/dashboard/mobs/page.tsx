@@ -118,8 +118,8 @@ function MobsContent() {
       try {
         const query = selectedZone
           ? `
-              query GetMobsByZone($zoneId: Int!) {
-                mobsByZone(zoneId: $zoneId) {
+              query GetMobsByZone($zoneId: Int!, $search: String) {
+                mobsByZone(zoneId: $zoneId, search: $search) {
                   id
                   keywords
                   name
@@ -149,8 +149,8 @@ function MobsContent() {
               }
             `
           : `
-              query GetMobs($skip: Int, $take: Int) {
-                mobs(skip: $skip, take: $take) {
+              query GetMobs($skip: Int, $take: Int, $search: String) {
+                mobs(skip: $skip, take: $take, search: $search) {
                   id
                   keywords
                   name
@@ -181,13 +181,16 @@ function MobsContent() {
             `;
 
         const skip = (currentPage - 1) * itemsPerPage;
+        const searchTerm = searchFilters.searchTerm?.trim() || undefined;
         const variables = selectedZone
           ? {
               zoneId: selectedZone,
+              search: searchTerm,
             }
           : {
               skip,
               take: itemsPerPage,
+              search: searchTerm,
             };
 
         const response = await fetch('http://localhost:4000/graphql', {
@@ -278,7 +281,12 @@ function MobsContent() {
     };
 
     fetchMobs();
-  }, [selectedZone, currentPage, itemsPerPage, sortBy, sortOrder]);
+  }, [selectedZone, currentPage, itemsPerPage, sortBy, sortOrder, searchFilters.searchTerm]);
+
+  // Reset to page 1 when search term changes
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchFilters.searchTerm]);
 
   // Apply advanced search filters
   const filteredMobs = applySearchFilters(mobs, searchFilters, {

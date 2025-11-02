@@ -990,8 +990,8 @@ type Query {
   mob(id: Int!, zoneId: Int!): MobDto!
   mobReset(id: ID!): MobResetDto
   mobResets(mobId: Int!, mobZoneId: Int!): [MobResetDto!]!
-  mobs(skip: Int, take: Int): [MobDto!]!
-  mobsByZone(zoneId: Int!): [MobDto!]!
+  mobs(search: String, skip: Int, take: Int): [MobDto!]!
+  mobsByZone(search: String, zoneId: Int!): [MobDto!]!
   mobsCount: Int!
   myCharacters: [CharacterDto!]!
   myOnlineCharacters: [OnlineCharacterDto!]!
