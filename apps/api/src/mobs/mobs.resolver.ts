@@ -20,9 +20,10 @@ export class MobsResolver {
   @Query(() => [MobDto], { name: 'mobs' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number
+    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string
   ): Promise<MobDto[]> {
-    return this.mobsService.findAll({ skip, take }) as any; // TODO: Map database fields to DTO
+    return this.mobsService.findAll({ skip, take, search }) as any; // TODO: Map database fields to DTO
   }
 
   @Query(() => MobDto, { name: 'mob' })
@@ -35,9 +36,10 @@ export class MobsResolver {
 
   @Query(() => [MobDto], { name: 'mobsByZone' })
   async findByZone(
-    @Args('zoneId', { type: () => Int }) zoneId: number
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('search', { type: () => String, nullable: true }) search?: string
   ): Promise<MobDto[]> {
-    return this.mobsService.findByZone(zoneId) as any; // TODO: Map database fields to DTO
+    return this.mobsService.findByZone(zoneId, search) as any; // TODO: Map database fields to DTO
   }
 
   @Query(() => Int, { name: 'mobsCount' })

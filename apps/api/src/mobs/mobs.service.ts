@@ -9,13 +9,25 @@ export class MobsService {
   async findAll(args?: {
     skip?: number;
     take?: number;
+    search?: string;
     where?: Prisma.MobsWhereInput;
     orderBy?: Prisma.MobsOrderByWithRelationInput;
   }): Promise<Mobs[]> {
+    const whereClause: Prisma.MobsWhereInput = args?.where || {};
+
+    // Add search filter if provided
+    if (args?.search && args.search.trim()) {
+      whereClause.OR = [
+        { name: { contains: args.search, mode: 'insensitive' } },
+        { keywords: { hasSome: [args.search.toLowerCase()] } },
+        { roomDescription: { contains: args.search, mode: 'insensitive' } },
+      ];
+    }
+
     const mobs = await this.database.mobs.findMany({
       skip: args?.skip,
       take: args?.take,
-      where: args?.where,
+      where: whereClause,
       orderBy: args?.orderBy || { id: 'asc' },
       include: {},
     });
@@ -45,9 +57,20 @@ export class MobsService {
     return mob;
   }
 
-  async findByZone(zoneId: number): Promise<Mobs[]> {
+  async findByZone(zoneId: number, search?: string): Promise<Mobs[]> {
+    const whereClause: Prisma.MobsWhereInput = { zoneId };
+
+    // Add search filter if provided
+    if (search && search.trim()) {
+      whereClause.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { keywords: { hasSome: [search.toLowerCase()] } },
+        { roomDescription: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
     const mobs = await this.database.mobs.findMany({
-      where: { zoneId },
+      where: whereClause,
       include: {
         mobResets: {
           include: {
