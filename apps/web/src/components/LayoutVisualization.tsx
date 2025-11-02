@@ -88,9 +88,9 @@ export function LayoutVisualization({
 
     return roomPos.room.exits
       .filter(exit => {
-        if (exit.toRoomId === null || exit.toRoomId === undefined || !positions[exit.toRoomId]) return false;
+        if (exit.destination === null || exit.destination === undefined || !positions[exit.destination]) return false;
 
-        const destPos = positions[exit.toRoomId];
+        const destPos = positions[exit.destination];
         const destZLevel = destPos.z || 0;
         const currentZLevel = roomPos.gridPos.z || 0;
 
@@ -103,7 +103,7 @@ export function LayoutVisualization({
         return true;
       })
       .map(exit => {
-        const destPos = positions[exit.toRoomId!];
+        const destPos = positions[exit.destination!];
         const destSvgPos = gridToSvg(destPos.x, destPos.y);
 
         return {
@@ -111,7 +111,7 @@ export function LayoutVisualization({
           to: destSvgPos,
           direction: exit.direction,
           fromRoom: roomPos.id,
-          toRoom: exit.toRoomId!
+          toRoom: exit.destination!
         };
       });
   });

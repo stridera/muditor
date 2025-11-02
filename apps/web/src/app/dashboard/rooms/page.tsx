@@ -462,9 +462,9 @@ function RoomsContent() {
                                 <div className='font-medium text-gray-900'>
                                   {exit.direction.toUpperCase()}
                                 </div>
-                                {exit.toRoomId != null && (
+                                {exit.destination != null && (
                                   <div className='text-blue-600'>
-                                    → Room {exit.toRoomId}
+                                    → Room {exit.destination}
                                   </div>
                                 )}
                                 {exit.description && (

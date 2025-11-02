@@ -13,31 +13,19 @@ const config: CodegenConfig = {
 
   // Generate types
   generates: {
-    // Generate types for the web app
-    './apps/web/src/generated/graphql.ts': {
-      plugins: [
-        'typescript',
-        'typescript-operations',
-        'typescript-react-apollo',
-      ],
+    // Generate types for the web app using client preset (modern recommended approach)
+    './apps/web/src/generated/': {
+      preset: 'client',
+      presetConfig: {
+        fragmentMasking: false,
+        gqlTagName: 'gql',
+      },
       config: {
-        // Make hooks more type-safe
-        withHooks: true,
-        withHOC: false,
-        withComponent: false,
-        // Disable newer Apollo Client features not available in v4.0.4
-        withRefetchFn: false,
-        // Explicitly specify which hooks to generate (exclude Suspense)
-        withQuery: true,
-        withMutation: true,
-        withLazyQuery: true,
-        // Don't generate Suspense-related hooks
-        withSuspenseQuery: false,
-        // Other options
-        exposeQueryKeys: true,
-        exposeFetcher: true,
+        useTypeImports: true,
         skipTypename: false,
-        addDocBlocks: false,
+        enumsAsTypes: true,
+        dedupeFragments: true,
+        avoidOptionals: false,
       },
     },
   },

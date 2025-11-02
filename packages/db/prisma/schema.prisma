@@ -329,7 +329,6 @@ model Mobs {
   name                String @map("name") // Display name (e.g., "A Large Orc", "Helena")
   roomDescription     String @map("room_description")  // Appears in room (e.g., "A large ogre stands here")
   examineDescription  String @map("examine_description")       // Full description when examined
-
   alignment       Int          @default(0)
   level           Int          @default(1)
   armorClass      Int @map("armor_class") @default(0)

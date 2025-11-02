@@ -66,7 +66,7 @@ async function validateImportedData() {
     // Check shops with items
     const shopsWithItems = await prisma.shops.count({
       where: {
-        shop_items: {
+        shopItems: {
           some: {}
         }
       }
@@ -77,7 +77,7 @@ async function validateImportedData() {
     // Check mobs with equipment
     const mobsWithEquipment = await prisma.mobResets.count({
       where: {
-        mob_reset_equipment: {
+        mobResetEquipment: {
           some: {}
         }
       }

@@ -1,13 +1,12 @@
-import { gql } from '@apollo/client';
-import * as Apollo from '@apollo/client';
+/* eslint-disable */
+import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-node/core';
 export type Maybe<T> = T | null;
-export type InputMaybe<T> = Maybe<T>;
+export type InputMaybe<T> = T | null | undefined;
 export type Exact<T extends { [key: string]: unknown }> = { [K in keyof T]: T[K] };
 export type MakeOptional<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]?: Maybe<T[SubKey]> };
 export type MakeMaybe<T, K extends keyof T> = Omit<T, K> & { [SubKey in K]: Maybe<T[SubKey]> };
 export type MakeEmpty<T extends { [key: string]: unknown }, K extends keyof T> = { [_ in K]?: never };
 export type Incremental<T> = T | { [P in keyof T]?: P extends ' $fragmentName' | '__typename' ? T[P] : never };
-const defaultOptions = {} as const;
 /** All built-in and custom scalars, mapped to their actual values */
 export type Scalars = {
   ID: { input: string; output: string; }
@@ -214,34 +213,32 @@ export type CharacterSessionInfoDto = {
   totalTimePlayed: Scalars['Int']['output'];
 };
 
-export enum Climate {
-  Alpine = 'ALPINE',
-  Arctic = 'ARCTIC',
-  Arid = 'ARID',
-  None = 'NONE',
-  Oceanic = 'OCEANIC',
-  Semiarid = 'SEMIARID',
-  Subarctic = 'SUBARCTIC',
-  Subtropical = 'SUBTROPICAL',
-  Temperate = 'TEMPERATE',
-  Tropical = 'TROPICAL'
-}
+export type Climate =
+  | 'ALPINE'
+  | 'ARCTIC'
+  | 'ARID'
+  | 'NONE'
+  | 'OCEANIC'
+  | 'SEMIARID'
+  | 'SUBARCTIC'
+  | 'SUBTROPICAL'
+  | 'TEMPERATE'
+  | 'TROPICAL';
 
-export enum Composition {
-  Air = 'AIR',
-  Bone = 'BONE',
-  Earth = 'EARTH',
-  Ether = 'ETHER',
-  Fire = 'FIRE',
-  Flesh = 'FLESH',
-  Ice = 'ICE',
-  Lava = 'LAVA',
-  Metal = 'METAL',
-  Mist = 'MIST',
-  Plant = 'PLANT',
-  Stone = 'STONE',
-  Water = 'WATER'
-}
+export type Composition =
+  | 'AIR'
+  | 'BONE'
+  | 'EARTH'
+  | 'ETHER'
+  | 'FIRE'
+  | 'FLESH'
+  | 'ICE'
+  | 'LAVA'
+  | 'METAL'
+  | 'MIST'
+  | 'PLANT'
+  | 'STONE'
+  | 'WATER';
 
 export type CreateCharacterEffectInput = {
   characterId: Scalars['String']['input'];
@@ -444,127 +441,124 @@ export type CreateZoneInput = {
   resetMode?: ResetMode;
 };
 
-export enum DamageType {
-  Acid = 'ACID',
-  Align = 'ALIGN',
-  Bite = 'BITE',
-  Blast = 'BLAST',
-  Bludgeon = 'BLUDGEON',
-  Claw = 'CLAW',
-  Cold = 'COLD',
-  Crush = 'CRUSH',
-  Fire = 'FIRE',
-  Hit = 'HIT',
-  Maul = 'MAUL',
-  Pierce = 'PIERCE',
-  Poison = 'POISON',
-  Pound = 'POUND',
-  Punch = 'PUNCH',
-  Shock = 'SHOCK',
-  Slash = 'SLASH',
-  Stab = 'STAB',
-  Sting = 'STING',
-  Thrash = 'THRASH',
-  Whip = 'WHIP'
-}
+export type DamageType =
+  | 'ACID'
+  | 'ALIGN'
+  | 'BITE'
+  | 'BLAST'
+  | 'BLUDGEON'
+  | 'CLAW'
+  | 'COLD'
+  | 'CRUSH'
+  | 'FIRE'
+  | 'HIT'
+  | 'MAUL'
+  | 'PIERCE'
+  | 'POISON'
+  | 'POUND'
+  | 'PUNCH'
+  | 'SHOCK'
+  | 'SLASH'
+  | 'STAB'
+  | 'STING'
+  | 'THRASH'
+  | 'WHIP';
 
-export enum Direction {
-  Down = 'DOWN',
-  East = 'EAST',
-  North = 'NORTH',
-  South = 'SOUTH',
-  Up = 'UP',
-  West = 'WEST'
-}
+export type Direction =
+  | 'DOWN'
+  | 'EAST'
+  | 'NORTH'
+  | 'SOUTH'
+  | 'UP'
+  | 'WEST';
 
-export enum EffectFlag {
-  AcidWeapon = 'ACID_WEAPON',
-  Animated = 'ANIMATED',
-  Aware = 'AWARE',
-  Berserk = 'BERSERK',
-  Bless = 'BLESS',
-  Blind = 'BLIND',
-  Blur = 'BLUR',
-  Camouflaged = 'CAMOUFLAGED',
-  Charm = 'CHARM',
-  Coldshield = 'COLDSHIELD',
-  Confusion = 'CONFUSION',
-  Curse = 'CURSE',
-  DetectAlign = 'DETECT_ALIGN',
-  DetectInvis = 'DETECT_INVIS',
-  DetectMagic = 'DETECT_MAGIC',
-  DetectPoison = 'DETECT_POISON',
-  Disease = 'DISEASE',
-  Displacement = 'DISPLACEMENT',
-  Enlarge = 'ENLARGE',
-  Exposed = 'EXPOSED',
-  Familiarity = 'FAMILIARITY',
-  Farsee = 'FARSEE',
-  Fear = 'FEAR',
-  FeatherFall = 'FEATHER_FALL',
-  Fireshield = 'FIRESHIELD',
-  FireWeapon = 'FIRE_WEAPON',
-  Fly = 'FLY',
-  Glory = 'GLORY',
-  GreaterDisplacement = 'GREATER_DISPLACEMENT',
-  Harness = 'HARNESS',
-  Haste = 'HASTE',
-  Hex = 'HEX',
-  HurtThroat = 'HURT_THROAT',
-  IceWeapon = 'ICE_WEAPON',
-  Immobilized = 'IMMOBILIZED',
-  Infravision = 'INFRAVISION',
-  Insanity = 'INSANITY',
-  Invisible = 'INVISIBLE',
-  Light = 'LIGHT',
-  MajorGlobe = 'MAJOR_GLOBE',
-  MajorParalysis = 'MAJOR_PARALYSIS',
-  Mesmerized = 'MESMERIZED',
-  MinorGlobe = 'MINOR_GLOBE',
-  MinorParalysis = 'MINOR_PARALYSIS',
-  Misdirecting = 'MISDIRECTING',
-  Misdirection = 'MISDIRECTION',
-  NegateAir = 'NEGATE_AIR',
-  NegateCold = 'NEGATE_COLD',
-  NegateEarth = 'NEGATE_EARTH',
-  NegateHeat = 'NEGATE_HEAT',
-  NoTrack = 'NO_TRACK',
-  OnFire = 'ON_FIRE',
-  Poison = 'POISON',
-  PoisonWeapon = 'POISON_WEAPON',
-  ProtectAir = 'PROTECT_AIR',
-  ProtectCold = 'PROTECT_COLD',
-  ProtectEarth = 'PROTECT_EARTH',
-  ProtectEvil = 'PROTECT_EVIL',
-  ProtectFire = 'PROTECT_FIRE',
-  ProtectGood = 'PROTECT_GOOD',
-  RadiantWeapon = 'RADIANT_WEAPON',
-  RayOfEnfeeblement = 'RAY_OF_ENFEEBLEMENT',
-  Reduce = 'REDUCE',
-  RemoteAggro = 'REMOTE_AGGRO',
-  Sanctuary = 'SANCTUARY',
-  SenseLife = 'SENSE_LIFE',
-  Shadowing = 'SHADOWING',
-  ShockWeapon = 'SHOCK_WEAPON',
-  Silence = 'SILENCE',
-  Sleep = 'SLEEP',
-  Sneak = 'SNEAK',
-  SongOfRest = 'SONG_OF_REST',
-  Soulshield = 'SOULSHIELD',
-  SpiritBear = 'SPIRIT_BEAR',
-  SpiritWolf = 'SPIRIT_WOLF',
-  Stealth = 'STEALTH',
-  StoneSkin = 'STONE_SKIN',
-  Tamed = 'TAMED',
-  Tongues = 'TONGUES',
-  Ultravision = 'ULTRAVISION',
-  Unused = 'UNUSED',
-  VampiricTouch = 'VAMPIRIC_TOUCH',
-  Vitality = 'VITALITY',
-  Waterbreath = 'WATERBREATH',
-  Waterwalk = 'WATERWALK',
-  Wrath = 'WRATH'
-}
+export type EffectFlag =
+  | 'ACID_WEAPON'
+  | 'ANIMATED'
+  | 'AWARE'
+  | 'BERSERK'
+  | 'BLESS'
+  | 'BLIND'
+  | 'BLUR'
+  | 'CAMOUFLAGED'
+  | 'CHARM'
+  | 'COLDSHIELD'
+  | 'CONFUSION'
+  | 'CURSE'
+  | 'DETECT_ALIGN'
+  | 'DETECT_INVIS'
+  | 'DETECT_MAGIC'
+  | 'DETECT_POISON'
+  | 'DISEASE'
+  | 'DISPLACEMENT'
+  | 'ENLARGE'
+  | 'EXPOSED'
+  | 'FAMILIARITY'
+  | 'FARSEE'
+  | 'FEAR'
+  | 'FEATHER_FALL'
+  | 'FIRESHIELD'
+  | 'FIRE_WEAPON'
+  | 'FLY'
+  | 'GLORY'
+  | 'GREATER_DISPLACEMENT'
+  | 'HARNESS'
+  | 'HASTE'
+  | 'HEX'
+  | 'HURT_THROAT'
+  | 'ICE_WEAPON'
+  | 'IMMOBILIZED'
+  | 'INFRAVISION'
+  | 'INSANITY'
+  | 'INVISIBLE'
+  | 'LIGHT'
+  | 'MAJOR_GLOBE'
+  | 'MAJOR_PARALYSIS'
+  | 'MESMERIZED'
+  | 'MINOR_GLOBE'
+  | 'MINOR_PARALYSIS'
+  | 'MISDIRECTING'
+  | 'MISDIRECTION'
+  | 'NEGATE_AIR'
+  | 'NEGATE_COLD'
+  | 'NEGATE_EARTH'
+  | 'NEGATE_HEAT'
+  | 'NO_TRACK'
+  | 'ON_FIRE'
+  | 'POISON'
+  | 'POISON_WEAPON'
+  | 'PROTECT_AIR'
+  | 'PROTECT_COLD'
+  | 'PROTECT_EARTH'
+  | 'PROTECT_EVIL'
+  | 'PROTECT_FIRE'
+  | 'PROTECT_GOOD'
+  | 'RADIANT_WEAPON'
+  | 'RAY_OF_ENFEEBLEMENT'
+  | 'REDUCE'
+  | 'REMOTE_AGGRO'
+  | 'SANCTUARY'
+  | 'SENSE_LIFE'
+  | 'SHADOWING'
+  | 'SHOCK_WEAPON'
+  | 'SILENCE'
+  | 'SLEEP'
+  | 'SNEAK'
+  | 'SONG_OF_REST'
+  | 'SOULSHIELD'
+  | 'SPIRIT_BEAR'
+  | 'SPIRIT_WOLF'
+  | 'STEALTH'
+  | 'STONE_SKIN'
+  | 'TAMED'
+  | 'TONGUES'
+  | 'ULTRAVISION'
+  | 'UNUSED'
+  | 'VAMPIRIC_TOUCH'
+  | 'VITALITY'
+  | 'WATERBREATH'
+  | 'WATERWALK'
+  | 'WRATH';
 
 export type EquipmentSetDto = {
   __typename?: 'EquipmentSetDto';
@@ -586,27 +580,24 @@ export type EquipmentSetItemDto = {
   slot?: Maybe<Scalars['String']['output']>;
 };
 
-export enum ExitFlag {
-  Closed = 'CLOSED',
-  Hidden = 'HIDDEN',
-  IsDoor = 'IS_DOOR',
-  Locked = 'LOCKED',
-  Pickproof = 'PICKPROOF'
-}
+export type ExitFlag =
+  | 'CLOSED'
+  | 'HIDDEN'
+  | 'IS_DOOR'
+  | 'LOCKED'
+  | 'PICKPROOF';
 
-export enum Gender {
-  Female = 'FEMALE',
-  Male = 'MALE',
-  Neutral = 'NEUTRAL',
-  NonBinary = 'NON_BINARY'
-}
+export type Gender =
+  | 'FEMALE'
+  | 'MALE'
+  | 'NEUTRAL'
+  | 'NON_BINARY';
 
-export enum Hemisphere {
-  Northeast = 'NORTHEAST',
-  Northwest = 'NORTHWEST',
-  Southeast = 'SOUTHEAST',
-  Southwest = 'SOUTHWEST'
-}
+export type Hemisphere =
+  | 'NORTHEAST'
+  | 'NORTHWEST'
+  | 'SOUTHEAST'
+  | 'SOUTHWEST';
 
 export type KeeperDto = {
   __typename?: 'KeeperDto';
@@ -616,14 +607,13 @@ export type KeeperDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export enum LifeForce {
-  Celestial = 'CELESTIAL',
-  Demonic = 'DEMONIC',
-  Elemental = 'ELEMENTAL',
-  Life = 'LIFE',
-  Magic = 'MAGIC',
-  Undead = 'UNDEAD'
-}
+export type LifeForce =
+  | 'CELESTIAL'
+  | 'DEMONIC'
+  | 'ELEMENTAL'
+  | 'LIFE'
+  | 'MAGIC'
+  | 'UNDEAD';
 
 export type LinkCharacterInput = {
   characterName: Scalars['String']['input'];
@@ -682,65 +672,64 @@ export type MobEquipmentSetDto = {
   probability: Scalars['Float']['output'];
 };
 
-export enum MobFlag {
-  Aggressive = 'AGGRESSIVE',
-  AggroEvil = 'AGGRO_EVIL',
-  AggroGood = 'AGGRO_GOOD',
-  AggroNeutral = 'AGGRO_NEUTRAL',
-  AntiPaladin = 'ANTI_PALADIN',
-  Aquatic = 'AQUATIC',
-  Assassin = 'ASSASSIN',
-  Aware = 'AWARE',
-  Berserker = 'BERSERKER',
-  Blur = 'BLUR',
-  Cleric = 'CLERIC',
-  Conjurer = 'CONJURER',
-  Diabolist = 'DIABOLIST',
-  Druid = 'DRUID',
-  FastTrack = 'FAST_TRACK',
-  Haste = 'HASTE',
-  HatesSun = 'HATES_SUN',
-  Helper = 'HELPER',
-  Illusion = 'ILLUSION',
-  IsNpc = 'IS_NPC',
-  Memory = 'MEMORY',
-  Mercenary = 'MERCENARY',
-  Monk = 'MONK',
-  Mount = 'MOUNT',
-  Mountable = 'MOUNTABLE',
-  Necromancer = 'NECROMANCER',
-  NoBash = 'NO_BASH',
-  NoBlind = 'NO_BLIND',
-  NoCharm = 'NO_CHARM',
-  NoClassAi = 'NO_CLASS_AI',
-  NoEqRestrict = 'NO_EQ_RESTRICT',
-  NoKill = 'NO_KILL',
-  NoPoison = 'NO_POISON',
-  NoSilence = 'NO_SILENCE',
-  NoSleep = 'NO_SLEEP',
-  NoSummon = 'NO_SUMMON',
-  NoVicious = 'NO_VICIOUS',
-  Paladin = 'PALADIN',
-  Peaceful = 'PEACEFUL',
-  Peacekeeper = 'PEACEKEEPER',
-  PoisonBite = 'POISON_BITE',
-  Protector = 'PROTECTOR',
-  Ranger = 'RANGER',
-  Scavenger = 'SCAVENGER',
-  Sentinel = 'SENTINEL',
-  Shaman = 'SHAMAN',
-  SlowTrack = 'SLOW_TRACK',
-  Sorcerer = 'SORCERER',
-  Spec = 'SPEC',
-  StaySect = 'STAY_SECT',
-  StayZone = 'STAY_ZONE',
-  SummonedMount = 'SUMMONED_MOUNT',
-  Teacher = 'TEACHER',
-  Thief = 'THIEF',
-  Track = 'TRACK',
-  Warrior = 'WARRIOR',
-  Wimpy = 'WIMPY'
-}
+export type MobFlag =
+  | 'AGGRESSIVE'
+  | 'AGGRO_EVIL'
+  | 'AGGRO_GOOD'
+  | 'AGGRO_NEUTRAL'
+  | 'ANTI_PALADIN'
+  | 'AQUATIC'
+  | 'ASSASSIN'
+  | 'AWARE'
+  | 'BERSERKER'
+  | 'BLUR'
+  | 'CLERIC'
+  | 'CONJURER'
+  | 'DIABOLIST'
+  | 'DRUID'
+  | 'FAST_TRACK'
+  | 'HASTE'
+  | 'HATES_SUN'
+  | 'HELPER'
+  | 'ILLUSION'
+  | 'IS_NPC'
+  | 'MEMORY'
+  | 'MERCENARY'
+  | 'MONK'
+  | 'MOUNT'
+  | 'MOUNTABLE'
+  | 'NECROMANCER'
+  | 'NO_BASH'
+  | 'NO_BLIND'
+  | 'NO_CHARM'
+  | 'NO_CLASS_AI'
+  | 'NO_EQ_RESTRICT'
+  | 'NO_KILL'
+  | 'NO_POISON'
+  | 'NO_SILENCE'
+  | 'NO_SLEEP'
+  | 'NO_SUMMON'
+  | 'NO_VICIOUS'
+  | 'PALADIN'
+  | 'PEACEFUL'
+  | 'PEACEKEEPER'
+  | 'POISON_BITE'
+  | 'PROTECTOR'
+  | 'RANGER'
+  | 'SCAVENGER'
+  | 'SENTINEL'
+  | 'SHAMAN'
+  | 'SLOW_TRACK'
+  | 'SORCERER'
+  | 'SPEC'
+  | 'STAY_SECT'
+  | 'STAY_ZONE'
+  | 'SUMMONED_MOUNT'
+  | 'TEACHER'
+  | 'THIEF'
+  | 'TRACK'
+  | 'WARRIOR'
+  | 'WIMPY';
 
 export type MobResetDto = {
   __typename?: 'MobResetDto';
@@ -1195,61 +1184,60 @@ export type ObjectDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export enum ObjectFlag {
-  AntiAntiPaladin = 'ANTI_ANTI_PALADIN',
-  AntiArborean = 'ANTI_ARBOREAN',
-  AntiAssassin = 'ANTI_ASSASSIN',
-  AntiBard = 'ANTI_BARD',
-  AntiBerserker = 'ANTI_BERSERKER',
-  AntiCleric = 'ANTI_CLERIC',
-  AntiColossal = 'ANTI_COLOSSAL',
-  AntiConjurer = 'ANTI_CONJURER',
-  AntiCryomancer = 'ANTI_CRYOMANCER',
-  AntiDiabolist = 'ANTI_DIABOLIST',
-  AntiDruid = 'ANTI_DRUID',
-  AntiEvil = 'ANTI_EVIL',
-  AntiGargantuan = 'ANTI_GARGANTUAN',
-  AntiGiant = 'ANTI_GIANT',
-  AntiGood = 'ANTI_GOOD',
-  AntiHuge = 'ANTI_HUGE',
-  AntiIllusionist = 'ANTI_ILLUSIONIST',
-  AntiLarge = 'ANTI_LARGE',
-  AntiMedium = 'ANTI_MEDIUM',
-  AntiMercenary = 'ANTI_MERCENARY',
-  AntiMonk = 'ANTI_MONK',
-  AntiMountainous = 'ANTI_MOUNTAINOUS',
-  AntiNecromancer = 'ANTI_NECROMANCER',
-  AntiNeutral = 'ANTI_NEUTRAL',
-  AntiPaladin = 'ANTI_PALADIN',
-  AntiPriest = 'ANTI_PRIEST',
-  AntiPyromancer = 'ANTI_PYROMANCER',
-  AntiRanger = 'ANTI_RANGER',
-  AntiRogue = 'ANTI_ROGUE',
-  AntiShaman = 'ANTI_SHAMAN',
-  AntiSmall = 'ANTI_SMALL',
-  AntiSorcerer = 'ANTI_SORCERER',
-  AntiThief = 'ANTI_THIEF',
-  AntiTiny = 'ANTI_TINY',
-  AntiTitanic = 'ANTI_TITANIC',
-  AntiWarrior = 'ANTI_WARRIOR',
-  Decomposing = 'DECOMPOSING',
-  Dwarven = 'DWARVEN',
-  Elven = 'ELVEN',
-  Float = 'FLOAT',
-  Glow = 'GLOW',
-  Hum = 'HUM',
-  Invisible = 'INVISIBLE',
-  Magic = 'MAGIC',
-  NoBurn = 'NO_BURN',
-  NoDrop = 'NO_DROP',
-  NoFall = 'NO_FALL',
-  NoInvisible = 'NO_INVISIBLE',
-  NoLocate = 'NO_LOCATE',
-  NoRent = 'NO_RENT',
-  NoSell = 'NO_SELL',
-  Permanent = 'PERMANENT',
-  WasDisarmed = 'WAS_DISARMED'
-}
+export type ObjectFlag =
+  | 'ANTI_ANTI_PALADIN'
+  | 'ANTI_ARBOREAN'
+  | 'ANTI_ASSASSIN'
+  | 'ANTI_BARD'
+  | 'ANTI_BERSERKER'
+  | 'ANTI_CLERIC'
+  | 'ANTI_COLOSSAL'
+  | 'ANTI_CONJURER'
+  | 'ANTI_CRYOMANCER'
+  | 'ANTI_DIABOLIST'
+  | 'ANTI_DRUID'
+  | 'ANTI_EVIL'
+  | 'ANTI_GARGANTUAN'
+  | 'ANTI_GIANT'
+  | 'ANTI_GOOD'
+  | 'ANTI_HUGE'
+  | 'ANTI_ILLUSIONIST'
+  | 'ANTI_LARGE'
+  | 'ANTI_MEDIUM'
+  | 'ANTI_MERCENARY'
+  | 'ANTI_MONK'
+  | 'ANTI_MOUNTAINOUS'
+  | 'ANTI_NECROMANCER'
+  | 'ANTI_NEUTRAL'
+  | 'ANTI_PALADIN'
+  | 'ANTI_PRIEST'
+  | 'ANTI_PYROMANCER'
+  | 'ANTI_RANGER'
+  | 'ANTI_ROGUE'
+  | 'ANTI_SHAMAN'
+  | 'ANTI_SMALL'
+  | 'ANTI_SORCERER'
+  | 'ANTI_THIEF'
+  | 'ANTI_TINY'
+  | 'ANTI_TITANIC'
+  | 'ANTI_WARRIOR'
+  | 'DECOMPOSING'
+  | 'DWARVEN'
+  | 'ELVEN'
+  | 'FLOAT'
+  | 'GLOW'
+  | 'HUM'
+  | 'INVISIBLE'
+  | 'MAGIC'
+  | 'NO_BURN'
+  | 'NO_DROP'
+  | 'NO_FALL'
+  | 'NO_INVISIBLE'
+  | 'NO_LOCATE'
+  | 'NO_RENT'
+  | 'NO_SELL'
+  | 'PERMANENT'
+  | 'WAS_DISARMED';
 
 export type ObjectSummaryDto = {
   __typename?: 'ObjectSummaryDto';
@@ -1260,39 +1248,38 @@ export type ObjectSummaryDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export enum ObjectType {
-  Armor = 'ARMOR',
-  Board = 'BOARD',
-  Boat = 'BOAT',
-  Container = 'CONTAINER',
-  Drinkcontainer = 'DRINKCONTAINER',
-  Fireweapon = 'FIREWEAPON',
-  Food = 'FOOD',
-  Fountain = 'FOUNTAIN',
-  Instrument = 'INSTRUMENT',
-  Key = 'KEY',
-  Light = 'LIGHT',
-  Missile = 'MISSILE',
-  Money = 'MONEY',
-  Note = 'NOTE',
-  Nothing = 'NOTHING',
-  Other = 'OTHER',
-  Pen = 'PEN',
-  Portal = 'PORTAL',
-  Potion = 'POTION',
-  Rope = 'ROPE',
-  Scroll = 'SCROLL',
-  Spellbook = 'SPELLBOOK',
-  Staff = 'STAFF',
-  Touchstone = 'TOUCHSTONE',
-  Trap = 'TRAP',
-  Trash = 'TRASH',
-  Treasure = 'TREASURE',
-  Wall = 'WALL',
-  Wand = 'WAND',
-  Weapon = 'WEAPON',
-  Worn = 'WORN'
-}
+export type ObjectType =
+  | 'ARMOR'
+  | 'BOARD'
+  | 'BOAT'
+  | 'CONTAINER'
+  | 'DRINKCONTAINER'
+  | 'FIREWEAPON'
+  | 'FOOD'
+  | 'FOUNTAIN'
+  | 'INSTRUMENT'
+  | 'KEY'
+  | 'LIGHT'
+  | 'MISSILE'
+  | 'MONEY'
+  | 'NOTE'
+  | 'NOTHING'
+  | 'OTHER'
+  | 'PEN'
+  | 'PORTAL'
+  | 'POTION'
+  | 'ROPE'
+  | 'SCROLL'
+  | 'SPELLBOOK'
+  | 'STAFF'
+  | 'TOUCHSTONE'
+  | 'TRAP'
+  | 'TRASH'
+  | 'TREASURE'
+  | 'WALL'
+  | 'WAND'
+  | 'WEAPON'
+  | 'WORN';
 
 export type OnlineCharacterDto = {
   __typename?: 'OnlineCharacterDto';
@@ -1312,13 +1299,12 @@ export type PasswordResetResponse = {
   success: Scalars['Boolean']['output'];
 };
 
-export enum Position {
-  Flying = 'FLYING',
-  Kneeling = 'KNEELING',
-  Prone = 'PRONE',
-  Sitting = 'SITTING',
-  Standing = 'STANDING'
-}
+export type Position =
+  | 'FLYING'
+  | 'KNEELING'
+  | 'PRONE'
+  | 'SITTING'
+  | 'STANDING';
 
 export type Query = {
   __typename?: 'Query';
@@ -1580,44 +1566,43 @@ export type QueryZonesArgs = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
-export enum Race {
-  Animal = 'ANIMAL',
-  Arborean = 'ARBOREAN',
-  Barbarian = 'BARBARIAN',
-  Brownie = 'BROWNIE',
-  Demon = 'DEMON',
-  DragonbornAcid = 'DRAGONBORN_ACID',
-  DragonbornFire = 'DRAGONBORN_FIRE',
-  DragonbornFrost = 'DRAGONBORN_FROST',
-  DragonbornGas = 'DRAGONBORN_GAS',
-  DragonbornLightning = 'DRAGONBORN_LIGHTNING',
-  DragonAcid = 'DRAGON_ACID',
-  DragonFire = 'DRAGON_FIRE',
-  DragonFrost = 'DRAGON_FROST',
-  DragonGas = 'DRAGON_GAS',
-  DragonGeneral = 'DRAGON_GENERAL',
-  DragonLightning = 'DRAGON_LIGHTNING',
-  Drow = 'DROW',
-  Duergar = 'DUERGAR',
-  Dwarf = 'DWARF',
-  Elf = 'ELF',
-  FaerieSeelie = 'FAERIE_SEELIE',
-  FaerieUnseelie = 'FAERIE_UNSEELIE',
-  Giant = 'GIANT',
-  Gnome = 'GNOME',
-  Goblin = 'GOBLIN',
-  Halfling = 'HALFLING',
-  HalfElf = 'HALF_ELF',
-  Human = 'HUMAN',
-  Humanoid = 'HUMANOID',
-  Nymph = 'NYMPH',
-  Ogre = 'OGRE',
-  Orc = 'ORC',
-  Other = 'OTHER',
-  Plant = 'PLANT',
-  Sverfneblin = 'SVERFNEBLIN',
-  Troll = 'TROLL'
-}
+export type Race =
+  | 'ANIMAL'
+  | 'ARBOREAN'
+  | 'BARBARIAN'
+  | 'BROWNIE'
+  | 'DEMON'
+  | 'DRAGONBORN_ACID'
+  | 'DRAGONBORN_FIRE'
+  | 'DRAGONBORN_FROST'
+  | 'DRAGONBORN_GAS'
+  | 'DRAGONBORN_LIGHTNING'
+  | 'DRAGON_ACID'
+  | 'DRAGON_FIRE'
+  | 'DRAGON_FROST'
+  | 'DRAGON_GAS'
+  | 'DRAGON_GENERAL'
+  | 'DRAGON_LIGHTNING'
+  | 'DROW'
+  | 'DUERGAR'
+  | 'DWARF'
+  | 'ELF'
+  | 'FAERIE_SEELIE'
+  | 'FAERIE_UNSEELIE'
+  | 'GIANT'
+  | 'GNOME'
+  | 'GOBLIN'
+  | 'HALFLING'
+  | 'HALF_ELF'
+  | 'HUMAN'
+  | 'HUMANOID'
+  | 'NYMPH'
+  | 'OGRE'
+  | 'ORC'
+  | 'OTHER'
+  | 'PLANT'
+  | 'SVERFNEBLIN'
+  | 'TROLL';
 
 export type RegisterInput = {
   email: Scalars['String']['input'];
@@ -1629,11 +1614,10 @@ export type RequestPasswordResetInput = {
   email: Scalars['String']['input'];
 };
 
-export enum ResetMode {
-  Empty = 'EMPTY',
-  Never = 'NEVER',
-  Normal = 'NORMAL'
-}
+export type ResetMode =
+  | 'EMPTY'
+  | 'NEVER'
+  | 'NORMAL';
 
 export type ResetPasswordInput = {
   newPassword: Scalars['String']['input'];
@@ -1684,46 +1668,45 @@ export type RoomExtraDescriptionDto = {
   keywords: Array<Scalars['String']['output']>;
 };
 
-export enum RoomFlag {
-  AltExit = 'ALT_EXIT',
-  AlwaysLit = 'ALWAYS_LIT',
-  Arena = 'ARENA',
-  Atrium = 'ATRIUM',
-  BfsMark = 'BFS_MARK',
-  Dark = 'DARK',
-  Death = 'DEATH',
-  EffectsNext = 'EFFECTS_NEXT',
-  FerryDest = 'FERRY_DEST',
-  Godroom = 'GODROOM',
-  Guildhall = 'GUILDHALL',
-  House = 'HOUSE',
-  Housecrash = 'HOUSECRASH',
-  Indoors = 'INDOORS',
-  Isolated = 'ISOLATED',
-  Large = 'LARGE',
-  Medium = 'MEDIUM',
-  MediumLarge = 'MEDIUM_LARGE',
-  MediumSmall = 'MEDIUM_SMALL',
-  NoMagic = 'NO_MAGIC',
-  NoMob = 'NO_MOB',
-  NoRecall = 'NO_RECALL',
-  NoScan = 'NO_SCAN',
-  NoShift = 'NO_SHIFT',
-  NoSummon = 'NO_SUMMON',
-  NoTrack = 'NO_TRACK',
-  NoWell = 'NO_WELL',
-  Observatory = 'OBSERVATORY',
-  Olc = 'OLC',
-  OnePerson = 'ONE_PERSON',
-  Peaceful = 'PEACEFUL',
-  Private = 'PRIVATE',
-  Small = 'SMALL',
-  Soundproof = 'SOUNDPROOF',
-  Tunnel = 'TUNNEL',
-  Underdark = 'UNDERDARK',
-  VerySmall = 'VERY_SMALL',
-  Worldmap = 'WORLDMAP'
-}
+export type RoomFlag =
+  | 'ALT_EXIT'
+  | 'ALWAYS_LIT'
+  | 'ARENA'
+  | 'ATRIUM'
+  | 'BFS_MARK'
+  | 'DARK'
+  | 'DEATH'
+  | 'EFFECTS_NEXT'
+  | 'FERRY_DEST'
+  | 'GODROOM'
+  | 'GUILDHALL'
+  | 'HOUSE'
+  | 'HOUSECRASH'
+  | 'INDOORS'
+  | 'ISOLATED'
+  | 'LARGE'
+  | 'MEDIUM'
+  | 'MEDIUM_LARGE'
+  | 'MEDIUM_SMALL'
+  | 'NO_MAGIC'
+  | 'NO_MOB'
+  | 'NO_RECALL'
+  | 'NO_SCAN'
+  | 'NO_SHIFT'
+  | 'NO_SUMMON'
+  | 'NO_TRACK'
+  | 'NO_WELL'
+  | 'OBSERVATORY'
+  | 'OLC'
+  | 'ONE_PERSON'
+  | 'PEACEFUL'
+  | 'PRIVATE'
+  | 'SMALL'
+  | 'SOUNDPROOF'
+  | 'TUNNEL'
+  | 'UNDERDARK'
+  | 'VERY_SMALL'
+  | 'WORLDMAP';
 
 export type RoomSummaryDto = {
   __typename?: 'RoomSummaryDto';
@@ -1732,37 +1715,35 @@ export type RoomSummaryDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export enum ScriptType {
-  Mob = 'MOB',
-  Object = 'OBJECT',
-  World = 'WORLD'
-}
+export type ScriptType =
+  | 'MOB'
+  | 'OBJECT'
+  | 'WORLD';
 
-export enum Sector {
-  Air = 'AIR',
-  Airplane = 'AIRPLANE',
-  Astralplane = 'ASTRALPLANE',
-  Avernus = 'AVERNUS',
-  Beach = 'BEACH',
-  Cave = 'CAVE',
-  City = 'CITY',
-  Earthplane = 'EARTHPLANE',
-  Etherealplane = 'ETHEREALPLANE',
-  Field = 'FIELD',
-  Fireplane = 'FIREPLANE',
-  Forest = 'FOREST',
-  Grasslands = 'GRASSLANDS',
-  Hills = 'HILLS',
-  Mountain = 'MOUNTAIN',
-  Road = 'ROAD',
-  Ruins = 'RUINS',
-  Shallows = 'SHALLOWS',
-  Structure = 'STRUCTURE',
-  Swamp = 'SWAMP',
-  Underdark = 'UNDERDARK',
-  Underwater = 'UNDERWATER',
-  Water = 'WATER'
-}
+export type Sector =
+  | 'AIR'
+  | 'AIRPLANE'
+  | 'ASTRALPLANE'
+  | 'AVERNUS'
+  | 'BEACH'
+  | 'CAVE'
+  | 'CITY'
+  | 'EARTHPLANE'
+  | 'ETHEREALPLANE'
+  | 'FIELD'
+  | 'FIREPLANE'
+  | 'FOREST'
+  | 'GRASSLANDS'
+  | 'HILLS'
+  | 'MOUNTAIN'
+  | 'ROAD'
+  | 'RUINS'
+  | 'SHALLOWS'
+  | 'STRUCTURE'
+  | 'SWAMP'
+  | 'UNDERDARK'
+  | 'UNDERWATER'
+  | 'WATER';
 
 export type ShopAcceptDto = {
   __typename?: 'ShopAcceptDto';
@@ -1794,12 +1775,11 @@ export type ShopDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export enum ShopFlag {
-  UsesBank = 'USES_BANK',
-  WillBankMoney = 'WILL_BANK_MONEY',
-  WillFight = 'WILL_FIGHT',
-  WillStartFight = 'WILL_START_FIGHT'
-}
+export type ShopFlag =
+  | 'USES_BANK'
+  | 'WILL_BANK_MONEY'
+  | 'WILL_FIGHT'
+  | 'WILL_START_FIGHT';
 
 export type ShopHourDto = {
   __typename?: 'ShopHourDto';
@@ -1816,41 +1796,38 @@ export type ShopItemDto = {
   objectId: Scalars['Int']['output'];
 };
 
-export enum ShopTradesWith {
-  Alignment = 'ALIGNMENT',
-  Class = 'CLASS',
-  Race = 'RACE',
-  TradeNocleric = 'TRADE_NOCLERIC',
-  TradeNoevil = 'TRADE_NOEVIL',
-  TradeNogood = 'TRADE_NOGOOD',
-  TradeNoneutral = 'TRADE_NONEUTRAL',
-  TradeNothief = 'TRADE_NOTHIEF',
-  TradeNowarrior = 'TRADE_NOWARRIOR'
-}
+export type ShopTradesWith =
+  | 'ALIGNMENT'
+  | 'CLASS'
+  | 'RACE'
+  | 'TRADE_NOCLERIC'
+  | 'TRADE_NOEVIL'
+  | 'TRADE_NOGOOD'
+  | 'TRADE_NONEUTRAL'
+  | 'TRADE_NOTHIEF'
+  | 'TRADE_NOWARRIOR';
 
-export enum Size {
-  Colossal = 'COLOSSAL',
-  Gargantuan = 'GARGANTUAN',
-  Giant = 'GIANT',
-  Huge = 'HUGE',
-  Large = 'LARGE',
-  Medium = 'MEDIUM',
-  Mountainous = 'MOUNTAINOUS',
-  Small = 'SMALL',
-  Tiny = 'TINY',
-  Titanic = 'TITANIC'
-}
+export type Size =
+  | 'COLOSSAL'
+  | 'GARGANTUAN'
+  | 'GIANT'
+  | 'HUGE'
+  | 'LARGE'
+  | 'MEDIUM'
+  | 'MOUNTAINOUS'
+  | 'SMALL'
+  | 'TINY'
+  | 'TITANIC';
 
-export enum Stance {
-  Alert = 'ALERT',
-  Dead = 'DEAD',
-  Fighting = 'FIGHTING',
-  Incapacitated = 'INCAPACITATED',
-  Mort = 'MORT',
-  Resting = 'RESTING',
-  Sleeping = 'SLEEPING',
-  Stunned = 'STUNNED'
-}
+export type Stance =
+  | 'ALERT'
+  | 'DEAD'
+  | 'FIGHTING'
+  | 'INCAPACITATED'
+  | 'MORT'
+  | 'RESTING'
+  | 'SLEEPING'
+  | 'STUNNED';
 
 export type TriggerDto = {
   __typename?: 'TriggerDto';
@@ -2093,13 +2070,12 @@ export type UserPermissions = {
 };
 
 /** User role in the MUD system */
-export enum UserRole {
-  Builder = 'BUILDER',
-  Coder = 'CODER',
-  God = 'GOD',
-  Immortal = 'IMMORTAL',
-  Player = 'PLAYER'
-}
+export type UserRole =
+  | 'BUILDER'
+  | 'CODER'
+  | 'GOD'
+  | 'IMMORTAL'
+  | 'PLAYER';
 
 export type UserSummaryDto = {
   __typename?: 'UserSummaryDto';
@@ -2109,20 +2085,18 @@ export type UserSummaryDto = {
 };
 
 /** The category of validation issue */
-export enum ValidationCategory {
-  Consistency = 'CONSISTENCY',
-  Integrity = 'INTEGRITY',
-  Quality = 'QUALITY'
-}
+export type ValidationCategory =
+  | 'CONSISTENCY'
+  | 'INTEGRITY'
+  | 'QUALITY';
 
 /** The type of entity being validated */
-export enum ValidationEntity {
-  Mob = 'MOB',
-  Object = 'OBJECT',
-  Room = 'ROOM',
-  Shop = 'SHOP',
-  Zone = 'ZONE'
-}
+export type ValidationEntity =
+  | 'MOB'
+  | 'OBJECT'
+  | 'ROOM'
+  | 'SHOP'
+  | 'ZONE';
 
 export type ValidationIssue = {
   __typename?: 'ValidationIssue';
@@ -2138,11 +2112,10 @@ export type ValidationIssue = {
 };
 
 /** The type of validation issue */
-export enum ValidationIssueType {
-  Error = 'ERROR',
-  Info = 'INFO',
-  Warning = 'WARNING'
-}
+export type ValidationIssueType =
+  | 'ERROR'
+  | 'INFO'
+  | 'WARNING';
 
 export type ValidationReportType = {
   __typename?: 'ValidationReportType';
@@ -2157,12 +2130,11 @@ export type ValidationReportType = {
 };
 
 /** The severity level of the validation issue */
-export enum ValidationSeverity {
-  Critical = 'CRITICAL',
-  High = 'HIGH',
-  Low = 'LOW',
-  Medium = 'MEDIUM'
-}
+export type ValidationSeverity =
+  | 'CRITICAL'
+  | 'HIGH'
+  | 'LOW'
+  | 'MEDIUM';
 
 export type ValidationSummaryType = {
   __typename?: 'ValidationSummaryType';
@@ -2174,30 +2146,29 @@ export type ValidationSummaryType = {
   zonesWithIssues: Scalars['Int']['output'];
 };
 
-export enum WearFlag {
-  About = 'ABOUT',
-  Arms = 'ARMS',
-  Badge = 'BADGE',
-  Belt = 'BELT',
-  Body = 'BODY',
-  Ear = 'EAR',
-  Eyes = 'EYES',
-  Face = 'FACE',
-  Feet = 'FEET',
-  Finger = 'FINGER',
-  Hands = 'HANDS',
-  Head = 'HEAD',
-  Hold = 'HOLD',
-  Hover = 'HOVER',
-  Legs = 'LEGS',
-  Neck = 'NECK',
-  Shield = 'SHIELD',
-  Take = 'TAKE',
-  TwoHandWield = 'TWO_HAND_WIELD',
-  Waist = 'WAIST',
-  Wield = 'WIELD',
-  Wrist = 'WRIST'
-}
+export type WearFlag =
+  | 'ABOUT'
+  | 'ARMS'
+  | 'BADGE'
+  | 'BELT'
+  | 'BODY'
+  | 'EAR'
+  | 'EYES'
+  | 'FACE'
+  | 'FEET'
+  | 'FINGER'
+  | 'HANDS'
+  | 'HEAD'
+  | 'HOLD'
+  | 'HOVER'
+  | 'LEGS'
+  | 'NECK'
+  | 'SHIELD'
+  | 'TAKE'
+  | 'TWO_HAND_WIELD'
+  | 'WAIST'
+  | 'WIELD'
+  | 'WRIST';
 
 export type ZoneCountsDto = {
   __typename?: 'ZoneCountsDto';
@@ -2760,1896 +2731,80 @@ export type MyPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 export type MyPermissionsQuery = { __typename?: 'Query', myPermissions: { __typename?: 'UserPermissions', isPlayer: boolean, isImmortal: boolean, isBuilder: boolean, isCoder: boolean, isGod: boolean, canAccessDashboard: boolean, canManageUsers: boolean, canViewValidation: boolean, maxCharacterLevel: number, role: UserRole } };
 
 
-export const GetMyCharactersDocument = gql`
-    query GetMyCharacters {
-  myCharacters {
-    id
-    name
-    level
-    raceType
-    playerClass
-    lastLogin
-    isOnline
-    timePlayed
-    hitPoints
-    hitPointsMax
-    movement
-    movementMax
-    alignment
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    luck
-    experience
-    copper
-    silver
-    gold
-    platinum
-    description
-    title
-    currentRoom
-  }
-}
-    `;
-export function useGetMyCharactersQuery(baseOptions?: Apollo.QueryHookOptions<GetMyCharactersQuery, GetMyCharactersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMyCharactersQuery, GetMyCharactersQueryVariables>(GetMyCharactersDocument, options);
-      }
-export function useGetMyCharactersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMyCharactersQuery, GetMyCharactersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMyCharactersQuery, GetMyCharactersQueryVariables>(GetMyCharactersDocument, options);
-        }
-export type GetMyCharactersQueryHookResult = ReturnType<typeof useGetMyCharactersQuery>;
-export type GetMyCharactersLazyQueryHookResult = ReturnType<typeof useGetMyCharactersLazyQuery>;
-export type GetMyCharactersQueryResult = Apollo.QueryResult<GetMyCharactersQuery, GetMyCharactersQueryVariables>;
-export const GetObjectDocument = gql`
-    query GetObject($id: Int!, $zoneId: Int!) {
-  object(id: $id, zoneId: $zoneId) {
-    id
-    type
-    keywords
-    name
-    examineDescription
-    actionDesc
-    weight
-    cost
-    timer
-    decomposeTimer
-    level
-    concealment
-    values
-    zoneId
-    flags
-    effectFlags
-    wearFlags
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export function useGetObjectQuery(baseOptions: Apollo.QueryHookOptions<GetObjectQuery, GetObjectQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectQuery, GetObjectQueryVariables>(GetObjectDocument, options);
-      }
-export function useGetObjectLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectQuery, GetObjectQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectQuery, GetObjectQueryVariables>(GetObjectDocument, options);
-        }
-export type GetObjectQueryHookResult = ReturnType<typeof useGetObjectQuery>;
-export type GetObjectLazyQueryHookResult = ReturnType<typeof useGetObjectLazyQuery>;
-export type GetObjectQueryResult = Apollo.QueryResult<GetObjectQuery, GetObjectQueryVariables>;
-export const UpdateObjectDocument = gql`
-    mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {
-  updateObject(id: $id, zoneId: $zoneId, data: $data) {
-    id
-    keywords
-    name
-    examineDescription
-  }
-}
-    `;
-export type UpdateObjectMutationFn = Apollo.MutationFunction<UpdateObjectMutation, UpdateObjectMutationVariables>;
-export function useUpdateObjectMutation(baseOptions?: Apollo.MutationHookOptions<UpdateObjectMutation, UpdateObjectMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateObjectMutation, UpdateObjectMutationVariables>(UpdateObjectDocument, options);
-      }
-export type UpdateObjectMutationHookResult = ReturnType<typeof useUpdateObjectMutation>;
-export type UpdateObjectMutationResult = Apollo.MutationResult<UpdateObjectMutation>;
-export type UpdateObjectMutationOptions = Apollo.BaseMutationOptions<UpdateObjectMutation, UpdateObjectMutationVariables>;
-export const CreateObjectDocument = gql`
-    mutation CreateObject($data: CreateObjectInput!) {
-  createObject(data: $data) {
-    id
-    keywords
-    name
-  }
-}
-    `;
-export type CreateObjectMutationFn = Apollo.MutationFunction<CreateObjectMutation, CreateObjectMutationVariables>;
-export function useCreateObjectMutation(baseOptions?: Apollo.MutationHookOptions<CreateObjectMutation, CreateObjectMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateObjectMutation, CreateObjectMutationVariables>(CreateObjectDocument, options);
-      }
-export type CreateObjectMutationHookResult = ReturnType<typeof useCreateObjectMutation>;
-export type CreateObjectMutationResult = Apollo.MutationResult<CreateObjectMutation>;
-export type CreateObjectMutationOptions = Apollo.BaseMutationOptions<CreateObjectMutation, CreateObjectMutationVariables>;
-export const GetObjectsDashboardDocument = gql`
-    query GetObjectsDashboard {
-  objects(take: 100) {
-    id
-    type
-    keywords
-    name
-    level
-    weight
-    cost
-    zoneId
-    values
-  }
-}
-    `;
-export function useGetObjectsDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>(GetObjectsDashboardDocument, options);
-      }
-export function useGetObjectsDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>(GetObjectsDashboardDocument, options);
-        }
-export type GetObjectsDashboardQueryHookResult = ReturnType<typeof useGetObjectsDashboardQuery>;
-export type GetObjectsDashboardLazyQueryHookResult = ReturnType<typeof useGetObjectsDashboardLazyQuery>;
-export type GetObjectsDashboardQueryResult = Apollo.QueryResult<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>;
-export const GetObjectsByZoneDashboardDocument = gql`
-    query GetObjectsByZoneDashboard($zoneId: Int!) {
-  objectsByZone(zoneId: $zoneId) {
-    id
-    type
-    keywords
-    name
-    level
-    weight
-    cost
-    zoneId
-    values
-  }
-}
-    `;
-export function useGetObjectsByZoneDashboardQuery(baseOptions: Apollo.QueryHookOptions<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>(GetObjectsByZoneDashboardDocument, options);
-      }
-export function useGetObjectsByZoneDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>(GetObjectsByZoneDashboardDocument, options);
-        }
-export type GetObjectsByZoneDashboardQueryHookResult = ReturnType<typeof useGetObjectsByZoneDashboardQuery>;
-export type GetObjectsByZoneDashboardLazyQueryHookResult = ReturnType<typeof useGetObjectsByZoneDashboardLazyQuery>;
-export type GetObjectsByZoneDashboardQueryResult = Apollo.QueryResult<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>;
-export const DeleteObjectDocument = gql`
-    mutation DeleteObject($id: Int!, $zoneId: Int!) {
-  deleteObject(id: $id, zoneId: $zoneId) {
-    id
-  }
-}
-    `;
-export type DeleteObjectMutationFn = Apollo.MutationFunction<DeleteObjectMutation, DeleteObjectMutationVariables>;
-export function useDeleteObjectMutation(baseOptions?: Apollo.MutationHookOptions<DeleteObjectMutation, DeleteObjectMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteObjectMutation, DeleteObjectMutationVariables>(DeleteObjectDocument, options);
-      }
-export type DeleteObjectMutationHookResult = ReturnType<typeof useDeleteObjectMutation>;
-export type DeleteObjectMutationResult = Apollo.MutationResult<DeleteObjectMutation>;
-export type DeleteObjectMutationOptions = Apollo.BaseMutationOptions<DeleteObjectMutation, DeleteObjectMutationVariables>;
-export const DeleteObjectsDocument = gql`
-    mutation DeleteObjects($ids: [Int!]!) {
-  deleteObjects(ids: $ids)
-}
-    `;
-export type DeleteObjectsMutationFn = Apollo.MutationFunction<DeleteObjectsMutation, DeleteObjectsMutationVariables>;
-export function useDeleteObjectsMutation(baseOptions?: Apollo.MutationHookOptions<DeleteObjectsMutation, DeleteObjectsMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteObjectsMutation, DeleteObjectsMutationVariables>(DeleteObjectsDocument, options);
-      }
-export type DeleteObjectsMutationHookResult = ReturnType<typeof useDeleteObjectsMutation>;
-export type DeleteObjectsMutationResult = Apollo.MutationResult<DeleteObjectsMutation>;
-export type DeleteObjectsMutationOptions = Apollo.BaseMutationOptions<DeleteObjectsMutation, DeleteObjectsMutationVariables>;
-export const GetDashboardStatsDocument = gql`
-    query GetDashboardStats {
-  zonesCount
-  roomsCount
-  mobsCount
-  objectsCount
-  shopsCount
-}
-    `;
-export function useGetDashboardStatsQuery(baseOptions?: Apollo.QueryHookOptions<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>(GetDashboardStatsDocument, options);
-      }
-export function useGetDashboardStatsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>(GetDashboardStatsDocument, options);
-        }
-export type GetDashboardStatsQueryHookResult = ReturnType<typeof useGetDashboardStatsQuery>;
-export type GetDashboardStatsLazyQueryHookResult = ReturnType<typeof useGetDashboardStatsLazyQuery>;
-export type GetDashboardStatsQueryResult = Apollo.QueryResult<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>;
-export const GetShopDocument = gql`
-    query GetShop($id: Int!, $zoneId: Int!) {
-  shop(id: $id, zoneId: $zoneId) {
-    id
-    buyProfit
-    sellProfit
-    temper
-    noSuchItemMessages
-    doNotBuyMessages
-    missingCashMessages
-    buyMessages
-    sellMessages
-    keeperId
-    zoneId
-    flags
-    tradesWithFlags
-    createdAt
-    updatedAt
-    items {
-      id
-      amount
-      objectId
-      object {
-        id
-        name
-        type
-        cost
-      }
-    }
-    accepts {
-      id
-      type
-      keywords
-    }
-    hours {
-      id
-      open
-      close
-    }
-  }
-}
-    `;
-export function useGetShopQuery(baseOptions: Apollo.QueryHookOptions<GetShopQuery, GetShopQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetShopQuery, GetShopQueryVariables>(GetShopDocument, options);
-      }
-export function useGetShopLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetShopQuery, GetShopQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetShopQuery, GetShopQueryVariables>(GetShopDocument, options);
-        }
-export type GetShopQueryHookResult = ReturnType<typeof useGetShopQuery>;
-export type GetShopLazyQueryHookResult = ReturnType<typeof useGetShopLazyQuery>;
-export type GetShopQueryResult = Apollo.QueryResult<GetShopQuery, GetShopQueryVariables>;
-export const GetAvailableObjectsDocument = gql`
-    query GetAvailableObjects {
-  objects {
-    id
-    keywords
-    name
-    type
-    cost
-    zoneId
-  }
-}
-    `;
-export function useGetAvailableObjectsQuery(baseOptions?: Apollo.QueryHookOptions<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>(GetAvailableObjectsDocument, options);
-      }
-export function useGetAvailableObjectsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>(GetAvailableObjectsDocument, options);
-        }
-export type GetAvailableObjectsQueryHookResult = ReturnType<typeof useGetAvailableObjectsQuery>;
-export type GetAvailableObjectsLazyQueryHookResult = ReturnType<typeof useGetAvailableObjectsLazyQuery>;
-export type GetAvailableObjectsQueryResult = Apollo.QueryResult<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>;
-export const GetAvailableMobsDocument = gql`
-    query GetAvailableMobs {
-  mobs {
-    id
-    keywords
-    name
-    zoneId
-  }
-}
-    `;
-export function useGetAvailableMobsQuery(baseOptions?: Apollo.QueryHookOptions<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>(GetAvailableMobsDocument, options);
-      }
-export function useGetAvailableMobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>(GetAvailableMobsDocument, options);
-        }
-export type GetAvailableMobsQueryHookResult = ReturnType<typeof useGetAvailableMobsQuery>;
-export type GetAvailableMobsLazyQueryHookResult = ReturnType<typeof useGetAvailableMobsLazyQuery>;
-export type GetAvailableMobsQueryResult = Apollo.QueryResult<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>;
-export const UpdateShopDocument = gql`
-    mutation UpdateShop($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
-  updateShop(id: $id, zoneId: $zoneId, data: $data) {
-    id
-    buyProfit
-    sellProfit
-  }
-}
-    `;
-export type UpdateShopMutationFn = Apollo.MutationFunction<UpdateShopMutation, UpdateShopMutationVariables>;
-export function useUpdateShopMutation(baseOptions?: Apollo.MutationHookOptions<UpdateShopMutation, UpdateShopMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateShopMutation, UpdateShopMutationVariables>(UpdateShopDocument, options);
-      }
-export type UpdateShopMutationHookResult = ReturnType<typeof useUpdateShopMutation>;
-export type UpdateShopMutationResult = Apollo.MutationResult<UpdateShopMutation>;
-export type UpdateShopMutationOptions = Apollo.BaseMutationOptions<UpdateShopMutation, UpdateShopMutationVariables>;
-export const CreateShopDocument = gql`
-    mutation CreateShop($data: CreateShopInput!) {
-  createShop(data: $data) {
-    id
-    buyProfit
-    sellProfit
-  }
-}
-    `;
-export type CreateShopMutationFn = Apollo.MutationFunction<CreateShopMutation, CreateShopMutationVariables>;
-export function useCreateShopMutation(baseOptions?: Apollo.MutationHookOptions<CreateShopMutation, CreateShopMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateShopMutation, CreateShopMutationVariables>(CreateShopDocument, options);
-      }
-export type CreateShopMutationHookResult = ReturnType<typeof useCreateShopMutation>;
-export type CreateShopMutationResult = Apollo.MutationResult<CreateShopMutation>;
-export type CreateShopMutationOptions = Apollo.BaseMutationOptions<CreateShopMutation, CreateShopMutationVariables>;
-export const GetShopsDocument = gql`
-    query GetShops {
-  shops {
-    id
-    buyProfit
-    sellProfit
-    temper
-    flags
-    tradesWithFlags
-    noSuchItemMessages
-    doNotBuyMessages
-    missingCashMessages
-    buyMessages
-    sellMessages
-    keeperId
-    keeper {
-      id
-      zoneId
-      name
-      keywords
-    }
-    zoneId
-    createdAt
-    updatedAt
-    items {
-      id
-      amount
-      objectId
-      object {
-        id
-        zoneId
-        name
-        type
-        cost
-      }
-    }
-    accepts {
-      id
-      type
-      keywords
-    }
-  }
-}
-    `;
-export function useGetShopsQuery(baseOptions?: Apollo.QueryHookOptions<GetShopsQuery, GetShopsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetShopsQuery, GetShopsQueryVariables>(GetShopsDocument, options);
-      }
-export function useGetShopsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetShopsQuery, GetShopsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetShopsQuery, GetShopsQueryVariables>(GetShopsDocument, options);
-        }
-export type GetShopsQueryHookResult = ReturnType<typeof useGetShopsQuery>;
-export type GetShopsLazyQueryHookResult = ReturnType<typeof useGetShopsLazyQuery>;
-export type GetShopsQueryResult = Apollo.QueryResult<GetShopsQuery, GetShopsQueryVariables>;
-export const GetShopsByZoneDocument = gql`
-    query GetShopsByZone($zoneId: Int!) {
-  shopsByZone(zoneId: $zoneId) {
-    id
-    buyProfit
-    sellProfit
-    temper
-    flags
-    tradesWithFlags
-    noSuchItemMessages
-    doNotBuyMessages
-    missingCashMessages
-    buyMessages
-    sellMessages
-    keeperId
-    keeper {
-      id
-      zoneId
-      name
-      keywords
-    }
-    zoneId
-    createdAt
-    updatedAt
-    items {
-      id
-      amount
-      objectId
-      object {
-        id
-        zoneId
-        name
-        type
-        cost
-      }
-    }
-    accepts {
-      id
-      type
-      keywords
-    }
-  }
-}
-    `;
-export function useGetShopsByZoneQuery(baseOptions: Apollo.QueryHookOptions<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>(GetShopsByZoneDocument, options);
-      }
-export function useGetShopsByZoneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>(GetShopsByZoneDocument, options);
-        }
-export type GetShopsByZoneQueryHookResult = ReturnType<typeof useGetShopsByZoneQuery>;
-export type GetShopsByZoneLazyQueryHookResult = ReturnType<typeof useGetShopsByZoneLazyQuery>;
-export type GetShopsByZoneQueryResult = Apollo.QueryResult<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>;
-export const DeleteShopDocument = gql`
-    mutation DeleteShop($id: Int!, $zoneId: Int!) {
-  deleteShop(id: $id, zoneId: $zoneId) {
-    id
-  }
-}
-    `;
-export type DeleteShopMutationFn = Apollo.MutationFunction<DeleteShopMutation, DeleteShopMutationVariables>;
-export function useDeleteShopMutation(baseOptions?: Apollo.MutationHookOptions<DeleteShopMutation, DeleteShopMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteShopMutation, DeleteShopMutationVariables>(DeleteShopDocument, options);
-      }
-export type DeleteShopMutationHookResult = ReturnType<typeof useDeleteShopMutation>;
-export type DeleteShopMutationResult = Apollo.MutationResult<DeleteShopMutation>;
-export type DeleteShopMutationOptions = Apollo.BaseMutationOptions<DeleteShopMutation, DeleteShopMutationVariables>;
-export const UsersDocument = gql`
-    query Users {
-  users {
-    id
-    username
-    email
-    role
-    isBanned
-    createdAt
-    lastLoginAt
-    banRecords {
-      id
-      reason
-      bannedAt
-      expiresAt
-      admin {
-        username
-      }
-    }
-  }
-}
-    `;
-export function useUsersQuery(baseOptions?: Apollo.QueryHookOptions<UsersQuery, UsersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
-      }
-export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<UsersQuery, UsersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<UsersQuery, UsersQueryVariables>(UsersDocument, options);
-        }
-export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
-export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
-export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;
-export const UpdateUserDocument = gql`
-    mutation UpdateUser($input: UpdateUserInput!) {
-  updateUser(input: $input) {
-    id
-    username
-    email
-    role
-  }
-}
-    `;
-export type UpdateUserMutationFn = Apollo.MutationFunction<UpdateUserMutation, UpdateUserMutationVariables>;
-export function useUpdateUserMutation(baseOptions?: Apollo.MutationHookOptions<UpdateUserMutation, UpdateUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateUserMutation, UpdateUserMutationVariables>(UpdateUserDocument, options);
-      }
-export type UpdateUserMutationHookResult = ReturnType<typeof useUpdateUserMutation>;
-export type UpdateUserMutationResult = Apollo.MutationResult<UpdateUserMutation>;
-export type UpdateUserMutationOptions = Apollo.BaseMutationOptions<UpdateUserMutation, UpdateUserMutationVariables>;
-export const BanUserDocument = gql`
-    mutation BanUser($input: BanUserInput!) {
-  banUser(input: $input) {
-    id
-    reason
-    bannedAt
-    userId
-  }
-}
-    `;
-export type BanUserMutationFn = Apollo.MutationFunction<BanUserMutation, BanUserMutationVariables>;
-export function useBanUserMutation(baseOptions?: Apollo.MutationHookOptions<BanUserMutation, BanUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<BanUserMutation, BanUserMutationVariables>(BanUserDocument, options);
-      }
-export type BanUserMutationHookResult = ReturnType<typeof useBanUserMutation>;
-export type BanUserMutationResult = Apollo.MutationResult<BanUserMutation>;
-export type BanUserMutationOptions = Apollo.BaseMutationOptions<BanUserMutation, BanUserMutationVariables>;
-export const UnbanUserDocument = gql`
-    mutation UnbanUser($input: UnbanUserInput!) {
-  unbanUser(input: $input) {
-    id
-    unbannedAt
-    userId
-  }
-}
-    `;
-export type UnbanUserMutationFn = Apollo.MutationFunction<UnbanUserMutation, UnbanUserMutationVariables>;
-export function useUnbanUserMutation(baseOptions?: Apollo.MutationHookOptions<UnbanUserMutation, UnbanUserMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UnbanUserMutation, UnbanUserMutationVariables>(UnbanUserDocument, options);
-      }
-export type UnbanUserMutationHookResult = ReturnType<typeof useUnbanUserMutation>;
-export type UnbanUserMutationResult = Apollo.MutationResult<UnbanUserMutation>;
-export type UnbanUserMutationOptions = Apollo.BaseMutationOptions<UnbanUserMutation, UnbanUserMutationVariables>;
-export const GetZonesDocument = gql`
-    query GetZones {
-  zones {
-    id
-    name
-    climate
-  }
-}
-    `;
-export function useGetZonesQuery(baseOptions?: Apollo.QueryHookOptions<GetZonesQuery, GetZonesQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetZonesQuery, GetZonesQueryVariables>(GetZonesDocument, options);
-      }
-export function useGetZonesLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetZonesQuery, GetZonesQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetZonesQuery, GetZonesQueryVariables>(GetZonesDocument, options);
-        }
-export type GetZonesQueryHookResult = ReturnType<typeof useGetZonesQuery>;
-export type GetZonesLazyQueryHookResult = ReturnType<typeof useGetZonesLazyQuery>;
-export type GetZonesQueryResult = Apollo.QueryResult<GetZonesQuery, GetZonesQueryVariables>;
-export const GetRoomsByZoneDocument = gql`
-    query GetRoomsByZone($zoneId: Int!) {
-  roomsByZone(zoneId: $zoneId) {
-    id
-    name
-    roomDescription
-    layoutX
-    layoutY
-    layoutZ
-    exits {
-      direction
-      destination
-    }
-  }
-}
-    `;
-export function useGetRoomsByZoneQuery(baseOptions: Apollo.QueryHookOptions<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>(GetRoomsByZoneDocument, options);
-      }
-export function useGetRoomsByZoneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>(GetRoomsByZoneDocument, options);
-        }
-export type GetRoomsByZoneQueryHookResult = ReturnType<typeof useGetRoomsByZoneQuery>;
-export type GetRoomsByZoneLazyQueryHookResult = ReturnType<typeof useGetRoomsByZoneLazyQuery>;
-export type GetRoomsByZoneQueryResult = Apollo.QueryResult<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>;
-export const GetZonesDashboardDocument = gql`
-    query GetZonesDashboard {
-  zones {
-    id
-    name
-    climate
-  }
-  roomsCount
-}
-    `;
-export function useGetZonesDashboardQuery(baseOptions?: Apollo.QueryHookOptions<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>(GetZonesDashboardDocument, options);
-      }
-export function useGetZonesDashboardLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>(GetZonesDashboardDocument, options);
-        }
-export type GetZonesDashboardQueryHookResult = ReturnType<typeof useGetZonesDashboardQuery>;
-export type GetZonesDashboardLazyQueryHookResult = ReturnType<typeof useGetZonesDashboardLazyQuery>;
-export type GetZonesDashboardQueryResult = Apollo.QueryResult<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>;
-export const RequestPasswordResetDocument = gql`
-    mutation RequestPasswordReset($input: RequestPasswordResetInput!) {
-  requestPasswordReset(input: $input) {
-    success
-    message
-  }
-}
-    `;
-export type RequestPasswordResetMutationFn = Apollo.MutationFunction<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
-export function useRequestPasswordResetMutation(baseOptions?: Apollo.MutationHookOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>(RequestPasswordResetDocument, options);
-      }
-export type RequestPasswordResetMutationHookResult = ReturnType<typeof useRequestPasswordResetMutation>;
-export type RequestPasswordResetMutationResult = Apollo.MutationResult<RequestPasswordResetMutation>;
-export type RequestPasswordResetMutationOptions = Apollo.BaseMutationOptions<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
-export const ChangePasswordDocument = gql`
-    mutation ChangePassword($input: ChangePasswordInput!) {
-  changePassword(input: $input) {
-    success
-    message
-  }
-}
-    `;
-export type ChangePasswordMutationFn = Apollo.MutationFunction<ChangePasswordMutation, ChangePasswordMutationVariables>;
-export function useChangePasswordMutation(baseOptions?: Apollo.MutationHookOptions<ChangePasswordMutation, ChangePasswordMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ChangePasswordMutation, ChangePasswordMutationVariables>(ChangePasswordDocument, options);
-      }
-export type ChangePasswordMutationHookResult = ReturnType<typeof useChangePasswordMutation>;
-export type ChangePasswordMutationResult = Apollo.MutationResult<ChangePasswordMutation>;
-export type ChangePasswordMutationOptions = Apollo.BaseMutationOptions<ChangePasswordMutation, ChangePasswordMutationVariables>;
-export const UpdateProfileDocument = gql`
-    mutation UpdateProfile($input: UpdateProfileInput!) {
-  updateProfile(input: $input) {
-    id
-    username
-    email
-    role
-    createdAt
-  }
-}
-    `;
-export type UpdateProfileMutationFn = Apollo.MutationFunction<UpdateProfileMutation, UpdateProfileMutationVariables>;
-export function useUpdateProfileMutation(baseOptions?: Apollo.MutationHookOptions<UpdateProfileMutation, UpdateProfileMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateProfileMutation, UpdateProfileMutationVariables>(UpdateProfileDocument, options);
-      }
-export type UpdateProfileMutationHookResult = ReturnType<typeof useUpdateProfileMutation>;
-export type UpdateProfileMutationResult = Apollo.MutationResult<UpdateProfileMutation>;
-export type UpdateProfileMutationOptions = Apollo.BaseMutationOptions<UpdateProfileMutation, UpdateProfileMutationVariables>;
-export const ResetPasswordDocument = gql`
-    mutation ResetPassword($input: ResetPasswordInput!) {
-  resetPassword(input: $input) {
-    success
-    message
-  }
-}
-    `;
-export type ResetPasswordMutationFn = Apollo.MutationFunction<ResetPasswordMutation, ResetPasswordMutationVariables>;
-export function useResetPasswordMutation(baseOptions?: Apollo.MutationHookOptions<ResetPasswordMutation, ResetPasswordMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<ResetPasswordMutation, ResetPasswordMutationVariables>(ResetPasswordDocument, options);
-      }
-export type ResetPasswordMutationHookResult = ReturnType<typeof useResetPasswordMutation>;
-export type ResetPasswordMutationResult = Apollo.MutationResult<ResetPasswordMutation>;
-export type ResetPasswordMutationOptions = Apollo.BaseMutationOptions<ResetPasswordMutation, ResetPasswordMutationVariables>;
-export const GetTriggersDocument = gql`
-    query GetTriggers {
-  triggers {
-    id
-    name
-    attachType
-    numArgs
-    argList
-    commands
-    variables
-    mobId
-    objectId
-    zoneId
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export function useGetTriggersQuery(baseOptions?: Apollo.QueryHookOptions<GetTriggersQuery, GetTriggersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetTriggersQuery, GetTriggersQueryVariables>(GetTriggersDocument, options);
-      }
-export function useGetTriggersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTriggersQuery, GetTriggersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetTriggersQuery, GetTriggersQueryVariables>(GetTriggersDocument, options);
-        }
-export type GetTriggersQueryHookResult = ReturnType<typeof useGetTriggersQuery>;
-export type GetTriggersLazyQueryHookResult = ReturnType<typeof useGetTriggersLazyQuery>;
-export type GetTriggersQueryResult = Apollo.QueryResult<GetTriggersQuery, GetTriggersQueryVariables>;
-export const GetTriggersByAttachmentDocument = gql`
-    query GetTriggersByAttachment($attachType: ScriptType!, $entityId: Int!) {
-  triggersByAttachment(attachType: $attachType, entityId: $entityId) {
-    id
-    name
-    attachType
-    numArgs
-    argList
-    commands
-    variables
-    mobId
-    objectId
-    zoneId
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export function useGetTriggersByAttachmentQuery(baseOptions: Apollo.QueryHookOptions<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>(GetTriggersByAttachmentDocument, options);
-      }
-export function useGetTriggersByAttachmentLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>(GetTriggersByAttachmentDocument, options);
-        }
-export type GetTriggersByAttachmentQueryHookResult = ReturnType<typeof useGetTriggersByAttachmentQuery>;
-export type GetTriggersByAttachmentLazyQueryHookResult = ReturnType<typeof useGetTriggersByAttachmentLazyQuery>;
-export type GetTriggersByAttachmentQueryResult = Apollo.QueryResult<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>;
-export const CreateTriggerDocument = gql`
-    mutation CreateTrigger($input: CreateTriggerInput!) {
-  createTrigger(input: $input) {
-    id
-    name
-    attachType
-    commands
-    variables
-  }
-}
-    `;
-export type CreateTriggerMutationFn = Apollo.MutationFunction<CreateTriggerMutation, CreateTriggerMutationVariables>;
-export function useCreateTriggerMutation(baseOptions?: Apollo.MutationHookOptions<CreateTriggerMutation, CreateTriggerMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateTriggerMutation, CreateTriggerMutationVariables>(CreateTriggerDocument, options);
-      }
-export type CreateTriggerMutationHookResult = ReturnType<typeof useCreateTriggerMutation>;
-export type CreateTriggerMutationResult = Apollo.MutationResult<CreateTriggerMutation>;
-export type CreateTriggerMutationOptions = Apollo.BaseMutationOptions<CreateTriggerMutation, CreateTriggerMutationVariables>;
-export const UpdateTriggerDocument = gql`
-    mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
-  updateTrigger(id: $id, input: $input) {
-    id
-    name
-    attachType
-    commands
-    variables
-  }
-}
-    `;
-export type UpdateTriggerMutationFn = Apollo.MutationFunction<UpdateTriggerMutation, UpdateTriggerMutationVariables>;
-export function useUpdateTriggerMutation(baseOptions?: Apollo.MutationHookOptions<UpdateTriggerMutation, UpdateTriggerMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateTriggerMutation, UpdateTriggerMutationVariables>(UpdateTriggerDocument, options);
-      }
-export type UpdateTriggerMutationHookResult = ReturnType<typeof useUpdateTriggerMutation>;
-export type UpdateTriggerMutationResult = Apollo.MutationResult<UpdateTriggerMutation>;
-export type UpdateTriggerMutationOptions = Apollo.BaseMutationOptions<UpdateTriggerMutation, UpdateTriggerMutationVariables>;
-export const DeleteTriggerDocument = gql`
-    mutation DeleteTrigger($id: Float!) {
-  deleteTrigger(id: $id) {
-    id
-  }
-}
-    `;
-export type DeleteTriggerMutationFn = Apollo.MutationFunction<DeleteTriggerMutation, DeleteTriggerMutationVariables>;
-export function useDeleteTriggerMutation(baseOptions?: Apollo.MutationHookOptions<DeleteTriggerMutation, DeleteTriggerMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteTriggerMutation, DeleteTriggerMutationVariables>(DeleteTriggerDocument, options);
-      }
-export type DeleteTriggerMutationHookResult = ReturnType<typeof useDeleteTriggerMutation>;
-export type DeleteTriggerMutationResult = Apollo.MutationResult<DeleteTriggerMutation>;
-export type DeleteTriggerMutationOptions = Apollo.BaseMutationOptions<DeleteTriggerMutation, DeleteTriggerMutationVariables>;
-export const AttachTriggerDocument = gql`
-    mutation AttachTrigger($input: AttachTriggerInput!) {
-  attachTrigger(input: $input) {
-    id
-    name
-    mobId
-    objectId
-    zoneId
-  }
-}
-    `;
-export type AttachTriggerMutationFn = Apollo.MutationFunction<AttachTriggerMutation, AttachTriggerMutationVariables>;
-export function useAttachTriggerMutation(baseOptions?: Apollo.MutationHookOptions<AttachTriggerMutation, AttachTriggerMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AttachTriggerMutation, AttachTriggerMutationVariables>(AttachTriggerDocument, options);
-      }
-export type AttachTriggerMutationHookResult = ReturnType<typeof useAttachTriggerMutation>;
-export type AttachTriggerMutationResult = Apollo.MutationResult<AttachTriggerMutation>;
-export type AttachTriggerMutationOptions = Apollo.BaseMutationOptions<AttachTriggerMutation, AttachTriggerMutationVariables>;
-export const DetachTriggerDocument = gql`
-    mutation DetachTrigger($triggerId: Float!) {
-  detachTrigger(triggerId: $triggerId) {
-    id
-    name
-  }
-}
-    `;
-export type DetachTriggerMutationFn = Apollo.MutationFunction<DetachTriggerMutation, DetachTriggerMutationVariables>;
-export function useDetachTriggerMutation(baseOptions?: Apollo.MutationHookOptions<DetachTriggerMutation, DetachTriggerMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DetachTriggerMutation, DetachTriggerMutationVariables>(DetachTriggerDocument, options);
-      }
-export type DetachTriggerMutationHookResult = ReturnType<typeof useDetachTriggerMutation>;
-export type DetachTriggerMutationResult = Apollo.MutationResult<DetachTriggerMutation>;
-export type DetachTriggerMutationOptions = Apollo.BaseMutationOptions<DetachTriggerMutation, DetachTriggerMutationVariables>;
-export const GetZonesForSelectorDocument = gql`
-    query GetZonesForSelector {
-  zones {
-    id
-    name
-  }
-}
-    `;
-export function useGetZonesForSelectorQuery(baseOptions?: Apollo.QueryHookOptions<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>(GetZonesForSelectorDocument, options);
-      }
-export function useGetZonesForSelectorLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>(GetZonesForSelectorDocument, options);
-        }
-export type GetZonesForSelectorQueryHookResult = ReturnType<typeof useGetZonesForSelectorQuery>;
-export type GetZonesForSelectorLazyQueryHookResult = ReturnType<typeof useGetZonesForSelectorLazyQuery>;
-export type GetZonesForSelectorQueryResult = Apollo.QueryResult<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>;
-export const CreateCharacterDocument = gql`
-    mutation CreateCharacter($data: CreateCharacterInput!) {
-  createCharacter(data: $data) {
-    id
-    name
-    level
-    raceType
-    playerClass
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    luck
-  }
-}
-    `;
-export type CreateCharacterMutationFn = Apollo.MutationFunction<CreateCharacterMutation, CreateCharacterMutationVariables>;
-export function useCreateCharacterMutation(baseOptions?: Apollo.MutationHookOptions<CreateCharacterMutation, CreateCharacterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateCharacterMutation, CreateCharacterMutationVariables>(CreateCharacterDocument, options);
-      }
-export type CreateCharacterMutationHookResult = ReturnType<typeof useCreateCharacterMutation>;
-export type CreateCharacterMutationResult = Apollo.MutationResult<CreateCharacterMutation>;
-export type CreateCharacterMutationOptions = Apollo.BaseMutationOptions<CreateCharacterMutation, CreateCharacterMutationVariables>;
-export const GetCharacterDetailsDocument = gql`
-    query GetCharacterDetails($id: ID!) {
-  character(id: $id) {
-    id
-    name
-    level
-    raceType
-    playerClass
-    lastLogin
-    isOnline
-    timePlayed
-    hitPoints
-    hitPointsMax
-    movement
-    movementMax
-    alignment
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    luck
-    experience
-    skillPoints
-    copper
-    silver
-    gold
-    platinum
-    bankCopper
-    bankSilver
-    bankGold
-    bankPlatinum
-    description
-    title
-    currentRoom
-    saveRoom
-    homeRoom
-    hunger
-    thirst
-    hitRoll
-    damageRoll
-    armorClass
-    playerFlags
-    effectFlags
-    privilegeFlags
-    invisLevel
-    birthTime
-    items {
-      id
-      equippedLocation
-      condition
-      charges
-      objectPrototype {
-        id
-        name
-        type
-      }
-    }
-    effects {
-      id
-      effectName
-      effectType
-      duration
-      strength
-      appliedAt
-      expiresAt
-    }
-  }
-}
-    `;
-export function useGetCharacterDetailsQuery(baseOptions: Apollo.QueryHookOptions<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>(GetCharacterDetailsDocument, options);
-      }
-export function useGetCharacterDetailsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>(GetCharacterDetailsDocument, options);
-        }
-export type GetCharacterDetailsQueryHookResult = ReturnType<typeof useGetCharacterDetailsQuery>;
-export type GetCharacterDetailsLazyQueryHookResult = ReturnType<typeof useGetCharacterDetailsLazyQuery>;
-export type GetCharacterDetailsQueryResult = Apollo.QueryResult<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>;
-export const GetCharacterSessionInfoDocument = gql`
-    query GetCharacterSessionInfo($characterId: ID!) {
-  characterSessionInfo(characterId: $characterId) {
-    id
-    name
-    isOnline
-    lastLogin
-    totalTimePlayed
-    currentSessionTime
-  }
-}
-    `;
-export function useGetCharacterSessionInfoQuery(baseOptions: Apollo.QueryHookOptions<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>(GetCharacterSessionInfoDocument, options);
-      }
-export function useGetCharacterSessionInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>(GetCharacterSessionInfoDocument, options);
-        }
-export type GetCharacterSessionInfoQueryHookResult = ReturnType<typeof useGetCharacterSessionInfoQuery>;
-export type GetCharacterSessionInfoLazyQueryHookResult = ReturnType<typeof useGetCharacterSessionInfoLazyQuery>;
-export type GetCharacterSessionInfoQueryResult = Apollo.QueryResult<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>;
-export const GetCharacterLinkingInfoDocument = gql`
-    query GetCharacterLinkingInfo($characterName: String!) {
-  characterLinkingInfo(characterName: $characterName) {
-    id
-    name
-    level
-    race
-    class
-    lastLogin
-    timePlayed
-    isOnline
-    isLinked
-    hasPassword
-  }
-}
-    `;
-export function useGetCharacterLinkingInfoQuery(baseOptions: Apollo.QueryHookOptions<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>(GetCharacterLinkingInfoDocument, options);
-      }
-export function useGetCharacterLinkingInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>(GetCharacterLinkingInfoDocument, options);
-        }
-export type GetCharacterLinkingInfoQueryHookResult = ReturnType<typeof useGetCharacterLinkingInfoQuery>;
-export type GetCharacterLinkingInfoLazyQueryHookResult = ReturnType<typeof useGetCharacterLinkingInfoLazyQuery>;
-export type GetCharacterLinkingInfoQueryResult = Apollo.QueryResult<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>;
-export const LinkCharacterDocument = gql`
-    mutation LinkCharacter($data: LinkCharacterInput!) {
-  linkCharacter(data: $data) {
-    id
-    name
-    level
-    raceType
-    playerClass
-  }
-}
-    `;
-export type LinkCharacterMutationFn = Apollo.MutationFunction<LinkCharacterMutation, LinkCharacterMutationVariables>;
-export function useLinkCharacterMutation(baseOptions?: Apollo.MutationHookOptions<LinkCharacterMutation, LinkCharacterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LinkCharacterMutation, LinkCharacterMutationVariables>(LinkCharacterDocument, options);
-      }
-export type LinkCharacterMutationHookResult = ReturnType<typeof useLinkCharacterMutation>;
-export type LinkCharacterMutationResult = Apollo.MutationResult<LinkCharacterMutation>;
-export type LinkCharacterMutationOptions = Apollo.BaseMutationOptions<LinkCharacterMutation, LinkCharacterMutationVariables>;
-export const ValidateCharacterPasswordDocument = gql`
-    query ValidateCharacterPassword($characterName: String!, $password: String!) {
-  validateCharacterPassword(characterName: $characterName, password: $password)
-}
-    `;
-export function useValidateCharacterPasswordQuery(baseOptions: Apollo.QueryHookOptions<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>(ValidateCharacterPasswordDocument, options);
-      }
-export function useValidateCharacterPasswordLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>(ValidateCharacterPasswordDocument, options);
-        }
-export type ValidateCharacterPasswordQueryHookResult = ReturnType<typeof useValidateCharacterPasswordQuery>;
-export type ValidateCharacterPasswordLazyQueryHookResult = ReturnType<typeof useValidateCharacterPasswordLazyQuery>;
-export type ValidateCharacterPasswordQueryResult = Apollo.QueryResult<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>;
-export const GetEquipmentSetsDocument = gql`
-    query GetEquipmentSets {
-  equipmentSets {
-    id
-    name
-    description
-    createdAt
-    updatedAt
-    items {
-      id
-      slot
-      probability
-      object {
-        id
-        name
-        type
-        keywords
-      }
-    }
-  }
-}
-    `;
-export function useGetEquipmentSetsQuery(baseOptions?: Apollo.QueryHookOptions<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>(GetEquipmentSetsDocument, options);
-      }
-export function useGetEquipmentSetsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>(GetEquipmentSetsDocument, options);
-        }
-export type GetEquipmentSetsQueryHookResult = ReturnType<typeof useGetEquipmentSetsQuery>;
-export type GetEquipmentSetsLazyQueryHookResult = ReturnType<typeof useGetEquipmentSetsLazyQuery>;
-export type GetEquipmentSetsQueryResult = Apollo.QueryResult<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>;
-export const GetObjectsForEquipmentSetDocument = gql`
-    query GetObjectsForEquipmentSet($skip: Int, $take: Int) {
-  objects(skip: $skip, take: $take) {
-    id
-    name
-    type
-    keywords
-    wearFlags
-  }
-}
-    `;
-export function useGetObjectsForEquipmentSetQuery(baseOptions?: Apollo.QueryHookOptions<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>(GetObjectsForEquipmentSetDocument, options);
-      }
-export function useGetObjectsForEquipmentSetLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>(GetObjectsForEquipmentSetDocument, options);
-        }
-export type GetObjectsForEquipmentSetQueryHookResult = ReturnType<typeof useGetObjectsForEquipmentSetQuery>;
-export type GetObjectsForEquipmentSetLazyQueryHookResult = ReturnType<typeof useGetObjectsForEquipmentSetLazyQuery>;
-export type GetObjectsForEquipmentSetQueryResult = Apollo.QueryResult<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>;
-export const CreateEquipmentSetDocument = gql`
-    mutation CreateEquipmentSet($data: CreateEquipmentSetInput!) {
-  createEquipmentSet(data: $data) {
-    id
-    name
-    description
-    createdAt
-  }
-}
-    `;
-export type CreateEquipmentSetMutationFn = Apollo.MutationFunction<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>;
-export function useCreateEquipmentSetMutation(baseOptions?: Apollo.MutationHookOptions<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>(CreateEquipmentSetDocument, options);
-      }
-export type CreateEquipmentSetMutationHookResult = ReturnType<typeof useCreateEquipmentSetMutation>;
-export type CreateEquipmentSetMutationResult = Apollo.MutationResult<CreateEquipmentSetMutation>;
-export type CreateEquipmentSetMutationOptions = Apollo.BaseMutationOptions<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>;
-export const UpdateEquipmentSetDocument = gql`
-    mutation UpdateEquipmentSet($id: ID!, $data: UpdateEquipmentSetInput!) {
-  updateEquipmentSet(id: $id, data: $data) {
-    id
-    name
-    description
-    updatedAt
-  }
-}
-    `;
-export type UpdateEquipmentSetMutationFn = Apollo.MutationFunction<UpdateEquipmentSetMutation, UpdateEquipmentSetMutationVariables>;
-export function useUpdateEquipmentSetMutation(baseOptions?: Apollo.MutationHookOptions<UpdateEquipmentSetMutation, UpdateEquipmentSetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateEquipmentSetMutation, UpdateEquipmentSetMutationVariables>(UpdateEquipmentSetDocument, options);
-      }
-export type UpdateEquipmentSetMutationHookResult = ReturnType<typeof useUpdateEquipmentSetMutation>;
-export type UpdateEquipmentSetMutationResult = Apollo.MutationResult<UpdateEquipmentSetMutation>;
-export type UpdateEquipmentSetMutationOptions = Apollo.BaseMutationOptions<UpdateEquipmentSetMutation, UpdateEquipmentSetMutationVariables>;
-export const DeleteEquipmentSetDocument = gql`
-    mutation DeleteEquipmentSet($id: ID!) {
-  deleteEquipmentSet(id: $id)
-}
-    `;
-export type DeleteEquipmentSetMutationFn = Apollo.MutationFunction<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>;
-export function useDeleteEquipmentSetMutation(baseOptions?: Apollo.MutationHookOptions<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>(DeleteEquipmentSetDocument, options);
-      }
-export type DeleteEquipmentSetMutationHookResult = ReturnType<typeof useDeleteEquipmentSetMutation>;
-export type DeleteEquipmentSetMutationResult = Apollo.MutationResult<DeleteEquipmentSetMutation>;
-export type DeleteEquipmentSetMutationOptions = Apollo.BaseMutationOptions<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>;
-export const AddEquipmentSetItemDocument = gql`
-    mutation AddEquipmentSetItem($data: CreateEquipmentSetItemStandaloneInput!) {
-  createEquipmentSetItem(data: $data) {
-    id
-    slot
-    probability
-  }
-}
-    `;
-export type AddEquipmentSetItemMutationFn = Apollo.MutationFunction<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>;
-export function useAddEquipmentSetItemMutation(baseOptions?: Apollo.MutationHookOptions<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>(AddEquipmentSetItemDocument, options);
-      }
-export type AddEquipmentSetItemMutationHookResult = ReturnType<typeof useAddEquipmentSetItemMutation>;
-export type AddEquipmentSetItemMutationResult = Apollo.MutationResult<AddEquipmentSetItemMutation>;
-export type AddEquipmentSetItemMutationOptions = Apollo.BaseMutationOptions<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>;
-export const RemoveEquipmentSetItemDocument = gql`
-    mutation RemoveEquipmentSetItem($id: ID!) {
-  deleteEquipmentSetItem(id: $id)
-}
-    `;
-export type RemoveEquipmentSetItemMutationFn = Apollo.MutationFunction<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>;
-export function useRemoveEquipmentSetItemMutation(baseOptions?: Apollo.MutationHookOptions<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>(RemoveEquipmentSetItemDocument, options);
-      }
-export type RemoveEquipmentSetItemMutationHookResult = ReturnType<typeof useRemoveEquipmentSetItemMutation>;
-export type RemoveEquipmentSetItemMutationResult = Apollo.MutationResult<RemoveEquipmentSetItemMutation>;
-export type RemoveEquipmentSetItemMutationOptions = Apollo.BaseMutationOptions<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>;
-export const GetMobResetsLegacyDocument = gql`
-    query GetMobResetsLegacy($mobId: Int!, $mobZoneId: Int!) {
-  mobResets(mobId: $mobId, mobZoneId: $mobZoneId) {
-    id
-    maxInstances
-    probability
-    roomId
-    roomZoneId
-    mob {
-      id
-      name
-    }
-    equipment {
-      id
-      maxInstances
-      probability
-      wearLocation
-      objectId
-      objectZoneId
-      object {
-        id
-        name
-        type
-      }
-    }
-  }
-}
-    `;
-export function useGetMobResetsLegacyQuery(baseOptions: Apollo.QueryHookOptions<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>(GetMobResetsLegacyDocument, options);
-      }
-export function useGetMobResetsLegacyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>(GetMobResetsLegacyDocument, options);
-        }
-export type GetMobResetsLegacyQueryHookResult = ReturnType<typeof useGetMobResetsLegacyQuery>;
-export type GetMobResetsLegacyLazyQueryHookResult = ReturnType<typeof useGetMobResetsLegacyLazyQuery>;
-export type GetMobResetsLegacyQueryResult = Apollo.QueryResult<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>;
-export const GetObjectsLegacyDocument = gql`
-    query GetObjectsLegacy($skip: Int, $take: Int) {
-  objects(skip: $skip, take: $take) {
-    id
-    name
-    type
-    keywords
-    wearFlags
-  }
-}
-    `;
-export function useGetObjectsLegacyQuery(baseOptions?: Apollo.QueryHookOptions<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>(GetObjectsLegacyDocument, options);
-      }
-export function useGetObjectsLegacyLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>(GetObjectsLegacyDocument, options);
-        }
-export type GetObjectsLegacyQueryHookResult = ReturnType<typeof useGetObjectsLegacyQuery>;
-export type GetObjectsLegacyLazyQueryHookResult = ReturnType<typeof useGetObjectsLegacyLazyQuery>;
-export type GetObjectsLegacyQueryResult = Apollo.QueryResult<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>;
-export const CreateMobResetDocument = gql`
-    mutation CreateMobReset($data: CreateMobResetInput!) {
-  createMobReset(data: $data) {
-    id
-    maxInstances
-    probability
-    roomId
-  }
-}
-    `;
-export type CreateMobResetMutationFn = Apollo.MutationFunction<CreateMobResetMutation, CreateMobResetMutationVariables>;
-export function useCreateMobResetMutation(baseOptions?: Apollo.MutationHookOptions<CreateMobResetMutation, CreateMobResetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateMobResetMutation, CreateMobResetMutationVariables>(CreateMobResetDocument, options);
-      }
-export type CreateMobResetMutationHookResult = ReturnType<typeof useCreateMobResetMutation>;
-export type CreateMobResetMutationResult = Apollo.MutationResult<CreateMobResetMutation>;
-export type CreateMobResetMutationOptions = Apollo.BaseMutationOptions<CreateMobResetMutation, CreateMobResetMutationVariables>;
-export const UpdateMobResetDocument = gql`
-    mutation UpdateMobReset($id: ID!, $data: UpdateMobResetInput!) {
-  updateMobReset(id: $id, data: $data) {
-    id
-    maxInstances
-    probability
-    roomId
-  }
-}
-    `;
-export type UpdateMobResetMutationFn = Apollo.MutationFunction<UpdateMobResetMutation, UpdateMobResetMutationVariables>;
-export function useUpdateMobResetMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMobResetMutation, UpdateMobResetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateMobResetMutation, UpdateMobResetMutationVariables>(UpdateMobResetDocument, options);
-      }
-export type UpdateMobResetMutationHookResult = ReturnType<typeof useUpdateMobResetMutation>;
-export type UpdateMobResetMutationResult = Apollo.MutationResult<UpdateMobResetMutation>;
-export type UpdateMobResetMutationOptions = Apollo.BaseMutationOptions<UpdateMobResetMutation, UpdateMobResetMutationVariables>;
-export const DeleteMobResetDocument = gql`
-    mutation DeleteMobReset($id: ID!) {
-  deleteMobReset(id: $id)
-}
-    `;
-export type DeleteMobResetMutationFn = Apollo.MutationFunction<DeleteMobResetMutation, DeleteMobResetMutationVariables>;
-export function useDeleteMobResetMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMobResetMutation, DeleteMobResetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteMobResetMutation, DeleteMobResetMutationVariables>(DeleteMobResetDocument, options);
-      }
-export type DeleteMobResetMutationHookResult = ReturnType<typeof useDeleteMobResetMutation>;
-export type DeleteMobResetMutationResult = Apollo.MutationResult<DeleteMobResetMutation>;
-export type DeleteMobResetMutationOptions = Apollo.BaseMutationOptions<DeleteMobResetMutation, DeleteMobResetMutationVariables>;
-export const DeleteMobResetEquipmentDocument = gql`
-    mutation DeleteMobResetEquipment($id: ID!) {
-  deleteMobResetEquipment(id: $id)
-}
-    `;
-export type DeleteMobResetEquipmentMutationFn = Apollo.MutationFunction<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
-export function useDeleteMobResetEquipmentMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>(DeleteMobResetEquipmentDocument, options);
-      }
-export type DeleteMobResetEquipmentMutationHookResult = ReturnType<typeof useDeleteMobResetEquipmentMutation>;
-export type DeleteMobResetEquipmentMutationResult = Apollo.MutationResult<DeleteMobResetEquipmentMutation>;
-export type DeleteMobResetEquipmentMutationOptions = Apollo.BaseMutationOptions<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
-export const GetMobResetsForMobDocument = gql`
-    query GetMobResetsForMob($mobId: Int!, $mobZoneId: Int!) {
-  mobResets(mobId: $mobId, mobZoneId: $mobZoneId) {
-    id
-    maxInstances
-    probability
-    roomId
-    roomZoneId
-    mob {
-      id
-      name
-    }
-    equipment {
-      id
-      maxInstances
-      probability
-      wearLocation
-      objectId
-      objectZoneId
-      object {
-        id
-        name
-        type
-      }
-    }
-  }
-}
-    `;
-export function useGetMobResetsForMobQuery(baseOptions: Apollo.QueryHookOptions<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>(GetMobResetsForMobDocument, options);
-      }
-export function useGetMobResetsForMobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>(GetMobResetsForMobDocument, options);
-        }
-export type GetMobResetsForMobQueryHookResult = ReturnType<typeof useGetMobResetsForMobQuery>;
-export type GetMobResetsForMobLazyQueryHookResult = ReturnType<typeof useGetMobResetsForMobLazyQuery>;
-export type GetMobResetsForMobQueryResult = Apollo.QueryResult<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>;
-export const GetEquipmentSetsForMobDocument = gql`
-    query GetEquipmentSetsForMob {
-  equipmentSets {
-    id
-    name
-    description
-    createdAt
-    items {
-      id
-      slot
-      probability
-      object {
-        id
-        name
-        type
-      }
-    }
-  }
-}
-    `;
-export function useGetEquipmentSetsForMobQuery(baseOptions?: Apollo.QueryHookOptions<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>(GetEquipmentSetsForMobDocument, options);
-      }
-export function useGetEquipmentSetsForMobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>(GetEquipmentSetsForMobDocument, options);
-        }
-export type GetEquipmentSetsForMobQueryHookResult = ReturnType<typeof useGetEquipmentSetsForMobQuery>;
-export type GetEquipmentSetsForMobLazyQueryHookResult = ReturnType<typeof useGetEquipmentSetsForMobLazyQuery>;
-export type GetEquipmentSetsForMobQueryResult = Apollo.QueryResult<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>;
-export const GetObjectsForMobDocument = gql`
-    query GetObjectsForMob($skip: Int, $take: Int) {
-  objects(skip: $skip, take: $take) {
-    id
-    name
-    type
-    keywords
-    wearFlags
-  }
-}
-    `;
-export function useGetObjectsForMobQuery(baseOptions?: Apollo.QueryHookOptions<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>(GetObjectsForMobDocument, options);
-      }
-export function useGetObjectsForMobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>(GetObjectsForMobDocument, options);
-        }
-export type GetObjectsForMobQueryHookResult = ReturnType<typeof useGetObjectsForMobQuery>;
-export type GetObjectsForMobLazyQueryHookResult = ReturnType<typeof useGetObjectsForMobLazyQuery>;
-export type GetObjectsForMobQueryResult = Apollo.QueryResult<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>;
-export const CreateEquipmentSetForMobDocument = gql`
-    mutation CreateEquipmentSetForMob($data: CreateEquipmentSetInput!) {
-  createEquipmentSet(data: $data) {
-    id
-    name
-    description
-  }
-}
-    `;
-export type CreateEquipmentSetForMobMutationFn = Apollo.MutationFunction<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>;
-export function useCreateEquipmentSetForMobMutation(baseOptions?: Apollo.MutationHookOptions<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>(CreateEquipmentSetForMobDocument, options);
-      }
-export type CreateEquipmentSetForMobMutationHookResult = ReturnType<typeof useCreateEquipmentSetForMobMutation>;
-export type CreateEquipmentSetForMobMutationResult = Apollo.MutationResult<CreateEquipmentSetForMobMutation>;
-export type CreateEquipmentSetForMobMutationOptions = Apollo.BaseMutationOptions<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>;
-export const AddMobEquipmentSetDocument = gql`
-    mutation AddMobEquipmentSet($data: CreateMobEquipmentSetInput!) {
-  createMobEquipmentSet(data: $data) {
-    id
-    probability
-  }
-}
-    `;
-export type AddMobEquipmentSetMutationFn = Apollo.MutationFunction<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>;
-export function useAddMobEquipmentSetMutation(baseOptions?: Apollo.MutationHookOptions<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>(AddMobEquipmentSetDocument, options);
-      }
-export type AddMobEquipmentSetMutationHookResult = ReturnType<typeof useAddMobEquipmentSetMutation>;
-export type AddMobEquipmentSetMutationResult = Apollo.MutationResult<AddMobEquipmentSetMutation>;
-export type AddMobEquipmentSetMutationOptions = Apollo.BaseMutationOptions<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>;
-export const RemoveMobEquipmentSetDocument = gql`
-    mutation RemoveMobEquipmentSet($id: ID!) {
-  deleteMobEquipmentSet(id: $id)
-}
-    `;
-export type RemoveMobEquipmentSetMutationFn = Apollo.MutationFunction<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>;
-export function useRemoveMobEquipmentSetMutation(baseOptions?: Apollo.MutationHookOptions<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>(RemoveMobEquipmentSetDocument, options);
-      }
-export type RemoveMobEquipmentSetMutationHookResult = ReturnType<typeof useRemoveMobEquipmentSetMutation>;
-export type RemoveMobEquipmentSetMutationResult = Apollo.MutationResult<RemoveMobEquipmentSetMutation>;
-export type RemoveMobEquipmentSetMutationOptions = Apollo.BaseMutationOptions<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>;
-export const LoginDocument = gql`
-    mutation Login($input: LoginInput!) {
-  login(input: $input) {
-    accessToken
-    user {
-      id
-      username
-      email
-      role
-      createdAt
-    }
-  }
-}
-    `;
-export type LoginMutationFn = Apollo.MutationFunction<LoginMutation, LoginMutationVariables>;
-export function useLoginMutation(baseOptions?: Apollo.MutationHookOptions<LoginMutation, LoginMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<LoginMutation, LoginMutationVariables>(LoginDocument, options);
-      }
-export type LoginMutationHookResult = ReturnType<typeof useLoginMutation>;
-export type LoginMutationResult = Apollo.MutationResult<LoginMutation>;
-export type LoginMutationOptions = Apollo.BaseMutationOptions<LoginMutation, LoginMutationVariables>;
-export const RegisterDocument = gql`
-    mutation Register($input: RegisterInput!) {
-  register(input: $input) {
-    accessToken
-    user {
-      id
-      username
-      email
-      role
-      createdAt
-    }
-  }
-}
-    `;
-export type RegisterMutationFn = Apollo.MutationFunction<RegisterMutation, RegisterMutationVariables>;
-export function useRegisterMutation(baseOptions?: Apollo.MutationHookOptions<RegisterMutation, RegisterMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<RegisterMutation, RegisterMutationVariables>(RegisterDocument, options);
-      }
-export type RegisterMutationHookResult = ReturnType<typeof useRegisterMutation>;
-export type RegisterMutationResult = Apollo.MutationResult<RegisterMutation>;
-export type RegisterMutationOptions = Apollo.BaseMutationOptions<RegisterMutation, RegisterMutationVariables>;
-export const MeDocument = gql`
-    query Me {
-  me {
-    id
-    username
-    email
-    role
-    createdAt
-  }
-}
-    `;
-export function useMeQuery(baseOptions?: Apollo.QueryHookOptions<MeQuery, MeQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-      }
-export function useMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MeQuery, MeQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MeQuery, MeQueryVariables>(MeDocument, options);
-        }
-export type MeQueryHookResult = ReturnType<typeof useMeQuery>;
-export type MeLazyQueryHookResult = ReturnType<typeof useMeLazyQuery>;
-export type MeQueryResult = Apollo.QueryResult<MeQuery, MeQueryVariables>;
-export const UpdateMobDocument = gql`
-    mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
-  updateMob(zoneId: $zoneId, id: $id, data: $data) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    hitRoll
-    armorClass
-    hpDice
-    damageDice
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    perception
-    concealment
-    race
-    gender
-    size
-    lifeForce
-    composition
-    mobFlags
-    effectFlags
-    position
-    stance
-  }
-}
-    `;
-export type UpdateMobMutationFn = Apollo.MutationFunction<UpdateMobMutation, UpdateMobMutationVariables>;
-export function useUpdateMobMutation(baseOptions?: Apollo.MutationHookOptions<UpdateMobMutation, UpdateMobMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateMobMutation, UpdateMobMutationVariables>(UpdateMobDocument, options);
-      }
-export type UpdateMobMutationHookResult = ReturnType<typeof useUpdateMobMutation>;
-export type UpdateMobMutationResult = Apollo.MutationResult<UpdateMobMutation>;
-export type UpdateMobMutationOptions = Apollo.BaseMutationOptions<UpdateMobMutation, UpdateMobMutationVariables>;
-export const CreateMobDocument = gql`
-    mutation CreateMob($data: CreateMobInput!) {
-  createMob(data: $data) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    hitRoll
-    armorClass
-    hpDice
-    damageDice
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    perception
-    concealment
-    race
-    gender
-    size
-    lifeForce
-    composition
-    mobFlags
-    effectFlags
-    position
-    stance
-  }
-}
-    `;
-export type CreateMobMutationFn = Apollo.MutationFunction<CreateMobMutation, CreateMobMutationVariables>;
-export function useCreateMobMutation(baseOptions?: Apollo.MutationHookOptions<CreateMobMutation, CreateMobMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<CreateMobMutation, CreateMobMutationVariables>(CreateMobDocument, options);
-      }
-export type CreateMobMutationHookResult = ReturnType<typeof useCreateMobMutation>;
-export type CreateMobMutationResult = Apollo.MutationResult<CreateMobMutation>;
-export type CreateMobMutationOptions = Apollo.BaseMutationOptions<CreateMobMutation, CreateMobMutationVariables>;
-export const DeleteMobDocument = gql`
-    mutation DeleteMob($zoneId: Int!, $id: Int!) {
-  deleteMob(zoneId: $zoneId, id: $id) {
-    id
-    zoneId
-  }
-}
-    `;
-export type DeleteMobMutationFn = Apollo.MutationFunction<DeleteMobMutation, DeleteMobMutationVariables>;
-export function useDeleteMobMutation(baseOptions?: Apollo.MutationHookOptions<DeleteMobMutation, DeleteMobMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<DeleteMobMutation, DeleteMobMutationVariables>(DeleteMobDocument, options);
-      }
-export type DeleteMobMutationHookResult = ReturnType<typeof useDeleteMobMutation>;
-export type DeleteMobMutationResult = Apollo.MutationResult<DeleteMobMutation>;
-export type DeleteMobMutationOptions = Apollo.BaseMutationOptions<DeleteMobMutation, DeleteMobMutationVariables>;
-export const GetMobDocument = gql`
-    query GetMob($id: Int!, $zoneId: Int!) {
-  mob(id: $id, zoneId: $zoneId) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    hitRoll
-    armorClass
-    hpDice
-    damageDice
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    perception
-    concealment
-    race
-    gender
-    size
-    lifeForce
-    composition
-    mobFlags
-    effectFlags
-    position
-    stance
-    createdAt
-    updatedAt
-  }
-}
-    `;
-export function useGetMobQuery(baseOptions: Apollo.QueryHookOptions<GetMobQuery, GetMobQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMobQuery, GetMobQueryVariables>(GetMobDocument, options);
-      }
-export function useGetMobLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMobQuery, GetMobQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMobQuery, GetMobQueryVariables>(GetMobDocument, options);
-        }
-export type GetMobQueryHookResult = ReturnType<typeof useGetMobQuery>;
-export type GetMobLazyQueryHookResult = ReturnType<typeof useGetMobLazyQuery>;
-export type GetMobQueryResult = Apollo.QueryResult<GetMobQuery, GetMobQueryVariables>;
-export const GetMobsDocument = gql`
-    query GetMobs($skip: Int, $take: Int) {
-  mobs(skip: $skip, take: $take) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    race
-    hitRoll
-    armorClass
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    lifeForce
-    hpDice
-    damageDice
-    mobFlags
-    effectFlags
-  }
-}
-    `;
-export function useGetMobsQuery(baseOptions?: Apollo.QueryHookOptions<GetMobsQuery, GetMobsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMobsQuery, GetMobsQueryVariables>(GetMobsDocument, options);
-      }
-export function useGetMobsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMobsQuery, GetMobsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMobsQuery, GetMobsQueryVariables>(GetMobsDocument, options);
-        }
-export type GetMobsQueryHookResult = ReturnType<typeof useGetMobsQuery>;
-export type GetMobsLazyQueryHookResult = ReturnType<typeof useGetMobsLazyQuery>;
-export type GetMobsQueryResult = Apollo.QueryResult<GetMobsQuery, GetMobsQueryVariables>;
-export const GetMobsByZoneDocument = gql`
-    query GetMobsByZone($zoneId: Int!) {
-  mobsByZone(zoneId: $zoneId) {
-    id
-    zoneId
-    keywords
-    name
-    roomDescription
-    examineDescription
-    level
-    alignment
-    race
-    hitRoll
-    armorClass
-    damageType
-    strength
-    intelligence
-    wisdom
-    dexterity
-    constitution
-    charisma
-    wealth
-    hpDice
-    damageDice
-    mobFlags
-    effectFlags
-    lifeForce
-  }
-}
-    `;
-export function useGetMobsByZoneQuery(baseOptions: Apollo.QueryHookOptions<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>(GetMobsByZoneDocument, options);
-      }
-export function useGetMobsByZoneLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>(GetMobsByZoneDocument, options);
-        }
-export type GetMobsByZoneQueryHookResult = ReturnType<typeof useGetMobsByZoneQuery>;
-export type GetMobsByZoneLazyQueryHookResult = ReturnType<typeof useGetMobsByZoneLazyQuery>;
-export type GetMobsByZoneQueryResult = Apollo.QueryResult<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
-export const OnlineCharactersDocument = gql`
-    query OnlineCharacters($userId: ID) {
-  onlineCharacters(userId: $userId) {
-    id
-    name
-    level
-    lastLogin
-    isOnline
-    raceType
-    playerClass
-    user {
-      id
-      username
-      role
-    }
-  }
-}
-    `;
-export function useOnlineCharactersQuery(baseOptions?: Apollo.QueryHookOptions<OnlineCharactersQuery, OnlineCharactersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<OnlineCharactersQuery, OnlineCharactersQueryVariables>(OnlineCharactersDocument, options);
-      }
-export function useOnlineCharactersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<OnlineCharactersQuery, OnlineCharactersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<OnlineCharactersQuery, OnlineCharactersQueryVariables>(OnlineCharactersDocument, options);
-        }
-export type OnlineCharactersQueryHookResult = ReturnType<typeof useOnlineCharactersQuery>;
-export type OnlineCharactersLazyQueryHookResult = ReturnType<typeof useOnlineCharactersLazyQuery>;
-export type OnlineCharactersQueryResult = Apollo.QueryResult<OnlineCharactersQuery, OnlineCharactersQueryVariables>;
-export const MyOnlineCharactersDocument = gql`
-    query MyOnlineCharacters {
-  myOnlineCharacters {
-    id
-    name
-    level
-    lastLogin
-    isOnline
-    raceType
-    playerClass
-    user {
-      id
-      username
-      role
-    }
-  }
-}
-    `;
-export function useMyOnlineCharactersQuery(baseOptions?: Apollo.QueryHookOptions<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>(MyOnlineCharactersDocument, options);
-      }
-export function useMyOnlineCharactersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>(MyOnlineCharactersDocument, options);
-        }
-export type MyOnlineCharactersQueryHookResult = ReturnType<typeof useMyOnlineCharactersQuery>;
-export type MyOnlineCharactersLazyQueryHookResult = ReturnType<typeof useMyOnlineCharactersLazyQuery>;
-export type MyOnlineCharactersQueryResult = Apollo.QueryResult<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>;
-export const CharacterSessionInfoDocument = gql`
-    query CharacterSessionInfo($characterId: ID!) {
-  characterSessionInfo(characterId: $characterId) {
-    id
-    name
-    isOnline
-    lastLogin
-    totalTimePlayed
-    currentSessionTime
-  }
-}
-    `;
-export function useCharacterSessionInfoQuery(baseOptions: Apollo.QueryHookOptions<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>(CharacterSessionInfoDocument, options);
-      }
-export function useCharacterSessionInfoLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>(CharacterSessionInfoDocument, options);
-        }
-export type CharacterSessionInfoQueryHookResult = ReturnType<typeof useCharacterSessionInfoQuery>;
-export type CharacterSessionInfoLazyQueryHookResult = ReturnType<typeof useCharacterSessionInfoLazyQuery>;
-export type CharacterSessionInfoQueryResult = Apollo.QueryResult<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>;
-export const SetCharacterOnlineDocument = gql`
-    mutation SetCharacterOnline($characterId: ID!) {
-  setCharacterOnline(characterId: $characterId)
-}
-    `;
-export type SetCharacterOnlineMutationFn = Apollo.MutationFunction<SetCharacterOnlineMutation, SetCharacterOnlineMutationVariables>;
-export function useSetCharacterOnlineMutation(baseOptions?: Apollo.MutationHookOptions<SetCharacterOnlineMutation, SetCharacterOnlineMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SetCharacterOnlineMutation, SetCharacterOnlineMutationVariables>(SetCharacterOnlineDocument, options);
-      }
-export type SetCharacterOnlineMutationHookResult = ReturnType<typeof useSetCharacterOnlineMutation>;
-export type SetCharacterOnlineMutationResult = Apollo.MutationResult<SetCharacterOnlineMutation>;
-export type SetCharacterOnlineMutationOptions = Apollo.BaseMutationOptions<SetCharacterOnlineMutation, SetCharacterOnlineMutationVariables>;
-export const SetCharacterOfflineDocument = gql`
-    mutation SetCharacterOffline($characterId: ID!) {
-  setCharacterOffline(characterId: $characterId)
-}
-    `;
-export type SetCharacterOfflineMutationFn = Apollo.MutationFunction<SetCharacterOfflineMutation, SetCharacterOfflineMutationVariables>;
-export function useSetCharacterOfflineMutation(baseOptions?: Apollo.MutationHookOptions<SetCharacterOfflineMutation, SetCharacterOfflineMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<SetCharacterOfflineMutation, SetCharacterOfflineMutationVariables>(SetCharacterOfflineDocument, options);
-      }
-export type SetCharacterOfflineMutationHookResult = ReturnType<typeof useSetCharacterOfflineMutation>;
-export type SetCharacterOfflineMutationResult = Apollo.MutationResult<SetCharacterOfflineMutation>;
-export type SetCharacterOfflineMutationOptions = Apollo.BaseMutationOptions<SetCharacterOfflineMutation, SetCharacterOfflineMutationVariables>;
-export const UpdateCharacterActivityDocument = gql`
-    mutation UpdateCharacterActivity($characterId: ID!) {
-  updateCharacterActivity(characterId: $characterId)
-}
-    `;
-export type UpdateCharacterActivityMutationFn = Apollo.MutationFunction<UpdateCharacterActivityMutation, UpdateCharacterActivityMutationVariables>;
-export function useUpdateCharacterActivityMutation(baseOptions?: Apollo.MutationHookOptions<UpdateCharacterActivityMutation, UpdateCharacterActivityMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UpdateCharacterActivityMutation, UpdateCharacterActivityMutationVariables>(UpdateCharacterActivityDocument, options);
-      }
-export type UpdateCharacterActivityMutationHookResult = ReturnType<typeof useUpdateCharacterActivityMutation>;
-export type UpdateCharacterActivityMutationResult = Apollo.MutationResult<UpdateCharacterActivityMutation>;
-export type UpdateCharacterActivityMutationOptions = Apollo.BaseMutationOptions<UpdateCharacterActivityMutation, UpdateCharacterActivityMutationVariables>;
-export const MyPermissionsDocument = gql`
-    query MyPermissions {
-  myPermissions {
-    isPlayer
-    isImmortal
-    isBuilder
-    isCoder
-    isGod
-    canAccessDashboard
-    canManageUsers
-    canViewValidation
-    maxCharacterLevel
-    role
-  }
-}
-    `;
-export function useMyPermissionsQuery(baseOptions?: Apollo.QueryHookOptions<MyPermissionsQuery, MyPermissionsQueryVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, options);
-      }
-export function useMyPermissionsLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<MyPermissionsQuery, MyPermissionsQueryVariables>) {
-          const options = {...defaultOptions, ...baseOptions}
-          return Apollo.useLazyQuery<MyPermissionsQuery, MyPermissionsQueryVariables>(MyPermissionsDocument, options);
-        }
-export type MyPermissionsQueryHookResult = ReturnType<typeof useMyPermissionsQuery>;
-export type MyPermissionsLazyQueryHookResult = ReturnType<typeof useMyPermissionsLazyQuery>;
-export type MyPermissionsQueryResult = Apollo.QueryResult<MyPermissionsQuery, MyPermissionsQueryVariables>;
+export const GetMyCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMyCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}}]}}]}}]} as unknown as DocumentNode<GetMyCharactersQuery, GetMyCharactersQueryVariables>;
+export const GetObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDesc"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"values"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetObjectQuery, GetObjectQueryVariables>;
+export const UpdateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<UpdateObjectMutation, UpdateObjectMutationVariables>;
+export const CreateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateObjectMutation, CreateObjectMutationVariables>;
+export const GetObjectsDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]}}]} as unknown as DocumentNode<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>;
+export const GetObjectsByZoneDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsByZoneDashboard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objectsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]}}]} as unknown as DocumentNode<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>;
+export const DeleteObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteObjectMutation, DeleteObjectMutationVariables>;
+export const DeleteObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObjects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}]}}]} as unknown as DocumentNode<DeleteObjectsMutation, DeleteObjectsMutationVariables>;
+export const GetDashboardStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDashboardStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zonesCount"}},{"kind":"Field","name":{"kind":"Name","value":"roomsCount"}},{"kind":"Field","name":{"kind":"Name","value":"mobsCount"}},{"kind":"Field","name":{"kind":"Name","value":"objectsCount"}},{"kind":"Field","name":{"kind":"Name","value":"shopsCount"}}]}}]} as unknown as DocumentNode<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>;
+export const GetShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"hours"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"open"}},{"kind":"Field","name":{"kind":"Name","value":"close"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopQuery, GetShopQueryVariables>;
+export const GetAvailableObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableObjects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>;
+export const GetAvailableMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableMobs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>;
+export const UpdateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<UpdateShopMutation, UpdateShopMutationVariables>;
+export const CreateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<CreateShopMutation, CreateShopMutationVariables>;
+export const GetShopsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShops"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shops"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsQuery, GetShopsQueryVariables>;
+export const GetShopsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shopsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>;
+export const DeleteShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteShopMutation, DeleteShopMutationVariables>;
+export const UsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"isBanned"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"banRecords"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"admin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UsersQuery, UsersQueryVariables>;
+export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
+export const BanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"banUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<BanUserMutation, BanUserMutationVariables>;
+export const UnbanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnbanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnbanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unbanUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"unbannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<UnbanUserMutation, UnbanUserMutationVariables>;
+export const GetZonesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"climate"}}]}}]}}]} as unknown as DocumentNode<GetZonesQuery, GetZonesQueryVariables>;
+export const GetRoomsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRoomsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roomsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"layoutX"}},{"kind":"Field","name":{"kind":"Name","value":"layoutY"}},{"kind":"Field","name":{"kind":"Name","value":"layoutZ"}},{"kind":"Field","name":{"kind":"Name","value":"exits"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"destination"}}]}}]}}]}}]} as unknown as DocumentNode<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>;
+export const GetZonesDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZonesDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"climate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roomsCount"}}]}}]} as unknown as DocumentNode<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>;
+export const RequestPasswordResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RequestPasswordReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RequestPasswordResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestPasswordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChangePasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const UpdateProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const ResetPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ResetPasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ResetPasswordMutation, ResetPasswordMutationVariables>;
+export const GetTriggersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersQuery, GetTriggersQueryVariables>;
+export const GetTriggersByAttachmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersByAttachment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ScriptType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggersByAttachment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"attachType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>;
+export const CreateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<CreateTriggerMutation, CreateTriggerMutationVariables>;
+export const UpdateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<UpdateTriggerMutation, UpdateTriggerMutationVariables>;
+export const DeleteTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteTriggerMutation, DeleteTriggerMutationVariables>;
+export const AttachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AttachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AttachTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<AttachTriggerMutation, AttachTriggerMutationVariables>;
+export const DetachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DetachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"detachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"triggerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<DetachTriggerMutation, DetachTriggerMutationVariables>;
+export const GetZonesForSelectorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZonesForSelector"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>;
+export const CreateCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}}]}}]}}]} as unknown as DocumentNode<CreateCharacterMutation, CreateCharacterMutationVariables>;
+export const GetCharacterDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"character"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"skillPoints"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"bankCopper"}},{"kind":"Field","name":{"kind":"Name","value":"bankSilver"}},{"kind":"Field","name":{"kind":"Name","value":"bankGold"}},{"kind":"Field","name":{"kind":"Name","value":"bankPlatinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}},{"kind":"Field","name":{"kind":"Name","value":"saveRoom"}},{"kind":"Field","name":{"kind":"Name","value":"homeRoom"}},{"kind":"Field","name":{"kind":"Name","value":"hunger"}},{"kind":"Field","name":{"kind":"Name","value":"thirst"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"damageRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"playerFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"privilegeFlags"}},{"kind":"Field","name":{"kind":"Name","value":"invisLevel"}},{"kind":"Field","name":{"kind":"Name","value":"birthTime"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"equippedLocation"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}},{"kind":"Field","name":{"kind":"Name","value":"charges"}},{"kind":"Field","name":{"kind":"Name","value":"objectPrototype"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"effectName"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"appliedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>;
+export const GetCharacterSessionInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterSessionInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}}]}}]}}]} as unknown as DocumentNode<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>;
+export const GetCharacterLinkingInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterLinkingInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterLinkingInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"isLinked"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}}]}}]}}]} as unknown as DocumentNode<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>;
+export const LinkCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LinkCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LinkCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"linkCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}}]}}]}}]} as unknown as DocumentNode<LinkCharacterMutation, LinkCharacterMutationVariables>;
+export const ValidateCharacterPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidateCharacterPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validateCharacterPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}]}]}}]} as unknown as DocumentNode<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>;
+export const GetEquipmentSetsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEquipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"equipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>;
+export const GetObjectsForEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsForEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>;
+export const CreateEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>;
+export const UpdateEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateEquipmentSetMutation, UpdateEquipmentSetMutationVariables>;
+export const DeleteEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>;
+export const AddEquipmentSetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddEquipmentSetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetItemStandaloneInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}}]}}]}}]} as unknown as DocumentNode<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>;
+export const RemoveEquipmentSetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveEquipmentSetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEquipmentSetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>;
+export const GetMobResetsLegacyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobResetsLegacy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobResets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"mob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>;
+export const GetObjectsLegacyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsLegacy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>;
+export const CreateMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}}]}}]}}]} as unknown as DocumentNode<CreateMobResetMutation, CreateMobResetMutationVariables>;
+export const UpdateMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}}]}}]}}]} as unknown as DocumentNode<UpdateMobResetMutation, UpdateMobResetMutationVariables>;
+export const DeleteMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetMutation, DeleteMobResetMutationVariables>;
+export const DeleteMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
+export const GetMobResetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobResetsForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobResets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"mob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>;
+export const GetEquipmentSetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEquipmentSetsForMob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"equipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>;
+export const GetObjectsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>;
+export const CreateEquipmentSetForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEquipmentSetForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>;
+export const AddMobEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddMobEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMobEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}}]}}]}}]} as unknown as DocumentNode<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>;
+export const RemoveMobEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveMobEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>;
+export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
+export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Register"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"register"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
+export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const UpdateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}}]}}]}}]} as unknown as DocumentNode<UpdateMobMutation, UpdateMobMutationVariables>;
+export const CreateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}}]}}]}}]} as unknown as DocumentNode<CreateMobMutation, CreateMobMutationVariables>;
+export const DeleteMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<DeleteMobMutation, DeleteMobMutationVariables>;
+export const GetMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetMobQuery, GetMobQueryVariables>;
+export const GetMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}}]}}]}}]} as unknown as DocumentNode<GetMobsQuery, GetMobsQueryVariables>;
+export const GetMobsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}}]}}]}}]} as unknown as DocumentNode<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
+export const OnlineCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OnlineCharacters"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"onlineCharacters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]}}]} as unknown as DocumentNode<OnlineCharactersQuery, OnlineCharactersQueryVariables>;
+export const MyOnlineCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyOnlineCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myOnlineCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]}}]} as unknown as DocumentNode<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>;
+export const CharacterSessionInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CharacterSessionInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}}]}}]}}]} as unknown as DocumentNode<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>;
+export const SetCharacterOnlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetCharacterOnline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setCharacterOnline"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}]}]}}]} as unknown as DocumentNode<SetCharacterOnlineMutation, SetCharacterOnlineMutationVariables>;
+export const SetCharacterOfflineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SetCharacterOffline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"setCharacterOffline"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}]}]}}]} as unknown as DocumentNode<SetCharacterOfflineMutation, SetCharacterOfflineMutationVariables>;
+export const UpdateCharacterActivityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCharacterActivity"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCharacterActivity"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}]}]}}]} as unknown as DocumentNode<UpdateCharacterActivityMutation, UpdateCharacterActivityMutationVariables>;
+export const MyPermissionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyPermissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myPermissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isPlayer"}},{"kind":"Field","name":{"kind":"Name","value":"isImmortal"}},{"kind":"Field","name":{"kind":"Name","value":"isBuilder"}},{"kind":"Field","name":{"kind":"Name","value":"isCoder"}},{"kind":"Field","name":{"kind":"Name","value":"isGod"}},{"kind":"Field","name":{"kind":"Name","value":"canAccessDashboard"}},{"kind":"Field","name":{"kind":"Name","value":"canManageUsers"}},{"kind":"Field","name":{"kind":"Name","value":"canViewValidation"}},{"kind":"Field","name":{"kind":"Name","value":"maxCharacterLevel"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<MyPermissionsQuery, MyPermissionsQueryVariables>;

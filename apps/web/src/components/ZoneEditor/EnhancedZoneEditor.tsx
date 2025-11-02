@@ -1842,7 +1842,6 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               (obj: any) => ({
                 id: obj.id,
                 name: obj.name,
-                name: obj.name,
                 type: obj.type,
                 keywords: obj.keywords || [],
                 value: obj.cost,
@@ -2355,12 +2354,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       if (
         now - lastLODUpdate.current < LOD_THROTTLE_MS &&
         zoom < 1.0 &&
-        cached?.nodes?.length > 0
+        (cached?.nodes?.length ?? 0) > 0
       ) {
         console.log(
-          `⏸️ Throttling world map generation - returning cached: ${cached.nodes.length}`
+          `⏸️ Throttling world map generation - returning cached: ${cached!.nodes.length}`
         );
-        return cached.nodes; // Only throttle if we have valid cached nodes
+        return cached!.nodes; // Only throttle if we have valid cached nodes
       }
       lastLODUpdate.current = now;
 
@@ -4453,7 +4452,6 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             variables: {
               data: {
                 id: newRoomId,
-                id: newRoomId,
                 name: roomName,
                 roomDescription: roomDescription,
                 sector: 'STRUCTURE',
@@ -4993,11 +4991,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 ) {
                   // Fallback: calculate position from room coordinates if node not found yet
                   const roomX =
-                    destinationRoom.layoutX *
+                    destinationRoom.layoutX! *
                     GRID_SIZE *
                     ROOM_SPACING_MULTIPLIER;
                   const roomY =
-                    -destinationRoom.layoutY *
+                    -destinationRoom.layoutY! *
                     GRID_SIZE *
                     ROOM_SPACING_MULTIPLIER; // Y is inverted
                   console.log(
@@ -5409,9 +5407,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const lastViewport = lastViewportRef.current;
 
             // Store mouse position for potential zoom-in centering
-            if (event && event.type === 'wheel' && event.currentTarget) {
+            if (event && event.type === 'wheel' && event.currentTarget && 'clientX' in event) {
               try {
-                const rect = event.currentTarget.getBoundingClientRect();
+                const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
                 const mouseX = event.clientX - rect.left;
                 const mouseY = event.clientY - rect.top;
 

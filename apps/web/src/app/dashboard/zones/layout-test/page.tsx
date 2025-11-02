@@ -357,7 +357,7 @@ export default function LayoutTestPage() {
                 </Button>
 
                 <Button
-                  onClick={() => refetch()}
+                  onClick={() => refetchZones()}
                   variant='outline'
                   className='w-full'
                 >
@@ -579,7 +579,7 @@ export default function LayoutTestPage() {
                                         <span className='font-mono'>
                                           {exit.direction}:
                                         </span>
-                                        <span>{exit.toRoomId ?? 'none'}</span>
+                                        <span>{exit.destination ?? 'none'}</span>
                                       </div>
                                     ))}
                                   </div>

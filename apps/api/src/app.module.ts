@@ -24,22 +24,11 @@ import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: process.env.GRAPHQL_PLAYGROUND === 'true',
+      introspection: true, // Required for Apollo Sandbox in Apollo Server 5
       debug: process.env.GRAPHQL_DEBUG === 'true',
       context: ({ req, res }) => ({ req, res }),
+      // Apollo Server 5 uses graphql-ws by default for subscriptions
       subscriptions: {
-        'subscriptions-transport-ws': {
-          onConnect: (connectionParams: any, webSocket: any) => {
-            return {
-              req: {
-                headers: {
-                  authorization:
-                    connectionParams.Authorization ||
-                    connectionParams.authorization,
-                },
-              },
-            };
-          },
-        },
         'graphql-ws': {
           onConnect: (context: any) => {
             const { connectionParams } = context;
