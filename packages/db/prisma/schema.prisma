@@ -23,10 +23,21 @@ model CharacterClass {
   updatedAt          DateTime @map("updated_at") @updatedAt
   characters         Characters[]
   classSkills        ClassSkills[]
+  classCircles       ClassCircles[]
   mobs               Mobs[]
   spellClassCircles  SpellClassCircles[]
 
   @@map("Class")
+}
+
+model ClassCircles {
+  id       Int                @id @default(autoincrement())
+  classId  Int @map("class_id")
+  circle   Int
+  minLevel Int @map("min_level")
+  characterClass CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+  @@unique([classId, circle])
 }
 
 model AuditLogs {
@@ -171,6 +182,8 @@ model Characters {
   playerClass      String? @map("player_class")
   height            Int?
   weight            Int?
+  baseHeight        Int? @map("base_height")
+  baseWeight        Int? @map("base_weight")
   baseSize         Int @map("base_size") @default(0)
   currentSize      Int @map("current_size") @default(0)
   hitRoll          Int @map("hit_roll") @default(0)
@@ -193,19 +206,33 @@ model Characters {
   privilegeFlags   String[] @map("privilege_flags") @default([])
   olcZones         Int[] @map("olc_zones") @default([])
   invisLevel       Int @map("invis_level") @default(0)
+  wimpyThreshold    Int @map("wimpy_threshold") @default(0)
+  freezeLevel       Int? @map("freeze_level")
+  autoInvisLevel    Int @map("auto_invis_level") @default(0)
   birthTime        DateTime @map("birth_time") @default(now())
-  userId            String @map("user_id")
+  userId            String? @map("user_id")  // Optional - characters can exist without a user (legacy imports)
   createdAt         DateTime @map("created_at") @default(now())
   updatedAt DateTime @map("updated_at") @updatedAt
   classId           Int? @map("class_id")
   experience        Int                 @default(0)
   skillPoints       Int @map("skill_points") @default(0)
+  characterAliases CharacterAliases[]
   characterEffects CharacterEffects[]
   characterItems   CharacterItems[]
   characterSkills  CharacterSkills[]
   characterSpells  CharacterSpells[]
-  Class             CharacterClass?     @relation(fields: [classId], references: [id])
-  users             Users               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  characterClass    CharacterClass?     @relation(fields: [classId], references: [id])
+  users             Users?              @relation(fields: [userId], references: [id], onDelete: SetNull)
+}
+
+model CharacterAliases {
+  id          Int    @id @default(autoincrement())
+  characterId String @map("character_id")
+  alias       String
+  command     String
+  characters  Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, alias])
 }
 
 model ClassSkills {
@@ -215,7 +242,7 @@ model ClassSkills {
   category SkillCategory @default(SECONDARY)
   minLevel Int @map("min_level") @default(1)
   maxLevel Int @map("max_level") @default(100)
-  Class    CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  characterClass CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
   skills   Skills         @relation(fields: [skillId], references: [id], onDelete: Cascade)
 
   @@unique([classId, skillId])
@@ -377,7 +404,7 @@ model Mobs {
   mobResets       MobResets[]
   mobSkills       MobSkills[]
   mobSpells       MobSpells[]
-  Class           CharacterClass? @relation(fields: [classId], references: [id])
+  characterClass  CharacterClass? @relation(fields: [classId], references: [id])
   zones           Zones           @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shops           Shops[]
   triggers        Triggers[]
@@ -437,8 +464,9 @@ model Objects {
   type                      ObjectType                  @default(NOTHING)
   keywords                  String[]
   name                      String @map("name")      // Display name (e.g., "a sword", "a loaf of bread")
-  examineDescription        String @map("examine_description")     // Full description when examined
-  actionDesc                String? @map("action_desc")    // Action when worn/wielded (e.g., "<worn on body>")
+  roomDescription           String @map("room_description")        // Description when object is in room (e.g., "A sword lies here")
+  examineDescription        String? @map("examine_description")    // Full description when examined (from matching extra description)
+  actionDescription         String? @map("action_desc")            // Action when worn/wielded (e.g., "<worn on body>")
   weight                    Float                       @default(0.0)
   cost                      Int                         @default(0)
   timer                     Int                         @default(0)
@@ -470,12 +498,59 @@ model Objects {
   @@id([zoneId, id])
 }
 
+model Races {
+  race                Race @id
+  name                String
+  keywords            String
+  displayName         String @map("display_name")
+  fullName            String @map("full_name")
+  plainName           String @map("plain_name")
+  playable            Boolean @default(false)
+  humanoid            Boolean @default(false)
+  magical             Boolean @default(false)
+  raceAlign           RaceAlign @map("race_align") @default(GOOD)
+  defaultSize         Size @map("default_size") @default(MEDIUM)
+  defaultAlignment    Int @map("default_alignment") @default(0)
+  bonusDamroll        Int @map("bonus_damroll") @default(0)
+  bonusHitroll        Int @map("bonus_hitroll") @default(0)
+  focusBonus          Int @map("focus_bonus") @default(100)
+  defaultLifeforce    LifeForce @map("default_lifeforce") @default(LIFE)
+  defaultComposition  Composition @map("default_composition") @default(FLESH)
+  maleWeightLow       Int @map("male_weight_low") @default(0)
+  maleWeightHigh      Int @map("male_weight_high") @default(0)
+  maleHeightLow       Int @map("male_height_low") @default(0)
+  maleHeightHigh      Int @map("male_height_high") @default(0)
+  femaleWeightLow     Int @map("female_weight_low") @default(0)
+  femaleWeightHigh    Int @map("female_weight_high") @default(0)
+  femaleHeightLow     Int @map("female_height_low") @default(0)
+  femaleHeightHigh    Int @map("female_height_high") @default(0)
+  maxStrength         Int @map("max_strength") @default(76)
+  maxDexterity        Int @map("max_dexterity") @default(76)
+  maxIntelligence     Int @map("max_intelligence") @default(76)
+  maxWisdom           Int @map("max_wisdom") @default(76)
+  maxConstitution     Int @map("max_constitution") @default(76)
+  maxCharisma         Int @map("max_charisma") @default(76)
+  expFactor           Int @map("exp_factor") @default(100)
+  hpFactor            Int @map("hp_factor") @default(100)
+  hitDamageFactor     Int @map("hit_damage_factor") @default(100)
+  damageDiceFactor    Int @map("damage_dice_factor") @default(100)
+  copperFactor        Int @map("copper_factor") @default(75)
+  acFactor            Int @map("ac_factor") @default(100)
+  enterVerb           String? @map("enter_verb")
+  leaveVerb           String? @map("leave_verb")
+  permanentEffects    EffectFlag[] @map("permanent_effects")
+  createdAt           DateTime @map("created_at") @default(now())
+  updatedAt           DateTime @map("updated_at") @updatedAt
+  raceSkills          RaceSkills[]
+}
+
 model RaceSkills {
   id       Int           @id @default(autoincrement())
   race     Race
   skillId  Int @map("skill_id")
   category SkillCategory @default(SECONDARY)
   bonus    Int           @default(0)
+  raceData Races         @relation(fields: [race], references: [race], onDelete: Cascade)
   skills   Skills        @relation(fields: [skillId], references: [id], onDelete: Cascade)
 
   @@unique([race, skillId])
@@ -606,7 +681,7 @@ model Skills {
   id              Int                @id @default(autoincrement())
   name            String             @unique
   description     String?
-  type            SkillType
+  type            SkillType          // WEAPON, COMBAT, STEALTH, SURVIVAL, etc.
   category        SkillCategory      @default(SECONDARY)
   maxLevel        Int @map("max_level") @default(100)
   createdAt       DateTime @map("created_at") @default(now())
@@ -634,8 +709,8 @@ model SpellClassCircles {
   circle          Int
   minLevel        Int? @map("min_level")
   proficiencyGain Int? @map("proficiency_gain")
-  Class           CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
-  spells          Spells         @relation(fields: [spellId], references: [id], onDelete: Cascade)
+  characterClass  CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+  spell           Spells         @relation(fields: [spellId], references: [id], onDelete: Cascade)
 
   @@unique([spellId, classId])
 }
@@ -657,6 +732,8 @@ model SpellEffects {
   chancePct       Int @map("chance_pct") @default(100)
   trigger         EffectTrigger? @default(ON_CAST)
   durationFormula String? @map("duration_formula")
+  luaFormula      S tring? @map("lua_formula") // For damage/heal calculations
+  condition       String? // Lua expression: "target.isUndead"
   stackingRule    StackingRule   @default(REFRESH)
   conditionFilter Json? @map("condition_filter")
   params          Json
@@ -725,7 +802,9 @@ model SpellTargeting {
 
 model Spells {
   id                  Int                   @id @default(autoincrement())
+  gameId              String?               @unique @map("game_id") // "spell.fireball"
   name                String                @unique
+  description         String?
   schoolId            Int? @map("school_id")
   minPosition         Position              @default(STANDING)
   violent             Boolean               @default(false)
@@ -734,6 +813,8 @@ model Spells {
   inCombatOnly        Boolean @map("in_combat_only") @default(false)
   isArea              Boolean @map("is_area") @default(false)
   notes              String?
+  tags                String[]              @default([])
+  luaScript           String?               @map("lua_script") @db.Text
   createdAt          DateTime @map("created_at") @default(now())
   updatedAt          DateTime @map("updated_at") @updatedAt
   characterSpells    CharacterSpells[]
@@ -746,6 +827,44 @@ model Spells {
   spellSavingThrows  SpellSavingThrows[]
   spellTargeting     SpellTargeting?
   spellSchools       SpellSchools?        @relation(fields: [schoolId], references: [id])
+
+  @@index([gameId])
+}
+
+// ============================================================================
+// AURAS SYSTEM - Reusable buff/debuff templates
+// ============================================================================
+
+model Auras {
+  id              Int             @id @default(autoincrement())
+  gameId          String          @unique @map("game_id") // "aura.bless"
+  name            String
+  description     String?
+  dispelCategory  String? @map("dispel_category") // "magic", "curse", "poison"
+  priority        Int             @default(0)
+  stackingRule    StackingRule @map("stacking_rule") @default(REFRESH)
+  maxStacks       Int @map("max_stacks") @default(1)
+  tickRate        Int? @map("tick_rate") // seconds (null = no ticking)
+  applyMessage    String? @map("apply_message")
+  tickMessage     String? @map("tick_message")
+  expireMessage   String? @map("expire_message")
+  tags            String[]        @default([])
+  modifiers       AuraModifiers[]
+  createdAt       DateTime @map("created_at") @default(now())
+  updatedAt       DateTime @map("updated_at") @updatedAt
+
+  @@index([gameId])
+  @@index([dispelCategory])
+}
+
+model AuraModifiers {
+  id        Int       @id @default(autoincrement())
+  auraId    Int @map("aura_id")
+  applyType ApplyType @map("apply_type")
+  formula   String // Lua expression: "10 + caster.level/2" or static: "15"
+  aura      Auras     @relation(fields: [auraId], references: [id], onDelete: Cascade)
+
+  @@index([auraId])
 }
 
 model Triggers {
@@ -790,6 +909,26 @@ model Users {
   banRecords       BanRecords[] @relation("userBanRecords")
   changeLogs       ChangeLogs[]
   characters       Characters[]
+  grants           UserGrants[]
+  grantsIssued     UserGrants[] @relation("grantsIssued")
+}
+
+model UserGrants {
+  id           Int      @id @default(autoincrement())
+  userId       String   @map("user_id")
+  resourceType GrantResourceType @map("resource_type")
+  resourceId   String   @map("resource_id")
+  permissions  GrantPermission[]
+  grantedBy    String   @map("granted_by")
+  grantedAt    DateTime @map("granted_at") @default(now())
+  expiresAt    DateTime? @map("expires_at")
+  notes        String?
+
+  user         Users    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  grantedByUser Users   @relation("grantsIssued", fields: [grantedBy], references: [id])
+
+  @@unique([userId, resourceType, resourceId])
+  @@map("user_grants")
 }
 
 model Zones {
@@ -987,6 +1126,11 @@ enum EffectType {
   CLEANSE
   REMOVE_CURSE
   SCRIPT
+  MULTI_HIT      // Multiple damage/heal instances
+  DELAYED        // Delayed/recurring effects
+  CONDITION      // Conditional branching logic
+  APPLY_AURA     // Apply aura from Auras table
+  REMOVE_AURA    // Remove specific aura
 }
 
 enum ExitFlag {
@@ -1217,6 +1361,12 @@ enum Race {
   ARBOREAN
 }
 
+enum RaceAlign {
+  UNKNOWN
+  GOOD
+  EVIL
+}
+
 enum ResetMode {
   NEVER
   EMPTY
@@ -1278,6 +1428,40 @@ enum SaveType {
   BREATH
   PARALYSIS
   WAND
+  ROD           // Rod/staff saves
+  PETRIFICATION // Petrification saves
+}
+
+// APPLY locations for stat modifiers (from CORE_MECHANICS.md)
+enum ApplyType {
+  AC
+  HITROLL
+  DAMROLL
+  STR
+  DEX
+  INT
+  WIS
+  CON
+  CHA
+  SAVING_PARA
+  SAVING_ROD
+  SAVING_PETRI
+  SAVING_BREATH
+  SAVING_SPELL
+  HIT_REGEN
+  MAX_HP
+  MAX_MANA
+  MAX_MOVEMENT
+  PERCEPTION
+  HIDDENNESS
+  SIZE
+  AGE
+  CHAR_WEIGHT
+  CHAR_HEIGHT
+  FOCUS
+  COMPOSITION
+  LEVEL
+  NONE
 }
 
 enum ScriptType {
@@ -1428,8 +1612,23 @@ enum UserRole {
   PLAYER
   IMMORTAL
   BUILDER
+  HEAD_BUILDER
   CODER
   GOD
+}
+
+enum GrantResourceType {
+  ZONE
+  MOB
+  OBJECT
+  SHOP
+}
+
+enum GrantPermission {
+  READ
+  WRITE
+  DELETE
+  ADMIN
 }
 
 enum WearFlag {
