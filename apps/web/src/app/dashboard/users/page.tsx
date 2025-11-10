@@ -1,37 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useQuery, useMutation } from '@apollo/client/react';
-import { gql } from '@apollo/client';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -43,6 +13,34 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@/components/ui/dialog';
+import { LoadingError } from '@/components/ui/error-display';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Loading } from '@/components/ui/loading';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -51,24 +49,26 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
+import { useErrorHandler } from '@/lib/error-utils';
+import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 import {
+  Ban,
+  Calendar,
   Crown,
+  Edit,
   Shield,
   ShieldBan,
   ShieldCheck,
-  Edit,
-  Ban,
-  UserX,
   User,
-  Calendar,
+  UserX,
 } from 'lucide-react';
+import { useState } from 'react';
 import { toast } from 'sonner';
-import { useErrorHandler } from '@/lib/error-utils';
-import { LoadingError } from '@/components/ui/error-display';
-import { Loading } from '@/components/ui/loading';
 
 const USERS_QUERY = gql`
-  query Users {
+  query UsersInline {
     users {
       id
       username
@@ -91,7 +91,7 @@ const USERS_QUERY = gql`
 `;
 
 const UPDATE_USER_MUTATION = gql`
-  mutation UpdateUser($input: UpdateUserInput!) {
+  mutation UpdateUserInline($input: UpdateUserInput!) {
     updateUser(input: $input) {
       id
       username
@@ -102,7 +102,7 @@ const UPDATE_USER_MUTATION = gql`
 `;
 
 const BAN_USER_MUTATION = gql`
-  mutation BanUser($input: BanUserInput!) {
+  mutation BanUserInline($input: BanUserInput!) {
     banUser(input: $input) {
       id
       reason
@@ -113,7 +113,7 @@ const BAN_USER_MUTATION = gql`
 `;
 
 const UNBAN_USER_MUTATION = gql`
-  mutation UnbanUser($input: UnbanUserInput!) {
+  mutation UnbanUserInline($input: UnbanUserInput!) {
     unbanUser(input: $input) {
       id
       unbannedAt
@@ -250,8 +250,11 @@ function UsersContent() {
     }
   };
 
-  if (loading) return <Loading text="Loading users..." className="py-8" />;
-  if (error) return <LoadingError error={error} onRetry={() => refetch()} resource="users" />;
+  if (loading) return <Loading text='Loading users...' className='py-8' />;
+  if (error)
+    return (
+      <LoadingError error={error} onRetry={() => refetch()} resource='users' />
+    );
 
   const users = data?.users || [];
 

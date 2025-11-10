@@ -1,14 +1,13 @@
 'use client';
 
-import { useState, useEffect, useMemo } from 'react';
-import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { useQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { LoadingError } from '@/components/ui/error-display';
-import { Loading } from '@/components/ui/loading';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useMemo, useState } from 'react';
 
 const ZONES_QUERY = gql`
   query GetZonesDashboard {
@@ -45,7 +44,8 @@ function ZonesContent() {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedClimate, setSelectedClimate] = useState('all');
 
-  const { data, loading, error, refetch } = useQuery<ZonesQueryResult>(ZONES_QUERY);
+  const { data, loading, error, refetch } =
+    useQuery<ZonesQueryResult>(ZONES_QUERY);
 
   const zones = data?.zones || [];
   const roomsCount = data?.roomsCount || 0;
@@ -88,7 +88,9 @@ function ZonesContent() {
   }
 
   if (error) {
-    return <LoadingError error={error} onRetry={() => refetch()} resource="zones" />;
+    return (
+      <LoadingError error={error} onRetry={() => refetch()} resource='zones' />
+    );
   }
 
   const adminView = (
@@ -97,16 +99,11 @@ function ZonesContent() {
         <div>
           <h1 className='text-3xl font-bold text-gray-900'>Zones</h1>
           <p className='text-gray-600 mt-1'>
-            {filteredZones.length} of {zones.length} zones, {roomsCount.toLocaleString()} rooms total
+            {filteredZones.length} of {zones.length} zones,{' '}
+            {roomsCount.toLocaleString()} rooms total
           </p>
         </div>
         <div className='flex items-center gap-3'>
-          <Link
-            href='/dashboard/zones/layout-test'
-            className='bg-purple-600 text-white px-4 py-2 rounded-lg hover:bg-purple-700 transition-colors'
-          >
-            🧪 Layout Test
-          </Link>
           <Link
             href='/dashboard/zones/world-map'
             className='bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors'

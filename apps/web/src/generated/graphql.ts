@@ -20,11 +20,109 @@ export type Scalars = {
   JSON: { input: any; output: any; }
 };
 
+export type Ability = {
+  __typename?: 'Ability';
+  abilityType: Scalars['String']['output'];
+  castTimeRounds: Scalars['Int']['output'];
+  cooldownMs: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  effects?: Maybe<Array<AbilityEffect>>;
+  gameId?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  inCombatOnly: Scalars['Boolean']['output'];
+  isArea: Scalars['Boolean']['output'];
+  luaScript?: Maybe<Scalars['String']['output']>;
+  messages?: Maybe<AbilityMessages>;
+  minPosition: Position;
+  name: Scalars['String']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  restrictions?: Maybe<AbilityRestrictions>;
+  savingThrows?: Maybe<Array<AbilitySavingThrow>>;
+  school?: Maybe<AbilitySchool>;
+  schoolId?: Maybe<Scalars['Int']['output']>;
+  tags: Array<Scalars['String']['output']>;
+  targeting?: Maybe<AbilityTargeting>;
+  updatedAt: Scalars['DateTime']['output'];
+  violent: Scalars['Boolean']['output'];
+};
+
+export type AbilityEffect = {
+  __typename?: 'AbilityEffect';
+  abilityId: Scalars['ID']['output'];
+  chancePct: Scalars['Int']['output'];
+  condition?: Maybe<Scalars['String']['output']>;
+  effect: Effect;
+  effectId: Scalars['ID']['output'];
+  order: Scalars['Int']['output'];
+  overrideParams?: Maybe<Scalars['JSON']['output']>;
+  trigger?: Maybe<Scalars['String']['output']>;
+};
+
+export type AbilityMessages = {
+  __typename?: 'AbilityMessages';
+  failToCaster?: Maybe<Scalars['String']['output']>;
+  failToRoom?: Maybe<Scalars['String']['output']>;
+  failToVictim?: Maybe<Scalars['String']['output']>;
+  startToCaster?: Maybe<Scalars['String']['output']>;
+  startToRoom?: Maybe<Scalars['String']['output']>;
+  startToVictim?: Maybe<Scalars['String']['output']>;
+  successToCaster?: Maybe<Scalars['String']['output']>;
+  successToRoom?: Maybe<Scalars['String']['output']>;
+  successToVictim?: Maybe<Scalars['String']['output']>;
+  wearoffToRoom?: Maybe<Scalars['String']['output']>;
+  wearoffToTarget?: Maybe<Scalars['String']['output']>;
+};
+
+export type AbilityRestrictions = {
+  __typename?: 'AbilityRestrictions';
+  customRequirementLua?: Maybe<Scalars['String']['output']>;
+  requirements: Array<Scalars['JSON']['output']>;
+};
+
+export type AbilitySavingThrow = {
+  __typename?: 'AbilitySavingThrow';
+  dcFormula: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  onSaveAction: Scalars['JSON']['output'];
+  saveType: SaveType;
+};
+
+export type AbilitySchool = {
+  __typename?: 'AbilitySchool';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AbilityTargeting = {
+  __typename?: 'AbilityTargeting';
+  maxTargets: Scalars['Int']['output'];
+  range: Scalars['Int']['output'];
+  requireLos: Scalars['Boolean']['output'];
+  scope: TargetScope;
+  scopePattern?: Maybe<Scalars['String']['output']>;
+  validTargets: Array<TargetType>;
+};
+
 export type AdminUser = {
   __typename?: 'AdminUser';
   id: Scalars['ID']['output'];
   role: UserRole;
   username: Scalars['String']['output'];
+};
+
+export type AssignSkillToClassInput = {
+  abilityId: Scalars['Int']['input'];
+  classId: Scalars['Int']['input'];
+  minLevel?: Scalars['Int']['input'];
+};
+
+export type AssignSkillToRaceInput = {
+  abilityId: Scalars['Int']['input'];
+  bonus?: Scalars['Int']['input'];
+  category?: SkillCategory;
+  race: Race;
 };
 
 export type AttachTriggerInput = {
@@ -213,6 +311,52 @@ export type CharacterSessionInfoDto = {
   totalTimePlayed: Scalars['Int']['output'];
 };
 
+export type CircleSpellDto = {
+  __typename?: 'CircleSpellDto';
+  id: Scalars['ID']['output'];
+  minLevel?: Maybe<Scalars['Int']['output']>;
+  proficiencyGain?: Maybe<Scalars['Int']['output']>;
+  spellId: Scalars['Int']['output'];
+  spellName: Scalars['String']['output'];
+};
+
+export type ClassCircleDto = {
+  __typename?: 'ClassCircleDto';
+  circle: Scalars['Int']['output'];
+  classId: Scalars['Int']['output'];
+  /** Class name */
+  className: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  minLevel: Scalars['Int']['output'];
+  /** Spells in this circle */
+  spells: Array<CircleSpellDto>;
+};
+
+export type ClassDto = {
+  __typename?: 'ClassDto';
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  hitDice: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  primaryStat?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type ClassSkillDto = {
+  __typename?: 'ClassSkillDto';
+  category: SkillCategory;
+  classId: Scalars['Int']['output'];
+  /** Class name */
+  className: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  maxLevel: Scalars['Int']['output'];
+  minLevel: Scalars['Int']['output'];
+  skillId: Scalars['Int']['output'];
+  /** Skill name */
+  skillName: Scalars['String']['output'];
+};
+
 export type Climate =
   | 'ALPINE'
   | 'ARCTIC'
@@ -239,6 +383,55 @@ export type Composition =
   | 'PLANT'
   | 'STONE'
   | 'WATER';
+
+export type CreateAbilityInput = {
+  abilityType?: Scalars['String']['input'];
+  castTimeRounds?: Scalars['Int']['input'];
+  cooldownMs?: Scalars['Int']['input'];
+  description?: InputMaybe<Scalars['String']['input']>;
+  gameId?: InputMaybe<Scalars['String']['input']>;
+  inCombatOnly?: Scalars['Boolean']['input'];
+  isArea?: Scalars['Boolean']['input'];
+  luaScript?: InputMaybe<Scalars['String']['input']>;
+  minPosition?: Position;
+  name: Scalars['String']['input'];
+  notes?: InputMaybe<Scalars['String']['input']>;
+  schoolId?: InputMaybe<Scalars['Int']['input']>;
+  tags?: Array<Scalars['String']['input']>;
+  violent?: Scalars['Boolean']['input'];
+};
+
+export type CreateAbilityMessagesInput = {
+  abilityId: Scalars['Int']['input'];
+  failToCaster?: InputMaybe<Scalars['String']['input']>;
+  failToRoom?: InputMaybe<Scalars['String']['input']>;
+  failToVictim?: InputMaybe<Scalars['String']['input']>;
+  startToCaster?: InputMaybe<Scalars['String']['input']>;
+  startToRoom?: InputMaybe<Scalars['String']['input']>;
+  startToVictim?: InputMaybe<Scalars['String']['input']>;
+  successToCaster?: InputMaybe<Scalars['String']['input']>;
+  successToRoom?: InputMaybe<Scalars['String']['input']>;
+  successToVictim?: InputMaybe<Scalars['String']['input']>;
+  wearoffToRoom?: InputMaybe<Scalars['String']['input']>;
+  wearoffToTarget?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateAbilitySavingThrowInput = {
+  abilityId: Scalars['Int']['input'];
+  dcFormula: Scalars['String']['input'];
+  onSaveAction?: Scalars['JSON']['input'];
+  saveType?: SaveType;
+};
+
+export type CreateAbilityTargetingInput = {
+  abilityId: Scalars['Int']['input'];
+  maxTargets?: Scalars['Int']['input'];
+  range?: Scalars['Int']['input'];
+  requireLos?: Scalars['Boolean']['input'];
+  scope?: TargetScope;
+  scopePattern?: InputMaybe<Scalars['String']['input']>;
+  validTargets?: Array<TargetType>;
+};
 
 export type CreateCharacterEffectInput = {
   characterId: Scalars['String']['input'];
@@ -281,6 +474,19 @@ export type CreateCharacterItemInput = {
   objectPrototypeId: Scalars['Int']['input'];
 };
 
+export type CreateClassCircleInput = {
+  circle: Scalars['Int']['input'];
+  classId: Scalars['Int']['input'];
+  minLevel: Scalars['Int']['input'];
+};
+
+export type CreateClassInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  hitDice?: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  primaryStat?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateEquipmentSetInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   items?: InputMaybe<Array<CreateEquipmentSetItemInput>>;
@@ -300,6 +506,15 @@ export type CreateEquipmentSetItemStandaloneInput = {
   probability?: Scalars['Float']['input'];
   quantity?: Scalars['Int']['input'];
   slot?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateGrantInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  permissions: Array<GrantPermission>;
+  resourceId: Scalars['String']['input'];
+  resourceType: GrantResourceType;
+  userId: Scalars['String']['input'];
 };
 
 export type CreateMobEquipmentSetInput = {
@@ -364,7 +579,7 @@ export type CreateMobResetInput = {
 };
 
 export type CreateObjectInput = {
-  actionDesc?: InputMaybe<Scalars['String']['input']>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
   concealment?: Scalars['Int']['input'];
   cost?: Scalars['Int']['input'];
   decomposeTimer?: Scalars['Int']['input'];
@@ -375,12 +590,42 @@ export type CreateObjectInput = {
   keywords: Array<Scalars['String']['input']>;
   level?: Scalars['Int']['input'];
   name: Scalars['String']['input'];
+  roomDescription: Scalars['String']['input'];
   timer?: Scalars['Int']['input'];
   type?: ObjectType;
   values?: InputMaybe<Scalars['JSON']['input']>;
   wearFlags?: Array<WearFlag>;
   weight?: Scalars['Float']['input'];
   zoneId: Scalars['Int']['input'];
+};
+
+export type CreateRaceInput = {
+  bonusDamroll?: Scalars['Int']['input'];
+  bonusHitroll?: Scalars['Int']['input'];
+  defaultAlignment?: Scalars['Int']['input'];
+  defaultComposition?: Composition;
+  defaultLifeforce?: LifeForce;
+  defaultSize?: Size;
+  displayName: Scalars['String']['input'];
+  expFactor?: Scalars['Int']['input'];
+  focusBonus?: Scalars['Int']['input'];
+  fullName: Scalars['String']['input'];
+  hpFactor?: Scalars['Int']['input'];
+  humanoid?: Scalars['Boolean']['input'];
+  keywords: Scalars['String']['input'];
+  magical?: Scalars['Boolean']['input'];
+  maxCharisma?: Scalars['Int']['input'];
+  maxConstitution?: Scalars['Int']['input'];
+  maxDexterity?: Scalars['Int']['input'];
+  maxIntelligence?: Scalars['Int']['input'];
+  maxStrength?: Scalars['Int']['input'];
+  maxWisdom?: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  permanentEffects?: Array<EffectFlag>;
+  plainName: Scalars['String']['input'];
+  playable?: Scalars['Boolean']['input'];
+  race: Race;
+  raceAlign?: RaceAlign;
 };
 
 export type CreateRoomExitInput = {
@@ -450,18 +695,22 @@ export type DamageType =
   | 'CLAW'
   | 'COLD'
   | 'CRUSH'
+  | 'ENERGY'
   | 'FIRE'
   | 'HIT'
   | 'MAUL'
+  | 'MENTAL'
   | 'PIERCE'
   | 'POISON'
   | 'POUND'
   | 'PUNCH'
+  | 'ROT'
   | 'SHOCK'
   | 'SLASH'
   | 'STAB'
   | 'STING'
   | 'THRASH'
+  | 'WATER'
   | 'WHIP';
 
 export type Direction =
@@ -471,6 +720,15 @@ export type Direction =
   | 'SOUTH'
   | 'UP'
   | 'WEST';
+
+export type Effect = {
+  __typename?: 'Effect';
+  defaultParams: Scalars['JSON']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  effectType: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+};
 
 export type EffectFlag =
   | 'ACID_WEAPON'
@@ -592,6 +850,28 @@ export type Gender =
   | 'MALE'
   | 'NEUTRAL'
   | 'NON_BINARY';
+
+/** Permission level for a grant */
+export type GrantPermission =
+  | 'ADMIN'
+  | 'DELETE'
+  | 'READ'
+  | 'WRITE';
+
+/** Type of resource that can be granted access to */
+export type GrantResourceType =
+  | 'MOB'
+  | 'OBJECT'
+  | 'SHOP'
+  | 'ZONE';
+
+export type GrantZoneAccessInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  permissions: Array<GrantPermission>;
+  userId: Scalars['String']['input'];
+  zoneId: Scalars['Float']['input'];
+};
 
 export type Hemisphere =
   | 'NORTHEAST'
@@ -768,29 +1048,48 @@ export type MobSummaryDto = {
 
 export type Mutation = {
   __typename?: 'Mutation';
+  addMobResetEquipment: MobResetDto;
+  /** Assign a skill to a class */
+  assignSkillToClass: ClassSkillDto;
+  /** Assign a skill to a race */
+  assignSkillToRace: RaceSkillDto;
   attachTrigger: TriggerDto;
   banUser: BanRecord;
   batchUpdateRoomPositions: BatchUpdateResult;
   changePassword: PasswordResetResponse;
+  createAbility: Ability;
+  createAbilityMessages: AbilityMessages;
+  createAbilitySavingThrow: AbilitySavingThrow;
+  createAbilityTargeting: AbilityTargeting;
   createCharacter: CharacterDto;
   createCharacterEffect: CharacterEffectDto;
   createCharacterItem: CharacterItemDto;
+  createClass: ClassDto;
+  createClassCircle: ClassCircleDto;
   createEquipmentSet: EquipmentSetDto;
   createEquipmentSetItem: EquipmentSetItemDto;
+  createGrant: UserGrantDto;
   createMob: MobDto;
   createMobEquipmentSet: MobEquipmentSetDto;
   createMobReset: MobResetDto;
   createObject: ObjectDto;
+  createRace: RaceDto;
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
   createShop: ShopDto;
   createTrigger: TriggerDto;
   createZone: ZoneDto;
+  deleteAbility: Scalars['Boolean']['output'];
+  deleteAbilityMessages: Scalars['Boolean']['output'];
+  deleteAbilitySavingThrow: Scalars['Boolean']['output'];
+  deleteAbilityTargeting: Scalars['Boolean']['output'];
   deleteCharacter: CharacterDto;
   deleteCharacterEffect: Scalars['Boolean']['output'];
   deleteCharacterItem: Scalars['Boolean']['output'];
+  deleteClass: Scalars['Boolean']['output'];
   deleteEquipmentSet: Scalars['Boolean']['output'];
   deleteEquipmentSetItem: Scalars['Boolean']['output'];
+  deleteGrant: Scalars['Boolean']['output'];
   deleteMob: MobDto;
   deleteMobEquipmentSet: Scalars['Boolean']['output'];
   deleteMobReset: Scalars['Boolean']['output'];
@@ -798,41 +1097,79 @@ export type Mutation = {
   deleteMobs: Scalars['Int']['output'];
   deleteObject: ObjectDto;
   deleteObjects: Scalars['Int']['output'];
+  deleteRace: Scalars['Boolean']['output'];
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
   deleteShop: ShopDto;
   deleteTrigger: TriggerDto;
   deleteZone: ZoneDto;
   detachTrigger: TriggerDto;
+  /** Grant zone access to a user */
+  grantZoneAccess: UserGrantDto;
   /** Link an existing game character to your user account */
   linkCharacter: CharacterDto;
   login: AuthPayload;
   refreshToken: Scalars['String']['output'];
   register: AuthPayload;
+  removeClassCircle: Scalars['Boolean']['output'];
+  removeClassSkill: Scalars['Boolean']['output'];
   /** Remove expired effects for a character or all characters */
   removeExpiredEffects: Scalars['Int']['output'];
+  removeRaceSkill: Scalars['Boolean']['output'];
   requestPasswordReset: PasswordResetResponse;
   resetPassword: PasswordResetResponse;
+  /** Revoke zone access from a user */
+  revokeZoneAccess: Scalars['Boolean']['output'];
   setCharacterOffline: Scalars['Boolean']['output'];
   setCharacterOnline: Scalars['Boolean']['output'];
   unbanUser: BanRecord;
   /** Unlink a character from your user account */
   unlinkCharacter: Scalars['Boolean']['output'];
+  updateAbility: Ability;
+  updateAbilityMessages: AbilityMessages;
+  updateAbilityTargeting: AbilityTargeting;
   updateCharacter: CharacterDto;
   updateCharacterActivity: Scalars['Boolean']['output'];
   updateCharacterEffect: CharacterEffectDto;
   updateCharacterItem: CharacterItemDto;
+  updateClass: ClassDto;
+  updateClassCircle: ClassCircleDto;
+  updateClassSkill: ClassSkillDto;
   updateEquipmentSet: EquipmentSetDto;
+  updateGrant: UserGrantDto;
   updateMob: MobDto;
   updateMobReset: MobResetDto;
+  updateMobResetEquipment: Scalars['Boolean']['output'];
   updateObject: ObjectDto;
   updateProfile: User;
+  updateRace: RaceDto;
+  updateRaceSkill: RaceSkillDto;
   updateRoom: RoomDto;
   updateRoomPosition: RoomDto;
   updateShop: ShopDto;
   updateTrigger: TriggerDto;
   updateUser: User;
   updateZone: ZoneDto;
+};
+
+
+export type MutationAddMobResetEquipmentArgs = {
+  maxInstances?: InputMaybe<Scalars['Int']['input']>;
+  objectId: Scalars['Int']['input'];
+  objectZoneId: Scalars['Int']['input'];
+  probability?: InputMaybe<Scalars['Float']['input']>;
+  resetId: Scalars['ID']['input'];
+  wearLocation?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type MutationAssignSkillToClassArgs = {
+  data: AssignSkillToClassInput;
+};
+
+
+export type MutationAssignSkillToRaceArgs = {
+  data: AssignSkillToRaceInput;
 };
 
 
@@ -856,6 +1193,26 @@ export type MutationChangePasswordArgs = {
 };
 
 
+export type MutationCreateAbilityArgs = {
+  data: CreateAbilityInput;
+};
+
+
+export type MutationCreateAbilityMessagesArgs = {
+  data: CreateAbilityMessagesInput;
+};
+
+
+export type MutationCreateAbilitySavingThrowArgs = {
+  data: CreateAbilitySavingThrowInput;
+};
+
+
+export type MutationCreateAbilityTargetingArgs = {
+  data: CreateAbilityTargetingInput;
+};
+
+
 export type MutationCreateCharacterArgs = {
   data: CreateCharacterInput;
 };
@@ -871,6 +1228,16 @@ export type MutationCreateCharacterItemArgs = {
 };
 
 
+export type MutationCreateClassArgs = {
+  data: CreateClassInput;
+};
+
+
+export type MutationCreateClassCircleArgs = {
+  data: CreateClassCircleInput;
+};
+
+
 export type MutationCreateEquipmentSetArgs = {
   data: CreateEquipmentSetInput;
 };
@@ -878,6 +1245,11 @@ export type MutationCreateEquipmentSetArgs = {
 
 export type MutationCreateEquipmentSetItemArgs = {
   data: CreateEquipmentSetItemStandaloneInput;
+};
+
+
+export type MutationCreateGrantArgs = {
+  data: CreateGrantInput;
 };
 
 
@@ -898,6 +1270,11 @@ export type MutationCreateMobResetArgs = {
 
 export type MutationCreateObjectArgs = {
   data: CreateObjectInput;
+};
+
+
+export type MutationCreateRaceArgs = {
+  data: CreateRaceInput;
 };
 
 
@@ -926,6 +1303,26 @@ export type MutationCreateZoneArgs = {
 };
 
 
+export type MutationDeleteAbilityArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAbilityMessagesArgs = {
+  abilityId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteAbilitySavingThrowArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteAbilityTargetingArgs = {
+  abilityId: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteCharacterArgs = {
   id: Scalars['ID']['input'];
 };
@@ -941,12 +1338,22 @@ export type MutationDeleteCharacterItemArgs = {
 };
 
 
+export type MutationDeleteClassArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationDeleteEquipmentSetArgs = {
   id: Scalars['ID']['input'];
 };
 
 
 export type MutationDeleteEquipmentSetItemArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteGrantArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -988,6 +1395,11 @@ export type MutationDeleteObjectsArgs = {
 };
 
 
+export type MutationDeleteRaceArgs = {
+  race: Race;
+};
+
+
 export type MutationDeleteRoomArgs = {
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -1020,6 +1432,11 @@ export type MutationDetachTriggerArgs = {
 };
 
 
+export type MutationGrantZoneAccessArgs = {
+  data: GrantZoneAccessInput;
+};
+
+
 export type MutationLinkCharacterArgs = {
   data: LinkCharacterInput;
 };
@@ -1035,8 +1452,23 @@ export type MutationRegisterArgs = {
 };
 
 
+export type MutationRemoveClassCircleArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationRemoveClassSkillArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationRemoveExpiredEffectsArgs = {
   characterId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type MutationRemoveRaceSkillArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1047,6 +1479,12 @@ export type MutationRequestPasswordResetArgs = {
 
 export type MutationResetPasswordArgs = {
   input: ResetPasswordInput;
+};
+
+
+export type MutationRevokeZoneAccessArgs = {
+  userId: Scalars['String']['input'];
+  zoneId: Scalars['Float']['input'];
 };
 
 
@@ -1067,6 +1505,24 @@ export type MutationUnbanUserArgs = {
 
 export type MutationUnlinkCharacterArgs = {
   data: UnlinkCharacterInput;
+};
+
+
+export type MutationUpdateAbilityArgs = {
+  data: UpdateAbilityInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateAbilityMessagesArgs = {
+  abilityId: Scalars['Int']['input'];
+  data: UpdateAbilityMessagesInput;
+};
+
+
+export type MutationUpdateAbilityTargetingArgs = {
+  abilityId: Scalars['Int']['input'];
+  data: UpdateAbilityTargetingInput;
 };
 
 
@@ -1093,8 +1549,32 @@ export type MutationUpdateCharacterItemArgs = {
 };
 
 
+export type MutationUpdateClassArgs = {
+  data: UpdateClassInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateClassCircleArgs = {
+  data: UpdateClassCircleInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateClassSkillArgs = {
+  data: UpdateClassSkillInput;
+  id: Scalars['ID']['input'];
+};
+
+
 export type MutationUpdateEquipmentSetArgs = {
   data: UpdateEquipmentSetInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateGrantArgs = {
+  data: UpdateGrantInput;
   id: Scalars['ID']['input'];
 };
 
@@ -1112,6 +1592,14 @@ export type MutationUpdateMobResetArgs = {
 };
 
 
+export type MutationUpdateMobResetEquipmentArgs = {
+  id: Scalars['ID']['input'];
+  maxInstances?: InputMaybe<Scalars['Int']['input']>;
+  probability?: InputMaybe<Scalars['Float']['input']>;
+  wearLocation?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type MutationUpdateObjectArgs = {
   data: UpdateObjectInput;
   id: Scalars['Int']['input'];
@@ -1121,6 +1609,18 @@ export type MutationUpdateObjectArgs = {
 
 export type MutationUpdateProfileArgs = {
   input: UpdateProfileInput;
+};
+
+
+export type MutationUpdateRaceArgs = {
+  data: UpdateRaceInput;
+  race: Race;
+};
+
+
+export type MutationUpdateRaceSkillArgs = {
+  data: UpdateRaceSkillInput;
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1163,7 +1663,7 @@ export type MutationUpdateZoneArgs = {
 
 export type ObjectDto = {
   __typename?: 'ObjectDto';
-  actionDesc?: Maybe<Scalars['String']['output']>;
+  actionDescription?: Maybe<Scalars['String']['output']>;
   concealment: Scalars['Int']['output'];
   cost: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
@@ -1175,6 +1675,7 @@ export type ObjectDto = {
   keywords: Array<Scalars['String']['output']>;
   level: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  roomDescription: Scalars['String']['output'];
   timer: Scalars['Int']['output'];
   type: ObjectType;
   updatedAt: Scalars['DateTime']['output'];
@@ -1308,6 +1809,12 @@ export type Position =
 
 export type Query = {
   __typename?: 'Query';
+  abilities: Array<Ability>;
+  abilitiesCount: Scalars['Int']['output'];
+  ability: Ability;
+  abilityByGameId?: Maybe<Ability>;
+  abilitySchool: AbilitySchool;
+  abilitySchools: Array<AbilitySchool>;
   activeCharacterEffects: Array<CharacterEffectDto>;
   banHistory: Array<BanRecord>;
   character: CharacterDto;
@@ -1319,10 +1826,23 @@ export type Query = {
   characterSessionInfo: CharacterSessionInfoDto;
   characters: Array<CharacterDto>;
   charactersCount: Scalars['Int']['output'];
+  class: ClassDto;
+  classByName?: Maybe<ClassDto>;
+  /** Get all spell circles for a class */
+  classCirclesList: Array<ClassCircleDto>;
+  /** Get all skills for a class */
+  classSkills: Array<ClassSkillDto>;
+  classes: Array<ClassDto>;
+  classesCount: Scalars['Int']['output'];
+  effect: Effect;
+  effects: Array<Effect>;
+  effectsCount: Scalars['Int']['output'];
   equipmentSet: EquipmentSetDto;
   equipmentSets: Array<EquipmentSetDto>;
   /** Get validation summary statistics */
   getValidationSummary: ValidationSummaryType;
+  grant: UserGrantDto;
+  grants: Array<UserGrantDto>;
   me: User;
   mob: MobDto;
   mobReset?: Maybe<MobResetDto>;
@@ -1333,12 +1853,18 @@ export type Query = {
   myCharacters: Array<CharacterDto>;
   myOnlineCharacters: Array<OnlineCharacterDto>;
   myPermissions: UserPermissions;
+  myZoneGrants: Array<ZoneGrantDto>;
   object: ObjectDto;
   objects: Array<ObjectDto>;
   objectsByType: Array<ObjectDto>;
   objectsByZone: Array<ObjectDto>;
   objectsCount: Scalars['Int']['output'];
   onlineCharacters: Array<OnlineCharacterDto>;
+  race: RaceDto;
+  /** Get all skills for a race */
+  raceSkills: Array<RaceSkillDto>;
+  races: Array<RaceDto>;
+  racesCount: Scalars['Int']['output'];
   room: RoomDto;
   rooms: Array<RoomDto>;
   roomsByZone: Array<RoomDto>;
@@ -1353,6 +1879,7 @@ export type Query = {
   triggersByAttachment: Array<TriggerDto>;
   user: User;
   userPermissions: UserPermissions;
+  userZoneGrants: Array<ZoneGrantDto>;
   users: Array<User>;
   /** Get validation reports for all zones */
   validateAllZones: Array<ValidationReportType>;
@@ -1362,6 +1889,35 @@ export type Query = {
   zone: ZoneDto;
   zones: Array<ZoneDto>;
   zonesCount: Scalars['Int']['output'];
+};
+
+
+export type QueryAbilitiesArgs = {
+  abilityType?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryAbilitiesCountArgs = {
+  abilityType?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryAbilityArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryAbilityByGameIdArgs = {
+  gameId: Scalars['String']['input'];
+};
+
+
+export type QueryAbilitySchoolArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -1416,8 +1972,62 @@ export type QueryCharactersArgs = {
 };
 
 
+export type QueryClassArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryClassByNameArgs = {
+  name: Scalars['String']['input'];
+};
+
+
+export type QueryClassCirclesListArgs = {
+  classId: Scalars['Int']['input'];
+};
+
+
+export type QueryClassSkillsArgs = {
+  classId: Scalars['Int']['input'];
+};
+
+
+export type QueryClassesArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryEffectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryEffectsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryEffectsCountArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+};
+
+
 export type QueryEquipmentSetArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type QueryGrantArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryGrantsArgs = {
+  resourceType?: InputMaybe<GrantResourceType>;
+  userId?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -1439,12 +2049,14 @@ export type QueryMobResetsArgs = {
 
 
 export type QueryMobsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
 export type QueryMobsByZoneArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
   zoneId: Scalars['Int']['input'];
 };
 
@@ -1473,6 +2085,16 @@ export type QueryObjectsByZoneArgs = {
 
 export type QueryOnlineCharactersArgs = {
   userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+
+export type QueryRaceArgs = {
+  race: Race;
+};
+
+
+export type QueryRaceSkillsArgs = {
+  race: Race;
 };
 
 
@@ -1545,6 +2167,11 @@ export type QueryUserPermissionsArgs = {
 };
 
 
+export type QueryUserZoneGrantsArgs = {
+  userId: Scalars['String']['input'];
+};
+
+
 export type QueryValidateCharacterPasswordArgs = {
   characterName: Scalars['String']['input'];
   password: Scalars['String']['input'];
@@ -1603,6 +2230,56 @@ export type Race =
   | 'PLANT'
   | 'SVERFNEBLIN'
   | 'TROLL';
+
+export type RaceAlign =
+  | 'EVIL'
+  | 'GOOD'
+  | 'UNKNOWN';
+
+export type RaceDto = {
+  __typename?: 'RaceDto';
+  bonusDamroll: Scalars['Int']['output'];
+  bonusHitroll: Scalars['Int']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  defaultAlignment: Scalars['Int']['output'];
+  defaultComposition: Composition;
+  defaultLifeforce: LifeForce;
+  defaultSize: Size;
+  displayName: Scalars['String']['output'];
+  expFactor: Scalars['Int']['output'];
+  focusBonus: Scalars['Int']['output'];
+  fullName: Scalars['String']['output'];
+  hpFactor: Scalars['Int']['output'];
+  humanoid: Scalars['Boolean']['output'];
+  keywords: Scalars['String']['output'];
+  magical: Scalars['Boolean']['output'];
+  maxCharisma: Scalars['Int']['output'];
+  maxConstitution: Scalars['Int']['output'];
+  maxDexterity: Scalars['Int']['output'];
+  maxIntelligence: Scalars['Int']['output'];
+  maxStrength: Scalars['Int']['output'];
+  maxWisdom: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  permanentEffects: Array<EffectFlag>;
+  plainName: Scalars['String']['output'];
+  playable: Scalars['Boolean']['output'];
+  race: Race;
+  raceAlign: RaceAlign;
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type RaceSkillDto = {
+  __typename?: 'RaceSkillDto';
+  bonus: Scalars['Int']['output'];
+  category: SkillCategory;
+  id: Scalars['ID']['output'];
+  race: Race;
+  /** Race name */
+  raceName: Scalars['String']['output'];
+  skillId: Scalars['Int']['output'];
+  /** Skill name */
+  skillName: Scalars['String']['output'];
+};
 
 export type RegisterInput = {
   email: Scalars['String']['input'];
@@ -1715,6 +2392,15 @@ export type RoomSummaryDto = {
   zoneId: Scalars['Int']['output'];
 };
 
+export type SaveType =
+  | 'BREATH'
+  | 'PARALYSIS'
+  | 'PETRIFICATION'
+  | 'POISON'
+  | 'ROD'
+  | 'SPELL'
+  | 'WAND';
+
 export type ScriptType =
   | 'MOB'
   | 'OBJECT'
@@ -1794,6 +2480,7 @@ export type ShopItemDto = {
   id: Scalars['String']['output'];
   object?: Maybe<ObjectSummaryDto>;
   objectId: Scalars['Int']['output'];
+  objectZoneId: Scalars['Int']['output'];
 };
 
 export type ShopTradesWith =
@@ -1819,6 +2506,12 @@ export type Size =
   | 'TINY'
   | 'TITANIC';
 
+export type SkillCategory =
+  | 'FORBIDDEN'
+  | 'PRIMARY'
+  | 'RESTRICTED'
+  | 'SECONDARY';
+
 export type Stance =
   | 'ALERT'
   | 'DEAD'
@@ -1828,6 +2521,27 @@ export type Stance =
   | 'RESTING'
   | 'SLEEPING'
   | 'STUNNED';
+
+export type TargetScope =
+  | 'AREA'
+  | 'CHAIN'
+  | 'CONE'
+  | 'GROUP'
+  | 'LINE'
+  | 'ROOM'
+  | 'SELF'
+  | 'SINGLE';
+
+export type TargetType =
+  | 'ALLY_GROUP'
+  | 'ALLY_NPC'
+  | 'ALLY_PC'
+  | 'CORPSE'
+  | 'ENEMY_NPC'
+  | 'ENEMY_PC'
+  | 'OBJECT_INV'
+  | 'OBJECT_WORLD'
+  | 'SELF';
 
 export type TriggerDto = {
   __typename?: 'TriggerDto';
@@ -1853,6 +2567,46 @@ export type UnbanUserInput = {
 
 export type UnlinkCharacterInput = {
   characterId: Scalars['ID']['input'];
+};
+
+export type UpdateAbilityInput = {
+  abilityType?: InputMaybe<Scalars['String']['input']>;
+  castTimeRounds?: InputMaybe<Scalars['Int']['input']>;
+  cooldownMs?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  gameId?: InputMaybe<Scalars['String']['input']>;
+  inCombatOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  isArea?: InputMaybe<Scalars['Boolean']['input']>;
+  luaScript?: InputMaybe<Scalars['String']['input']>;
+  minPosition?: InputMaybe<Position>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  schoolId?: InputMaybe<Scalars['Int']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+  violent?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UpdateAbilityMessagesInput = {
+  failToCaster?: InputMaybe<Scalars['String']['input']>;
+  failToRoom?: InputMaybe<Scalars['String']['input']>;
+  failToVictim?: InputMaybe<Scalars['String']['input']>;
+  startToCaster?: InputMaybe<Scalars['String']['input']>;
+  startToRoom?: InputMaybe<Scalars['String']['input']>;
+  startToVictim?: InputMaybe<Scalars['String']['input']>;
+  successToCaster?: InputMaybe<Scalars['String']['input']>;
+  successToRoom?: InputMaybe<Scalars['String']['input']>;
+  successToVictim?: InputMaybe<Scalars['String']['input']>;
+  wearoffToRoom?: InputMaybe<Scalars['String']['input']>;
+  wearoffToTarget?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateAbilityTargetingInput = {
+  maxTargets?: InputMaybe<Scalars['Int']['input']>;
+  range?: InputMaybe<Scalars['Int']['input']>;
+  requireLos?: InputMaybe<Scalars['Boolean']['input']>;
+  scope?: InputMaybe<TargetScope>;
+  scopePattern?: InputMaybe<Scalars['String']['input']>;
+  validTargets?: InputMaybe<Array<TargetType>>;
 };
 
 export type UpdateCharacterEffectInput = {
@@ -1903,9 +2657,31 @@ export type UpdateCharacterItemInput = {
   instanceFlags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+export type UpdateClassCircleInput = {
+  circle?: InputMaybe<Scalars['Int']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateClassInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  hitDice?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  primaryStat?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateClassSkillInput = {
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type UpdateEquipmentSetInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateGrantInput = {
+  expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
+  notes?: InputMaybe<Scalars['String']['input']>;
+  permissions?: InputMaybe<Array<GrantPermission>>;
 };
 
 export type UpdateMobInput = {
@@ -1960,7 +2736,7 @@ export type UpdateMobResetInput = {
 };
 
 export type UpdateObjectInput = {
-  actionDesc?: InputMaybe<Scalars['String']['input']>;
+  actionDescription?: InputMaybe<Scalars['String']['input']>;
   concealment?: InputMaybe<Scalars['Int']['input']>;
   cost?: InputMaybe<Scalars['Int']['input']>;
   decomposeTimer?: InputMaybe<Scalars['Int']['input']>;
@@ -1970,6 +2746,7 @@ export type UpdateObjectInput = {
   keywords?: InputMaybe<Array<Scalars['String']['input']>>;
   level?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  roomDescription?: InputMaybe<Scalars['String']['input']>;
   timer?: InputMaybe<Scalars['Int']['input']>;
   type?: InputMaybe<ObjectType>;
   values?: InputMaybe<Scalars['JSON']['input']>;
@@ -1980,6 +2757,39 @@ export type UpdateObjectInput = {
 
 export type UpdateProfileInput = {
   email?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateRaceInput = {
+  bonusDamroll?: InputMaybe<Scalars['Int']['input']>;
+  bonusHitroll?: InputMaybe<Scalars['Int']['input']>;
+  defaultAlignment?: InputMaybe<Scalars['Int']['input']>;
+  defaultComposition?: InputMaybe<Composition>;
+  defaultLifeforce?: InputMaybe<LifeForce>;
+  defaultSize?: InputMaybe<Size>;
+  displayName?: InputMaybe<Scalars['String']['input']>;
+  expFactor?: InputMaybe<Scalars['Int']['input']>;
+  focusBonus?: InputMaybe<Scalars['Int']['input']>;
+  fullName?: InputMaybe<Scalars['String']['input']>;
+  hpFactor?: InputMaybe<Scalars['Int']['input']>;
+  humanoid?: InputMaybe<Scalars['Boolean']['input']>;
+  keywords?: InputMaybe<Scalars['String']['input']>;
+  magical?: InputMaybe<Scalars['Boolean']['input']>;
+  maxCharisma?: InputMaybe<Scalars['Int']['input']>;
+  maxConstitution?: InputMaybe<Scalars['Int']['input']>;
+  maxDexterity?: InputMaybe<Scalars['Int']['input']>;
+  maxIntelligence?: InputMaybe<Scalars['Int']['input']>;
+  maxStrength?: InputMaybe<Scalars['Int']['input']>;
+  maxWisdom?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  permanentEffects?: InputMaybe<Array<EffectFlag>>;
+  plainName?: InputMaybe<Scalars['String']['input']>;
+  playable?: InputMaybe<Scalars['Boolean']['input']>;
+  raceAlign?: InputMaybe<RaceAlign>;
+};
+
+export type UpdateRaceSkillInput = {
+  bonus?: InputMaybe<Scalars['Int']['input']>;
+  category?: InputMaybe<SkillCategory>;
 };
 
 export type UpdateRoomInput = {
@@ -2055,6 +2865,23 @@ export type User = {
   username: Scalars['String']['output'];
 };
 
+export type UserGrantDto = {
+  __typename?: 'UserGrantDto';
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  grantedAt: Scalars['DateTime']['output'];
+  grantedBy: Scalars['String']['output'];
+  /** Username of the person who granted access */
+  grantedByUsername: Scalars['String']['output'];
+  id: Scalars['ID']['output'];
+  notes?: Maybe<Scalars['String']['output']>;
+  permissions: Array<GrantPermission>;
+  resourceId: Scalars['String']['output'];
+  resourceType: GrantResourceType;
+  userId: Scalars['String']['output'];
+  /** Username of the person who received the grant */
+  username: Scalars['String']['output'];
+};
+
 export type UserPermissions = {
   __typename?: 'UserPermissions';
   canAccessDashboard: Scalars['Boolean']['output'];
@@ -2074,6 +2901,7 @@ export type UserRole =
   | 'BUILDER'
   | 'CODER'
   | 'GOD'
+  | 'HEAD_BUILDER'
   | 'IMMORTAL'
   | 'PLAYER';
 
@@ -2192,6 +3020,15 @@ export type ZoneDto = {
   updatedAt: Scalars['DateTime']['output'];
 };
 
+export type ZoneGrantDto = {
+  __typename?: 'ZoneGrantDto';
+  expiresAt?: Maybe<Scalars['DateTime']['output']>;
+  notes?: Maybe<Scalars['String']['output']>;
+  permissions: Array<GrantPermission>;
+  zoneId: Scalars['ID']['output'];
+  zoneName: Scalars['String']['output'];
+};
+
 export type ZoneRoomDto = {
   __typename?: 'ZoneRoomDto';
   description: Scalars['String']['output'];
@@ -2200,288 +3037,271 @@ export type ZoneRoomDto = {
   sector: Scalars['String']['output'];
 };
 
-export type GetMyCharactersQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetMyCharactersQuery = { __typename?: 'Query', myCharacters: Array<{ __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean, timePlayed: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number, experience: number, copper: number, silver: number, gold: number, platinum: number, description?: string | null, title?: string | null, currentRoom?: number | null }> };
-
-export type GetObjectQueryVariables = Exact<{
+export type GetObjectInlineQueryVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 }>;
 
 
-export type GetObjectQuery = { __typename?: 'Query', object: { __typename?: 'ObjectDto', id: number, type: ObjectType, keywords: Array<string>, name: string, examineDescription: string, actionDesc?: string | null, weight: number, cost: number, timer: number, decomposeTimer: number, level: number, concealment: number, values: any, zoneId: number, flags: Array<ObjectFlag>, effectFlags: Array<EffectFlag>, wearFlags: Array<WearFlag>, createdAt: any, updatedAt: any } };
+export type GetObjectInlineQuery = { __typename?: 'Query', object: { __typename?: 'ObjectDto', id: number, type: ObjectType, keywords: Array<string>, name: string, examineDescription: string, actionDescription?: string | null, weight: number, cost: number, timer: number, decomposeTimer: number, level: number, concealment: number, values: any, zoneId: number, flags: Array<ObjectFlag>, effectFlags: Array<EffectFlag>, wearFlags: Array<WearFlag>, createdAt: any, updatedAt: any } };
 
-export type UpdateObjectMutationVariables = Exact<{
+export type UpdateObjectInlineMutationVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
   data: UpdateObjectInput;
 }>;
 
 
-export type UpdateObjectMutation = { __typename?: 'Mutation', updateObject: { __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string, examineDescription: string } };
+export type UpdateObjectInlineMutation = { __typename?: 'Mutation', updateObject: { __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string, examineDescription: string } };
 
-export type CreateObjectMutationVariables = Exact<{
+export type CreateObjectInlineMutationVariables = Exact<{
   data: CreateObjectInput;
 }>;
 
 
-export type CreateObjectMutation = { __typename?: 'Mutation', createObject: { __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string } };
-
-export type GetObjectsDashboardQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetObjectsDashboardQuery = { __typename?: 'Query', objects: Array<{ __typename?: 'ObjectDto', id: number, type: ObjectType, keywords: Array<string>, name: string, level: number, weight: number, cost: number, zoneId: number, values: any }> };
-
-export type GetObjectsByZoneDashboardQueryVariables = Exact<{
-  zoneId: Scalars['Int']['input'];
-}>;
-
-
-export type GetObjectsByZoneDashboardQuery = { __typename?: 'Query', objectsByZone: Array<{ __typename?: 'ObjectDto', id: number, type: ObjectType, keywords: Array<string>, name: string, level: number, weight: number, cost: number, zoneId: number, values: any }> };
-
-export type DeleteObjectMutationVariables = Exact<{
-  id: Scalars['Int']['input'];
-  zoneId: Scalars['Int']['input'];
-}>;
-
-
-export type DeleteObjectMutation = { __typename?: 'Mutation', deleteObject: { __typename?: 'ObjectDto', id: number } };
-
-export type DeleteObjectsMutationVariables = Exact<{
-  ids: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
-}>;
-
-
-export type DeleteObjectsMutation = { __typename?: 'Mutation', deleteObjects: number };
+export type CreateObjectInlineMutation = { __typename?: 'Mutation', createObject: { __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string } };
 
 export type GetDashboardStatsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetDashboardStatsQuery = { __typename?: 'Query', zonesCount: number, roomsCount: number, mobsCount: number, objectsCount: number, shopsCount: number };
 
-export type GetShopQueryVariables = Exact<{
+export type GetRacesInlineQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRacesInlineQuery = { __typename?: 'Query', racesCount: number, races: Array<{ __typename?: 'RaceDto', race: Race, name: string, displayName: string, playable: boolean, humanoid: boolean, magical: boolean, defaultSize: Size, maxStrength: number, maxDexterity: number, maxIntelligence: number, maxWisdom: number, maxConstitution: number, maxCharisma: number, expFactor: number, hpFactor: number }> };
+
+export type UpdateRaceInlineMutationVariables = Exact<{
+  race: Race;
+  data: UpdateRaceInput;
+}>;
+
+
+export type UpdateRaceInlineMutation = { __typename?: 'Mutation', updateRace: { __typename?: 'RaceDto', race: Race, name: string, playable: boolean, humanoid: boolean, magical: boolean, defaultSize: Size, maxStrength: number, maxDexterity: number, maxIntelligence: number, maxWisdom: number, maxConstitution: number, maxCharisma: number, expFactor: number, hpFactor: number } };
+
+export type GetShopInlineQueryVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 }>;
 
 
-export type GetShopQuery = { __typename?: 'Query', shop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, createdAt: any, updatedAt: any, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }>, hours: Array<{ __typename?: 'ShopHourDto', id: string, open: number, close: number }> } };
+export type GetShopInlineQuery = { __typename?: 'Query', shop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, createdAt: any, updatedAt: any, keeper?: { __typename?: 'KeeperDto', id: number, name: string, zoneId: number } | null, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, objectZoneId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }>, hours: Array<{ __typename?: 'ShopHourDto', id: string, open: number, close: number }> } };
 
-export type GetAvailableObjectsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetAvailableObjectsQuery = { __typename?: 'Query', objects: Array<{ __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string, type: ObjectType, cost: number, zoneId: number }> };
-
-export type GetAvailableMobsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetAvailableObjectsInlineQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+}>;
 
 
-export type GetAvailableMobsQuery = { __typename?: 'Query', mobs: Array<{ __typename?: 'MobDto', id: number, keywords: Array<string>, name: string, zoneId: number }> };
+export type GetAvailableObjectsInlineQuery = { __typename?: 'Query', objectsByZone: Array<{ __typename?: 'ObjectDto', id: number, keywords: Array<string>, name: string, type: ObjectType, cost: number, zoneId: number }> };
 
-export type UpdateShopMutationVariables = Exact<{
+export type GetAvailableMobsInlineQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type GetAvailableMobsInlineQuery = { __typename?: 'Query', mobsByZone: Array<{ __typename?: 'MobDto', id: number, keywords: Array<string>, name: string, zoneId: number }> };
+
+export type GetZonesInlineQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetZonesInlineQuery = { __typename?: 'Query', zones: Array<{ __typename?: 'ZoneDto', id: number, name: string }> };
+
+export type UpdateShopInlineMutationVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
   data: UpdateShopInput;
 }>;
 
 
-export type UpdateShopMutation = { __typename?: 'Mutation', updateShop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number } };
+export type UpdateShopInlineMutation = { __typename?: 'Mutation', updateShop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number } };
 
-export type CreateShopMutationVariables = Exact<{
+export type CreateShopInlineMutationVariables = Exact<{
   data: CreateShopInput;
 }>;
 
 
-export type CreateShopMutation = { __typename?: 'Mutation', createShop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number } };
+export type CreateShopInlineMutation = { __typename?: 'Mutation', createShop: { __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number } };
 
-export type GetShopsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetShopsInlineQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetShopsQuery = { __typename?: 'Query', shops: Array<{ __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, createdAt: any, updatedAt: any, keeper?: { __typename?: 'KeeperDto', id: number, zoneId: number, name: string, keywords: Array<string> } | null, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }> }> };
+export type GetShopsInlineQuery = { __typename?: 'Query', shops: Array<{ __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, createdAt: any, updatedAt: any, keeper?: { __typename?: 'KeeperDto', id: number, zoneId: number, name: string, keywords: Array<string> } | null, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }> }> };
 
-export type GetShopsByZoneQueryVariables = Exact<{
+export type GetShopsByZoneInlineQueryVariables = Exact<{
   zoneId: Scalars['Int']['input'];
 }>;
 
 
-export type GetShopsByZoneQuery = { __typename?: 'Query', shopsByZone: Array<{ __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, createdAt: any, updatedAt: any, keeper?: { __typename?: 'KeeperDto', id: number, zoneId: number, name: string, keywords: Array<string> } | null, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }> }> };
+export type GetShopsByZoneInlineQuery = { __typename?: 'Query', shopsByZone: Array<{ __typename?: 'ShopDto', id: number, buyProfit: number, sellProfit: number, temper: number, flags: Array<ShopFlag>, tradesWithFlags: Array<ShopTradesWith>, noSuchItemMessages: Array<string>, doNotBuyMessages: Array<string>, missingCashMessages: Array<string>, buyMessages: Array<string>, sellMessages: Array<string>, keeperId?: number | null, zoneId: number, createdAt: any, updatedAt: any, keeper?: { __typename?: 'KeeperDto', id: number, zoneId: number, name: string, keywords: Array<string> } | null, items: Array<{ __typename?: 'ShopItemDto', id: string, amount: number, objectId: number, object?: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string, cost?: number | null } | null }>, accepts: Array<{ __typename?: 'ShopAcceptDto', id: string, type: string, keywords?: string | null }> }> };
 
-export type DeleteShopMutationVariables = Exact<{
+export type DeleteShopInlineMutationVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 }>;
 
 
-export type DeleteShopMutation = { __typename?: 'Mutation', deleteShop: { __typename?: 'ShopDto', id: number } };
+export type DeleteShopInlineMutation = { __typename?: 'Mutation', deleteShop: { __typename?: 'ShopDto', id: number } };
 
-export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+export type UsersInlineQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, username: string, email: string, role: UserRole, isBanned: boolean, createdAt: any, lastLoginAt?: any | null, banRecords?: Array<{ __typename?: 'BanRecord', id: string, reason: string, bannedAt: any, expiresAt?: any | null, admin?: { __typename?: 'AdminUser', username: string } | null }> | null }> };
+export type UsersInlineQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, username: string, email: string, role: UserRole, isBanned: boolean, createdAt: any, lastLoginAt?: any | null, banRecords?: Array<{ __typename?: 'BanRecord', id: string, reason: string, bannedAt: any, expiresAt?: any | null, admin?: { __typename?: 'AdminUser', username: string } | null }> | null }> };
 
-export type UpdateUserMutationVariables = Exact<{
+export type UpdateUserInlineMutationVariables = Exact<{
   input: UpdateUserInput;
 }>;
 
 
-export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, username: string, email: string, role: UserRole } };
+export type UpdateUserInlineMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, username: string, email: string, role: UserRole } };
 
-export type BanUserMutationVariables = Exact<{
+export type BanUserInlineMutationVariables = Exact<{
   input: BanUserInput;
 }>;
 
 
-export type BanUserMutation = { __typename?: 'Mutation', banUser: { __typename?: 'BanRecord', id: string, reason: string, bannedAt: any, userId: string } };
+export type BanUserInlineMutation = { __typename?: 'Mutation', banUser: { __typename?: 'BanRecord', id: string, reason: string, bannedAt: any, userId: string } };
 
-export type UnbanUserMutationVariables = Exact<{
+export type UnbanUserInlineMutationVariables = Exact<{
   input: UnbanUserInput;
 }>;
 
 
-export type UnbanUserMutation = { __typename?: 'Mutation', unbanUser: { __typename?: 'BanRecord', id: string, unbannedAt?: any | null, userId: string } };
-
-export type GetZonesQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetZonesQuery = { __typename?: 'Query', zones: Array<{ __typename?: 'ZoneDto', id: number, name: string, climate: Climate }> };
-
-export type GetRoomsByZoneQueryVariables = Exact<{
-  zoneId: Scalars['Int']['input'];
-}>;
-
-
-export type GetRoomsByZoneQuery = { __typename?: 'Query', roomsByZone: Array<{ __typename?: 'RoomDto', id: number, name: string, roomDescription: string, layoutX?: number | null, layoutY?: number | null, layoutZ?: number | null, exits: Array<{ __typename?: 'RoomExitDto', direction: Direction, destination?: number | null }> }> };
+export type UnbanUserInlineMutation = { __typename?: 'Mutation', unbanUser: { __typename?: 'BanRecord', id: string, unbannedAt?: any | null, userId: string } };
 
 export type GetZonesDashboardQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetZonesDashboardQuery = { __typename?: 'Query', roomsCount: number, zones: Array<{ __typename?: 'ZoneDto', id: number, name: string, climate: Climate }> };
 
-export type RequestPasswordResetMutationVariables = Exact<{
+export type RequestPasswordResetInlineMutationVariables = Exact<{
   input: RequestPasswordResetInput;
 }>;
 
 
-export type RequestPasswordResetMutation = { __typename?: 'Mutation', requestPasswordReset: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+export type RequestPasswordResetInlineMutation = { __typename?: 'Mutation', requestPasswordReset: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
 
-export type ChangePasswordMutationVariables = Exact<{
+export type ChangePasswordInlineMutationVariables = Exact<{
   input: ChangePasswordInput;
 }>;
 
 
-export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+export type ChangePasswordInlineMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
 
-export type UpdateProfileMutationVariables = Exact<{
+export type UpdateProfileInlineMutationVariables = Exact<{
   input: UpdateProfileInput;
 }>;
 
 
-export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'User', id: string, username: string, email: string, role: UserRole, createdAt: any } };
+export type UpdateProfileInlineMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'User', id: string, username: string, email: string, role: UserRole, createdAt: any } };
 
-export type ResetPasswordMutationVariables = Exact<{
+export type GetProfileCharactersInlineQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetProfileCharactersInlineQuery = { __typename?: 'Query', myCharacters: Array<{ __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean }> };
+
+export type ResetPasswordInlineMutationVariables = Exact<{
   input: ResetPasswordInput;
 }>;
 
 
-export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+export type ResetPasswordInlineMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
 
-export type GetTriggersQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetTriggersInlineQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetTriggersQuery = { __typename?: 'Query', triggers: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, numArgs: number, argList: Array<string>, commands: string, variables: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null, createdAt: any, updatedAt: any }> };
+export type GetTriggersInlineQuery = { __typename?: 'Query', triggers: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, numArgs: number, argList: Array<string>, commands: string, variables: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null, createdAt: any, updatedAt: any }> };
 
-export type GetTriggersByAttachmentQueryVariables = Exact<{
+export type GetTriggersByAttachmentInlineQueryVariables = Exact<{
   attachType: ScriptType;
   entityId: Scalars['Int']['input'];
 }>;
 
 
-export type GetTriggersByAttachmentQuery = { __typename?: 'Query', triggersByAttachment: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, numArgs: number, argList: Array<string>, commands: string, variables: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null, createdAt: any, updatedAt: any }> };
+export type GetTriggersByAttachmentInlineQuery = { __typename?: 'Query', triggersByAttachment: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, numArgs: number, argList: Array<string>, commands: string, variables: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null, createdAt: any, updatedAt: any }> };
 
-export type CreateTriggerMutationVariables = Exact<{
+export type CreateTriggerInlineMutationVariables = Exact<{
   input: CreateTriggerInput;
 }>;
 
 
-export type CreateTriggerMutation = { __typename?: 'Mutation', createTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, commands: string, variables: string } };
+export type CreateTriggerInlineMutation = { __typename?: 'Mutation', createTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, commands: string, variables: string } };
 
-export type UpdateTriggerMutationVariables = Exact<{
+export type UpdateTriggerInlineMutationVariables = Exact<{
   id: Scalars['Float']['input'];
   input: UpdateTriggerInput;
 }>;
 
 
-export type UpdateTriggerMutation = { __typename?: 'Mutation', updateTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, commands: string, variables: string } };
+export type UpdateTriggerInlineMutation = { __typename?: 'Mutation', updateTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, commands: string, variables: string } };
 
-export type DeleteTriggerMutationVariables = Exact<{
+export type DeleteTriggerInlineMutationVariables = Exact<{
   id: Scalars['Float']['input'];
 }>;
 
 
-export type DeleteTriggerMutation = { __typename?: 'Mutation', deleteTrigger: { __typename?: 'TriggerDto', id: string } };
+export type DeleteTriggerInlineMutation = { __typename?: 'Mutation', deleteTrigger: { __typename?: 'TriggerDto', id: string } };
 
-export type AttachTriggerMutationVariables = Exact<{
+export type AttachTriggerInlineMutationVariables = Exact<{
   input: AttachTriggerInput;
 }>;
 
 
-export type AttachTriggerMutation = { __typename?: 'Mutation', attachTrigger: { __typename?: 'TriggerDto', id: string, name: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null } };
+export type AttachTriggerInlineMutation = { __typename?: 'Mutation', attachTrigger: { __typename?: 'TriggerDto', id: string, name: string, mobId?: number | null, objectId?: number | null, zoneId?: number | null } };
 
-export type DetachTriggerMutationVariables = Exact<{
+export type DetachTriggerInlineMutationVariables = Exact<{
   triggerId: Scalars['Float']['input'];
 }>;
 
 
-export type DetachTriggerMutation = { __typename?: 'Mutation', detachTrigger: { __typename?: 'TriggerDto', id: string, name: string } };
+export type DetachTriggerInlineMutation = { __typename?: 'Mutation', detachTrigger: { __typename?: 'TriggerDto', id: string, name: string } };
 
 export type GetZonesForSelectorQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetZonesForSelectorQuery = { __typename?: 'Query', zones: Array<{ __typename?: 'ZoneDto', id: number, name: string }> };
 
-export type CreateCharacterMutationVariables = Exact<{
+export type CreateCharacterInlineMutationVariables = Exact<{
   data: CreateCharacterInput;
 }>;
 
 
-export type CreateCharacterMutation = { __typename?: 'Mutation', createCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number } };
+export type CreateCharacterInlineMutation = { __typename?: 'Mutation', createCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number } };
 
-export type GetCharacterDetailsQueryVariables = Exact<{
+export type GetCharacterDetailsInlineQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetCharacterDetailsQuery = { __typename?: 'Query', character: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean, timePlayed: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number, experience: number, skillPoints: number, copper: number, silver: number, gold: number, platinum: number, bankCopper: number, bankSilver: number, bankGold: number, bankPlatinum: number, description?: string | null, title?: string | null, currentRoom?: number | null, saveRoom?: number | null, homeRoom?: number | null, hunger: number, thirst: number, hitRoll: number, damageRoll: number, armorClass: number, playerFlags: Array<string>, effectFlags: Array<string>, privilegeFlags: Array<string>, invisLevel: number, birthTime: any, items: Array<{ __typename?: 'CharacterItemDto', id: string, equippedLocation?: string | null, condition: number, charges: number, objectPrototype: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string } }>, effects: Array<{ __typename?: 'CharacterEffectDto', id: string, effectName: string, effectType?: string | null, duration?: number | null, strength: number, appliedAt: any, expiresAt?: any | null }> } };
+export type GetCharacterDetailsInlineQuery = { __typename?: 'Query', character: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean, timePlayed: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number, experience: number, skillPoints: number, copper: number, silver: number, gold: number, platinum: number, bankCopper: number, bankSilver: number, bankGold: number, bankPlatinum: number, description?: string | null, title?: string | null, currentRoom?: number | null, saveRoom?: number | null, homeRoom?: number | null, hunger: number, thirst: number, hitRoll: number, damageRoll: number, armorClass: number, playerFlags: Array<string>, effectFlags: Array<string>, privilegeFlags: Array<string>, invisLevel: number, birthTime: any, items: Array<{ __typename?: 'CharacterItemDto', id: string, equippedLocation?: string | null, condition: number, charges: number, objectPrototype: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string } }>, effects: Array<{ __typename?: 'CharacterEffectDto', id: string, effectName: string, effectType?: string | null, duration?: number | null, strength: number, appliedAt: any, expiresAt?: any | null }> } };
 
-export type GetCharacterSessionInfoQueryVariables = Exact<{
+export type GetCharacterSessionInfoInlineQueryVariables = Exact<{
   characterId: Scalars['ID']['input'];
 }>;
 
 
-export type GetCharacterSessionInfoQuery = { __typename?: 'Query', characterSessionInfo: { __typename?: 'CharacterSessionInfoDto', id: string, name: string, isOnline: boolean, lastLogin?: any | null, totalTimePlayed: number, currentSessionTime: number } };
+export type GetCharacterSessionInfoInlineQuery = { __typename?: 'Query', characterSessionInfo: { __typename?: 'CharacterSessionInfoDto', id: string, name: string, isOnline: boolean, lastLogin?: any | null, totalTimePlayed: number, currentSessionTime: number } };
 
-export type GetCharacterLinkingInfoQueryVariables = Exact<{
+export type GetCharacterLinkingInfoInlineQueryVariables = Exact<{
   characterName: Scalars['String']['input'];
 }>;
 
 
-export type GetCharacterLinkingInfoQuery = { __typename?: 'Query', characterLinkingInfo: { __typename?: 'CharacterLinkingInfoDto', id: string, name: string, level: number, race?: string | null, class?: string | null, lastLogin?: any | null, timePlayed: number, isOnline: boolean, isLinked: boolean, hasPassword: boolean } };
+export type GetCharacterLinkingInfoInlineQuery = { __typename?: 'Query', characterLinkingInfo: { __typename?: 'CharacterLinkingInfoDto', id: string, name: string, level: number, race?: string | null, class?: string | null, lastLogin?: any | null, timePlayed: number, isOnline: boolean, isLinked: boolean, hasPassword: boolean } };
 
-export type LinkCharacterMutationVariables = Exact<{
+export type LinkCharacterInlineMutationVariables = Exact<{
   data: LinkCharacterInput;
 }>;
 
 
-export type LinkCharacterMutation = { __typename?: 'Mutation', linkCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null } };
+export type LinkCharacterInlineMutation = { __typename?: 'Mutation', linkCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null } };
 
-export type ValidateCharacterPasswordQueryVariables = Exact<{
+export type ValidateCharacterPasswordInlineQueryVariables = Exact<{
   characterName: Scalars['String']['input'];
   password: Scalars['String']['input'];
 }>;
 
 
-export type ValidateCharacterPasswordQuery = { __typename?: 'Query', validateCharacterPassword: boolean };
+export type ValidateCharacterPasswordInlineQuery = { __typename?: 'Query', validateCharacterPassword: boolean };
 
 export type GetEquipmentSetsQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -2532,63 +3352,18 @@ export type RemoveEquipmentSetItemMutationVariables = Exact<{
 
 export type RemoveEquipmentSetItemMutation = { __typename?: 'Mutation', deleteEquipmentSetItem: boolean };
 
-export type GetMobResetsLegacyQueryVariables = Exact<{
-  mobId: Scalars['Int']['input'];
-  mobZoneId: Scalars['Int']['input'];
-}>;
-
-
-export type GetMobResetsLegacyQuery = { __typename?: 'Query', mobResets: Array<{ __typename?: 'MobResetDto', id: string, maxInstances: number, probability: number, roomId: number, roomZoneId: number, mob?: { __typename?: 'MobSummaryDto', id: number, name: string } | null, equipment: Array<{ __typename?: 'MobResetEquipmentDto', id: string, maxInstances: number, probability: number, wearLocation?: WearFlag | null, objectId: number, objectZoneId: number, object: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string } }> }> };
-
-export type GetObjectsLegacyQueryVariables = Exact<{
-  skip?: InputMaybe<Scalars['Int']['input']>;
-  take?: InputMaybe<Scalars['Int']['input']>;
-}>;
-
-
-export type GetObjectsLegacyQuery = { __typename?: 'Query', objects: Array<{ __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, keywords: Array<string>, wearFlags: Array<WearFlag> }> };
-
-export type CreateMobResetMutationVariables = Exact<{
-  data: CreateMobResetInput;
-}>;
-
-
-export type CreateMobResetMutation = { __typename?: 'Mutation', createMobReset: { __typename?: 'MobResetDto', id: string, maxInstances: number, probability: number, roomId: number } };
-
-export type UpdateMobResetMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-  data: UpdateMobResetInput;
-}>;
-
-
-export type UpdateMobResetMutation = { __typename?: 'Mutation', updateMobReset: { __typename?: 'MobResetDto', id: string, maxInstances: number, probability: number, roomId: number } };
-
-export type DeleteMobResetMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteMobResetMutation = { __typename?: 'Mutation', deleteMobReset: boolean };
-
-export type DeleteMobResetEquipmentMutationVariables = Exact<{
-  id: Scalars['ID']['input'];
-}>;
-
-
-export type DeleteMobResetEquipmentMutation = { __typename?: 'Mutation', deleteMobResetEquipment: boolean };
-
 export type GetMobResetsForMobQueryVariables = Exact<{
   mobId: Scalars['Int']['input'];
   mobZoneId: Scalars['Int']['input'];
 }>;
 
 
-export type GetMobResetsForMobQuery = { __typename?: 'Query', mobResets: Array<{ __typename?: 'MobResetDto', id: string, maxInstances: number, probability: number, roomId: number, roomZoneId: number, mob?: { __typename?: 'MobSummaryDto', id: number, name: string } | null, equipment: Array<{ __typename?: 'MobResetEquipmentDto', id: string, maxInstances: number, probability: number, wearLocation?: WearFlag | null, objectId: number, objectZoneId: number, object: { __typename?: 'ObjectSummaryDto', id: number, name: string, type: string } }> }> };
+export type GetMobResetsForMobQuery = { __typename?: 'Query', mobResets: Array<{ __typename?: 'MobResetDto', id: string, maxInstances: number, probability: number, roomId: number, roomZoneId: number, mob?: { __typename?: 'MobSummaryDto', id: number, zoneId: number, name: string } | null, equipment: Array<{ __typename?: 'MobResetEquipmentDto', id: string, maxInstances: number, probability: number, wearLocation?: WearFlag | null, objectId: number, objectZoneId: number, object: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string } }> }> };
 
 export type GetEquipmentSetsForMobQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetEquipmentSetsForMobQuery = { __typename?: 'Query', equipmentSets: Array<{ __typename?: 'EquipmentSetDto', id: string, name: string, description?: string | null, createdAt: any, items: Array<{ __typename?: 'EquipmentSetItemDto', id: string, slot?: string | null, probability: number, object: { __typename?: 'ObjectDto', id: number, name: string, type: ObjectType } }> }> };
+export type GetEquipmentSetsForMobQuery = { __typename?: 'Query', equipmentSets: Array<{ __typename?: 'EquipmentSetDto', id: string, name: string, description?: string | null, createdAt: any, items: Array<{ __typename?: 'EquipmentSetItemDto', id: string, slot?: string | null, probability: number, object: { __typename?: 'ObjectDto', id: number, zoneId: number, name: string, type: ObjectType } }> }> };
 
 export type GetObjectsForMobQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -2619,6 +3394,35 @@ export type RemoveMobEquipmentSetMutationVariables = Exact<{
 
 export type RemoveMobEquipmentSetMutation = { __typename?: 'Mutation', deleteMobEquipmentSet: boolean };
 
+export type DeleteMobResetEquipmentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteMobResetEquipmentMutation = { __typename?: 'Mutation', deleteMobResetEquipment: boolean };
+
+export type AddMobResetEquipmentMutationVariables = Exact<{
+  resetId: Scalars['ID']['input'];
+  objectZoneId: Scalars['Int']['input'];
+  objectId: Scalars['Int']['input'];
+  wearLocation?: InputMaybe<Scalars['String']['input']>;
+  maxInstances?: InputMaybe<Scalars['Int']['input']>;
+  probability?: InputMaybe<Scalars['Float']['input']>;
+}>;
+
+
+export type AddMobResetEquipmentMutation = { __typename?: 'Mutation', addMobResetEquipment: { __typename?: 'MobResetDto', id: string, equipment: Array<{ __typename?: 'MobResetEquipmentDto', id: string, objectId: number, objectZoneId: number, wearLocation?: WearFlag | null, maxInstances: number, probability: number, object: { __typename?: 'ObjectSummaryDto', id: number, zoneId: number, name: string, type: string } }> } };
+
+export type UpdateMobResetEquipmentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  wearLocation?: InputMaybe<Scalars['String']['input']>;
+  maxInstances?: InputMaybe<Scalars['Int']['input']>;
+  probability?: InputMaybe<Scalars['Float']['input']>;
+}>;
+
+
+export type UpdateMobResetEquipmentMutation = { __typename?: 'Mutation', updateMobResetEquipment: boolean };
+
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
 }>;
@@ -2637,6 +3441,216 @@ export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type MeQuery = { __typename?: 'Query', me: { __typename?: 'User', id: string, username: string, email: string, role: UserRole, createdAt: any } };
+
+export type GetAbilitiesQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+  abilityType?: InputMaybe<Scalars['String']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetAbilitiesQuery = { __typename?: 'Query', abilitiesCount: number, abilities: Array<{ __typename?: 'Ability', id: string, name: string, abilityType: string, description?: string | null, minPosition: Position, violent: boolean, castTimeRounds: number, cooldownMs: number, inCombatOnly: boolean, isArea: boolean, notes?: string | null, tags: Array<string>, school?: { __typename?: 'AbilitySchool', id: string, name: string } | null, effects?: Array<{ __typename?: 'AbilityEffect', effectId: string, effect: { __typename?: 'Effect', id: string, name: string } }> | null }> };
+
+export type GetAbilityDetailsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetAbilityDetailsQuery = { __typename?: 'Query', ability: { __typename?: 'Ability', id: string, name: string, abilityType: string, description?: string | null, gameId?: string | null, minPosition: Position, violent: boolean, castTimeRounds: number, cooldownMs: number, inCombatOnly: boolean, isArea: boolean, notes?: string | null, tags: Array<string>, luaScript?: string | null, school?: { __typename?: 'AbilitySchool', id: string, name: string, description?: string | null } | null, effects?: Array<{ __typename?: 'AbilityEffect', effectId: string, order: number, chancePct: number, trigger?: string | null, condition?: string | null, overrideParams?: any | null, effect: { __typename?: 'Effect', id: string, name: string, effectType: string, description?: string | null } }> | null, savingThrows?: Array<{ __typename?: 'AbilitySavingThrow', id: string, dcFormula: string, saveType: SaveType, onSaveAction: any }> | null, targeting?: { __typename?: 'AbilityTargeting', range: number, maxTargets: number, requireLos: boolean, scope: TargetScope, scopePattern?: string | null, validTargets: Array<TargetType> } | null, restrictions?: { __typename?: 'AbilityRestrictions', customRequirementLua?: string | null, requirements: Array<any> } | null, messages?: { __typename?: 'AbilityMessages', startToCaster?: string | null, startToRoom?: string | null, startToVictim?: string | null, successToCaster?: string | null, successToRoom?: string | null, successToVictim?: string | null, failToCaster?: string | null, failToRoom?: string | null, failToVictim?: string | null, wearoffToRoom?: string | null, wearoffToTarget?: string | null } | null } };
+
+export type GetAbilitySchoolsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAbilitySchoolsQuery = { __typename?: 'Query', abilitySchools: Array<{ __typename?: 'AbilitySchool', id: string, name: string, description?: string | null }> };
+
+export type CreateAbilityMutationVariables = Exact<{
+  data: CreateAbilityInput;
+}>;
+
+
+export type CreateAbilityMutation = { __typename?: 'Mutation', createAbility: { __typename?: 'Ability', id: string, name: string, abilityType: string } };
+
+export type UpdateAbilityMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateAbilityInput;
+}>;
+
+
+export type UpdateAbilityMutation = { __typename?: 'Mutation', updateAbility: { __typename?: 'Ability', id: string, name: string, abilityType: string } };
+
+export type DeleteAbilityMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteAbilityMutation = { __typename?: 'Mutation', deleteAbility: boolean };
+
+export type RequestPasswordResetMutationVariables = Exact<{
+  email: Scalars['String']['input'];
+}>;
+
+
+export type RequestPasswordResetMutation = { __typename?: 'Mutation', requestPasswordReset: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+
+export type ResetPasswordMutationVariables = Exact<{
+  token: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type ResetPasswordMutation = { __typename?: 'Mutation', resetPassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+
+export type ChangePasswordMutationVariables = Exact<{
+  currentPassword: Scalars['String']['input'];
+  newPassword: Scalars['String']['input'];
+}>;
+
+
+export type ChangePasswordMutation = { __typename?: 'Mutation', changePassword: { __typename?: 'PasswordResetResponse', success: boolean, message: string } };
+
+export type UpdateProfileMutationVariables = Exact<{
+  email?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type UpdateProfileMutation = { __typename?: 'Mutation', updateProfile: { __typename?: 'User', id: string, email: string, username: string } };
+
+export type CharacterCardFieldsFragment = { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean, timePlayed: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number, experience: number, copper: number, silver: number, gold: number, platinum: number, description?: string | null, title?: string | null, currentRoom?: number | null };
+
+export type GetMyCharactersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetMyCharactersQuery = { __typename?: 'Query', myCharacters: Array<{ __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null, playerClass?: string | null, lastLogin?: any | null, isOnline: boolean, timePlayed: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, luck: number, experience: number, copper: number, silver: number, gold: number, platinum: number, description?: string | null, title?: string | null, currentRoom?: number | null }> };
+
+export type GetCharacterDetailsQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCharacterDetailsQuery = { __typename?: 'Query', character: { __typename?: 'CharacterDto', id: string, name: string, level: number, description?: string | null, raceType?: string | null, playerClass?: string | null, strength: number, dexterity: number, constitution: number, intelligence: number, wisdom: number, charisma: number, hitPoints: number, hitPointsMax: number, movement: number, movementMax: number, alignment: number } };
+
+export type GetCharacterSessionInfoQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetCharacterSessionInfoQuery = { __typename?: 'Query', characterSessionInfo: { __typename?: 'CharacterSessionInfoDto', id: string, name: string, isOnline: boolean, currentSessionTime: number, totalTimePlayed: number, lastLogin?: any | null } };
+
+export type GetCharacterLinkingInfoQueryVariables = Exact<{
+  characterName: Scalars['String']['input'];
+}>;
+
+
+export type GetCharacterLinkingInfoQuery = { __typename?: 'Query', characterLinkingInfo: { __typename?: 'CharacterLinkingInfoDto', id: string, name: string, level: number, race?: string | null, hasPassword: boolean, isLinked: boolean, timePlayed: number, lastLogin?: any | null } };
+
+export type CreateCharacterMutationVariables = Exact<{
+  data: CreateCharacterInput;
+}>;
+
+
+export type CreateCharacterMutation = { __typename?: 'Mutation', createCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number, raceType?: string | null } };
+
+export type LinkCharacterMutationVariables = Exact<{
+  characterName: Scalars['String']['input'];
+  characterPassword: Scalars['String']['input'];
+}>;
+
+
+export type LinkCharacterMutation = { __typename?: 'Mutation', linkCharacter: { __typename?: 'CharacterDto', id: string, name: string, level: number } };
+
+export type ValidateCharacterPasswordQueryVariables = Exact<{
+  characterName: Scalars['String']['input'];
+  password: Scalars['String']['input'];
+}>;
+
+
+export type ValidateCharacterPasswordQuery = { __typename?: 'Query', validateCharacterPassword: boolean };
+
+export type GetClassesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetClassesQuery = { __typename?: 'Query', classes: Array<{ __typename?: 'ClassDto', id: string, name: string, description?: string | null, hitDice: string, primaryStat?: string | null }> };
+
+export type GetClassSkillsQueryVariables = Exact<{
+  classId: Scalars['Int']['input'];
+}>;
+
+
+export type GetClassSkillsQuery = { __typename?: 'Query', classSkills: Array<{ __typename?: 'ClassSkillDto', id: string, classId: number, skillId: number, skillName: string, category: SkillCategory, minLevel: number, maxLevel: number }> };
+
+export type GetAllAbilitiesQueryVariables = Exact<{
+  abilityType?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetAllAbilitiesQuery = { __typename?: 'Query', abilities: Array<{ __typename?: 'Ability', id: string, name: string }> };
+
+export type GetClassCirclesQueryVariables = Exact<{
+  classId: Scalars['Int']['input'];
+}>;
+
+
+export type GetClassCirclesQuery = { __typename?: 'Query', classCirclesList: Array<{ __typename?: 'ClassCircleDto', id: string, classId: number, circle: number, minLevel: number, spells: Array<{ __typename?: 'CircleSpellDto', id: string, spellId: number, spellName: string, minLevel?: number | null, proficiencyGain?: number | null }> }> };
+
+export type UpdateClassMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateClassInput;
+}>;
+
+
+export type UpdateClassMutation = { __typename?: 'Mutation', updateClass: { __typename?: 'ClassDto', id: string, name: string, description?: string | null, hitDice: string, primaryStat?: string | null } };
+
+export type AssignSkillToClassMutationVariables = Exact<{
+  data: AssignSkillToClassInput;
+}>;
+
+
+export type AssignSkillToClassMutation = { __typename?: 'Mutation', assignSkillToClass: { __typename?: 'ClassSkillDto', id: string, skillId: number, skillName: string, category: SkillCategory, minLevel: number, maxLevel: number } };
+
+export type RemoveClassSkillMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveClassSkillMutation = { __typename?: 'Mutation', removeClassSkill: boolean };
+
+export type CreateClassCircleMutationVariables = Exact<{
+  data: CreateClassCircleInput;
+}>;
+
+
+export type CreateClassCircleMutation = { __typename?: 'Mutation', createClassCircle: { __typename?: 'ClassCircleDto', id: string, circle: number, minLevel: number } };
+
+export type RemoveClassCircleMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type RemoveClassCircleMutation = { __typename?: 'Mutation', removeClassCircle: boolean };
+
+export type GetEffectsQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetEffectsQuery = { __typename?: 'Query', effects: Array<{ __typename?: 'Effect', id: string, name: string, effectType: string, description?: string | null, defaultParams: any }> };
+
+export type GetEffectsCountQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type GetEffectsCountQuery = { __typename?: 'Query', effectsCount: number };
+
+export type GetEffectQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetEffectQuery = { __typename?: 'Query', effect: { __typename?: 'Effect', id: string, name: string, effectType: string, description?: string | null, defaultParams: any } };
 
 export type UpdateMobMutationVariables = Exact<{
   zoneId: Scalars['Int']['input'];
@@ -2662,6 +3676,64 @@ export type DeleteMobMutationVariables = Exact<{
 
 export type DeleteMobMutation = { __typename?: 'Mutation', deleteMob: { __typename?: 'MobDto', id: number, zoneId: number } };
 
+export type ObjectSummaryFragment = { __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any };
+
+export type ObjectDetailsFragment = { __typename?: 'ObjectDto', examineDescription: string, roomDescription: string, actionDescription?: string | null, concealment: number, timer: number, decomposeTimer: number, flags: Array<ObjectFlag>, effectFlags: Array<EffectFlag>, wearFlags: Array<WearFlag>, createdAt: any, updatedAt: any, id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any };
+
+export type GetObjectsQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetObjectsQuery = { __typename?: 'Query', objectsCount: number, objects: Array<{ __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any }> };
+
+export type GetObjectsByZoneQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type GetObjectsByZoneQuery = { __typename?: 'Query', objectsByZone: Array<{ __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any }> };
+
+export type GetObjectQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type GetObjectQuery = { __typename?: 'Query', object: { __typename?: 'ObjectDto', examineDescription: string, roomDescription: string, actionDescription?: string | null, concealment: number, timer: number, decomposeTimer: number, flags: Array<ObjectFlag>, effectFlags: Array<EffectFlag>, wearFlags: Array<WearFlag>, createdAt: any, updatedAt: any, id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any } };
+
+export type CreateObjectMutationVariables = Exact<{
+  data: CreateObjectInput;
+}>;
+
+
+export type CreateObjectMutation = { __typename?: 'Mutation', createObject: { __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any } };
+
+export type UpdateObjectMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+  data: UpdateObjectInput;
+}>;
+
+
+export type UpdateObjectMutation = { __typename?: 'Mutation', updateObject: { __typename?: 'ObjectDto', id: number, name: string, type: ObjectType, level: number, weight: number, cost: number, zoneId: number, keywords: Array<string>, values: any } };
+
+export type DeleteObjectMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteObjectMutation = { __typename?: 'Mutation', deleteObject: { __typename?: 'ObjectDto', id: number } };
+
+export type DeleteObjectsMutationVariables = Exact<{
+  ids: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+}>;
+
+
+export type DeleteObjectsMutation = { __typename?: 'Mutation', deleteObjects: number };
+
 export type GetMobQueryVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -2684,6 +3756,149 @@ export type GetMobsByZoneQueryVariables = Exact<{
 
 
 export type GetMobsByZoneQuery = { __typename?: 'Query', mobsByZone: Array<{ __typename?: 'MobDto', id: number, zoneId: number, keywords: Array<string>, name: string, roomDescription: string, examineDescription: string, level: number, alignment: number, race: Race, hitRoll: number, armorClass: number, damageType: DamageType, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, wealth?: number | null, hpDice: string, damageDice: string, mobFlags: Array<MobFlag>, effectFlags: Array<EffectFlag>, lifeForce: LifeForce }> };
+
+export type GetRacesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRacesQuery = { __typename?: 'Query', races: Array<{ __typename?: 'RaceDto', race: Race, name: string, displayName: string, playable: boolean, humanoid: boolean, magical: boolean }> };
+
+export type UpdateRaceMutationVariables = Exact<{
+  race: Race;
+  data: UpdateRaceInput;
+}>;
+
+
+export type UpdateRaceMutation = { __typename?: 'Mutation', updateRace: { __typename?: 'RaceDto', race: Race, name: string, displayName: string, playable: boolean, humanoid: boolean, magical: boolean } };
+
+export type GetShopsQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetShopsQuery = { __typename?: 'Query', shopsCount: number, shops: Array<{ __typename?: 'ShopDto', id: number, zoneId: number, temper: number, sellProfit: number, buyProfit: number }> };
+
+export type GetShopsByZoneQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type GetShopsByZoneQuery = { __typename?: 'Query', shopsByZone: Array<{ __typename?: 'ShopDto', id: number, zoneId: number, temper: number, sellProfit: number, buyProfit: number }> };
+
+export type GetShopQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type GetShopQuery = { __typename?: 'Query', shop: { __typename?: 'ShopDto', id: number, zoneId: number, keeperId?: number | null, buyMessages: Array<string>, sellMessages: Array<string>, missingCashMessages: Array<string> } };
+
+export type CreateShopMutationVariables = Exact<{
+  data: CreateShopInput;
+}>;
+
+
+export type CreateShopMutation = { __typename?: 'Mutation', createShop: { __typename?: 'ShopDto', id: number, zoneId: number } };
+
+export type UpdateShopMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+  data: UpdateShopInput;
+}>;
+
+
+export type UpdateShopMutation = { __typename?: 'Mutation', updateShop: { __typename?: 'ShopDto', id: number, zoneId: number } };
+
+export type DeleteShopMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteShopMutation = { __typename?: 'Mutation', deleteShop: { __typename?: 'ShopDto', id: number } };
+
+export type GetTriggersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTriggersQuery = { __typename?: 'Query', triggers: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, zoneId?: number | null }> };
+
+export type GetTriggersByAttachmentQueryVariables = Exact<{
+  attachType: ScriptType;
+  entityId: Scalars['Int']['input'];
+}>;
+
+
+export type GetTriggersByAttachmentQuery = { __typename?: 'Query', triggersByAttachment: Array<{ __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType, zoneId?: number | null }> };
+
+export type CreateTriggerMutationVariables = Exact<{
+  input: CreateTriggerInput;
+}>;
+
+
+export type CreateTriggerMutation = { __typename?: 'Mutation', createTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType } };
+
+export type UpdateTriggerMutationVariables = Exact<{
+  id: Scalars['Float']['input'];
+  input: UpdateTriggerInput;
+}>;
+
+
+export type UpdateTriggerMutation = { __typename?: 'Mutation', updateTrigger: { __typename?: 'TriggerDto', id: string, name: string, attachType: ScriptType } };
+
+export type DeleteTriggerMutationVariables = Exact<{
+  id: Scalars['Float']['input'];
+}>;
+
+
+export type DeleteTriggerMutation = { __typename?: 'Mutation', deleteTrigger: { __typename?: 'TriggerDto', id: string } };
+
+export type AttachTriggerMutationVariables = Exact<{
+  input: AttachTriggerInput;
+}>;
+
+
+export type AttachTriggerMutation = { __typename?: 'Mutation', attachTrigger: { __typename?: 'TriggerDto', id: string, name: string } };
+
+export type DetachTriggerMutationVariables = Exact<{
+  triggerId: Scalars['Float']['input'];
+}>;
+
+
+export type DetachTriggerMutation = { __typename?: 'Mutation', detachTrigger: { __typename?: 'TriggerDto', id: string } };
+
+export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: string, username: string, role: UserRole, lastLoginAt?: any | null, isBanned: boolean }>, myPermissions: { __typename?: 'UserPermissions', isGod: boolean, isCoder: boolean, isBuilder: boolean, canManageUsers: boolean } };
+
+export type UpdateUserMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  role?: InputMaybe<UserRole>;
+}>;
+
+
+export type UpdateUserMutation = { __typename?: 'Mutation', updateUser: { __typename?: 'User', id: string, username: string, role: UserRole } };
+
+export type BanUserMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+  reason: Scalars['String']['input'];
+  expiresAt?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+
+export type BanUserMutation = { __typename?: 'Mutation', banUser: { __typename?: 'BanRecord', id: string, userId: string, reason: string, bannedAt: any, expiresAt?: any | null, active: boolean } };
+
+export type UnbanUserMutationVariables = Exact<{
+  userId: Scalars['ID']['input'];
+}>;
+
+
+export type UnbanUserMutation = { __typename?: 'Mutation', unbanUser: { __typename?: 'BanRecord', id: string, userId: string, active: boolean, unbannedAt?: any | null } };
+
+export type GetZonesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetZonesQuery = { __typename?: 'Query', zones: Array<{ __typename?: 'ZoneDto', id: number, name: string, climate: Climate, lifespan: number, resetMode: ResetMode }> };
 
 export type OnlineCharactersQueryVariables = Exact<{
   userId?: InputMaybe<Scalars['ID']['input']>;
@@ -2730,49 +3945,48 @@ export type MyPermissionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type MyPermissionsQuery = { __typename?: 'Query', myPermissions: { __typename?: 'UserPermissions', isPlayer: boolean, isImmortal: boolean, isBuilder: boolean, isCoder: boolean, isGod: boolean, canAccessDashboard: boolean, canManageUsers: boolean, canViewValidation: boolean, maxCharacterLevel: number, role: UserRole } };
 
-
-export const GetMyCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMyCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}}]}}]}}]} as unknown as DocumentNode<GetMyCharactersQuery, GetMyCharactersQueryVariables>;
-export const GetObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDesc"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"values"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetObjectQuery, GetObjectQueryVariables>;
-export const UpdateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<UpdateObjectMutation, UpdateObjectMutationVariables>;
-export const CreateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateObjectMutation, CreateObjectMutationVariables>;
-export const GetObjectsDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"100"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]}}]} as unknown as DocumentNode<GetObjectsDashboardQuery, GetObjectsDashboardQueryVariables>;
-export const GetObjectsByZoneDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsByZoneDashboard"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objectsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]}}]} as unknown as DocumentNode<GetObjectsByZoneDashboardQuery, GetObjectsByZoneDashboardQueryVariables>;
-export const DeleteObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteObjectMutation, DeleteObjectMutationVariables>;
-export const DeleteObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObjects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}]}}]} as unknown as DocumentNode<DeleteObjectsMutation, DeleteObjectsMutationVariables>;
+export const CharacterCardFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CharacterCardFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CharacterDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}}]}}]} as unknown as DocumentNode<CharacterCardFieldsFragment, unknown>;
+export const ObjectSummaryFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<ObjectSummaryFragment, unknown>;
+export const ObjectDetailsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDescription"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<ObjectDetailsFragment, unknown>;
+export const GetObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDescription"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"values"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetObjectInlineQuery, GetObjectInlineQueryVariables>;
+export const UpdateObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<UpdateObjectInlineMutation, UpdateObjectInlineMutationVariables>;
+export const CreateObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateObjectInlineMutation, CreateObjectInlineMutationVariables>;
 export const GetDashboardStatsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDashboardStats"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zonesCount"}},{"kind":"Field","name":{"kind":"Name","value":"roomsCount"}},{"kind":"Field","name":{"kind":"Name","value":"mobsCount"}},{"kind":"Field","name":{"kind":"Name","value":"objectsCount"}},{"kind":"Field","name":{"kind":"Name","value":"shopsCount"}}]}}]} as unknown as DocumentNode<GetDashboardStatsQuery, GetDashboardStatsQueryVariables>;
-export const GetShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"hours"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"open"}},{"kind":"Field","name":{"kind":"Name","value":"close"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopQuery, GetShopQueryVariables>;
-export const GetAvailableObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableObjects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableObjectsQuery, GetAvailableObjectsQueryVariables>;
-export const GetAvailableMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableMobs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableMobsQuery, GetAvailableMobsQueryVariables>;
-export const UpdateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<UpdateShopMutation, UpdateShopMutationVariables>;
-export const CreateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<CreateShopMutation, CreateShopMutationVariables>;
-export const GetShopsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShops"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shops"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsQuery, GetShopsQueryVariables>;
-export const GetShopsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shopsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>;
-export const DeleteShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteShopMutation, DeleteShopMutationVariables>;
-export const UsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"isBanned"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"banRecords"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"admin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UsersQuery, UsersQueryVariables>;
-export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
-export const BanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"banUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<BanUserMutation, BanUserMutationVariables>;
-export const UnbanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnbanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnbanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unbanUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"unbannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<UnbanUserMutation, UnbanUserMutationVariables>;
-export const GetZonesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"climate"}}]}}]}}]} as unknown as DocumentNode<GetZonesQuery, GetZonesQueryVariables>;
-export const GetRoomsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRoomsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roomsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"layoutX"}},{"kind":"Field","name":{"kind":"Name","value":"layoutY"}},{"kind":"Field","name":{"kind":"Name","value":"layoutZ"}},{"kind":"Field","name":{"kind":"Name","value":"exits"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"destination"}}]}}]}}]}}]} as unknown as DocumentNode<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>;
+export const GetRacesInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRacesInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"races"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}},{"kind":"Field","name":{"kind":"Name","value":"defaultSize"}},{"kind":"Field","name":{"kind":"Name","value":"maxStrength"}},{"kind":"Field","name":{"kind":"Name","value":"maxDexterity"}},{"kind":"Field","name":{"kind":"Name","value":"maxIntelligence"}},{"kind":"Field","name":{"kind":"Name","value":"maxWisdom"}},{"kind":"Field","name":{"kind":"Name","value":"maxConstitution"}},{"kind":"Field","name":{"kind":"Name","value":"maxCharisma"}},{"kind":"Field","name":{"kind":"Name","value":"expFactor"}},{"kind":"Field","name":{"kind":"Name","value":"hpFactor"}}]}},{"kind":"Field","name":{"kind":"Name","value":"racesCount"}}]}}]} as unknown as DocumentNode<GetRacesInlineQuery, GetRacesInlineQueryVariables>;
+export const UpdateRaceInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRaceInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"race"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Race"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"race"},"value":{"kind":"Variable","name":{"kind":"Name","value":"race"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}},{"kind":"Field","name":{"kind":"Name","value":"defaultSize"}},{"kind":"Field","name":{"kind":"Name","value":"maxStrength"}},{"kind":"Field","name":{"kind":"Name","value":"maxDexterity"}},{"kind":"Field","name":{"kind":"Name","value":"maxIntelligence"}},{"kind":"Field","name":{"kind":"Name","value":"maxWisdom"}},{"kind":"Field","name":{"kind":"Name","value":"maxConstitution"}},{"kind":"Field","name":{"kind":"Name","value":"maxCharisma"}},{"kind":"Field","name":{"kind":"Name","value":"expFactor"}},{"kind":"Field","name":{"kind":"Name","value":"hpFactor"}}]}}]}}]} as unknown as DocumentNode<UpdateRaceInlineMutation, UpdateRaceInlineMutationVariables>;
+export const GetShopInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"hours"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"open"}},{"kind":"Field","name":{"kind":"Name","value":"close"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopInlineQuery, GetShopInlineQueryVariables>;
+export const GetAvailableObjectsInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableObjectsInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objectsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableObjectsInlineQuery, GetAvailableObjectsInlineQueryVariables>;
+export const GetAvailableMobsInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAvailableMobsInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetAvailableMobsInlineQuery, GetAvailableMobsInlineQueryVariables>;
+export const GetZonesInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZonesInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetZonesInlineQuery, GetZonesInlineQueryVariables>;
+export const UpdateShopInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateShopInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<UpdateShopInlineMutation, UpdateShopInlineMutationVariables>;
+export const CreateShopInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateShopInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<CreateShopInlineMutation, CreateShopInlineMutationVariables>;
+export const GetShopsInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopsInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shops"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsInlineQuery, GetShopsInlineQueryVariables>;
+export const GetShopsByZoneInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopsByZoneInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shopsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopsByZoneInlineQuery, GetShopsByZoneInlineQueryVariables>;
+export const DeleteShopInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteShopInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteShopInlineMutation, DeleteShopInlineMutationVariables>;
+export const UsersInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"UsersInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"isBanned"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"banRecords"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"admin"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]}}]}}]} as unknown as DocumentNode<UsersInlineQuery, UsersInlineQueryVariables>;
+export const UpdateUserInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUserInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<UpdateUserInlineMutation, UpdateUserInlineMutationVariables>;
+export const BanUserInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BanUserInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"banUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<BanUserInlineMutation, BanUserInlineMutationVariables>;
+export const UnbanUserInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnbanUserInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UnbanUserInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unbanUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"unbannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}}]}}]}}]} as unknown as DocumentNode<UnbanUserInlineMutation, UnbanUserInlineMutationVariables>;
 export const GetZonesDashboardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZonesDashboard"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"climate"}}]}},{"kind":"Field","name":{"kind":"Name","value":"roomsCount"}}]}}]} as unknown as DocumentNode<GetZonesDashboardQuery, GetZonesDashboardQueryVariables>;
-export const RequestPasswordResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RequestPasswordReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RequestPasswordResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestPasswordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
-export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChangePasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;
-export const UpdateProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UpdateProfileMutation, UpdateProfileMutationVariables>;
-export const ResetPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ResetPasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ResetPasswordMutation, ResetPasswordMutationVariables>;
-export const GetTriggersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersQuery, GetTriggersQueryVariables>;
-export const GetTriggersByAttachmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersByAttachment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ScriptType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggersByAttachment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"attachType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>;
-export const CreateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<CreateTriggerMutation, CreateTriggerMutationVariables>;
-export const UpdateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<UpdateTriggerMutation, UpdateTriggerMutationVariables>;
-export const DeleteTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteTriggerMutation, DeleteTriggerMutationVariables>;
-export const AttachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AttachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AttachTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<AttachTriggerMutation, AttachTriggerMutationVariables>;
-export const DetachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DetachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"detachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"triggerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<DetachTriggerMutation, DetachTriggerMutationVariables>;
+export const RequestPasswordResetInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RequestPasswordResetInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RequestPasswordResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestPasswordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<RequestPasswordResetInlineMutation, RequestPasswordResetInlineMutationVariables>;
+export const ChangePasswordInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePasswordInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ChangePasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ChangePasswordInlineMutation, ChangePasswordInlineMutationVariables>;
+export const UpdateProfileInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProfileInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateProfileInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<UpdateProfileInlineMutation, UpdateProfileInlineMutationVariables>;
+export const GetProfileCharactersInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetProfileCharactersInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}}]}}]}}]} as unknown as DocumentNode<GetProfileCharactersInlineQuery, GetProfileCharactersInlineQueryVariables>;
+export const ResetPasswordInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetPasswordInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ResetPasswordInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ResetPasswordInlineMutation, ResetPasswordInlineMutationVariables>;
+export const GetTriggersInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersInline"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersInlineQuery, GetTriggersInlineQueryVariables>;
+export const GetTriggersByAttachmentInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersByAttachmentInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ScriptType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggersByAttachment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"attachType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"numArgs"}},{"kind":"Field","name":{"kind":"Name","value":"argList"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetTriggersByAttachmentInlineQuery, GetTriggersByAttachmentInlineQueryVariables>;
+export const CreateTriggerInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTriggerInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<CreateTriggerInlineMutation, CreateTriggerInlineMutationVariables>;
+export const UpdateTriggerInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTriggerInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"commands"}},{"kind":"Field","name":{"kind":"Name","value":"variables"}}]}}]}}]} as unknown as DocumentNode<UpdateTriggerInlineMutation, UpdateTriggerInlineMutationVariables>;
+export const DeleteTriggerInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTriggerInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteTriggerInlineMutation, DeleteTriggerInlineMutationVariables>;
+export const AttachTriggerInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AttachTriggerInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AttachTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"mobId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<AttachTriggerInlineMutation, AttachTriggerInlineMutationVariables>;
+export const DetachTriggerInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DetachTriggerInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"detachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"triggerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<DetachTriggerInlineMutation, DetachTriggerInlineMutationVariables>;
 export const GetZonesForSelectorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZonesForSelector"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetZonesForSelectorQuery, GetZonesForSelectorQueryVariables>;
-export const CreateCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}}]}}]}}]} as unknown as DocumentNode<CreateCharacterMutation, CreateCharacterMutationVariables>;
-export const GetCharacterDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"character"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"skillPoints"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"bankCopper"}},{"kind":"Field","name":{"kind":"Name","value":"bankSilver"}},{"kind":"Field","name":{"kind":"Name","value":"bankGold"}},{"kind":"Field","name":{"kind":"Name","value":"bankPlatinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}},{"kind":"Field","name":{"kind":"Name","value":"saveRoom"}},{"kind":"Field","name":{"kind":"Name","value":"homeRoom"}},{"kind":"Field","name":{"kind":"Name","value":"hunger"}},{"kind":"Field","name":{"kind":"Name","value":"thirst"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"damageRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"playerFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"privilegeFlags"}},{"kind":"Field","name":{"kind":"Name","value":"invisLevel"}},{"kind":"Field","name":{"kind":"Name","value":"birthTime"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"equippedLocation"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}},{"kind":"Field","name":{"kind":"Name","value":"charges"}},{"kind":"Field","name":{"kind":"Name","value":"objectPrototype"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"effectName"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"appliedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>;
-export const GetCharacterSessionInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterSessionInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}}]}}]}}]} as unknown as DocumentNode<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>;
-export const GetCharacterLinkingInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterLinkingInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterLinkingInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"isLinked"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}}]}}]}}]} as unknown as DocumentNode<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>;
-export const LinkCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LinkCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LinkCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"linkCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}}]}}]}}]} as unknown as DocumentNode<LinkCharacterMutation, LinkCharacterMutationVariables>;
-export const ValidateCharacterPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidateCharacterPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validateCharacterPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}]}]}}]} as unknown as DocumentNode<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>;
+export const CreateCharacterInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCharacterInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}}]}}]}}]} as unknown as DocumentNode<CreateCharacterInlineMutation, CreateCharacterInlineMutationVariables>;
+export const GetCharacterDetailsInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterDetailsInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"character"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"skillPoints"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"bankCopper"}},{"kind":"Field","name":{"kind":"Name","value":"bankSilver"}},{"kind":"Field","name":{"kind":"Name","value":"bankGold"}},{"kind":"Field","name":{"kind":"Name","value":"bankPlatinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}},{"kind":"Field","name":{"kind":"Name","value":"saveRoom"}},{"kind":"Field","name":{"kind":"Name","value":"homeRoom"}},{"kind":"Field","name":{"kind":"Name","value":"hunger"}},{"kind":"Field","name":{"kind":"Name","value":"thirst"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"damageRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"playerFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"privilegeFlags"}},{"kind":"Field","name":{"kind":"Name","value":"invisLevel"}},{"kind":"Field","name":{"kind":"Name","value":"birthTime"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"equippedLocation"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}},{"kind":"Field","name":{"kind":"Name","value":"charges"}},{"kind":"Field","name":{"kind":"Name","value":"objectPrototype"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"effectName"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"duration"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"appliedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}}]}}]}}]}}]} as unknown as DocumentNode<GetCharacterDetailsInlineQuery, GetCharacterDetailsInlineQueryVariables>;
+export const GetCharacterSessionInfoInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterSessionInfoInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}}]}}]}}]} as unknown as DocumentNode<GetCharacterSessionInfoInlineQuery, GetCharacterSessionInfoInlineQueryVariables>;
+export const GetCharacterLinkingInfoInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterLinkingInfoInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterLinkingInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"class"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"isLinked"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}}]}}]}}]} as unknown as DocumentNode<GetCharacterLinkingInfoInlineQuery, GetCharacterLinkingInfoInlineQueryVariables>;
+export const LinkCharacterInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LinkCharacterInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LinkCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"linkCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}}]}}]}}]} as unknown as DocumentNode<LinkCharacterInlineMutation, LinkCharacterInlineMutationVariables>;
+export const ValidateCharacterPasswordInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidateCharacterPasswordInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validateCharacterPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}]}]}}]} as unknown as DocumentNode<ValidateCharacterPasswordInlineQuery, ValidateCharacterPasswordInlineQueryVariables>;
 export const GetEquipmentSetsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEquipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"equipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetEquipmentSetsQuery, GetEquipmentSetsQueryVariables>;
 export const GetObjectsForEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsForEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsForEquipmentSetQuery, GetObjectsForEquipmentSetQueryVariables>;
 export const CreateEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<CreateEquipmentSetMutation, CreateEquipmentSetMutationVariables>;
@@ -2780,27 +3994,80 @@ export const UpdateEquipmentSetDocument = {"kind":"Document","definitions":[{"ki
 export const DeleteEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteEquipmentSetMutation, DeleteEquipmentSetMutationVariables>;
 export const AddEquipmentSetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddEquipmentSetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetItemStandaloneInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}}]}}]}}]} as unknown as DocumentNode<AddEquipmentSetItemMutation, AddEquipmentSetItemMutationVariables>;
 export const RemoveEquipmentSetItemDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveEquipmentSetItem"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEquipmentSetItem"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveEquipmentSetItemMutation, RemoveEquipmentSetItemMutationVariables>;
-export const GetMobResetsLegacyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobResetsLegacy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobResets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"mob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetMobResetsLegacyQuery, GetMobResetsLegacyQueryVariables>;
-export const GetObjectsLegacyDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsLegacy"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsLegacyQuery, GetObjectsLegacyQueryVariables>;
-export const CreateMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}}]}}]}}]} as unknown as DocumentNode<CreateMobResetMutation, CreateMobResetMutationVariables>;
-export const UpdateMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobResetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}}]}}]}}]} as unknown as DocumentNode<UpdateMobResetMutation, UpdateMobResetMutationVariables>;
-export const DeleteMobResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetMutation, DeleteMobResetMutationVariables>;
-export const DeleteMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
-export const GetMobResetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobResetsForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobResets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"mob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>;
-export const GetEquipmentSetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEquipmentSetsForMob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"equipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>;
+export const GetMobResetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobResetsForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobResets"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobZoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"mob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetMobResetsForMobQuery, GetMobResetsForMobQueryVariables>;
+export const GetEquipmentSetsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEquipmentSetsForMob"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"equipmentSets"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slot"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetEquipmentSetsForMobQuery, GetEquipmentSetsForMobQueryVariables>;
 export const GetObjectsForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}}]}}]}}]} as unknown as DocumentNode<GetObjectsForMobQuery, GetObjectsForMobQueryVariables>;
 export const CreateEquipmentSetForMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEquipmentSetForMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<CreateEquipmentSetForMobMutation, CreateEquipmentSetForMobMutationVariables>;
 export const AddMobEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddMobEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobEquipmentSetInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMobEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}}]}}]}}]} as unknown as DocumentNode<AddMobEquipmentSetMutation, AddMobEquipmentSetMutationVariables>;
 export const RemoveMobEquipmentSetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveMobEquipmentSet"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobEquipmentSet"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveMobEquipmentSetMutation, RemoveMobEquipmentSetMutationVariables>;
+export const DeleteMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
+export const AddMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"resetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"objectZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"objectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"probability"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"resetId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"resetId"}}},{"kind":"Argument","name":{"kind":"Name","value":"objectZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"objectZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"objectId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"objectId"}}},{"kind":"Argument","name":{"kind":"Name","value":"wearLocation"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxInstances"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}}},{"kind":"Argument","name":{"kind":"Name","value":"probability"},"value":{"kind":"Variable","name":{"kind":"Name","value":"probability"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddMobResetEquipmentMutation, AddMobResetEquipmentMutationVariables>;
+export const UpdateMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"probability"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"wearLocation"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxInstances"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}}},{"kind":"Argument","name":{"kind":"Name","value":"probability"},"value":{"kind":"Variable","name":{"kind":"Name","value":"probability"}}}]}]}}]} as unknown as DocumentNode<UpdateMobResetEquipmentMutation, UpdateMobResetEquipmentMutationVariables>;
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Register"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"register"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;
+export const GetAbilitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAbilities"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"abilityType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"abilities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"abilityType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"abilityType"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minPosition"}},{"kind":"Field","name":{"kind":"Name","value":"violent"}},{"kind":"Field","name":{"kind":"Name","value":"castTimeRounds"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownMs"}},{"kind":"Field","name":{"kind":"Name","value":"inCombatOnly"}},{"kind":"Field","name":{"kind":"Name","value":"isArea"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"school"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectId"}},{"kind":"Field","name":{"kind":"Name","value":"effect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"abilitiesCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"abilityType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"abilityType"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}]}]}}]} as unknown as DocumentNode<GetAbilitiesQuery, GetAbilitiesQueryVariables>;
+export const GetAbilityDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAbilityDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ability"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"gameId"}},{"kind":"Field","name":{"kind":"Name","value":"minPosition"}},{"kind":"Field","name":{"kind":"Name","value":"violent"}},{"kind":"Field","name":{"kind":"Name","value":"castTimeRounds"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownMs"}},{"kind":"Field","name":{"kind":"Name","value":"inCombatOnly"}},{"kind":"Field","name":{"kind":"Name","value":"isArea"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"luaScript"}},{"kind":"Field","name":{"kind":"Name","value":"school"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectId"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"chancePct"}},{"kind":"Field","name":{"kind":"Name","value":"trigger"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}},{"kind":"Field","name":{"kind":"Name","value":"overrideParams"}},{"kind":"Field","name":{"kind":"Name","value":"effect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"savingThrows"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"dcFormula"}},{"kind":"Field","name":{"kind":"Name","value":"saveType"}},{"kind":"Field","name":{"kind":"Name","value":"onSaveAction"}}]}},{"kind":"Field","name":{"kind":"Name","value":"targeting"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"range"}},{"kind":"Field","name":{"kind":"Name","value":"maxTargets"}},{"kind":"Field","name":{"kind":"Name","value":"requireLos"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"scopePattern"}},{"kind":"Field","name":{"kind":"Name","value":"validTargets"}}]}},{"kind":"Field","name":{"kind":"Name","value":"restrictions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"customRequirementLua"}},{"kind":"Field","name":{"kind":"Name","value":"requirements"}}]}},{"kind":"Field","name":{"kind":"Name","value":"messages"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"startToCaster"}},{"kind":"Field","name":{"kind":"Name","value":"startToRoom"}},{"kind":"Field","name":{"kind":"Name","value":"startToVictim"}},{"kind":"Field","name":{"kind":"Name","value":"successToCaster"}},{"kind":"Field","name":{"kind":"Name","value":"successToRoom"}},{"kind":"Field","name":{"kind":"Name","value":"successToVictim"}},{"kind":"Field","name":{"kind":"Name","value":"failToCaster"}},{"kind":"Field","name":{"kind":"Name","value":"failToRoom"}},{"kind":"Field","name":{"kind":"Name","value":"failToVictim"}},{"kind":"Field","name":{"kind":"Name","value":"wearoffToRoom"}},{"kind":"Field","name":{"kind":"Name","value":"wearoffToTarget"}}]}}]}}]}}]} as unknown as DocumentNode<GetAbilityDetailsQuery, GetAbilityDetailsQueryVariables>;
+export const GetAbilitySchoolsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAbilitySchools"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"abilitySchools"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}}]}}]}}]} as unknown as DocumentNode<GetAbilitySchoolsQuery, GetAbilitySchoolsQueryVariables>;
+export const CreateAbilityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateAbility"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateAbilityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createAbility"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}}]}}]} as unknown as DocumentNode<CreateAbilityMutation, CreateAbilityMutationVariables>;
+export const UpdateAbilityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateAbility"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateAbilityInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateAbility"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}}]}}]} as unknown as DocumentNode<UpdateAbilityMutation, UpdateAbilityMutationVariables>;
+export const DeleteAbilityDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteAbility"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteAbility"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteAbilityMutation, DeleteAbilityMutationVariables>;
+export const RequestPasswordResetDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RequestPasswordReset"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"requestPasswordReset"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<RequestPasswordResetMutation, RequestPasswordResetMutationVariables>;
+export const ResetPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ResetPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"token"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"resetPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"token"},"value":{"kind":"Variable","name":{"kind":"Name","value":"token"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"newPassword"},"value":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ResetPasswordMutation, ResetPasswordMutationVariables>;
+export const ChangePasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ChangePassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"currentPassword"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"changePassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"currentPassword"},"value":{"kind":"Variable","name":{"kind":"Name","value":"currentPassword"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"newPassword"},"value":{"kind":"Variable","name":{"kind":"Name","value":"newPassword"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"success"}},{"kind":"Field","name":{"kind":"Name","value":"message"}}]}}]}}]} as unknown as DocumentNode<ChangePasswordMutation, ChangePasswordMutationVariables>;
+export const UpdateProfileDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateProfile"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"email"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateProfile"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"email"},"value":{"kind":"Variable","name":{"kind":"Name","value":"email"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"username"}}]}}]}}]} as unknown as DocumentNode<UpdateProfileMutation, UpdateProfileMutationVariables>;
+export const GetMyCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMyCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"CharacterCardFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CharacterCardFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CharacterDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}}]}}]} as unknown as DocumentNode<GetMyCharactersQuery, GetMyCharactersQueryVariables>;
+export const GetCharacterDetailsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterDetails"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"character"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}}]}}]}}]} as unknown as DocumentNode<GetCharacterDetailsQuery, GetCharacterDetailsQueryVariables>;
+export const GetCharacterSessionInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterSessionInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}}]}}]}}]} as unknown as DocumentNode<GetCharacterSessionInfoQuery, GetCharacterSessionInfoQueryVariables>;
+export const GetCharacterLinkingInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCharacterLinkingInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterLinkingInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"hasPassword"}},{"kind":"Field","name":{"kind":"Name","value":"isLinked"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}}]}}]}}]} as unknown as DocumentNode<GetCharacterLinkingInfoQuery, GetCharacterLinkingInfoQueryVariables>;
+export const CreateCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCharacterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}}]}}]}}]} as unknown as DocumentNode<CreateCharacterMutation, CreateCharacterMutationVariables>;
+export const LinkCharacterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"LinkCharacter"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterPassword"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"linkCharacter"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"characterPassword"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterPassword"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}}]}}]}}]} as unknown as DocumentNode<LinkCharacterMutation, LinkCharacterMutationVariables>;
+export const ValidateCharacterPasswordDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ValidateCharacterPassword"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"password"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"validateCharacterPassword"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterName"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterName"}}},{"kind":"Argument","name":{"kind":"Name","value":"password"},"value":{"kind":"Variable","name":{"kind":"Name","value":"password"}}}]}]}}]} as unknown as DocumentNode<ValidateCharacterPasswordQuery, ValidateCharacterPasswordQueryVariables>;
+export const GetClassesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetClasses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"hitDice"}},{"kind":"Field","name":{"kind":"Name","value":"primaryStat"}}]}}]}}]} as unknown as DocumentNode<GetClassesQuery, GetClassesQueryVariables>;
+export const GetClassSkillsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetClassSkills"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classSkills"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"classId"}},{"kind":"Field","name":{"kind":"Name","value":"skillId"}},{"kind":"Field","name":{"kind":"Name","value":"skillName"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}}]}}]}}]} as unknown as DocumentNode<GetClassSkillsQuery, GetClassSkillsQueryVariables>;
+export const GetAllAbilitiesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAllAbilities"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"abilityType"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"abilities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"abilityType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"abilityType"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetAllAbilitiesQuery, GetAllAbilitiesQueryVariables>;
+export const GetClassCirclesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetClassCircles"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classCirclesList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"classId"}},{"kind":"Field","name":{"kind":"Name","value":"circle"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"spells"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"spellId"}},{"kind":"Field","name":{"kind":"Name","value":"spellName"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"proficiencyGain"}}]}}]}}]}}]} as unknown as DocumentNode<GetClassCirclesQuery, GetClassCirclesQueryVariables>;
+export const UpdateClassDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClass"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateClassInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClass"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"hitDice"}},{"kind":"Field","name":{"kind":"Name","value":"primaryStat"}}]}}]}}]} as unknown as DocumentNode<UpdateClassMutation, UpdateClassMutationVariables>;
+export const AssignSkillToClassDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AssignSkillToClass"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AssignSkillToClassInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"assignSkillToClass"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"skillId"}},{"kind":"Field","name":{"kind":"Name","value":"skillName"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}}]}}]}}]} as unknown as DocumentNode<AssignSkillToClassMutation, AssignSkillToClassMutationVariables>;
+export const RemoveClassSkillDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassSkill"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassSkill"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassSkillMutation, RemoveClassSkillMutationVariables>;
+export const CreateClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateClassCircleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"circle"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}}]}}]}}]} as unknown as DocumentNode<CreateClassCircleMutation, CreateClassCircleMutationVariables>;
+export const RemoveClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassCircleMutation, RemoveClassCircleMutationVariables>;
+export const GetEffectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"defaultParams"}}]}}]}}]} as unknown as DocumentNode<GetEffectsQuery, GetEffectsQueryVariables>;
+export const GetEffectsCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffectsCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}]}]}}]} as unknown as DocumentNode<GetEffectsCountQuery, GetEffectsCountQueryVariables>;
+export const GetEffectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffect"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effect"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"defaultParams"}}]}}]}}]} as unknown as DocumentNode<GetEffectQuery, GetEffectQueryVariables>;
 export const UpdateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}}]}}]}}]} as unknown as DocumentNode<UpdateMobMutation, UpdateMobMutationVariables>;
 export const CreateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}}]}}]}}]} as unknown as DocumentNode<CreateMobMutation, CreateMobMutationVariables>;
 export const DeleteMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<DeleteMobMutation, DeleteMobMutationVariables>;
+export const GetObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}}]}},{"kind":"Field","name":{"kind":"Name","value":"objectsCount"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<GetObjectsQuery, GetObjectsQueryVariables>;
+export const GetObjectsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"objectsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<GetObjectsByZoneQuery, GetObjectsByZoneQueryVariables>;
+export const GetObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectDetails"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDescription"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]} as unknown as DocumentNode<GetObjectQuery, GetObjectQueryVariables>;
+export const CreateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<CreateObjectMutation, CreateObjectMutationVariables>;
+export const UpdateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<UpdateObjectMutation, UpdateObjectMutationVariables>;
+export const DeleteObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteObjectMutation, DeleteObjectMutationVariables>;
+export const DeleteObjectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteObjects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ids"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteObjects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"ids"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ids"}}}]}]}}]} as unknown as DocumentNode<DeleteObjectsMutation, DeleteObjectsMutationVariables>;
 export const GetMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"position"}},{"kind":"Field","name":{"kind":"Name","value":"stance"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetMobQuery, GetMobQueryVariables>;
 export const GetMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}}]}}]}}]} as unknown as DocumentNode<GetMobsQuery, GetMobsQueryVariables>;
 export const GetMobsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"hitRoll"}},{"kind":"Field","name":{"kind":"Name","value":"armorClass"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"mobFlags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}}]}}]}}]} as unknown as DocumentNode<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
+export const GetRacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"races"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}}]}}]}}]} as unknown as DocumentNode<GetRacesQuery, GetRacesQueryVariables>;
+export const UpdateRaceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateRace"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"race"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Race"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateRaceInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateRace"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"race"},"value":{"kind":"Variable","name":{"kind":"Name","value":"race"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}}]}}]}}]} as unknown as DocumentNode<UpdateRaceMutation, UpdateRaceMutationVariables>;
+export const GetShopsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShops"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shops"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}}]}},{"kind":"Field","name":{"kind":"Name","value":"shopsCount"}}]}}]} as unknown as DocumentNode<GetShopsQuery, GetShopsQueryVariables>;
+export const GetShopsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shopsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}}]}}]}}]} as unknown as DocumentNode<GetShopsByZoneQuery, GetShopsByZoneQueryVariables>;
+export const GetShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}}]}}]}}]} as unknown as DocumentNode<GetShopQuery, GetShopQueryVariables>;
+export const CreateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<CreateShopMutation, CreateShopMutationVariables>;
+export const UpdateShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<UpdateShopMutation, UpdateShopMutationVariables>;
+export const DeleteShopDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteShop"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteShopMutation, DeleteShopMutationVariables>;
+export const GetTriggersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetTriggersQuery, GetTriggersQueryVariables>;
+export const GetTriggersByAttachmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetTriggersByAttachment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ScriptType"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"triggersByAttachment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"attachType"},"value":{"kind":"Variable","name":{"kind":"Name","value":"attachType"}}},{"kind":"Argument","name":{"kind":"Name","value":"entityId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"entityId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetTriggersByAttachmentQuery, GetTriggersByAttachmentQueryVariables>;
+export const CreateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}}]}}]}}]} as unknown as DocumentNode<CreateTriggerMutation, CreateTriggerMutationVariables>;
+export const UpdateTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"attachType"}}]}}]}}]} as unknown as DocumentNode<UpdateTriggerMutation, UpdateTriggerMutationVariables>;
+export const DeleteTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteTriggerMutation, DeleteTriggerMutationVariables>;
+export const AttachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AttachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"AttachTriggerInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"attachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<AttachTriggerMutation, AttachTriggerMutationVariables>;
+export const DetachTriggerDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DetachTrigger"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"detachTrigger"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"triggerId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"triggerId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DetachTriggerMutation, DetachTriggerMutationVariables>;
+export const UsersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"users"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"lastLoginAt"}},{"kind":"Field","name":{"kind":"Name","value":"isBanned"}}]}},{"kind":"Field","name":{"kind":"Name","value":"myPermissions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"isGod"}},{"kind":"Field","name":{"kind":"Name","value":"isCoder"}},{"kind":"Field","name":{"kind":"Name","value":"isBuilder"}},{"kind":"Field","name":{"kind":"Name","value":"canManageUsers"}}]}}]}}]} as unknown as DocumentNode<UsersQuery, UsersQueryVariables>;
+export const UpdateUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"role"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"UserRole"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"role"},"value":{"kind":"Variable","name":{"kind":"Name","value":"role"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]} as unknown as DocumentNode<UpdateUserMutation, UpdateUserMutationVariables>;
+export const BanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"BanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"reason"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"expiresAt"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"banUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"reason"},"value":{"kind":"Variable","name":{"kind":"Name","value":"reason"}}},{"kind":"ObjectField","name":{"kind":"Name","value":"expiresAt"},"value":{"kind":"Variable","name":{"kind":"Name","value":"expiresAt"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"bannedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"active"}}]}}]}}]} as unknown as DocumentNode<BanUserMutation, BanUserMutationVariables>;
+export const UnbanUserDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UnbanUser"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"unbanUser"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"ObjectValue","fields":[{"kind":"ObjectField","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}]}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"active"}},{"kind":"Field","name":{"kind":"Name","value":"unbannedAt"}}]}}]}}]} as unknown as DocumentNode<UnbanUserMutation, UnbanUserMutationVariables>;
+export const GetZonesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetZones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"climate"}},{"kind":"Field","name":{"kind":"Name","value":"lifespan"}},{"kind":"Field","name":{"kind":"Name","value":"resetMode"}}]}}]}}]} as unknown as DocumentNode<GetZonesQuery, GetZonesQueryVariables>;
 export const OnlineCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"OnlineCharacters"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"userId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"onlineCharacters"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"userId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"userId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]}}]} as unknown as DocumentNode<OnlineCharactersQuery, OnlineCharactersQueryVariables>;
 export const MyOnlineCharactersDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"MyOnlineCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"myOnlineCharacters"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"role"}}]}}]}}]}}]} as unknown as DocumentNode<MyOnlineCharactersQuery, MyOnlineCharactersQueryVariables>;
 export const CharacterSessionInfoDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"CharacterSessionInfo"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"characterSessionInfo"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"characterId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"characterId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"totalTimePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"currentSessionTime"}}]}}]}}]} as unknown as DocumentNode<CharacterSessionInfoQuery, CharacterSessionInfoQueryVariables>;

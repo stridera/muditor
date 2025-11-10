@@ -1,6 +1,6 @@
 'use client';
 
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import React, {
   useCallback,
   useEffect,
@@ -46,7 +46,7 @@ import { ObjectNode } from './ObjectNode';
 import { PortalNode } from './PortalNode';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
-import { WorldMapCanvas } from './WorldMapCanvas';
+// import { WorldMapCanvas } from './WorldMapCanvas'; // Removed
 import { WorldMapRoom } from './WorldMapRoom';
 import { WorldMapZone } from './WorldMapZone';
 
@@ -54,6 +54,28 @@ import { WorldMapZone } from './WorldMapZone';
 const GRID_SIZE = 180; // Grid cell size in pixels (matches room size)
 const GRID_SCALE = 10; // Scale factor: 1 grid unit = 10 pixels
 const ROOM_SPACING_MULTIPLIER = 4.0; // Multiply database coordinates for better spacing (rooms are ~200px wide × 120px tall)
+
+// (Removed old world map scaling constants after simplification)
+
+// Raw API entity interfaces (replaces previous implicit any usage)
+interface RawMob {
+  id: number;
+  name: string;
+  level: number;
+  race?: string | null;
+  mobClass?: string | null;
+  lifeForce?: string | null;
+}
+
+interface RawObject {
+  id: number;
+  name: string;
+  type: string;
+  keywords?: string[] | null;
+  cost?: number | null;
+  weight?: number | null;
+  level?: number | null;
+}
 
 // Helper functions
 const snapToGrid = (value: number): number =>
@@ -88,6 +110,7 @@ interface WorldMapRoom {
   layoutX: number | null;
   layoutY: number | null;
   layoutZ: number | null;
+  exits?: RoomExit[]; // Added to satisfy downstream exit parsing logic
 }
 
 interface ZoneMapData {
@@ -117,71 +140,12 @@ interface WorldMapZone {
   style?: React.CSSProperties;
 }
 
-interface WorldMapRoomNode {
-  id: string;
-  type: 'worldRoom';
-  data: {
-    roomId: number;
-    name: string;
-    sector: string;
-    zoneId: number;
-    zoneName: string;
-    onRoomSelect?: (roomId: number) => void;
-  };
-  position: { x: number; y: number };
-  style?: React.CSSProperties;
-}
+// Removed unused WorldMapRoomNode interface (initial dev cleanup)
 
 // Import shared auto-layout utilities
-import {
-  AutoLayoutRoom,
-  detectOneWayExits,
-  LayoutPosition,
-  OverlapInfo,
-  autoLayoutRooms as sharedAutoLayoutRooms,
-  detectOverlaps as sharedDetectOverlaps,
-  resolveOverlaps as sharedResolveOverlaps,
-} from '@muditor/types';
+import { detectOneWayExits, OverlapInfo } from '@muditor/types';
 
-// Adapter function to convert editor Room type to shared AutoLayoutRoom type
-const convertToAutoLayoutRoom = (room: Room): AutoLayoutRoom => ({
-  id: room.id,
-  name: room.name,
-  description: room.roomDescription,
-  layoutX: room.layoutX,
-  layoutY: room.layoutY,
-  layoutZ: room.layoutZ,
-  exits: room.exits.map(exit => ({
-    direction: exit.direction,
-    toRoomId: exit.toRoomId,
-    toZoneId: exit.toZoneId,
-  })),
-});
-
-// Wrapper function for the shared algorithm
-const autoLayoutRooms = (
-  rooms: Room[],
-  startRoomId?: number
-): Record<number, LayoutPosition> => {
-  // Convert rooms to the shared format
-  const sharedRooms = rooms.map(convertToAutoLayoutRoom);
-  // Call the shared algorithm
-  return sharedAutoLayoutRooms(sharedRooms, startRoomId);
-};
-
-// Wrapper for overlap detection
-const detectOverlaps = (
-  positions: Record<number, LayoutPosition>
-): OverlapInfo[] => {
-  return sharedDetectOverlaps(positions);
-};
-
-// Wrapper for overlap resolution
-const resolveOverlaps = (
-  positions: Record<number, LayoutPosition>
-): Record<number, LayoutPosition> => {
-  return sharedResolveOverlaps(positions);
-};
+// Removed auto-layout / overlap adapter helpers (initial dev cleanup).
 
 // Types
 interface Room {
@@ -190,6 +154,7 @@ interface Room {
   roomDescription: string;
   sector: string;
   zoneId: number;
+  // May be null/undefined prior to layout assignment; coalesce before arithmetic
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
@@ -219,6 +184,13 @@ interface Zone {
   climate: string;
 }
 
+// Minimal zone summary interface used during bounds calculation
+interface ZoneSummary {
+  id: number;
+  name: string;
+  climate: string;
+}
+
 // Using imported Object interface from EntityPalette instead
 
 interface EnhancedZoneEditorProps {
@@ -240,8 +212,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   worldMapMode = false,
 }) => {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const reactFlowInstance = useReactFlow();
-  const { canEditZone, isBuilder, isCoder, isGod } = usePermissions();
+  // Transient metadata storage for cursor world coordinates during zoom/transition
+  const runtimeMetaRef = useRef<{
+    lastMouseWorldPos?: { x: number; y: number };
+  }>({});
+  const { canEditZone } = usePermissions();
 
   // State
   const [zone, setZone] = useState<Zone | null>(null);
@@ -265,10 +242,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const room = rooms.find(r => r.id === roomId);
       setEditedRoom(room ? { ...room } : null);
 
-      // Update URL with selected room
+      // Update URL with selected room using Next.js router to ensure proper state sync
       const params = new URLSearchParams(window.location.search);
       params.set('room', roomId.toString());
-      router.push(`?${params.toString()}`, { scroll: false });
+      router.push(`${window.location.pathname}?${params.toString()}`, {
+        scroll: false,
+      });
 
       // Update z-level to match selected room's floor
       if (room) {
@@ -291,8 +270,47 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           `📚 Set room ${roomId} as active in overlap (via handleSelectRoom)`
         );
       }
+
+      // Zoom to the selected room
+      if (room && reactFlowInstance) {
+        // Use a small delay to ensure nodes are rendered before trying to center
+        setTimeout(() => {
+          // Try to find the node first
+          const currentNodes = reactFlowInstance.getNodes();
+          const targetNode = currentNodes.find(n => n.id === String(roomId));
+
+          if (targetNode) {
+            console.log(
+              `🎯 Centering on room ${roomId} at position:`,
+              targetNode.position
+            );
+            reactFlowInstance.setCenter(
+              targetNode.position.x + 90, // Center of room node (room width ~180px)
+              targetNode.position.y + 60, // Center of room node (room height ~120px)
+              { zoom: 1.2, duration: 800 }
+            );
+          } else if (room.layoutX != null && room.layoutY != null) {
+            // Fallback: calculate position from room coordinates if node not found yet
+            const roomX =
+              (room.layoutX ?? 0) * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
+            const roomY =
+              -(room.layoutY ?? 0) * GRID_SIZE * ROOM_SPACING_MULTIPLIER; // Y is inverted
+            console.log(
+              `🎯 Node not found yet, centering on room ${roomId} at calculated position: (${roomX}, ${roomY})`
+            );
+            reactFlowInstance.setCenter(roomX + 90, roomY + 60, {
+              zoom: 1.2,
+              duration: 800,
+            });
+          } else {
+            console.warn(
+              `⚠️ Could not center on room ${roomId} - node not found and no coordinates`
+            );
+          }
+        }, 50); // Small delay to ensure nodes are rendered
+      }
     },
-    [rooms, overlaps, router]
+    [rooms, overlaps, router, reactFlowInstance]
   );
 
   // Handler for navigating to a different zone
@@ -312,20 +330,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const [currentZLevel, setCurrentZLevel] = useState<number>(0); // Current floor being viewed
   const hasInitializedZLevel = useRef<boolean>(false); // Track if Z-level has been initialized
   const hasPerformedInitialFit = useRef<boolean>(false); // Track if initial fit has been performed
+  const lastProcessedZoneId = useRef<number | null>(null); // Track the last zone ID we processed to detect actual changes
 
   // World map state
   const [allZones, setAllZones] = useState<Zone[]>([]);
   const [zoneMapData, setZoneMapData] = useState<ZoneMapData | null>(null);
-  const [useCanvasRendering, setUseCanvasRendering] = useState(false);
-  const [canvasClusters, setCanvasClusters] = useState<
-    Array<{
-      rooms: WorldMapRoom[];
-      centerX: number;
-      centerY: number;
-      dominantSector: string;
-      size: number;
-    }>
-  >([]);
+  // Removed canvas rendering & clustering state (deprecated world map LOD system)
 
   // Performance optimization and caching
   const lastLODUpdate = useRef<number>(0);
@@ -344,16 +354,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const customZoneTransitionDone = useRef<boolean>(false);
   const [currentViewMode, setCurrentViewMode] =
     useState<ViewMode>('room-detail');
-  const [selectedZoneId, setSelectedZoneId] = useState<number | undefined>(
-    zoneId
-  );
+  // Removed unused selectedZoneId state
   const [showOverlapInfo, setShowOverlapInfo] = useState(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [showLayoutTools, setShowLayoutTools] = useState(false);
 
   // Helper functions for overlap management
-  const getPositionKey = (x: number, y: number, z: number = 0) =>
-    `${x},${y},${z}`;
+  // Removed unused getPositionKey helper
 
   const getActiveOverlapIndex = useCallback(
     (roomId: number, overlappedRoomIds: number[]) => {
@@ -414,12 +421,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       }));
 
       // Update selected room to the new active room
-      setSelectedRoomId(newActiveRoomId);
+      handleSelectRoom(newActiveRoomId);
 
-      // Update edited room and z-level
+      // Update z-level
       const newActiveRoom = rooms.find(r => r.id === newActiveRoomId);
       if (newActiveRoom) {
-        setEditedRoom({ ...newActiveRoom });
         const roomZ = newActiveRoom.layoutZ ?? 0;
         setCurrentZLevel(roomZ);
         console.log(
@@ -431,7 +437,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         `🔄 Switched overlap room from ${roomId} to ${newActiveRoomId} (direction: ${direction})`
       );
     },
-    [activeOverlapRooms, setSelectedRoomId, rooms]
+    [handleSelectRoom, rooms]
   );
 
   // Undo system for room positions
@@ -913,7 +919,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     } catch (error) {
       console.error('❌ Failed to reset layout:', error);
     }
-  }, [rooms, nodes, setNodes, addToUndoHistory, originalPositions]);
+  }, [rooms, nodes, setNodes, addToUndoHistory, originalPositions, zoneId]);
 
   // Auto-layout algorithm for systematic room positioning
   const generateAutoLayout = useCallback(
@@ -950,13 +956,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       >();
       allRooms.forEach(room => {
         const exits: Array<{ direction: string; toRoomId: number | null }> = [];
-        // Parse exits from room data - assuming they're in a property like 'exits'
-        if ((room as any).exits && Array.isArray((room as any).exits)) {
-          (room as any).exits.forEach((exit: any) => {
+        if (room.exits && Array.isArray(room.exits)) {
+          room.exits.forEach(exit => {
             if (hasValidDestination(exit)) {
               exits.push({
                 direction: exit.direction,
-                toRoomId: exit.toRoomId,
+                toRoomId: exit.toRoomId ?? null,
               });
             }
           });
@@ -1082,7 +1087,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (existingRoom) {
             // Mark both rooms as overlapping
             const existingRoomId = Array.from(layout.entries()).find(
-              ([_, pos]) => pos.x === newX && pos.y === newY && pos.z === newZ
+              ([, pos]) => pos.x === newX && pos.y === newY && pos.z === newZ
             )?.[0];
 
             if (existingRoomId) {
@@ -1302,6 +1307,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   direction
                   toZoneId
                   toRoomId
+                  description
+                  keywords
+                  key
+                  flags
                 }
               }
             }
@@ -1315,7 +1324,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       if (roomsData.errors) {
         console.error('Failed to fetch rooms:', roomsData.errors);
         // Continue with zones only, using default bounds
-        const zoneBounds = zones.map((zone: any) => ({
+        interface ZoneSummary {
+          id: number;
+          name: string;
+          climate: string;
+        }
+        const zoneBounds = (zones as ZoneSummary[]).map(zone => ({
           ...zone,
           rooms: [],
           minX: 0,
@@ -1344,7 +1358,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Update room positions with auto-layout results ONLY for rooms without existing coordinates
       let roomsWithDbCoords = 0;
       let roomsWithAutoLayout = 0;
-      const updatedRooms = allRooms.map((room: any) => {
+      const updatedRooms = allRooms.map((room: Room) => {
         // If room already has valid database coordinates, use them
         if (room.layoutX !== null && room.layoutY !== null) {
           roomsWithDbCoords++;
@@ -1371,24 +1385,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       );
 
       // Group updated rooms by zoneId
-      const roomsByZone = updatedRooms.reduce((acc: any, room: any) => {
-        if (!acc[room.zoneId]) {
-          acc[room.zoneId] = [];
-        }
-        acc[room.zoneId].push(room);
+      const roomsByZone = (updatedRooms as Room[]).reduce<
+        Record<number, Room[]>
+      >((acc: Record<number, Room[]>, room: Room) => {
+        (acc[room.zoneId] ||= []).push(room);
         return acc;
       }, {});
 
       // Calculate bounds for each zone using updated positions
-      const zoneBounds = zones.map((zone: any) => {
-        const zoneRooms = roomsByZone[zone.id] || [];
-        return calculateZoneBounds({
+      const zoneBounds = (zones as ZoneSummary[]).map(zone =>
+        calculateZoneBounds({
           id: zone.id,
           name: zone.name,
           climate: zone.climate,
-          rooms: zoneRooms,
-        });
-      });
+          rooms: roomsByZone[zone.id] || [],
+        })
+      );
 
       // Calculate global bounds
       if (zoneBounds.length === 0) {
@@ -1420,7 +1432,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       console.error('Error fetching all zones:', error);
       return null;
     }
-  }, [calculateZoneBounds]);
+  }, [calculateZoneBounds, generateAutoLayout]);
 
   // Zoom level detection with hysteresis to prevent bouncing
   const detectViewMode = useCallback(
@@ -1449,7 +1461,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   // Zone selection handler with smooth transition
   const handleZoneSelect = useCallback(
     (newZoneId: number) => {
-      setSelectedZoneId(newZoneId);
+      // selectedZoneId state was removed during cleanup
 
       // If we're in world map mode, zoom into the selected zone (any zone)
       if (worldMapMode || currentViewMode === 'world-map') {
@@ -1475,10 +1487,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           } else {
             // If it's the same zone, navigate back to the zone editor
             console.log('🎯 Transitioning from world map to same zone');
-            worldMapTransitionRef.current = {
-              active: true,
-              startTime: Date.now(),
-            };
+            // Mark transition active (boolean ref)
+            worldMapTransitionRef.current = true;
 
             router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
             setCurrentViewMode('zone-overview');
@@ -1512,7 +1522,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
       }
     },
-    [zoneId, zoneMapData, reactFlowInstance, worldMapMode, router]
+    [
+      zoneId,
+      zoneMapData,
+      reactFlowInstance,
+      worldMapMode,
+      router,
+      currentViewMode,
+    ]
   );
 
   // Smooth transition to world map view
@@ -1665,6 +1682,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     id
                     zoneId
                     name
+                    roomDescription
                     sector
                     layoutX
                     layoutY
@@ -1674,6 +1692,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       direction
                       toZoneId
                       toRoomId
+                      description
+                      keywords
+                      key
+                      flags
                     }
                     mobs {
                       id
@@ -1755,13 +1777,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (!roomsData.errors) {
             const loadedRooms = roomsData.data.roomsByZone || [];
             // Transform rooms to include name field for mobs
-            const transformedRooms = loadedRooms.map((room: any) => ({
+            const transformedRooms = loadedRooms.map((room: Room) => ({
               ...room,
-              mobs:
-                room.mobs?.map((mob: any) => ({
-                  ...mob,
-                  name: mob.name, // Add name field mapping from name
-                })) || [],
+              mobs: room.mobs?.map(mob => ({ ...mob })) || [],
             }));
             setRooms(transformedRooms);
 
@@ -1805,13 +1823,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (!mobsData.errors && mobsData.data?.mobsByZone) {
             // Transform API data to match our interface
             const transformedMobs = mobsData.data.mobsByZone.map(
-              (mob: any) => ({
+              (mob: RawMob) => ({
                 id: mob.id,
                 name: mob.name,
                 level: mob.level,
                 race: mob.race || 'HUMAN',
                 class: mob.mobClass,
-                hitpoints: 0, // Not available in current schema
+                hitpoints: 0,
                 alignment: mob.lifeForce,
                 difficulty:
                   mob.level > 40
@@ -1839,25 +1857,28 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (!objectsData.errors && objectsData.data?.objectsByZone) {
             // Transform API data to match our interface
             const transformedObjects = objectsData.data.objectsByZone.map(
-              (obj: any) => ({
-                id: obj.id,
-                name: obj.name,
-                type: obj.type,
-                keywords: obj.keywords || [],
-                value: obj.cost,
-                weight: obj.weight,
-                level: obj.level,
-                material: 'unknown', // Not available in current schema
-                condition: 'good',
-                rarity:
-                  obj.level > 30
-                    ? 'epic'
-                    : obj.level > 20
-                      ? 'rare'
-                      : obj.level > 10
-                        ? 'uncommon'
-                        : 'common',
-              })
+              (obj: RawObject) => {
+                const lvl = obj.level ?? 1;
+                return {
+                  id: obj.id,
+                  name: obj.name,
+                  type: obj.type,
+                  keywords: obj.keywords || [],
+                  value: obj.cost ?? 0,
+                  weight: obj.weight ?? 0,
+                  level: lvl,
+                  material: 'unknown',
+                  condition: 'good',
+                  rarity:
+                    lvl > 30
+                      ? 'epic'
+                      : lvl > 20
+                        ? 'rare'
+                        : lvl > 10
+                          ? 'uncommon'
+                          : 'common',
+                };
+              }
             );
             setObjects(transformedObjects);
           } else {
@@ -1876,21 +1897,26 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     };
 
     fetchData();
-  }, [zoneId]);
+  }, [zoneId, worldMapMode]);
 
   // Handle initial room selection from URL parameter
   useEffect(() => {
-    if (rooms.length > 0 && selectedRoomId == null) {
-      // Check for room parameter in URL
-      const urlParams = new URLSearchParams(window.location.search);
-      const roomParam = urlParams.get('room');
+    const roomParam = searchParams.get('room');
+    console.log(
+      `🔍 Room selection useEffect: rooms=${rooms.length}, selectedRoomId=${selectedRoomId}, roomParam=${roomParam}`
+    );
 
+    // Only proceed if we have rooms loaded
+    if (rooms.length > 0) {
       if (roomParam) {
         const roomId = parseInt(roomParam);
         const targetRoom = rooms.find(r => r.id === roomId);
 
-        if (targetRoom) {
-          console.log(`🎯 Setting initial room from URL: ${roomId}`);
+        // Only update if the URL room is different from currently selected room
+        if (targetRoom && selectedRoomId !== roomId) {
+          console.log(
+            `🎯 Setting room from URL: ${roomId} (was ${selectedRoomId})`
+          );
           setSelectedRoomId(roomId);
           setEditedRoom({ ...targetRoom });
 
@@ -1914,394 +1940,65 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           setCurrentZLevel(roomZ);
           hasInitializedZLevel.current = true; // Prevent default z-level from overriding
           console.log(`🏢 Set initial z-level to Z${roomZ} for room from URL`);
-        } else {
+        } else if (!targetRoom) {
           console.warn(
             `⚠️ Room ${roomId} from URL not found in zone ${zoneId}`
           );
         }
+      } else if (selectedRoomId == null) {
+        // No room parameter in URL and no room selected - this is fine for initial load
+        console.log(`📍 No room parameter in URL, no room selected yet`);
       }
     }
-  }, [rooms, selectedRoomId, zoneId, overlaps]);
+  }, [rooms, selectedRoomId, zoneId, overlaps, searchParams]);
 
-  // Generate world map nodes for zone viewing
-  const generateWorldMapNodes = useCallback(
-    (mapData: ZoneMapData): Node[] => {
-      const ZONE_SCALE = 200; // Scale factor for world map positioning
+  // Center on selected room when nodes are ready
+  useEffect(() => {
+    // Only center if we have a selected room, nodes are loaded, and reactFlowInstance is available
+    if (selectedRoomId !== null && nodes.length > 0 && reactFlowInstance) {
+      const room = rooms.find(r => r.id === selectedRoomId);
+      if (!room) return;
 
-      return mapData.zones.map(zoneBounds => {
-        const centerX = zoneBounds.centerX * ZONE_SCALE;
-        const centerY = zoneBounds.centerY * ZONE_SCALE;
+      // Small delay to ensure React Flow has fully rendered
+      const timerId = setTimeout(() => {
+        const targetNode = reactFlowInstance
+          .getNodes()
+          .find(n => n.id === String(selectedRoomId));
 
-        return {
-          id: `zone-${zoneBounds.id}`,
-          type: 'zone',
-          position: { x: centerX, y: centerY },
-          data: {
-            zoneId: zoneBounds.id,
-            name: zoneBounds.name,
-            climate: zoneBounds.climate,
-            roomCount: zoneBounds.roomCount,
-            bounds: zoneBounds,
-            onZoneSelect: handleZoneSelect,
-          },
-          draggable: false,
-          selectable: true,
-        };
-      });
-    },
-    [handleZoneSelect]
-  );
-
-  // Generate world map room nodes with enhanced Level of Detail (LOD) system
-  const generateWorldMapRoomNodes = useCallback(
-    (mapData: ZoneMapData, zoom: number = 0.5): Node[] => {
-      const performanceStart = performance.now();
-
-      // Dynamic scaling based on zoom level for better visibility
-      const ROOM_SCALE = zoom < 0.3 ? 200 : zoom < 0.5 ? 100 : 50; // Much larger scale for world view
-      const MIN_ZONE_PADDING = 200; // Minimum padding between zone boundaries
-
-      const zoneNameMap = mapData.zones.reduce(
-        (acc, zone) => {
-          acc[zone.id] = zone.name;
-          return acc;
-        },
-        {} as Record<number, string>
-      );
-
-      // Create a smart zone-based layout that prevents overlapping using actual zone bounds
-      const zonePositions = new Map<number, { x: number; y: number }>();
-
-      // Calculate actual zone dimensions in world coordinates
-      const zoneMetrics = mapData.zones.map(zone => ({
-        id: zone.id,
-        width: (zone.maxX - zone.minX) * ROOM_SCALE,
-        height: (zone.maxY - zone.minY) * ROOM_SCALE,
-        bounds: zone,
-      }));
-
-      // Sort zones by area (largest first) for better packing
-      const sortedZones = [...zoneMetrics].sort(
-        (a, b) => b.width * b.height - a.width * a.height
-      );
-
-      // Use a simple but effective bin-packing algorithm
-      const placedZones: Array<{
-        id: number;
-        x: number;
-        y: number;
-        width: number;
-        height: number;
-      }> = [];
-
-      sortedZones.forEach(zone => {
-        let bestPosition = { x: 0, y: 0 };
-        let bestWaste = Infinity;
-
-        // Try to find the best position that minimizes wasted space
-        for (let x = 0; x <= 5000; x += 100) {
-          // Reasonable search space
-          for (let y = 0; y <= 5000; y += 100) {
-            // Check if this position would cause overlap
-            const wouldOverlap = placedZones.some(placed => {
-              const overlap = !(
-                x >= placed.x + placed.width + MIN_ZONE_PADDING ||
-                x + zone.width + MIN_ZONE_PADDING <= placed.x ||
-                y >= placed.y + placed.height + MIN_ZONE_PADDING ||
-                y + zone.height + MIN_ZONE_PADDING <= placed.y
-              );
-              return overlap;
-            });
-
-            if (!wouldOverlap) {
-              // Calculate waste (distance from origin - prefer positions closer to origin)
-              const waste = Math.sqrt(x * x + y * y);
-              if (waste < bestWaste) {
-                bestWaste = waste;
-                bestPosition = { x, y };
-              }
-            }
-          }
-        }
-
-        // Place the zone at the best position found
-        placedZones.push({
-          id: zone.id,
-          x: bestPosition.x,
-          y: bestPosition.y,
-          width: zone.width,
-          height: zone.height,
-        });
-
-        // Store the position offset for this zone (center the zone content)
-        zonePositions.set(zone.id, {
-          x: bestPosition.x + zone.width / 2,
-          y: bestPosition.y + zone.height / 2,
-        });
-      });
-
-      // Enhanced Level of Detail based on zoom level with performance optimization
-      let clusterSize = 1; // Default: show individual rooms
-      let maxNodes = 10000; // Maximum nodes to render
-      let lodLevel = 'detailed';
-
-      if (zoom < 0.1) {
-        // Extreme zoom out: use Canvas rendering for ultimate performance (disabled for now)
-        clusterSize = 32;
-        maxNodes = 100;
-        lodLevel = 'canvas-micro';
-        setUseCanvasRendering(false); // Temporarily disabled
-      } else if (zoom < 0.2) {
-        // Ultra zoomed out: maximum clustering for overview
-        clusterSize = 16;
-        maxNodes = 200;
-        lodLevel = 'ultra-overview';
-        setUseCanvasRendering(false);
-      } else if (zoom < 0.3) {
-        // Very zoomed out: cluster rooms heavily
-        clusterSize = 8;
-        maxNodes = 500;
-        lodLevel = 'overview';
-        setUseCanvasRendering(false);
-      } else if (zoom < 0.5) {
-        // Moderately zoomed out: some clustering
-        clusterSize = 4;
-        maxNodes = 1500;
-        lodLevel = 'medium';
-        setUseCanvasRendering(false);
-      } else if (zoom < 0.8) {
-        // Somewhat zoomed in: minimal clustering
-        clusterSize = 2;
-        maxNodes = 3000;
-        lodLevel = 'detailed';
-        setUseCanvasRendering(false);
-      } else {
-        // zoom >= 0.8: show all individual rooms (full detail)
-        setUseCanvasRendering(false);
-      }
-
-      const validRooms = mapData.rooms.filter(
-        room => room.layoutX !== null && room.layoutY !== null
-      );
-
-      // Enhanced clustering algorithm for better performance and visual organization
-      if (clusterSize > 1) {
-        const clusters = new Map<
-          string,
-          {
-            rooms: WorldMapRoom[];
-            centerX: number;
-            centerY: number;
-            dominantSector: string;
-            sectorDistribution: Record<string, number>;
-          }
-        >();
-
-        // Group rooms into clusters with zone-based positioning
-        validRooms.forEach(room => {
-          const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
-
-          // Get the zone bounds to calculate the origin offset from center
-          const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
-          if (!zoneBounds) return; // Skip rooms without zone bounds
-
-          // Calculate zone origin from center position
-          const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
-          const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
-          const zoneOriginX = zonePos.x - zoneWidth / 2;
-          const zoneOriginY = zonePos.y - zoneHeight / 2;
-
-          // Use room's local coordinates within the zone
-          const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
-          const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
-
-          const clusterX = Math.floor(roomLocalX / clusterSize) * clusterSize;
-          const clusterY = Math.floor(roomLocalY / clusterSize) * clusterSize;
-          const clusterKey = `${room.zoneId}-${clusterX},${clusterY}`;
-
-          if (!clusters.has(clusterKey)) {
-            clusters.set(clusterKey, {
-              rooms: [],
-              centerX: zoneOriginX + (clusterX + clusterSize / 2) * ROOM_SCALE,
-              centerY: zoneOriginY + (clusterY + clusterSize / 2) * ROOM_SCALE,
-              dominantSector: room.sector,
-              sectorDistribution: {},
-            });
-          }
-
-          const cluster = clusters.get(clusterKey)!;
-          cluster.rooms.push(room);
-
-          // Track sector distribution for better visualization
-          cluster.sectorDistribution[room.sector] =
-            (cluster.sectorDistribution[room.sector] || 0) + 1;
-        });
-
-        // Convert clusters to nodes with improved visual differentiation
-        const clusterNodes = Array.from(clusters.entries()).map(
-          ([key, cluster], index) => {
-            // Use the sector distribution to find the most dominant sector
-            const dominantSector = Object.entries(
-              cluster.sectorDistribution
-            ).sort(([, a], [, b]) => b - a)[0][0];
-
-            const x = cluster.centerX;
-            const y = cluster.centerY;
-
-            // Use the first room's zone info for the cluster
-            const firstRoom = cluster.rooms[0];
-
-            // Calculate cluster size based on room count and LOD level - very large for easy interaction
-            const baseSize =
-              lodLevel === 'canvas-micro'
-                ? 32
-                : lodLevel === 'ultra-overview'
-                  ? 80
-                  : lodLevel === 'overview'
-                    ? 100
-                    : lodLevel === 'medium'
-                      ? 120
-                      : 140;
-
-            const clusterNodeSize = Math.min(
-              baseSize + 32,
-              baseSize + Math.floor(cluster.rooms.length * 1.5)
-            );
-
-            return {
-              id: `cluster-${key}`,
-              type: 'worldRoom',
-              position: { x, y },
-              data: {
-                roomId: firstRoom.id, // Representative room
-                name: `${cluster.rooms.length} rooms`,
-                sector: dominantSector,
-                zoneId: firstRoom.zoneId,
-                zoneName:
-                  zoneNameMap[firstRoom.zoneId] || `Zone ${firstRoom.zoneId}`,
-                onRoomSelect: handleRoomSelect,
-              },
-              draggable: false,
-              selectable: true,
-              style: {
-                width: clusterNodeSize,
-                height: clusterNodeSize,
-                opacity: 0.9,
-                minWidth: clusterNodeSize,
-                minHeight: clusterNodeSize,
-              },
-            } as Node;
-          }
-        );
-
-        const finalClusterNodes = clusterNodes.slice(0, maxNodes);
-        const performanceEnd = performance.now();
-
-        // For canvas rendering mode, also set the canvas clusters
-        if (lodLevel === 'canvas-micro') {
-          const canvasClusterData = Array.from(clusters.entries()).map(
-            ([key, cluster]) => ({
-              rooms: cluster.rooms,
-              centerX: cluster.centerX,
-              centerY: cluster.centerY,
-              dominantSector: Object.entries(cluster.sectorDistribution).sort(
-                ([, a], [, b]) => b - a
-              )[0][0],
-              size: Math.max(16, Math.min(48, cluster.rooms.length * 3)),
-            })
+        if (targetNode) {
+          console.log(
+            `🎯 Centering on room ${selectedRoomId} at position:`,
+            targetNode.position
           );
-          setCanvasClusters(canvasClusterData);
+          reactFlowInstance.setCenter(
+            targetNode.position.x + 90, // Center of room node (room width ~180px)
+            targetNode.position.y + 60, // Center of room node (room height ~120px)
+            { zoom: 1.2, duration: 800 }
+          );
+        } else if (room.layoutX != null && room.layoutY != null) {
+          // Fallback: calculate position from room coordinates
+          const roomX =
+            (room.layoutX ?? 0) * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
+          const roomY =
+            -(room.layoutY ?? 0) * GRID_SIZE * ROOM_SPACING_MULTIPLIER; // Y is inverted
+          console.log(
+            `🎯 Centering on room ${selectedRoomId} at calculated position: (${roomX}, ${roomY})`
+          );
+          reactFlowInstance.setCenter(roomX + 90, roomY + 60, {
+            zoom: 1.2,
+            duration: 800,
+          });
         }
 
-        // Performance logging disabled to reduce console spam during interactions
-        // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, clusterSize=${clusterSize}, ` +
-        //             `clusters=${finalClusterNodes.length}/${clusters.size}, ` +
-        //             `rooms=${validRooms.length}, time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
+        // Mark initial fit as performed to prevent the general fit view from running
+        hasPerformedInitialFit.current = true;
+      }, 150); // Delay to ensure nodes are rendered
 
-        return finalClusterNodes;
-      }
+      return () => clearTimeout(timerId);
+    }
+  }, [selectedRoomId, nodes, reactFlowInstance, rooms]);
 
-      // No clustering: show individual rooms (but respect maxNodes limit)
-      const limitedRooms = validRooms.slice(0, maxNodes);
-      const roomNodes = limitedRooms.map(room => {
-        const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
-
-        // Get the zone bounds to calculate the origin offset from center
-        const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
-        if (!zoneBounds) {
-          // Fallback to simple positioning if zone bounds not found
-          const x = zonePos.x + (room.layoutX || 0) * ROOM_SCALE;
-          const y = zonePos.y + (room.layoutY || 0) * ROOM_SCALE;
-          return {
-            id: `room-${room.id}`,
-            type: 'worldRoom',
-            position: { x, y },
-            data: {
-              roomId: room.id,
-              name: room.name || `Room ${room.id}`,
-              sector: room.sector || 'UNKNOWN',
-              zoneId: room.zoneId,
-              zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
-              onRoomSelect: handleRoomSelect,
-            },
-            draggable: false,
-            selectable: true,
-            style: {
-              width: 8,
-              height: 8,
-              backgroundColor: '#10b981', // Simple green color for fallback
-              border: '1px solid #374151',
-              borderRadius: '2px',
-              opacity: 0.9,
-            },
-          } as Node;
-        }
-
-        // Calculate zone origin from center position
-        const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
-        const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
-        const zoneOriginX = zonePos.x - zoneWidth / 2;
-        const zoneOriginY = zonePos.y - zoneHeight / 2;
-
-        // Position room relative to zone origin, accounting for zone's internal coordinate system
-        const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
-        const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
-        const x = zoneOriginX + roomLocalX * ROOM_SCALE;
-        const y = zoneOriginY + roomLocalY * ROOM_SCALE;
-
-        return {
-          id: `worldroom-${room.id}`,
-          type: 'worldRoom',
-          position: { x, y },
-          data: {
-            roomId: room.id,
-            name: room.name,
-            sector: room.sector,
-            zoneId: room.zoneId,
-            zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
-            onRoomSelect: handleRoomSelect,
-          },
-          draggable: false,
-          selectable: true,
-          style: {
-            width: 80,
-            height: 80,
-            minWidth: 80,
-            minHeight: 80,
-            opacity: 1.0,
-          },
-        } as Node;
-      });
-
-      const performanceEnd = performance.now();
-      // Performance logging disabled to reduce console spam during interactions
-      // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, individual rooms=${roomNodes.length}/${validRooms.length}, ` +
-      //             `time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
-
-      return roomNodes;
-    },
-    []
-  );
+  // Removed legacy world map node and position generators (simplified mode retained)
 
   // Handle room selection in world map mode
   const handleRoomSelect = useCallback(
@@ -2737,7 +2434,33 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Reset flags and UI state when zone changes (can be in useEffect)
   useEffect(() => {
-    console.log(`🔄 Zone changed to ${zoneId} - resetting UI state`);
+    console.log(
+      `🔍 Zone change useEffect triggered: zoneId=${zoneId}, lastProcessedZoneId=${lastProcessedZoneId.current}`
+    );
+
+    // Check if this is the same zone (React Strict Mode double-render or initial mount)
+    if (lastProcessedZoneId.current === zoneId) {
+      console.log(
+        `🔵 Same zone (${zoneId}) - skipping reset (React Strict Mode double-render)`
+      );
+      return;
+    }
+
+    // Check if this is the initial zone load
+    if (lastProcessedZoneId.current === null) {
+      console.log(
+        `🔵 Initial zone load (${zoneId}) - skipping reset to preserve URL parameters`
+      );
+      const params = new URLSearchParams(window.location.search);
+      console.log(`🔍 Current URL params:`, params.toString());
+      lastProcessedZoneId.current = zoneId ?? null;
+      return;
+    }
+
+    // This is an actual zone change - reset UI state
+    console.log(
+      `🔄 Zone changed from ${lastProcessedZoneId.current} to ${zoneId} - resetting UI state`
+    );
 
     hasInitializedZLevel.current = false;
     hasPerformedInitialFit.current = false;
@@ -2749,11 +2472,16 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // Clear rooms to prevent rendering with stale data from previous zone
     setRooms([]);
 
-    // Reset selected room
+    // Reset selected room state (but keep URL parameter - it will be used once rooms load)
     setSelectedRoomId(null);
     setEditedRoom(null);
 
-    console.log('✅ Cleared UI state for zone change');
+    // Update the last processed zone ID
+    lastProcessedZoneId.current = zoneId ?? null;
+
+    console.log(
+      '✅ Cleared UI state for zone change (preserved room URL parameter)'
+    );
   }, [zoneId, setNodes, setEdges, setRooms, setSelectedRoomId, setEditedRoom]);
 
   // Initialize Z-level to the most populated floor when rooms are loaded
@@ -2792,6 +2520,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
     // Only perform initial fit once - don't re-trigger on Z-level changes
     // Wait for nodes to be generated before trying to position
+    // Skip initial fit if we have a selected room (let the room centering handle it)
     if (
       rooms.length > 0 &&
       nodes.length > 0 &&
@@ -2800,7 +2529,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       currentViewMode !== 'world-map' &&
       !worldMapTransitionRef.current &&
       !customZoneTransitionDone.current &&
-      !hasPerformedInitialFit.current
+      !hasPerformedInitialFit.current &&
+      selectedRoomId === null
     ) {
       console.log(
         `🎯 Running initial positioning logic (selectedRoomId=${selectedRoomId})`
@@ -2815,7 +2545,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         // If we have a selected room, center on that specific room
         if (selectedRoomId) {
           const targetNode = nodes.find(
-            n => n.id === selectedRoomId.toString() && n.type === 'room'
+            n => n.id === String(selectedRoomId) && n.type === 'room'
           );
           if (targetNode && targetNode.position) {
             console.log(
@@ -3035,6 +2765,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     currentViewMode,
     zoneMapData,
     generateEnhancedWorldMapNodes,
+    reactFlowInstance,
   ]);
 
   // Convert rooms to React Flow nodes and edges
@@ -3299,6 +3030,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           description: room.roomDescription,
           exits: room.exits,
           mobs: room.mobs || [],
+          objects: room.objects || [],
+          shops: room.shops || [],
           layoutZ: room.layoutZ,
           room: room,
           isOverlapping: !!overlappingWith,
@@ -3337,21 +3070,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     });
 
     // Detect one-way exits for enhanced visualization
-    const autoLayoutRooms: AutoLayoutRoom[] = rooms.map(room => ({
-      id: room.id,
-      name: room.name,
-      description: room.roomDescription,
-      layoutX: room.layoutX,
-      layoutY: room.layoutY,
-      layoutZ: room.layoutZ,
-      exits: room.exits.map(exit => ({
-        direction: exit.direction,
-        toRoomId: exit.toRoomId,
-        toZoneId: exit.toZoneId,
-      })),
-    }));
-
-    const oneWayExits = detectOneWayExits(autoLayoutRooms);
+    // Prepare simplified room data for one-way exit detection
+    const oneWayExits = detectOneWayExits(
+      rooms.map(room => ({
+        id: room.id,
+        name: room.name,
+        description: room.roomDescription,
+        layoutX: room.layoutX ?? 0,
+        layoutY: room.layoutY ?? 0,
+        layoutZ: room.layoutZ ?? 0,
+        exits: room.exits.map(exit => ({
+          direction: exit.direction,
+          toRoomId: exit.toRoomId ?? null,
+          toZoneId: exit.toZoneId ?? null,
+        })),
+      }))
+    );
     console.log(`🔍 Detected ${oneWayExits.length} one-way exits in zone`);
 
     // Create individual portal nodes for each cross-zone exit
@@ -3660,6 +3394,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     zoneId,
     zoneMapData,
     reactFlowInstance,
+    selectedRoomId,
   ]);
 
   // Update node selection state without regenerating all nodes
@@ -3731,8 +3466,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           // Only update selected room if it's actually different
           if (selectedRoomId !== roomId) {
-            setSelectedRoomId(roomId);
-            setEditedRoom({ ...room });
+            handleSelectRoom(roomId);
 
             // Check if clicked room is part of an overlap and make it visible
             const clickedOverlap = overlaps.find(overlap =>
@@ -3763,6 +3497,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       worldMapMode,
       selectedRoomId,
       currentZLevel,
+      handleSelectRoom,
+      overlaps,
     ]
   );
 
@@ -3895,7 +3631,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         }
       }
     },
-    [viewMode, setNodes, setRooms, rooms, addToUndoHistory]
+    [
+      viewMode,
+      setNodes,
+      setRooms,
+      rooms,
+      addToUndoHistory,
+      worldMapMode,
+      zoneId,
+    ]
   );
 
   const handleRoomChange = useCallback(
@@ -4047,7 +3791,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     }
   };
 
-  const handleUpdateExit = async (exitId: string, exitData: any) => {
+  interface ExitUpdate {
+    direction?: string;
+    toZoneId?: number | null;
+    toRoomId?: number | null;
+    description?: string;
+    keyword?: string;
+  }
+  const handleUpdateExit = async (exitId: string, exitData: ExitUpdate) => {
     if (selectedRoomId == null) return;
     if (!canEditZone(zoneId)) {
       setError('You do not have permission to edit this zone.');
@@ -4146,8 +3897,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Helper function to find the nearest room to a position
   const findNearestRoom = useCallback(
-    (position: { x: number; y: number }) => {
-      let nearestRoom = null;
+    (position: { x: number; y: number }): Room | null => {
+      let nearestRoom: Room | null = null;
       let minDistance = Infinity;
 
       rooms.forEach(room => {
@@ -4169,30 +3920,46 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   );
 
   // Handler to add a mob to a room
+  interface MobInput {
+    id: number;
+    name: string;
+    level: number;
+    race?: string | null;
+    mobClass?: string | null;
+    lifeForce?: string | null;
+  }
   const handleAddMobToRoom = useCallback(
-    async (roomId: number, mob: any) => {
+    async (roomId: number, mob: MobInput) => {
       try {
         setRooms(prevRooms =>
-          prevRooms.map(room =>
-            room.id === roomId
-              ? {
-                  ...room,
-                  mobs: [...(room.mobs || []), { ...mob, roomId }],
-                }
-              : room
-          )
+          prevRooms.map(room => {
+            if (room.id !== roomId) return room;
+            const newMob: Mob = {
+              id: mob.id,
+              name: mob.name,
+              level: mob.level,
+              race: mob.race ?? undefined,
+              mobClass: mob.mobClass ?? undefined,
+              lifeForce: mob.lifeForce ?? undefined,
+            } as Mob; // ensure conforms to Mob
+            return { ...room, mobs: [...(room.mobs || []), newMob] };
+          })
         );
 
         // Also update editedRoom if it's the target room
         if (editedRoom?.id === roomId) {
-          setEditedRoom(prev =>
-            prev
-              ? {
-                  ...prev,
-                  mobs: [...(prev.mobs || []), { ...mob, roomId }],
-                }
-              : null
-          );
+          setEditedRoom(prev => {
+            if (!prev) return null;
+            const newMob: Mob = {
+              id: mob.id,
+              name: mob.name,
+              level: mob.level,
+              race: mob.race ?? undefined,
+              mobClass: mob.mobClass ?? undefined,
+              lifeForce: mob.lifeForce ?? undefined,
+            } as Mob;
+            return { ...prev, mobs: [...(prev.mobs || []), newMob] };
+          });
         }
 
         console.log(`✅ Added mob "${mob.name}" to room ${roomId}`);
@@ -4205,8 +3972,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   );
 
   // Handler to add an object to a room
+  interface ObjectInput {
+    id: number;
+    name: string;
+    type: string;
+    keywords?: string[] | null;
+    cost?: number | null;
+    weight?: number | null;
+    level?: number | null;
+  }
   const handleAddObjectToRoom = useCallback(
-    async (roomId: number, object: any) => {
+    async (roomId: number, object: ObjectInput) => {
       try {
         // Objects are managed separately at the zone level, not per room
 
@@ -4216,19 +3992,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         setError('Failed to add object to room.');
       }
     },
-    [editedRoom]
+    []
   );
 
-  const handleUpdateZLevel = async (roomId: number, newZLevel: number) => {
-    console.log(`Updating room ${roomId} Z-level to ${newZLevel}`);
+  const handleUpdateZLevel = useCallback(
+    async (roomId: number, newZLevel: number) => {
+      console.log(`Updating room ${roomId} Z-level to ${newZLevel}`);
 
-    try {
-      const response = await authenticatedFetch(
-        'http://localhost:4000/graphql',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            query: `
+      try {
+        const response = await authenticatedFetch(
+          'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              query: `
             mutation UpdateRoomPosition($id: Int!, $position: UpdateRoomPositionInput!) {
               updateRoomPosition(id: $id, position: $position) {
                 id
@@ -4238,76 +4015,81 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-            variables: {
-              id: roomId,
-              position: {
-                layoutZ: newZLevel,
+              variables: {
+                id: roomId,
+                position: {
+                  layoutZ: newZLevel,
+                },
               },
-            },
-          }),
-        }
-      );
-
-      if (response.ok) {
-        // Update local state
-        setRooms(prevRooms =>
-          prevRooms.map(room =>
-            room.id === roomId ? { ...room, layoutZ: newZLevel } : room
-          )
+            }),
+          }
         );
 
-        // Update nodes with new Z-level data
-        setNodes(prevNodes =>
-          prevNodes.map(node =>
-            parseInt(node.id) === roomId
-              ? { ...node, data: { ...node.data, layoutZ: newZLevel } }
-              : node
-          )
-        );
+        if (response.ok) {
+          // Update local state
+          setRooms(prevRooms =>
+            prevRooms.map(room =>
+              room.id === roomId ? { ...room, layoutZ: newZLevel } : room
+            )
+          );
 
-        // Update edited room if it's the current room
-        if (editedRoom?.id === roomId) {
-          setEditedRoom(prev =>
-            prev ? { ...prev, layoutZ: newZLevel } : null
+          // Update nodes with new Z-level data
+          setNodes(prevNodes =>
+            prevNodes.map(node =>
+              parseInt(node.id) === roomId
+                ? { ...node, data: { ...node.data, layoutZ: newZLevel } }
+                : node
+            )
+          );
+
+          // Update edited room if it's the current room
+          if (editedRoom?.id === roomId) {
+            setEditedRoom(prev =>
+              prev ? { ...prev, layoutZ: newZLevel } : null
+            );
+          }
+
+          console.log(`✅ Room ${roomId} Z-level updated to ${newZLevel}`);
+        } else {
+          console.error(
+            `❌ Failed to update room ${roomId} Z-level:`,
+            await response.text()
           );
         }
-
-        console.log(`✅ Room ${roomId} Z-level updated to ${newZLevel}`);
-      } else {
-        console.error(
-          `❌ Failed to update room ${roomId} Z-level:`,
-          await response.text()
-        );
+      } catch (error) {
+        console.error(`❌ Error updating room ${roomId} Z-level:`, error);
       }
-    } catch (error) {
-      console.error(`❌ Error updating room ${roomId} Z-level:`, error);
-    }
-  };
+    },
+    [setRooms, setNodes, editedRoom, setEditedRoom]
+  );
 
-  const handleDeleteRoom = async (roomId: number) => {
-    if (!canEditZone(zoneId)) {
-      console.log('⚠️ You do not have permission to delete rooms in this zone');
-      return;
-    }
+  const handleDeleteRoom = useCallback(
+    async (roomId: number) => {
+      if (!canEditZone(zoneId)) {
+        console.log(
+          '⚠️ You do not have permission to delete rooms in this zone'
+        );
+        return;
+      }
 
-    const room = rooms.find(r => r.id === roomId);
-    if (!room) return;
+      const room = rooms.find(r => r.id === roomId);
+      if (!room) return;
 
-    const confirmed = window.confirm(
-      `Are you sure you want to delete room ${roomId}: "${room.name}"?\n\nThis action cannot be undone.`
-    );
+      const confirmed = window.confirm(
+        `Are you sure you want to delete room ${roomId}: "${room.name}"?\n\nThis action cannot be undone.`
+      );
 
-    if (!confirmed) return;
+      if (!confirmed) return;
 
-    try {
-      console.log(`🗑️ Deleting room ${roomId}...`);
+      try {
+        console.log(`🗑️ Deleting room ${roomId}...`);
 
-      const response = await authenticatedFetch(
-        'http://localhost:4000/graphql',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            query: `
+        const response = await authenticatedFetch(
+          'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              query: `
             mutation DeleteRoom($id: Int!) {
               deleteRoom(id: $id) {
                 id
@@ -4315,122 +4097,147 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-            variables: { id: roomId },
-          }),
-        }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        if (!data.errors) {
-          // Remove room from local state
-          setRooms(prevRooms => prevRooms.filter(r => r.id !== roomId));
-
-          // Remove node from React Flow
-          setNodes(prevNodes =>
-            prevNodes.filter(n => parseInt(n.id) !== roomId)
-          );
-
-          // Remove edges connected to this room
-          setEdges(prevEdges =>
-            prevEdges.filter(
-              e =>
-                e.source !== roomId.toString() && e.target !== roomId.toString()
-            )
-          );
-
-          // Clear selection if deleted room was selected
-          if (selectedRoomId === roomId) {
-            setSelectedRoomId(null);
-            setEditedRoom(null);
+              variables: { id: roomId },
+            }),
           }
+        );
 
-          console.log(`✅ Room ${roomId} deleted successfully`);
+        if (response.ok) {
+          const data = await response.json();
+          if (!data.errors) {
+            // Remove room from local state
+            setRooms(prevRooms => prevRooms.filter(r => r.id !== roomId));
+
+            // Remove node from React Flow
+            setNodes(prevNodes =>
+              prevNodes.filter(n => parseInt(n.id) !== roomId)
+            );
+
+            // Remove edges connected to this room
+            setEdges(prevEdges =>
+              prevEdges.filter(
+                e =>
+                  e.source !== roomId.toString() &&
+                  e.target !== roomId.toString()
+              )
+            );
+
+            // Clear selection if deleted room was selected
+            if (selectedRoomId === roomId) {
+              setSelectedRoomId(null);
+              setEditedRoom(null);
+
+              // Remove room parameter from URL using router
+              const params = new URLSearchParams(window.location.search);
+              params.delete('room');
+              router.push(`${window.location.pathname}?${params.toString()}`, {
+                scroll: false,
+              });
+            }
+
+            console.log(`✅ Room ${roomId} deleted successfully`);
+          } else {
+            console.error(
+              `❌ GraphQL error deleting room ${roomId}:`,
+              data.errors[0].message
+            );
+            alert(`Failed to delete room: ${data.errors[0].message}`);
+          }
         } else {
           console.error(
-            `❌ GraphQL error deleting room ${roomId}:`,
-            data.errors[0].message
+            `❌ HTTP error deleting room ${roomId}:`,
+            response.status
           );
-          alert(`Failed to delete room: ${data.errors[0].message}`);
+          alert(`Failed to delete room: HTTP ${response.status}`);
         }
-      } else {
-        console.error(
-          `❌ HTTP error deleting room ${roomId}:`,
-          response.status
+      } catch (error) {
+        console.error(`❌ Error deleting room ${roomId}:`, error);
+        alert(
+          `Failed to delete room: ${error instanceof Error ? error.message : 'Unknown error'}`
         );
-        alert(`Failed to delete room: HTTP ${response.status}`);
       }
-    } catch (error) {
-      console.error(`❌ Error deleting room ${roomId}:`, error);
-      alert(
-        `Failed to delete room: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
+    },
+    [
+      canEditZone,
+      zoneId,
+      rooms,
+      selectedRoomId,
+      setRooms,
+      setNodes,
+      setEdges,
+      setSelectedRoomId,
+      setEditedRoom,
+      router,
+    ]
+  );
 
-  const handleCreateNewRoom = async (direction?: string) => {
-    if (!canEditZone(zoneId)) {
-      console.log('⚠️ You do not have permission to create rooms in this zone');
-      return;
-    }
-
-    // Prompt for direction if not provided and a room is selected
-    let selectedDirection = direction;
-    if (!selectedDirection && selectedRoomId) {
-      const availableDirections = [
-        'NORTH',
-        'SOUTH',
-        'EAST',
-        'WEST',
-        'NORTHEAST',
-        'NORTHWEST',
-        'SOUTHEAST',
-        'SOUTHWEST',
-        'UP',
-        'DOWN',
-      ];
-      const currentRoom = rooms.find(r => r.id === selectedRoomId);
-      const usedDirections = currentRoom?.exits.map(e => e.direction) || [];
-      const unusedDirections = availableDirections.filter(
-        d => !usedDirections.includes(d)
-      );
-
-      if (unusedDirections.length > 0) {
-        const promptResult = prompt(
-          `Create new room in which direction from room ${selectedRoomId}?\n\nAvailable directions: ${unusedDirections.join(', ')}`
+  const handleCreateNewRoom = useCallback(
+    async (direction?: string) => {
+      if (!canEditZone(zoneId)) {
+        console.log(
+          '⚠️ You do not have permission to create rooms in this zone'
         );
-        selectedDirection = promptResult || undefined;
+        return;
+      }
 
-        if (
-          selectedDirection &&
-          !unusedDirections.includes(selectedDirection.toUpperCase())
-        ) {
-          alert(
-            `Invalid direction. Available directions: ${unusedDirections.join(', ')}`
+      // Prompt for direction if not provided and a room is selected
+      let selectedDirection = direction;
+      if (!selectedDirection && selectedRoomId) {
+        const availableDirections = [
+          'NORTH',
+          'SOUTH',
+          'EAST',
+          'WEST',
+          'NORTHEAST',
+          'NORTHWEST',
+          'SOUTHEAST',
+          'SOUTHWEST',
+          'UP',
+          'DOWN',
+        ];
+        const currentRoom = rooms.find(r => r.id === selectedRoomId);
+        const usedDirections = currentRoom?.exits.map(e => e.direction) || [];
+        const unusedDirections = availableDirections.filter(
+          d => !usedDirections.includes(d)
+        );
+
+        if (unusedDirections.length > 0) {
+          const promptResult = prompt(
+            `Create new room in which direction from room ${selectedRoomId}?\n\nAvailable directions: ${unusedDirections.join(', ')}`
           );
-          return;
+          selectedDirection = promptResult || undefined;
+
+          if (
+            selectedDirection &&
+            !unusedDirections.includes(selectedDirection.toUpperCase())
+          ) {
+            alert(
+              `Invalid direction. Available directions: ${unusedDirections.join(', ')}`
+            );
+            return;
+          }
         }
       }
-    }
 
-    const roomName = prompt('Enter name for the new room:');
-    if (!roomName) return;
+      const roomName = prompt('Enter name for the new room:');
+      if (!roomName) return;
 
-    const roomDescription = prompt('Enter description for the new room:') || '';
+      const roomDescription =
+        prompt('Enter description for the new room:') || '';
 
-    // Find next available room ID
-    const maxId = Math.max(...rooms.map(r => r.id), 0);
-    const newRoomId = maxId + 1;
+      // Find next available room ID
+      const maxId = Math.max(...rooms.map(r => r.id), 0);
+      const newRoomId = maxId + 1;
 
-    try {
-      console.log(`➕ Creating new room ${newRoomId}...`);
+      try {
+        console.log(`➕ Creating new room ${newRoomId}...`);
 
-      const response = await authenticatedFetch(
-        'http://localhost:4000/graphql',
-        {
-          method: 'POST',
-          body: JSON.stringify({
-            query: `
+        const response = await authenticatedFetch(
+          'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            body: JSON.stringify({
+              query: `
             mutation CreateRoom($data: CreateRoomInput!) {
               createRoom(data: $data) {
                 id
@@ -4445,65 +4252,70 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   direction
                   toZoneId
                   toRoomId
+                  description
+                  keywords
+                  key
+                  flags
                 }
               }
             }
           `,
-            variables: {
-              data: {
-                id: newRoomId,
-                name: roomName,
-                roomDescription: roomDescription,
-                sector: 'STRUCTURE',
-                zoneId: zoneId,
+              variables: {
+                data: {
+                  id: newRoomId,
+                  name: roomName,
+                  roomDescription: roomDescription,
+                  sector: 'STRUCTURE',
+                  zoneId: zoneId,
+                },
               },
-            },
-          }),
-        }
-      );
+            }),
+          }
+        );
 
-      if (response.ok) {
-        const data = await response.json();
-        if (!data.errors) {
-          const newRoom = data.data.createRoom;
+        if (response.ok) {
+          const data = await response.json();
+          if (!data.errors) {
+            const newRoom = data.data.createRoom;
 
-          // Add room to local state
-          setRooms(prevRooms => [...prevRooms, newRoom]);
+            // Add room to local state
+            setRooms(prevRooms => [...prevRooms, newRoom]);
 
-          // Select the new room
-          setSelectedRoomId(newRoom.id);
-          setEditedRoom({ ...newRoom });
+            // Select the new room
+            handleSelectRoom(newRoom.id);
 
-          console.log(`✅ Room ${newRoom.id} created successfully`);
+            console.log(`✅ Room ${newRoom.id} created successfully`);
 
-          // TODO: Add exit creation functionality between rooms when direction is specified
-          if (
-            selectedRoomId != null &&
-            selectedDirection &&
-            selectedDirection.trim()
-          ) {
-            console.log(
-              `📝 Note: Would create ${selectedDirection} exit from room ${selectedRoomId} to new room ${newRoom.id}`
+            // TODO: Add exit creation functionality between rooms when direction is specified
+            if (
+              selectedRoomId != null &&
+              selectedDirection &&
+              selectedDirection.trim()
+            ) {
+              console.log(
+                `📝 Note: Would create ${selectedDirection} exit from room ${selectedRoomId} to new room ${newRoom.id}`
+              );
+            }
+          } else {
+            console.error(
+              `❌ GraphQL error creating room:`,
+              data.errors[0].message
             );
+            alert(`Failed to create room: ${data.errors[0].message}`);
           }
         } else {
-          console.error(
-            `❌ GraphQL error creating room:`,
-            data.errors[0].message
-          );
-          alert(`Failed to create room: ${data.errors[0].message}`);
+          console.error(`❌ HTTP error creating room:`, response.status);
+          alert(`Failed to create room: HTTP ${response.status}`);
         }
-      } else {
-        console.error(`❌ HTTP error creating room:`, response.status);
-        alert(`Failed to create room: HTTP ${response.status}`);
+      } catch (error) {
+        console.error(`❌ Error creating room:`, error);
+        alert(
+          `Failed to create room: ${error instanceof Error ? error.message : 'Unknown error'}`
+        );
       }
-    } catch (error) {
-      console.error(`❌ Error creating room:`, error);
-      alert(
-        `Failed to create room: ${error instanceof Error ? error.message : 'Unknown error'}`
-      );
-    }
-  };
+    },
+    [canEditZone, zoneId, rooms, selectedRoomId, handleSelectRoom, setRooms]
+  );
 
   // Auto-layout functionality
   const handleAutoLayout = useCallback(async () => {
@@ -4693,7 +4505,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Check for any remaining overlaps
       const remainingOverlaps = detectOverlaps(resolvedPositions);
       setOverlaps(remainingOverlaps);
-      setShowOverlapInfo(remainingOverlaps.length > 0);
+      // Don't auto-show the popup after batch updates - let user click "View Details"
 
       // Add to undo history (batch update succeeded)
       const finalPositions: Record<number, { x: number; y: number }> = {};
@@ -4719,6 +4531,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     } catch (error) {
       console.error('❌ Failed to apply auto-layout:', error);
     }
+    // Note: autoLayoutRooms / detectOverlaps / resolveOverlaps are defined later; exclude to avoid temporal dead zone issues.
+    // Their logic does not change during a session; safe to omit for stability.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [rooms, nodes, setNodes, addToUndoHistory, viewMode, canEditZone, zoneId]);
 
   // Comprehensive keyboard shortcuts for zone editor
@@ -4869,14 +4684,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             if (roomOverlap && roomOverlap.roomIds.length >= numberPressed) {
               event.preventDefault();
               const targetRoomId = roomOverlap.roomIds[numberPressed - 1];
-              setSelectedRoomId(targetRoomId);
-              const targetRoom = rooms.find(r => r.id === targetRoomId);
-              if (targetRoom) {
-                setEditedRoom({ ...targetRoom });
-                console.log(
-                  `🔢 Jumped to overlapped room ${numberPressed}: ${targetRoom.name} (ID: ${targetRoomId})`
-                );
-              }
+              handleSelectRoom(targetRoomId);
+              console.log(
+                `🔢 Jumped to overlapped room ${numberPressed}: ${rooms.find(r => r.id === targetRoomId)?.name} (ID: ${targetRoomId})`
+              );
               return;
             }
           }
@@ -4942,8 +4753,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 console.log(
                   `🧭 Navigating ${direction.toLowerCase()} to room ${destRoomId}: "${destinationRoom.name}"`
                 );
-                setSelectedRoomId(destRoomId);
-                setEditedRoom({ ...destinationRoom });
+                handleSelectRoom(destRoomId);
 
                 // Always update z-level to match destination room's floor
                 const destZ = destinationRoom.layoutZ ?? 0;
@@ -5084,6 +4894,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     currentZLevel,
     setSelectedRoomId,
     setEditedRoom,
+    handleSelectRoom,
+    overlaps,
   ]);
 
   const handleDrop = useCallback(
@@ -5101,20 +4913,46 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           event.dataTransfer.getData('application/json')
         );
         const type = rawData.type as 'mob' | 'object';
-        const entity = rawData.entity as any;
+        type DragEntity = {
+          id: number;
+          name: string;
+          level?: number;
+          type?: string;
+          keywords?: string[];
+          cost?: number;
+          weight?: number;
+          race?: string | null;
+          mobClass?: string | null;
+          lifeForce?: string | null;
+        };
+        const entity: DragEntity = rawData.entity;
 
         if (type === 'mob') {
           // Handle mob drop - place in nearest room
-          const mobEntity: any = entity;
+          const mobEntity: MobInput = {
+            id: entity.id,
+            name: entity.name,
+            level: typeof entity.level === 'number' ? entity.level : 1,
+            race: entity.race ?? null,
+            mobClass: entity.mobClass ?? null,
+            lifeForce: entity.lifeForce ?? null,
+          };
           console.log('Dropped mob:', mobEntity, 'at position:', position);
           const nearestRoom = findNearestRoom(position);
           if (nearestRoom && canEditZone(zoneId)) {
-            // @ts-ignore - Entity type inference issue
             handleAddMobToRoom(nearestRoom.id, mobEntity);
           }
         } else if (type === 'object') {
           // Handle object drop - place in nearest room
-          const objectEntity: any = entity;
+          const objectEntity: ObjectInput = {
+            id: entity.id,
+            name: entity.name,
+            type: entity.type || 'unknown',
+            keywords: entity.keywords || [],
+            cost: typeof entity.cost === 'number' ? entity.cost : null,
+            weight: typeof entity.weight === 'number' ? entity.weight : null,
+            level: typeof entity.level === 'number' ? entity.level : null,
+          };
           console.log(
             'Dropped object:',
             objectEntity,
@@ -5123,7 +4961,6 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           );
           const nearestRoom = findNearestRoom(position);
           if (nearestRoom && canEditZone(zoneId)) {
-            // @ts-ignore - Entity type inference issue
             handleAddObjectToRoom(nearestRoom.id, objectEntity);
           }
         }
@@ -5254,12 +5091,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Find overlaps
       positionMap.forEach((roomIds, posKey) => {
         if (roomIds.length > 1) {
-          const [x, y, z] = posKey.split(',').map(Number);
-          overlaps.push({
-            roomIds,
-            position: { x, y },
-            count: roomIds.length,
-          });
+          const [x, y] = posKey.split(',').map(Number); // z not needed for overlap summary
+          overlaps.push({ roomIds, position: { x, y }, count: roomIds.length });
         }
       });
 
@@ -5327,8 +5160,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         `📚 Detected ${detectedOverlaps.length} overlaps:`,
         detectedOverlaps
       );
-      setShowOverlapInfo(true);
+      // Don't auto-show the popup - let user click "View Details" to see it
     } else {
+      // Close the popup if overlaps are resolved
       setShowOverlapInfo(false);
     }
   }, [rooms, detectOverlaps]); // Remove overlaps from dependencies to avoid circular dependency
@@ -5379,11 +5213,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         <EntityPalette
           mobs={mobs}
           objects={objects}
-          onMobDragStart={mob => {
-            // Drag data is handled in the drag event handlers
+          onMobDragStart={() => {
+            /* mob drag start unused */
           }}
-          onObjectDragStart={obj => {
-            // Drag data is handled in the drag event handlers
+          onObjectDragStart={() => {
+            /* object drag start unused */
           }}
           zoneId={zoneId || 0}
         />
@@ -5407,9 +5241,16 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const lastViewport = lastViewportRef.current;
 
             // Store mouse position for potential zoom-in centering
-            if (event && event.type === 'wheel' && event.currentTarget && 'clientX' in event) {
+            if (
+              event &&
+              event.type === 'wheel' &&
+              event.currentTarget &&
+              'clientX' in event
+            ) {
               try {
-                const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
+                const rect = (
+                  event.currentTarget as HTMLElement
+                ).getBoundingClientRect();
                 const mouseX = event.clientX - rect.left;
                 const mouseY = event.clientY - rect.top;
 
@@ -5418,12 +5259,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 const worldY = (-viewport.y + mouseY) / viewport.zoom;
 
                 // Store for use in zone transition - use a more reliable reference
-                if (reactFlowInstance) {
-                  (reactFlowInstance as any).lastMouseWorldPos = {
-                    x: worldX,
-                    y: worldY,
-                  };
-                }
+                runtimeMetaRef.current.lastMouseWorldPos = {
+                  x: worldX,
+                  y: worldY,
+                };
               } catch (error) {
                 console.warn(
                   'Could not capture mouse position for zoom centering:',
@@ -5453,7 +5292,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
 
               const transitionDuration =
-                now - (worldMapTransitionRef.current as any).startTime;
+                now -
+                (typeof worldMapTransitionRef.current === 'object'
+                  ? worldMapTransitionRef.current.startTime
+                  : now);
               console.log(
                 `🚫 Skipping zoom detection - transition in progress (${transitionDuration}ms)`
               );
@@ -5575,8 +5417,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     const currentViewport = reactFlowInstance.getViewport();
 
                     // Try to get the actual mouse/cursor position first
-                    const mouseWorldPos = (reactFlowInstance as any)
-                      .lastMouseWorldPos;
+                    const mouseWorldPos =
+                      runtimeMetaRef.current.lastMouseWorldPos;
                     let detectionX, detectionY;
 
                     if (mouseWorldPos) {
@@ -5695,11 +5537,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                         return; // Let the new page load handle the positioning
                       }
 
-                      setSelectedZoneId(targetZone.id);
-
                       // Try to get the cursor position for more precise centering
-                      const mouseWorldPos = (reactFlowInstance as any)
-                        .lastMouseWorldPos;
+                      const mouseWorldPos =
+                        runtimeMetaRef.current.lastMouseWorldPos;
                       let targetCenterX, targetCenterY;
 
                       if (mouseWorldPos && zoneMapData?.rooms) {
@@ -6605,12 +6445,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                         <button
                           key={roomId}
                           onClick={() => {
-                            setSelectedRoomId(roomId);
+                            handleSelectRoom(roomId);
 
-                            // Update edited room and z-level
+                            // Update z-level
                             const room = rooms.find(r => r.id === roomId);
                             if (room) {
-                              setEditedRoom({ ...room });
                               const roomZ = room.layoutZ ?? 0;
                               setCurrentZLevel(roomZ);
                               console.log(
@@ -6654,19 +6493,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           )}
 
           {/* Canvas-based rendering overlay for ultra-dense views */}
-          {useCanvasRendering && canvasClusters.length > 0 && (
-            <div
-              className='absolute inset-0 pointer-events-none'
-              style={{ zIndex: 1000 }}
-            >
-              <WorldMapCanvas
-                clusters={canvasClusters}
-                zoom={reactFlowInstance?.getZoom() || 0.1}
-                onRoomClick={handleRoomSelect}
-                className='pointer-events-auto'
-              />
-            </div>
-          )}
+          {/* Removed canvas-based rendering overlay */}
         </ReactFlow>
       </div>
 
@@ -6714,7 +6541,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     onClick={() => {
                       // Jump to first room in overlap
                       const firstRoomId = overlap.roomIds[0];
-                      setSelectedRoomId(firstRoomId);
+                      handleSelectRoom(firstRoomId);
 
                       // Make this room the active one in the overlap
                       const positionKey = `overlapped-${overlap.roomIds.join('-')}`;

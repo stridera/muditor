@@ -1,0 +1,111 @@
+# Character related operations
+
+# Fields needed for CharacterCard display
+fragment CharacterCardFields on CharacterDto {
+  id
+  name
+  level
+  raceType
+  playerClass
+  lastLogin
+  isOnline
+  timePlayed
+  hitPoints
+  hitPointsMax
+  movement
+  movementMax
+  alignment
+  strength
+  intelligence
+  wisdom
+  dexterity
+  constitution
+  charisma
+  luck
+  experience
+  copper
+  silver
+  gold
+  platinum
+  description
+  title
+  currentRoom
+}
+
+query GetMyCharacters {
+  myCharacters {
+    ...CharacterCardFields
+  }
+}
+
+query GetCharacterDetails($id: ID!) {
+  character(id: $id) {
+    id
+    name
+    level
+    description
+    raceType
+    playerClass
+    strength
+    dexterity
+    constitution
+    intelligence
+    wisdom
+    charisma
+    hitPoints
+    hitPointsMax
+    movement
+    movementMax
+    alignment
+  }
+}
+
+query GetCharacterSessionInfo($id: ID!) {
+  characterSessionInfo(characterId: $id) {
+    id
+    name
+    isOnline
+    currentSessionTime
+    totalTimePlayed
+    lastLogin
+  }
+}
+
+query GetCharacterLinkingInfo($characterName: String!) {
+  characterLinkingInfo(characterName: $characterName) {
+    id
+    name
+    level
+    race
+    hasPassword
+    isLinked
+    timePlayed
+    lastLogin
+  }
+}
+
+mutation CreateCharacter($data: CreateCharacterInput!) {
+  createCharacter(data: $data) {
+    id
+    name
+    level
+    raceType
+  }
+}
+
+mutation LinkCharacter($characterName: String!, $characterPassword: String!) {
+  linkCharacter(
+    data: {
+      characterName: $characterName
+      characterPassword: $characterPassword
+    }
+  ) {
+    id
+    name
+    level
+  }
+}
+
+query ValidateCharacterPassword($characterName: String!, $password: String!) {
+  validateCharacterPassword(characterName: $characterName, password: $password)
+}

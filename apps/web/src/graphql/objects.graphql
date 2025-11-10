@@ -1,0 +1,69 @@
+# Object related operations (unified) with fragments
+
+fragment ObjectSummary on ObjectDto {
+  id
+  name
+  type
+  level
+  weight
+  cost
+  zoneId
+  keywords
+  values
+}
+
+fragment ObjectDetails on ObjectDto {
+  ...ObjectSummary
+  examineDescription
+  roomDescription
+  actionDescription
+  concealment
+  timer
+  decomposeTimer
+  flags
+  effectFlags
+  wearFlags
+  createdAt
+  updatedAt
+}
+
+query GetObjects($skip: Int, $take: Int) {
+  objects(skip: $skip, take: $take) {
+    ...ObjectSummary
+  }
+  objectsCount
+}
+
+query GetObjectsByZone($zoneId: Int!) {
+  objectsByZone(zoneId: $zoneId) {
+    ...ObjectSummary
+  }
+}
+
+query GetObject($id: Int!, $zoneId: Int!) {
+  object(id: $id, zoneId: $zoneId) {
+    ...ObjectDetails
+  }
+}
+
+mutation CreateObject($data: CreateObjectInput!) {
+  createObject(data: $data) {
+    ...ObjectSummary
+  }
+}
+
+mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {
+  updateObject(id: $id, zoneId: $zoneId, data: $data) {
+    ...ObjectSummary
+  }
+}
+
+mutation DeleteObject($id: Int!, $zoneId: Int!) {
+  deleteObject(id: $id, zoneId: $zoneId) {
+    id
+  }
+}
+
+mutation DeleteObjects($ids: [Int!]!) {
+  deleteObjects(ids: $ids)
+}

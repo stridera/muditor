@@ -17,14 +17,14 @@ import {
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_OBJECT = gql`
-  query GetObject($id: Int!, $zoneId: Int!) {
+  query GetObjectInline($id: Int!, $zoneId: Int!) {
     object(id: $id, zoneId: $zoneId) {
       id
       type
       keywords
       name
       examineDescription
-      actionDesc
+      actionDescription
       weight
       cost
       timer
@@ -43,7 +43,11 @@ const GET_OBJECT = gql`
 `;
 
 const UPDATE_OBJECT = gql`
-  mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {
+  mutation UpdateObjectInline(
+    $id: Int!
+    $zoneId: Int!
+    $data: UpdateObjectInput!
+  ) {
     updateObject(id: $id, zoneId: $zoneId, data: $data) {
       id
       keywords
@@ -54,7 +58,7 @@ const UPDATE_OBJECT = gql`
 `;
 
 const CREATE_OBJECT = gql`
-  mutation CreateObject($data: CreateObjectInput!) {
+  mutation CreateObjectInline($data: CreateObjectInput!) {
     createObject(data: $data) {
       id
       keywords
@@ -68,7 +72,7 @@ interface ObjectFormData {
   keywords: string;
   name: string;
   examineDescription: string;
-  actionDesc: string;
+  actionDescription: string;
   weight: number;
   cost: number;
   timer: number;
@@ -221,7 +225,7 @@ function ObjectEditorContent() {
     keywords: '',
     name: '',
     examineDescription: '',
-    actionDesc: '',
+    actionDescription: '',
     weight: 0,
     cost: 0,
     timer: 0,
@@ -261,7 +265,7 @@ function ObjectEditorContent() {
         keywords: object.keywords || '',
         name: object.name || '',
         examineDescription: object.examineDescription || '',
-        actionDesc: object.actionDesc || '',
+        actionDescription: object.actionDescription || '',
         weight: object.weight || 0,
         cost: object.cost || 0,
         timer: object.timer || 0,
@@ -346,6 +350,7 @@ function ObjectEditorContent() {
         await updateObject({
           variables: {
             id: parseInt(objectId!),
+            zoneId: saveData.zoneId,
             data: saveData,
           },
         });
@@ -525,17 +530,17 @@ function ObjectEditorContent() {
 
               <div>
                 <label
-                  htmlFor='actionDesc'
+                  htmlFor='actionDescription'
                   className='block text-sm font-medium text-gray-700 mb-1'
                 >
                   Action Description
                 </label>
                 <input
                   type='text'
-                  id='actionDesc'
-                  value={formData.actionDesc}
+                  id='actionDescription'
+                  value={formData.actionDescription}
                   onChange={e =>
-                    handleInputChange('actionDesc', e.target.value)
+                    handleInputChange('actionDescription', e.target.value)
                   }
                   placeholder='Description when used/activated'
                   className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'

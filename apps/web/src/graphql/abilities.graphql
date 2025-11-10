@@ -1,0 +1,127 @@
+# Abilities-related operations for codegen
+
+query GetAbilities($skip: Int, $take: Int, $abilityType: String, $search: String) {
+  abilities(abilityType: $abilityType, skip: $skip, take: $take, search: $search) {
+    id
+    name
+    abilityType
+    description
+    minPosition
+    violent
+    castTimeRounds
+    cooldownMs
+    inCombatOnly
+    isArea
+    notes
+    tags
+    school {
+      id
+      name
+    }
+    effects {
+      effectId
+      effect {
+        id
+        name
+      }
+    }
+  }
+  abilitiesCount(abilityType: $abilityType, search: $search)
+}
+
+query GetAbilityDetails($id: ID!) {
+  ability(id: $id) {
+    id
+    name
+    abilityType
+    description
+    gameId
+    minPosition
+    violent
+    castTimeRounds
+    cooldownMs
+    inCombatOnly
+    isArea
+    notes
+    tags
+    luaScript
+    school {
+      id
+      name
+      description
+    }
+    effects {
+      effectId
+      order
+      chancePct
+      trigger
+      condition
+      overrideParams
+      effect {
+        id
+        name
+        effectType
+        description
+      }
+    }
+    savingThrows {
+      id
+      dcFormula
+      saveType
+      onSaveAction
+    }
+    targeting {
+      range
+      maxTargets
+      requireLos
+      scope
+      scopePattern
+      validTargets
+    }
+    restrictions {
+      customRequirementLua
+      requirements
+    }
+    messages {
+      startToCaster
+      startToRoom
+      startToVictim
+      successToCaster
+      successToRoom
+      successToVictim
+      failToCaster
+      failToRoom
+      failToVictim
+      wearoffToRoom
+      wearoffToTarget
+    }
+  }
+}
+
+query GetAbilitySchools {
+  abilitySchools {
+    id
+    name
+    description
+  }
+}
+
+mutation CreateAbility($data: CreateAbilityInput!) {
+  createAbility(data: $data) {
+    id
+    name
+    abilityType
+  }
+}
+
+mutation UpdateAbility($id: ID!, $data: UpdateAbilityInput!) {
+  updateAbility(id: $id, data: $data) {
+    id
+    name
+    abilityType
+  }
+}
+
+mutation DeleteAbility($id: ID!) {
+  deleteAbility(id: $id)
+}

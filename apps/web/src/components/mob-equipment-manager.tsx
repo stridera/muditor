@@ -49,6 +49,7 @@ const GET_EQUIPMENT_SETS = gql`
         probability
         object {
           id
+          zoneId
           name
           type
         }
@@ -561,8 +562,7 @@ export default function MobEquipmentManager({
                   </p>
                 )}
                 <div className='text-xs text-gray-500'>
-                  Items:{' '}
-                  {set.items.map(item => item.object.name).join(', ')}
+                  Items: {set.items.map(item => item.object.name).join(', ')}
                 </div>
               </div>
             ))}
@@ -657,7 +657,9 @@ export default function MobEquipmentManager({
                             </label>
                             <select
                               value={selectedWearLocation}
-                              onChange={e => setSelectedWearLocation(e.target.value)}
+                              onChange={e =>
+                                setSelectedWearLocation(e.target.value)
+                              }
                               className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
                             >
                               <option value=''>None (carried)</option>
@@ -727,7 +729,8 @@ export default function MobEquipmentManager({
                                 <div className='font-medium text-sm text-gray-900 mb-1'>
                                   {item.object.name}
                                   <span className='text-xs text-gray-500 ml-2'>
-                                    {item.object.zoneId}:{item.object.id}
+                                    {(item.object as any).zoneId}:
+                                    {item.object.id}
                                   </span>
                                 </div>
                                 <div>
@@ -763,7 +766,8 @@ export default function MobEquipmentManager({
                                     onChange={e =>
                                       setEditValues({
                                         ...editValues,
-                                        maxInstances: parseInt(e.target.value) || 1,
+                                        maxInstances:
+                                          parseInt(e.target.value) || 1,
                                       })
                                     }
                                     className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
@@ -782,7 +786,8 @@ export default function MobEquipmentManager({
                                     onChange={e =>
                                       setEditValues({
                                         ...editValues,
-                                        probability: parseFloat(e.target.value) || 1.0,
+                                        probability:
+                                          parseFloat(e.target.value) || 1.0,
                                       })
                                     }
                                     className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
@@ -812,7 +817,8 @@ export default function MobEquipmentManager({
                                       {item.object.name}
                                     </div>
                                     <div className='text-xs text-gray-500'>
-                                      {item.object.zoneId}:{item.object.id} • {item.object.type}
+                                      {(item.object as any).zoneId}:
+                                      {item.object.id} • {item.object.type}
                                     </div>
                                   </div>
                                   <div className='flex gap-1'>
@@ -824,7 +830,9 @@ export default function MobEquipmentManager({
                                       <Settings className='w-4 h-4' />
                                     </button>
                                     <button
-                                      onClick={() => handleDeleteEquipment(item.id)}
+                                      onClick={() =>
+                                        handleDeleteEquipment(item.id)
+                                      }
                                       className='text-red-600 hover:text-red-800'
                                       title='Remove equipment'
                                     >
@@ -840,7 +848,8 @@ export default function MobEquipmentManager({
                                   )}
                                   <span>Max: {item.maxInstances}</span>
                                   <span>
-                                    Probability: {(item.probability * 100).toFixed(0)}%
+                                    Probability:{' '}
+                                    {(item.probability * 100).toFixed(0)}%
                                   </span>
                                 </div>
                               </>
@@ -940,7 +949,6 @@ export default function MobEquipmentManager({
                       </div>
                     )}
                   </div>
-
                 </div>
               )}
             </div>

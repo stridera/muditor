@@ -15,6 +15,10 @@ import { TriggersModule } from './triggers/triggers.module';
 import { ValidationModule } from './validation/validation.module';
 import { CharactersModule } from './characters/characters.module';
 import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
+import { GrantsModule } from './grants/grants.module';
+import { AbilitiesModule } from './abilities/abilities.module';
+import { RacesModule } from './races/races.module';
+import { ClassesModule } from './classes/classes.module';
 
 @Module({
   imports: [
@@ -57,6 +61,10 @@ import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
     ValidationModule,
     CharactersModule,
     EquipmentSetsModule,
+    GrantsModule,
+    AbilitiesModule,
+    RacesModule,
+    ClassesModule,
   ],
 })
 export class AppModule {}

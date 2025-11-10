@@ -16,7 +16,7 @@ import {
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_SHOP = gql`
-  query GetShop($id: Int!, $zoneId: Int!) {
+  query GetShopInline($id: Int!, $zoneId: Int!) {
     shop(id: $id, zoneId: $zoneId) {
       id
       buyProfit
@@ -65,7 +65,7 @@ const GET_SHOP = gql`
 `;
 
 const GET_AVAILABLE_OBJECTS = gql`
-  query GetAvailableObjects($zoneId: Int!) {
+  query GetAvailableObjectsInline($zoneId: Int!) {
     objectsByZone(zoneId: $zoneId) {
       id
       keywords
@@ -78,7 +78,7 @@ const GET_AVAILABLE_OBJECTS = gql`
 `;
 
 const GET_AVAILABLE_MOBS = gql`
-  query GetAvailableMobs($zoneId: Int!) {
+  query GetAvailableMobsInline($zoneId: Int!) {
     mobsByZone(zoneId: $zoneId) {
       id
       keywords
@@ -89,7 +89,7 @@ const GET_AVAILABLE_MOBS = gql`
 `;
 
 const GET_ZONES = gql`
-  query GetZones {
+  query GetZonesInline {
     zones {
       id
       name
@@ -98,7 +98,7 @@ const GET_ZONES = gql`
 `;
 
 const UPDATE_SHOP = gql`
-  mutation UpdateShop($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
+  mutation UpdateShopInline($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
     updateShop(id: $id, zoneId: $zoneId, data: $data) {
       id
       buyProfit
@@ -108,7 +108,7 @@ const UPDATE_SHOP = gql`
 `;
 
 const CREATE_SHOP = gql`
-  mutation CreateShop($data: CreateShopInput!) {
+  mutation CreateShopInline($data: CreateShopInput!) {
     createShop(data: $data) {
       id
       buyProfit

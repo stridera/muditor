@@ -1,8 +1,10 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/auth-context';
 import { ProtectedRoute } from '@/components/auth/protected-route';
+import { RoleBadge } from '@/components/role-badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,26 +12,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import {
-  User,
-  Mail,
-  Crown,
-  Calendar,
-  Settings,
-  Loader2,
-  CheckCircle,
-} from 'lucide-react';
-import { formatDistanceToNow } from 'date-fns';
-import { gql } from '@apollo/client';
+import { useAuth } from '@/contexts/auth-context';
 import { apolloClient } from '@/lib/apollo-client';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+import { formatDistanceToNow } from 'date-fns';
+import { CheckCircle, Gamepad2, Loader2, Settings } from 'lucide-react';
+import { useState } from 'react';
 
 const CHANGE_PASSWORD_MUTATION = gql`
-  mutation ChangePassword($input: ChangePasswordInput!) {
+  mutation ChangePasswordInline($input: ChangePasswordInput!) {
     changePassword(input: $input) {
       success
       message
@@ -38,13 +32,27 @@ const CHANGE_PASSWORD_MUTATION = gql`
 `;
 
 const UPDATE_PROFILE_MUTATION = gql`
-  mutation UpdateProfile($input: UpdateProfileInput!) {
+  mutation UpdateProfileInline($input: UpdateProfileInput!) {
     updateProfile(input: $input) {
       id
       username
       email
       role
       createdAt
+    }
+  }
+`;
+
+const GET_MY_CHARACTERS = gql`
+  query GetProfileCharactersInline {
+    myCharacters {
+      id
+      name
+      level
+      raceType
+      playerClass
+      lastLogin
+      isOnline
     }
   }
 `;
@@ -59,6 +67,10 @@ export default function ProfilePage() {
 
 function ProfileContent() {
   const { user } = useAuth();
+
+  // Fetch linked characters
+  const { data: charactersData } = useQuery(GET_MY_CHARACTERS);
+  const characters = (charactersData as any)?.myCharacters || [];
 
   // Profile editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
@@ -164,23 +176,6 @@ function ProfileContent() {
     }
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'GOD':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'CODER':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'BUILDER':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'IMMORTAL':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'PLAYER':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
-
   return (
     <div className='min-h-screen bg-gray-50 py-8'>
       <div className='container mx-auto px-4'>
@@ -210,10 +205,7 @@ function ProfileContent() {
                     <span className='text-sm font-medium text-gray-500'>
                       Role
                     </span>
-                    <Badge className={getRoleBadgeColor(user.role)}>
-                      <Crown className='w-3 h-3 mr-1' />
-                      {user.role}
-                    </Badge>
+                    <RoleBadge role={user.role} size='sm' />
                   </div>
 
                   <div className='flex items-center justify-between'>
@@ -225,6 +217,40 @@ function ProfileContent() {
                         addSuffix: true,
                       })}
                     </span>
+                  </div>
+
+                  <div className='pt-4 border-t'>
+                    <div className='flex items-center justify-between mb-2'>
+                      <span className='text-sm font-medium text-gray-500'>
+                        Linked Characters
+                      </span>
+                      <Badge variant='secondary'>{characters.length}</Badge>
+                    </div>
+                    {characters.length > 0 ? (
+                      <div className='space-y-2'>
+                        {characters.map((char: any) => (
+                          <div
+                            key={char.id}
+                            className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                          >
+                            <div className='flex items-center gap-2'>
+                              <Gamepad2 className='h-4 w-4 text-gray-500' />
+                              <span className='text-sm font-medium'>
+                                {char.name}
+                              </span>
+                            </div>
+                            <Badge variant='outline' className='text-xs'>
+                              Level {char.level}
+                            </Badge>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className='text-xs text-gray-500'>
+                        No characters linked. Visit the Characters page to link
+                        your game characters.
+                      </p>
+                    )}
                   </div>
                 </CardContent>
               </Card>

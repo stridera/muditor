@@ -33,7 +33,7 @@ import { useState } from 'react';
 import ScriptEditor, { Script } from './ScriptEditor';
 
 const GET_TRIGGERS = gql`
-  query GetTriggers {
+  query GetTriggersInline {
     triggers {
       id
       name
@@ -52,7 +52,10 @@ const GET_TRIGGERS = gql`
 `;
 
 const GET_TRIGGERS_BY_ATTACHMENT = gql`
-  query GetTriggersByAttachment($attachType: ScriptType!, $entityId: Int!) {
+  query GetTriggersByAttachmentInline(
+    $attachType: ScriptType!
+    $entityId: Int!
+  ) {
     triggersByAttachment(attachType: $attachType, entityId: $entityId) {
       id
       name
@@ -71,7 +74,7 @@ const GET_TRIGGERS_BY_ATTACHMENT = gql`
 `;
 
 const CREATE_TRIGGER = gql`
-  mutation CreateTrigger($input: CreateTriggerInput!) {
+  mutation CreateTriggerInline($input: CreateTriggerInput!) {
     createTrigger(input: $input) {
       id
       name
@@ -83,7 +86,7 @@ const CREATE_TRIGGER = gql`
 `;
 
 const UPDATE_TRIGGER = gql`
-  mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
+  mutation UpdateTriggerInline($id: Float!, $input: UpdateTriggerInput!) {
     updateTrigger(id: $id, input: $input) {
       id
       name
@@ -95,7 +98,7 @@ const UPDATE_TRIGGER = gql`
 `;
 
 const DELETE_TRIGGER = gql`
-  mutation DeleteTrigger($id: Float!) {
+  mutation DeleteTriggerInline($id: Float!) {
     deleteTrigger(id: $id) {
       id
     }
@@ -103,7 +106,7 @@ const DELETE_TRIGGER = gql`
 `;
 
 const ATTACH_TRIGGER = gql`
-  mutation AttachTrigger($input: AttachTriggerInput!) {
+  mutation AttachTriggerInline($input: AttachTriggerInput!) {
     attachTrigger(input: $input) {
       id
       name
@@ -115,7 +118,7 @@ const ATTACH_TRIGGER = gql`
 `;
 
 const DETACH_TRIGGER = gql`
-  mutation DetachTrigger($triggerId: Float!) {
+  mutation DetachTriggerInline($triggerId: Float!) {
     detachTrigger(triggerId: $triggerId) {
       id
       name

@@ -1,0 +1,25 @@
+# Effects-related operations for codegen
+
+query GetEffects($skip: Int, $take: Int, $search: String) {
+  effects(skip: $skip, take: $take, search: $search) {
+    id
+    name
+    effectType
+    description
+    defaultParams
+  }
+}
+
+query GetEffectsCount($search: String) {
+  effectsCount(search: $search)
+}
+
+query GetEffect($id: ID!) {
+  effect(id: $id) {
+    id
+    name
+    effectType
+    description
+    defaultParams
+  }
+}

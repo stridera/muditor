@@ -1,12 +1,11 @@
 'use client';
 
-import { useQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
-import { DualInterface } from '@/components/dashboard/dual-interface';
 import { CharacterCard } from '@/components/characters/character-card';
-import { CharacterLinkingForm } from '@/components/characters/character-linking-form';
 import { CharacterCreationForm } from '@/components/characters/character-creation-form';
 import { CharacterDetails } from '@/components/characters/character-details';
+import { CharacterLinkingForm } from '@/components/characters/character-linking-form';
+import { DualInterface } from '@/components/dashboard/dual-interface';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -14,80 +13,18 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, Users, Gamepad2 } from 'lucide-react';
+import {
+  GetMyCharactersDocument,
+  type GetMyCharactersQuery,
+} from '@/generated/graphql';
+import { useQuery } from '@apollo/client/react';
+import { Gamepad2, Plus, Users } from 'lucide-react';
 import { useState } from 'react';
 
-const GET_MY_CHARACTERS = gql`
-  query GetMyCharacters {
-    myCharacters {
-      id
-      name
-      level
-      raceType
-      playerClass
-      lastLogin
-      isOnline
-      timePlayed
-      hitPoints
-      hitPointsMax
-      movement
-      movementMax
-      alignment
-      strength
-      intelligence
-      wisdom
-      dexterity
-      constitution
-      charisma
-      luck
-      experience
-      copper
-      silver
-      gold
-      platinum
-      description
-      title
-      currentRoom
-    }
-  }
-`;
+// Using generated CharacterDto type via GetMyCharactersQuery; custom Character interface removed.
 
-interface Character {
-  id: string;
-  name: string;
-  level: number;
-  raceType?: string;
-  playerClass?: string;
-  lastLogin?: Date;
-  isOnline: boolean;
-  timePlayed: number;
-  hitPoints: number;
-  hitPointsMax: number;
-  movement: number;
-  movementMax: number;
-  alignment: number;
-  strength: number;
-  intelligence: number;
-  wisdom: number;
-  dexterity: number;
-  constitution: number;
-  charisma: number;
-  luck: number;
-  experience: number;
-  copper: number;
-  silver: number;
-  gold: number;
-  platinum: number;
-  description?: string;
-  title?: string;
-  currentRoom?: number;
-}
-
-interface MyCharactersQueryResult {
-  myCharacters: Character[];
-}
+type MyCharactersQueryResult = GetMyCharactersQuery;
 
 export default function CharactersPage() {
   const [activeTab, setActiveTab] = useState('my-characters');
@@ -95,10 +32,8 @@ export default function CharactersPage() {
     null
   );
   const { data, loading, error, refetch } = useQuery<MyCharactersQueryResult>(
-    GET_MY_CHARACTERS,
-    {
-      pollInterval: 30000, // Poll every 30 seconds for updates
-    }
+    GetMyCharactersDocument,
+    { pollInterval: 30000 }
   );
 
   const characters = data?.myCharacters || [];

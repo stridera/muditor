@@ -1,14 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { useQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
-import { DualInterface } from '@/components/dashboard/dual-interface';
-import { usePermissions } from '@/hooks/use-permissions';
 import {
   OnlineCharactersList,
   OnlineStats,
 } from '@/components/characters/online-characters-list';
+import { DualInterface } from '@/components/dashboard/dual-interface';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -16,8 +13,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Users, Gamepad2, Settings } from 'lucide-react';
+import { usePermissions } from '@/hooks/use-permissions';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
+import { Gamepad2, Settings } from 'lucide-react';
+import Link from 'next/link';
 
 const GET_DASHBOARD_STATS = gql`
   query GetDashboardStats {

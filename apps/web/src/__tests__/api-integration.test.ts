@@ -222,6 +222,7 @@ describe('API Integration Tests', () => {
         return;
       }
       const badQuery = `
+        # GRAPHQL-VALIDATION:SKIP
         query TestBadField($id: Int!, $zoneId: Int!) {
           mob(id: $id, zoneId: $zoneId) {
             id

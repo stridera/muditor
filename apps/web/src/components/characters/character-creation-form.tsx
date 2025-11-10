@@ -1,8 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation } from '@apollo/client/react';
-import { gql } from '@apollo/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,7 +9,6 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -21,18 +19,20 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { gql } from '@apollo/client';
+import { useMutation } from '@apollo/client/react';
 import {
-  Loader2,
-  Plus,
   AlertCircle,
   CheckCircle,
+  Loader2,
+  Plus,
   User,
   Wand2,
 } from 'lucide-react';
+import { useState } from 'react';
 
 const CREATE_CHARACTER_MUTATION = gql`
-  mutation CreateCharacter($data: CreateCharacterInput!) {
+  mutation CreateCharacterInline($data: CreateCharacterInput!) {
     createCharacter(data: $data) {
       id
       name

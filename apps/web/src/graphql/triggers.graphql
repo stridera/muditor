@@ -1,0 +1,54 @@
+# Trigger related operations
+
+query GetTriggers {
+  triggers {
+    id
+    name
+    attachType
+    zoneId
+  }
+}
+
+query GetTriggersByAttachment($attachType: ScriptType!, $entityId: Int!) {
+  triggersByAttachment(attachType: $attachType, entityId: $entityId) {
+    id
+    name
+    attachType
+    zoneId
+  }
+}
+
+mutation CreateTrigger($input: CreateTriggerInput!) {
+  createTrigger(input: $input) {
+    id
+    name
+    attachType
+  }
+}
+
+mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
+  updateTrigger(id: $id, input: $input) {
+    id
+    name
+    attachType
+  }
+}
+
+mutation DeleteTrigger($id: Float!) {
+  deleteTrigger(id: $id) {
+    id
+  }
+}
+
+mutation AttachTrigger($input: AttachTriggerInput!) {
+  attachTrigger(input: $input) {
+    id
+    name
+  }
+}
+
+mutation DetachTrigger($triggerId: Float!) {
+  detachTrigger(triggerId: $triggerId) {
+    id
+  }
+}

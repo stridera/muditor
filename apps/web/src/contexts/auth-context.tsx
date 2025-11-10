@@ -1,9 +1,9 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import { gql } from '@apollo/client';
 import { apolloClient } from '@/lib/apollo-client';
+import { gql } from '@apollo/client';
+import { useRouter } from 'next/navigation';
+import React, { createContext, useContext, useEffect, useState } from 'react';
 
 // GraphQL queries and mutations
 const LOGIN_MUTATION = gql`
@@ -66,6 +66,7 @@ export interface AuthContextType {
     password: string
   ) => Promise<void>;
   logout: () => void;
+  refetchUser: () => Promise<void>;
   isAuthenticated: boolean;
 }
 
@@ -181,6 +182,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     router.push('/login');
   };
 
+  const refetchUser = async () => {
+    try {
+      const result = await apolloClient.query({
+        query: ME_QUERY,
+        fetchPolicy: 'network-only', // Force refetch from server
+      });
+
+      if ((result.data as any)?.me) {
+        setUser((result.data as any).me);
+        setStoredUser((result.data as any).me);
+      }
+    } catch (error) {
+      console.error('Failed to refetch user:', error);
+    }
+  };
+
   const isAuthenticated = !!user;
 
   return (
@@ -191,6 +208,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         login,
         register,
         logout,
+        refetchUser,
         isAuthenticated,
       }}
     >

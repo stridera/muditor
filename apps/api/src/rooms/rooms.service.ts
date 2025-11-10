@@ -132,19 +132,74 @@ export class RoomsService {
           r.layout_z as "layoutZ",
           COALESCE(
             json_agg(
-              json_build_object(
+              DISTINCT jsonb_build_object(
                 'id', e.id,
                 'direction', e.direction,
                 'toZoneId', e.to_zone_id,
                 'toRoomId', e.to_room_id,
-                'destination', dest.id
-              ) ORDER BY e.direction
+                'destination', dest.id,
+                'description', e.description,
+                'keywords', e.keywords,
+                'key', e.key,
+                'flags', e.flags
+              )
             ) FILTER (WHERE e.id IS NOT NULL),
             '[]'::json
-          ) as exits
+          ) as exits,
+          COALESCE(
+            json_agg(
+              DISTINCT jsonb_build_object(
+                'id', mr.id,
+                'zoneId', mr.zone_id,
+                'maxInstances', mr.max_instances,
+                'probability', mr.probability,
+                'comment', mr.comment,
+                'mobZoneId', mr.mob_zone_id,
+                'mobId', mr.mob_id,
+                'roomZoneId', mr.room_zone_id,
+                'roomId', mr.room_id,
+                'mobs', jsonb_build_object(
+                  'id', m.id,
+                  'zoneId', m.zone_id,
+                  'keywords', m.keywords,
+                  'name', m.name,
+                  'level', m.level,
+                  'race', m.race
+                )
+              )
+            ) FILTER (WHERE mr.id IS NOT NULL),
+            '[]'::json
+          ) as mob_resets,
+          COALESCE(
+            json_agg(
+              DISTINCT jsonb_build_object(
+                'id', orst.id,
+                'zoneId', orst.zone_id,
+                'maxInstances', orst.max_instances,
+                'probability', orst.probability,
+                'comment', orst.comment,
+                'objectZoneId', orst.object_zone_id,
+                'objectId', orst.object_id,
+                'roomZoneId', orst.room_zone_id,
+                'roomId', orst.room_id,
+                'objects', jsonb_build_object(
+                  'id', o.id,
+                  'zoneId', o.zone_id,
+                  'keywords', o.keywords,
+                  'name', o.name,
+                  'type', o.type
+                )
+              )
+            ) FILTER (WHERE orst.id IS NOT NULL),
+            '[]'::json
+          ) as object_resets
         FROM "Rooms" r
         LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
         LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
+        LEFT JOIN "MobResets" mr ON mr.room_zone_id = r.zone_id AND mr.room_id = r.id
+        LEFT JOIN "Mobs" m ON m.zone_id = mr.mob_zone_id AND m.id = mr.mob_id
+        LEFT JOIN "ObjectResets" orst ON orst.room_zone_id = r.zone_id AND orst.room_id = r.id
+        LEFT JOIN "Objects" o ON o.zone_id = orst.object_zone_id AND o.id = orst.object_id
         ${whereClause}
         GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
         ORDER BY r.id
@@ -204,19 +259,74 @@ export class RoomsService {
           r.layout_z as "layoutZ",
           COALESCE(
             json_agg(
-              json_build_object(
+              DISTINCT jsonb_build_object(
                 'id', e.id,
                 'direction', e.direction,
                 'toZoneId', e.to_zone_id,
                 'toRoomId', e.to_room_id,
-                'destination', dest.id
-              ) ORDER BY e.direction
+                'destination', dest.id,
+                'description', e.description,
+                'keywords', e.keywords,
+                'key', e.key,
+                'flags', e.flags
+              )
             ) FILTER (WHERE e.id IS NOT NULL),
             '[]'::json
-          ) as exits
+          ) as exits,
+          COALESCE(
+            json_agg(
+              DISTINCT jsonb_build_object(
+                'id', mr.id,
+                'zoneId', mr.zone_id,
+                'maxInstances', mr.max_instances,
+                'probability', mr.probability,
+                'comment', mr.comment,
+                'mobZoneId', mr.mob_zone_id,
+                'mobId', mr.mob_id,
+                'roomZoneId', mr.room_zone_id,
+                'roomId', mr.room_id,
+                'mobs', jsonb_build_object(
+                  'id', m.id,
+                  'zoneId', m.zone_id,
+                  'keywords', m.keywords,
+                  'name', m.name,
+                  'level', m.level,
+                  'race', m.race
+                )
+              )
+            ) FILTER (WHERE mr.id IS NOT NULL),
+            '[]'::json
+          ) as mob_resets,
+          COALESCE(
+            json_agg(
+              DISTINCT jsonb_build_object(
+                'id', orst.id,
+                'zoneId', orst.zone_id,
+                'maxInstances', orst.max_instances,
+                'probability', orst.probability,
+                'comment', orst.comment,
+                'objectZoneId', orst.object_zone_id,
+                'objectId', orst.object_id,
+                'roomZoneId', orst.room_zone_id,
+                'roomId', orst.room_id,
+                'objects', jsonb_build_object(
+                  'id', o.id,
+                  'zoneId', o.zone_id,
+                  'keywords', o.keywords,
+                  'name', o.name,
+                  'type', o.type
+                )
+              )
+            ) FILTER (WHERE orst.id IS NOT NULL),
+            '[]'::json
+          ) as object_resets
         FROM "Rooms" r
         LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
         LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
+        LEFT JOIN "MobResets" mr ON mr.room_zone_id = r.zone_id AND mr.room_id = r.id
+        LEFT JOIN "Mobs" m ON m.zone_id = mr.mob_zone_id AND m.id = mr.mob_id
+        LEFT JOIN "ObjectResets" orst ON orst.room_zone_id = r.zone_id AND orst.room_id = r.id
+        LEFT JOIN "Objects" o ON o.zone_id = orst.object_zone_id AND o.id = orst.object_id
         WHERE r.zone_id = ${zoneId}
         GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
         ORDER BY r.id

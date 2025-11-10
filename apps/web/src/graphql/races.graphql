@@ -1,0 +1,23 @@
+# Race related operations
+
+query GetRaces {
+  races {
+    race
+    name
+    displayName
+    playable
+    humanoid
+    magical
+  }
+}
+
+mutation UpdateRace($race: Race!, $data: UpdateRaceInput!) {
+  updateRace(race: $race, data: $data) {
+    race
+    name
+    displayName
+    playable
+    humanoid
+    magical
+  }
+}

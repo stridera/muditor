@@ -1,0 +1,53 @@
+# Shop related operations
+
+query GetShops($skip: Int, $take: Int) {
+  shops(skip: $skip, take: $take) {
+    id
+    zoneId
+    temper
+    sellProfit
+    buyProfit
+  }
+  shopsCount
+}
+
+query GetShopsByZone($zoneId: Int!) {
+  shopsByZone(zoneId: $zoneId) {
+    id
+    zoneId
+    temper
+    sellProfit
+    buyProfit
+  }
+}
+
+query GetShop($id: Int!, $zoneId: Int!) {
+  shop(id: $id, zoneId: $zoneId) {
+    id
+    zoneId
+    keeperId
+    buyMessages
+    sellMessages
+    missingCashMessages
+  }
+}
+
+mutation CreateShop($data: CreateShopInput!) {
+  createShop(data: $data) {
+    id
+    zoneId
+  }
+}
+
+mutation UpdateShop($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
+  updateShop(id: $id, zoneId: $zoneId, data: $data) {
+    id
+    zoneId
+  }
+}
+
+mutation DeleteShop($id: Int!, $zoneId: Int!) {
+  deleteShop(id: $id, zoneId: $zoneId) {
+    id
+  }
+}

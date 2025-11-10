@@ -2,8 +2,30 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { useZone } from '@/contexts/zone-context';
-import { gql } from '@apollo/client';
-import { useMutation, useQuery } from '@apollo/client/react';
+import {
+  CreateObjectDocument,
+  type CreateObjectInput,
+  type CreateObjectMutation,
+  type CreateObjectMutationVariables,
+  DeleteObjectDocument,
+  type DeleteObjectMutation,
+  type DeleteObjectMutationVariables,
+  DeleteObjectsDocument,
+  type DeleteObjectsMutation,
+  type DeleteObjectsMutationVariables,
+  GetObjectDocument,
+  type GetObjectQuery,
+  type GetObjectQueryVariables,
+  GetObjectsByZoneDocument,
+  type GetObjectsByZoneQuery,
+  type GetObjectsByZoneQueryVariables,
+  GetObjectsDocument,
+  type GetObjectsQuery,
+  type GetObjectsQueryVariables,
+  type ObjectDetailsFragment,
+  type ObjectSummaryFragment,
+} from '@/generated/graphql';
+import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import {
   ArrowDown,
   ArrowUp,
@@ -31,51 +53,7 @@ import {
   getUniqueValues,
 } from '../../../lib/search-utils';
 
-const GET_OBJECTS = gql`
-  query GetObjectsDashboard {
-    objects(take: 100) {
-      id
-      type
-      keywords
-      name
-      level
-      weight
-      cost
-      zoneId
-      values
-    }
-  }
-`;
-
-const GET_OBJECTS_BY_ZONE = gql`
-  query GetObjectsByZoneDashboard($zoneId: Int!) {
-    objectsByZone(zoneId: $zoneId) {
-      id
-      type
-      keywords
-      name
-      level
-      weight
-      cost
-      zoneId
-      values
-    }
-  }
-`;
-
-const DELETE_OBJECT = gql`
-  mutation DeleteObject($id: Int!, $zoneId: Int!) {
-    deleteObject(id: $id, zoneId: $zoneId) {
-      id
-    }
-  }
-`;
-
-const DELETE_OBJECTS = gql`
-  mutation DeleteObjects($ids: [Int!]!) {
-    deleteObjects(ids: $ids)
-  }
-`;
+// Inline queries removed; using unified generated documents & fragments.
 
 export default function ObjectsPage() {
   return (
@@ -86,6 +64,7 @@ export default function ObjectsPage() {
 }
 
 function ObjectsContent() {
+  const apolloClient = useApolloClient();
   const searchParams = useSearchParams();
   const router = useRouter();
   const zoneParam = searchParams.get('zone');
@@ -105,7 +84,10 @@ function ObjectsContent() {
     new Set()
   );
   const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
-  const [objectDetails, setObjectDetails] = useState<Record<number, any>>({});
+  // Store detailed object data keyed by object id (details fragment)
+  const [objectDetails, setObjectDetails] = useState<
+    Record<number, ObjectDetailsFragment>
+  >({});
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
@@ -113,20 +95,21 @@ function ObjectsContent() {
   const [sortBy, setSortBy] = useState('level');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  const { loading, error, data, refetch } = useQuery(
-    selectedZone ? GET_OBJECTS_BY_ZONE : GET_OBJECTS,
-    {
-      variables: selectedZone ? { zoneId: selectedZone } : undefined,
-    }
-  ) as {
-    loading: boolean;
-    error?: any;
-    data?: { objects?: any[]; objectsByZone?: any[] };
-    refetch: () => void;
-  };
+  const { loading, error, data, refetch } = useQuery<
+    GetObjectsQuery | GetObjectsByZoneQuery,
+    GetObjectsQueryVariables | GetObjectsByZoneQueryVariables
+  >(selectedZone ? GetObjectsByZoneDocument : GetObjectsDocument, {
+    variables: selectedZone ? { zoneId: selectedZone } : { take: 100 },
+  });
 
-  const [deleteObject] = useMutation(DELETE_OBJECT);
-  const [deleteObjects] = useMutation(DELETE_OBJECTS);
+  const [deleteObject] = useMutation<
+    DeleteObjectMutation,
+    DeleteObjectMutationVariables
+  >(DeleteObjectDocument);
+  const [deleteObjects] = useMutation<
+    DeleteObjectsMutation,
+    DeleteObjectsMutationVariables
+  >(DeleteObjectsDocument);
 
   // Redirect to object editor if id parameter is provided
   useEffect(() => {
@@ -149,6 +132,14 @@ function ObjectsContent() {
     }
   }, [zoneParam, selectedZone, setSelectedZone]);
 
+  // Type guard to differentiate summary vs detailed object
+  const isDetailed = (
+    obj: ObjectSummaryFragment | ObjectDetailsFragment
+  ): obj is ObjectDetailsFragment => {
+    // examineDescription exists only on detailed fragment
+    return (obj as ObjectDetailsFragment).examineDescription !== undefined;
+  };
+
   const toggleObjectExpanded = async (objectId: number) => {
     if (expandedObjects.has(objectId)) {
       setExpandedObjects(
@@ -161,58 +152,23 @@ function ObjectsContent() {
     setExpandedObjects(new Set(expandedObjects).add(objectId));
 
     // Load detailed data if not already loaded
-    const object = objects.find((obj: any) => obj.id === objectId);
-    if (object && !objectDetails[objectId] && !object.description) {
+    const object = objects.find(obj => obj.id === objectId);
+    if (object && !objectDetails[objectId]) {
       setLoadingDetails(new Set(loadingDetails).add(objectId));
       try {
-        const getObjectQuery = `
-          query GetObject($id: Int!, $zoneId: Int!) {
-            object(id: $id, zoneId: $zoneId) {
-              id
-              type
-              keywords
-              name
-              examineDescription
-              actionDesc
-              flags
-              effectFlags
-              wearFlags
-              weight
-              cost
-              timer
-              decomposeTimer
-              level
-              concealment
-              values
-              zoneId
-              createdAt
-              updatedAt
-            }
-          }
-        `;
-
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: getObjectQuery,
-            variables: { id: objectId, zoneId: object.zoneId },
-          }),
+        const detailed = await apolloClient.query<
+          GetObjectQuery,
+          GetObjectQueryVariables
+        >({
+          query: GetObjectDocument,
+          variables: { id: objectId, zoneId: object.zoneId },
+          fetchPolicy: 'network-only',
         });
-
-        const result = await response.json();
-        if (result.errors) {
-          console.error(
-            'Error loading object details:',
-            result.errors[0].message
-          );
-        } else if (result.data.object) {
-          console.log('Object data received:', result.data.object);
-          console.log('Object values:', result.data.object.values);
-          // Store detailed data separately to trigger re-render
+        const objDetails = detailed.data?.object;
+        if (objDetails) {
           setObjectDetails(prev => ({
             ...prev,
-            [objectId]: result.data.object,
+            [objectId]: objDetails,
           }));
         }
       } catch (err) {
@@ -236,7 +192,11 @@ function ObjectsContent() {
 
     setDeletingId(id);
     try {
-      await deleteObject({ variables: { id } });
+      const obj = objects.find(o => o.id === id);
+      if (!obj) {
+        throw new Error('Object not found for deletion');
+      }
+      await deleteObject({ variables: { id, zoneId: obj.zoneId! } });
       await refetch();
     } catch (err) {
       console.error('Error deleting object:', err);
@@ -247,7 +207,12 @@ function ObjectsContent() {
   };
 
   // Get objects from whichever query is active
-  const objects = data?.objects || data?.objectsByZone || [];
+  const objects: ObjectSummaryFragment[] =
+    (data && 'objects' in data && (data as GetObjectsQuery).objects) ||
+    (data &&
+      'objectsByZone' in data &&
+      (data as GetObjectsByZoneQuery).objectsByZone) ||
+    [];
 
   // Get available types for filtering
   const availableTypes = getUniqueValues(objects, 'type');
@@ -264,7 +229,7 @@ function ObjectsContent() {
   };
 
   const selectAllObjects = () => {
-    setSelectedObjects(new Set(paginatedObjects.map((obj: any) => obj.id)));
+    setSelectedObjects(new Set(paginatedObjects.map(obj => obj.id!)));
   };
 
   const clearSelection = () => {
@@ -297,110 +262,60 @@ function ObjectsContent() {
     }
   };
 
+  const [createObject] = useMutation<
+    CreateObjectMutation,
+    CreateObjectMutationVariables
+  >(CreateObjectDocument);
+
   const handleCloneObject = async (objectId: number) => {
     setCloningId(objectId);
     try {
-      // Get the object's zoneId first
-      const object = objects.find((obj: any) => obj.id === objectId);
+      const object = objects.find(obj => obj.id === objectId);
       if (!object) {
         throw new Error('Object not found');
       }
 
-      // First, fetch the complete object data
-      const getObjectQuery = `
-        query GetObject($id: Int!, $zoneId: Int!) {
-          object(id: $id, zoneId: $zoneId) {
-            id
-            keywords
-            name
-            examineDescription
-            type
-            cost
-            weight
-            level
-            material
-            condition
-            extra
-            itemFlags
-            values
-            zoneId
-          }
-        }
-      `;
-
-      const objectResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: getObjectQuery,
-          variables: { id: objectId, zoneId: object.zoneId },
-        }),
+      // Fetch full object details (still using network-only to ensure fresh data)
+      const detailed = await apolloClient.query<
+        GetObjectQuery,
+        GetObjectQueryVariables
+      >({
+        query: GetObjectDocument,
+        variables: { id: objectId, zoneId: object.zoneId },
+        fetchPolicy: 'network-only',
       });
+      const originalObject = detailed.data?.object;
+      if (!originalObject) throw new Error('Original object details missing');
 
-      const objectResult = await objectResponse.json();
-      if (objectResult.errors) {
-        throw new Error(objectResult.errors[0].message);
-      }
-
-      const originalObject = objectResult.data.object;
-      if (!originalObject) {
-        throw new Error('Object not found');
-      }
-
-      // Create clone data (remove id and modify name)
-      const cloneData = {
+      // Build clone payload (NOTE: CreateObjectInput requires additional fields like id & roomDescription)
+      const cloneData: CreateObjectInput = {
+        id: Date.now() % 2147483647,
         keywords: originalObject.keywords,
         name: `${originalObject.name} (Copy)`,
         examineDescription: originalObject.examineDescription,
+        roomDescription:
+          originalObject.roomDescription || originalObject.examineDescription,
         type: originalObject.type,
         cost: originalObject.cost,
         weight: originalObject.weight,
         level: originalObject.level,
-        material: originalObject.material,
-        condition: originalObject.condition,
-        extra: originalObject.extra,
-        itemFlags: originalObject.itemFlags,
-        values: originalObject.values,
+        concealment: originalObject.concealment,
+        timer: originalObject.timer,
+        decomposeTimer: originalObject.decomposeTimer,
         zoneId: originalObject.zoneId,
+        values: originalObject.values,
+        flags: originalObject.flags,
+        effectFlags: originalObject.effectFlags,
+        wearFlags: originalObject.wearFlags,
       };
 
-      // Create the cloned object
-      const createMutation = `
-        mutation CreateObject($data: CreateObjectInput!) {
-          createObject(data: $data) {
-            id
-            keywords
-            name
-            type
-            cost
-            weight
-            level
-            zoneId
-          }
-        }
-      `;
-
-      const createResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: createMutation,
-          variables: { data: cloneData },
-        }),
+      const createResult = await createObject({
+        variables: { data: cloneData },
       });
-
-      const createResult = await createResponse.json();
-      if (createResult.errors) {
-        throw new Error(createResult.errors[0].message);
-      }
-
-      const newObject = createResult.data.createObject;
-
-      // Refresh the data to show the new object
       await refetch();
-
-      // Show success message (could be replaced with a toast notification)
-      alert(`Object cloned successfully! New object ID: ${newObject.id}`);
+      alert(
+        `Object cloned successfully! New object ID: ${createResult.data?.createObject.id}`
+      );
     } catch (err) {
       console.error('Error cloning object:', err);
       alert(
@@ -414,7 +329,7 @@ function ObjectsContent() {
   const exportSelectedObjects = () => {
     if (selectedObjects.size === 0) return;
 
-    const selectedData = sortedObjects.filter((obj: any) =>
+    const selectedData = sortedObjects.filter(obj =>
       selectedObjects.has(obj.id)
     );
     const jsonData = JSON.stringify(selectedData, null, 2);
@@ -431,25 +346,59 @@ function ObjectsContent() {
   };
 
   // Apply advanced search filters and sorting
-  const filteredObjects = applySearchFilters(objects, searchFilters, {
+  interface ObjectSearchShape {
+    id: number;
+    keywords?: string;
+    name?: string;
+    level: number;
+    type?: string;
+    cost: number;
+    weight: number;
+    zoneId: number;
+    // Additional fields (roomDescription, examineDescription, concealment) only available once detailed data is loaded
+    [key: string]: unknown;
+  }
+  const searchableObjects: ObjectSearchShape[] = objects.map(o => ({
+    id: o.id,
+    keywords: Array.isArray(o.keywords) ? o.keywords.join(' ') : o.keywords,
+    name: o.name,
+    level: o.level,
+    type: o.type as string | undefined,
+    cost: o.cost,
+    weight: o.weight,
+    zoneId: o.zoneId,
+  }));
+  const filteredObjects = applySearchFilters(searchableObjects, searchFilters, {
     // Custom field mappings for object-specific filters
-    isValuable: obj => obj.cost >= 1000,
-    isLightweight: obj => obj.weight <= 5,
-    isHeavy: obj => obj.weight >= 50,
-    minCost: obj => obj.cost,
-    maxWeight: obj => obj.weight,
+    isValuable: obj => (obj.cost ?? 0) >= 1000,
+    isLightweight: obj => (obj.weight ?? 0) <= 5,
+    isHeavy: obj => (obj.weight ?? 0) >= 50,
+    minCost: obj => obj.cost ?? 0,
+    maxWeight: obj => obj.weight ?? 0,
   });
 
   // Sort the filtered objects
-  const sortedObjects = [...filteredObjects].sort((a: any, b: any) => {
-    const aVal = a[sortBy] || 0;
-    const bVal = b[sortBy] || 0;
+  const sortedObjects = [...filteredObjects].sort((a, b) => {
+    const aVal = (a as Record<string, unknown>)[sortBy];
+    const bVal = (b as Record<string, unknown>)[sortBy];
+    const normA =
+      aVal === undefined || aVal === null
+        ? typeof bVal === 'string'
+          ? ''
+          : 0
+        : aVal;
+    const normB =
+      bVal === undefined || bVal === null
+        ? typeof aVal === 'string'
+          ? ''
+          : 0
+        : bVal;
     const comparison =
-      typeof aVal === 'string'
-        ? aVal.localeCompare(bVal)
-        : aVal < bVal
+      typeof normA === 'string' && typeof normB === 'string'
+        ? normA.localeCompare(normB)
+        : (normA as number) < (normB as number)
           ? -1
-          : aVal > bVal
+          : (normA as number) > (normB as number)
             ? 1
             : 0;
     return sortOrder === 'asc' ? comparison : -comparison;
@@ -639,11 +588,10 @@ function ObjectsContent() {
         </div>
       ) : (
         <div className='grid gap-4'>
-          {paginatedObjects.map((object: any) => {
-            // Merge object with detailed data if available
-            const fullObject = objectDetails[object.id]
-              ? { ...object, ...objectDetails[object.id] }
-              : object;
+          {paginatedObjects.map(object => {
+            // Merge object with detailed data if available (union type)
+            const fullObject: ObjectSummaryFragment | ObjectDetailsFragment =
+              objectDetails[object.id] || object;
             return (
               <div
                 key={fullObject.id}
@@ -675,7 +623,7 @@ function ObjectsContent() {
                             #{fullObject.id} - {fullObject.name}
                           </h3>
                           <span className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full uppercase'>
-                            {fullObject.type.replace('_', ' ')}
+                            {(fullObject.type ?? '').replace('_', ' ')}
                           </span>
                           <ChevronDown
                             className={`w-4 h-4 text-gray-400 transition-transform ${
@@ -722,7 +670,7 @@ function ObjectsContent() {
                       <button
                         onClick={e => {
                           e.stopPropagation();
-                          handleDelete(fullObject.id, fullObject.name);
+                          handleDelete(fullObject.id!, fullObject.name ?? '');
                         }}
                         disabled={deletingId === fullObject.id}
                         className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm disabled:opacity-50'
@@ -751,28 +699,30 @@ function ObjectsContent() {
                     ) : (
                       <div className='space-y-4'>
                         {/* Full Description */}
-                        {fullObject.examineDescription && (
-                          <div>
-                            <h4 className='font-medium text-gray-900 mb-2'>
-                              Examine Description
-                            </h4>
-                            <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
-                              {fullObject.examineDescription}
-                            </p>
-                          </div>
-                        )}
+                        {isDetailed(fullObject) &&
+                          fullObject.examineDescription && (
+                            <div>
+                              <h4 className='font-medium text-gray-900 mb-2'>
+                                Examine Description
+                              </h4>
+                              <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                                {fullObject.examineDescription}
+                              </p>
+                            </div>
+                          )}
 
                         {/* Action Description */}
-                        {fullObject.actionDesc && (
-                          <div>
-                            <h4 className='font-medium text-gray-900 mb-2'>
-                              Action Description
-                            </h4>
-                            <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
-                              {fullObject.actionDesc}
-                            </p>
-                          </div>
-                        )}
+                        {isDetailed(fullObject) &&
+                          fullObject.actionDescription && (
+                            <div>
+                              <h4 className='font-medium text-gray-900 mb-2'>
+                                Action Description
+                              </h4>
+                              <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                                {fullObject.actionDescription}
+                              </p>
+                            </div>
+                          )}
 
                         {/* Technical Details */}
                         <div>
@@ -804,98 +754,105 @@ function ObjectsContent() {
                                   Concealment:
                                 </span>
                                 <span className='ml-1 font-medium'>
-                                  {fullObject.concealment || 0}
+                                  {isDetailed(fullObject)
+                                    ? fullObject.concealment
+                                    : 0}
                                 </span>
                               </div>
-                              {fullObject.timer > 0 && (
-                                <div>
-                                  <span className='text-gray-600'>Timer:</span>
-                                  <span className='ml-1 font-medium'>
-                                    {fullObject.timer}
-                                  </span>
-                                </div>
-                              )}
-                              {fullObject.decomposeTimer > 0 && (
-                                <div>
-                                  <span className='text-gray-600'>
-                                    Decompose Timer:
-                                  </span>
-                                  <span className='ml-1 font-medium'>
-                                    {fullObject.decomposeTimer}
-                                  </span>
-                                </div>
-                              )}
+                              {isDetailed(fullObject) &&
+                                fullObject.timer > 0 && (
+                                  <div>
+                                    <span className='text-gray-600'>
+                                      Timer:
+                                    </span>
+                                    <span className='ml-1 font-medium'>
+                                      {fullObject.timer}
+                                    </span>
+                                  </div>
+                                )}
+                              {isDetailed(fullObject) &&
+                                fullObject.decomposeTimer > 0 && (
+                                  <div>
+                                    <span className='text-gray-600'>
+                                      Decompose Timer:
+                                    </span>
+                                    <span className='ml-1 font-medium'>
+                                      {fullObject.decomposeTimer}
+                                    </span>
+                                  </div>
+                                )}
                             </div>
                           </div>
                         </div>
 
                         {/* Flags */}
-                        {(fullObject.flags?.length > 0 ||
-                          fullObject.effectFlags?.length > 0 ||
-                          fullObject.wearFlags?.length > 0) && (
-                          <div>
-                            <h4 className='font-medium text-gray-900 mb-2'>
-                              Flags
-                            </h4>
-                            <div className='bg-white p-3 rounded border text-sm space-y-2'>
-                              {fullObject.flags?.length > 0 && (
-                                <div>
-                                  <span className='text-gray-600'>
-                                    Object Flags:
-                                  </span>
-                                  <div className='flex flex-wrap gap-1 mt-1'>
-                                    {fullObject.flags.map((flag: string) => (
-                                      <span
-                                        key={flag}
-                                        className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'
-                                      >
-                                        {flag.replace('_', ' ')}
-                                      </span>
-                                    ))}
-                                  </div>
-                                </div>
-                              )}
-                              {fullObject.effectFlags?.length > 0 && (
-                                <div>
-                                  <span className='text-gray-600'>
-                                    Effect Flags:
-                                  </span>
-                                  <div className='flex flex-wrap gap-1 mt-1'>
-                                    {fullObject.effectFlags.map(
-                                      (flag: string) => (
+                        {isDetailed(fullObject) &&
+                          (fullObject.flags.length > 0 ||
+                            fullObject.effectFlags.length > 0 ||
+                            fullObject.wearFlags.length > 0) && (
+                            <div>
+                              <h4 className='font-medium text-gray-900 mb-2'>
+                                Flags
+                              </h4>
+                              <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                                {fullObject.flags.length > 0 && (
+                                  <div>
+                                    <span className='text-gray-600'>
+                                      Object Flags:
+                                    </span>
+                                    <div className='flex flex-wrap gap-1 mt-1'>
+                                      {fullObject.flags.map((flag: string) => (
                                         <span
                                           key={flag}
-                                          className='px-2 py-1 bg-green-100 text-green-700 text-xs rounded'
+                                          className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'
                                         >
                                           {flag.replace('_', ' ')}
                                         </span>
-                                      )
-                                    )}
+                                      ))}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
-                              {fullObject.wearFlags?.length > 0 && (
-                                <div>
-                                  <span className='text-gray-600'>
-                                    Wear Flags:
-                                  </span>
-                                  <div className='flex flex-wrap gap-1 mt-1'>
-                                    {fullObject.wearFlags.map(
-                                      (flag: string) => (
-                                        <span
-                                          key={flag}
-                                          className='px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded'
-                                        >
-                                          {flag.replace('_', ' ')}
-                                        </span>
-                                      )
-                                    )}
+                                )}
+                                {fullObject.effectFlags.length > 0 && (
+                                  <div>
+                                    <span className='text-gray-600'>
+                                      Effect Flags:
+                                    </span>
+                                    <div className='flex flex-wrap gap-1 mt-1'>
+                                      {fullObject.effectFlags.map(
+                                        (flag: string) => (
+                                          <span
+                                            key={flag}
+                                            className='px-2 py-1 bg-green-100 text-green-700 text-xs rounded'
+                                          >
+                                            {flag.replace('_', ' ')}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
                                   </div>
-                                </div>
-                              )}
+                                )}
+                                {fullObject.wearFlags.length > 0 && (
+                                  <div>
+                                    <span className='text-gray-600'>
+                                      Wear Flags:
+                                    </span>
+                                    <div className='flex flex-wrap gap-1 mt-1'>
+                                      {fullObject.wearFlags.map(
+                                        (flag: string) => (
+                                          <span
+                                            key={flag}
+                                            className='px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded'
+                                          >
+                                            {flag.replace('_', ' ')}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                              </div>
                             </div>
-                          </div>
-                        )}
+                          )}
 
                         {/* Type-Specific Information */}
                         <div>
@@ -1125,7 +1082,7 @@ function ObjectsContent() {
                                   'LIGHT',
                                   'FOOD',
                                   'ARMOR',
-                                ].includes(fullObject.type) && (
+                                ].includes(fullObject.type ?? '') && (
                                   <div className='space-y-1'>
                                     {Object.entries(fullObject.values).map(
                                       ([key, value]) => (
@@ -1156,37 +1113,43 @@ function ObjectsContent() {
                         </div>
 
                         {/* Timestamps */}
-                        {(fullObject.createdAt || fullObject.updatedAt) && (
-                          <div>
-                            <h4 className='font-medium text-gray-900 mb-2'>
-                              Timestamps
-                            </h4>
-                            <div className='bg-white p-3 rounded border text-sm space-y-1'>
-                              {fullObject.createdAt && (
-                                <div className='flex justify-between'>
-                                  <span className='text-gray-600'>
-                                    Created:
-                                  </span>
-                                  <span>
-                                    {new Date(
-                                      fullObject.createdAt
-                                    ).toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
-                              {fullObject.updatedAt && (
-                                <div className='flex justify-between'>
-                                  <span className='text-gray-600'>
-                                    Updated:
-                                  </span>
-                                  <span>
-                                    {new Date(
-                                      fullObject.updatedAt
-                                    ).toLocaleString()}
-                                  </span>
-                                </div>
-                              )}
+                        {isDetailed(fullObject) &&
+                          (fullObject.createdAt || fullObject.updatedAt) && (
+                            <div>
+                              <h4 className='font-medium text-gray-900 mb-2'>
+                                Timestamps
+                              </h4>
+                              <div className='bg-white p-3 rounded border text-sm space-y-1'>
+                                {fullObject.createdAt && (
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>
+                                      Created:
+                                    </span>
+                                    <span>
+                                      {new Date(
+                                        fullObject.createdAt
+                                      ).toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
+                                {fullObject.updatedAt && (
+                                  <div className='flex justify-between'>
+                                    <span className='text-gray-600'>
+                                      Updated:
+                                    </span>
+                                    <span>
+                                      {new Date(
+                                        fullObject.updatedAt
+                                      ).toLocaleString()}
+                                    </span>
+                                  </div>
+                                )}
+                              </div>
                             </div>
+                          )}
+                        {!isDetailed(fullObject) && (
+                          <div className='text-xs text-gray-500 italic'>
+                            Detailed data not loaded yet.
                           </div>
                         )}
                       </div>

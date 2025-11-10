@@ -1,0 +1,45 @@
+# User management operations
+
+query Users {
+  users {
+    id
+    username
+    role
+    lastLoginAt
+    isBanned
+  }
+  myPermissions {
+    isGod
+    isCoder
+    isBuilder
+    canManageUsers
+  }
+}
+
+mutation UpdateUser($id: ID!, $role: UserRole) {
+  updateUser(input: { id: $id, role: $role }) {
+    id
+    username
+    role
+  }
+}
+
+mutation BanUser($userId: ID!, $reason: String!, $expiresAt: String) {
+  banUser(input: { userId: $userId, reason: $reason, expiresAt: $expiresAt }) {
+    id
+    userId
+    reason
+    bannedAt
+    expiresAt
+    active
+  }
+}
+
+mutation UnbanUser($userId: ID!) {
+  unbanUser(input: { userId: $userId }) {
+    id
+    userId
+    active
+    unbannedAt
+  }
+}
