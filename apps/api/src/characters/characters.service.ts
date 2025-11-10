@@ -3,7 +3,9 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import { DatabaseService } from '../database/database.service';
+import { RoleCalculatorService } from '../users/services/role-calculator.service';
 import {
   CreateCharacterEffectInput,
   CreateCharacterInput,
@@ -15,7 +17,10 @@ import {
 
 @Injectable()
 export class CharactersService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly roleCalculator: RoleCalculatorService
+  ) {}
 
   // Character operations
   async findAllCharacters(skip?: number, take?: number) {
@@ -525,24 +530,97 @@ export class CharactersService {
   }
 
   // Character linking methods
-  // DEPRECATED: Character linking methods
-  // Characters now require userId at creation, so linking is no longer supported
+  /**
+   * Link an existing game character to a user account
+   * Validates character password and recalculates user role
+   */
   async linkCharacterToUser(
     userId: string,
     characterName: string,
     characterPassword: string
   ) {
-    throw new BadRequestException(
-      'Character linking is deprecated. Characters are now created directly by users.'
+    // Find character by name (case-insensitive)
+    const character = await this.db.characters.findFirst({
+      where: {
+        name: {
+          equals: characterName,
+          mode: 'insensitive',
+        },
+      },
+    });
+
+    if (!character) {
+      throw new NotFoundException(`Character '${characterName}' not found`);
+    }
+
+    // Check if character is already linked
+    if (character.userId) {
+      throw new BadRequestException(
+        `Character '${characterName}' is already linked to another account`
+      );
+    }
+
+    // Validate character password
+    if (!character.passwordHash) {
+      throw new BadRequestException(
+        `Character '${characterName}' does not have a password set`
+      );
+    }
+
+    const isPasswordValid = await bcrypt.compare(
+      characterPassword,
+      character.passwordHash
     );
+
+    if (!isPasswordValid) {
+      throw new BadRequestException('Invalid character password');
+    }
+
+    // Link character to user
+    await this.db.characters.update({
+      where: { id: character.id },
+      data: { userId },
+    });
+
+    // Recalculate and update user role based on character level
+    await this.roleCalculator.updateUserRole(userId);
+
+    return character;
   }
 
+  /**
+   * Unlink a character from a user account
+   * Recalculates user role after unlinking
+   */
   async unlinkCharacterFromUser(characterId: string, userId: string) {
-    throw new BadRequestException(
-      'Character unlinking is not currently supported. Please contact an administrator.'
-    );
+    const character = await this.db.characters.findUnique({
+      where: { id: characterId },
+    });
+
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${characterId} not found`);
+    }
+
+    // Verify character belongs to the user
+    if (character.userId !== userId) {
+      throw new BadRequestException(
+        'Character does not belong to this user account'
+      );
+    }
+
+    // Unlink character
+    await this.db.characters.update({
+      where: { id: characterId },
+      data: { userId: null },
+    });
+
+    // Recalculate user role (may be downgraded if this was their highest-level character)
+    await this.roleCalculator.updateUserRole(userId);
   }
 
+  /**
+   * Find character by name for linking purposes
+   */
   async findCharacterByNameForLinking(characterName: string) {
     const character = await this.db.characters.findFirst({
       where: {
@@ -556,6 +634,7 @@ export class CharactersService {
         name: true,
         level: true,
         userId: true,
+        passwordHash: true,
       },
     });
 
@@ -568,17 +647,34 @@ export class CharactersService {
       name: character.name,
       level: character.level,
       isLinked: !!character.userId,
-      hasPassword: false, // Deprecated: passwords are now on User model
+      hasPassword: !!character.passwordHash,
     };
   }
 
+  /**
+   * Validate character password for linking
+   */
   async validateCharacterPassword(
     characterName: string,
     password: string
   ): Promise<boolean> {
-    throw new BadRequestException(
-      'Character password validation is deprecated. Use user authentication instead.'
-    );
+    const character = await this.db.characters.findFirst({
+      where: {
+        name: {
+          equals: characterName,
+          mode: 'insensitive',
+        },
+      },
+      select: {
+        passwordHash: true,
+      },
+    });
+
+    if (!character || !character.passwordHash) {
+      return false;
+    }
+
+    return bcrypt.compare(password, character.passwordHash);
   }
 
   async getCharacterLinkingInfo(characterName: string) {

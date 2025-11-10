@@ -2,10 +2,101 @@
 # THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
 # ------------------------------------------------------
 
+type Ability {
+  abilityType: String!
+  castTimeRounds: Int!
+  cooldownMs: Int!
+  createdAt: DateTime!
+  description: String
+  effects: [AbilityEffect!]
+  gameId: String
+  id: ID!
+  inCombatOnly: Boolean!
+  isArea: Boolean!
+  luaScript: String
+  messages: AbilityMessages
+  minPosition: Position!
+  name: String!
+  notes: String
+  restrictions: AbilityRestrictions
+  savingThrows: [AbilitySavingThrow!]
+  school: AbilitySchool
+  schoolId: Int
+  tags: [String!]!
+  targeting: AbilityTargeting
+  updatedAt: DateTime!
+  violent: Boolean!
+}
+
+type AbilityEffect {
+  abilityId: ID!
+  chancePct: Int!
+  condition: String
+  effect: Effect!
+  effectId: ID!
+  order: Int!
+  overrideParams: JSON
+  trigger: String
+}
+
+type AbilityMessages {
+  failToCaster: String
+  failToRoom: String
+  failToVictim: String
+  startToCaster: String
+  startToRoom: String
+  startToVictim: String
+  successToCaster: String
+  successToRoom: String
+  successToVictim: String
+  wearoffToRoom: String
+  wearoffToTarget: String
+}
+
+type AbilityRestrictions {
+  customRequirementLua: String
+  requirements: [JSON!]!
+}
+
+type AbilitySavingThrow {
+  dcFormula: String!
+  id: ID!
+  onSaveAction: JSON!
+  saveType: SaveType!
+}
+
+type AbilitySchool {
+  description: String
+  id: ID!
+  name: String!
+}
+
+type AbilityTargeting {
+  maxTargets: Int!
+  range: Int!
+  requireLos: Boolean!
+  scope: TargetScope!
+  scopePattern: String
+  validTargets: [TargetType!]!
+}
+
 type AdminUser {
   id: ID!
   role: UserRole!
   username: String!
+}
+
+input AssignSkillToClassInput {
+  abilityId: Int!
+  classId: Int!
+  minLevel: Int! = 1
+}
+
+input AssignSkillToRaceInput {
+  abilityId: Int!
+  bonus: Int! = 0
+  category: SkillCategory! = SECONDARY
+  race: Race!
 }
 
 input AttachTriggerInput {
@@ -188,6 +279,52 @@ type CharacterSessionInfoDto {
   totalTimePlayed: Int!
 }
 
+type CircleSpellDto {
+  id: ID!
+  minLevel: Int
+  proficiencyGain: Int
+  spellId: Int!
+  spellName: String!
+}
+
+type ClassCircleDto {
+  circle: Int!
+  classId: Int!
+
+  """Class name"""
+  className: String!
+  id: ID!
+  minLevel: Int!
+
+  """Spells in this circle"""
+  spells: [CircleSpellDto!]!
+}
+
+type ClassDto {
+  createdAt: DateTime!
+  description: String
+  hitDice: String!
+  id: ID!
+  name: String!
+  primaryStat: String
+  updatedAt: DateTime!
+}
+
+type ClassSkillDto {
+  category: SkillCategory
+  classId: Int!
+
+  """Class name"""
+  className: String!
+  id: ID!
+  maxLevel: Int
+  minLevel: Int!
+  skillId: Int!
+
+  """Skill name"""
+  skillName: String!
+}
+
 enum Climate {
   ALPINE
   ARCTIC
@@ -215,6 +352,55 @@ enum Composition {
   PLANT
   STONE
   WATER
+}
+
+input CreateAbilityInput {
+  abilityType: String! = "SPELL"
+  castTimeRounds: Int! = 1
+  cooldownMs: Int! = 0
+  description: String
+  gameId: String
+  inCombatOnly: Boolean! = false
+  isArea: Boolean! = false
+  luaScript: String
+  minPosition: Position! = STANDING
+  name: String!
+  notes: String
+  schoolId: Int
+  tags: [String!]! = []
+  violent: Boolean! = false
+}
+
+input CreateAbilityMessagesInput {
+  abilityId: Int!
+  failToCaster: String
+  failToRoom: String
+  failToVictim: String
+  startToCaster: String
+  startToRoom: String
+  startToVictim: String
+  successToCaster: String
+  successToRoom: String
+  successToVictim: String
+  wearoffToRoom: String
+  wearoffToTarget: String
+}
+
+input CreateAbilitySavingThrowInput {
+  abilityId: Int!
+  dcFormula: String!
+  onSaveAction: JSON! = "NEGATE"
+  saveType: SaveType! = SPELL
+}
+
+input CreateAbilityTargetingInput {
+  abilityId: Int!
+  maxTargets: Int! = 1
+  range: Int! = 0
+  requireLos: Boolean! = false
+  scope: TargetScope! = SINGLE
+  scopePattern: String
+  validTargets: [TargetType!]! = [SELF]
 }
 
 input CreateCharacterEffectInput {
@@ -258,6 +444,19 @@ input CreateCharacterItemInput {
   objectPrototypeId: Int!
 }
 
+input CreateClassCircleInput {
+  circle: Int!
+  classId: Int!
+  minLevel: Int!
+}
+
+input CreateClassInput {
+  description: String
+  hitDice: String! = "1d8"
+  name: String!
+  primaryStat: String
+}
+
 input CreateEquipmentSetInput {
   description: String
   items: [CreateEquipmentSetItemInput!]
@@ -277,6 +476,15 @@ input CreateEquipmentSetItemStandaloneInput {
   probability: Float! = 1
   quantity: Int! = 1
   slot: String
+}
+
+input CreateGrantInput {
+  expiresAt: DateTime
+  notes: String
+  permissions: [GrantPermission!]!
+  resourceId: String!
+  resourceType: GrantResourceType!
+  userId: String!
 }
 
 input CreateMobEquipmentSetInput {
@@ -341,7 +549,7 @@ input CreateMobResetInput {
 }
 
 input CreateObjectInput {
-  actionDesc: String
+  actionDescription: String
   concealment: Int! = 0
   cost: Int! = 0
   decomposeTimer: Int! = 0
@@ -352,12 +560,42 @@ input CreateObjectInput {
   keywords: [String!]!
   level: Int! = 1
   name: String!
+  roomDescription: String!
   timer: Int! = 0
   type: ObjectType! = NOTHING
   values: JSON
   wearFlags: [WearFlag!]! = []
   weight: Float! = 0
   zoneId: Int!
+}
+
+input CreateRaceInput {
+  bonusDamroll: Int! = 0
+  bonusHitroll: Int! = 0
+  defaultAlignment: Int! = 0
+  defaultComposition: Composition! = FLESH
+  defaultLifeforce: LifeForce! = LIFE
+  defaultSize: Size! = MEDIUM
+  displayName: String!
+  expFactor: Int! = 100
+  focusBonus: Int! = 100
+  fullName: String!
+  hpFactor: Int! = 100
+  humanoid: Boolean! = false
+  keywords: String!
+  magical: Boolean! = false
+  maxCharisma: Int! = 76
+  maxConstitution: Int! = 76
+  maxDexterity: Int! = 76
+  maxIntelligence: Int! = 76
+  maxStrength: Int! = 76
+  maxWisdom: Int! = 76
+  name: String!
+  permanentEffects: [EffectFlag!]! = []
+  plainName: String!
+  playable: Boolean! = false
+  race: Race!
+  raceAlign: RaceAlign! = GOOD
 }
 
 input CreateRoomExitInput {
@@ -427,18 +665,22 @@ enum DamageType {
   CLAW
   COLD
   CRUSH
+  ENERGY
   FIRE
   HIT
   MAUL
+  MENTAL
   PIERCE
   POISON
   POUND
   PUNCH
+  ROT
   SHOCK
   SLASH
   STAB
   STING
   THRASH
+  WATER
   WHIP
 }
 
@@ -454,6 +696,14 @@ enum Direction {
   SOUTH
   UP
   WEST
+}
+
+type Effect {
+  defaultParams: JSON!
+  description: String
+  effectType: String!
+  id: ID!
+  name: String!
 }
 
 enum EffectFlag {
@@ -576,6 +826,30 @@ enum Gender {
   MALE
   NEUTRAL
   NON_BINARY
+}
+
+"""Permission level for a grant"""
+enum GrantPermission {
+  ADMIN
+  DELETE
+  READ
+  WRITE
+}
+
+"""Type of resource that can be granted access to"""
+enum GrantResourceType {
+  MOB
+  OBJECT
+  SHOP
+  ZONE
+}
+
+input GrantZoneAccessInput {
+  expiresAt: DateTime
+  notes: String
+  permissions: [GrantPermission!]!
+  userId: String!
+  zoneId: Float!
 }
 
 enum Hemisphere {
@@ -756,29 +1030,49 @@ type MobSummaryDto {
 
 type Mutation {
   addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: String): MobResetDto!
+
+  """Assign a skill to a class"""
+  assignSkillToClass(data: AssignSkillToClassInput!): ClassSkillDto!
+
+  """Assign a skill to a race"""
+  assignSkillToRace(data: AssignSkillToRaceInput!): RaceSkillDto!
   attachTrigger(input: AttachTriggerInput!): TriggerDto!
   banUser(input: BanUserInput!): BanRecord!
   batchUpdateRoomPositions(input: BatchUpdateRoomPositionsInput!): BatchUpdateResult!
   changePassword(input: ChangePasswordInput!): PasswordResetResponse!
+  createAbility(data: CreateAbilityInput!): Ability!
+  createAbilityMessages(data: CreateAbilityMessagesInput!): AbilityMessages!
+  createAbilitySavingThrow(data: CreateAbilitySavingThrowInput!): AbilitySavingThrow!
+  createAbilityTargeting(data: CreateAbilityTargetingInput!): AbilityTargeting!
   createCharacter(data: CreateCharacterInput!): CharacterDto!
   createCharacterEffect(data: CreateCharacterEffectInput!): CharacterEffectDto!
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
+  createClass(data: CreateClassInput!): ClassDto!
+  createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
   createEquipmentSet(data: CreateEquipmentSetInput!): EquipmentSetDto!
   createEquipmentSetItem(data: CreateEquipmentSetItemStandaloneInput!): EquipmentSetItemDto!
+  createGrant(data: CreateGrantInput!): UserGrantDto!
   createMob(data: CreateMobInput!): MobDto!
   createMobEquipmentSet(data: CreateMobEquipmentSetInput!): MobEquipmentSetDto!
   createMobReset(data: CreateMobResetInput!): MobResetDto!
   createObject(data: CreateObjectInput!): ObjectDto!
+  createRace(data: CreateRaceInput!): RaceDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
   createShop(data: CreateShopInput!): ShopDto!
   createTrigger(input: CreateTriggerInput!): TriggerDto!
   createZone(data: CreateZoneInput!): ZoneDto!
+  deleteAbility(id: ID!): Boolean!
+  deleteAbilityMessages(abilityId: Int!): Boolean!
+  deleteAbilitySavingThrow(id: ID!): Boolean!
+  deleteAbilityTargeting(abilityId: Int!): Boolean!
   deleteCharacter(id: ID!): CharacterDto!
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
+  deleteClass(id: ID!): Boolean!
   deleteEquipmentSet(id: ID!): Boolean!
   deleteEquipmentSetItem(id: ID!): Boolean!
+  deleteGrant(id: ID!): Boolean!
   deleteMob(id: Int!, zoneId: Int!): MobDto!
   deleteMobEquipmentSet(id: ID!): Boolean!
   deleteMobReset(id: ID!): Boolean!
@@ -786,6 +1080,7 @@ type Mutation {
   deleteMobs(ids: [Int!]!): Int!
   deleteObject(id: Int!, zoneId: Int!): ObjectDto!
   deleteObjects(ids: [Int!]!): Int!
+  deleteRace(race: Race!): Boolean!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
@@ -793,32 +1088,50 @@ type Mutation {
   deleteZone(id: Int!): ZoneDto!
   detachTrigger(triggerId: Float!): TriggerDto!
 
+  """Grant zone access to a user"""
+  grantZoneAccess(data: GrantZoneAccessInput!): UserGrantDto!
+
   """Link an existing game character to your user account"""
   linkCharacter(data: LinkCharacterInput!): CharacterDto!
   login(input: LoginInput!): AuthPayload!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
+  removeClassCircle(id: ID!): Boolean!
+  removeClassSkill(id: ID!): Boolean!
 
   """Remove expired effects for a character or all characters"""
   removeExpiredEffects(characterId: ID): Int!
+  removeRaceSkill(id: ID!): Boolean!
   requestPasswordReset(input: RequestPasswordResetInput!): PasswordResetResponse!
   resetPassword(input: ResetPasswordInput!): PasswordResetResponse!
+
+  """Revoke zone access from a user"""
+  revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
   setCharacterOffline(characterId: ID!): Boolean!
   setCharacterOnline(characterId: ID!): Boolean!
   unbanUser(input: UnbanUserInput!): BanRecord!
 
   """Unlink a character from your user account"""
   unlinkCharacter(data: UnlinkCharacterInput!): Boolean!
+  updateAbility(data: UpdateAbilityInput!, id: ID!): Ability!
+  updateAbilityMessages(abilityId: Int!, data: UpdateAbilityMessagesInput!): AbilityMessages!
+  updateAbilityTargeting(abilityId: Int!, data: UpdateAbilityTargetingInput!): AbilityTargeting!
   updateCharacter(data: UpdateCharacterInput!, id: ID!): CharacterDto!
   updateCharacterActivity(characterId: ID!): Boolean!
   updateCharacterEffect(data: UpdateCharacterEffectInput!, id: ID!): CharacterEffectDto!
   updateCharacterItem(data: UpdateCharacterItemInput!, id: ID!): CharacterItemDto!
+  updateClass(data: UpdateClassInput!, id: ID!): ClassDto!
+  updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
+  updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
   updateEquipmentSet(data: UpdateEquipmentSetInput!, id: ID!): EquipmentSetDto!
+  updateGrant(data: UpdateGrantInput!, id: ID!): UserGrantDto!
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: String): Boolean!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
   updateProfile(input: UpdateProfileInput!): User!
+  updateRace(data: UpdateRaceInput!, race: Race!): RaceDto!
+  updateRaceSkill(data: UpdateRaceSkillInput!, id: ID!): RaceSkillDto!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
@@ -828,7 +1141,7 @@ type Mutation {
 }
 
 type ObjectDto {
-  actionDesc: String
+  actionDescription: String
   concealment: Int!
   cost: Int!
   createdAt: DateTime!
@@ -840,6 +1153,7 @@ type ObjectDto {
   keywords: [String!]!
   level: Int!
   name: String!
+  roomDescription: String!
   timer: Int!
   type: ObjectType!
   updatedAt: DateTime!
@@ -972,6 +1286,12 @@ enum Position {
 }
 
 type Query {
+  abilities(abilityType: String, search: String, skip: Int, take: Int): [Ability!]!
+  abilitiesCount(abilityType: String, search: String): Int!
+  ability(id: ID!): Ability!
+  abilityByGameId(gameId: String!): Ability
+  abilitySchool(id: ID!): AbilitySchool!
+  abilitySchools: [AbilitySchool!]!
   activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
   banHistory(userId: ID!): [BanRecord!]!
   character(id: ID!): CharacterDto!
@@ -983,11 +1303,26 @@ type Query {
   characterSessionInfo(characterId: ID!): CharacterSessionInfoDto!
   characters(skip: Int, take: Int): [CharacterDto!]!
   charactersCount: Int!
+  class(id: ID!): ClassDto!
+  classByName(name: String!): ClassDto
+
+  """Get all spell circles for a class"""
+  classCirclesList(classId: Int!): [ClassCircleDto!]!
+
+  """Get all skills for a class"""
+  classSkills(classId: Int!): [ClassSkillDto!]!
+  classes(skip: Int, take: Int): [ClassDto!]!
+  classesCount: Int!
+  effect(id: ID!): Effect!
+  effects(search: String, skip: Int, take: Int): [Effect!]!
+  effectsCount(search: String): Int!
   equipmentSet(id: ID!): EquipmentSetDto!
   equipmentSets: [EquipmentSetDto!]!
 
   """Get validation summary statistics"""
   getValidationSummary: ValidationSummaryType!
+  grant(id: ID!): UserGrantDto!
+  grants(resourceType: GrantResourceType, userId: String): [UserGrantDto!]!
   me: User!
   mob(id: Int!, zoneId: Int!): MobDto!
   mobReset(id: ID!): MobResetDto
@@ -998,12 +1333,19 @@ type Query {
   myCharacters: [CharacterDto!]!
   myOnlineCharacters: [OnlineCharacterDto!]!
   myPermissions: UserPermissions!
+  myZoneGrants: [ZoneGrantDto!]!
   object(id: Int!, zoneId: Int!): ObjectDto!
   objects(skip: Int, take: Int): [ObjectDto!]!
   objectsByType(type: String!): [ObjectDto!]!
   objectsByZone(zoneId: Int!): [ObjectDto!]!
   objectsCount: Int!
   onlineCharacters(userId: ID): [OnlineCharacterDto!]!
+  race(race: Race!): RaceDto!
+
+  """Get all skills for a race"""
+  raceSkills(race: Race!): [RaceSkillDto!]!
+  races: [RaceDto!]!
+  racesCount: Int!
   room(id: Int!, zoneId: Int!): RoomDto!
   rooms(lightweight: Boolean = false, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
@@ -1018,6 +1360,7 @@ type Query {
   triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
   user(id: ID!): User!
   userPermissions(userId: ID!): UserPermissions!
+  userZoneGrants(userId: String!): [ZoneGrantDto!]!
   users: [User!]!
 
   """Get validation reports for all zones"""
@@ -1068,6 +1411,57 @@ enum Race {
   PLANT
   SVERFNEBLIN
   TROLL
+}
+
+enum RaceAlign {
+  EVIL
+  GOOD
+  UNKNOWN
+}
+
+type RaceDto {
+  bonusDamroll: Int!
+  bonusHitroll: Int!
+  createdAt: DateTime!
+  defaultAlignment: Int!
+  defaultComposition: Composition!
+  defaultLifeforce: LifeForce!
+  defaultSize: Size!
+  displayName: String!
+  expFactor: Int!
+  focusBonus: Int!
+  fullName: String!
+  hpFactor: Int!
+  humanoid: Boolean!
+  keywords: String!
+  magical: Boolean!
+  maxCharisma: Int!
+  maxConstitution: Int!
+  maxDexterity: Int!
+  maxIntelligence: Int!
+  maxStrength: Int!
+  maxWisdom: Int!
+  name: String!
+  permanentEffects: [EffectFlag!]!
+  plainName: String!
+  playable: Boolean!
+  race: Race!
+  raceAlign: RaceAlign!
+  updatedAt: DateTime!
+}
+
+type RaceSkillDto {
+  bonus: Int!
+  category: SkillCategory!
+  id: ID!
+  race: Race!
+
+  """Race name"""
+  raceName: String!
+  skillId: Int!
+
+  """Skill name"""
+  skillName: String!
 }
 
 input RegisterInput {
@@ -1179,6 +1573,16 @@ type RoomSummaryDto {
   zoneId: Int!
 }
 
+enum SaveType {
+  BREATH
+  PARALYSIS
+  PETRIFICATION
+  POISON
+  ROD
+  SPELL
+  WAND
+}
+
 enum ScriptType {
   MOB
   OBJECT
@@ -1285,6 +1689,13 @@ enum Size {
   TITANIC
 }
 
+enum SkillCategory {
+  FORBIDDEN
+  PRIMARY
+  RESTRICTED
+  SECONDARY
+}
+
 enum Stance {
   ALERT
   DEAD
@@ -1294,6 +1705,29 @@ enum Stance {
   RESTING
   SLEEPING
   STUNNED
+}
+
+enum TargetScope {
+  AREA
+  CHAIN
+  CONE
+  GROUP
+  LINE
+  ROOM
+  SELF
+  SINGLE
+}
+
+enum TargetType {
+  ALLY_GROUP
+  ALLY_NPC
+  ALLY_PC
+  CORPSE
+  ENEMY_NPC
+  ENEMY_PC
+  OBJECT_INV
+  OBJECT_WORLD
+  SELF
 }
 
 type TriggerDto {
@@ -1319,6 +1753,46 @@ input UnbanUserInput {
 
 input UnlinkCharacterInput {
   characterId: ID!
+}
+
+input UpdateAbilityInput {
+  abilityType: String
+  castTimeRounds: Int
+  cooldownMs: Int
+  description: String
+  gameId: String
+  inCombatOnly: Boolean
+  isArea: Boolean
+  luaScript: String
+  minPosition: Position
+  name: String
+  notes: String
+  schoolId: Int
+  tags: [String!]
+  violent: Boolean
+}
+
+input UpdateAbilityMessagesInput {
+  failToCaster: String
+  failToRoom: String
+  failToVictim: String
+  startToCaster: String
+  startToRoom: String
+  startToVictim: String
+  successToCaster: String
+  successToRoom: String
+  successToVictim: String
+  wearoffToRoom: String
+  wearoffToTarget: String
+}
+
+input UpdateAbilityTargetingInput {
+  maxTargets: Int
+  range: Int
+  requireLos: Boolean
+  scope: TargetScope
+  scopePattern: String
+  validTargets: [TargetType!]
 }
 
 input UpdateCharacterEffectInput {
@@ -1369,9 +1843,31 @@ input UpdateCharacterItemInput {
   instanceFlags: [String!]
 }
 
+input UpdateClassCircleInput {
+  circle: Int
+  minLevel: Int
+}
+
+input UpdateClassInput {
+  description: String
+  hitDice: String
+  name: String
+  primaryStat: String
+}
+
+input UpdateClassSkillInput {
+  minLevel: Int
+}
+
 input UpdateEquipmentSetInput {
   description: String
   name: String
+}
+
+input UpdateGrantInput {
+  expiresAt: DateTime
+  notes: String
+  permissions: [GrantPermission!]
 }
 
 input UpdateMobInput {
@@ -1426,7 +1922,7 @@ input UpdateMobResetInput {
 }
 
 input UpdateObjectInput {
-  actionDesc: String
+  actionDescription: String
   concealment: Int
   cost: Int
   decomposeTimer: Int
@@ -1436,6 +1932,7 @@ input UpdateObjectInput {
   keywords: [String!]
   level: Int
   name: String
+  roomDescription: String
   timer: Int
   type: ObjectType
   values: JSON
@@ -1446,6 +1943,39 @@ input UpdateObjectInput {
 
 input UpdateProfileInput {
   email: String
+}
+
+input UpdateRaceInput {
+  bonusDamroll: Int
+  bonusHitroll: Int
+  defaultAlignment: Int
+  defaultComposition: Composition
+  defaultLifeforce: LifeForce
+  defaultSize: Size
+  displayName: String
+  expFactor: Int
+  focusBonus: Int
+  fullName: String
+  hpFactor: Int
+  humanoid: Boolean
+  keywords: String
+  magical: Boolean
+  maxCharisma: Int
+  maxConstitution: Int
+  maxDexterity: Int
+  maxIntelligence: Int
+  maxStrength: Int
+  maxWisdom: Int
+  name: String
+  permanentEffects: [EffectFlag!]
+  plainName: String
+  playable: Boolean
+  raceAlign: RaceAlign
+}
+
+input UpdateRaceSkillInput {
+  bonus: Int
+  category: SkillCategory
 }
 
 input UpdateRoomInput {
@@ -1521,6 +2051,24 @@ type User {
   username: String!
 }
 
+type UserGrantDto {
+  expiresAt: DateTime
+  grantedAt: DateTime!
+  grantedBy: String!
+
+  """Username of the person who granted access"""
+  grantedByUsername: String!
+  id: ID!
+  notes: String
+  permissions: [GrantPermission!]!
+  resourceId: String!
+  resourceType: GrantResourceType!
+  userId: String!
+
+  """Username of the person who received the grant"""
+  username: String!
+}
+
 type UserPermissions {
   canAccessDashboard: Boolean!
   canManageUsers: Boolean!
@@ -1539,6 +2087,7 @@ enum UserRole {
   BUILDER
   CODER
   GOD
+  HEAD_BUILDER
   IMMORTAL
   PLAYER
 }
@@ -1655,6 +2204,14 @@ type ZoneDto {
   resetMode: ResetMode!
   rooms: [ZoneRoomDto!]
   updatedAt: DateTime!
+}
+
+type ZoneGrantDto {
+  expiresAt: DateTime
+  notes: String
+  permissions: [GrantPermission!]!
+  zoneId: ID!
+  zoneName: String!
 }
 
 type ZoneRoomDto {

@@ -15,7 +15,7 @@ import ZoneSelector from '../../../components/ZoneSelector';
 import { applySearchFilters } from '../../../lib/search-utils';
 
 const GET_SHOPS = gql`
-  query GetShops {
+  query GetShopsInline {
     shops {
       id
       buyProfit
@@ -60,7 +60,7 @@ const GET_SHOPS = gql`
 `;
 
 const GET_SHOPS_BY_ZONE = gql`
-  query GetShopsByZone($zoneId: Int!) {
+  query GetShopsByZoneInline($zoneId: Int!) {
     shopsByZone(zoneId: $zoneId) {
       id
       buyProfit
@@ -105,7 +105,7 @@ const GET_SHOPS_BY_ZONE = gql`
 `;
 
 const DELETE_SHOP = gql`
-  mutation DeleteShop($id: Int!, $zoneId: Int!) {
+  mutation DeleteShopInline($id: Int!, $zoneId: Int!) {
     deleteShop(id: $id, zoneId: $zoneId) {
       id
     }

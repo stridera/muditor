@@ -1,7 +1,7 @@
 'use client';
 
-import { useQuery, useMutation } from '@apollo/client/react';
 import { gql } from '@apollo/client';
+import { useMutation, useQuery } from '@apollo/client/react';
 
 export const ONLINE_CHARACTERS_QUERY = gql`
   query OnlineCharacters($userId: ID) {

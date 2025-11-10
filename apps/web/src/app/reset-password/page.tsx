@@ -1,11 +1,7 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
-import Link from 'next/link';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -13,13 +9,17 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Loader2, CheckCircle, ArrowLeft } from 'lucide-react';
-import { gql } from '@apollo/client';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { apolloClient } from '@/lib/apollo-client';
+import { gql } from '@apollo/client';
+import { ArrowLeft, CheckCircle, Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useState } from 'react';
 
 const RESET_PASSWORD_MUTATION = gql`
-  mutation ResetPassword($input: ResetPasswordInput!) {
+  mutation ResetPasswordInline($input: ResetPasswordInput!) {
     resetPassword(input: $input) {
       success
       message

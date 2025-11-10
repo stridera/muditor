@@ -1,0 +1,11 @@
+# Zone related operations
+
+query GetZones {
+  zones {
+    id
+    name
+    climate
+    lifespan
+    resetMode
+  }
+}

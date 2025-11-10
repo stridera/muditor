@@ -146,7 +146,8 @@ export class RoomsResolver {
 
   @ResolveField(() => [MobDto])
   mobs(@Parent() room: any): MobDto[] {
-    const resets = room.mob_resets;
+    // Support both snake_case (from raw SQL) and camelCase (from Prisma)
+    const resets = room.mobResets || room.mob_resets;
     if (!resets || resets.length === 0) {
       return [];
     }
@@ -164,7 +165,8 @@ export class RoomsResolver {
 
   @ResolveField(() => [ObjectDto])
   objects(@Parent() room: any): ObjectDto[] {
-    const resets = room.objectResets;
+    // Support both snake_case (from raw SQL) and camelCase (from Prisma)
+    const resets = room.objectResets || room.object_resets;
     if (!resets || resets.length === 0) {
       return [];
     }
@@ -182,7 +184,8 @@ export class RoomsResolver {
 
   @ResolveField(() => [ShopDto])
   async shops(@Parent() room: any): Promise<ShopDto[]> {
-    const resets = room.mob_resets;
+    // Support both snake_case (from raw SQL) and camelCase (from Prisma)
+    const resets = room.mobResets || room.mob_resets;
     if (!resets || resets.length === 0) {
       return [];
     }
@@ -230,6 +233,7 @@ export class RoomsResolver {
               id: item.id,
               amount: item.stockLimit,
               objectId: item.objectId,
+              objectZoneId: item.objectZoneId,
               object: item.object,
             })) || [],
           accepts:

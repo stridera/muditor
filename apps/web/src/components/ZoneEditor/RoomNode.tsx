@@ -17,6 +17,7 @@ interface RoomData {
   roomDescription: string;
   mobs?: Array<{ id: number; name: string; level: number }>;
   objects?: Array<{ id: number; name: string; type: string }>;
+  shops?: Array<{ id: number; buyProfit: number; sellProfit: number; keeperId: number }>;
   exits: Array<{
     direction: string;
     toZoneId?: number | null;
@@ -102,6 +103,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
   const style = sectorStyles[data.sector] || sectorStyles.STRUCTURE;
   const mobCount = data.mobs?.length || 0;
   const objectCount = data.objects?.length || 0;
+  const shopCount = data.shops?.length || 0;
   const exitCount = data.exits.length;
   const zLevel = data.layoutZ ?? 0;
   const currentZLevel = data.currentZLevel ?? 0;
@@ -412,6 +414,12 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                 <span className='text-xs font-medium'>{objectCount}</span>
               </div>
             )}
+            {shopCount > 0 && (
+              <div className='flex items-center gap-1 bg-green-500 bg-opacity-20 px-2 py-1 rounded-full'>
+                <span className='text-xs'>🏪</span>
+                <span className='text-xs font-medium'>{shopCount}</span>
+              </div>
+            )}
           </div>
 
           {/* Sector tag */}
@@ -479,7 +487,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
               </div>
             )}
 
-            {(mobCount > 0 || objectCount > 0) && (
+            {(mobCount > 0 || objectCount > 0 || shopCount > 0) && (
               <div className='border-t border-gray-700 pt-2 mt-2'>
                 {mobCount > 0 && (
                   <div className='text-red-300'>
@@ -489,6 +497,11 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                 {objectCount > 0 && (
                   <div className='text-blue-300'>
                     📦 {objectCount} object{objectCount !== 1 ? 's' : ''}
+                  </div>
+                )}
+                {shopCount > 0 && (
+                  <div className='text-green-300'>
+                    🏪 {shopCount} shop{shopCount !== 1 ? 's' : ''}
                   </div>
                 )}
               </div>

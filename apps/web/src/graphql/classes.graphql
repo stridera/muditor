@@ -1,0 +1,83 @@
+# Class-related operations
+
+query GetClasses {
+  classes {
+    id
+    name
+    description
+    hitDice
+    primaryStat
+  }
+}
+
+query GetClassSkills($classId: Int!) {
+  classSkills(classId: $classId) {
+    id
+    classId
+    skillId
+    skillName
+    category
+    minLevel
+    maxLevel
+  }
+}
+
+query GetAllAbilities($abilityType: String) {
+  abilities(abilityType: $abilityType) {
+    id
+    name
+  }
+}
+
+query GetClassCircles($classId: Int!) {
+  classCirclesList(classId: $classId) {
+    id
+    classId
+    circle
+    minLevel
+    spells {
+      id
+      spellId
+      spellName
+      minLevel
+      proficiencyGain
+    }
+  }
+}
+
+mutation UpdateClass($id: ID!, $data: UpdateClassInput!) {
+  updateClass(id: $id, data: $data) {
+    id
+    name
+    description
+    hitDice
+    primaryStat
+  }
+}
+
+mutation AssignSkillToClass($data: AssignSkillToClassInput!) {
+  assignSkillToClass(data: $data) {
+    id
+    skillId
+    skillName
+    category
+    minLevel
+    maxLevel
+  }
+}
+
+mutation RemoveClassSkill($id: ID!) {
+  removeClassSkill(id: $id)
+}
+
+mutation CreateClassCircle($data: CreateClassCircleInput!) {
+  createClassCircle(data: $data) {
+    id
+    circle
+    minLevel
+  }
+}
+
+mutation RemoveClassCircle($id: ID!) {
+  removeClassCircle(id: $id)
+}

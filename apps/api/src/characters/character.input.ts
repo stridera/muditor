@@ -1,4 +1,5 @@
 import { Field, ID, InputType, Int } from '@nestjs/graphql';
+import { IsString, IsNotEmpty } from 'class-validator';
 
 @InputType()
 export class CreateCharacterInput {
@@ -244,9 +245,13 @@ export class UpdateCharacterEffectInput {
 @InputType()
 export class LinkCharacterInput {
   @Field()
+  @IsString()
+  @IsNotEmpty()
   characterName: string;
 
   @Field()
+  @IsString()
+  @IsNotEmpty()
   characterPassword: string;
 }
 

@@ -1,35 +1,29 @@
 'use client';
 
-import { useQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { OnlineStatus } from './online-status';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  Heart,
-  Zap,
-  Shield,
-  Coins,
-  MapPin,
-  Clock,
-  User,
+  Activity,
   Backpack,
+  Clock,
+  Coins,
+  Heart,
+  MapPin,
+  Shield,
   Sparkles,
   TrendingUp,
-  Activity,
+  User,
+  Zap,
 } from 'lucide-react';
+import { OnlineStatus } from './online-status';
 
 const GET_CHARACTER_DETAILS = gql`
-  query GetCharacterDetails($id: ID!) {
+  query GetCharacterDetailsInline($id: ID!) {
     character(id: $id) {
       id
       name
@@ -101,7 +95,7 @@ const GET_CHARACTER_DETAILS = gql`
 `;
 
 const GET_CHARACTER_SESSION_INFO = gql`
-  query GetCharacterSessionInfo($characterId: ID!) {
+  query GetCharacterSessionInfoInline($characterId: ID!) {
     characterSessionInfo(characterId: $characterId) {
       id
       name

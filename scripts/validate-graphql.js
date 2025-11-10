@@ -1,19 +1,24 @@
 #!/usr/bin/env node
 /**
  * GraphQL Schema Validation Script
- * 
+ *
  * This script validates all GraphQL queries used in the frontend against
  * the actual API schema. It's designed to run during the build process
  * to catch schema mismatches before deployment.
- * 
+ *
  * Usage:
  *   node scripts/validate-graphql.js
  *   API_URL=http://localhost:4000/graphql node scripts/validate-graphql.js
  */
 
-const fs = require('fs');
-const path = require('path');
-const { execSync } = require('child_process');
+import fs from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// Emulate __dirname/__filename in ESM context
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+// Removed unused execSync import to satisfy lint
 
 const API_URL = process.env.API_URL || 'http://localhost:4000/graphql';
 const TIMEOUT_MS = 10000; // 10 seconds
@@ -27,25 +32,27 @@ console.log(`📡 API URL: ${API_URL}`);
 async function checkApiAvailability() {
   try {
     console.log('⏳ Checking API availability...');
-    
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        query: '{ __schema { queryType { name } } }'
+        query: '{ __schema { queryType { name } } }',
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS)
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    
+
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}: ${response.statusText}`);
     }
-    
+
     const result = await response.json();
     if (result.errors) {
-      throw new Error(`GraphQL errors: ${result.errors.map(e => e.message).join(', ')}`);
+      throw new Error(
+        `GraphQL errors: ${result.errors.map(e => e.message).join(', ')}`
+      );
     }
-    
+
     console.log('✅ API is available');
     return true;
   } catch (error) {
@@ -61,36 +68,43 @@ async function checkApiAvailability() {
 function extractGraphQLQueries() {
   const queries = [];
   const frontendDir = path.join(__dirname, '..', 'apps', 'web', 'src');
-  
+
   function scanDirectory(dir) {
     const files = fs.readdirSync(dir);
-    
+
     for (const file of files) {
       const filePath = path.join(dir, file);
       const stat = fs.statSync(filePath);
-      
+
       if (stat.isDirectory()) {
         scanDirectory(filePath);
       } else if (file.endsWith('.tsx') || file.endsWith('.ts')) {
         const content = fs.readFileSync(filePath, 'utf-8');
-        
+
         // Look for GraphQL queries in template literals
         const queryRegex = /query\s+\w+[^`]*`([^`]+)`/gs;
         let match;
-        
+
         while ((match = queryRegex.exec(content)) !== null) {
           const queryContent = match[1];
-          if (queryContent.includes('query') || queryContent.includes('mutation')) {
+          // Skip queries explicitly marked to be ignored (used for negative tests)
+          if (queryContent.includes('GRAPHQL-VALIDATION:SKIP')) {
+            continue;
+          }
+          if (
+            queryContent.includes('query') ||
+            queryContent.includes('mutation')
+          ) {
             queries.push({
               file: path.relative(frontendDir, filePath),
-              query: queryContent.trim()
+              query: queryContent.trim(),
             });
           }
         }
       }
     }
   }
-  
+
   scanDirectory(frontendDir);
   return queries;
 }
@@ -105,30 +119,31 @@ async function validateQuery(queryInfo) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: queryInfo.query,
-        variables: {} // Empty variables for validation
+        variables: {}, // Empty variables for validation
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS)
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    
+
     const result = await response.json();
-    
+
     // Filter for schema-related errors
-    const schemaErrors = (result.errors || []).filter(error => 
-      error.message.includes('Cannot query field') ||
-      error.message.includes('Unknown field') ||
-      error.message.includes('Unknown argument') ||
-      error.message.includes('syntax error') ||
-      error.message.includes('Expected')
+    const schemaErrors = (result.errors || []).filter(
+      error =>
+        error.message.includes('Cannot query field') ||
+        error.message.includes('Unknown field') ||
+        error.message.includes('Unknown argument') ||
+        error.message.includes('syntax error') ||
+        error.message.includes('Expected')
     );
-    
+
     return {
       isValid: schemaErrors.length === 0,
-      errors: schemaErrors.map(e => e.message)
+      errors: schemaErrors.map(e => e.message),
     };
   } catch (error) {
     return {
       isValid: false,
-      errors: [`Validation error: ${error.message}`]
+      errors: [`Validation error: ${error.message}`],
     };
   }
 }
@@ -152,23 +167,23 @@ async function getTypeInfo(typeName) {
         }
       }
     `;
-    
+
     const response = await fetch(API_URL, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         query: introspectionQuery,
-        variables: { typeName }
+        variables: { typeName },
       }),
-      signal: AbortSignal.timeout(TIMEOUT_MS)
+      signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    
+
     const result = await response.json();
-    
+
     if (result.errors) {
       throw new Error(result.errors[0].message);
     }
-    
+
     return result.data?.__type || null;
   } catch (error) {
     console.warn(`Could not get type info for ${typeName}: ${error.message}`);
@@ -182,53 +197,53 @@ async function getTypeInfo(typeName) {
 async function main() {
   // Check if API is available
   const apiAvailable = await checkApiAvailability();
-  
+
   if (!apiAvailable) {
     console.log('⏭️  Skipping GraphQL validation');
     process.exit(0); // Exit successfully but skip validation
   }
-  
+
   // Extract queries from frontend code
   console.log('🔍 Scanning frontend files for GraphQL queries...');
   const queries = extractGraphQLQueries();
   console.log(`📋 Found ${queries.length} GraphQL queries`);
-  
+
   if (queries.length === 0) {
     console.log('✅ No GraphQL queries found to validate');
     return;
   }
-  
+
   // Validate each query
   let hasErrors = false;
   const errorSummary = [];
-  
+
   for (const queryInfo of queries) {
     console.log(`🔍 Validating query in ${queryInfo.file}...`);
-    
+
     const validation = await validateQuery(queryInfo);
-    
+
     if (!validation.isValid) {
       hasErrors = true;
       console.error(`❌ Validation failed for ${queryInfo.file}:`);
       validation.errors.forEach(error => {
         console.error(`   ${error}`);
       });
-      
+
       errorSummary.push({
         file: queryInfo.file,
-        errors: validation.errors
+        errors: validation.errors,
       });
     } else {
       console.log(`✅ ${queryInfo.file} - OK`);
     }
   }
-  
+
   // Print summary
   console.log('\n📊 Validation Summary:');
   console.log(`   Total queries: ${queries.length}`);
   console.log(`   Valid: ${queries.length - errorSummary.length}`);
   console.log(`   Invalid: ${errorSummary.length}`);
-  
+
   if (hasErrors) {
     console.log('\n❌ GraphQL Schema Validation Failed!');
     console.log('   The following files have schema mismatches:');
@@ -240,7 +255,7 @@ async function main() {
   } else {
     console.log('\n✅ All GraphQL queries are valid!');
   }
-  
+
   // Get common type information for documentation
   console.log('\n📚 Schema Information:');
   const mobType = await getTypeInfo('MobDto');

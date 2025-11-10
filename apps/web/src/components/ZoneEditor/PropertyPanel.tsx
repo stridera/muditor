@@ -43,9 +43,9 @@ interface RoomExit {
   toZoneId?: number | null;
   toRoomId?: number | null;
   description?: string;
-  keyword?: string;
-  doorFlag?: boolean;
-  locked?: boolean;
+  keywords?: string[];
+  key?: string;
+  flags?: string[];
 }
 
 interface PropertyPanelProps {
@@ -170,9 +170,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
     setEditingExitId(exit.id);
     setEditExitData({
       description: exit.description || '',
-      keyword: exit.keyword || '',
-      doorFlag: exit.doorFlag || false,
-      locked: exit.locked || false,
+      keywords: exit.keywords || [],
+      key: exit.key || '',
+      flags: exit.flags || [],
     });
   };
 
@@ -521,7 +521,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           →{' '}
                           {destRoom
                             ? `${destRoom.name} (${destZoneId !== room.zoneId ? `Zone ${destZoneId}, ` : ''}Room ${destRoomId})`
-                            : `Zone ${destZoneId}, Room ${destRoomId || 'None'}`}
+                            : `Zone ${destZoneId}, Room ${destRoomId !== null && destRoomId !== undefined ? destRoomId : 'None'}`}
                           {!destRoom &&
                             hasValidDestination(exit) &&
                             destZoneId === room.zoneId && (
@@ -531,9 +531,56 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             )}
                         </div>
 
+                        {/* Exit State Badges */}
+                        {(exit.flags?.length || exit.keywords?.length || exit.key) && (
+                          <div className='flex flex-wrap gap-1 mt-2'>
+                            {exit.flags?.includes('IS_DOOR') && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
+                                🚪 Door
+                              </span>
+                            )}
+                            {exit.flags?.includes('CLOSED') && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full border border-yellow-300'>
+                                🚧 Closed
+                              </span>
+                            )}
+                            {exit.flags?.includes('LOCKED') && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full border border-red-300'>
+                                🔒 Locked
+                              </span>
+                            )}
+                            {exit.flags?.includes('PICKPROOF') && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded-full border border-purple-300'>
+                                🛡️ Pickproof
+                              </span>
+                            )}
+                            {exit.flags?.includes('HIDDEN') && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
+                                👁️ Hidden
+                              </span>
+                            )}
+                            {exit.keywords?.map((keyword, idx) => (
+                              <span key={idx} className='inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full border border-blue-300'>
+                                🔑 {keyword}
+                              </span>
+                            ))}
+                            {exit.key && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-300'>
+                                🗝️ Key: {exit.key}
+                              </span>
+                            )}
+                          </div>
+                        )}
+
+                        {/* Exit Description */}
                         {exit.description && (
-                          <div className='text-xs text-gray-500 mt-1'>
-                            {exit.description}
+                          <div className='mt-2 p-2 bg-gray-50 rounded border border-gray-200'>
+                            <div className='text-xs font-medium text-gray-500 mb-1'>
+                              Description:
+                            </div>
+                            <div className='text-xs text-gray-700 italic'>
+                              {exit.description}
+                            </div>
                           </div>
                         )}
 
@@ -567,67 +614,57 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               {/* Keywords */}
                               <div>
                                 <label className='block text-xs font-medium text-gray-700 mb-1'>
-                                  Keywords
+                                  Keywords (comma-separated)
                                 </label>
                                 <input
                                   type='text'
-                                  value={editExitData.keyword || ''}
+                                  value={(editExitData.keywords || []).join(', ')}
                                   onChange={e =>
                                     setEditExitData({
                                       ...editExitData,
-                                      keyword: e.target.value,
+                                      keywords: e.target.value.split(',').map(k => k.trim()).filter(k => k),
                                     })
                                   }
-                                  placeholder='e.g., door gate'
+                                  placeholder='e.g., door, gate, entrance'
                                   className='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
                                 />
                               </div>
 
-                              {/* Door Properties */}
+                              {/* Exit Flags */}
                               <div className='space-y-2'>
-                                <div className='flex items-center gap-2'>
-                                  <input
-                                    type='checkbox'
-                                    id={`door-${exit.id}`}
-                                    checked={editExitData.doorFlag || false}
-                                    onChange={e =>
-                                      setEditExitData({
-                                        ...editExitData,
-                                        doorFlag: e.target.checked,
-                                      })
-                                    }
-                                    className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                                  />
-                                  <label
-                                    htmlFor={`door-${exit.id}`}
-                                    className='text-xs text-gray-700'
-                                  >
-                                    Has door
-                                  </label>
-                                </div>
+                                <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                  Exit Flags
+                                </label>
 
-                                {editExitData.doorFlag && (
-                                  <div className='flex items-center gap-2 ml-6'>
+                                {['IS_DOOR', 'CLOSED', 'LOCKED', 'PICKPROOF', 'HIDDEN'].map(flag => (
+                                  <div key={flag} className='flex items-center gap-2'>
                                     <input
                                       type='checkbox'
-                                      id={`locked-${exit.id}`}
-                                      checked={editExitData.locked || false}
-                                      onChange={e =>
+                                      id={`${flag}-${exit.id}`}
+                                      checked={(editExitData.flags || []).includes(flag)}
+                                      onChange={e => {
+                                        const currentFlags = editExitData.flags || [];
                                         setEditExitData({
                                           ...editExitData,
-                                          locked: e.target.checked,
-                                        })
-                                      }
-                                      className='rounded border-gray-300 text-red-600 focus:ring-red-500'
+                                          flags: e.target.checked
+                                            ? [...currentFlags, flag]
+                                            : currentFlags.filter(f => f !== flag),
+                                        });
+                                      }}
+                                      className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
                                     />
                                     <label
-                                      htmlFor={`locked-${exit.id}`}
+                                      htmlFor={`${flag}-${exit.id}`}
                                       className='text-xs text-gray-700'
                                     >
-                                      Locked
+                                      {flag === 'IS_DOOR' ? '🚪 Door' :
+                                       flag === 'CLOSED' ? '🚧 Closed' :
+                                       flag === 'LOCKED' ? '🔒 Locked' :
+                                       flag === 'PICKPROOF' ? '🛡️ Pickproof' :
+                                       '👁️ Hidden'}
                                     </label>
                                   </div>
-                                )}
+                                ))}
                               </div>
                             </div>
 

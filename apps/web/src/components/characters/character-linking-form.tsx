@@ -1,8 +1,8 @@
 'use client';
 
-import { useState } from 'react';
-import { useMutation, useLazyQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,25 +10,26 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { useAuth } from '@/contexts/auth-context';
+import { gql } from '@apollo/client';
+import { useLazyQuery, useMutation } from '@apollo/client/react';
+import { formatDistanceToNow } from 'date-fns';
 import {
-  Loader2,
-  Search,
-  Link,
   AlertCircle,
   CheckCircle,
-  User,
+  Link,
+  Loader2,
+  Search,
   Shield,
+  User,
 } from 'lucide-react';
+import { useState } from 'react';
 import { OnlineStatus } from './online-status';
-import { formatDistanceToNow } from 'date-fns';
 
 const GET_CHARACTER_LINKING_INFO = gql`
-  query GetCharacterLinkingInfo($characterName: String!) {
+  query GetCharacterLinkingInfoInline($characterName: String!) {
     characterLinkingInfo(characterName: $characterName) {
       id
       name
@@ -45,7 +46,7 @@ const GET_CHARACTER_LINKING_INFO = gql`
 `;
 
 const LINK_CHARACTER_MUTATION = gql`
-  mutation LinkCharacter($data: LinkCharacterInput!) {
+  mutation LinkCharacterInline($data: LinkCharacterInput!) {
     linkCharacter(data: $data) {
       id
       name
@@ -57,7 +58,10 @@ const LINK_CHARACTER_MUTATION = gql`
 `;
 
 const VALIDATE_CHARACTER_PASSWORD = gql`
-  query ValidateCharacterPassword($characterName: String!, $password: String!) {
+  query ValidateCharacterPasswordInline(
+    $characterName: String!
+    $password: String!
+  ) {
     validateCharacterPassword(
       characterName: $characterName
       password: $password
@@ -103,6 +107,7 @@ interface CharacterLinkingFormProps {
 export function CharacterLinkingForm({
   onCharacterLinked,
 }: CharacterLinkingFormProps) {
+  const { refetchUser } = useAuth();
   const [step, setStep] = useState<'search' | 'verify' | 'password'>('search');
   const [characterName, setCharacterName] = useState('');
   const [password, setPassword] = useState('');
@@ -178,9 +183,12 @@ export function CharacterLinkingForm({
         },
       });
 
-      setSuccess(`Successfully linked ${character.name} to your account!`);
+      setSuccess(
+        `Successfully linked ${character.name} to your account! Your role has been updated.`
+      );
       setStep('search');
       setCharacterName('');
+      await refetchUser(); // Refresh user role
       onCharacterLinked();
     } catch (err: any) {
       setError(err.message || 'Failed to link character');
@@ -219,10 +227,13 @@ export function CharacterLinkingForm({
         },
       });
 
-      setSuccess(`Successfully linked ${character.name} to your account!`);
+      setSuccess(
+        `Successfully linked ${character.name} to your account! Your role has been updated.`
+      );
       setStep('search');
       setCharacterName('');
       setPassword('');
+      await refetchUser(); // Refresh user role
       onCharacterLinked();
     } catch (err: any) {
       setError(err.message || 'Failed to link character');

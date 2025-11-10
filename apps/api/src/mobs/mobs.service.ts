@@ -43,8 +43,7 @@ export class MobsService {
         },
       },
       include: {
-        mobSkills: { include: { skills: true } },
-        mobSpells: { include: { spells: true } },
+        mobAbilities: { include: { ability: true } },
         mobResets: {
           include: {
             rooms: { select: { id: true, zoneId: true, name: true } },

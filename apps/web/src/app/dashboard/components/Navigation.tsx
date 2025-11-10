@@ -7,6 +7,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { EnvironmentSelector } from '@/components/environment-selector';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { RoleBadge } from '@/components/role-badge';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,43 +24,92 @@ import {
   Code,
   Crown,
   Users,
+  ChevronDown,
 } from 'lucide-react';
 
 // Navigation items for different user types
-const playerNavItems = [
+type NavItem = {
+  name: string;
+  href?: string;
+  children?: Array<{ name: string; href: string }>;
+};
+
+const playerNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard' },
   { name: 'My Characters', href: '/dashboard/characters' },
 ];
 
-const immortalNavItems = [
+const immortalNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard' },
-  { name: 'Zones', href: '/dashboard/zones' },
-  { name: 'Rooms', href: '/dashboard/rooms' },
-  { name: 'Mobs', href: '/dashboard/mobs' },
-  { name: 'Objects', href: '/dashboard/objects' },
-  { name: 'Shops', href: '/dashboard/shops' },
-  { name: 'Scripts', href: '/dashboard/scripts' },
+  {
+    name: 'World',
+    children: [
+      { name: 'Zones', href: '/dashboard/zones' },
+      { name: 'Rooms', href: '/dashboard/rooms' },
+      { name: 'Mobs', href: '/dashboard/mobs' },
+      { name: 'Objects', href: '/dashboard/objects' },
+      { name: 'Shops', href: '/dashboard/shops' },
+      { name: 'Scripts', href: '/dashboard/scripts' },
+    ],
+  },
+  {
+    name: 'Game Systems',
+    children: [
+      { name: 'Classes', href: '/dashboard/classes' },
+      { name: 'Races', href: '/dashboard/races' },
+      { name: 'Abilities', href: '/dashboard/abilities' },
+      { name: 'Effects', href: '/dashboard/effects' },
+    ],
+  },
 ];
 
-const coderNavItems = [
+const coderNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard' },
-  { name: 'Zones', href: '/dashboard/zones' },
-  { name: 'Rooms', href: '/dashboard/rooms' },
-  { name: 'Mobs', href: '/dashboard/mobs' },
-  { name: 'Objects', href: '/dashboard/objects' },
-  { name: 'Shops', href: '/dashboard/shops' },
-  { name: 'Scripts', href: '/dashboard/scripts' },
+  {
+    name: 'World',
+    children: [
+      { name: 'Zones', href: '/dashboard/zones' },
+      { name: 'Rooms', href: '/dashboard/rooms' },
+      { name: 'Mobs', href: '/dashboard/mobs' },
+      { name: 'Objects', href: '/dashboard/objects' },
+      { name: 'Shops', href: '/dashboard/shops' },
+      { name: 'Scripts', href: '/dashboard/scripts' },
+    ],
+  },
+  {
+    name: 'Game Systems',
+    children: [
+      { name: 'Classes', href: '/dashboard/classes' },
+      { name: 'Races', href: '/dashboard/races' },
+      { name: 'Abilities', href: '/dashboard/abilities' },
+      { name: 'Effects', href: '/dashboard/effects' },
+    ],
+  },
   { name: 'Validation', href: '/dashboard/validation' },
 ];
 
-const godNavItems = [
+const godNavItems: NavItem[] = [
   { name: 'Dashboard', href: '/dashboard' },
-  { name: 'Zones', href: '/dashboard/zones' },
-  { name: 'Rooms', href: '/dashboard/rooms' },
-  { name: 'Mobs', href: '/dashboard/mobs' },
-  { name: 'Objects', href: '/dashboard/objects' },
-  { name: 'Shops', href: '/dashboard/shops' },
-  { name: 'Scripts', href: '/dashboard/scripts' },
+  {
+    name: 'World',
+    children: [
+      { name: 'Zones', href: '/dashboard/zones' },
+      { name: 'Rooms', href: '/dashboard/rooms' },
+      { name: 'Mobs', href: '/dashboard/mobs' },
+      { name: 'Objects', href: '/dashboard/objects' },
+      { name: 'Shops', href: '/dashboard/shops' },
+      { name: 'Scripts', href: '/dashboard/scripts' },
+    ],
+  },
+  {
+    name: 'Game Systems',
+    children: [
+      { name: 'Classes', href: '/dashboard/classes' },
+      { name: 'Races', href: '/dashboard/races' },
+      { name: 'Abilities', href: '/dashboard/abilities' },
+      { name: 'Effects', href: '/dashboard/effects' },
+    ],
+  },
   { name: 'Validation', href: '/dashboard/validation' },
   { name: 'Users', href: '/dashboard/users' },
 ];
@@ -80,6 +130,23 @@ export function Navigation() {
   };
 
   const navItems = getNavItems();
+
+  const isMenuActive = (item: NavItem) => {
+    if (item.href) {
+      return (
+        pathname === item.href ||
+        (item.href !== '/dashboard' && pathname.startsWith(item.href))
+      );
+    }
+    if (item.children) {
+      return item.children.some(
+        (child) =>
+          pathname === child.href ||
+          (child.href !== '/dashboard' && pathname.startsWith(child.href))
+      );
+    }
+    return false;
+  };
 
   const getRoleIcon = () => {
     switch (user?.role) {
@@ -108,25 +175,68 @@ export function Navigation() {
               Muditor
             </Link>
             <div className='flex space-x-4'>
-              {navItems.map(item => {
-                const isActive =
-                  pathname === item.href ||
-                  (item.href !== '/dashboard' &&
-                    pathname.startsWith(item.href));
+              {navItems.map((item) => {
+                const isActive = isMenuActive(item);
 
-                return (
-                  <Link
-                    key={item.name}
-                    href={item.href}
-                    className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                      isActive
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                    }`}
-                  >
-                    {item.name}
-                  </Link>
-                );
+                // Regular menu item with direct link
+                if (item.href) {
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                        isActive
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                      }`}
+                    >
+                      {item.name}
+                    </Link>
+                  );
+                }
+
+                // Parent menu with children (dropdown)
+                if (item.children) {
+                  return (
+                    <DropdownMenu key={item.name}>
+                      <DropdownMenuTrigger asChild>
+                        <button
+                          className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
+                            isActive
+                              ? 'bg-blue-100 text-blue-700'
+                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                          }`}
+                        >
+                          {item.name}
+                          <ChevronDown className='h-4 w-4' />
+                        </button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align='start'>
+                        {item.children.map((child) => {
+                          const isChildActive =
+                            pathname === child.href ||
+                            (child.href !== '/dashboard' &&
+                              pathname.startsWith(child.href));
+
+                          return (
+                            <DropdownMenuItem key={child.name} asChild>
+                              <Link
+                                href={child.href}
+                                className={
+                                  isChildActive ? 'bg-blue-50 text-blue-700' : ''
+                                }
+                              >
+                                {child.name}
+                              </Link>
+                            </DropdownMenuItem>
+                          );
+                        })}
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  );
+                }
+
+                return null;
               })}
             </div>
           </div>
@@ -140,13 +250,7 @@ export function Navigation() {
                     <span className='text-gray-900 font-medium'>
                       {user.username}
                     </span>
-                    <Badge
-                      variant='outline'
-                      className='text-xs flex items-center gap-1'
-                    >
-                      {getRoleIcon()}
-                      {user.role}
-                    </Badge>
+                    <RoleBadge role={user.role} size='sm' />
                   </div>
                   <div className='text-gray-500 text-xs'>
                     {permissions && (

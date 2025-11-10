@@ -1,8 +1,8 @@
 'use client';
 
-import { useQuery } from '@apollo/client/react';
-import { gql } from '@apollo/client';
 import { useAuth } from '@/contexts/auth-context';
+import { gql } from '@apollo/client';
+import { useQuery } from '@apollo/client/react';
 
 export const MY_PERMISSIONS_QUERY = gql`
   query MyPermissions {

@@ -42,10 +42,13 @@ export class ObjectDto {
   name: string;
 
   @Field()
+  roomDescription: string;
+
+  @Field()
   examineDescription: string;
 
   @Field({ nullable: true })
-  actionDesc?: string;
+  actionDescription?: string;
 
   @Field(() => [ObjectFlag])
   flags: ObjectFlag[];
@@ -112,12 +115,16 @@ export class CreateObjectInput {
 
   @Field()
   @IsString()
+  roomDescription: string;
+
+  @Field()
+  @IsString()
   examineDescription: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  actionDesc?: string;
+  actionDescription?: string;
 
   @Field(() => [ObjectFlag], { defaultValue: [] })
   @IsOptional()
@@ -192,12 +199,17 @@ export class UpdateObjectInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
+  roomDescription?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   examineDescription?: string;
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  actionDesc?: string;
+  actionDescription?: string;
 
   @Field(() => [ObjectFlag], { nullable: true })
   @IsOptional()

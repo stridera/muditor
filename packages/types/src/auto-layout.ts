@@ -611,5 +611,68 @@ export function detectOneWayExits(rooms: AutoLayoutRoom[]): Array<{
   return oneWayExits;
 }
 
+/**
+ * Detect one-way entrances from external zones
+ * These are exits from rooms in OTHER zones that lead TO rooms in the current zone
+ * but have no corresponding exit back to the source zone
+ *
+ * @param currentZoneId - The zone being edited
+ * @param currentZoneRooms - Rooms in the current zone
+ * @param externalExits - Exits from external zones pointing to current zone
+ * @returns Array of one-way entrance portals with source zone info
+ */
+export interface OneWayEntrance {
+  sourceZoneId: number;
+  sourceRoomId: number;
+  targetRoomId: number; // Room in current zone
+  direction: string; // Direction of incoming exit
+  reverseDirection: string | null; // Expected return direction
+  hasReturnExit: boolean;
+}
+
+export function detectOneWayEntrances(
+  currentZoneId: number,
+  currentZoneRooms: AutoLayoutRoom[],
+  externalExits: Array<{
+    sourceZoneId: number;
+    sourceRoomId: number;
+    targetRoomId: number;
+    direction: string;
+  }>
+): OneWayEntrance[] {
+  const oneWayEntrances: OneWayEntrance[] = [];
+
+  for (const externalExit of externalExits) {
+    // Find the target room in current zone
+    const targetRoom = currentZoneRooms.find(r => r.id === externalExit.targetRoomId);
+    if (!targetRoom) continue;
+
+    // Determine what the return direction should be
+    const expectedReturnDirection = getReverseDirection(externalExit.direction);
+    if (!expectedReturnDirection) continue;
+
+    // Check if target room has a return exit to the source zone/room
+    const hasReturnExit = targetRoom.exits.some(exit =>
+      exit.toZoneId === externalExit.sourceZoneId &&
+      exit.toRoomId === externalExit.sourceRoomId &&
+      exit.direction.toLowerCase() === expectedReturnDirection.toLowerCase()
+    );
+
+    oneWayEntrances.push({
+      sourceZoneId: externalExit.sourceZoneId,
+      sourceRoomId: externalExit.sourceRoomId,
+      targetRoomId: externalExit.targetRoomId,
+      direction: externalExit.direction,
+      reverseDirection: expectedReturnDirection,
+      hasReturnExit
+    });
+  }
+
+  const oneWayCount = oneWayEntrances.filter(e => !e.hasReturnExit).length;
+  console.log(`🔍 One-way entrance analysis for zone ${currentZoneId}: ${oneWayCount} one-way entrances out of ${oneWayEntrances.length} external connections`);
+
+  return oneWayEntrances;
+}
+
 // Export additional utility functions for advanced use cases
 export { detectOverlaps, calculateLayoutQuality };

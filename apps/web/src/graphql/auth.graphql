@@ -1,0 +1,32 @@
+# Auth and profile operations
+
+mutation RequestPasswordReset($email: String!) {
+  requestPasswordReset(input: { email: $email }) {
+    success
+    message
+  }
+}
+
+mutation ResetPassword($token: String!, $newPassword: String!) {
+  resetPassword(input: { token: $token, newPassword: $newPassword }) {
+    success
+    message
+  }
+}
+
+mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
+  changePassword(
+    input: { currentPassword: $currentPassword, newPassword: $newPassword }
+  ) {
+    success
+    message
+  }
+}
+
+mutation UpdateProfile($email: String) {
+  updateProfile(input: { email: $email }) {
+    id
+    email
+    username
+  }
+}

@@ -1,5 +1,7 @@
 'use client';
 
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -7,60 +9,59 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { OnlineStatus } from './online-status';
+import type { CharacterDto } from '@/generated/graphql';
 import { formatDistanceToNow } from 'date-fns';
 import {
-  Heart,
-  Zap,
-  Shield,
-  Sword,
-  Star,
-  Coins,
-  MapPin,
   Clock,
-  User,
-  Settings,
+  Coins,
   Eye,
+  Heart,
+  MapPin,
+  Settings,
+  Shield,
+  User,
+  Zap,
 } from 'lucide-react';
+import { OnlineStatus } from './online-status';
 
-interface Character {
-  id: string;
-  name: string;
-  level: number;
-  raceType?: string;
-  playerClass?: string;
-  lastLogin?: Date;
-  isOnline: boolean;
-  timePlayed: number;
-  hitPoints: number;
-  hitPointsMax: number;
-  movement: number;
-  movementMax: number;
-  alignment: number;
-  strength: number;
-  intelligence: number;
-  wisdom: number;
-  dexterity: number;
-  constitution: number;
-  charisma: number;
-  luck: number;
-  experience: number;
-  copper: number;
-  silver: number;
-  gold: number;
-  platinum: number;
-  description?: string;
-  title?: string;
-  currentRoom?: number;
-}
+// Use a narrowed subset of CharacterDto for display (all selected via fragment)
+type Character = Pick<
+  CharacterDto,
+  | 'id'
+  | 'name'
+  | 'level'
+  | 'raceType'
+  | 'playerClass'
+  | 'lastLogin'
+  | 'isOnline'
+  | 'timePlayed'
+  | 'hitPoints'
+  | 'hitPointsMax'
+  | 'movement'
+  | 'movementMax'
+  | 'alignment'
+  | 'strength'
+  | 'intelligence'
+  | 'wisdom'
+  | 'dexterity'
+  | 'constitution'
+  | 'charisma'
+  | 'luck'
+  | 'experience'
+  | 'copper'
+  | 'silver'
+  | 'gold'
+  | 'platinum'
+  | 'description'
+  | 'title'
+  | 'currentRoom'
+>;
 
 interface CharacterCardProps {
   character: Character;
@@ -90,21 +91,12 @@ export function CharacterCard({
   };
 
   const formatCurrency = () => {
-    const total =
-      character.copper +
-      character.silver * 10 +
-      character.gold * 100 +
-      character.platinum * 1000;
-
-    if (character.platinum > 0) {
+    if (character.platinum > 0)
       return `${character.platinum}p ${character.gold}g`;
-    } else if (character.gold > 0) {
-      return `${character.gold}g ${character.silver}s`;
-    } else if (character.silver > 0) {
+    if (character.gold > 0) return `${character.gold}g ${character.silver}s`;
+    if (character.silver > 0)
       return `${character.silver}s ${character.copper}c`;
-    } else {
-      return `${character.copper}c`;
-    }
+    return `${character.copper}c`;
   };
 
   const getAlignmentText = (alignment: number) => {

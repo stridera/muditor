@@ -271,6 +271,7 @@ describe('GraphQL Schema Validation', () => {
     test('should detect common field mismatches', () => {
       // Test query with OLD field names that should NOT work
       const badQuery = `
+        # GRAPHQL-VALIDATION:SKIP
         query GetMob($id: Int!, $zoneId: Int!) {
           mob(id: $id, zoneId: $zoneId) {
             id
