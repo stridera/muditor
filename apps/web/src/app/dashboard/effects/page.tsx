@@ -34,17 +34,19 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
+import type {
+  Effect,
   GetEffectQuery,
   GetEffectQueryVariables,
-  GetEffectsCountDocument,
   GetEffectsCountQuery,
   GetEffectsCountQueryVariables,
-  GetEffectDocument,
-  GetEffectsDocument,
   GetEffectsQuery,
   GetEffectsQueryVariables,
-  type Effect,
+} from '@/generated/graphql';
+import {
+  GetEffectDocument,
+  GetEffectsCountDocument,
+  GetEffectsDocument,
 } from '@/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import {
@@ -297,7 +299,9 @@ export default function EffectsPage() {
                     Page {page + 1} of {totalPages} ({totalCount} total effects)
                   </div>
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm text-muted-foreground'>Per page:</span>
+                    <span className='text-sm text-muted-foreground'>
+                      Per page:
+                    </span>
                     <Select
                       value={pageSize.toString()}
                       onValueChange={value => {
@@ -352,7 +356,9 @@ export default function EffectsPage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 1))}
+                    onClick={() =>
+                      setPage(p => Math.min(totalPages - 1, p + 1))
+                    }
                     disabled={page >= totalPages - 1}
                     title='Next page'
                   >
@@ -361,7 +367,9 @@ export default function EffectsPage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 10))}
+                    onClick={() =>
+                      setPage(p => Math.min(totalPages - 1, p + 10))
+                    }
                     disabled={page >= totalPages - 10}
                     title='Forward 10 pages'
                   >
@@ -449,7 +457,11 @@ export default function EffectsPage() {
                 <div>
                   <Label className='text-sm font-semibold'>Raw JSON</Label>
                   <pre className='mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto'>
-                    {JSON.stringify(effectDetailsData.effect.defaultParams, null, 2)}
+                    {JSON.stringify(
+                      effectDetailsData.effect.defaultParams,
+                      null,
+                      2
+                    )}
                   </pre>
                 </div>
 
@@ -457,9 +469,9 @@ export default function EffectsPage() {
                 <Alert>
                   <Info className='h-4 w-4' />
                   <AlertDescription className='text-sm'>
-                    Effects can be attached to abilities with custom parameters. The
-                    parameters shown here are the default values that will be used if
-                    no override is specified.
+                    Effects can be attached to abilities with custom parameters.
+                    The parameters shown here are the default values that will
+                    be used if no override is specified.
                   </AlertDescription>
                 </Alert>
               </div>

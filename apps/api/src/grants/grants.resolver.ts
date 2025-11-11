@@ -1,16 +1,17 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Users, GrantResourceType } from '@prisma/client';
+import type { Users } from '@prisma/client';
+import { GrantResourceType, UserRole } from '@prisma/client';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
-import { UserRole } from '@prisma/client';
+// UserRole re-imported above with runtime import to preserve decorator metadata
 import { UserGrantDto, ZoneGrantDto } from './grants.dto';
 import {
   CreateGrantInput,
-  UpdateGrantInput,
   GrantZoneAccessInput,
+  UpdateGrantInput,
 } from './grants.input';
 import { GrantsService } from './grants.service';
 

@@ -1,11 +1,24 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-    // Revert to CommonJS output to avoid ESM import-type adjustments; align resolution
-    "module": "commonjs",
-  "moduleResolution": "node",
-  // NOTE: VSCode may show a deprecation warning for 'node' (node10) resolution.
-  // We keep it for now to avoid ESM refactor; upgrade to TypeScript >=6 and migrate to Node16 later.
+    "composite": true,
+    "noEmit": false,
+    "rootDir": "./src",
+    // TEMPORARY RELAXATIONS (Target re-enable: 2026-Q1 after DTO constructors & ESM migration):
+    // - verbatimModuleSyntax: false (project still CJS; switch to true after adding "type":"module" or full ESM migration)
+    // - strictPropertyInitialization: false (will add constructors/definite assignment assertions to DTO/input types)
+    // Track in README Null & Optional Policy section.
+    // Use Node16 module system to align with moduleResolution=node16 for TS 6 strict config
+    "module": "Node16",
+    "moduleResolution": "node16",
+    // Node16 resolution active; ensure module kind matches for proper conditional exports handling.
+    // Override a few root-level ultra-strict flags temporarily while we migrate the API codebase.
+    // 1. verbatimModuleSyntax off because NestJS project is still effectively CommonJS (no "type":"module").
+    //    This prevents a flood of TS1295 errors about ESM syntax in CJS files.
+    // 2. strictPropertyInitialization off to defer adding definite assignment operators/ctors to every DTO.
+    //    We'll re-enable after refactoring DTO/property initialization patterns.
+    "verbatimModuleSyntax": false,
+    "strictPropertyInitialization": false,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
@@ -16,10 +29,10 @@
     "outDir": "./dist",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
-    "noImplicitAny": false,
-    "strictBindCallApply": false,
-    "forceConsistentCasingInFileNames": false,
+    "strictNullChecks": true,
+    "noImplicitAny": true,
+    "strictBindCallApply": true,
+    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "paths": {
       "~/*": [
@@ -34,11 +47,19 @@
     }
   },
   "include": [
-    "src/**/*"
+    "src/**/*.ts",
+    "src/common/mappers/**/*.ts" // Explicit to satisfy project references / ts-loader edge case (TS6307)
   ],
   "exclude": [
     "node_modules",
-    "dist",
-    "test"
+    "dist"
+  ],
+  "references": [
+    {
+      "path": "../../packages/db"
+    },
+    {
+      "path": "../../packages/types"
+    }
   ]
 }

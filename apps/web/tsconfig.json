@@ -1,6 +1,27 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+    "composite": true,
+    "declaration": true,
+    // Only emit type declarations into a separate directory; avoid generating JS alongside Next.js sources (prevents duplicate route files)
+    "emitDeclarationOnly": true,
+    "outDir": "dist-types",
+    // Enable React JSX transform locally for proper JSX namespace resolution
+    "jsx": "preserve",
+    // React type definitions are provided by local devDependencies; specify only needed globals
+    "types": [
+      "node",
+      "jest",
+      "react",
+      "react-dom"
+    ],
+    // Ensure type resolution for monorepo when building in isolation
+    "typeRoots": [
+      "../../node_modules/@types",
+      "./node_modules/@types"
+    ],
+    // Temporarily relax lib checking to suppress 3rd-party ambient inconsistencies (Monaco/ReactFlow)
+    "skipLibCheck": true,
     "paths": {
       "@/*": [
         "./src/*"
@@ -20,11 +41,19 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
-    "**/*.d.ts",
-    ".next/types/**/*.ts"
+    // Types emitted go to dist-types; don't re-include generated declaration outputs to keep project lean
+    ".next/types/**/*.ts",
+    // Include types package sources to satisfy project file list (TS6307)
+    "../../packages/types/src/**/*.ts"
+  ],
+  "references": [
+    {
+      "path": "../../packages/types"
+    }
   ],
   "exclude": [
     "node_modules",
-    "src/__tests__/**/*"
+    "src/__tests__/**/*",
+    "dist-types"
   ]
 }

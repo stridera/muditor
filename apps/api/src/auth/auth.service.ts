@@ -1,20 +1,40 @@
 import {
-  Injectable,
-  UnauthorizedException,
   ConflictException,
+  Injectable,
   Logger,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole } from '@prisma/client';
+import { UserRole, Users } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
 import { EmailService } from '../email/email.service';
-import { RegisterInput } from './dto/register.input';
-import { LoginInput } from './dto/login.input';
+import type { User } from '../users/entities/user.entity';
 import { AuthPayload } from './dto/auth.payload';
+import { LoginInput } from './dto/login.input';
+import { RegisterInput } from './dto/register.input';
 import { JwtPayload } from './interfaces/jwt-payload.interface';
+
+// Sanitized user returned by auth operations (no password or reset tokens)
+interface SanitizedUser
+  extends Omit<
+    User,
+    | 'passwordHash'
+    | 'resetToken'
+    | 'resetTokenExpiry'
+    | 'failedLoginAttempts'
+    | 'lockedUntil'
+    | 'lastFailedLogin'
+  > {
+  passwordHash?: never;
+  resetToken?: never;
+  resetTokenExpiry?: never;
+  failedLoginAttempts?: never;
+  lockedUntil?: never;
+  lastFailedLogin?: never;
+}
 
 @Injectable()
 export class AuthService {
@@ -26,7 +46,10 @@ export class AuthService {
     private emailService: EmailService
   ) {}
 
-  async validateUser(identifier: string, password: string): Promise<any> {
+  async validateUser(
+    identifier: string,
+    password: string
+  ): Promise<Users | null> {
     const user = await this.databaseService.users.findFirst({
       where: {
         OR: [
@@ -38,7 +61,7 @@ export class AuthService {
 
     if (user && (await bcrypt.compare(password, user.passwordHash))) {
       const { passwordHash, ...result } = user;
-      return result;
+      return result as Users;
     }
     return null;
   }
@@ -86,21 +109,28 @@ export class AuthService {
     // Send welcome email
     try {
       await this.emailService.sendWelcomeEmail(email, username);
-    } catch (error: any) {
-      this.logger.warn(
-        `Failed to send welcome email to ${email}: ${error.message || error}`
-      );
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
+      this.logger.warn(`Failed to send welcome email to ${email}: ${msg}`);
     }
 
     this.logger.log(`New user registered: ${username} (${email})`);
 
-    return {
-      accessToken,
-      user: {
-        ...user,
-        isBanned: false, // New users are not banned
-      },
-    };
+    const {
+      passwordHash: _ph,
+      resetToken: _rt,
+      resetTokenExpiry: _rte,
+      failedLoginAttempts: _fla,
+      lockedUntil: _lu,
+      lastFailedLogin: _lfl,
+      ...rest
+    } = user as Users;
+    const authUser: SanitizedUser = {
+      ...(rest as Users),
+      isBanned: false,
+    } as SanitizedUser;
+    if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;
+    return { accessToken, user: authUser };
   }
 
   async login(loginInput: LoginInput): Promise<AuthPayload> {
@@ -127,16 +157,24 @@ export class AuthService {
 
     this.logger.log(`User logged in: ${user.username}`);
 
-    return {
-      accessToken,
-      user: {
-        ...user,
-        isBanned: false,
-      },
-    };
+    const {
+      passwordHash: _ph2,
+      resetToken: _rt2,
+      resetTokenExpiry: _rte2,
+      failedLoginAttempts: _fla2,
+      lockedUntil: _lu2,
+      lastFailedLogin: _lfl2,
+      ...rest2
+    } = user as Users;
+    const authUser: SanitizedUser = {
+      ...(rest2 as Users),
+      isBanned: false,
+    } as SanitizedUser;
+    if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;
+    return { accessToken, user: authUser };
   }
 
-  async validateJwtPayload(payload: JwtPayload): Promise<any> {
+  async validateJwtPayload(payload: JwtPayload): Promise<Users> {
     const user = await this.databaseService.users.findUnique({
       where: { id: payload.sub },
     });
@@ -146,7 +184,7 @@ export class AuthService {
     }
 
     const { passwordHash, ...result } = user;
-    return result;
+    return result as Users;
   }
 
   async refreshToken(userId: string): Promise<string> {
@@ -190,9 +228,10 @@ export class AuthService {
     try {
       await this.emailService.sendPasswordResetEmail(email, resetToken);
       this.logger.log(`Password reset email sent to: ${email}`);
-    } catch (error: any) {
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : String(error);
       this.logger.error(
-        `Failed to send password reset email to ${email}: ${error.message || error}`
+        `Failed to send password reset email to ${email}: ${msg}`
       );
       // Don't throw the error to avoid revealing email sending issues
     }
@@ -233,7 +272,10 @@ export class AuthService {
     return true;
   }
 
-  async updateProfile(userId: string, data: { email?: string }): Promise<any> {
+  async updateProfile(
+    userId: string,
+    data: { email?: string }
+  ): Promise<Users> {
     // Check if email is already taken by another user (case-insensitive)
     if (data.email) {
       const existingUser = await this.databaseService.users.findFirst({
@@ -254,7 +296,7 @@ export class AuthService {
     });
 
     const { passwordHash, resetToken, resetTokenExpiry, ...result } = user;
-    return result;
+    return result as Users;
   }
 
   async changePassword(

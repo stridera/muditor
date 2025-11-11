@@ -1,4 +1,6 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
+import { LoggingService } from '../common/logging/logging.service';
 import { DatabaseService } from '../database/database.service';
 
 export interface ValidationIssue {
@@ -24,9 +26,56 @@ export interface ValidationReport {
   generatedAt: Date;
 }
 
+// Precise selection types leveraging Prisma.Args to ensure strong typing and future-safe refactors.
+// These reflect the minimal data we need for each validation phase.
+type ZoneRoomsForContent = Prisma.ZonesGetPayload<{
+  select: {
+    rooms: {
+      select: { id: true; name: true; roomDescription: true };
+    };
+    mobs: { select: { id: true; roomDescription: true; keywords: true } };
+    objects: { select: { id: true; roomDescription: true } };
+  };
+}>['rooms']; // array of rooms
+
+type ZoneMobsForContent = Prisma.ZonesGetPayload<{
+  select: {
+    mobs: { select: { id: true; roomDescription: true; keywords: true } };
+  };
+}>['mobs'];
+
+type ZoneObjectsForContent = Prisma.ZonesGetPayload<{
+  select: { objects: { select: { id: true; roomDescription: true } } };
+}>['objects'];
+
+interface ContentZone {
+  rooms: ZoneRoomsForContent;
+  mobs: ZoneMobsForContent;
+  objects: ZoneObjectsForContent;
+}
+
+type ZoneShopsForConsistency = Prisma.ZonesGetPayload<{
+  select: { shops: { select: { id: true; keeperId: true } } };
+}>['shops'];
+type ZoneMobsForConsistency = Prisma.ZonesGetPayload<{
+  select: { mobs: { select: { id: true } } };
+}>['mobs'];
+type ZoneRoomsForConsistency = Prisma.ZonesGetPayload<{
+  select: { rooms: { select: { id: true } } };
+}>['rooms'];
+
+interface ConsistencyZone {
+  shops: ZoneShopsForConsistency;
+  mobs: ZoneMobsForConsistency;
+  rooms: ZoneRoomsForConsistency;
+}
+
 @Injectable()
 export class ValidationService {
-  constructor(private readonly prisma: DatabaseService) {}
+  constructor(
+    private readonly prisma: DatabaseService,
+    private readonly logging: LoggingService
+  ) {}
 
   async validateZone(zoneId: number): Promise<ValidationReport> {
     const zone = await this.prisma.zones.findUnique({
@@ -49,14 +98,37 @@ export class ValidationService {
 
     const issues: ValidationIssue[] = [];
 
-    // Zone Integrity Checks
+    // Zone Integrity Checks (use raw rooms with exits from original include)
     issues.push(...(await this.checkZoneIntegrity(zone)));
 
-    // Content Quality Checks
-    issues.push(...(await this.checkContentQuality(zone)));
+    // Content Quality Checks (pass strongly typed slices directly)
+    issues.push(
+      ...(await this.checkContentQuality({
+        rooms: zone.rooms.map(r => ({
+          id: r.id,
+          name: r.name,
+          roomDescription: r.roomDescription,
+        })),
+        mobs: zone.mobs.map(m => ({
+          id: m.id,
+          roomDescription: m.roomDescription,
+          keywords: m.keywords,
+        })),
+        objects: zone.objects.map(o => ({
+          id: o.id,
+          roomDescription: o.roomDescription,
+        })),
+      }))
+    );
 
     // World Consistency Checks
-    issues.push(...(await this.checkWorldConsistency(zone)));
+    issues.push(
+      ...(await this.checkWorldConsistency({
+        shops: zone.shops.map(s => ({ id: s.id, keeperId: s.keeperId })),
+        mobs: zone.mobs.map(m => ({ id: m.id })),
+        rooms: zone.rooms.map(r => ({ id: r.id })),
+      }))
+    );
 
     const errorCount = issues.filter(i => i.type === 'error').length;
     const warningCount = issues.filter(i => i.type === 'warning').length;
@@ -74,13 +146,25 @@ export class ValidationService {
     };
   }
 
-  private async checkZoneIntegrity(zone: any): Promise<ValidationIssue[]> {
+  private async checkZoneIntegrity(zone: {
+    id: number;
+    name: string;
+    rooms: Array<{
+      id: number;
+      name: string;
+      description?: string | null;
+      exits: Array<{
+        direction: string;
+        destination?: number | null;
+      }>;
+    }>;
+  }): Promise<ValidationIssue[]> {
     const issues: ValidationIssue[] = [];
 
     // Check for orphaned rooms (rooms without any exits leading to them)
     const roomsWithIncomingExits = new Set<number>();
-    zone.rooms.forEach((room: any) => {
-      room.exits.forEach((exit: any) => {
+    zone.rooms.forEach(room => {
+      room.exits.forEach(exit => {
         if (exit.destination) {
           roomsWithIncomingExits.add(exit.destination);
         }
@@ -88,7 +172,7 @@ export class ValidationService {
     });
 
     // Find the starting room (lowest ID room in zone range)
-    const startingRoom = zone.rooms.reduce((min: any, room: any) =>
+    const startingRoom = zone.rooms.reduce((min, room) =>
       room.id < min.id ? room : min
     );
 
@@ -113,13 +197,12 @@ export class ValidationService {
       for (const exit of room.exits) {
         if (exit.destination) {
           const destinationRoom = zone.rooms.find(
-            (r: any) => r.id === exit.destination
+            r => r.id === exit.destination
           );
           if (destinationRoom) {
             const reverseDirection = this.getReverseDirection(exit.direction);
             const reverseExit = destinationRoom.exits.find(
-              (e: any) =>
-                e.direction === reverseDirection && e.destination === room.id
+              e => e.direction === reverseDirection && e.destination === room.id
             );
 
             if (!reverseExit) {
@@ -164,12 +247,15 @@ export class ValidationService {
     return issues;
   }
 
-  private async checkContentQuality(zone: any): Promise<ValidationIssue[]> {
+  // TODO: Refine typings for mobs/objects to actual Prisma model shape
+  private async checkContentQuality(
+    zone: ContentZone
+  ): Promise<ValidationIssue[]> {
     const issues: ValidationIssue[] = [];
 
     // Check room descriptions
-    zone.rooms.forEach((room: any) => {
-      if (!room.description || room.description.trim().length < 10) {
+    zone.rooms.forEach(room => {
+      if (!room.roomDescription || room.roomDescription.trim().length < 10) {
         issues.push({
           id: `short-room-desc-${room.id}`,
           type: 'warning',
@@ -200,8 +286,8 @@ export class ValidationService {
     });
 
     // Check mob descriptions
-    zone.mobs.forEach((mob: any) => {
-      if (!mob.desc || mob.desc.trim().length < 10) {
+    zone.mobs.forEach(mob => {
+      if (!mob.roomDescription || mob.roomDescription.trim().length < 10) {
         issues.push({
           id: `short-mob-desc-${mob.id}`,
           type: 'warning',
@@ -216,7 +302,7 @@ export class ValidationService {
         });
       }
 
-      if (!mob.keywords || mob.keywords.trim().length === 0) {
+      if (!mob.keywords || mob.keywords.length === 0) {
         issues.push({
           id: `missing-mob-keywords-${mob.id}`,
           type: 'error',
@@ -233,8 +319,8 @@ export class ValidationService {
     });
 
     // Check object descriptions
-    zone.objects.forEach((obj: any) => {
-      if (!obj.desc || obj.desc.trim().length < 10) {
+    zone.objects.forEach(obj => {
+      if (!obj.roomDescription || obj.roomDescription.trim().length < 10) {
         issues.push({
           id: `short-object-desc-${obj.id}`,
           type: 'warning',
@@ -253,13 +339,15 @@ export class ValidationService {
     return issues;
   }
 
-  private async checkWorldConsistency(zone: any): Promise<ValidationIssue[]> {
+  private async checkWorldConsistency(
+    zone: ConsistencyZone
+  ): Promise<ValidationIssue[]> {
     const issues: ValidationIssue[] = [];
 
     // Check shop consistency
     for (const shop of zone.shops) {
-      if (shop.keeperMobId) {
-        const keeperMob = zone.mobs.find((m: any) => m.id === shop.keeperMobId);
+      if (shop.keeperId) {
+        const keeperMob = zone.mobs.find(m => m.id === shop.keeperId);
         if (!keeperMob) {
           // Check if keeper is in another zone
           // TODO: Fix composite key lookup
@@ -283,30 +371,7 @@ export class ValidationService {
         }
       }
 
-      if (shop.roomId) {
-        const shopRoom = zone.rooms.find((r: any) => r.id === shop.roomId);
-        if (!shopRoom) {
-          // Check if room is in another zone
-          // TODO: Fix composite key lookup
-          // const externalRoom = await this.prisma.room.findUnique({
-          //   where: { zoneId_id: { zoneId, id } },
-          // });
-          // if (!externalRoom) {
-          //   issues.push({
-          //     id: `missing-shop-room-${shop.id}`,
-          //     type: 'error',
-          //     category: 'consistency',
-          //     entity: 'shop',
-          //     entityId: shop.id,
-          //     title: 'Missing Shop Room',
-          //     description: `Shop ${shop.id} references non-existent room ${shop.roomId}.`,
-          //     suggestion:
-          //       'Create the room or update the shop to reference an existing room.',
-          //     severity: 'high',
-          //   });
-          // }
-        }
-      }
+      // Room consistency check removed (shop model no longer includes room association directly)
     }
 
     return issues;
@@ -339,7 +404,12 @@ export class ValidationService {
         const report = await this.validateZone(zone.id);
         reports.push(report);
       } catch (error) {
-        console.error(`Failed to validate zone ${zone.id}:`, error);
+        this.logging.logError(
+          `Failed to validate zone ${zone.id}`,
+          'ValidationService.validateAllZones',
+          { zoneId: zone.id },
+          error instanceof Error ? error.stack : undefined
+        );
       }
     }
 

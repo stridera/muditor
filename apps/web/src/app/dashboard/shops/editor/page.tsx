@@ -3,147 +3,103 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
-import { gql } from '@apollo/client';
+// Apollo hooks imported via generated code; direct useMutation/useQuery unused now
+import type { ShopFlag, ShopTradesWith } from '@/generated/graphql';
+import {
+  CreateShopEditorDocument,
+  GetAvailableMobsDocument,
+  GetAvailableObjectsDocument,
+  GetShopEditorDocument,
+  GetZonesEditorDocument,
+  UpdateShopEditorDocument,
+  UpdateShopHoursEditorDocument,
+  UpdateShopInventoryEditorDocument,
+} from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Plus, Save, Trash2, X } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
   useRealTimeValidation,
   ValidationHelpers,
-  ValidationRules,
 } from '../../../../hooks/useRealTimeValidation';
 
-const GET_SHOP = gql`
-  query GetShopInline($id: Int!, $zoneId: Int!) {
-    shop(id: $id, zoneId: $zoneId) {
-      id
-      buyProfit
-      sellProfit
-      temper
-      noSuchItemMessages
-      doNotBuyMessages
-      missingCashMessages
-      buyMessages
-      sellMessages
-      keeperId
-      zoneId
-      flags
-      tradesWithFlags
-      createdAt
-      updatedAt
-      keeper {
-        id
-        name
-        zoneId
-      }
-      items {
-        id
-        amount
-        objectId
-        objectZoneId
-        object {
-          id
-          name
-          type
-          cost
-        }
-      }
-      accepts {
-        id
-        type
-        keywords
-      }
-      hours {
-        id
-        open
-        close
-      }
-    }
-  }
-`;
-
-const GET_AVAILABLE_OBJECTS = gql`
-  query GetAvailableObjectsInline($zoneId: Int!) {
-    objectsByZone(zoneId: $zoneId) {
-      id
-      keywords
-      name
-      type
-      cost
-      zoneId
-    }
-  }
-`;
-
-const GET_AVAILABLE_MOBS = gql`
-  query GetAvailableMobsInline($zoneId: Int!) {
-    mobsByZone(zoneId: $zoneId) {
-      id
-      keywords
-      name
-      zoneId
-    }
-  }
-`;
-
-const GET_ZONES = gql`
-  query GetZonesInline {
-    zones {
-      id
-      name
-    }
-  }
-`;
-
-const UPDATE_SHOP = gql`
-  mutation UpdateShopInline($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
-    updateShop(id: $id, zoneId: $zoneId, data: $data) {
-      id
-      buyProfit
-      sellProfit
-    }
-  }
-`;
-
-const CREATE_SHOP = gql`
-  mutation CreateShopInline($data: CreateShopInput!) {
-    createShop(data: $data) {
-      id
-      buyProfit
-      sellProfit
-    }
-  }
-`;
+// Inline gql operations removed; now using generated typed hooks from codegen
 
 interface ShopFormData {
+  id: number; // required for create path per CreateShopInput
   buyProfit: number;
   sellProfit: number;
   temper: number;
-  noSuchItem1: string;
-  noSuchItem2: string;
-  doNotBuy: string;
-  missingCash1: string;
-  missingCash2: string;
-  messageBuy: string;
-  messageSell: string;
   keeperId: number | null;
   zoneId: number;
 }
 
-interface ShopItem {
-  id?: string;
-  amount: number;
-  objectId: number;
-  objectZoneId: number;
-  object?: any;
+import type { ShopHour, ShopItem, ShopQueryResult } from '@/lib/shopMapping';
+import { mapShopHours, mapShopItems } from '@/lib/shopMapping';
+import { buildShopSavePayload } from '@/lib/shopPayload';
+
+interface MessageListProps {
+  title: string;
+  values: string[];
+  setValues: (vals: string[]) => void;
+  placeholder?: string;
 }
 
-interface ShopHour {
-  id?: string;
-  openHour: number;
-  closeHour: number;
+function MessageList({
+  title,
+  values,
+  setValues,
+  placeholder,
+}: MessageListProps) {
+  const updateValue = (idx: number, val: string) => {
+    setValues(values.map((v, i) => (i === idx ? val : v)));
+  };
+  const addRow = () => setValues([...values, '']);
+  const removeRow = (idx: number) => {
+    if (values.length === 1) {
+      // Keep at least one row
+      setValues(['']);
+      return;
+    }
+    setValues(values.filter((_, i) => i !== idx));
+  };
+  return (
+    <div>
+      <h4 className='text-sm font-medium text-gray-900 mb-2'>{title}</h4>
+      <div className='space-y-2'>
+        {values.map((val, idx) => (
+          <div key={idx} className='flex gap-2 items-start'>
+            <textarea
+              rows={2}
+              value={val}
+              onChange={e => updateValue(idx, e.target.value)}
+              placeholder={placeholder}
+              className='flex-1 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm'
+            />
+            <button
+              type='button'
+              onClick={() => removeRow(idx)}
+              className='text-red-600 hover:text-red-800 p-1'
+              aria-label={`Remove ${title} row ${idx + 1}`}
+            >
+              <Trash2 className='w-4 h-4' />
+            </button>
+          </div>
+        ))}
+        <button
+          type='button'
+          onClick={addRow}
+          className='inline-flex items-center text-sm text-blue-600 hover:text-blue-800'
+        >
+          <Plus className='w-3 h-3 mr-1' /> Add{' '}
+          {title.replace(/ Messages?$/, '')} Message
+        </button>
+      </div>
+    </div>
+  );
 }
 
 const SHOP_FLAGS = [
@@ -187,6 +143,11 @@ const OBJECT_TYPES = [
 // Define validation rules for shop form
 const shopValidationRules: ValidationRules<ShopFormData> = [
   {
+    field: 'id',
+    validate: value => (value && value > 0 ? null : 'Shop ID must be > 0'),
+    debounceMs: 0,
+  },
+  {
     field: 'buyProfit',
     validate: ValidationHelpers.min(1, 'Buy profit must be at least 1'),
     debounceMs: 200,
@@ -203,6 +164,8 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
   },
 ];
 
+// Types now imported from mapping helpers
+
 function ShopEditorContent() {
   const searchParams = useSearchParams();
   const shopId = searchParams.get('id');
@@ -211,19 +174,20 @@ function ShopEditorContent() {
 
   const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState<ShopFormData>({
+    id: 0,
     buyProfit: 1.0,
     sellProfit: 1.0,
     temper: 0,
-    noSuchItem1: '',
-    noSuchItem2: '',
-    doNotBuy: '',
-    missingCash1: '',
-    missingCash2: '',
-    messageBuy: '',
-    messageSell: '',
     keeperId: null,
     zoneId: 511,
   });
+  const [buyMessages, setBuyMessages] = useState<string[]>(['']);
+  const [sellMessages, setSellMessages] = useState<string[]>(['']);
+  const [noSuchItemMessages, setNoSuchItemMessages] = useState<string[]>(['']);
+  const [doNotBuyMessages, setDoNotBuyMessages] = useState<string[]>(['']);
+  const [missingCashMessages, setMissingCashMessages] = useState<string[]>([
+    '',
+  ]);
 
   const [shopItems, setShopItems] = useState<ShopItem[]>([]);
   const [shopHours, setShopHours] = useState<ShopHour[]>([
@@ -242,77 +206,130 @@ function ShopEditorContent() {
   const [modalAmount, setModalAmount] = useState<number>(0);
 
   // Initialize real-time validation
-  const { errors, validateField, validateAllFields, clearError } =
+  const { errors, validateField, validateAllFields } =
     useRealTimeValidation<ShopFormData>(shopValidationRules);
 
   // Separate state for general/save errors
   const [generalError, setGeneralError] = useState<string>('');
 
-  const { loading, error, data } = useQuery(GET_SHOP, {
-    variables: {
-      id: parseInt(shopId || '0'),
-      zoneId: parseInt(zoneId || '0'),
-    },
+  const { loading, error, data } = useQuery(GetShopEditorDocument, {
+    variables: { id: parseInt(shopId || '0'), zoneId: parseInt(zoneId || '0') },
     skip: isNew,
-  }) as { loading: boolean; error?: any; data?: { shop?: any } };
+  });
 
   // Get the zone ID from the shop data or from query params/form data
-  const effectiveZoneId =
-    data?.shop?.zoneId || parseInt(zoneId || '0') || formData.zoneId;
+  const effectiveZoneId = (() => {
+    const raw = data?.shop as ShopQueryResult | undefined;
+    return (
+      (typeof raw?.zoneId === 'number' ? raw.zoneId : undefined) ||
+      parseInt(zoneId || '0') ||
+      formData.zoneId
+    );
+  })();
 
-  const { data: objectsData } = useQuery(GET_AVAILABLE_OBJECTS, {
+  const { data: objectsData } = useQuery(GetAvailableObjectsDocument, {
     variables: { zoneId: effectiveZoneId },
     skip: !effectiveZoneId,
-  }) as {
-    data?: { objectsByZone?: any[] };
-  };
-  const { data: mobsData } = useQuery(GET_AVAILABLE_MOBS, {
+  });
+  // Mob summary type inferred from generated types; local interface removed
+  const { data: mobsData } = useQuery(GetAvailableMobsDocument, {
     variables: { zoneId: effectiveZoneId },
     skip: !effectiveZoneId,
-  }) as {
-    data?: { mobsByZone?: any[] };
-  };
+  });
 
   // Query for zones (for modal)
-  const { data: zonesData } = useQuery(GET_ZONES) as {
-    data?: { zones?: any[] };
-  };
+  // Zone summary type inferred from generated types; local interface removed
+  const { data: zonesData } = useQuery(GetZonesEditorDocument);
 
   // Query for objects in modal's selected zone
-  const { data: modalObjectsData } = useQuery(GET_AVAILABLE_OBJECTS, {
+  const { data: modalObjectsData } = useQuery(GetAvailableObjectsDocument, {
     variables: { zoneId: modalSelectedZoneId },
     skip: !modalSelectedZoneId || !showAddItemModal,
-    fetchPolicy: 'network-only', // Always fetch fresh data to avoid stale cache
-  }) as {
-    data?: { objectsByZone?: any[] };
-  };
+    fetchPolicy: 'network-only',
+  });
 
-  const [updateShop, { loading: updateLoading }] = useMutation(UPDATE_SHOP);
-  const [createShop, { loading: createLoading }] = useMutation(CREATE_SHOP);
+  const [updateShop, { loading: updateLoading }] = useMutation(
+    UpdateShopEditorDocument
+  );
+  const [createShop, { loading: createLoading }] = useMutation(
+    CreateShopEditorDocument
+  );
+  const [updateInventory] = useMutation(UpdateShopInventoryEditorDocument);
+  const [updateHours] = useMutation(UpdateShopHoursEditorDocument);
 
   useEffect(() => {
     if (data?.shop) {
-      const shop = data.shop;
+      // Use a structural type to access arrays we requested in the query
+      // Raw shop includes arrays and possible string ids for accepts from GraphQL
+      type RawShop = ShopQueryResult & {
+        noSuchItemMessages?: string[];
+        doNotBuyMessages?: string[];
+        missingCashMessages?: string[];
+        buyMessages?: string[];
+        sellMessages?: string[];
+        accepts?: ShopQueryResult['accepts'];
+        flags?: ShopFlag[];
+        tradesWithFlags?: ShopTradesWith[];
+      };
+      const shop: RawShop = data.shop as unknown as RawShop;
+      // Transform array-based messages into individual editable fields
       setFormData({
-        buyProfit: shop.buyProfit || 1.0,
-        sellProfit: shop.sellProfit || 1.0,
-        temper: shop.temper || 0,
-        noSuchItem1: shop.noSuchItem1 || '',
-        noSuchItem2: shop.noSuchItem2 || '',
-        doNotBuy: shop.doNotBuy || '',
-        missingCash1: shop.missingCash1 || '',
-        missingCash2: shop.missingCash2 || '',
-        messageBuy: shop.messageBuy || '',
-        messageSell: shop.messageSell || '',
-        keeperId: shop.keeperId || null,
-        zoneId: shop.zoneId || 511,
+        id: shop.id ?? 0,
+        buyProfit: typeof shop.buyProfit === 'number' ? shop.buyProfit : 1.0,
+        sellProfit: typeof shop.sellProfit === 'number' ? shop.sellProfit : 1.0,
+        temper: typeof shop.temper === 'number' ? shop.temper : 0,
+        keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
+        zoneId: typeof shop.zoneId === 'number' ? shop.zoneId : formData.zoneId,
       });
-      setShopItems(shop.items || []);
-      setShopHours(shop.hours || [{ openHour: 6, closeHour: 20 }]);
-      setAcceptedTypes(shop.accepts?.map((a: any) => a.objectType) || []);
-      setSelectedFlags(shop.flags || []);
-      setSelectedTradesWithFlags(shop.tradesWithFlags || []);
+      setNoSuchItemMessages(
+        Array.isArray(shop.noSuchItemMessages) && shop.noSuchItemMessages.length
+          ? shop.noSuchItemMessages
+          : ['']
+      );
+      setDoNotBuyMessages(
+        Array.isArray(shop.doNotBuyMessages) && shop.doNotBuyMessages.length
+          ? shop.doNotBuyMessages
+          : ['']
+      );
+      setMissingCashMessages(
+        Array.isArray(shop.missingCashMessages) &&
+          shop.missingCashMessages.length
+          ? shop.missingCashMessages
+          : ['']
+      );
+      setBuyMessages(
+        Array.isArray(shop.buyMessages) && shop.buyMessages.length
+          ? shop.buyMessages
+          : ['']
+      );
+      setSellMessages(
+        Array.isArray(shop.sellMessages) && shop.sellMessages.length
+          ? shop.sellMessages
+          : ['']
+      );
+      setShopItems(mapShopItems(shop as ShopQueryResult));
+      setShopHours(mapShopHours(shop as ShopQueryResult));
+      setAcceptedTypes(
+        Array.isArray(shop.accepts)
+          ? shop.accepts
+              .map((a: { type?: string }) =>
+                typeof a.type === 'string' ? a.type : undefined
+              )
+              .filter((t: string | undefined): t is string => !!t)
+          : []
+      );
+      setSelectedFlags(
+        Array.isArray(shop.flags)
+          ? shop.flags.map((f: ShopFlag) => String(f))
+          : []
+      );
+      setSelectedTradesWithFlags(
+        Array.isArray(shop.tradesWithFlags)
+          ? shop.tradesWithFlags.map((f: ShopTradesWith) => String(f))
+          : []
+      );
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data]);
 
   const handleInputChange = (
@@ -398,7 +415,11 @@ function ShopEditorContent() {
     setShopItems(prev => prev.filter((_, i) => i !== index));
   };
 
-  const updateShopItem = (index: number, field: keyof ShopItem, value: any) => {
+  const updateShopItem = (
+    index: number,
+    field: keyof ShopItem,
+    value: ShopItem[keyof ShopItem]
+  ) => {
     setShopItems(prev =>
       prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     );
@@ -422,6 +443,48 @@ function ShopEditorContent() {
     );
   };
 
+  // Validate hours: each (open < close), ranges within 0..23, non-overlapping, sorted by openHour
+  const validateHours = (): string[] => {
+    const errors: string[] = [];
+    if (!shopHours.length) return errors; // empty hours set is allowed
+    // Basic field validation
+    shopHours.forEach((h, idx) => {
+      if (h.openHour < 0 || h.openHour > 23)
+        errors.push(
+          `Hour ${idx + 1}: open hour ${h.openHour} out of range (0-23)`
+        );
+      if (h.closeHour < 0 || h.closeHour > 23)
+        errors.push(
+          `Hour ${idx + 1}: close hour ${h.closeHour} out of range (0-23)`
+        );
+      if (h.openHour === h.closeHour)
+        errors.push(`Hour ${idx + 1}: open and close cannot be the same`);
+      if (h.openHour > h.closeHour)
+        errors.push(`Hour ${idx + 1}: open hour must be before close hour`);
+    });
+    // Sort copy and check ordering overlaps
+    const sorted = [...shopHours].sort((a, b) => a.openHour - b.openHour);
+    for (let i = 1; i < sorted.length; i++) {
+      const prev = sorted[i - 1]!;
+      const curr = sorted[i]!;
+      if (curr.openHour < prev.closeHour) {
+        errors.push(
+          `Hours overlap: ${prev.openHour}-${prev.closeHour} overlaps with ${curr.openHour}-${curr.closeHour}`
+        );
+      }
+    }
+    // Ensure original array matches sorted order (strict increasing by openHour)
+    for (let i = 0; i < shopHours.length - 1; i++) {
+      const current = shopHours[i];
+      const next = shopHours[i + 1];
+      if (current && next && current.openHour > next.openHour) {
+        errors.push('Hours are not in ascending order by open time');
+        break;
+      }
+    }
+    return errors;
+  };
+
   const validateForm = (): boolean => {
     // Use the real-time validation for final form validation
     return validateAllFields(formData);
@@ -430,26 +493,142 @@ function ShopEditorContent() {
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    const hoursErrors = validateHours();
+    if (hoursErrors.length) {
+      setGeneralError(hoursErrors.join('\n'));
+      return;
+    }
+
     try {
-      const saveData = {
-        ...formData,
-        flags: selectedFlags,
-        tradesWithFlags: selectedTradesWithFlags,
-        // Note: Items, hours, and accepts would need separate mutations in a real implementation
-        // For now, we're just saving the basic shop data
-      };
+      const saveData = buildShopSavePayload(
+        formData,
+        selectedFlags,
+        selectedTradesWithFlags,
+        buyMessages,
+        sellMessages,
+        noSuchItemMessages,
+        doNotBuyMessages,
+        missingCashMessages
+      );
 
       if (isNew) {
-        await createShop({
+        if (!formData.id || formData.id <= 0) {
+          setGeneralError('Shop ID is required for creation');
+          return;
+        }
+        const createResult = await createShop({
           variables: {
+            data: { id: formData.id, ...saveData },
+          },
+        });
+        const newId = createResult.data?.createShop?.id;
+        if (newId && shopItems.length) {
+          await updateInventory({
+            variables: {
+              id: newId,
+              zoneId: formData.zoneId,
+              items: shopItems.map(i => ({
+                amount: i.amount,
+                objectZoneId: i.objectZoneId,
+                objectId: i.objectId,
+              })),
+            },
+            optimisticResponse: {
+              updateShopInventory: {
+                id: newId,
+                items: shopItems.map((i, idx) => ({
+                  id: String(idx),
+                  amount: i.amount,
+                  objectId: i.objectId,
+                  objectZoneId: i.objectZoneId,
+                  object: null,
+                  __typename: 'ShopItemDto',
+                })),
+                __typename: 'ShopDto',
+              },
+            },
+          });
+        }
+        if (newId && shopHours.length) {
+          await updateHours({
+            variables: {
+              id: newId,
+              zoneId: formData.zoneId,
+              hours: shopHours.map(h => ({
+                open: h.openHour,
+                close: h.closeHour,
+              })),
+            },
+            optimisticResponse: {
+              updateShopHours: {
+                id: newId,
+                hours: shopHours.map((h, idx) => ({
+                  id: String(idx),
+                  open: h.openHour,
+                  close: h.closeHour,
+                  __typename: 'ShopHourDto',
+                })),
+                __typename: 'ShopDto',
+              },
+            },
+          });
+        }
+      } else {
+        const numericId = parseInt(shopId!);
+        await updateShop({
+          variables: {
+            id: numericId,
+            zoneId: formData.zoneId,
             data: saveData,
           },
         });
-      } else {
-        await updateShop({
+        // Batch replace inventory
+        await updateInventory({
           variables: {
-            id: parseInt(shopId!),
-            data: saveData,
+            id: numericId,
+            zoneId: formData.zoneId,
+            items: shopItems.map(i => ({
+              amount: i.amount,
+              objectZoneId: i.objectZoneId,
+              objectId: i.objectId,
+            })),
+          },
+          optimisticResponse: {
+            updateShopInventory: {
+              id: numericId,
+              items: shopItems.map((i, idx) => ({
+                id: String(idx),
+                amount: i.amount,
+                objectId: i.objectId,
+                objectZoneId: i.objectZoneId,
+                object: null,
+                __typename: 'ShopItemDto',
+              })),
+              __typename: 'ShopDto',
+            },
+          },
+        });
+        // Batch replace hours
+        await updateHours({
+          variables: {
+            id: numericId,
+            zoneId: formData.zoneId,
+            hours: shopHours.map(h => ({
+              open: h.openHour,
+              close: h.closeHour,
+            })),
+          },
+          optimisticResponse: {
+            updateShopHours: {
+              id: numericId,
+              hours: shopHours.map((h, idx) => ({
+                id: String(idx),
+                open: h.openHour,
+                close: h.closeHour,
+                __typename: 'ShopHourDto',
+              })),
+              __typename: 'ShopDto',
+            },
           },
         });
       }
@@ -463,8 +642,10 @@ function ShopEditorContent() {
   };
 
   if (loading) return <div className='p-4'>Loading shop data...</div>;
-  if (error)
-    return <div className='p-4 text-red-600'>Error: {error.message}</div>;
+  if (error) {
+    const msg = (error as { message?: string })?.message || 'Unknown error';
+    return <div className='p-4 text-red-600'>Error: {msg}</div>;
+  }
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
@@ -481,7 +662,7 @@ function ShopEditorContent() {
           <h1 className='text-3xl font-bold text-gray-900'>
             {isNew
               ? 'Create New Shop'
-              : data?.shop?.keeper
+              : data?.shop?.keeper?.name
                 ? `${data.shop.keeper.name}'s Shop`
                 : formData.zoneId
                   ? `Shop: Zone ${formData.zoneId}, ID ${shopId}`
@@ -642,6 +823,27 @@ function ShopEditorContent() {
               <div className='space-y-4'>
                 <div>
                   <label
+                    htmlFor='id'
+                    className='block text-sm font-medium text-gray-700 mb-1'
+                  >
+                    Shop ID *
+                  </label>
+                  <input
+                    type='number'
+                    id='id'
+                    value={formData.id}
+                    onChange={e =>
+                      handleInputChange('id', parseInt(e.target.value) || 0)
+                    }
+                    disabled={!isNew}
+                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.id ? 'border-red-300' : 'border-gray-300'}`}
+                  />
+                  {errors.id && (
+                    <p className='text-red-500 text-xs mt-1'>{errors.id}</p>
+                  )}
+                </div>
+                <div>
+                  <label
                     htmlFor='keeperId'
                     className='block text-sm font-medium text-gray-700 mb-1'
                   >
@@ -659,11 +861,16 @@ function ShopEditorContent() {
                     className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                   >
                     <option value=''>No shopkeeper</option>
-                    {mobsData?.mobsByZone?.map((mob: any, index: number) => (
-                      <option key={index} value={mob.id}>
-                        {mob.name} (#{mob.zoneId}:{mob.id})
-                      </option>
-                    ))}
+                    {mobsData?.mobsByZone?.map(
+                      (
+                        mob: (typeof mobsData.mobsByZone)[number],
+                        index: number
+                      ) => (
+                        <option key={index} value={mob.id}>
+                          {mob.name} (#{mob.zoneId}:{mob.id})
+                        </option>
+                      )
+                    )}
                   </select>
                 </div>
 
@@ -782,10 +989,14 @@ function ShopEditorContent() {
                       <select
                         value={`${item.objectZoneId}:${item.objectId}`}
                         onChange={e => {
-                          const [zoneId, objId] = e.target.value.split(':');
+                          const parts = e.target.value.split(':');
+                          const zoneId = parts[0] ?? '0';
+                          const objId = parts[1] ?? '0';
                           const newItems = [...shopItems];
+                          const existing = newItems[index];
                           newItems[index] = {
-                            ...newItems[index],
+                            ...existing,
+                            amount: existing?.amount ?? 0, // preserve required amount
                             objectZoneId: parseInt(zoneId) || 0,
                             objectId: parseInt(objId) || 0,
                           };
@@ -794,14 +1005,16 @@ function ShopEditorContent() {
                         className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                       >
                         <option value='0:0'>Select object</option>
-                        {objectsData?.objectsByZone?.map((obj: any) => (
-                          <option
-                            key={`${obj.zoneId}-${obj.id}`}
-                            value={`${obj.zoneId}:${obj.id}`}
-                          >
-                            {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
-                          </option>
-                        ))}
+                        {objectsData?.objectsByZone?.map(
+                          (obj: (typeof objectsData.objectsByZone)[number]) => (
+                            <option
+                              key={`${obj.zoneId}-${obj.id}`}
+                              value={`${obj.zoneId}:${obj.id}`}
+                            >
+                              {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
+                            </option>
+                          )
+                        )}
                       </select>
                     </div>
 
@@ -929,142 +1142,44 @@ function ShopEditorContent() {
             <h3 className='text-lg font-medium text-gray-900 mb-4'>
               Shop Messages
             </h3>
-            <div className='grid grid-cols-2 gap-6'>
-              <div className='space-y-4'>
-                <div>
-                  <label
-                    htmlFor='messageBuy'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Buy Message
-                  </label>
-                  <textarea
-                    id='messageBuy'
-                    rows={3}
-                    value={formData.messageBuy}
-                    onChange={e =>
-                      handleInputChange('messageBuy', e.target.value)
-                    }
-                    placeholder='Message when shopkeeper buys from player'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='messageSell'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Sell Message
-                  </label>
-                  <textarea
-                    id='messageSell'
-                    rows={3}
-                    value={formData.messageSell}
-                    onChange={e =>
-                      handleInputChange('messageSell', e.target.value)
-                    }
-                    placeholder='Message when shopkeeper sells to player'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='noSuchItem1'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    No Such Item Message 1
-                  </label>
-                  <input
-                    type='text'
-                    id='noSuchItem1'
-                    value={formData.noSuchItem1}
-                    onChange={e =>
-                      handleInputChange('noSuchItem1', e.target.value)
-                    }
-                    placeholder='Message when item not found'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
+            <p className='text-sm text-gray-600 mb-4'>
+              Add, edit, or remove messages. Empty lines will be ignored when
+              saving.
+            </p>
+            <div className='grid grid-cols-2 gap-8'>
+              <div className='space-y-6'>
+                <MessageList
+                  title='Buy Messages'
+                  values={buyMessages}
+                  setValues={setBuyMessages}
+                  placeholder='Message when shopkeeper buys from player'
+                />
+                <MessageList
+                  title='Sell Messages'
+                  values={sellMessages}
+                  setValues={setSellMessages}
+                  placeholder='Message when shopkeeper sells to player'
+                />
+                <MessageList
+                  title='No Such Item Messages'
+                  values={noSuchItemMessages}
+                  setValues={setNoSuchItemMessages}
+                  placeholder='Message when item not found'
+                />
               </div>
-
-              <div className='space-y-4'>
-                <div>
-                  <label
-                    htmlFor='noSuchItem2'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    No Such Item Message 2
-                  </label>
-                  <input
-                    type='text'
-                    id='noSuchItem2'
-                    value={formData.noSuchItem2}
-                    onChange={e =>
-                      handleInputChange('noSuchItem2', e.target.value)
-                    }
-                    placeholder='Alternative message when item not found'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='doNotBuy'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Do Not Buy Message
-                  </label>
-                  <input
-                    type='text'
-                    id='doNotBuy'
-                    value={formData.doNotBuy}
-                    onChange={e =>
-                      handleInputChange('doNotBuy', e.target.value)
-                    }
-                    placeholder='Message when refusing to buy item'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='missingCash1'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Missing Cash Message 1
-                  </label>
-                  <input
-                    type='text'
-                    id='missingCash1'
-                    value={formData.missingCash1}
-                    onChange={e =>
-                      handleInputChange('missingCash1', e.target.value)
-                    }
-                    placeholder='Message when player lacks funds'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
-
-                <div>
-                  <label
-                    htmlFor='missingCash2'
-                    className='block text-sm font-medium text-gray-700 mb-1'
-                  >
-                    Missing Cash Message 2
-                  </label>
-                  <input
-                    type='text'
-                    id='missingCash2'
-                    value={formData.missingCash2}
-                    onChange={e =>
-                      handleInputChange('missingCash2', e.target.value)
-                    }
-                    placeholder='Alternative message when player lacks funds'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
-                  />
-                </div>
+              <div className='space-y-6'>
+                <MessageList
+                  title='Missing Cash Messages'
+                  values={missingCashMessages}
+                  setValues={setMissingCashMessages}
+                  placeholder='Message when player lacks funds'
+                />
+                <MessageList
+                  title='Do Not Buy Messages'
+                  values={doNotBuyMessages}
+                  setValues={setDoNotBuyMessages}
+                  placeholder='Message when refusing to buy item'
+                />
               </div>
             </div>
           </div>
@@ -1100,11 +1215,13 @@ function ShopEditorContent() {
                   className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                 >
                   <option value={0}>Select a zone</option>
-                  {zonesData?.zones?.map((zone: any) => (
-                    <option key={zone.id} value={zone.id}>
-                      Zone {zone.id}: {zone.name}
-                    </option>
-                  ))}
+                  {zonesData?.zones?.map(
+                    (zone: (typeof zonesData.zones)[number]) => (
+                      <option key={zone.id} value={zone.id}>
+                        Zone {zone.id}: {zone.name}
+                      </option>
+                    )
+                  )}
                 </select>
               </div>
 
@@ -1122,11 +1239,18 @@ function ShopEditorContent() {
                       className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
                     >
                       <option value={0}>Select an object</option>
-                      {modalObjectsData?.objectsByZone?.map((obj: any) => (
-                        <option key={`${obj.zoneId}-${obj.id}`} value={obj.id}>
-                          {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
-                        </option>
-                      ))}
+                      {modalObjectsData?.objectsByZone?.map(
+                        (
+                          obj: (typeof modalObjectsData.objectsByZone)[number]
+                        ) => (
+                          <option
+                            key={`${obj.zoneId}-${obj.id}`}
+                            value={obj.id}
+                          >
+                            {obj.name} (#{obj.zoneId}:{obj.id}) - {obj.cost}cp
+                          </option>
+                        )
+                      )}
                     </select>
                   </div>
 

@@ -12,12 +12,13 @@ export class ZonesService {
     where?: Prisma.ZonesWhereInput;
     orderBy?: Prisma.ZonesOrderByWithRelationInput;
   }): Promise<Zones[]> {
-    return this.database.zones.findMany({
-      skip: args?.skip,
-      take: args?.take,
-      where: args?.where,
+    const findArgs: Prisma.ZonesFindManyArgs = {
       orderBy: args?.orderBy || { id: 'asc' },
-    });
+    };
+    if (args?.where) findArgs.where = args.where;
+    if (args?.skip !== undefined) findArgs.skip = args.skip;
+    if (args?.take !== undefined) findArgs.take = args.take;
+    return this.database.zones.findMany(findArgs);
   }
 
   async findOne(id: number): Promise<Zones | null> {
@@ -47,7 +48,9 @@ export class ZonesService {
   }
 
   async count(where?: Prisma.ZonesWhereInput): Promise<number> {
-    return this.database.zones.count({ where });
+    const countArgs: { where?: Prisma.ZonesWhereInput } = {};
+    if (where) countArgs.where = where;
+    return this.database.zones.count(countArgs);
   }
 
   async create(data: Prisma.ZonesCreateInput): Promise<Zones> {

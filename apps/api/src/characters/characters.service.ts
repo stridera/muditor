@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
+import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
 import {
@@ -24,19 +25,12 @@ export class CharactersService {
 
   // Character operations
   async findAllCharacters(skip?: number, take?: number) {
-    return this.db.characters.findMany({
-      skip,
-      take,
+    const args: Parameters<typeof this.db.characters.findMany>[0] = {
       include: {
         characterItems: {
           include: {
             objects: {
-              select: {
-                id: true,
-                zoneId: true,
-                name: true,
-                type: true,
-              },
+              select: { id: true, zoneId: true, name: true, type: true },
             },
             container: true,
             containedItems: true,
@@ -45,7 +39,10 @@ export class CharactersService {
         characterEffects: true,
       },
       orderBy: { name: 'asc' },
-    });
+    };
+    if (skip !== undefined) args.skip = skip;
+    if (take !== undefined) args.take = take;
+    return this.db.characters.findMany(args);
   }
 
   async findCharacterById(id: string) {
@@ -115,16 +112,18 @@ export class CharactersService {
       );
     }
 
-    return this.db.characters.create({
-      data: {
+    const createData: Parameters<typeof this.db.characters.create>[0]['data'] =
+      {
+        id: crypto.randomUUID(),
         ...data,
         users: { connect: { id: userId } },
-        // Set default max values based on constitution and level
         hitPointsMax: Math.max(50, data.constitution * 5 + data.level * 10),
         movementMax: Math.max(100, data.constitution * 8 + data.level * 5),
         hitPoints: Math.max(50, data.constitution * 5 + data.level * 10),
         movement: Math.max(100, data.constitution * 8 + data.level * 5),
-      } as any,
+      };
+    return this.db.characters.create({
+      data: createData,
       include: {
         characterItems: {
           include: {
@@ -160,7 +159,7 @@ export class CharactersService {
 
     return this.db.characters.update({
       where: { id },
-      data: data as any,
+      data: data,
       include: {
         characterItems: {
           include: {
@@ -253,8 +252,25 @@ export class CharactersService {
       }
     }
 
+    // Map prototype to required object composite key (placeholder until proper lookup implemented)
+    const itemCreateData: Parameters<
+      typeof this.db.characterItems.create
+    >[0]['data'] = {
+      characterId: data.characterId,
+      objectZoneId: 0, // TODO: derive zone id from prototype
+      objectId: data.objectPrototypeId,
+      containerId: data.containerId ?? null,
+      equippedLocation: data.equippedLocation ?? null,
+      condition: data.condition,
+      charges: data.charges,
+      instanceFlags: data.instanceFlags,
+      customName: data.customShortDesc ?? null,
+      customExamineDescription: data.customLongDesc ?? null,
+      customValues: {},
+      updatedAt: new Date(),
+    };
     return this.db.characterItems.create({
-      data: data as any,
+      data: itemCreateData,
       include: {
         characters: true,
         objects: {
@@ -346,8 +362,20 @@ export class CharactersService {
     await this.findCharacterById(data.characterId);
 
     // Duration is stored and expiration is calculated on-the-fly
+    const effectCreateData: Parameters<
+      typeof this.db.characterEffects.create
+    >[0]['data'] = {
+      characterId: data.characterId,
+      effectName: data.effectName,
+      effectType: data.effectType ?? null,
+      duration: data.duration ?? null,
+      strength: data.strength,
+      sourceType: data.sourceType ?? null,
+      sourceId: data.sourceId ?? null,
+      appliedAt: new Date(),
+    };
     return this.db.characterEffects.create({
-      data: data as any,
+      data: effectCreateData,
       include: {
         characters: true,
       },

@@ -1,8 +1,8 @@
-import { Resolver, Query, Mutation, Args, Int } from '@nestjs/graphql';
 import { UseGuards } from '@nestjs/common';
-import { ZonesService } from './zones.service';
-import { ZoneDto, CreateZoneInput, UpdateZoneInput } from './zone.dto';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { CreateZoneInput, UpdateZoneInput, ZoneDto } from './zone.dto';
+import { ZonesService } from './zones.service';
 
 @Resolver(() => ZoneDto)
 export class ZonesResolver {
@@ -11,13 +11,18 @@ export class ZonesResolver {
   @Query(() => [ZoneDto], { name: 'zones' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<ZoneDto[]> {
-    return this.zonesService.findAll({ skip, take });
+    const params: { skip?: number; take?: number } = {};
+    if (skip !== undefined) params.skip = skip;
+    if (take !== undefined) params.take = take;
+    return this.zonesService.findAll(params);
   }
 
   @Query(() => ZoneDto, { name: 'zone' })
-  async findOne(@Args('id', { type: () => Int }) id: number): Promise<ZoneDto | null> {
+  async findOne(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ZoneDto | null> {
     return this.zonesService.findOne(id);
   }
 
@@ -36,14 +41,16 @@ export class ZonesResolver {
   @UseGuards(JwtAuthGuard)
   async updateZone(
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateZoneInput,
+    @Args('data') data: UpdateZoneInput
   ): Promise<ZoneDto> {
     return this.zonesService.update(id, data);
   }
 
   @Mutation(() => ZoneDto)
   @UseGuards(JwtAuthGuard)
-  async deleteZone(@Args('id', { type: () => Int }) id: number): Promise<ZoneDto> {
+  async deleteZone(
+    @Args('id', { type: () => Int }) id: number
+  ): Promise<ZoneDto> {
     return this.zonesService.delete(id);
   }
 }

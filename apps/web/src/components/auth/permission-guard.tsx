@@ -1,8 +1,7 @@
 'use client';
 
-import { ReactNode } from 'react';
-import { usePermissions } from '@/hooks/use-permissions';
-import { useAuth } from '@/contexts/auth-context';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,10 +9,11 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
-import { Button } from '@/components/ui/button';
-import { Loader2, Shield, AlertTriangle, ArrowLeft } from 'lucide-react';
+import { useAuth } from '@/contexts/auth-context';
+import { usePermissions } from '@/hooks/use-permissions';
+import { AlertTriangle, ArrowLeft, Loader2, Shield } from 'lucide-react';
 import Link from 'next/link';
+import type { ReactNode } from 'react';
 
 interface PermissionGuardProps {
   children: ReactNode;
@@ -39,7 +39,8 @@ export function PermissionGuard({
   showFallback = true,
 }: PermissionGuardProps) {
   const { user } = useAuth();
-  const { permissions, loading, isImmortal, isBuilder, isCoder, isGod } = usePermissions();
+  const { permissions, loading, isImmortal, isBuilder, isCoder, isGod } =
+    usePermissions();
 
   if (loading) {
     return (

@@ -45,11 +45,14 @@
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
     "clean": "pnpm run --recursive clean && rm -rf node_modules",
-    "prepare:disabled": "husky",
+    "prepare": "husky",
     "system:start": "./scripts/start-system.sh",
     "system:stop": "./scripts/stop-system.sh",
     "system:status": "./scripts/check-system.sh",
-    "system:restart": "./scripts/stop-system.sh && ./scripts/start-system.sh"
+    "system:restart": "./scripts/stop-system.sh && ./scripts/start-system.sh",
+    "check:gql-args": "tsx scripts/check-graphql-args.ts",
+    "build:schema": "tsx apps/api/scripts/build-graphql-schema.ts",
+    "preflight": "pnpm build:schema && pnpm type-check && pnpm lint && node scripts/validate-graphql.js && pnpm check:gql-args"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
@@ -59,7 +62,11 @@
     "@graphql-codegen/typescript-operations": "^5.0.2",
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@playwright/test": "^1.56.1",
+    "@prisma/client": "^6.16.1",
+    "@types/jest": "^30.0.0",
     "@types/node": "^24.9.2",
+    "@types/react": "19.1.12",
+    "@types/react-dom": "19.1.9",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "eslint": "^9.39.0",
@@ -74,9 +81,10 @@
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
+    "prisma": "^6.16.1",
     "tsx": "^4.20.6",
     "turbo": "^2.6.0",
-    "typescript": "~5.9.3",
+    "typescript": "5.9.0",
     "typescript-eslint": "^8.46.2"
   },
   "lint-staged": {
@@ -101,7 +109,8 @@
   ],
   "pnpm": {
     "overrides": {
-      "axios": "^1.12.0"
+      "axios": "^1.12.0",
+      "@types/node": "24.9.2"
     }
   }
 }

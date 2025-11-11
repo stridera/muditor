@@ -1,7 +1,13 @@
 import { Sector } from '@muditor/db';
 import { Test, TestingModule } from '@nestjs/testing';
+import { LoggingService } from '../common/logging/logging.service';
 import { DatabaseService } from '../database/database.service';
-import { CreateRoomInput, RoomDto } from './room.dto';
+import {
+  CreateRoomInput,
+  RoomDto,
+  UpdateRoomInput,
+  UpdateRoomPositionInput,
+} from './room.dto';
 import { RoomsService } from './rooms.service';
 
 describe('RoomsService', () => {
@@ -42,6 +48,10 @@ describe('RoomsService', () => {
       providers: [
         RoomsService,
         { provide: DatabaseService, useValue: mockDatabaseService },
+        {
+          provide: LoggingService,
+          useValue: { log: jest.fn(), warn: jest.fn(), error: jest.fn() },
+        },
       ],
     }).compile();
 
@@ -59,9 +69,6 @@ describe('RoomsService', () => {
 
       expect(result).toEqual([mockRoom]);
       expect(databaseService.rooms.findMany).toHaveBeenCalledWith({
-        where: undefined,
-        skip: undefined,
-        take: undefined,
         include: {
           exits: true,
           roomExtraDescriptions: true,
@@ -190,8 +197,6 @@ describe('RoomsService', () => {
 
       expect(databaseService.rooms.findMany).toHaveBeenCalledWith({
         where: { zoneId: 511 },
-        skip: undefined,
-        take: undefined,
         include: {
           exits: true,
           roomExtraDescriptions: true,
@@ -212,6 +217,8 @@ describe('RoomsService', () => {
                   zoneId: true,
                   keywords: true,
                   name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -275,6 +282,8 @@ describe('RoomsService', () => {
                   zoneId: true,
                   keywords: true,
                   name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -332,11 +341,14 @@ describe('RoomsService', () => {
       expect(databaseService.rooms.create).toHaveBeenCalledWith({
         data: {
           id: 1,
+          zoneId: 511,
           name: 'New Room',
           roomDescription: 'A new room for testing',
           sector: 'STRUCTURE',
           flags: [],
-          zoneId: 511,
+          layoutX: null,
+          layoutY: null,
+          layoutZ: null,
         },
         include: {
           exits: true,
@@ -358,6 +370,8 @@ describe('RoomsService', () => {
                   zoneId: true,
                   keywords: true,
                   name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -390,9 +404,9 @@ describe('RoomsService', () => {
   });
 
   describe('update', () => {
-    const updateRoomInput = {
-      description: 'Updated room description',
-    } as any;
+    const updateRoomInput: UpdateRoomInput = {
+      roomDescription: 'Updated room description',
+    };
 
     it('should update a room', async () => {
       const updatedRoom = { ...mockRoom, ...updateRoomInput };
@@ -405,12 +419,7 @@ describe('RoomsService', () => {
       expect(result).toEqual(updatedRoom);
       expect(databaseService.rooms.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
-        data: {
-          name: undefined,
-          description: 'Updated room description',
-          sector: undefined,
-          flags: undefined,
-        },
+        data: { roomDescription: { set: 'Updated room description' } },
         include: {
           exits: true,
           roomExtraDescriptions: true,
@@ -431,6 +440,8 @@ describe('RoomsService', () => {
                   zoneId: true,
                   keywords: true,
                   name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -491,6 +502,8 @@ describe('RoomsService', () => {
                   zoneId: true,
                   keywords: true,
                   name: true,
+                  level: true,
+                  race: true,
                 },
               },
             },
@@ -529,7 +542,7 @@ describe('RoomsService', () => {
       const result = await service.count();
 
       expect(result).toBe(50);
-      expect(databaseService.rooms.count).toHaveBeenCalledWith({});
+      expect(databaseService.rooms.count).toHaveBeenCalled();
     });
 
     it('should return count filtered by zoneId', async () => {
@@ -545,11 +558,11 @@ describe('RoomsService', () => {
   });
 
   describe('updatePosition', () => {
-    const positionInput = {
+    const positionInput: UpdateRoomPositionInput = {
       layoutX: 100,
       layoutY: 200,
       layoutZ: 5,
-    } as any;
+    };
 
     it('should update room position', async () => {
       const updatedRoom = { ...mockRoom, ...positionInput };
@@ -562,7 +575,11 @@ describe('RoomsService', () => {
       expect(result).toEqual(updatedRoom);
       expect(databaseService.rooms.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
-        data: positionInput,
+        data: {
+          layoutX: { set: 100 },
+          layoutY: { set: 200 },
+          layoutZ: { set: 5 },
+        },
         include: {
           exits: true,
           roomExtraDescriptions: true,

@@ -1,5 +1,6 @@
-import { NestFactory } from '@nestjs/core';
 import { Logger, ValidationPipe } from '@nestjs/common';
+import { NestFactory } from '@nestjs/core';
+import { GraphQLSchemaHost } from '@nestjs/graphql';
 import { AppModule } from './app.module';
 import { LoggingService } from './common/logging/logging.service';
 
@@ -76,7 +77,55 @@ async function bootstrap() {
     24 * 60 * 60 * 1000
   );
 
+  // Defer schema validation until after listen to ensure ApolloDriver completed schema build.
+  // (Accessing GraphQLSchemaHost.schema too early causes "schema has not yet been created" errors.)
+  const validateSchema = async () => {
+    try {
+      const schemaHost = app.get(GraphQLSchemaHost, { strict: false });
+      const schema = schemaHost?.schema;
+      if (!schema) {
+        await loggingService.logError(
+          'GraphQL schema unavailable after initialization',
+          'Bootstrap',
+          {}
+        );
+        Logger.error('GraphQL schema not yet created (post-listen).');
+        return;
+      }
+      const requiredEnums = [
+        'ObjectType',
+        'ObjectFlag',
+        'EffectFlag',
+        'WearFlag',
+        'Race',
+        'MobFlag',
+        'RoomFlag',
+      ];
+      const missingEnums = requiredEnums.filter(name => !schema.getType(name));
+      if (missingEnums.length) {
+        await loggingService.logError(
+          'Missing GraphQL enum registrations',
+          'Bootstrap',
+          { missing: missingEnums }
+        );
+        Logger.error(
+          `Missing GraphQL enums: ${missingEnums.join(', ')}. Schema may be incomplete.`
+        );
+      } else {
+        await loggingService.logInfo(
+          'All required GraphQL enums present',
+          'Bootstrap',
+          { count: requiredEnums.length }
+        );
+      }
+    } catch (err) {
+      Logger.error('Schema validation threw error', err as Error);
+    }
+  };
+
   await app.listen(port, host);
+  // Perform schema validation asynchronously (non-blocking startup)
+  setTimeout(validateSchema, 0);
 
   Logger.log(`🚀 API is running on: http://${host}:${port}/${globalPrefix}`);
   Logger.log(`📊 GraphQL Playground: http://${host}:${port}/graphql`);

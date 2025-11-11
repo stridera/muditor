@@ -44,7 +44,7 @@ export class UsersService {
   }
 
   async updateRole(id: string, role: UserRole) {
-    const user = await this.findOne(id);
+    await this.findOne(id);
 
     return this.databaseService.users.update({
       where: { id },
@@ -139,11 +139,18 @@ export class UsersService {
         ...banRecord.user,
         isBanned: true,
       },
-      admin: {
-        ...banRecord.bannedByUser,
-        isBanned: false, // Admins shouldn't be banned
-      },
-    };
+      admin: banRecord.bannedByUser
+        ? {
+            id: banRecord.bannedByUser.id,
+            username: banRecord.bannedByUser.username,
+            role: banRecord.bannedByUser.role,
+          }
+        : {
+            id: '',
+            username: '',
+            role: UserRole.PLAYER,
+          },
+    } as const;
   }
 
   async unbanUser(userId: string, unbannedById: string) {
@@ -182,11 +189,18 @@ export class UsersService {
         ...updatedBanRecord.user,
         isBanned: false,
       },
-      admin: {
-        ...updatedBanRecord.bannedByUser,
-        isBanned: false,
-      },
-    };
+      admin: updatedBanRecord.bannedByUser
+        ? {
+            id: updatedBanRecord.bannedByUser.id,
+            username: updatedBanRecord.bannedByUser.username,
+            role: updatedBanRecord.bannedByUser.role,
+          }
+        : {
+            id: '',
+            username: '',
+            role: UserRole.PLAYER,
+          },
+    } as const;
   }
 
   async getUserWithBanStatus(id: string) {
@@ -215,6 +229,8 @@ export class UsersService {
     return {
       ...user,
       isBanned: user.banRecords.length > 0,
+      // Preserve original nullable fields (null instead of undefined)
+      banRecords: user.banRecords.map(r => ({ ...r })),
     };
   }
 
@@ -240,6 +256,7 @@ export class UsersService {
     return users.map(user => ({
       ...user,
       isBanned: user.banRecords.length > 0,
+      banRecords: user.banRecords.map(r => ({ ...r })),
     }));
   }
 
@@ -267,13 +284,14 @@ export class UsersService {
             ...record.user,
             isBanned: record.active,
           }
-        : undefined,
+        : null,
       admin: record.bannedByUser
         ? {
-            ...record.bannedByUser,
-            isBanned: false, // Admins shouldn't be banned
+            id: record.bannedByUser.id,
+            username: record.bannedByUser.username,
+            role: record.bannedByUser.role,
           }
-        : undefined,
+        : null,
     }));
   }
 

@@ -7,7 +7,14 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { ShopFlag, ShopTradesWith } from '@prisma/client';
-import { IsArray, IsEnum, IsNumber, IsOptional } from 'class-validator';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  Min,
+} from 'class-validator';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
 
 // Register GraphQL enums
@@ -262,4 +269,47 @@ export class ShopHourDto {
 
   @Field(() => Int)
   close: number;
+}
+
+@InputType()
+export class ShopItemInput {
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  amount: number;
+
+  @Field(() => Int)
+  @IsInt()
+  objectZoneId: number;
+
+  @Field(() => Int)
+  @IsInt()
+  objectId: number;
+}
+
+@InputType()
+export class ShopHourInput {
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  open: number;
+
+  @Field(() => Int)
+  @IsInt()
+  @Min(0)
+  close: number;
+}
+
+@InputType()
+export class UpdateShopInventoryInput {
+  @Field(() => [ShopItemInput])
+  @IsArray()
+  items: ShopItemInput[];
+}
+
+@InputType()
+export class UpdateShopHoursInput {
+  @Field(() => [ShopHourInput])
+  @IsArray()
+  hours: ShopHourInput[];
 }

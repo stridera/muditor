@@ -3,11 +3,11 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export interface LogEntry {
-  level: 'log' | 'error' | 'warn' | 'debug' | 'verbose';
+  level: 'info' | 'error' | 'warn' | 'debug';
   timestamp: string;
-  context?: string;
+  context?: string; // optional, only included when defined
   message: string;
-  data?: any;
+  data?: unknown;
   stack?: string;
 }
 
@@ -35,17 +35,17 @@ export class LoggingService {
   async logError(
     message: string,
     context?: string,
-    data?: any,
+    data?: unknown,
     stack?: string
-  ) {
+  ): Promise<void> {
     const entry: LogEntry = {
       level: 'error',
       timestamp: new Date().toISOString(),
-      context,
       message,
       data: this.sanitizeData(data),
-      stack,
     };
+    if (context !== undefined) entry.context = context;
+    if (stack !== undefined) entry.stack = stack;
 
     await this.writeToFile('error', entry);
     this.logger.error(message, context);
@@ -54,14 +54,18 @@ export class LoggingService {
   /**
    * Log a warning with context
    */
-  async logWarn(message: string, context?: string, data?: any) {
+  async logWarn(
+    message: string,
+    context?: string,
+    data?: unknown
+  ): Promise<void> {
     const entry: LogEntry = {
       level: 'warn',
       timestamp: new Date().toISOString(),
-      context,
       message,
       data: this.sanitizeData(data),
     };
+    if (context !== undefined) entry.context = context;
 
     await this.writeToFile('warn', entry);
     this.logger.warn(message, context);
@@ -70,14 +74,18 @@ export class LoggingService {
   /**
    * Log general information
    */
-  async logInfo(message: string, context?: string, data?: any) {
+  async logInfo(
+    message: string,
+    context?: string,
+    data?: unknown
+  ): Promise<void> {
     const entry: LogEntry = {
-      level: 'log',
+      level: 'info',
       timestamp: new Date().toISOString(),
-      context,
       message,
       data: this.sanitizeData(data),
     };
+    if (context !== undefined) entry.context = context;
 
     await this.writeToFile('info', entry);
     this.logger.log(message, context);
@@ -86,7 +94,11 @@ export class LoggingService {
   /**
    * Log debug information (only in development)
    */
-  async logDebug(message: string, context?: string, data?: any) {
+  async logDebug(
+    message: string,
+    context?: string,
+    data?: unknown
+  ): Promise<void> {
     if (process.env.NODE_ENV !== 'development') {
       return;
     }
@@ -94,10 +106,10 @@ export class LoggingService {
     const entry: LogEntry = {
       level: 'debug',
       timestamp: new Date().toISOString(),
-      context,
       message,
       data: this.sanitizeData(data),
     };
+    if (context !== undefined) entry.context = context;
 
     await this.writeToFile('debug', entry);
     this.logger.debug(message, context);
@@ -106,7 +118,10 @@ export class LoggingService {
   /**
    * Get recent log entries for debugging
    */
-  async getRecentLogs(level?: string, limit = 100): Promise<LogEntry[]> {
+  async getRecentLogs(
+    level?: 'error' | 'warn' | 'info' | 'debug',
+    limit = 100
+  ): Promise<LogEntry[]> {
     try {
       const logFile = level ? `${level}.log` : 'error.log';
       const logPath = path.join(this.logDir, logFile);
@@ -127,7 +142,7 @@ export class LoggingService {
         } catch {
           // Handle non-JSON log lines
           return {
-            level: 'log' as const,
+            level: 'info' as const,
             timestamp: new Date().toISOString(),
             message: line,
           };
@@ -192,7 +207,10 @@ export class LoggingService {
     }
   }
 
-  private async writeToFile(level: string, entry: LogEntry) {
+  private async writeToFile(
+    level: 'error' | 'warn' | 'info' | 'debug',
+    entry: LogEntry
+  ): Promise<void> {
     try {
       const filename = `${level}.log`;
       const filepath = path.join(this.logDir, filename);
@@ -208,7 +226,7 @@ export class LoggingService {
     }
   }
 
-  private sanitizeData(data: any): any {
+  private sanitizeData(data: unknown): unknown {
     if (!data || typeof data !== 'object') {
       return data;
     }
@@ -228,14 +246,16 @@ export class LoggingService {
       'refresh_token',
     ];
 
-    const sanitizeObject = (obj: any) => {
+    const sanitizeObject = (obj: unknown): unknown => {
       if (Array.isArray(obj)) {
         return obj.map(sanitizeObject);
       }
 
       if (obj && typeof obj === 'object') {
-        const result: any = {};
-        for (const [key, value] of Object.entries(obj)) {
+        const result: Record<string, unknown> = {};
+        for (const [key, value] of Object.entries(
+          obj as Record<string, unknown>
+        )) {
           if (
             sensitiveFields.some(field =>
               key.toLowerCase().includes(field.toLowerCase())

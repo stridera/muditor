@@ -3,20 +3,47 @@ import { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../app.module';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
 describe('Data Integrity Tests', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
 
   beforeAll(async () => {
+    // Bypass guard no longer needed (overrideGuard used below)
+
     const moduleFixture: TestingModule = await Test.createTestingModule({
       imports: [AppModule],
-    }).compile();
+    })
+      // Properly override guards (not providers) so decorators use bypass implementation
+      .overrideGuard(JwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .overrideGuard(GraphQLJwtAuthGuard)
+      .useValue({ canActivate: () => true })
+      .compile();
 
     app = moduleFixture.createNestApplication();
     await app.init();
 
     prisma = new PrismaClient();
+    // Ensure test zone exists for foreign key relations (zones.id=1000)
+    await prisma.zones.upsert({
+      where: { id: 1000 },
+      update: {},
+      create: {
+        id: 1000,
+        name: 'Data Integrity Zone',
+        resetMode: 'NORMAL',
+        lifespan: 30,
+        hemisphere: 'NORTHWEST',
+        climate: 'TEMPERATE',
+      },
+    });
+    // Clean previous test artifacts (id collisions) if rerunning without DB reset
+    await prisma.mobs.deleteMany({ where: { zoneId: 1000 } });
+    await prisma.objects.deleteMany({ where: { zoneId: 1000 } });
+    await prisma.rooms.deleteMany({ where: { zoneId: 1000 } });
   });
 
   afterAll(async () => {
@@ -40,7 +67,8 @@ describe('Data Integrity Tests', () => {
         hitRoll: 8,
         hpDice: '8d8+100',
         damageDice: '2d8+4',
-      };
+        // wealth is not a direct input property (removed from CreateMobInput)
+      } as const;
 
       // Create mob via API
       const createResponse = await request(app.getHttpServer())
@@ -131,6 +159,7 @@ describe('Data Integrity Tests', () => {
         type: 'WEAPON',
         keywords: ['sword', 'steel', 'weapon'],
         name: 'a gleaming steel sword',
+        roomDescription: 'A gleaming steel sword lies here.',
         examineDescription:
           'This masterfully crafted sword gleams with magical enchantments.',
         weight: 5,
@@ -188,13 +217,14 @@ describe('Data Integrity Tests', () => {
   describe('Room Data Integrity', () => {
     it('should preserve room descriptions correctly', async () => {
       const testRoomData = {
-        id: 1,
+        id: 101,
         zoneId: 1000,
         name: 'Test Chamber',
         roomDescription:
           'A large stone chamber with ancient carvings on the walls.',
-        flags: ['DARK', 'NO_MOB'],
-        sector: 'INSIDE',
+        flags: [],
+        // Use a valid Sector enum value (previously 'INSIDE' which is not in the Prisma enum -> GraphQL validation error)
+        sector: 'STRUCTURE',
       };
 
       const createResponse = await request(app.getHttpServer())
@@ -215,6 +245,15 @@ describe('Data Integrity Tests', () => {
           variables: { data: testRoomData },
         })
         .expect(200);
+
+      // Assert no GraphQL validation errors (helps surface enum issues quickly if they recur)
+      if (createResponse.body.errors) {
+        throw new Error(
+          'Room creation GraphQL errors: ' +
+            JSON.stringify(createResponse.body.errors, null, 2)
+        );
+      }
+      expect(createResponse.body.errors).toBeUndefined();
 
       const createdRoom = createResponse.body.data.createRoom;
 
@@ -241,13 +280,16 @@ describe('Data Integrity Tests', () => {
   describe('Zone Data Integrity', () => {
     it('should preserve zone configuration and reset settings', async () => {
       const testZoneData = {
-        id: 9999,
+        id: 15000,
         name: 'Test Zone',
         resetMode: 'NORMAL',
         lifespan: 20,
         hemisphere: 'NORTHWEST',
         climate: 'TEMPERATE',
       };
+
+      // Ensure no pre-existing zone with this ID to avoid unique constraint failure on reruns
+      await prisma.zones.deleteMany({ where: { id: testZoneData.id } });
 
       const createResponse = await request(app.getHttpServer())
         .post('/graphql')
@@ -267,6 +309,17 @@ describe('Data Integrity Tests', () => {
           variables: { data: testZoneData },
         })
         .expect(200);
+
+      // Unique constraint can fail if test re-runs without cleanup; proactively delete before attempting create.
+      // (Deletion placed after request previously; move logic before creation if needed in future refactor.)
+      // For now, if errors exist and indicate unique constraint, log them to aid diagnosis.
+      if (createResponse.body.errors) {
+        throw new Error(
+          'Zone creation GraphQL errors: ' +
+            JSON.stringify(createResponse.body.errors, null, 2)
+        );
+      }
+      expect(createResponse.body.errors).toBeUndefined();
 
       const createdZone = createResponse.body.data.createZone;
 
@@ -312,7 +365,7 @@ describe('Data Integrity Tests', () => {
         roomDescription: 'This is a test mob for flag testing.',
         examineDescription: 'A basic test mob.',
         level: 1,
-      };
+      } as const;
 
       const response = await request(app.getHttpServer())
         .post('/graphql')

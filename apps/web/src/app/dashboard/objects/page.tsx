@@ -44,7 +44,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import EnhancedSearch, {
-  SearchFilters,
+  type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import ZoneSelector from '../../../components/ZoneSelector';
 import {
@@ -329,7 +329,7 @@ function ObjectsContent() {
   const exportSelectedObjects = () => {
     if (selectedObjects.size === 0) return;
 
-    const selectedData = sortedObjects.filter(obj =>
+    const selectedData = sortedDisplayObjects.filter(obj =>
       selectedObjects.has(obj.id)
     );
     const jsonData = JSON.stringify(selectedData, null, 2);
@@ -358,16 +358,22 @@ function ObjectsContent() {
     // Additional fields (roomDescription, examineDescription, concealment) only available once detailed data is loaded
     [key: string]: unknown;
   }
-  const searchableObjects: ObjectSearchShape[] = objects.map(o => ({
-    id: o.id,
-    keywords: Array.isArray(o.keywords) ? o.keywords.join(' ') : o.keywords,
-    name: o.name,
-    level: o.level,
-    type: o.type as string | undefined,
-    cost: o.cost,
-    weight: o.weight,
-    zoneId: o.zoneId,
-  }));
+  const searchableObjects: ObjectSearchShape[] = objects.map(o => {
+    const base: ObjectSearchShape = {
+      id: o.id,
+      keywords: Array.isArray(o.keywords) ? o.keywords.join(' ') : o.keywords,
+      name: o.name,
+      level: o.level,
+      cost: o.cost,
+      weight: o.weight,
+      zoneId: o.zoneId,
+    } as ObjectSearchShape; // assertion to satisfy exactOptionalPropertyTypes during incremental build
+    if (o.type) {
+      // Only include type if defined; avoid assigning undefined
+      base.type = o.type as string;
+    }
+    return base;
+  });
   const filteredObjects = applySearchFilters(searchableObjects, searchFilters, {
     // Custom field mappings for object-specific filters
     isValuable: obj => (obj.cost ?? 0) >= 1000,
@@ -378,41 +384,38 @@ function ObjectsContent() {
   });
 
   // Sort the filtered objects
-  const sortedObjects = [...filteredObjects].sort((a, b) => {
-    const aVal = (a as Record<string, unknown>)[sortBy];
-    const bVal = (b as Record<string, unknown>)[sortBy];
-    const normA =
-      aVal === undefined || aVal === null
-        ? typeof bVal === 'string'
-          ? ''
-          : 0
-        : aVal;
-    const normB =
-      bVal === undefined || bVal === null
-        ? typeof aVal === 'string'
-          ? ''
-          : 0
-        : bVal;
-    const comparison =
-      typeof normA === 'string' && typeof normB === 'string'
-        ? normA.localeCompare(normB)
-        : (normA as number) < (normB as number)
-          ? -1
-          : (normA as number) > (normB as number)
-            ? 1
-            : 0;
+  // Map filtered search shapes back to original fragment objects for display
+  const filteredIdSet = new Set(filteredObjects.map(o => o.id));
+  const displayObjects = objects.filter(o => filteredIdSet.has(o.id));
+
+  const sortedDisplayObjects = [...displayObjects].sort((a, b) => {
+    const aVal = (a as unknown as Record<string, unknown>)[sortBy];
+    const bVal = (b as unknown as Record<string, unknown>)[sortBy];
+    const normA = aVal ?? (typeof bVal === 'string' ? '' : 0);
+    const normB = bVal ?? (typeof aVal === 'string' ? '' : 0);
+    let comparison: number;
+    if (typeof normA === 'string' && typeof normB === 'string') {
+      comparison = normA.localeCompare(normB);
+    } else {
+      const numA = Number(normA);
+      const numB = Number(normB);
+      comparison = numA === numB ? 0 : numA < numB ? -1 : 1;
+    }
     return sortOrder === 'asc' ? comparison : -comparison;
   });
 
   // Calculate pagination
-  const totalPages = Math.ceil(sortedObjects.length / itemsPerPage);
+  const totalPages = Math.ceil(sortedDisplayObjects.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
-  const paginatedObjects = sortedObjects.slice(
+  const paginatedObjects = sortedDisplayObjects.slice(
     startIndex,
     startIndex + itemsPerPage
   );
   const startItem = startIndex + 1;
-  const endItem = Math.min(startIndex + itemsPerPage, sortedObjects.length);
+  const endItem = Math.min(
+    startIndex + itemsPerPage,
+    sortedDisplayObjects.length
+  );
 
   if (loading) return <div className='p-4'>Loading objects...</div>;
   if (error)
@@ -426,8 +429,8 @@ function ObjectsContent() {
             {selectedZone ? `Zone ${selectedZone} Objects` : 'Objects'}
           </h1>
           <p className='text-sm text-gray-500 mt-1'>
-            Showing {startItem}-{endItem} of {sortedObjects.length} objects
-            (Page {currentPage} of {totalPages})
+            Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
+            objects (Page {currentPage} of {totalPages})
             {selectedZone && ' in this zone'}
           </p>
         </div>
@@ -1166,7 +1169,8 @@ function ObjectsContent() {
       {totalPages > 1 && (
         <div className='flex items-center justify-between mt-6 px-4 py-3 bg-gray-50 rounded-lg'>
           <div className='text-sm text-gray-500'>
-            Showing {startItem}-{endItem} of {sortedObjects.length} results
+            Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
+            results
           </div>
           <div className='flex items-center gap-2'>
             <button

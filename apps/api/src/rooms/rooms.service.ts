@@ -1,4 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
+import type { Prisma, RoomExits } from '@prisma/client';
+import { Direction } from '@prisma/client';
+import { LoggingService } from '../common/logging/logging.service';
 import { DatabaseService } from '../database/database.service';
 import {
   BatchUpdateResult,
@@ -53,7 +56,10 @@ type RoomServiceResult = Omit<RoomDto, 'mobs' | 'objects' | 'shops'> & {
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(
+    private readonly db: DatabaseService,
+    private readonly logging: LoggingService
+  ) {}
 
   // Shared include pattern to prevent stack overflow from circular references
   private readonly roomInclude = {
@@ -205,20 +211,21 @@ export class RoomsService {
         ORDER BY r.id
         ${limitClause}
         ${offsetClause}
-      `);
-      return rooms as any;
+  `);
+      return rooms as unknown as RoomServiceResult[];
     }
 
     // Full query with all data
-    const rooms = await this.db.rooms.findMany({
-      where: zoneId ? { zoneId } : undefined,
-      skip,
-      take,
+    const findArgs: Prisma.RoomsFindManyArgs = {
       include: this.roomInclude,
       orderBy: { id: 'asc' },
-    });
+    };
+    if (zoneId !== undefined) findArgs.where = { zoneId };
+    if (skip !== undefined) findArgs.skip = skip;
+    if (take !== undefined) findArgs.take = take;
 
-    return rooms as any;
+    const rooms = await this.db.rooms.findMany(findArgs);
+    return rooms as unknown as RoomServiceResult[];
   }
 
   async findOne(zoneId: number, id: number): Promise<RoomServiceResult | null> {
@@ -238,7 +245,7 @@ export class RoomsService {
       );
     }
 
-    return room as any;
+    return room as unknown as RoomServiceResult;
   }
 
   async findByZone(
@@ -330,8 +337,8 @@ export class RoomsService {
         WHERE r.zone_id = ${zoneId}
         GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
         ORDER BY r.id
-      `);
-      return rooms as any;
+  `);
+      return rooms as unknown as RoomServiceResult[];
     }
 
     // Full query with all data
@@ -340,30 +347,94 @@ export class RoomsService {
       include: this.roomInclude,
       orderBy: { id: 'asc' },
     });
-
-    return rooms as any;
+    return rooms as unknown as RoomServiceResult[];
   }
 
   async count(zoneId?: number): Promise<number> {
-    return this.db.rooms.count({
-      where: zoneId ? { zoneId } : undefined,
-    });
+    if (zoneId === undefined) {
+      return this.db.rooms.count();
+    }
+    return this.db.rooms.count({ where: { zoneId } });
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {
+    // Compute layout offsets if a source room + direction are provided and no explicit layout given
+    let layoutX = data.layoutX;
+    let layoutY = data.layoutY;
+    let layoutZ = data.layoutZ;
+
+    if (
+      layoutX === undefined &&
+      layoutY === undefined &&
+      layoutZ === undefined &&
+      data.sourceZoneId !== undefined &&
+      data.sourceRoomId !== undefined &&
+      data.directionFromSource !== undefined
+    ) {
+      const source = await this.db.rooms.findUnique({
+        where: {
+          zoneId_id: {
+            zoneId: data.sourceZoneId,
+            id: data.sourceRoomId,
+          },
+        },
+        select: { layoutX: true, layoutY: true, layoutZ: true },
+      });
+
+      const baseX = source?.layoutX ?? 0;
+      const baseY = source?.layoutY ?? 0;
+      const baseZ = source?.layoutZ ?? 0;
+
+      const deltas: Record<Direction, { dx: number; dy: number; dz: number }> =
+        {
+          NORTH: { dx: 0, dy: 1, dz: 0 },
+          SOUTH: { dx: 0, dy: -1, dz: 0 },
+          EAST: { dx: 1, dy: 0, dz: 0 },
+          WEST: { dx: -1, dy: 0, dz: 0 },
+          UP: { dx: 0, dy: 0, dz: 1 },
+          DOWN: { dx: 0, dy: 0, dz: -1 },
+        };
+
+      const delta = deltas[data.directionFromSource];
+      layoutX = baseX + delta.dx;
+      layoutY = baseY + delta.dy;
+      layoutZ = baseZ + delta.dz;
+
+      // Optional: guard against duplicate position in the same zone
+      const existingAtTarget = await this.db.rooms.findFirst({
+        where: {
+          zoneId: data.zoneId,
+          layoutX,
+          layoutY,
+          layoutZ,
+        },
+        select: { id: true },
+      });
+      if (existingAtTarget) {
+        // Simple fallback: don't throw; revert to undefined so createData will persist null via ?? logic below
+        layoutX = undefined;
+        layoutY = undefined;
+        layoutZ = undefined;
+      }
+    }
+
+    const createData: Prisma.RoomsUncheckedCreateInput = {
+      id: data.id,
+      zoneId: data.zoneId,
+      name: data.name,
+      roomDescription: data.roomDescription,
+      sector: data.sector || 'STRUCTURE',
+      flags: data.flags || [],
+      layoutX: layoutX ?? null,
+      layoutY: layoutY ?? null,
+      layoutZ: layoutZ ?? null,
+    };
+
     const room = await this.db.rooms.create({
-      data: {
-        id: data.id,
-        zoneId: data.zoneId,
-        name: data.name,
-        roomDescription: data.roomDescription,
-        sector: data.sector || 'STRUCTURE',
-        flags: data.flags || [],
-      },
+      data: createData,
       include: this.roomInclude,
     });
-
-    return room as any;
+    return room as unknown as RoomServiceResult;
   }
 
   async update(
@@ -371,18 +442,22 @@ export class RoomsService {
     id: number,
     data: UpdateRoomInput
   ): Promise<RoomServiceResult> {
+    const updateData: Prisma.RoomsUpdateInput = {};
+    if (data.name !== undefined) updateData.name = { set: data.name };
+    if (data.roomDescription !== undefined)
+      updateData.roomDescription = { set: data.roomDescription };
+    if (data.sector !== undefined) updateData.sector = { set: data.sector };
+    if (data.flags !== undefined) updateData.flags = { set: data.flags };
+    if (data.layoutX !== undefined) updateData.layoutX = { set: data.layoutX };
+    if (data.layoutY !== undefined) updateData.layoutY = { set: data.layoutY };
+    if (data.layoutZ !== undefined) updateData.layoutZ = { set: data.layoutZ };
+
     const room = await this.db.rooms.update({
       where: { zoneId_id: { zoneId, id } },
-      data: {
-        name: data.name,
-        roomDescription: data.roomDescription,
-        sector: data.sector,
-        flags: data.flags,
-      },
+      data: updateData,
       include: this.roomInclude,
     });
-
-    return room as any;
+    return room as unknown as RoomServiceResult;
   }
 
   async delete(zoneId: number, id: number): Promise<RoomServiceResult> {
@@ -390,31 +465,27 @@ export class RoomsService {
       where: { zoneId_id: { zoneId, id } },
       include: this.roomInclude,
     });
-
-    return room as any;
+    return room as unknown as RoomServiceResult;
   }
 
-  async createExit(data: CreateRoomExitInput): Promise<any> {
-    const exit = await this.db.roomExits.create({
-      data: {
-        direction: data.direction,
-        description: data.description,
-        keywords: data.keywords || [],
-        toZoneId: data.toZoneId,
-        toRoomId: data.toRoomId,
-        roomZoneId: data.roomZoneId,
-        roomId: data.roomId,
-      },
-    });
-
+  async createExit(data: CreateRoomExitInput): Promise<RoomExits> {
+    const exitData: Prisma.RoomExitsUncheckedCreateInput = {
+      direction: data.direction,
+      roomZoneId: data.roomZoneId,
+      roomId: data.roomId,
+      keywords: data.keywords || [],
+      description: data.description ?? null,
+      toZoneId: data.toZoneId ?? null,
+      toRoomId: data.toRoomId ?? null,
+    };
+    const exit = await this.db.roomExits.create({ data: exitData });
     return exit;
   }
 
-  async deleteExit(exitId: number): Promise<any> {
+  async deleteExit(exitId: number): Promise<RoomExits> {
     const exit = await this.db.roomExits.delete({
       where: { id: exitId },
     });
-
     return exit;
   }
 
@@ -423,65 +494,20 @@ export class RoomsService {
     id: number,
     position: UpdateRoomPositionInput
   ): Promise<RoomServiceResult> {
+    const positionData: Prisma.RoomsUpdateInput = {};
+    if (position.layoutX !== undefined)
+      positionData.layoutX = { set: position.layoutX };
+    if (position.layoutY !== undefined)
+      positionData.layoutY = { set: position.layoutY };
+    if (position.layoutZ !== undefined)
+      positionData.layoutZ = { set: position.layoutZ };
+
     const room = await this.db.rooms.update({
       where: { zoneId_id: { zoneId, id } },
-      data: {
-        layoutX: position.layoutX,
-        layoutY: position.layoutY,
-        layoutZ: position.layoutZ,
-      },
-      include: {
-        exits: true,
-        roomExtraDescriptions: true,
-        mobResets: {
-          select: {
-            id: true,
-            zoneId: true,
-            maxInstances: true,
-            probability: true,
-            comment: true,
-            mobZoneId: true,
-            mobId: true,
-            roomZoneId: true,
-            roomId: true,
-            mobs: {
-              select: {
-                id: true,
-                zoneId: true,
-                keywords: true,
-                name: true,
-                level: true,
-                race: true,
-              },
-            },
-          },
-        },
-        objectResets: {
-          select: {
-            id: true,
-            zoneId: true,
-            maxInstances: true,
-            probability: true,
-            comment: true,
-            objectZoneId: true,
-            objectId: true,
-            roomZoneId: true,
-            roomId: true,
-            objects: {
-              select: {
-                id: true,
-                zoneId: true,
-                keywords: true,
-                name: true,
-                type: true,
-              },
-            },
-          },
-        },
-      },
+      data: positionData,
+      include: this.roomInclude,
     });
-
-    return room as any;
+    return room as unknown as RoomServiceResult;
   }
 
   async batchUpdatePositions(
@@ -498,18 +524,22 @@ export class RoomsService {
 
     try {
       // Use a transaction to ensure all updates succeed or fail together
-      const result = await this.db.$transaction(async tx => {
+      await this.db.$transaction(async tx => {
         const updatePromises = updates.map(async update => {
           try {
+            const data: Prisma.RoomsUpdateInput = {};
+            if (update.layoutX !== undefined)
+              data.layoutX = { set: update.layoutX };
+            if (update.layoutY !== undefined)
+              data.layoutY = { set: update.layoutY };
+            if (update.layoutZ !== undefined)
+              data.layoutZ = { set: update.layoutZ };
+
             await tx.rooms.update({
               where: {
                 zoneId_id: { zoneId: update.zoneId, id: update.roomId },
               },
-              data: {
-                layoutX: update.layoutX,
-                layoutY: update.layoutY,
-                layoutZ: update.layoutZ,
-              },
+              data,
             });
             return {
               success: true,
@@ -517,9 +547,12 @@ export class RoomsService {
               roomId: update.roomId,
             };
           } catch (error) {
-            console.error(
-              `Failed to update room ${update.zoneId}/${update.roomId}:`,
-              error
+            // Centralized logging (see common/logging.ts)
+            this.logging.logError(
+              `Failed to update room ${update.zoneId}/${update.roomId}`,
+              'RoomsService.batchUpdatePositions',
+              { zoneId: update.zoneId, roomId: update.roomId },
+              error instanceof Error ? error.stack : undefined
             );
             return {
               success: false,
@@ -542,16 +575,19 @@ export class RoomsService {
             );
           }
         }
-
-        return results;
       });
 
       return {
         updatedCount,
-        errors: errors.length > 0 ? errors : undefined,
+        errors,
       };
     } catch (error) {
-      console.error('Batch update transaction failed:', error);
+      this.logging.logError(
+        'Batch update transaction failed',
+        'RoomsService.batchUpdatePositions',
+        { updates: updates.length },
+        error instanceof Error ? error.stack : undefined
+      );
       return {
         updatedCount: 0,
         errors: [

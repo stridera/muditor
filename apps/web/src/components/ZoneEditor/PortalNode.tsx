@@ -1,8 +1,8 @@
 'use client';
 
-import React from 'react';
-import { Handle, Position, NodeProps } from 'reactflow';
 import { useRouter } from 'next/navigation';
+import React from 'react';
+import { Handle, Position, type NodeProps } from 'reactflow';
 
 interface PortalData {
   direction: string;

@@ -22,7 +22,7 @@ import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import EnhancedSearch, {
-  SearchFilters,
+  type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import ZoneSelector from '../../../components/ZoneSelector';
 import {
@@ -281,7 +281,14 @@ function MobsContent() {
     };
 
     fetchMobs();
-  }, [selectedZone, currentPage, itemsPerPage, sortBy, sortOrder, searchFilters.searchTerm]);
+  }, [
+    selectedZone,
+    currentPage,
+    itemsPerPage,
+    sortBy,
+    sortOrder,
+    searchFilters.searchTerm,
+  ]);
 
   // Reset to page 1 when search term changes
   useEffect(() => {

@@ -13,7 +13,6 @@ const config: CodegenConfig = {
 
   // Generate types
   generates: {
-    // Generate types for the web app using client preset (modern recommended approach)
     './apps/web/src/generated/': {
       preset: 'client',
       presetConfig: {

@@ -52,6 +52,9 @@ export class MobDto {
   @Field()
   name: string;
 
+  @Field({ description: 'Mob class identifier (e.g., NORMAL)' })
+  mobClass: string;
+
   @Field()
   roomDescription: string;
 

@@ -30,7 +30,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useState } from 'react';
-import ScriptEditor, { Script } from './ScriptEditor';
+import ScriptEditor, { type Script } from './ScriptEditor';
 
 const GET_TRIGGERS = gql`
   query GetTriggersInline {
@@ -367,18 +367,22 @@ export default function TriggerManager({
     setIsEditDialogOpen(true);
   };
 
-  const convertTriggerToScript = (trigger: TriggerData): Script => ({
-    id: trigger.id,
-    name: trigger.name,
-    attachType: trigger.attachType,
-    numArgs: trigger.numArgs,
-    argList: trigger.argList,
-    commands: trigger.commands,
-    variables: JSON.parse(trigger.variables || '{}'),
-    zoneId: trigger.zoneId,
-    mobId: trigger.mobId,
-    objectId: trigger.objectId,
-  });
+  const convertTriggerToScript = (trigger: TriggerData): Script => {
+    // Build incrementally to avoid assigning undefined to required properties
+    const base: Partial<Script> = {
+      id: trigger.id,
+      name: trigger.name,
+      attachType: trigger.attachType,
+      numArgs: trigger.numArgs,
+      commands: trigger.commands,
+      variables: JSON.parse(trigger.variables || '{}'),
+    };
+    if (trigger.zoneId != null) base.zoneId = trigger.zoneId;
+    if (trigger.mobId != null) base.mobId = trigger.mobId;
+    if (trigger.objectId != null) base.objectId = trigger.objectId;
+    if (trigger.argList) base.argList = trigger.argList;
+    return base as Script;
+  };
 
   if (attachedLoading || allLoading) {
     return <div className='p-4'>Loading triggers...</div>;
@@ -618,15 +622,18 @@ export default function TriggerManager({
           </DialogHeader>
 
           <div className='flex-1 overflow-hidden'>
-            <ScriptEditor
-              script={
-                selectedTrigger
-                  ? convertTriggerToScript(selectedTrigger)
-                  : undefined
-              }
-              onSave={isCreating ? handleCreateTrigger : handleUpdateTrigger}
-              height='500px'
-            />
+            {selectedTrigger ? (
+              <ScriptEditor
+                script={convertTriggerToScript(selectedTrigger)}
+                onSave={isCreating ? handleCreateTrigger : handleUpdateTrigger}
+                height='500px'
+              />
+            ) : (
+              <ScriptEditor
+                onSave={isCreating ? handleCreateTrigger : handleUpdateTrigger}
+                height='500px'
+              />
+            )}
           </div>
         </DialogContent>
       </Dialog>

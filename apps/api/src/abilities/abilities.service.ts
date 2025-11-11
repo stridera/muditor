@@ -30,26 +30,21 @@ export class AbilitiesService {
       ];
     }
 
-    return this.prisma.ability.findMany({
+    const args: any = {
       where,
-      skip,
-      take,
       include: {
         school: true,
-        effects: {
-          include: {
-            effect: true,
-          },
-        },
+        effects: { include: { effect: true } },
         targeting: true,
         restrictions: true,
         savingThrows: true,
         messages: true,
       },
-      orderBy: {
-        name: 'asc',
-      },
-    });
+      orderBy: { name: 'asc' },
+    };
+    if (skip !== undefined) args.skip = skip;
+    if (take !== undefined) args.take = take;
+    return this.prisma.ability.findMany(args);
   }
 
   async count(abilityType?: string, search?: string) {
@@ -114,30 +109,28 @@ export class AbilitiesService {
   }
 
   async create(data: CreateAbilityInput) {
+    const createData: any = {
+      name: data.name,
+      abilityType: data.abilityType,
+      minPosition: data.minPosition,
+      violent: data.violent,
+      castTimeRounds: data.castTimeRounds,
+      cooldownMs: data.cooldownMs,
+      inCombatOnly: data.inCombatOnly,
+      isArea: data.isArea,
+    };
+    if (data.description !== undefined) createData.description = data.description;
+    if (data.gameId !== undefined) createData.gameId = data.gameId;
+    if (data.schoolId !== undefined) createData.schoolId = data.schoolId;
+    if (data.notes !== undefined) createData.notes = data.notes;
+    if (data.tags !== undefined) createData.tags = data.tags;
+    if (data.luaScript !== undefined) createData.luaScript = data.luaScript;
+
     return this.prisma.ability.create({
-      data: {
-        name: data.name,
-        description: data.description,
-        gameId: data.gameId,
-        abilityType: data.abilityType,
-        schoolId: data.schoolId,
-        minPosition: data.minPosition,
-        violent: data.violent,
-        castTimeRounds: data.castTimeRounds,
-        cooldownMs: data.cooldownMs,
-        inCombatOnly: data.inCombatOnly,
-        isArea: data.isArea,
-        notes: data.notes,
-        tags: data.tags,
-        luaScript: data.luaScript,
-      },
+      data: createData,
       include: {
         school: true,
-        effects: {
-          include: {
-            effect: true,
-          },
-        },
+        effects: { include: { effect: true } },
         targeting: true,
         restrictions: true,
         savingThrows: true,
@@ -147,31 +140,28 @@ export class AbilitiesService {
   }
 
   async update(id: number, data: UpdateAbilityInput) {
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined) updateData.description = data.description;
+    if (data.gameId !== undefined) updateData.gameId = data.gameId;
+    if (data.abilityType !== undefined) updateData.abilityType = data.abilityType;
+    if (data.schoolId !== undefined) updateData.schoolId = data.schoolId;
+    if (data.minPosition !== undefined) updateData.minPosition = data.minPosition;
+    if (data.violent !== undefined) updateData.violent = data.violent;
+    if (data.castTimeRounds !== undefined) updateData.castTimeRounds = data.castTimeRounds;
+    if (data.cooldownMs !== undefined) updateData.cooldownMs = data.cooldownMs;
+    if (data.inCombatOnly !== undefined) updateData.inCombatOnly = data.inCombatOnly;
+    if (data.isArea !== undefined) updateData.isArea = data.isArea;
+    if (data.notes !== undefined) updateData.notes = data.notes;
+    if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.luaScript !== undefined) updateData.luaScript = data.luaScript;
+
     return this.prisma.ability.update({
       where: { id },
-      data: {
-        name: data.name,
-        description: data.description,
-        gameId: data.gameId,
-        abilityType: data.abilityType,
-        schoolId: data.schoolId,
-        minPosition: data.minPosition,
-        violent: data.violent,
-        castTimeRounds: data.castTimeRounds,
-        cooldownMs: data.cooldownMs,
-        inCombatOnly: data.inCombatOnly,
-        isArea: data.isArea,
-        notes: data.notes,
-        tags: data.tags,
-        luaScript: data.luaScript,
-      },
+      data: updateData,
       include: {
         school: true,
-        effects: {
-          include: {
-            effect: true,
-          },
-        },
+        effects: { include: { effect: true } },
         targeting: true,
         restrictions: true,
         savingThrows: true,
@@ -270,14 +260,13 @@ export class AbilitiesService {
       ];
     }
 
-    return this.prisma.effect.findMany({
+    const args: any = {
       where,
-      skip,
-      take,
-      orderBy: {
-        effectType: 'asc',
-      },
-    });
+      orderBy: { effectType: 'asc' },
+    };
+    if (skip !== undefined) args.skip = skip;
+    if (take !== undefined) args.take = take;
+    return this.prisma.effect.findMany(args);
   }
 
   async countEffects(search?: string) {

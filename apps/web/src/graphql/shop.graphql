@@ -1,0 +1,127 @@
+# Centralized shop operations for codegen
+
+query GetShopEditor($id: Int!, $zoneId: Int!) {
+  shop(id: $id, zoneId: $zoneId) {
+    id
+    buyProfit
+    sellProfit
+    temper
+    noSuchItemMessages
+    doNotBuyMessages
+    missingCashMessages
+    buyMessages
+    sellMessages
+    keeperId
+    zoneId
+    flags
+    tradesWithFlags
+    keeper {
+      id
+      name
+      zoneId
+    }
+    items {
+      id
+      amount
+      objectId
+      objectZoneId
+      object {
+        id
+        name
+        type
+        cost
+      }
+    }
+    accepts {
+      id
+      type
+      keywords
+    }
+    hours {
+      id
+      open
+      close
+    }
+  }
+}
+
+mutation UpdateShopEditor($id: Int!, $zoneId: Int!, $data: UpdateShopInput!) {
+  updateShop(id: $id, zoneId: $zoneId, data: $data) {
+    id
+    buyProfit
+    sellProfit
+  }
+}
+
+mutation CreateShopEditor($data: CreateShopInput!) {
+  createShop(data: $data) {
+    id
+    buyProfit
+    sellProfit
+  }
+}
+
+# New mutations for batch inventory and hours replacement
+mutation UpdateShopInventoryEditor(
+  $zoneId: Int!
+  $id: Int!
+  $items: [ShopItemInput!]!
+) {
+  updateShopInventory(zoneId: $zoneId, id: $id, data: { items: $items }) {
+    id
+    items {
+      id
+      amount
+      objectId
+      objectZoneId
+      object {
+        id
+        name
+        type
+        cost
+      }
+    }
+  }
+}
+
+mutation UpdateShopHoursEditor(
+  $zoneId: Int!
+  $id: Int!
+  $hours: [ShopHourInput!]!
+) {
+  updateShopHours(zoneId: $zoneId, id: $id, data: { hours: $hours }) {
+    id
+    hours {
+      id
+      open
+      close
+    }
+  }
+}
+
+query GetAvailableObjects($zoneId: Int!) {
+  objectsByZone(zoneId: $zoneId) {
+    id
+    keywords
+    name
+    type
+    cost
+    zoneId
+  }
+}
+
+query GetAvailableMobs($zoneId: Int!) {
+  mobsByZone(zoneId: $zoneId) {
+    id
+    keywords
+    name
+    zoneId
+  }
+}
+
+query GetZonesEditor {
+  zones {
+    id
+    name
+  }
+}

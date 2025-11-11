@@ -24,13 +24,14 @@ export class MobsService {
       ];
     }
 
-    const mobs = await this.database.mobs.findMany({
-      skip: args?.skip,
-      take: args?.take,
+    const findArgs: Prisma.MobsFindManyArgs = {
       where: whereClause,
       orderBy: args?.orderBy || { id: 'asc' },
       include: {},
-    });
+    };
+    if (args?.skip !== undefined) findArgs.skip = args.skip;
+    if (args?.take !== undefined) findArgs.take = args.take;
+    const mobs = await this.database.mobs.findMany(findArgs);
     return mobs;
   }
 
@@ -82,7 +83,9 @@ export class MobsService {
   }
 
   async count(where?: Prisma.MobsWhereInput): Promise<number> {
-    return this.database.mobs.count({ where });
+    const countArgs: { where?: Prisma.MobsWhereInput } = {};
+    if (where) countArgs.where = where;
+    return this.database.mobs.count(countArgs);
   }
 
   async create(data: Prisma.MobsCreateInput): Promise<Mobs> {

@@ -1,4 +1,10 @@
-import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
+import {
+  Field,
+  GraphQLISODateTime,
+  ID,
+  ObjectType,
+  registerEnumType,
+} from '@nestjs/graphql';
 import { UserRole } from '@prisma/client';
 import { BanRecord } from './ban-record.entity';
 
@@ -23,28 +29,28 @@ export class User {
   username: string;
 
   // Don't expose password hash
-  passwordHash?: string;
+  passwordHash?: string | null;
 
   @Field(() => UserRole)
   role: UserRole;
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   createdAt: Date;
 
-  @Field()
+  @Field(() => GraphQLISODateTime)
   updatedAt: Date;
 
-  @Field({ nullable: true })
-  lastLoginAt?: Date;
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  lastLoginAt?: Date | null;
 
   // Password reset fields - don't expose in GraphQL
-  resetToken?: string;
-  resetTokenExpiry?: Date;
+  resetToken?: string | null;
+  resetTokenExpiry?: Date | null;
 
   // Security fields - don't expose in GraphQL
-  failedLoginAttempts?: number;
-  lockedUntil?: Date;
-  lastFailedLogin?: Date;
+  failedLoginAttempts?: number; // always present in DB
+  lockedUntil?: Date | null;
+  lastFailedLogin?: Date | null;
 
   @Field(() => [BanRecord], {
     description: 'Ban records for this user',

@@ -1,10 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { useAuth } from '@/contexts/auth-context';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import ScriptEditor, { type Script } from '@/components/ScriptEditor';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   Select,
@@ -13,9 +13,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { Search, Plus, Edit, Trash2, FileText, Database } from 'lucide-react';
-import { PermissionGuard } from '@/components/auth/permission-guard';
-import ScriptEditor, { Script } from '@/components/ScriptEditor';
+import { useAuth } from '@/contexts/auth-context';
+import { Database, Edit, FileText, Plus, Search, Trash2 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 interface PageScript {
   id: number;
@@ -40,16 +40,20 @@ const convertPageScriptToScript = (pageScript: PageScript): Script => ({
 const convertScriptToPageScript = (
   script: Partial<Script>,
   existingScript?: PageScript
-): Partial<PageScript> => ({
-  id: script.id ? parseInt(script.id) : undefined,
-  name: script.name,
-  type:
+): Partial<PageScript> => {
+  const base: Partial<PageScript> = {
+    lastModified: new Date().toISOString(),
+  };
+  if (existingScript?.author) base.author = existingScript.author;
+  if (script.id) base.id = parseInt(script.id);
+  if (script.name) base.name = script.name;
+  const resolvedType =
     (script.attachType as 'ROOM' | 'MOB' | 'OBJECT' | 'GLOBAL') ||
-    existingScript?.type,
-  content: script.commands,
-  lastModified: new Date().toISOString(),
-  author: existingScript?.author,
-});
+    existingScript?.type;
+  if (resolvedType) base.type = resolvedType;
+  if (script.commands) base.content = script.commands;
+  return base;
+};
 
 function ScriptsPageContent() {
   const { user } = useAuth();
@@ -214,14 +218,14 @@ function ScriptsPageContent() {
           </div>
         </div>
 
-        <ScriptEditor
-          script={
-            selectedScript
-              ? convertPageScriptToScript(selectedScript)
-              : undefined
-          }
-          onSave={handleSaveScript}
-        />
+        {selectedScript ? (
+          <ScriptEditor
+            script={convertPageScriptToScript(selectedScript)}
+            onSave={handleSaveScript}
+          />
+        ) : (
+          <ScriptEditor onSave={handleSaveScript} />
+        )}
       </div>
     );
   }

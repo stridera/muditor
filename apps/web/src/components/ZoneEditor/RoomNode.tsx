@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { Handle, NodeProps, Position } from 'reactflow';
+import { Handle, Position, type NodeProps } from 'reactflow';
 
 interface OverlapInfo {
   roomIds: number[];
@@ -17,7 +17,12 @@ interface RoomData {
   roomDescription: string;
   mobs?: Array<{ id: number; name: string; level: number }>;
   objects?: Array<{ id: number; name: string; type: string }>;
-  shops?: Array<{ id: number; buyProfit: number; sellProfit: number; keeperId: number }>;
+  shops?: Array<{
+    id: number;
+    buyProfit: number;
+    sellProfit: number;
+    keeperId: number;
+  }>;
   exits: Array<{
     direction: string;
     toZoneId?: number | null;
@@ -100,7 +105,14 @@ const sectorStyles: Record<
 };
 
 export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
-  const style = sectorStyles[data.sector] || sectorStyles.STRUCTURE;
+  // Rename to sectorStyle to avoid shadowing NodeProps.style and improve clarity.
+  // Explicit annotation ensures it is never treated as possibly undefined.
+  const sectorStyle = (sectorStyles[data.sector] ?? sectorStyles.STRUCTURE) as {
+    bg: string;
+    border: string;
+    icon: string;
+    text: string;
+  };
   const mobCount = data.mobs?.length || 0;
   const objectCount = data.objects?.length || 0;
   const shopCount = data.shops?.length || 0;
@@ -136,12 +148,12 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
         ? 'border-dashed border-blue-400'
         : zLevel < 0
           ? 'border-dotted border-red-600'
-          : style.border
+          : sectorStyle.border
       : floorDifference > 0
         ? 'border-dashed border-blue-300/50' // Upper floors - light blue dashed
         : floorDifference < 0
           ? 'border-dotted border-red-400/50' // Lower floors - light red dotted
-          : style.border,
+          : sectorStyle.border,
 
     // Additional styling for non-current floors
     additionalClasses: isCurrentFloor
@@ -171,7 +183,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
       <div
         className={`
           relative min-w-[160px] max-w-[200px]
-          ${style.bg} ${depthEffects.borderStyle} ${style.text}
+          ${sectorStyle.bg} ${depthEffects.borderStyle} ${sectorStyle.text}
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
           ${depthEffects.additionalClasses}
           ${
@@ -303,7 +315,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
         <div className='px-3 py-2 border-b border-opacity-30 border-gray-400'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
-              <span className='text-lg'>{style.icon}</span>
+              <span className='text-lg'>{sectorStyle.icon}</span>
               <span className='font-bold text-sm'>Room {data.roomId}</span>
             </div>
             <div className='flex items-center gap-1'>
