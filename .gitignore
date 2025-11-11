@@ -11,6 +11,13 @@ build/
 .turbo/
 out/
 coverage/
+dist-types/
+apps/web/tests/e2e/**/*.d.ts
+apps/web/tests/e2e/**/*.d.ts.map
+apps/web/tests/e2e/**/*.js.map
+apps/web/src/**/*.d.ts
+apps/web/src/**/*.d.ts.map
+apps/web/src/**/*.js.map
 
 # Environment variables
 .env
@@ -83,6 +90,9 @@ temp/
 
 # TypeScript
 *.tsbuildinfo
+# Ignore emitted declaration artifacts when using emitDeclarationOnly to avoid accidental commits
+*.d.ts.map
+apps/web/src/**/*.d.ts
 
 # Optional npm cache directory
 .npm

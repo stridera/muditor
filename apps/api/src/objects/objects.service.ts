@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Objects, Prisma } from '@prisma/client';
+import { Objects, ObjectType, Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -12,12 +12,13 @@ export class ObjectsService {
     where?: Prisma.ObjectsWhereInput;
     orderBy?: Prisma.ObjectsOrderByWithRelationInput;
   }): Promise<Objects[]> {
-    return this.database.objects.findMany({
-      skip: args?.skip,
-      take: args?.take,
-      where: args?.where,
+    const findArgs: Prisma.ObjectsFindManyArgs = {
       orderBy: args?.orderBy || { id: 'asc' },
-    });
+    };
+    if (args?.where) findArgs.where = args.where;
+    if (args?.skip !== undefined) findArgs.skip = args.skip;
+    if (args?.take !== undefined) findArgs.take = args.take;
+    return this.database.objects.findMany(findArgs);
   }
 
   async findOne(zoneId: number, id: number): Promise<Objects | null> {
@@ -96,24 +97,19 @@ export class ObjectsService {
     });
   }
 
-  async findByType(type: string): Promise<Objects[]> {
+  async findByType(type: ObjectType): Promise<Objects[]> {
     return this.database.objects.findMany({
-      where: {
-        type: type as any,
-      },
+      where: { type },
       include: {
-        zones: {
-          select: {
-            id: true,
-            name: true,
-          },
-        },
+        zones: { select: { id: true, name: true } },
       },
     });
   }
 
   async count(where?: Prisma.ObjectsWhereInput): Promise<number> {
-    return this.database.objects.count({ where });
+    const countArgs: { where?: Prisma.ObjectsWhereInput } = {};
+    if (where) countArgs.where = where;
+    return this.database.objects.count(countArgs);
   }
 
   async create(data: Prisma.ObjectsCreateInput): Promise<Objects> {

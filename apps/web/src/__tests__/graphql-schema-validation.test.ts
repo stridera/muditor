@@ -357,12 +357,13 @@ export class GraphQLValidator {
    * @param query - The GraphQL query string
    * @returns Array of validation errors (empty if valid)
    */
-  validateQuery(query: string): GraphQLError[] {
+  validateQuery(query: string): ReadonlyArray<GraphQLError> {
     try {
       const document = parse(query);
       return validate(this.schema, document);
     } catch (parseError) {
-      return [new GraphQLError(`Parse error: ${parseError.message}`)];
+      const msg = parseError instanceof Error ? parseError.message : 'Unknown';
+      return [new GraphQLError(`Parse error: ${msg}`)];
     }
   }
 

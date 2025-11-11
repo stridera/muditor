@@ -1,14 +1,10 @@
-import {
-  Injectable,
-  NotFoundException,
-  BadRequestException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
+import { GrantPermission, GrantResourceType, Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
-import { GrantResourceType, GrantPermission } from '@prisma/client';
 import {
   CreateGrantInput,
-  UpdateGrantInput,
   GrantZoneAccessInput,
+  UpdateGrantInput,
 } from './grants.input';
 
 @Injectable()
@@ -39,11 +35,17 @@ export class GrantsService {
       }
     }
 
+    const createData: Prisma.UserGrantsUncheckedCreateInput = {
+      userId: data.userId,
+      resourceType: data.resourceType,
+      resourceId: data.resourceId,
+      permissions: data.permissions as GrantPermission[],
+      grantedBy,
+    };
+    if (data.notes !== undefined) createData.notes = data.notes;
+    if (data.expiresAt) createData.expiresAt = new Date(data.expiresAt);
     return this.db.userGrants.create({
-      data: {
-        ...data,
-        grantedBy,
-      },
+      data: createData,
       include: {
         user: {
           select: {
@@ -63,7 +65,7 @@ export class GrantsService {
    * Find all grants with optional filtering
    */
   async findAll(userId?: string, resourceType?: GrantResourceType) {
-    const where: any = {};
+    const where: Prisma.UserGrantsWhereInput = {};
 
     if (userId) {
       where.userId = userId;
@@ -126,9 +128,19 @@ export class GrantsService {
   async update(id: number, data: UpdateGrantInput) {
     await this.findOne(id); // Ensure grant exists
 
+    const updateData: Prisma.UserGrantsUncheckedUpdateInput = {};
+    if (data.permissions) {
+      updateData.permissions = data.permissions as GrantPermission[];
+    }
+    if (data.notes !== undefined) {
+      updateData.notes = data.notes;
+    }
+    if (data.expiresAt) {
+      updateData.expiresAt = new Date(data.expiresAt);
+    }
     return this.db.userGrants.update({
       where: { id },
-      data,
+      data: updateData,
       include: {
         user: {
           select: {
@@ -159,17 +171,15 @@ export class GrantsService {
    * Grant zone access to a user (convenience method)
    */
   async grantZoneAccess(data: GrantZoneAccessInput, grantedBy: string) {
-    return this.create(
-      {
-        userId: data.userId,
-        resourceType: GrantResourceType.ZONE,
-        resourceId: data.zoneId.toString(),
-        permissions: data.permissions,
-        expiresAt: data.expiresAt,
-        notes: data.notes,
-      },
-      grantedBy
-    );
+    const input: CreateGrantInput = {
+      userId: data.userId,
+      resourceType: GrantResourceType.ZONE,
+      resourceId: data.zoneId.toString(),
+      permissions: data.permissions,
+    };
+    if (data.expiresAt) input.expiresAt = data.expiresAt;
+    if (data.notes) input.notes = data.notes;
+    return this.create(input, grantedBy);
   }
 
   /**
@@ -214,7 +224,7 @@ export class GrantsService {
     });
 
     // Fetch zone names
-    const zoneIds = grants.map((g) => Number(g.resourceId));
+    const zoneIds = grants.map(g => Number(g.resourceId));
     const zones = await this.db.zones.findMany({
       where: {
         id: {
@@ -227,9 +237,9 @@ export class GrantsService {
       },
     });
 
-    const zoneMap = new Map(zones.map((z) => [z.id, z.name]));
+    const zoneMap = new Map(zones.map(z => [z.id, z.name]));
 
-    return grants.map((grant) => ({
+    return grants.map(grant => ({
       zoneId: Number(grant.resourceId),
       zoneName: zoneMap.get(Number(grant.resourceId)) || 'Unknown Zone',
       permissions: grant.permissions,

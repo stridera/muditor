@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
-import { NodeProps } from 'reactflow';
+import type { NodeProps } from 'reactflow';
 
 interface MobData {
   id: number;

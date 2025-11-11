@@ -1,11 +1,7 @@
 'use client';
 
-import {
-  useOnlineCharacters,
-  useMyOnlineCharacters,
-  OnlineCharacter,
-} from '@/hooks/use-character-status';
-import { CharacterStatusCard, OnlineStatus } from './online-status';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,10 +9,14 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { RefreshCw, Users, Gamepad2 } from 'lucide-react';
+import type { OnlineCharacter } from '@/hooks/use-character-status';
+import {
+  useMyOnlineCharacters,
+  useOnlineCharacters,
+} from '@/hooks/use-character-status';
+import { Gamepad2, RefreshCw, Users } from 'lucide-react';
 import { useState } from 'react';
+import { CharacterStatusCard, OnlineStatus } from './online-status';
 
 interface OnlineCharactersListProps {
   showAllUsers?: boolean;

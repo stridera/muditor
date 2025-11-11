@@ -1,7 +1,7 @@
 import { Injectable, Logger } from '@nestjs/common';
 import * as sgMail from '@sendgrid/mail';
-import * as nodemailer from 'nodemailer';
 import type { Transporter } from 'nodemailer';
+import * as nodemailer from 'nodemailer';
 
 export interface EmailOptions {
   to: string;
@@ -91,15 +91,16 @@ export class EmailService {
 
   private async sendWithSendGrid(options: EmailOptions): Promise<boolean> {
     try {
+      // Build message object without undefined fields; defer strict typing until send
       const msg = {
         to: options.to,
         from: process.env.FROM_EMAIL || 'noreply@muditor.com',
         subject: options.subject,
-        text: options.text,
-        html: options.html,
+        ...(options.text ? { text: options.text } : {}),
+        ...(options.html ? { html: options.html } : {}),
       };
 
-      await sgMail.send(msg);
+      await sgMail.send(msg as sgMail.MailDataRequired);
       this.logger.log(`Email sent successfully via SendGrid to: ${options.to}`);
       return true;
     } catch (error) {
@@ -110,12 +111,12 @@ export class EmailService {
 
   private async sendWithSMTP(options: EmailOptions): Promise<boolean> {
     try {
-      const mailOptions = {
+      const mailOptions: nodemailer.SendMailOptions = {
         from: process.env.FROM_EMAIL || process.env.SMTP_USER,
         to: options.to,
         subject: options.subject,
-        text: options.text,
-        html: options.html,
+        ...(options.text ? { text: options.text } : {}),
+        ...(options.html ? { html: options.html } : {}),
       };
 
       await this.smtpTransporter!.sendMail(mailOptions);

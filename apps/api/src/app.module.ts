@@ -1,24 +1,25 @@
+import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
 import { GraphQLModule } from '@nestjs/graphql';
-import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
+import type { Request, Response } from 'express';
 import { join } from 'path';
+import { AbilitiesModule } from './abilities/abilities.module';
+import { AuthModule } from './auth/auth.module';
+import { CharactersModule } from './characters/characters.module';
+import { ClassesModule } from './classes/classes.module';
 import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
-import { AuthModule } from './auth/auth.module';
-import { UsersModule } from './users/users.module';
-import { ZonesModule } from './zones/zones.module';
-import { RoomsModule } from './rooms/rooms.module';
-import { MobsModule } from './mobs/mobs.module';
-import { ObjectsModule } from './objects/objects.module';
-import { ShopsModule } from './shops/shops.module';
-import { TriggersModule } from './triggers/triggers.module';
-import { ValidationModule } from './validation/validation.module';
-import { CharactersModule } from './characters/characters.module';
 import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
 import { GrantsModule } from './grants/grants.module';
-import { AbilitiesModule } from './abilities/abilities.module';
+import { MobsModule } from './mobs/mobs.module';
+import { ObjectsModule } from './objects/objects.module';
 import { RacesModule } from './races/races.module';
-import { ClassesModule } from './classes/classes.module';
+import { RoomsModule } from './rooms/rooms.module';
+import { ShopsModule } from './shops/shops.module';
+import { TriggersModule } from './triggers/triggers.module';
+import { UsersModule } from './users/users.module';
+import { ValidationModule } from './validation/validation.module';
+import { ZonesModule } from './zones/zones.module';
 
 @Module({
   imports: [
@@ -30,21 +31,21 @@ import { ClassesModule } from './classes/classes.module';
       playground: process.env.GRAPHQL_PLAYGROUND === 'true',
       introspection: true, // Required for Apollo Sandbox in Apollo Server 5
       debug: process.env.GRAPHQL_DEBUG === 'true',
-      context: ({ req, res }) => ({ req, res }),
+      context: ({ req, res }: { req: Request; res: Response }) => ({
+        req,
+        res,
+      }),
       // Apollo Server 5 uses graphql-ws by default for subscriptions
       subscriptions: {
         'graphql-ws': {
-          onConnect: (context: any) => {
-            const { connectionParams } = context;
-            return {
-              req: {
-                headers: {
-                  authorization:
-                    connectionParams.Authorization ||
-                    connectionParams.authorization,
-                },
-              },
-            };
+          onConnect: ctx => {
+            const params = (ctx.connectionParams || {}) as Record<
+              string,
+              unknown
+            >;
+            const auth = (params['Authorization'] ||
+              params['authorization']) as string | undefined;
+            return { req: { headers: { authorization: auth } } };
           },
         },
       },

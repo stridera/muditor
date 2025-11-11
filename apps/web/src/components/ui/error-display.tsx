@@ -2,20 +2,20 @@
 
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { 
-  AlertTriangle, 
-  Wifi, 
-  RefreshCw, 
-  LogIn, 
-  Home,
+import type { ErrorDisplayProps } from '@/lib/error-utils';
+import {
   AlertCircle,
-  Info
+  AlertTriangle,
+  Home,
+  Info,
+  LogIn,
+  RefreshCw,
 } from 'lucide-react';
 import Link from 'next/link';
-import { ErrorDisplayProps } from '@/lib/error-utils';
 
 interface ErrorDisplayComponentProps extends ErrorDisplayProps {
-  onRetry?: () => void;
+  // Optional prop but explicitly includes undefined to satisfy exactOptionalPropertyTypes when key present with undefined value
+  onRetry?: (() => void) | undefined;
   showHomeButton?: boolean;
   className?: string;
 }
@@ -33,11 +33,11 @@ export function ErrorDisplay({
   const getIcon = () => {
     switch (variant) {
       case 'warning':
-        return <AlertTriangle className="h-4 w-4" />;
+        return <AlertTriangle className='h-4 w-4' />;
       case 'info':
-        return <Info className="h-4 w-4" />;
+        return <Info className='h-4 w-4' />;
       default:
-        return <AlertCircle className="h-4 w-4" />;
+        return <AlertCircle className='h-4 w-4' />;
     }
   };
 
@@ -54,10 +54,10 @@ export function ErrorDisplay({
 
   const getActionIcon = () => {
     if (actionLabel?.toLowerCase().includes('retry')) {
-      return <RefreshCw className="w-4 h-4 mr-2" />;
+      return <RefreshCw className='w-4 h-4 mr-2' />;
     }
     if (actionLabel?.toLowerCase().includes('log')) {
-      return <LogIn className="w-4 h-4 mr-2" />;
+      return <LogIn className='w-4 h-4 mr-2' />;
     }
     return null;
   };
@@ -66,26 +66,26 @@ export function ErrorDisplay({
     <Alert variant={getVariant()} className={className}>
       {getIcon()}
       <AlertTitle>{title}</AlertTitle>
-      <AlertDescription className="mt-2">
+      <AlertDescription className='mt-2'>
         <p>{message}</p>
-        
+
         {(action || onRetry || actionLabel || showHomeButton) && (
-          <div className="flex flex-col sm:flex-row gap-2 mt-4">
+          <div className='flex flex-col sm:flex-row gap-2 mt-4'>
             {(action || onRetry) && actionLabel && (
               <Button
                 onClick={action || onRetry}
                 variant={variant === 'error' ? 'destructive' : 'default'}
-                size="sm"
+                size='sm'
               >
                 {getActionIcon()}
                 {actionLabel}
               </Button>
             )}
-            
+
             {showHomeButton && (
-              <Button variant="outline" size="sm" asChild>
-                <Link href="/dashboard">
-                  <Home className="w-4 h-4 mr-2" />
+              <Button variant='outline' size='sm' asChild>
+                <Link href='/dashboard'>
+                  <Home className='w-4 h-4 mr-2' />
                   Go to Dashboard
                 </Link>
               </Button>
@@ -100,34 +100,32 @@ export function ErrorDisplay({
 /**
  * Simplified error display for loading states
  */
-export function LoadingError({ 
-  error, 
+export function LoadingError({
+  error,
   onRetry,
-  resource = 'data'
-}: { 
-  error: any; 
+  resource = 'data',
+}: {
+  error: any;
   onRetry?: () => void;
   resource?: string;
 }) {
   return (
-    <div className="bg-red-50 border border-red-200 rounded-md p-4">
-      <div className="flex items-start">
-        <AlertTriangle className="h-5 w-5 text-red-400 mt-0.5 mr-3" />
-        <div className="flex-1">
-          <h3 className="text-red-800 font-medium">
-            Error loading {resource}
-          </h3>
-          <p className="text-red-600 text-sm mt-1">
+    <div className='bg-red-50 border border-red-200 rounded-md p-4'>
+      <div className='flex items-start'>
+        <AlertTriangle className='h-5 w-5 text-red-400 mt-0.5 mr-3' />
+        <div className='flex-1'>
+          <h3 className='text-red-800 font-medium'>Error loading {resource}</h3>
+          <p className='text-red-600 text-sm mt-1'>
             {error?.message || 'An unexpected error occurred'}
           </p>
           {onRetry && (
             <Button
               onClick={onRetry}
-              variant="outline"
-              size="sm"
-              className="mt-3"
+              variant='outline'
+              size='sm'
+              className='mt-3'
             >
-              <RefreshCw className="w-4 h-4 mr-2" />
+              <RefreshCw className='w-4 h-4 mr-2' />
               Try Again
             </Button>
           )}
@@ -143,10 +141,10 @@ export function LoadingError({
 export function NetworkError({ onRetry }: { onRetry?: () => void }) {
   return (
     <ErrorDisplay
-      title="Connection Problem"
-      message="Unable to connect to the server. Please check your internet connection."
-      variant="warning"
-      actionLabel="Retry"
+      title='Connection Problem'
+      message='Unable to connect to the server. Please check your internet connection.'
+      variant='warning'
+      actionLabel='Retry'
       onRetry={onRetry}
       showHomeButton
     />
@@ -159,11 +157,11 @@ export function NetworkError({ onRetry }: { onRetry?: () => void }) {
 export function AuthError() {
   return (
     <ErrorDisplay
-      title="Session Expired"
-      message="Your session has expired. Please log in again to continue."
-      variant="error"
-      actionLabel="Log In"
-      action={() => window.location.href = '/login'}
+      title='Session Expired'
+      message='Your session has expired. Please log in again to continue.'
+      variant='error'
+      actionLabel='Log In'
+      action={() => (window.location.href = '/login')}
     />
   );
 }

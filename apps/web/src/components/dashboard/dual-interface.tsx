@@ -1,8 +1,7 @@
 'use client';
 
-import { ReactNode, useState } from 'react';
-import { usePermissions } from '@/hooks/use-permissions';
-import { useAuth } from '@/contexts/auth-context';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -10,17 +9,19 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
+import { useAuth } from '@/contexts/auth-context';
+import { usePermissions } from '@/hooks/use-permissions';
 import {
-  Loader2,
-  Shield,
-  Users,
   Code,
   Crown,
+  Loader2,
+  Shield,
   ToggleLeft,
   ToggleRight,
+  Users,
 } from 'lucide-react';
+import type { ReactNode } from 'react';
+import { useState } from 'react';
 
 interface DualInterfaceProps {
   children: ReactNode;

@@ -18,17 +18,18 @@ describe('AuthService', () => {
   let emailService: jest.Mocked<EmailService>;
 
   beforeEach(async () => {
+    // Provide only the methods the service actually calls; cast with unknown first to avoid forcing full delegate surface
     const mockDatabaseService = {
-      user: {
+      users: {
         findFirst: jest.fn(),
         findUnique: jest.fn(),
         create: jest.fn(),
         update: jest.fn(),
       },
-      banRecord: {
+      banRecords: {
         findFirst: jest.fn(),
       },
-    } as any;
+    } as unknown as Pick<DatabaseService, 'users' | 'banRecords'>;
 
     const mockJwtService = {
       sign: jest.fn(),
@@ -64,7 +65,9 @@ describe('AuthService', () => {
     };
 
     it('should return user without password hash when credentials are valid', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        mockUser
+      );
       (bcrypt.compare as jest.Mock).mockResolvedValue(true);
 
       const result = await service.validateUser('testuser', 'password123');
@@ -94,7 +97,9 @@ describe('AuthService', () => {
     });
 
     it('should return null when password is incorrect', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        mockUser
+      );
       (bcrypt.compare as jest.Mock).mockResolvedValue(false);
 
       const result = await service.validateUser('testuser', 'wrongpassword');
@@ -123,7 +128,7 @@ describe('AuthService', () => {
     beforeEach(() => {
       (bcrypt.hash as jest.Mock).mockResolvedValue('hashedpassword');
       jwtService.sign.mockReturnValue('jwt-token');
-      emailService.sendWelcomeEmail.mockResolvedValue(undefined);
+      emailService.sendWelcomeEmail.mockResolvedValue(true);
     });
 
     it('should successfully register a new user', async () => {
@@ -137,18 +142,25 @@ describe('AuthService', () => {
       expect(result).toEqual({
         accessToken: 'jwt-token',
         user: {
-          ...mockCreatedUser,
+          id: mockCreatedUser.id,
+          email: mockCreatedUser.email,
+          username: mockCreatedUser.username,
+          role: mockCreatedUser.role,
+          createdAt: mockCreatedUser.createdAt,
+          updatedAt: mockCreatedUser.updatedAt,
           isBanned: false,
         },
       });
-      expect(databaseService.users.create).toHaveBeenCalledWith({
-        data: {
-          username: 'newuser',
-          email: 'new@example.com',
-          passwordHash: 'hashedpassword',
-          role: UserRole.PLAYER,
-        },
-      });
+      expect(databaseService.users.create).toHaveBeenCalledWith(
+        expect.objectContaining({
+          data: expect.objectContaining({
+            username: 'newuser',
+            email: 'new@example.com',
+            passwordHash: 'hashedpassword',
+            role: UserRole.PLAYER,
+          }),
+        })
+      );
       expect(emailService.sendWelcomeEmail).toHaveBeenCalledWith(
         'new@example.com',
         'newuser'
@@ -193,7 +205,12 @@ describe('AuthService', () => {
       expect(result).toEqual({
         accessToken: 'jwt-token',
         user: {
-          ...mockCreatedUser,
+          id: mockCreatedUser.id,
+          email: mockCreatedUser.email,
+          username: mockCreatedUser.username,
+          role: mockCreatedUser.role,
+          createdAt: mockCreatedUser.createdAt,
+          updatedAt: mockCreatedUser.updatedAt,
           isBanned: false,
         },
       });
@@ -210,7 +227,16 @@ describe('AuthService', () => {
       id: 'user-id',
       email: 'test@example.com',
       username: 'testuser',
+      passwordHash: 'hash',
       role: UserRole.PLAYER,
+      createdAt: new Date(),
+      updatedAt: new Date(),
+      lastLoginAt: null,
+      resetToken: null,
+      resetTokenExpiry: null,
+      failedLoginAttempts: 0,
+      lockedUntil: null,
+      lastFailedLogin: null,
     };
 
     beforeEach(() => {
@@ -229,7 +255,13 @@ describe('AuthService', () => {
       expect(result).toEqual({
         accessToken: 'jwt-token',
         user: {
-          ...mockUser,
+          id: mockUser.id,
+          email: mockUser.email,
+          username: mockUser.username,
+          role: mockUser.role,
+          createdAt: mockUser.createdAt,
+          updatedAt: mockUser.updatedAt,
+          lastLoginAt: mockUser.lastLoginAt,
           isBanned: false,
         },
       });
@@ -276,7 +308,13 @@ describe('AuthService', () => {
       expect(result).toEqual({
         accessToken: 'jwt-token',
         user: {
-          ...mockUser,
+          id: mockUser.id,
+          email: mockUser.email,
+          username: mockUser.username,
+          role: mockUser.role,
+          createdAt: mockUser.createdAt,
+          updatedAt: mockUser.updatedAt,
+          lastLoginAt: mockUser.lastLoginAt,
           isBanned: false,
         },
       });
@@ -293,7 +331,11 @@ describe('AuthService', () => {
       });
 
       // Use reflection to access private method
-      const result = await (service as any).checkBanStatus('user-id');
+      const result = await (
+        service as unknown as {
+          checkBanStatus: (id: string) => Promise<boolean>;
+        }
+      ).checkBanStatus('user-id');
 
       expect(result).toBe(true);
     });
@@ -309,7 +351,11 @@ describe('AuthService', () => {
         expiresAt: futureDate,
       });
 
-      const result = await (service as any).checkBanStatus('user-id');
+      const result = await (
+        service as unknown as {
+          checkBanStatus: (id: string) => Promise<boolean>;
+        }
+      ).checkBanStatus('user-id');
 
       expect(result).toBe(true);
     });
@@ -319,7 +365,11 @@ describe('AuthService', () => {
         null
       );
 
-      const result = await (service as any).checkBanStatus('user-id');
+      const result = await (
+        service as unknown as {
+          checkBanStatus: (id: string) => Promise<boolean>;
+        }
+      ).checkBanStatus('user-id');
 
       expect(result).toBe(false);
     });
@@ -333,9 +383,11 @@ describe('AuthService', () => {
     };
 
     it('should generate reset token and send email for existing user', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(mockUser);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        mockUser
+      );
       (databaseService.users.update as jest.Mock).mockResolvedValue(mockUser);
-      emailService.sendPasswordResetEmail.mockResolvedValue(undefined);
+      emailService.sendPasswordResetEmail.mockResolvedValue(true);
 
       const result = await service.requestPasswordReset('test@example.com');
 

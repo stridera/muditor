@@ -6,8 +6,8 @@
       "dom.iterable",
       "es6"
     ],
-    "allowJs": true,
-    "skipLibCheck": true,
+    "allowJs": false,
+    "skipLibCheck": false,
     "strict": true,
     "noEmit": true,
     "esModuleInterop": true,
@@ -15,6 +15,10 @@
     "moduleResolution": "bundler",
     "resolveJsonModule": true,
     "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedIndexedAccess": true,
+    "useUnknownInCatchVariables": true,
     "jsx": "preserve",
     "incremental": true,
     "plugins": [
@@ -42,18 +46,26 @@
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "declarationMap": true,
-    "sourceMap": true
+    "sourceMap": true,
+    // Remove direct react types from root to avoid missing resolution; rely on per-package tsconfig for react types
+    "types": [
+      "node",
+      "jest"
+    ],
+    "typeRoots": [
+      "./node_modules/@types"
+    ]
   },
   "include": [
     "**/*.ts",
-    "**/*.tsx",
-    "**/.next/types/**/*.ts"
+    "**/*.tsx"
   ],
   "exclude": [
     "node_modules",
     "dist",
     "build",
-    ".next"
+    ".next",
+    "packages/db/apps/**"
   ],
   "references": [
     {

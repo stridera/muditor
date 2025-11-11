@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface Room {
   id: number;
@@ -37,10 +37,15 @@ export function LayoutVisualization({
   positions,
   overlaps,
   selectedStartRoom,
-  onRoomClick
+  onRoomClick,
 }: LayoutVisualizationProps) {
   const svgRef = useRef<SVGSVGElement>(null);
-  const [viewBox, setViewBox] = useState({ x: 0, y: 0, width: 800, height: 600 });
+  const [viewBox, setViewBox] = useState({
+    x: 0,
+    y: 0,
+    width: 800,
+    height: 600,
+  });
   const [zoom, setZoom] = useState(1);
   const [pan, setPan] = useState({ x: 0, y: 0 });
   const [isDragging, setIsDragging] = useState(false);
@@ -52,7 +57,7 @@ export function LayoutVisualization({
   const gridToSvg = (gridX: number, gridY: number) => {
     return {
       x: gridX * GRID_SIZE + 400, // Center offset
-      y: gridY * GRID_SIZE + 300  // Center offset
+      y: gridY * GRID_SIZE + 300, // Center offset
     };
   };
 
@@ -73,14 +78,17 @@ export function LayoutVisualization({
       gridPos: pos,
       svgPos,
       isStartRoom: roomId === selectedStartRoom,
-      hasOverlap: overlaps.some(overlap => overlap.roomIds.includes(roomId))
+      hasOverlap: overlaps.some(overlap => overlap.roomIds.includes(roomId)),
     };
   });
 
   // Filter by selected Z-level
-  const roomPositions = selectedZLevel === 'all'
-    ? allRoomPositions
-    : allRoomPositions.filter(roomPos => (roomPos.gridPos.z || 0) === selectedZLevel);
+  const roomPositions =
+    selectedZLevel === 'all'
+      ? allRoomPositions
+      : allRoomPositions.filter(
+          roomPos => (roomPos.gridPos.z || 0) === selectedZLevel
+        );
 
   // Calculate connections between rooms (only show connections on current Z-level)
   const connections = roomPositions.flatMap(roomPos => {
@@ -88,22 +96,26 @@ export function LayoutVisualization({
 
     return roomPos.room.exits
       .filter(exit => {
-        if (exit.destination === null || exit.destination === undefined || !positions[exit.destination]) return false;
-
-        const destPos = positions[exit.destination];
+        const destPos =
+          exit.destination != null ? positions[exit.destination] : undefined;
+        if (!destPos) return false;
         const destZLevel = destPos.z || 0;
         const currentZLevel = roomPos.gridPos.z || 0;
 
         // If filtering by specific Z-level, only show connections within that level
         if (selectedZLevel !== 'all') {
-          return destZLevel === selectedZLevel && currentZLevel === selectedZLevel;
+          return (
+            destZLevel === selectedZLevel && currentZLevel === selectedZLevel
+          );
         }
 
         // If showing all levels, show all connections
         return true;
       })
       .map(exit => {
-        const destPos = positions[exit.destination!];
+        const destPos =
+          exit.destination != null ? positions[exit.destination] : undefined;
+        if (!destPos) return null; // Guard against undefined
         const destSvgPos = gridToSvg(destPos.x, destPos.y);
 
         return {
@@ -111,9 +123,16 @@ export function LayoutVisualization({
           to: destSvgPos,
           direction: exit.direction,
           fromRoom: roomPos.id,
-          toRoom: exit.destination!
+          toRoom: exit.destination!,
         };
-      });
+      })
+      .filter(Boolean) as Array<{
+      from: { x: number; y: number };
+      to: { x: number; y: number };
+      direction: string;
+      fromRoom: number;
+      toRoom: number;
+    }>;
   });
 
   // Auto-fit view to show all rooms
@@ -153,7 +172,7 @@ export function LayoutVisualization({
 
     setPan({
       x: lastPan.x + deltaX / zoom,
-      y: lastPan.y + deltaY / zoom
+      y: lastPan.y + deltaY / zoom,
     });
   };
 
@@ -174,60 +193,71 @@ export function LayoutVisualization({
 
   if (roomPositions.length === 0) {
     return (
-      <div className="h-full flex items-center justify-center bg-gray-50 rounded-lg border">
-        <div className="text-center text-gray-500">
-          <p className="text-lg font-medium">No Layout Data</p>
-          <p className="text-sm">Run the algorithm to see room positions</p>
+      <div className='h-full flex items-center justify-center bg-gray-50 rounded-lg border'>
+        <div className='text-center text-gray-500'>
+          <p className='text-lg font-medium'>No Layout Data</p>
+          <p className='text-sm'>Run the algorithm to see room positions</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="h-full flex flex-col bg-white rounded-lg border">
+    <div className='h-full flex flex-col bg-white rounded-lg border'>
       {/* Controls */}
-      <div className="flex items-center justify-between p-3 border-b bg-gray-50">
-        <div className="flex items-center gap-2">
-          <span className="text-sm font-medium">Layout Visualization</span>
-          <span className="text-xs text-gray-500">
+      <div className='flex items-center justify-between p-3 border-b bg-gray-50'>
+        <div className='flex items-center gap-2'>
+          <span className='text-sm font-medium'>Layout Visualization</span>
+          <span className='text-xs text-gray-500'>
             {roomPositions.length} rooms • Zoom: {(zoom * 100).toFixed(0)}%
           </span>
         </div>
-        <div className="flex items-center gap-2">
+        <div className='flex items-center gap-2'>
           {/* Z-Level Filter */}
-          <div className="flex items-center gap-1">
-            <span className="text-xs text-gray-600">Z-Level:</span>
+          <div className='flex items-center gap-1'>
+            <span className='text-xs text-gray-600'>Z-Level:</span>
             <select
               value={selectedZLevel}
-              onChange={(e) => setSelectedZLevel(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
-              className="px-1 py-0.5 text-xs border rounded"
+              onChange={e =>
+                setSelectedZLevel(
+                  e.target.value === 'all' ? 'all' : parseInt(e.target.value)
+                )
+              }
+              className='px-1 py-0.5 text-xs border rounded'
             >
-              <option value="all">All ({availableZLevels.length} levels)</option>
+              <option value='all'>
+                All ({availableZLevels.length} levels)
+              </option>
               {availableZLevels.map(level => (
                 <option key={level} value={level}>
-                  Z{level} ({allRoomPositions.filter(r => (r.gridPos.z || 0) === level).length} rooms)
+                  Z{level} (
+                  {
+                    allRoomPositions.filter(r => (r.gridPos.z || 0) === level)
+                      .length
+                  }{' '}
+                  rooms)
                 </option>
               ))}
             </select>
           </div>
 
           {/* Zoom Controls */}
-          <div className="flex items-center gap-1">
+          <div className='flex items-center gap-1'>
             <button
               onClick={handleZoomIn}
-              className="px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+              className='px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50'
             >
               +
             </button>
             <button
               onClick={handleZoomOut}
-              className="px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+              className='px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50'
             >
               −
             </button>
             <button
               onClick={handleReset}
-              className="px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50"
+              className='px-2 py-1 text-xs bg-white border rounded hover:bg-gray-50'
             >
               Reset
             </button>
@@ -236,44 +266,68 @@ export function LayoutVisualization({
       </div>
 
       {/* Legend */}
-      <div className="flex items-center gap-4 px-3 py-2 text-xs border-b bg-gray-50">
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: ROOM_COLOR }}></div>
+      <div className='flex items-center gap-4 px-3 py-2 text-xs border-b bg-gray-50'>
+        <div className='flex items-center gap-1'>
+          <div
+            className='w-3 h-3 rounded'
+            style={{ backgroundColor: ROOM_COLOR }}
+          ></div>
           <span>Room</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: START_ROOM_COLOR }}></div>
+        <div className='flex items-center gap-1'>
+          <div
+            className='w-3 h-3 rounded'
+            style={{ backgroundColor: START_ROOM_COLOR }}
+          ></div>
           <span>Start Room</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-3 h-3 rounded" style={{ backgroundColor: OVERLAP_COLOR }}></div>
+        <div className='flex items-center gap-1'>
+          <div
+            className='w-3 h-3 rounded'
+            style={{ backgroundColor: OVERLAP_COLOR }}
+          ></div>
           <span>Overlap</span>
         </div>
-        <div className="flex items-center gap-1">
-          <div className="w-4 h-0.5" style={{ backgroundColor: CONNECTION_COLOR }}></div>
+        <div className='flex items-center gap-1'>
+          <div
+            className='w-4 h-0.5'
+            style={{ backgroundColor: CONNECTION_COLOR }}
+          ></div>
           <span>Exit</span>
         </div>
-        <div className="flex items-center gap-1">
-          <svg width="12" height="12" viewBox="0 0 12 12">
-            <polygon points="6,2 4,6 8,6" fill="white" stroke={ROOM_COLOR} strokeWidth="1"/>
+        <div className='flex items-center gap-1'>
+          <svg width='12' height='12' viewBox='0 0 12 12'>
+            <polygon
+              points='6,2 4,6 8,6'
+              fill='white'
+              stroke={ROOM_COLOR}
+              strokeWidth='1'
+            />
           </svg>
           <span>UP</span>
         </div>
-        <div className="flex items-center gap-1">
-          <svg width="12" height="12" viewBox="0 0 12 12">
-            <polygon points="6,10 4,6 8,6" fill="white" stroke={ROOM_COLOR} strokeWidth="1"/>
+        <div className='flex items-center gap-1'>
+          <svg width='12' height='12' viewBox='0 0 12 12'>
+            <polygon
+              points='6,10 4,6 8,6'
+              fill='white'
+              stroke={ROOM_COLOR}
+              strokeWidth='1'
+            />
           </svg>
           <span>DOWN</span>
         </div>
       </div>
 
       {/* SVG Visualization */}
-      <div className="flex-1 overflow-hidden">
+      <div className='flex-1 overflow-hidden'>
         <svg
           ref={svgRef}
           className={`w-full h-full ${isDragging ? 'cursor-grabbing' : 'cursor-grab'}`}
           viewBox={`${viewBox.x} ${viewBox.y} ${viewBox.width} ${viewBox.height}`}
-          style={{ transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)` }}
+          style={{
+            transform: `scale(${zoom}) translate(${pan.x}px, ${pan.y}px)`,
+          }}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
           onMouseUp={handleMouseUp}
@@ -281,16 +335,21 @@ export function LayoutVisualization({
         >
           {/* Grid lines */}
           <defs>
-            <pattern id="grid" width={GRID_SIZE} height={GRID_SIZE} patternUnits="userSpaceOnUse">
+            <pattern
+              id='grid'
+              width={GRID_SIZE}
+              height={GRID_SIZE}
+              patternUnits='userSpaceOnUse'
+            >
               <path
                 d={`M ${GRID_SIZE} 0 L 0 0 0 ${GRID_SIZE}`}
-                fill="none"
-                stroke="#f1f5f9"
-                strokeWidth="1"
+                fill='none'
+                stroke='#f1f5f9'
+                strokeWidth='1'
               />
             </pattern>
           </defs>
-          <rect width="100%" height="100%" fill="url(#grid)" />
+          <rect width='100%' height='100%' fill='url(#grid)' />
 
           {/* Connections (drawn first so they appear behind rooms) */}
           {connections.map((conn, index) => (
@@ -301,8 +360,8 @@ export function LayoutVisualization({
               x2={conn.to.x}
               y2={conn.to.y}
               stroke={CONNECTION_COLOR}
-              strokeWidth="2"
-              strokeOpacity="0.6"
+              strokeWidth='2'
+              strokeOpacity='0.6'
             />
           ))}
 
@@ -311,15 +370,15 @@ export function LayoutVisualization({
             const color = roomPos.hasOverlap
               ? OVERLAP_COLOR
               : roomPos.isStartRoom
-              ? START_ROOM_COLOR
-              : ROOM_COLOR;
+                ? START_ROOM_COLOR
+                : ROOM_COLOR;
 
             // Check for UP/DOWN exits
-            const hasUpExit = roomPos.room?.exits.some(exit =>
-              exit.direction.toLowerCase() === 'up'
+            const hasUpExit = roomPos.room?.exits.some(
+              exit => exit.direction.toLowerCase() === 'up'
             );
-            const hasDownExit = roomPos.room?.exits.some(exit =>
-              exit.direction.toLowerCase() === 'down'
+            const hasDownExit = roomPos.room?.exits.some(
+              exit => exit.direction.toLowerCase() === 'down'
             );
 
             return (
@@ -330,20 +389,20 @@ export function LayoutVisualization({
                   cy={roomPos.svgPos.y}
                   r={ROOM_SIZE / 2}
                   fill={color}
-                  stroke="white"
-                  strokeWidth="2"
-                  opacity="0.9"
+                  stroke='white'
+                  strokeWidth='2'
+                  opacity='0.9'
                   style={{ cursor: 'pointer' }}
-                  onClick={(e) => handleRoomClick(roomPos.id, e)}
+                  onClick={e => handleRoomClick(roomPos.id, e)}
                 />
 
                 {/* UP exit indicator */}
                 {hasUpExit && (
                   <polygon
                     points={`${roomPos.svgPos.x},${roomPos.svgPos.y - ROOM_SIZE / 2 - 6} ${roomPos.svgPos.x - 4},${roomPos.svgPos.y - ROOM_SIZE / 2 - 12} ${roomPos.svgPos.x + 4},${roomPos.svgPos.y - ROOM_SIZE / 2 - 12}`}
-                    fill="white"
+                    fill='white'
                     stroke={color}
-                    strokeWidth="1"
+                    strokeWidth='1'
                   />
                 )}
 
@@ -351,9 +410,9 @@ export function LayoutVisualization({
                 {hasDownExit && (
                   <polygon
                     points={`${roomPos.svgPos.x},${roomPos.svgPos.y + ROOM_SIZE / 2 + 6} ${roomPos.svgPos.x - 4},${roomPos.svgPos.y + ROOM_SIZE / 2 + 12} ${roomPos.svgPos.x + 4},${roomPos.svgPos.y + ROOM_SIZE / 2 + 12}`}
-                    fill="white"
+                    fill='white'
                     stroke={color}
-                    strokeWidth="1"
+                    strokeWidth='1'
                   />
                 )}
 
@@ -361,11 +420,11 @@ export function LayoutVisualization({
                 <text
                   x={roomPos.svgPos.x}
                   y={roomPos.svgPos.y}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="white"
-                  fontSize="10"
-                  fontWeight="bold"
+                  textAnchor='middle'
+                  dominantBaseline='middle'
+                  fill='white'
+                  fontSize='10'
+                  fontWeight='bold'
                 >
                   {roomPos.id}
                 </text>
@@ -375,10 +434,10 @@ export function LayoutVisualization({
                   <text
                     x={roomPos.svgPos.x}
                     y={roomPos.svgPos.y - ROOM_SIZE / 2 - 8}
-                    textAnchor="middle"
+                    textAnchor='middle'
                     fill={color}
-                    fontSize="8"
-                    fontWeight="bold"
+                    fontSize='8'
+                    fontWeight='bold'
                   >
                     Z{roomPos.gridPos.z}
                   </text>
@@ -401,8 +460,9 @@ export function LayoutVisualization({
       </div>
 
       {/* Status info */}
-      <div className="px-3 py-2 text-xs text-gray-600 border-t bg-gray-50">
-        Grid coordinates • Each square = 1 unit • Click and drag to pan • Use zoom controls above
+      <div className='px-3 py-2 text-xs text-gray-600 border-t bg-gray-50'>
+        Grid coordinates • Each square = 1 unit • Click and drag to pan • Use
+        zoom controls above
       </div>
     </div>
   );

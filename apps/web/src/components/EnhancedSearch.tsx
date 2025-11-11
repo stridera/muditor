@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { Search, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { ChevronDown, ChevronUp, Filter, Search, X } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 export interface SearchFilters {
   searchTerm: string;
@@ -74,7 +74,18 @@ export default function EnhancedSearch({
   }, [filters, onFiltersChange]);
 
   const updateFilters = (updates: Partial<SearchFilters>) => {
-    setFilters(prev => ({ ...prev, ...updates }));
+    setFilters(prev => {
+      const next: SearchFilters = { ...prev };
+      for (const [key, value] of Object.entries(updates)) {
+        if (value === undefined) {
+          // Omit undefined keys entirely to satisfy exactOptionalPropertyTypes
+          delete (next as any)[key];
+        } else {
+          (next as any)[key] = value;
+        }
+      }
+      return next;
+    });
   };
 
   const toggleType = (type: string) => {
@@ -197,27 +208,35 @@ export default function EnhancedSearch({
                   <input
                     type='number'
                     placeholder='Min'
-                    value={filters.levelMin || ''}
-                    onChange={e =>
-                      updateFilters({
-                        levelMin: e.target.value
-                          ? parseInt(e.target.value)
-                          : undefined,
-                      })
-                    }
+                    value={filters.levelMin ?? ''}
+                    onChange={e => {
+                      const raw = e.target.value;
+                      if (raw === '') {
+                        setFilters(prev => {
+                          const { levelMin, ...rest } = prev;
+                          return rest as SearchFilters;
+                        });
+                      } else {
+                        updateFilters({ levelMin: parseInt(raw, 10) });
+                      }
+                    }}
                     className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                   />
                   <input
                     type='number'
                     placeholder='Max'
-                    value={filters.levelMax || ''}
-                    onChange={e =>
-                      updateFilters({
-                        levelMax: e.target.value
-                          ? parseInt(e.target.value)
-                          : undefined,
-                      })
-                    }
+                    value={filters.levelMax ?? ''}
+                    onChange={e => {
+                      const raw = e.target.value;
+                      if (raw === '') {
+                        setFilters(prev => {
+                          const { levelMax, ...rest } = prev;
+                          return rest as SearchFilters;
+                        });
+                      } else {
+                        updateFilters({ levelMax: parseInt(raw, 10) });
+                      }
+                    }}
                     className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
                   />
                 </div>

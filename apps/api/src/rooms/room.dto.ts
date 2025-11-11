@@ -161,6 +161,38 @@ export class CreateRoomInput {
   @Field(() => Int)
   @IsNumber()
   zoneId: number;
+
+  // Optional spatial coordinates (auto-computed when creating relative to an existing room)
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  layoutX?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  layoutY?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  layoutZ?: number;
+
+  // Create relative to an existing room (e.g. "New room, North")
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  sourceZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  sourceRoomId?: number;
+
+  @Field(() => Direction, { nullable: true })
+  @IsOptional()
+  @IsEnum(Direction)
+  directionFromSource?: Direction;
 }
 
 @InputType()
@@ -271,8 +303,8 @@ export class BatchUpdateResult {
   @Field(() => Int)
   updatedCount: number;
 
-  @Field(() => [String], { nullable: true })
-  errors?: string[];
+  @Field(() => [String])
+  errors: string[];
 }
 
 @InputType()

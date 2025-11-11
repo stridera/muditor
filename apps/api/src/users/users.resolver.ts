@@ -1,26 +1,32 @@
+import { UseGuards } from '@nestjs/common';
 import {
-  Resolver,
-  Query,
   Args,
+  Field,
   ID,
   Mutation,
-  ResolveField,
-  Parent,
   ObjectType,
-  Field,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
 } from '@nestjs/graphql';
-import { UseGuards } from '@nestjs/common';
-import { UsersService } from './users.service';
-import { User } from './entities/user.entity';
-import { BanRecord } from './entities/ban-record.entity';
+import { UserRole } from '@prisma/client';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { Roles } from '../auth/decorators/roles.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
-import { Roles } from '../auth/decorators/roles.decorator';
-import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { UserRole } from '@prisma/client';
-import { UpdateUserInput } from './dto/update-user.input';
 import { BanUserInput } from './dto/ban-user.input';
 import { UnbanUserInput } from './dto/unban-user.input';
+import { UpdateUserInput } from './dto/update-user.input';
+import { BanRecord } from './entities/ban-record.entity';
+import { User } from './entities/user.entity';
+import { UsersService } from './users.service';
+
+interface CurrentUserContext {
+  id: string;
+  username?: string;
+  role?: UserRole;
+}
 
 @ObjectType()
 export class UserPermissions {
@@ -92,7 +98,7 @@ export class UsersResolver {
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async banUser(
     @Args('input') input: BanUserInput,
-    @CurrentUser() currentUser: any
+    @CurrentUser() currentUser: CurrentUserContext
   ): Promise<BanRecord> {
     return this.usersService.banUser(input, currentUser.id);
   }
@@ -102,7 +108,7 @@ export class UsersResolver {
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async unbanUser(
     @Args('input') input: UnbanUserInput,
-    @CurrentUser() currentUser: any
+    @CurrentUser() currentUser: CurrentUserContext
   ): Promise<BanRecord> {
     return this.usersService.unbanUser(input.userId, currentUser.id);
   }
@@ -114,8 +120,11 @@ export class UsersResolver {
 
   @Query(() => UserPermissions, { name: 'myPermissions' })
   @UseGuards(GraphQLJwtAuthGuard)
-  async getMyPermissions(@CurrentUser() user: any): Promise<UserPermissions> {
-    return this.usersService.getUserPermissions(user);
+  async getMyPermissions(
+    @CurrentUser() user: CurrentUserContext
+  ): Promise<UserPermissions> {
+    const full = await this.usersService.findOne(user.id);
+    return this.usersService.getUserPermissions(full);
   }
 
   @Query(() => UserPermissions, { name: 'userPermissions' })

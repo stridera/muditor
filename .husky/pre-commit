@@ -1,0 +1,15 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Fast safety gates (keep lightweight to avoid dev friction)
+# 1. Type check API & shared packages (fail fast on types) - skip web full lint due to current warnings
+pnpm --filter @muditor/api type-check || exit 1
+pnpm --filter @muditor/db type-check || exit 1
+pnpm --filter @muditor/types type-check || exit 1
+
+# 2. Optional staged lint (only if env variable set to reduce slowdown)
+if [ "$MEDITOR_STRICT_PRECOMMIT" = "1" ]; then
+  pnpm lint || exit 1
+fi
+
+echo "✅ Pre-commit checks passed (set MEDITOR_STRICT_PRECOMMIT=1 for full lint)."

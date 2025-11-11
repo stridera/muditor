@@ -38,40 +38,40 @@ export interface AutoLayoutExit {
 // Enhanced direction to coordinate offset mapping with dynamic spacing for natural layout
 const BASE_DIRECTION_OFFSETS: Record<string, { x: number; y: number }> = {
   // All caps versions (for compatibility)
-  'NORTH': { x: 0, y: -1 },
-  'SOUTH': { x: 0, y: 1 },
-  'EAST': { x: 1, y: 0 },
-  'WEST': { x: -1, y: 0 },
-  'NORTHEAST': { x: 1, y: -1 },
-  'NORTHWEST': { x: -1, y: -1 },
-  'SOUTHEAST': { x: 1, y: 1 },
-  'SOUTHWEST': { x: -1, y: 1 },
-  'UP': { x: 0, y: 0 }, // UP/DOWN maintain same X/Y position
-  'DOWN': { x: 0, y: 0 },
+  NORTH: { x: 0, y: -1 },
+  SOUTH: { x: 0, y: 1 },
+  EAST: { x: 1, y: 0 },
+  WEST: { x: -1, y: 0 },
+  NORTHEAST: { x: 1, y: -1 },
+  NORTHWEST: { x: -1, y: -1 },
+  SOUTHEAST: { x: 1, y: 1 },
+  SOUTHWEST: { x: -1, y: 1 },
+  UP: { x: 0, y: 0 }, // UP/DOWN maintain same X/Y position
+  DOWN: { x: 0, y: 0 },
 
   // Capitalized versions (actual world data format)
-  'North': { x: 0, y: -1 },
-  'South': { x: 0, y: 1 },
-  'East': { x: 1, y: 0 },
-  'West': { x: -1, y: 0 },
-  'Northeast': { x: 1, y: -1 },
-  'Northwest': { x: -1, y: -1 },
-  'Southeast': { x: 1, y: 1 },
-  'Southwest': { x: -1, y: 1 },
-  'Up': { x: 0, y: 0 },
-  'Down': { x: 0, y: 0 },
+  North: { x: 0, y: -1 },
+  South: { x: 0, y: 1 },
+  East: { x: 1, y: 0 },
+  West: { x: -1, y: 0 },
+  Northeast: { x: 1, y: -1 },
+  Northwest: { x: -1, y: -1 },
+  Southeast: { x: 1, y: 1 },
+  Southwest: { x: -1, y: 1 },
+  Up: { x: 0, y: 0 },
+  Down: { x: 0, y: 0 },
 
   // Lowercase versions (for completeness)
-  'north': { x: 0, y: -1 },
-  'south': { x: 0, y: 1 },
-  'east': { x: 1, y: 0 },
-  'west': { x: -1, y: 0 },
-  'northeast': { x: 1, y: -1 },
-  'northwest': { x: -1, y: -1 },
-  'southeast': { x: 1, y: 1 },
-  'southwest': { x: -1, y: 1 },
-  'up': { x: 0, y: 0 },
-  'down': { x: 0, y: 0 },
+  north: { x: 0, y: -1 },
+  south: { x: 0, y: 1 },
+  east: { x: 1, y: 0 },
+  west: { x: -1, y: 0 },
+  northeast: { x: 1, y: -1 },
+  northwest: { x: -1, y: -1 },
+  southeast: { x: 1, y: 1 },
+  southwest: { x: -1, y: 1 },
+  up: { x: 0, y: 0 },
+  down: { x: 0, y: 0 },
 };
 
 /**
@@ -96,13 +96,16 @@ function calculateDynamicSpacing(rooms: AutoLayoutRoom[]): number {
 /**
  * Get directional offset with dynamic spacing
  */
-function getDirectionalOffset(direction: string, spacing: number): { x: number; y: number } {
+function getDirectionalOffset(
+  direction: string,
+  spacing: number
+): { x: number; y: number } {
   const baseOffset = BASE_DIRECTION_OFFSETS[direction];
   if (!baseOffset) return { x: spacing, y: 0 }; // Default to east
 
   return {
     x: baseOffset.x * spacing,
-    y: baseOffset.y * spacing
+    y: baseOffset.y * spacing,
   };
 }
 
@@ -118,7 +121,12 @@ function calculateRoomCentrality(rooms: AutoLayoutRoom[]): Map<number, number> {
   // Build adjacency list for graph analysis
   const adjacencyList = new Map<number, number[]>();
   rooms.forEach(room => {
-    adjacencyList.set(room.id, room.exits.map(e => e.toRoomId).filter(d => d !== null && d !== undefined) as number[]);
+    adjacencyList.set(
+      room.id,
+      room.exits
+        .map(e => e.toRoomId)
+        .filter(d => d !== null && d !== undefined) as number[]
+    );
   });
 
   // Calculate betweenness centrality (simplified)
@@ -138,13 +146,26 @@ function calculateRoomCentrality(rooms: AutoLayoutRoom[]): Map<number, number> {
 
     // Entrance/important room keywords
     const text = `${room.name || ''} ${room.description || ''}`.toLowerCase();
-    if (text.includes('entrance') || text.includes('gate') || text.includes('entry')) {
+    if (
+      text.includes('entrance') ||
+      text.includes('gate') ||
+      text.includes('entry')
+    ) {
       centrality += 50;
     }
-    if (text.includes('central') || text.includes('main') || text.includes('plaza') || text.includes('square')) {
+    if (
+      text.includes('central') ||
+      text.includes('main') ||
+      text.includes('plaza') ||
+      text.includes('square')
+    ) {
       centrality += 40;
     }
-    if (text.includes('crossroads') || text.includes('intersection') || text.includes('junction')) {
+    if (
+      text.includes('crossroads') ||
+      text.includes('intersection') ||
+      text.includes('junction')
+    ) {
       centrality += 30;
     }
 
@@ -155,7 +176,7 @@ function calculateRoomCentrality(rooms: AutoLayoutRoom[]): Map<number, number> {
 
     // Slight preference for lower IDs (often spawn areas)
     const maxId = Math.max(...rooms.map(r => r.id));
-    centrality += (maxId - room.id) / maxId * 5;
+    centrality += ((maxId - room.id) / maxId) * 5;
 
     centralityScores.set(room.id, centrality);
   });
@@ -166,7 +187,10 @@ function calculateRoomCentrality(rooms: AutoLayoutRoom[]): Map<number, number> {
 /**
  * Enhanced starting room selection with MUD spawn room priority
  */
-function selectStartingRoom(rooms: AutoLayoutRoom[], startRoomId?: number): AutoLayoutRoom | null {
+function selectStartingRoom(
+  rooms: AutoLayoutRoom[],
+  startRoomId?: number
+): AutoLayoutRoom | null {
   // First priority: Explicit start room ID provided
   if (startRoomId) {
     const specifiedRoom = rooms.find(r => r.id === startRoomId);
@@ -179,7 +203,9 @@ function selectStartingRoom(rooms: AutoLayoutRoom[], startRoomId?: number): Auto
   // Second priority: MUD starting room (3001) - the global spawn point
   const mudStartRoom = rooms.find(r => r.id === 3001);
   if (mudStartRoom) {
-    console.log(`🌍 Using MUD starting room (3001) as global layout origin for world map connectivity`);
+    console.log(
+      `🌍 Using MUD starting room (3001) as global layout origin for world map connectivity`
+    );
     return mudStartRoom;
   }
 
@@ -211,14 +237,18 @@ function selectStartingRoom(rooms: AutoLayoutRoom[], startRoomId?: number): Auto
   });
 
   if (bestRoom) {
-    console.log(`🎯 Smart starting room selection: room ${(bestRoom as AutoLayoutRoom).id} (centrality: ${bestScore.toFixed(1)}, exits: ${(bestRoom as AutoLayoutRoom).exits.length})`);
+    console.log(
+      `🎯 Smart starting room selection: room ${(bestRoom as AutoLayoutRoom).id} (centrality: ${bestScore.toFixed(1)}, exits: ${(bestRoom as AutoLayoutRoom).exits.length})`
+    );
     return bestRoom;
   }
 
   // Last resort: Fallback to first room
   const fallbackRoom = rooms[0];
   if (fallbackRoom) {
-    console.log(`🎯 Fallback starting room selection: room ${fallbackRoom.id} (exits: ${fallbackRoom.exits.length})`);
+    console.log(
+      `🎯 Fallback starting room selection: room ${fallbackRoom.id} (exits: ${fallbackRoom.exits.length})`
+    );
     return fallbackRoom;
   }
 
@@ -236,10 +266,14 @@ function validateDirection(direction: string): boolean {
 /**
  * Detect overlaps
  */
-function detectOverlaps(positions: Record<number, LayoutPosition>): OverlapInfo[] {
+function detectOverlaps(
+  positions: Record<number, LayoutPosition>
+): OverlapInfo[] {
   const positionMap = new Map<string, number[]>();
 
-  console.log(`🔍 detectOverlaps: Checking ${Object.keys(positions).length} positions`);
+  console.log(
+    `🔍 detectOverlaps: Checking ${Object.keys(positions).length} positions`
+  );
 
   // Group rooms by 3D position (including Z-level)
   for (const [roomIdStr, pos] of Object.entries(positions)) {
@@ -248,7 +282,9 @@ function detectOverlaps(positions: Record<number, LayoutPosition>): OverlapInfo[
 
     // Debug specific rooms
     if (roomId === 3045 || roomId === 3094) {
-      console.log(`🔍 Room ${roomId} position: (${pos.x}, ${pos.y}, ${pos.z ?? 0}) key: "${key}"`);
+      console.log(
+        `🔍 Room ${roomId} position: (${pos.x}, ${pos.y}, ${pos.z ?? 0}) key: "${key}"`
+      );
     }
 
     if (!positionMap.has(key)) {
@@ -261,12 +297,17 @@ function detectOverlaps(positions: Record<number, LayoutPosition>): OverlapInfo[
   const overlaps: OverlapInfo[] = [];
   for (const [posKey, roomIds] of positionMap) {
     if (roomIds.length > 1) {
-      const [x, y, z] = posKey.split(',').map(Number);
-      console.log(`🔍 Found overlap at position ${posKey}: rooms ${roomIds.join(', ')}`);
+      const parts = posKey.split(',');
+      const x = Number(parts[0]) || 0;
+      const y = Number(parts[1]) || 0;
+      const z = Number(parts[2]) || 0;
+      console.log(
+        `🔍 Found overlap at position ${posKey}: rooms ${roomIds.join(', ')}`
+      );
       overlaps.push({
         roomIds,
         position: { x, y, z },
-        count: roomIds.length
+        count: roomIds.length,
       });
     }
   }
@@ -278,7 +319,10 @@ function detectOverlaps(positions: Record<number, LayoutPosition>): OverlapInfo[
 /**
  * Layout quality metrics
  */
-function calculateLayoutQuality(positions: Record<number, LayoutPosition>, rooms: AutoLayoutRoom[]): number {
+function calculateLayoutQuality(
+  positions: Record<number, LayoutPosition>,
+  rooms: AutoLayoutRoom[]
+): number {
   let totalPathLength = 0;
   let pathCount = 0;
   let overlapCount = 0;
@@ -295,8 +339,8 @@ function calculateLayoutQuality(positions: Record<number, LayoutPosition>, rooms
 
       const distance = Math.sqrt(
         Math.pow(destPos.x - roomPos.x, 2) +
-        Math.pow(destPos.y - roomPos.y, 2) +
-        Math.pow((destPos.z || 0) - (roomPos.z || 0), 2)
+          Math.pow(destPos.y - roomPos.y, 2) +
+          Math.pow((destPos.z || 0) - (roomPos.z || 0), 2)
       );
       totalPathLength += distance;
       pathCount++;
@@ -311,7 +355,9 @@ function calculateLayoutQuality(positions: Record<number, LayoutPosition>, rooms
   const averagePathLength = pathCount > 0 ? totalPathLength / pathCount : 0;
   const qualityScore = averagePathLength; // Don't penalize overlaps
 
-  console.log(`📊 Layout quality: avg path length: ${averagePathLength.toFixed(2)}, overlaps: ${overlapCount}, score: ${qualityScore.toFixed(2)}`);
+  console.log(
+    `📊 Layout quality: avg path length: ${averagePathLength.toFixed(2)}, overlaps: ${overlapCount}, score: ${qualityScore.toFixed(2)}`
+  );
 
   return qualityScore;
 }
@@ -319,7 +365,9 @@ function calculateLayoutQuality(positions: Record<number, LayoutPosition>, rooms
 /**
  * Build bidirectional connections (add reverse connections for incoming exits)
  */
-function buildBidirectionalConnections(rooms: AutoLayoutRoom[]): Map<number, AutoLayoutExit[]> {
+function buildBidirectionalConnections(
+  rooms: AutoLayoutRoom[]
+): Map<number, AutoLayoutExit[]> {
   const connections = new Map<number, AutoLayoutExit[]>();
 
   // Initialize with existing exits
@@ -341,14 +389,14 @@ function buildBidirectionalConnections(rooms: AutoLayoutRoom[]): Map<number, Aut
       if (reverseDirection) {
         // Check if reverse connection already exists to avoid duplicates
         const destConnections = connections.get(exit.toRoomId)!;
-        const hasReverse = destConnections.some(e =>
-          e.toRoomId === room.id && e.direction === reverseDirection
+        const hasReverse = destConnections.some(
+          e => e.toRoomId === room.id && e.direction === reverseDirection
         );
 
         if (!hasReverse) {
           destConnections.push({
             direction: reverseDirection,
-            toRoomId: room.id
+            toRoomId: room.id,
           });
         }
       }
@@ -356,8 +404,13 @@ function buildBidirectionalConnections(rooms: AutoLayoutRoom[]): Map<number, Aut
   }
 
   const totalOriginal = rooms.reduce((sum, room) => sum + room.exits.length, 0);
-  const totalBidirectional = Array.from(connections.values()).reduce((sum, exits) => sum + exits.length, 0);
-  console.log(`🔍 Built bidirectional graph: ${totalOriginal} original exits → ${totalBidirectional} total connections`);
+  const totalBidirectional = Array.from(connections.values()).reduce(
+    (sum, exits) => sum + exits.length,
+    0
+  );
+  console.log(
+    `🔍 Built bidirectional graph: ${totalOriginal} original exits → ${totalBidirectional} total connections`
+  );
 
   return connections;
 }
@@ -368,40 +421,40 @@ function buildBidirectionalConnections(rooms: AutoLayoutRoom[]): Map<number, Aut
 function getReverseDirection(direction: string): string | null {
   const reverseMap: Record<string, string> = {
     // All caps versions
-    'NORTH': 'SOUTH',
-    'SOUTH': 'NORTH',
-    'EAST': 'WEST',
-    'WEST': 'EAST',
-    'NORTHEAST': 'SOUTHWEST',
-    'NORTHWEST': 'SOUTHEAST',
-    'SOUTHEAST': 'NORTHWEST',
-    'SOUTHWEST': 'NORTHEAST',
-    'UP': 'DOWN',
-    'DOWN': 'UP',
+    NORTH: 'SOUTH',
+    SOUTH: 'NORTH',
+    EAST: 'WEST',
+    WEST: 'EAST',
+    NORTHEAST: 'SOUTHWEST',
+    NORTHWEST: 'SOUTHEAST',
+    SOUTHEAST: 'NORTHWEST',
+    SOUTHWEST: 'NORTHEAST',
+    UP: 'DOWN',
+    DOWN: 'UP',
 
     // Capitalized versions
-    'North': 'South',
-    'South': 'North',
-    'East': 'West',
-    'West': 'East',
-    'Northeast': 'Southwest',
-    'Northwest': 'Southeast',
-    'Southeast': 'Northwest',
-    'Southwest': 'Northeast',
-    'Up': 'Down',
-    'Down': 'Up',
+    North: 'South',
+    South: 'North',
+    East: 'West',
+    West: 'East',
+    Northeast: 'Southwest',
+    Northwest: 'Southeast',
+    Southeast: 'Northwest',
+    Southwest: 'Northeast',
+    Up: 'Down',
+    Down: 'Up',
 
     // Lowercase versions
-    'north': 'south',
-    'south': 'north',
-    'east': 'west',
-    'west': 'east',
-    'northeast': 'southwest',
-    'northwest': 'southeast',
-    'southeast': 'northwest',
-    'southwest': 'northeast',
-    'up': 'down',
-    'down': 'up'
+    north: 'south',
+    south: 'north',
+    east: 'west',
+    west: 'east',
+    northeast: 'southwest',
+    northwest: 'southeast',
+    southeast: 'northwest',
+    southwest: 'northeast',
+    up: 'down',
+    down: 'up',
   };
 
   return reverseMap[direction] || null;
@@ -410,12 +463,21 @@ function getReverseDirection(direction: string): string | null {
 /**
  * Enhanced auto-layout algorithm with natural spacing and smart positioning
  */
-export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): Record<number, LayoutPosition> {
+export function autoLayoutRooms(
+  rooms: AutoLayoutRoom[],
+  startRoomId?: number
+): Record<number, LayoutPosition> {
   const positions: Record<number, LayoutPosition> = {};
   const visited = new Set<number>();
-  const queue: Array<{ roomId: number; position: LayoutPosition; depth: number }> = [];
+  const queue: Array<{
+    roomId: number;
+    position: LayoutPosition;
+    depth: number;
+  }> = [];
 
-  console.log(`🔍 autoLayoutRooms called with ${rooms.length} rooms, startRoomId: ${startRoomId}`);
+  console.log(
+    `🔍 autoLayoutRooms called with ${rooms.length} rooms, startRoomId: ${startRoomId}`
+  );
 
   // Calculate dynamic spacing based on zone size
   const spacing = calculateDynamicSpacing(rooms);
@@ -431,7 +493,9 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
     return positions;
   }
 
-  console.log(`🔍 Starting enhanced auto-layout from room ${startRoom.id} with ${spacing}-unit spacing`);
+  console.log(
+    `🔍 Starting enhanced auto-layout from room ${startRoom.id} with ${spacing}-unit spacing`
+  );
 
   // Start at origin with Z-level from existing room data
   const startZ = startRoom.layoutZ || 0;
@@ -440,19 +504,32 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
   visited.add(startRoom.id);
   queue.push({ roomId: startRoom.id, position: startPos, depth: 0 });
 
-  console.log(`🔍 Initial position: room ${startRoom.id} at (${startPos.x}, ${startPos.y}, Z${startPos.z})`);
+  console.log(
+    `🔍 Initial position: room ${startRoom.id} at (${startPos.x}, ${startPos.y}, Z${startPos.z})`
+  );
 
   // Enhanced BFS with natural placement logic
   while (queue.length > 0) {
     const { roomId, position, depth } = queue.shift()!;
     const connections = bidirectionalConnections.get(roomId) || [];
 
-    console.log(`🔍 Processing room ${roomId} at (${position.x}, ${position.y}) depth ${depth} with ${connections.length} connections`);
+    console.log(
+      `🔍 Processing room ${roomId} at (${position.x}, ${position.y}) depth ${depth} with ${connections.length} connections`
+    );
 
     // Sort connections by importance for more natural placement
     const sortedConnections = connections.slice().sort((a, b) => {
       // Prioritize cardinal directions for main pathways
-      const cardinalDirections = ['north', 'south', 'east', 'west', 'NORTH', 'SOUTH', 'EAST', 'WEST'];
+      const cardinalDirections = [
+        'north',
+        'south',
+        'east',
+        'west',
+        'NORTH',
+        'SOUTH',
+        'EAST',
+        'WEST',
+      ];
       const aIsCardinal = cardinalDirections.includes(a.direction);
       const bIsCardinal = cardinalDirections.includes(b.direction);
 
@@ -466,15 +543,24 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
 
     // Process each connection with enhanced positioning
     for (const connection of sortedConnections) {
-      console.log(`🔍 Found connection: ${connection.direction} → room ${connection.toRoomId}`);
-      if (connection.toRoomId === null || connection.toRoomId === undefined || visited.has(connection.toRoomId)) continue;
+      console.log(
+        `🔍 Found connection: ${connection.direction} → room ${connection.toRoomId}`
+      );
+      if (
+        connection.toRoomId === null ||
+        connection.toRoomId === undefined ||
+        visited.has(connection.toRoomId)
+      )
+        continue;
 
       const destinationRoom = rooms.find(r => r.id === connection.toRoomId);
       if (!destinationRoom) continue;
 
       // Validate direction
       if (!validateDirection(connection.direction)) {
-        console.warn(`⚠️ Unknown direction: ${connection.direction}, using default offset`);
+        console.warn(
+          `⚠️ Unknown direction: ${connection.direction}, using default offset`
+        );
       }
 
       // Calculate new position with dynamic spacing
@@ -490,7 +576,9 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
           y: position.y, // Same Y coordinate
           z: currentZ + zChange, // Change Z-level
         };
-        console.log(`🔍 Placing room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z}) via ${connection.direction} connection (Z-level change: ${zChange > 0 ? '+' : ''}${zChange})`);
+        console.log(
+          `🔍 Placing room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z}) via ${connection.direction} connection (Z-level change: ${zChange > 0 ? '+' : ''}${zChange})`
+        );
       } else {
         // Horizontal exits use dynamic spacing
         const offset = getDirectionalOffset(connection.direction, spacing);
@@ -499,16 +587,29 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
           y: position.y + offset.y,
           z: position.z || 0, // Maintain current Z-level
         };
-        console.log(`🔍 Placing room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z || 0}) via ${connection.direction} connection (offset: ${offset.x},${offset.y} with ${spacing}-unit spacing)`);
+        console.log(
+          `🔍 Placing room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z || 0}) via ${connection.direction} connection (offset: ${offset.x},${offset.y} with ${spacing}-unit spacing)`
+        );
       }
 
+      // Coalesce numeric positions to ensure no undefined propagates
+      if (newPosition.x === undefined || newPosition.y === undefined) {
+        newPosition.x = newPosition.x ?? 0;
+        newPosition.y = newPosition.y ?? 0;
+      }
       positions[connection.toRoomId] = newPosition;
       visited.add(connection.toRoomId);
-      queue.push({ roomId: connection.toRoomId, position: newPosition, depth: depth + 1 });
+      queue.push({
+        roomId: connection.toRoomId,
+        position: newPosition,
+        depth: depth + 1,
+      });
 
       // Debug specific rooms
       if (connection.toRoomId === 3045 || connection.toRoomId === 3094) {
-        console.log(`🎯 Placed room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) from room ${roomId} via ${connection.direction}`);
+        console.log(
+          `🎯 Placed room ${connection.toRoomId} at (${newPosition.x}, ${newPosition.y}, ${newPosition.z}) from room ${roomId} via ${connection.direction}`
+        );
       }
     }
   }
@@ -518,12 +619,17 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
   let unconnectedX = spacing * 5; // Start further away from main layout
   let unconnectedY = 0;
   let unconnectedCount = 0;
-  const maxUnconnectedPerRow = Math.max(6, Math.ceil(Math.sqrt(rooms.length - visited.size)));
+  const maxUnconnectedPerRow = Math.max(
+    6,
+    Math.ceil(Math.sqrt(rooms.length - visited.size))
+  );
 
   for (const room of rooms) {
     if (!visited.has(room.id)) {
-      positions[room.id] = { x: unconnectedX, y: unconnectedY };
-      console.log(`🔍 Placing unconnected room ${room.id} at (${unconnectedX}, ${unconnectedY})`);
+      positions[room.id] = { x: unconnectedX ?? 0, y: unconnectedY ?? 0 };
+      console.log(
+        `🔍 Placing unconnected room ${room.id} at (${unconnectedX}, ${unconnectedY})`
+      );
       unconnectedCount++;
       unconnectedX += unconnectedSpacing;
 
@@ -534,7 +640,9 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
     }
   }
 
-  console.log(`🔍 Enhanced auto-layout complete: ${Object.keys(positions).length} total positions, ${visited.size} connected, ${unconnectedCount} unconnected`);
+  console.log(
+    `🔍 Enhanced auto-layout complete: ${Object.keys(positions).length} total positions, ${visited.size} connected, ${unconnectedCount} unconnected`
+  );
 
   // Calculate and log layout quality
   calculateLayoutQuality(positions, rooms);
@@ -545,9 +653,13 @@ export function autoLayoutRooms(rooms: AutoLayoutRoom[], startRoomId?: number): 
 /**
  * Resolve overlaps by shifting rooms (disabled - overlaps are now allowed)
  */
-export function resolveOverlaps(positions: Record<number, LayoutPosition>): Record<number, LayoutPosition> {
+export function resolveOverlaps(
+  positions: Record<number, LayoutPosition>
+): Record<number, LayoutPosition> {
   // Return original positions without any changes - overlaps are now allowed
-  console.log(`🔍 resolveOverlaps: Keeping original positions (overlaps allowed)`);
+  console.log(
+    `🔍 resolveOverlaps: Keeping original positions (overlaps allowed)`
+  );
   return { ...positions };
 }
 
@@ -580,7 +692,7 @@ export function detectOneWayExits(rooms: AutoLayoutRoom[]): Array<{
           toRoom: exit.toRoomId,
           direction: exit.direction,
           isOneWay: true,
-          reason: 'target_not_found'
+          reason: 'target_not_found',
         });
         continue;
       }
@@ -589,9 +701,11 @@ export function detectOneWayExits(rooms: AutoLayoutRoom[]): Array<{
       const expectedReturnDirection = getReverseDirection(exit.direction);
       if (!expectedReturnDirection) continue;
 
-      const hasReturnExit = targetRoom.exits.some(returnExit =>
-        returnExit.toRoomId === room.id &&
-        returnExit.direction.toLowerCase() === expectedReturnDirection.toLowerCase()
+      const hasReturnExit = targetRoom.exits.some(
+        returnExit =>
+          returnExit.toRoomId === room.id &&
+          returnExit.direction.toLowerCase() ===
+            expectedReturnDirection.toLowerCase()
       );
 
       oneWayExits.push({
@@ -599,14 +713,16 @@ export function detectOneWayExits(rooms: AutoLayoutRoom[]): Array<{
         toRoom: exit.toRoomId,
         direction: exit.direction,
         isOneWay: !hasReturnExit,
-        reason: hasReturnExit ? 'no_return_exit' : 'no_return_exit'
+        reason: hasReturnExit ? 'no_return_exit' : 'no_return_exit',
       });
     }
   }
 
   const oneWayCount = oneWayExits.filter(e => e.isOneWay).length;
   const totalExits = oneWayExits.length;
-  console.log(`🔍 One-way exit analysis: ${oneWayCount} one-way exits out of ${totalExits} total exits`);
+  console.log(
+    `🔍 One-way exit analysis: ${oneWayCount} one-way exits out of ${totalExits} total exits`
+  );
 
   return oneWayExits;
 }
@@ -644,7 +760,9 @@ export function detectOneWayEntrances(
 
   for (const externalExit of externalExits) {
     // Find the target room in current zone
-    const targetRoom = currentZoneRooms.find(r => r.id === externalExit.targetRoomId);
+    const targetRoom = currentZoneRooms.find(
+      r => r.id === externalExit.targetRoomId
+    );
     if (!targetRoom) continue;
 
     // Determine what the return direction should be
@@ -652,10 +770,11 @@ export function detectOneWayEntrances(
     if (!expectedReturnDirection) continue;
 
     // Check if target room has a return exit to the source zone/room
-    const hasReturnExit = targetRoom.exits.some(exit =>
-      exit.toZoneId === externalExit.sourceZoneId &&
-      exit.toRoomId === externalExit.sourceRoomId &&
-      exit.direction.toLowerCase() === expectedReturnDirection.toLowerCase()
+    const hasReturnExit = targetRoom.exits.some(
+      exit =>
+        exit.toZoneId === externalExit.sourceZoneId &&
+        exit.toRoomId === externalExit.sourceRoomId &&
+        exit.direction.toLowerCase() === expectedReturnDirection.toLowerCase()
     );
 
     oneWayEntrances.push({
@@ -664,15 +783,17 @@ export function detectOneWayEntrances(
       targetRoomId: externalExit.targetRoomId,
       direction: externalExit.direction,
       reverseDirection: expectedReturnDirection,
-      hasReturnExit
+      hasReturnExit,
     });
   }
 
   const oneWayCount = oneWayEntrances.filter(e => !e.hasReturnExit).length;
-  console.log(`🔍 One-way entrance analysis for zone ${currentZoneId}: ${oneWayCount} one-way entrances out of ${oneWayEntrances.length} external connections`);
+  console.log(
+    `🔍 One-way entrance analysis for zone ${currentZoneId}: ${oneWayCount} one-way entrances out of ${oneWayEntrances.length} external connections`
+  );
 
   return oneWayEntrances;
 }
 
 // Export additional utility functions for advanced use cases
-export { detectOverlaps, calculateLayoutQuality };
+export { calculateLayoutQuality, detectOverlaps };

@@ -472,7 +472,7 @@ model MobResets {
   mobEquipmentSets  MobEquipmentSets[]
   mobResetEquipment MobResetEquipment[]
   mobs              Mobs                @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
-  rooms             Rooms               @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  rooms             Room               @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
   zones             Zones               @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   spawnConditions   SpawnConditions[]
 }
@@ -572,7 +572,7 @@ model ObjectResets {
   containerReset   ObjectResets?     @relation("resetContainer", fields: [containerResetId], references: [id], onDelete: Cascade)
   containedResets  ObjectResets[]    @relation("resetContainer")
   objects          Objects           @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  rooms            Rooms?            @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  rooms            Room?            @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
   zones            Zones             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   spawnConditions  SpawnConditions[]
 }
@@ -674,7 +674,7 @@ model RaceAbilities {
   @@unique([race, abilityId])
 }
 
-model RoomExits {
+model RoomExit {
   id              Int        @id @default(autoincrement())
   direction       Direction
   description     String?
@@ -685,8 +685,8 @@ model RoomExits {
   roomZoneId      Int        @map("room_zone_id")
   roomId          Int        @map("room_id")
   flags           ExitFlag[] @default([])
-  sourceRoom      Rooms      @relation("roomExits", fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
-  destinationRoom Rooms?     @relation("roomEntrances", fields: [toZoneId, toRoomId], references: [zoneId, id])
+  sourceRoom      Room      @relation("roomExits", fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  destinationRoom Room?     @relation("roomEntrances", fields: [toZoneId, toRoomId], references: [zoneId, id])
 
   @@unique([roomZoneId, roomId, direction])
 }
@@ -697,10 +697,10 @@ model RoomExtraDescriptions {
   description String
   roomZoneId  Int      @map("room_zone_id")
   roomId      Int      @map("room_id")
-  rooms       Rooms    @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  rooms       Room    @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
 }
 
-model Rooms {
+model Room {
   id                    Int
   name                  String
   roomDescription       String                  @map("room_description")
@@ -717,8 +717,8 @@ model Rooms {
   layoutZ               Int?                    @default(0) @map("layout_z")
   mobResets             MobResets[]
   objectResets          ObjectResets[]
-  exits                 RoomExits[]             @relation("roomExits")
-  entrances             RoomExits[]             @relation("roomEntrances")
+  exits                 RoomExit[]             @relation("roomExits")
+  entrances             RoomExit[]             @relation("roomEntrances")
   roomExtraDescriptions RoomExtraDescriptions[]
   zones                 Zones                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
@@ -885,7 +885,7 @@ model Zones {
   mobs         Mobs[]
   objectResets ObjectResets[]
   objects      Objects[]
-  rooms        Rooms[]
+  rooms        Room[]
   shops        Shops[]
   triggers     Triggers[]
 }

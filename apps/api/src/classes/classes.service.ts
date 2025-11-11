@@ -1,16 +1,17 @@
 import {
+  BadRequestException,
   Injectable,
   NotFoundException,
-  BadRequestException,
 } from '@nestjs/common';
+import type { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
-  CreateClassInput,
-  UpdateClassInput,
   AssignSkillToClassInput,
-  UpdateClassSkillInput,
   CreateClassCircleInput,
+  CreateClassInput,
   UpdateClassCircleInput,
+  UpdateClassInput,
+  UpdateClassSkillInput,
 } from './classes.input';
 
 @Injectable()
@@ -23,11 +24,12 @@ export class ClassesService {
    * Find all classes
    */
   async findAll(skip?: number, take?: number) {
-    return this.db.characterClass.findMany({
-      skip,
-      take,
+    const args: Prisma.CharacterClassFindManyArgs = {
       orderBy: { name: 'asc' },
-    });
+    };
+    if (skip !== undefined) (args as any).skip = skip;
+    if (take !== undefined) (args as any).take = take;
+    return this.db.characterClass.findMany(args);
   }
 
   /**
@@ -74,9 +76,10 @@ export class ClassesService {
       );
     }
 
-    return this.db.characterClass.create({
-      data,
-    });
+    const createData: Prisma.CharacterClassCreateInput = { name: data.name };
+    if (data.description !== undefined)
+      (createData as any).description = data.description;
+    return this.db.characterClass.create({ data: createData });
   }
 
   /**
@@ -96,10 +99,11 @@ export class ClassesService {
       }
     }
 
-    return this.db.characterClass.update({
-      where: { id },
-      data,
-    });
+    const updateData: Prisma.CharacterClassUpdateInput = {};
+    if (data.name !== undefined) (updateData as any).name = data.name;
+    if (data.description !== undefined)
+      (updateData as any).description = data.description;
+    return this.db.characterClass.update({ where: { id }, data: updateData });
   }
 
   /**
@@ -150,7 +154,7 @@ export class ClassesService {
       orderBy: { abilityId: 'asc' },
     });
 
-    return skills.map((skill) => ({
+    return skills.map(skill => ({
       id: skill.id,
       classId: skill.classId,
       skillId: skill.abilityId,
@@ -298,7 +302,7 @@ export class ClassesService {
 
     // Fetch abilities for each circle
     const circlesWithAbilities = await Promise.all(
-      circles.map(async (circle) => {
+      circles.map(async circle => {
         const abilities = await this.db.classAbilities.findMany({
           where: {
             classId: classId,
@@ -323,7 +327,7 @@ export class ClassesService {
         return {
           ...circle,
           className: circle.characterClass.name,
-          spells: abilities.map((a) => ({
+          spells: abilities.map(a => ({
             id: a.id,
             spellId: a.abilityId,
             spellName: a.ability.name,

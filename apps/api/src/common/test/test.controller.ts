@@ -1,11 +1,11 @@
 import {
+  Body,
   Controller,
   Get,
-  Post,
-  Query,
-  Body,
   HttpException,
   HttpStatus,
+  Post,
+  Query,
 } from '@nestjs/common';
 import { LoggingService } from '../logging/logging.service';
 
@@ -27,20 +27,19 @@ export class TestController {
           'This is a test HTTP exception',
           HttpStatus.BAD_REQUEST
         );
-
-      case 'runtime':
-        // Force a runtime error
-        const obj: any = null;
-        return obj.someProperty.that.doesnt.exist;
-
+      case 'runtime': {
+        return (
+          null as unknown as {
+            someProperty: { that: { doesnt: { exist: unknown } } };
+          }
+        ).someProperty.that.doesnt.exist;
+      }
       case 'async':
-        // Simulate async error
-        return new Promise((resolve, reject) => {
+        return new Promise((_, reject) => {
           setTimeout(() => {
             reject(new Error('This is a test async error'));
           }, 100);
         });
-
       case 'validation':
         throw new HttpException(
           {
@@ -49,7 +48,6 @@ export class TestController {
           },
           HttpStatus.UNPROCESSABLE_ENTITY
         );
-
       default:
         throw new Error('This is a test generic error');
     }
@@ -61,12 +59,27 @@ export class TestController {
     @Query('limit') limit?: string
   ) {
     const limitNum = limit ? parseInt(limit, 10) : 50;
-    return this.loggingService.getRecentLogs(level, limitNum);
+    const allowed: Array<'error' | 'info' | 'warn' | 'debug'> = [
+      'error',
+      'info',
+      'warn',
+      'debug',
+    ];
+    const levelTyped =
+      level && (allowed as readonly string[]).includes(level)
+        ? (level as (typeof allowed)[number])
+        : undefined;
+    return this.loggingService.getRecentLogs(levelTyped, limitNum);
   }
 
   @Post('log')
   async createTestLog(
-    @Body() body: { message: string; level?: string; data?: any }
+    @Body()
+    body: {
+      message: string;
+      level?: 'error' | 'info' | 'warn' | 'debug';
+      data?: unknown;
+    }
   ) {
     const { message, level = 'info', data } = body;
 

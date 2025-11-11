@@ -7,6 +7,15 @@ import {
   CreateMobDocument,
   GetMobDocument,
   UpdateMobDocument,
+  type Composition,
+  type DamageType,
+  type Gender,
+  type GetMobQuery,
+  type LifeForce,
+  type Position,
+  type Race,
+  type Size,
+  type Stance,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -14,10 +23,10 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
 import MobEquipmentManager from '../../../../components/mob-equipment-manager';
+import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
   useRealTimeValidation,
   ValidationHelpers,
-  ValidationRules,
 } from '../../../../hooks/useRealTimeValidation';
 
 interface MobFormData {
@@ -172,36 +181,41 @@ function MobEditorContent() {
   const [createMob, { loading: createLoading }] =
     useMutation(CreateMobDocument);
 
-  // Helper function to parse dice notation (e.g., "1d8+0" -> {num: 1, size: 8, bonus: 0})
-  const parseDice = (diceStr: string) => {
-    const match = diceStr.match(/(\d+)d(\d+)([\+\-]\d+)?/);
-    if (match) {
-      return {
-        num: parseInt(match[1]),
-        size: parseInt(match[2]),
-        bonus: parseInt(match[3] || '0'),
-      };
-    }
-    return { num: 1, size: 8, bonus: 0 };
+  // Helper function to parse dice notation (accepts undefined/null safely)
+  const parseDice = (diceStr: string | undefined | null) => {
+    const safe = diceStr ?? '';
+    const match = safe.match(/(\d+)d(\d+)([+-]\d+)?/);
+    if (!match) return { num: 1, size: 8, bonus: 0 };
+    const [, numStr, sizeStr, bonusStr] = match as [
+      string,
+      string,
+      string,
+      string?,
+    ];
+    return {
+      num: parseInt(numStr, 10),
+      size: parseInt(sizeStr, 10),
+      bonus: bonusStr ? parseInt(bonusStr, 10) : 0,
+    };
   };
 
   useEffect(() => {
-    const typedData = data as any;
+    const typedData = data as GetMobQuery | undefined;
     if (typedData?.mob) {
       const mob = typedData.mob;
-      const hpDice = parseDice(mob.hpDice || '1d8+0');
-      const damageDice = parseDice(mob.damageDice || '1d4+0');
+      const hpDice = parseDice(mob.hpDice ?? '1d8+0');
+      const damageDice = parseDice(mob.damageDice ?? '1d4+0');
 
       setFormData({
-        keywords: mob.keywords?.join(' ') || '',
+        keywords: mob.keywords.join(' '),
         mobClass: 'warrior', // Not in schema
-        name: mob.name || '',
-        roomDescription: mob.roomDescription || '',
-        examineDescription: mob.examineDescription || '',
-        alignment: mob.alignment || 0,
-        level: mob.level || 1,
-        armorClass: mob.armorClass || 0,
-        hitRoll: mob.hitRoll || 0,
+        name: mob.name,
+        roomDescription: mob.roomDescription,
+        examineDescription: mob.examineDescription,
+        alignment: mob.alignment,
+        level: mob.level,
+        armorClass: mob.armorClass,
+        hitRoll: mob.hitRoll,
         move: 0, // Not in schema
         hpDiceNum: hpDice.num,
         hpDiceSize: hpDice.size,
@@ -213,24 +227,24 @@ function MobEditorContent() {
         silver: 0, // Not in schema
         gold: 0, // Not in schema
         platinum: 0, // Not in schema
-        strength: mob.strength || 13,
-        intelligence: mob.intelligence || 13,
-        wisdom: mob.wisdom || 13,
-        dexterity: mob.dexterity || 13,
-        constitution: mob.constitution || 13,
-        charisma: mob.charisma || 13,
-        perception: mob.perception || 0,
-        concealment: mob.concealment || 0,
-        zoneId: mob.zoneId || 511,
-        race: mob.race || 'HUMAN',
-        position: mob.position || 'STANDING',
+        strength: mob.strength,
+        intelligence: mob.intelligence,
+        wisdom: mob.wisdom,
+        dexterity: mob.dexterity,
+        constitution: mob.constitution,
+        charisma: mob.charisma,
+        perception: mob.perception,
+        concealment: mob.concealment,
+        zoneId: mob.zoneId,
+        race: mob.race,
+        position: mob.position,
         defaultPosition: mob.position || 'STANDING', // Use position since defaultPosition doesn't exist
-        gender: mob.gender || 'NEUTRAL',
-        size: mob.size || 'MEDIUM',
-        lifeForce: mob.lifeForce || 'LIFE',
-        composition: mob.composition || 'FLESH',
-        stance: mob.stance || 'ALERT',
-        damageType: mob.damageType || 'HIT',
+        gender: mob.gender,
+        size: mob.size,
+        lifeForce: mob.lifeForce,
+        composition: mob.composition,
+        stance: mob.stance,
+        damageType: mob.damageType,
       });
     }
   }, [data]);
@@ -276,7 +290,7 @@ function MobEditorContent() {
         armorClass: formData.armorClass,
         hpDice: `${formData.hpDiceNum}d${formData.hpDiceSize}${formData.hpDiceBonus >= 0 ? '+' : ''}${formData.hpDiceBonus}`,
         damageDice: `${formData.damageDiceNum}d${formData.damageDiceSize}${formData.damageDiceBonus >= 0 ? '+' : ''}${formData.damageDiceBonus}`,
-        damageType: formData.damageType as any,
+        damageType: formData.damageType as DamageType,
         strength: formData.strength,
         intelligence: formData.intelligence,
         wisdom: formData.wisdom,
@@ -285,13 +299,13 @@ function MobEditorContent() {
         charisma: formData.charisma,
         perception: formData.perception,
         concealment: formData.concealment,
-        race: formData.race as any,
-        position: formData.position as any,
-        gender: formData.gender as any,
-        size: formData.size as any,
-        lifeForce: formData.lifeForce as any,
-        composition: formData.composition as any,
-        stance: formData.stance as any,
+        race: formData.race as Race,
+        position: formData.position as Position,
+        gender: formData.gender as Gender,
+        size: formData.size as Size,
+        lifeForce: formData.lifeForce as LifeForce,
+        composition: formData.composition as Composition,
+        stance: formData.stance as Stance,
       };
 
       if (isNew) {
@@ -309,7 +323,7 @@ function MobEditorContent() {
           variables: {
             zoneId: parseInt(zoneId!),
             id: parseInt(mobId!),
-            data: saveData as any, // Type assertion needed due to enum string conversion
+            data: saveData, // saveData now conforms to expected input shape
           },
         });
       }

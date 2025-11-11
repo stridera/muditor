@@ -1,59 +1,145 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { CreateShopInput, ShopDto, UpdateShopInput } from './shop.dto';
+import {
+  CreateShopInput,
+  KeeperDto,
+  ShopAcceptDto,
+  ShopDto,
+  ShopHourDto,
+  ShopItemDto,
+  UpdateShopHoursInput,
+  UpdateShopInput,
+  UpdateShopInventoryInput,
+} from './shop.dto';
 import { ShopsService } from './shops.service';
 
 @Resolver(() => ShopDto)
 export class ShopsResolver {
   constructor(private readonly shopsService: ShopsService) {}
 
-  private mapShopToDto(shop: any): ShopDto {
-    return {
+  private mapShopToDto(shop: {
+    id: number;
+    buyProfit: number;
+    sellProfit: number;
+    temper: number;
+    flags: import('@prisma/client').ShopFlag[];
+    tradesWithFlags: import('@prisma/client').ShopTradesWith[];
+    noSuchItemMessages: string[];
+    doNotBuyMessages: string[];
+    missingCashMessages: string[];
+    buyMessages: string[];
+    sellMessages: string[];
+    keeperId?: number | null;
+    zoneId: number;
+    createdAt: Date;
+    updatedAt: Date;
+    mobs?: {
+      id: number;
+      zoneId: number;
+      name: string;
+      keywords: string[];
+    } | null;
+    shopItems?: Array<{
+      id: number;
+      amount: number;
+      objectId: number;
+      objectZoneId: number;
+      objects?: {
+        id: number;
+        zoneId: number;
+        name: string;
+        type: string;
+        cost?: number | null;
+      } | null;
+    }>;
+    shopAccepts?: Array<{ id: number; type: string; keywords: string[] }>;
+    shopHours?: Array<{ id: number; open: number; close: number }>;
+  }): ShopDto {
+    const keeper: KeeperDto | undefined = shop.mobs
+      ? {
+          id: shop.mobs.id,
+          zoneId: shop.mobs.zoneId,
+          name: shop.mobs.name,
+          keywords: shop.mobs.keywords || [],
+        }
+      : undefined;
+    const items: ShopItemDto[] = (shop.shopItems || []).map(i => {
+      const base: ShopItemDto = {
+        id: String(i.id),
+        amount: i.amount,
+        objectId: i.objectId,
+        objectZoneId: i.objectZoneId,
+      };
+      if (i.objects) {
+        (
+          base as unknown as {
+            object: {
+              id: number;
+              zoneId: number;
+              name: string;
+              keywords: string[];
+              type: string;
+              cost?: number | undefined;
+            };
+          }
+        ).object = {
+          id: i.objects.id,
+          zoneId: i.objects.zoneId,
+          name: i.objects.name,
+          keywords: [],
+          type: i.objects.type,
+          cost: i.objects.cost ?? undefined,
+        };
+      }
+      return base;
+    });
+    const accepts: ShopAcceptDto[] = (shop.shopAccepts || []).map(a => {
+      const base: ShopAcceptDto = {
+        id: String(a.id),
+        type: a.type,
+      } as ShopAcceptDto;
+      if (a.keywords && a.keywords.length) {
+        // Non-empty check above doesn't narrow array emptiness for TS with exactOptionalPropertyTypes; use non-null assertion
+        (base as unknown as { keywords?: string }).keywords = a.keywords[0]!;
+      }
+      return base;
+    });
+    const hours: ShopHourDto[] = (shop.shopHours || []).map(h => ({
+      id: String(h.id),
+      open: h.open,
+      close: h.close,
+    }));
+    // Build result without optional keeperId unless it exists; with exactOptionalPropertyTypes we must omit the property instead of setting undefined
+    const result: Omit<ShopDto, 'keeperId' | 'keeper'> & {
+      keeperId?: number;
+      keeper?: KeeperDto;
+    } = {
       id: shop.id,
       buyProfit: shop.buyProfit,
       sellProfit: shop.sellProfit,
       temper: shop.temper,
       flags: shop.flags || [],
-      tradesWithFlags: shop.tradesWith || [],
+      tradesWithFlags: shop.tradesWithFlags || [],
       noSuchItemMessages: shop.noSuchItemMessages || [],
       doNotBuyMessages: shop.doNotBuyMessages || [],
       missingCashMessages: shop.missingCashMessages || [],
       buyMessages: shop.buyMessages || [],
       sellMessages: shop.sellMessages || [],
-      keeperId: shop.keeperId,
-      keeper: shop.mobs
-        ? {
-            id: shop.mobs.id,
-            zoneId: shop.mobs.zoneId,
-            name: shop.mobs.name,
-            keywords: shop.mobs.keywords || [],
-          }
-        : undefined,
       zoneId: shop.zoneId,
       createdAt: shop.createdAt,
       updatedAt: shop.updatedAt,
-      items:
-        shop.shopItems?.map((item: any) => ({
-          id: item.id,
-          amount: item.amount,
-          objectId: item.objectId,
-          objectZoneId: item.objectZoneId,
-          object: item.objects,
-        })) || [],
-      accepts:
-        shop.shopAccepts?.map((accept: any) => ({
-          id: accept.id,
-          type: accept.type,
-          keywords: accept.keywords || [],
-        })) || [],
-      hours:
-        shop.shopHours?.map((hour: any) => ({
-          id: hour.id,
-          open: hour.open,
-          close: hour.close,
-        })) || [],
+      items,
+      accepts,
+      hours,
     };
+    if (shop.keeperId != null) {
+      (result as { keeperId?: number }).keeperId = shop.keeperId;
+    }
+    if (keeper) {
+      (result as { keeper?: KeeperDto }).keeper = keeper;
+    }
+    return result as ShopDto;
   }
 
   @Query(() => [ShopDto], { name: 'shops' })
@@ -61,7 +147,10 @@ export class ShopsResolver {
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<ShopDto[]> {
-    const shops = await this.shopsService.findAll({ skip, take });
+    const shops = await this.shopsService.findAll({
+      ...(typeof skip === 'number' ? { skip } : {}),
+      ...(typeof take === 'number' ? { take } : {}),
+    });
     return shops.map(shop => this.mapShopToDto(shop));
   }
 
@@ -127,6 +216,32 @@ export class ShopsResolver {
     @Args('id', { type: () => Int }) id: number
   ): Promise<ShopDto> {
     const shop = await this.shopsService.delete(zoneId, id);
+    return this.mapShopToDto(shop);
+  }
+
+  @Mutation(() => ShopDto)
+  @UseGuards(JwtAuthGuard)
+  async updateShopInventory(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('data') data: UpdateShopInventoryInput
+  ): Promise<ShopDto> {
+    const shop = await this.shopsService.replaceInventory(
+      zoneId,
+      id,
+      data.items
+    );
+    return this.mapShopToDto(shop);
+  }
+
+  @Mutation(() => ShopDto)
+  @UseGuards(JwtAuthGuard)
+  async updateShopHours(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('data') data: UpdateShopHoursInput
+  ): Promise<ShopDto> {
+    const shop = await this.shopsService.replaceHours(zoneId, id, data.hours);
     return this.mapShopToDto(shop);
   }
 }

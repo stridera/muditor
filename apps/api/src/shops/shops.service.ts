@@ -40,19 +40,10 @@ export class ShopsService {
     where?: Prisma.ShopsWhereInput;
     orderBy?: Prisma.ShopsOrderByWithRelationInput;
   }): Promise<ShopWithRelations[]> {
-    return this.database.shops.findMany({
-      skip: args?.skip,
-      take: args?.take,
-      where: args?.where,
-      orderBy: args?.orderBy || { id: 'asc' },
+    const query: Prisma.ShopsFindManyArgs = {
       include: {
         mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-            keywords: true,
-          },
+          select: { id: true, zoneId: true, name: true, keywords: true },
         },
         shopItems: {
           include: {
@@ -70,7 +61,15 @@ export class ShopsService {
         shopAccepts: true,
         shopHours: true,
       },
-    });
+      orderBy: args?.orderBy ? { ...args.orderBy } : { id: 'asc' },
+    };
+    if (typeof args?.skip === 'number') query.skip = args.skip;
+    if (typeof args?.take === 'number') query.take = args.take;
+    if (args?.where) query.where = { ...args.where };
+    // Prisma's type inference under exactOptionalPropertyTypes is losing the include typing; force cast.
+    return this.database.shops.findMany(
+      query
+    ) as unknown as ShopWithRelations[];
   }
 
   async findOne(zoneId: number, id: number): Promise<ShopWithRelations | null> {
@@ -180,7 +179,9 @@ export class ShopsService {
   }
 
   async count(where?: Prisma.ShopsWhereInput): Promise<number> {
-    return this.database.shops.count({ where });
+    const args: Prisma.ShopsCountArgs = {};
+    if (where) args.where = { ...where };
+    return this.database.shops.count(args);
   }
 
   async create(data: Prisma.ShopsCreateInput): Promise<ShopWithRelations> {
@@ -289,5 +290,49 @@ export class ShopsService {
         shopHours: true,
       },
     });
+  }
+
+  async replaceInventory(
+    zoneId: number,
+    id: number,
+    items: Array<{ amount: number; objectZoneId: number; objectId: number }>
+  ): Promise<ShopWithRelations> {
+    // Strategy: delete existing items then recreate
+    await this.database.shopItems.deleteMany({
+      where: { shopZoneId: zoneId, shopId: id },
+    });
+    if (items.length) {
+      await this.database.shopItems.createMany({
+        data: items.map(i => ({
+          shopZoneId: zoneId,
+          shopId: id,
+          amount: i.amount,
+          objectZoneId: i.objectZoneId,
+          objectId: i.objectId,
+        })),
+      });
+    }
+    return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
+  }
+
+  async replaceHours(
+    zoneId: number,
+    id: number,
+    hours: Array<{ open: number; close: number }>
+  ): Promise<ShopWithRelations> {
+    await this.database.shopHours.deleteMany({
+      where: { shopZoneId: zoneId, shopId: id },
+    });
+    if (hours.length) {
+      await this.database.shopHours.createMany({
+        data: hours.map(h => ({
+          shopZoneId: zoneId,
+          shopId: id,
+          open: h.open,
+          close: h.close,
+        })),
+      });
+    }
+    return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
   }
 }

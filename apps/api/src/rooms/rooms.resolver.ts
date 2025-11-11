@@ -9,9 +9,12 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+// Import from barrel to ensure mapper files are included in program graph for tooling
+import { mapRoom } from '../common/mappers';
+import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
 import { MobDto } from '../mobs/mob.dto';
 import { ObjectDto } from '../objects/object.dto';
-import { ShopDto } from '../shops/shop.dto';
+import { ShopDto, ShopItemDto } from '../shops/shop.dto';
 import { ShopsService } from '../shops/shops.service';
 import {
   BatchUpdateResult,
@@ -24,6 +27,66 @@ import {
   UpdateRoomPositionInput,
 } from './room.dto';
 import { RoomsService } from './rooms.service';
+
+// Narrow mapper input to the actual shape returned by RoomsService (RoomServiceResult) plus relation arrays.
+// Use flexible mapper source type (optional relation arrays) matching `mapRoom` requirements.
+import { RoomMapperSource } from '../common/mappers/types';
+type RoomsMapperInput = RoomMapperSource;
+
+// Internal lightweight types used for field resolution to avoid `any`
+interface MobSummary {
+  id: number;
+  zoneId: number;
+  name: string;
+  keywords?: string[];
+}
+interface ObjectSummary {
+  id: number;
+  zoneId: number;
+  name: string;
+  keywords?: string[];
+}
+interface MobReset {
+  mobs?: MobSummary;
+}
+interface ObjectReset {
+  objects?: ObjectSummary;
+}
+interface RawShopItem {
+  id: number;
+  amount: number;
+  shopZoneId: number;
+  shopId: number;
+  objectZoneId: number;
+  objectId: number;
+  objects?: {
+    id: number;
+    zoneId: number;
+    name: string;
+    type: string;
+    cost?: number;
+  };
+}
+interface RawShopAccept {
+  id: number;
+  type: string;
+  keywords: string[];
+  shopZoneId: number;
+  shopId: number;
+}
+interface RawShopHour {
+  id: number;
+  shopZoneId: number;
+  shopId: number;
+  open: number;
+  close: number;
+}
+interface RoomWithResets {
+  mobResets?: MobReset[];
+  mob_resets?: MobReset[];
+  objectResets?: ObjectReset[];
+  object_resets?: ObjectReset[];
+}
 
 @Resolver(() => RoomDto)
 export class RoomsResolver {
@@ -44,12 +107,18 @@ export class RoomsResolver {
     })
     lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findAll({
-      skip,
-      take,
-      zoneId,
-      lightweight,
-    }) as unknown as RoomDto[];
+    const params: {
+      skip?: number;
+      take?: number;
+      zoneId?: number;
+      lightweight?: boolean;
+    } = {};
+    if (skip !== undefined) params.skip = skip;
+    if (take !== undefined) params.take = take;
+    if (zoneId !== undefined) params.zoneId = zoneId;
+    if (lightweight !== undefined) params.lightweight = lightweight;
+    const rooms = await this.roomsService.findAll(params);
+    return rooms.map(r => mapRoom(r as unknown as RoomsMapperInput));
   }
 
   @Query(() => RoomDto, { name: 'room' })
@@ -57,7 +126,8 @@ export class RoomsResolver {
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<RoomDto | null> {
-    return this.roomsService.findOne(zoneId, id) as unknown as RoomDto | null;
+    const room = await this.roomsService.findOne(zoneId, id);
+    return room ? mapRoom(room as unknown as RoomsMapperInput) : null;
   }
 
   @Query(() => [RoomDto], { name: 'roomsByZone' })
@@ -70,10 +140,8 @@ export class RoomsResolver {
     })
     lightweight?: boolean
   ): Promise<RoomDto[]> {
-    return this.roomsService.findByZone(
-      zoneId,
-      lightweight
-    ) as unknown as RoomDto[];
+    const rooms = await this.roomsService.findByZone(zoneId, lightweight);
+    return rooms.map(r => mapRoom(r as unknown as RoomsMapperInput));
   }
 
   @Query(() => Int, { name: 'roomsCount' })
@@ -86,7 +154,8 @@ export class RoomsResolver {
   @Mutation(() => RoomDto)
   @UseGuards(GraphQLJwtAuthGuard)
   async createRoom(@Args('data') data: CreateRoomInput): Promise<RoomDto> {
-    return this.roomsService.create(data) as unknown as RoomDto;
+    const created = await this.roomsService.create(data);
+    return mapRoom(created as unknown as RoomsMapperInput);
   }
 
   @Mutation(() => RoomDto)
@@ -96,7 +165,8 @@ export class RoomsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateRoomInput
   ): Promise<RoomDto> {
-    return this.roomsService.update(zoneId, id, data) as unknown as RoomDto;
+    const updated = await this.roomsService.update(zoneId, id, data);
+    return mapRoom(updated as unknown as RoomsMapperInput);
   }
 
   @Mutation(() => RoomDto)
@@ -105,7 +175,8 @@ export class RoomsResolver {
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<RoomDto> {
-    return this.roomsService.delete(zoneId, id) as unknown as RoomDto;
+    const deleted = await this.roomsService.delete(zoneId, id);
+    return mapRoom(deleted as unknown as RoomsMapperInput);
   }
 
   @Mutation(() => RoomExitDto)
@@ -113,13 +184,31 @@ export class RoomsResolver {
   async createRoomExit(
     @Args('data') data: CreateRoomExitInput
   ): Promise<RoomExitDto> {
-    return this.roomsService.createExit(data);
+    const exit = await this.roomsService.createExit(data);
+    const mapped: RoomExitDto = {
+      ...exit,
+      id: String(exit.id),
+      description: exit.description ?? undefined,
+      key: exit.key ?? undefined,
+      toZoneId: exit.toZoneId ?? undefined,
+      toRoomId: exit.toRoomId ?? undefined,
+    } as RoomExitDto;
+    return mapped;
   }
 
   @Mutation(() => RoomExitDto)
   @UseGuards(GraphQLJwtAuthGuard)
   async deleteRoomExit(@Args('exitId') exitId: number): Promise<RoomExitDto> {
-    return this.roomsService.deleteExit(exitId);
+    const exit = await this.roomsService.deleteExit(exitId);
+    const mapped: RoomExitDto = {
+      ...exit,
+      id: String(exit.id),
+      description: exit.description ?? undefined,
+      key: exit.key ?? undefined,
+      toZoneId: exit.toZoneId ?? undefined,
+      toRoomId: exit.toRoomId ?? undefined,
+    } as RoomExitDto;
+    return mapped;
   }
 
   @Mutation(() => RoomDto)
@@ -129,11 +218,12 @@ export class RoomsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('position') position: UpdateRoomPositionInput
   ): Promise<RoomDto> {
-    return this.roomsService.updatePosition(
+    const updated = await this.roomsService.updatePosition(
       zoneId,
       id,
       position
-    ) as unknown as RoomDto;
+    );
+    return mapRoom(updated as unknown as RoomsMapperInput);
   }
 
   @Mutation(() => BatchUpdateResult)
@@ -145,7 +235,7 @@ export class RoomsResolver {
   }
 
   @ResolveField(() => [MobDto])
-  mobs(@Parent() room: any): MobDto[] {
+  mobs(@Parent() room: RoomWithResets): MobDto[] {
     // Support both snake_case (from raw SQL) and camelCase (from Prisma)
     const resets = room.mobResets || room.mob_resets;
     if (!resets || resets.length === 0) {
@@ -153,18 +243,19 @@ export class RoomsResolver {
     }
 
     // Deduplicate mobs by ID since multiple resets can reference the same mob
-    const uniqueMobs = new Map<number, any>();
-    resets.forEach((reset: any) => {
+    const uniqueMobs = new Map<number, MobSummary>();
+    resets.forEach((reset: MobReset) => {
       if (reset.mobs) {
         uniqueMobs.set(reset.mobs.id, reset.mobs);
       }
     });
 
-    return Array.from(uniqueMobs.values());
+    // Cast since we only need basic mob fields for GraphQL; additional fields resolved elsewhere
+    return Array.from(uniqueMobs.values()) as unknown as MobDto[];
   }
 
   @ResolveField(() => [ObjectDto])
-  objects(@Parent() room: any): ObjectDto[] {
+  objects(@Parent() room: RoomWithResets): ObjectDto[] {
     // Support both snake_case (from raw SQL) and camelCase (from Prisma)
     const resets = room.objectResets || room.object_resets;
     if (!resets || resets.length === 0) {
@@ -172,18 +263,18 @@ export class RoomsResolver {
     }
 
     // Deduplicate objects by ID since multiple resets can reference the same object
-    const uniqueObjects = new Map<number, any>();
-    resets.forEach((reset: any) => {
+    const uniqueObjects = new Map<number, ObjectSummary>();
+    resets.forEach((reset: ObjectReset) => {
       if (reset.objects) {
         uniqueObjects.set(reset.objects.id, reset.objects);
       }
     });
 
-    return Array.from(uniqueObjects.values());
+    return Array.from(uniqueObjects.values()) as unknown as ObjectDto[];
   }
 
   @ResolveField(() => [ShopDto])
-  async shops(@Parent() room: any): Promise<ShopDto[]> {
+  async shops(@Parent() room: RoomWithResets): Promise<ShopDto[]> {
     // Support both snake_case (from raw SQL) and camelCase (from Prisma)
     const resets = room.mobResets || room.mob_resets;
     if (!resets || resets.length === 0) {
@@ -192,7 +283,7 @@ export class RoomsResolver {
 
     // Get unique mobs from room (need both zoneId and id)
     const uniqueMobs = new Map<string, { zoneId: number; id: number }>();
-    resets.forEach((reset: any) => {
+    resets.forEach((reset: MobReset) => {
       if (reset.mobs) {
         const key = `${reset.mobs.zoneId}-${reset.mobs.id}`;
         uniqueMobs.set(key, { zoneId: reset.mobs.zoneId, id: reset.mobs.id });
@@ -204,7 +295,7 @@ export class RoomsResolver {
     for (const mob of uniqueMobs.values()) {
       const shop = await this.shopsService.findByKeeper(mob.zoneId, mob.id);
       if (shop) {
-        shops.push({
+        const mapped: ShopDto = {
           id: shop.id,
           buyProfit: shop.buyProfit,
           sellProfit: shop.sellProfit,
@@ -216,39 +307,59 @@ export class RoomsResolver {
           missingCashMessages: shop.missingCashMessages || [],
           buyMessages: shop.buyMessages || [],
           sellMessages: shop.sellMessages || [],
-          keeperId: shop.keeperId,
-          keeper: shop.mobs
-            ? {
-                id: shop.mobs.id,
-                zoneId: shop.mobs.zoneId,
-                name: shop.mobs.name,
-                keywords: shop.mobs.keywords || [],
-              }
-            : undefined,
           zoneId: shop.zoneId,
           createdAt: shop.createdAt,
           updatedAt: shop.updatedAt,
           items:
-            shop.shopItems?.map((item: any) => ({
-              id: item.id,
-              amount: item.stockLimit,
-              objectId: item.objectId,
-              objectZoneId: item.objectZoneId,
-              object: item.object,
-            })) || [],
+            shop.shopItems?.map((item: RawShopItem) => {
+              const base: Partial<ShopItemDto> = {
+                id: String(item.id),
+                amount: item.amount,
+                objectId: item.objectId,
+                objectZoneId: item.objectZoneId,
+              };
+              if (item.objects) {
+                const obj: Partial<ObjectSummaryDto> = {
+                  id: item.objects.id,
+                  zoneId: item.objects.zoneId,
+                  name: item.objects.name,
+                  type: String(item.objects.type),
+                };
+                if (
+                  item.objects.cost !== null &&
+                  item.objects.cost !== undefined
+                ) {
+                  obj.cost = item.objects.cost;
+                }
+                base.object = obj as ObjectSummaryDto;
+              }
+              return base as ShopItemDto;
+            }) || [],
           accepts:
-            shop.shopAccepts?.map((accept: any) => ({
-              id: accept.id,
-              type: accept.itemType,
-              keywords: '',
+            shop.shopAccepts?.map((accept: RawShopAccept) => ({
+              id: String(accept.id),
+              type: accept.type,
+              keywords: accept.keywords?.join(' ') ?? '',
             })) || [],
           hours:
-            shop.shopHours?.map((hour: any) => ({
-              id: hour.id,
-              open: hour.openHour,
-              close: hour.closeHour,
+            shop.shopHours?.map((hour: RawShopHour) => ({
+              id: String(hour.id),
+              open: hour.open,
+              close: hour.close,
             })) || [],
-        });
+        };
+        if (shop.mobs) {
+          mapped.keeper = {
+            id: shop.mobs.id,
+            zoneId: shop.mobs.zoneId,
+            name: shop.mobs.name,
+            keywords: shop.mobs.keywords || [],
+          };
+        }
+        if (shop.keeperId !== null && shop.keeperId !== undefined) {
+          mapped.keeperId = shop.keeperId;
+        }
+        shops.push(mapped);
       }
     }
 

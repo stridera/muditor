@@ -10,10 +10,10 @@ import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
+import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
   useRealTimeValidation,
   ValidationHelpers,
-  ValidationRules,
 } from '../../../../hooks/useRealTimeValidation';
 
 const GET_OBJECT = gql`

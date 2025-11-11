@@ -1,12 +1,5 @@
+import type { Position } from '@prisma/client';
 import { PrismaClient } from '@prisma/client';
-import type {
-  Race,
-  Gender,
-  Position,
-  TargetScope,
-  SaveType,
-  TargetType,
-} from '@prisma/client';
 
 export async function seedGameSystem(prisma: PrismaClient) {
   console.log('🎮 Seeding game system data...');
@@ -88,7 +81,8 @@ export async function seedGameSystem(prisma: PrismaClient) {
     },
     {
       name: 'Transmutation',
-      description: 'Spells that transform the recipient physically or mentally.',
+      description:
+        'Spells that transform the recipient physically or mentally.',
     },
     {
       name: 'Conjuration',
@@ -201,27 +195,37 @@ export async function seedGameSystem(prisma: PrismaClient) {
       where: { name: abilityData.schoolName },
     });
 
+    // Build update/create payloads omitting optional schoolId when undefined (strict optional compliance)
+    const abilityBase = {
+      violent: abilityData.violent,
+      castTimeRounds: abilityData.castTimeRounds,
+      cooldownMs: abilityData.cooldownMs,
+      minPosition: abilityData.minPosition,
+      isArea: abilityData.isArea,
+      abilityType: abilityData.abilityType,
+    } as const;
+
+    // Use explicit typed builders avoiding Partial to satisfy exactOptionalPropertyTypes
+    const abilityUpdateBuilder: {
+      [K in keyof typeof abilityBase]: (typeof abilityBase)[K];
+    } & { schoolId?: number } = {
+      ...abilityBase,
+    };
+    const abilityCreateBuilder: { name: string } & {
+      [K in keyof typeof abilityBase]: (typeof abilityBase)[K];
+    } & { schoolId?: number } = {
+      name: abilityData.name,
+      ...abilityBase,
+    };
+    if (typeof school?.id === 'number') {
+      abilityUpdateBuilder.schoolId = school.id;
+      abilityCreateBuilder.schoolId = school.id;
+    }
+
     const ability = await prisma.ability.upsert({
       where: { name: abilityData.name },
-      update: {
-        schoolId: school?.id,
-        violent: abilityData.violent,
-        castTimeRounds: abilityData.castTimeRounds,
-        cooldownMs: abilityData.cooldownMs,
-        minPosition: abilityData.minPosition,
-        isArea: abilityData.isArea,
-        abilityType: abilityData.abilityType,
-      },
-      create: {
-        name: abilityData.name,
-        schoolId: school?.id,
-        violent: abilityData.violent,
-        castTimeRounds: abilityData.castTimeRounds,
-        cooldownMs: abilityData.cooldownMs,
-        minPosition: abilityData.minPosition,
-        isArea: abilityData.isArea,
-        abilityType: abilityData.abilityType,
-      },
+      update: abilityUpdateBuilder,
+      create: abilityCreateBuilder,
     });
 
     // Add basic targeting for each ability
@@ -234,10 +238,10 @@ export async function seedGameSystem(prisma: PrismaClient) {
           abilityData.name === 'Fireball'
             ? ['ENEMY_PC', 'ENEMY_NPC']
             : abilityData.name === 'Cure Light Wounds'
-            ? ['SELF', 'ALLY_PC', 'ALLY_NPC']
-            : abilityData.name === 'Detect Invisibility'
-            ? ['SELF', 'ALLY_PC', 'ALLY_NPC']
-            : ['SELF'],
+              ? ['SELF', 'ALLY_PC', 'ALLY_NPC']
+              : abilityData.name === 'Detect Invisibility'
+                ? ['SELF', 'ALLY_PC', 'ALLY_NPC']
+                : ['SELF'],
         scope: abilityData.isArea ? 'ROOM' : 'SINGLE',
         maxTargets: abilityData.isArea ? 10 : 1,
         range: 10, // Room range

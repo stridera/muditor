@@ -119,11 +119,12 @@ type AbilitySummary = Pick<
   }> | null;
 };
 
+// Optional values must explicitly include undefined to satisfy exactOptionalPropertyTypes
 interface AbilityFormData {
   name: string;
   abilityType: string;
   description: string;
-  schoolId?: number;
+  schoolId: number | undefined; // explicit undefined instead of optional property
   minPosition: Position;
   violent: boolean;
   castTimeRounds: number;
@@ -527,15 +528,17 @@ export default function AbilitiesPage() {
                           <TableCell>
                             {ability.effects && ability.effects.length > 0 ? (
                               <div className='flex flex-wrap gap-1'>
-                                {ability.effects.slice(0, 2).map(abilityEffect => (
-                                  <Badge
-                                    key={abilityEffect.effectId}
-                                    variant='outline'
-                                    className='text-xs'
-                                  >
-                                    {abilityEffect.effect.name}
-                                  </Badge>
-                                ))}
+                                {ability.effects
+                                  .slice(0, 2)
+                                  .map(abilityEffect => (
+                                    <Badge
+                                      key={abilityEffect.effectId}
+                                      variant='outline'
+                                      className='text-xs'
+                                    >
+                                      {abilityEffect.effect.name}
+                                    </Badge>
+                                  ))}
                                 {ability.effects.length > 2 && (
                                   <Badge
                                     variant='secondary'
@@ -632,10 +635,13 @@ export default function AbilitiesPage() {
               <div className='flex flex-col sm:flex-row items-start sm:items-center justify-between mt-4 gap-4'>
                 <div className='flex items-center gap-4'>
                   <div className='text-sm text-muted-foreground'>
-                    Page {page + 1} of {totalPages} ({totalCount} total abilities)
+                    Page {page + 1} of {totalPages} ({totalCount} total
+                    abilities)
                   </div>
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm text-muted-foreground'>Per page:</span>
+                    <span className='text-sm text-muted-foreground'>
+                      Per page:
+                    </span>
                     <Select
                       value={pageSize.toString()}
                       onValueChange={value => {
@@ -702,7 +708,9 @@ export default function AbilitiesPage() {
                   <Button
                     variant='outline'
                     size='sm'
-                    onClick={() => setPage(p => Math.min(totalPages - 1, p + 10))}
+                    onClick={() =>
+                      setPage(p => Math.min(totalPages - 1, p + 10))
+                    }
                     disabled={page >= totalPages - 10}
                     title='Forward 10 pages'
                   >
@@ -1213,12 +1221,14 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
     isArea: false,
     notes: '',
     tags: [],
+    schoolId: undefined,
   });
 
   // Update form when ability changes
   useEffect(() => {
     if (ability) {
-      setFormData({
+      setFormData(prev => ({
+        ...prev,
         name: ability.name,
         abilityType: ability.abilityType,
         description: ability.description || '',
@@ -1231,12 +1241,14 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         isArea: ability.isArea,
         notes: ability.notes || '',
         tags: (ability.tags as string[]) || [],
-      });
+      }));
     } else {
-      setFormData({
+      setFormData(prev => ({
+        ...prev,
         name: '',
         abilityType: 'SPELL',
         description: '',
+        schoolId: undefined,
         minPosition: 'STANDING',
         violent: false,
         castTimeRounds: 1,
@@ -1245,7 +1257,7 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         isArea: false,
         notes: '',
         tags: [],
-      });
+      }));
     }
   }, [ability]);
 

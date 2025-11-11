@@ -1,6 +1,6 @@
-import { FullConfig, chromium } from '@playwright/test';
+import type { FullConfig } from '@playwright/test';
 
-async function globalSetup(config: FullConfig) {
+async function globalSetup(_config: FullConfig) {
   console.log('🔧 Starting global E2E test setup...');
 
   // Ensure database and API are ready
@@ -23,7 +23,7 @@ async function waitForServer(
         console.log(`✅ Server ready at ${url}`);
         return;
       }
-    } catch (error) {
+    } catch (_error) {
       // Server not ready, continue waiting
     }
 

@@ -1,4 +1,4 @@
-import { SearchFilters } from '../components/EnhancedSearch';
+import type { SearchFilters } from '../components/EnhancedSearch';
 
 /**
  * Advanced search utility functions for filtering entities

@@ -5,7 +5,7 @@
 export interface ApiError {
   message: string;
   code?: string;
-  details?: any;
+  details?: unknown;
   statusCode?: number;
 }
 
@@ -20,22 +20,34 @@ export interface ErrorDisplayProps {
 /**
  * Extract meaningful error messages from GraphQL/Apollo errors
  */
-export function extractErrorMessage(error: any): string {
+// Narrowable GraphQL/Apollo error shapes
+interface GraphQLErrorLike {
+  message: string;
+}
+interface ApolloErrorLike {
+  graphQLErrors?: GraphQLErrorLike[];
+  networkError?: { message?: string } & Record<string, unknown>;
+  message?: string;
+  stack?: string;
+}
+
+export function extractErrorMessage(error: unknown): string {
+  const e = error as ApolloErrorLike | undefined;
   // GraphQL errors
-  if (error?.graphQLErrors?.length > 0) {
-    return error.graphQLErrors[0].message;
+  if (e?.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors[0]) {
+    return e.graphQLErrors[0].message;
   }
-  
+
   // Network errors
-  if (error?.networkError?.message) {
-    return error.networkError.message;
+  if (e?.networkError?.message) {
+    return e.networkError.message as string;
   }
-  
+
   // Standard error
-  if (error?.message) {
-    return error.message;
+  if (typeof e?.message === 'string') {
+    return e.message;
   }
-  
+
   // Fallback
   return 'An unexpected error occurred. Please try again.';
 }
@@ -43,28 +55,29 @@ export function extractErrorMessage(error: any): string {
 /**
  * Categorize errors for better user messaging
  */
-export function categorizeError(error: any): {
+export function categorizeError(error: unknown): {
   category: 'network' | 'authentication' | 'validation' | 'server' | 'unknown';
   userMessage: string;
   shouldRetry: boolean;
 } {
   const message = extractErrorMessage(error);
   const lowerMessage = message.toLowerCase();
-  
+
   // Network connectivity issues
   if (
     lowerMessage.includes('network') ||
     lowerMessage.includes('fetch') ||
     lowerMessage.includes('connection') ||
-    error?.networkError
+    (error as ApolloErrorLike | undefined)?.networkError
   ) {
     return {
       category: 'network',
-      userMessage: 'Connection problem. Please check your internet connection and try again.',
+      userMessage:
+        'Connection problem. Please check your internet connection and try again.',
       shouldRetry: true,
     };
   }
-  
+
   // Authentication/authorization issues
   if (
     lowerMessage.includes('unauthorized') ||
@@ -78,7 +91,7 @@ export function categorizeError(error: any): {
       shouldRetry: false,
     };
   }
-  
+
   // Validation errors
   if (
     lowerMessage.includes('validation') ||
@@ -92,7 +105,7 @@ export function categorizeError(error: any): {
       shouldRetry: false,
     };
   }
-  
+
   // Server errors
   if (
     lowerMessage.includes('server') ||
@@ -101,11 +114,12 @@ export function categorizeError(error: any): {
   ) {
     return {
       category: 'server',
-      userMessage: 'Server error. Our team has been notified. Please try again later.',
+      userMessage:
+        'Server error. Our team has been notified. Please try again later.',
       shouldRetry: true,
     };
   }
-  
+
   // Unknown errors
   return {
     category: 'unknown',
@@ -117,9 +131,9 @@ export function categorizeError(error: any): {
 /**
  * Create user-friendly error messages with suggested actions
  */
-export function createErrorDisplay(error: any): ErrorDisplayProps {
+export function createErrorDisplay(error: unknown): ErrorDisplayProps {
   const { category, userMessage, shouldRetry } = categorizeError(error);
-  
+
   switch (category) {
     case 'network':
       return {
@@ -128,7 +142,7 @@ export function createErrorDisplay(error: any): ErrorDisplayProps {
         actionLabel: 'Retry',
         variant: 'warning',
       };
-      
+
     case 'authentication':
       return {
         title: 'Session Expired',
@@ -136,49 +150,63 @@ export function createErrorDisplay(error: any): ErrorDisplayProps {
         actionLabel: 'Log In',
         variant: 'error',
       };
-      
+
     case 'validation':
       return {
         title: 'Invalid Input',
         message: userMessage,
         variant: 'warning',
       };
-      
+
     case 'server':
-      return {
-        title: 'Server Error',
-        message: userMessage,
-        actionLabel: shouldRetry ? 'Try Again' : undefined,
-        variant: 'error',
-      };
-      
+      return shouldRetry
+        ? {
+            title: 'Server Error',
+            message: userMessage,
+            actionLabel: 'Try Again',
+            variant: 'error',
+          }
+        : {
+            title: 'Server Error',
+            message: userMessage,
+            variant: 'error',
+          };
+
     default:
-      return {
-        title: 'Error',
-        message: userMessage,
-        actionLabel: shouldRetry ? 'Try Again' : undefined,
-        variant: 'error',
-      };
+      return shouldRetry
+        ? {
+            title: 'Error',
+            message: userMessage,
+            actionLabel: 'Try Again',
+            variant: 'error',
+          }
+        : {
+            title: 'Error',
+            message: userMessage,
+            variant: 'error',
+          };
   }
 }
 
 /**
  * Log errors with context for debugging
  */
-export function logError(error: any, context?: string): void {
+export function logError(error: unknown, context?: string): void {
+  const e = error as ApolloErrorLike | undefined;
   const errorInfo = {
     message: extractErrorMessage(error),
     context,
     timestamp: new Date().toISOString(),
-    userAgent: typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
+    userAgent:
+      typeof window !== 'undefined' ? window.navigator.userAgent : 'unknown',
     url: typeof window !== 'undefined' ? window.location.href : 'unknown',
-    stackTrace: error?.stack,
-    graphQLErrors: error?.graphQLErrors,
-    networkError: error?.networkError,
+    stackTrace: e?.stack,
+    graphQLErrors: e?.graphQLErrors,
+    networkError: e?.networkError,
   };
-  
+
   console.error('Application Error:', errorInfo);
-  
+
   // In production, you could send this to an error tracking service
   if (process.env.NODE_ENV === 'production') {
     // Example: Sentry, LogRocket, etc.
@@ -191,7 +219,7 @@ export function logError(error: any, context?: string): void {
  */
 export function useErrorHandler() {
   return {
-    handleError: (error: any, context?: string) => {
+    handleError: (error: unknown, context?: string) => {
       logError(error, context);
       return createErrorDisplay(error);
     },

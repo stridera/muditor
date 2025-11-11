@@ -1,19 +1,26 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+// Import enum only AFTER GraphQL enums have been registered in object.dto (registration side-effect)
+import { ObjectType as ObjectTypeEnum } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';
 import { ObjectsService } from './objects.service';
 
 @Resolver(() => ObjectDto)
 export class ObjectsResolver {
-  constructor(private readonly objectsService: ObjectsService) { }
+  constructor(private readonly objectsService: ObjectsService) {}
 
   @Query(() => [ObjectDto], { name: 'objects' })
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<ObjectDto[]> {
-    return this.objectsService.findAll({ skip, take }) as any; // TODO: Map database fields to DTO
+    const params: { skip?: number; take?: number } = {};
+    if (skip !== undefined) params.skip = skip;
+    if (take !== undefined) params.take = take;
+    const objects = await this.objectsService.findAll(params);
+    return objects.map(o => mapObject(o));
   }
 
   @Query(() => ObjectDto, { name: 'object' })
@@ -21,19 +28,26 @@ export class ObjectsResolver {
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<ObjectDto | null> {
-    return this.objectsService.findOne(zoneId, id) as any; // TODO: Map database fields to DTO
+    const obj = await this.objectsService.findOne(zoneId, id);
+    return obj ? mapObject(obj) : null;
   }
 
   @Query(() => [ObjectDto], { name: 'objectsByZone' })
   async findByZone(
     @Args('zoneId', { type: () => Int }) zoneId: number
   ): Promise<ObjectDto[]> {
-    return this.objectsService.findByZone(zoneId) as any; // TODO: Map database fields to DTO
+    const objects = await this.objectsService.findByZone(zoneId);
+    return objects.map(o => mapObject(o));
   }
 
   @Query(() => [ObjectDto], { name: 'objectsByType' })
-  async findByType(@Args('type') type: string): Promise<ObjectDto[]> {
-    return this.objectsService.findByType(type) as any; // TODO: Map database fields to DTO
+  async findByType(
+    // Provide explicit enum type in the decorator factory to prevent UndefinedTypeError.
+    // The explicit lambda ensures Nest can reflect the enum even in CommonJS compilation mode.
+    @Args('type', { type: () => ObjectTypeEnum }) type: ObjectTypeEnum
+  ): Promise<ObjectDto[]> {
+    const objects = await this.objectsService.findByType(type);
+    return objects.map(o => mapObject(o));
   }
 
   @Query(() => Int, { name: 'objectsCount' })
@@ -47,12 +61,13 @@ export class ObjectsResolver {
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
     const { zoneId, ...objectData } = data;
-    return this.objectsService.create({
+    const created = await this.objectsService.create({
       ...objectData,
       zones: {
         connect: { id: zoneId },
       },
-    }) as any; // TODO: Map database fields to DTO
+    });
+    return mapObject(created);
   }
 
   @Mutation(() => ObjectDto)
@@ -62,7 +77,8 @@ export class ObjectsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateObjectInput
   ): Promise<ObjectDto> {
-    return this.objectsService.update(zoneId, id, data) as any; // TODO: Map database fields to DTO
+    const updated = await this.objectsService.update(zoneId, id, data);
+    return mapObject(updated);
   }
 
   @Mutation(() => ObjectDto)
@@ -71,7 +87,8 @@ export class ObjectsResolver {
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
   ): Promise<ObjectDto> {
-    return this.objectsService.delete(zoneId, id) as any; // TODO: Map database fields to DTO
+    const deleted = await this.objectsService.delete(zoneId, id);
+    return mapObject(deleted);
   }
 
   @Mutation(() => Int, { name: 'deleteObjects' })

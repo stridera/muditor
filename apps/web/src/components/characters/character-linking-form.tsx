@@ -358,8 +358,10 @@ export function CharacterLinkingForm({
                     </span>
                     <OnlineStatus
                       isOnline={character.isOnline}
-                      lastLogin={character.lastLogin}
                       size='sm'
+                      {...(character.lastLogin
+                        ? { lastLogin: character.lastLogin }
+                        : {})}
                     />
                   </div>
                   <div className='flex justify-between'>

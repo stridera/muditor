@@ -9,7 +9,7 @@ import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import EnhancedSearch, {
-  SearchFilters,
+  type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import ZoneSelector from '../../../components/ZoneSelector';
 import { applySearchFilters } from '../../../lib/search-utils';
@@ -133,9 +133,7 @@ function ShopsContent() {
 
   const { loading, error, data, refetch } = useQuery(
     selectedZone ? GET_SHOPS_BY_ZONE : GET_SHOPS,
-    {
-      variables: selectedZone ? { zoneId: selectedZone } : undefined,
-    }
+    selectedZone != null ? { variables: { zoneId: selectedZone } } : {}
   ) as {
     loading: boolean;
     error?: any;

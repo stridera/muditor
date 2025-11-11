@@ -4,7 +4,7 @@ import {
   OnModuleDestroy,
   OnModuleInit,
 } from '@nestjs/common';
-import { PrismaClient } from '@prisma/client';
+import { Prisma, PrismaClient } from '@prisma/client';
 
 @Injectable()
 export class DatabaseService
@@ -39,21 +39,27 @@ export class DatabaseService
   async onModuleInit() {
     // Log Prisma events in development
     if (process.env.NODE_ENV === 'development') {
-      this.$on('query', (e: any) => {
+      // TODO(prisma-wrapper): Replace direct $on listeners with a lightweight wrapper service
+      // that normalizes event payloads and enforces typed query logging.
+      // Issue: Subclassing PrismaClient with custom log config + strict optional types forces
+      // us to use @ts-expect-error here. Wrapper will expose onQuery/onError hooks instead.
+      // Restore listeners with explicit ts-expect-error due to subclass narrowing bug under strict optional types
+      // @ts-expect-error Prisma typing issue when subclassing with custom log configuration
+      this.$on('query', (e: Prisma.QueryEvent) => {
         this.logger.debug(
           `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration}ms`
         );
       });
-
-      this.$on('error', (e: any) => {
+      // @ts-expect-error see note above
+      this.$on('error', (e: Prisma.LogEvent) => {
         this.logger.error('Database error:', e);
       });
-
-      this.$on('warn', (e: any) => {
+      // @ts-expect-error see note above
+      this.$on('warn', (e: Prisma.LogEvent) => {
         this.logger.warn('Database warning:', e);
       });
-
-      this.$on('info', (e: any) => {
+      // @ts-expect-error see note above
+      this.$on('info', (e: Prisma.LogEvent) => {
         this.logger.log('Database info:', e);
       });
     }

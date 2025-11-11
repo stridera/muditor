@@ -7,12 +7,12 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
-import { Circle, Clock, User } from 'lucide-react';
 import { formatDistanceToNow } from 'date-fns';
+import { Circle, Clock, User } from 'lucide-react';
 
 interface OnlineStatusProps {
   isOnline: boolean;
-  lastLogin?: Date | string;
+  lastLogin?: Date | string; // optional: omit key entirely when unknown
   showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
@@ -153,7 +153,6 @@ interface CharacterStatusCardProps {
 export function CharacterStatusCard({
   character,
   showUser = false,
-  showActions = false,
   onCharacterClick,
 }: CharacterStatusCardProps) {
   return (
@@ -169,8 +168,10 @@ export function CharacterStatusCard({
             <h3 className='font-medium text-gray-900'>{character.name}</h3>
             <OnlineStatus
               isOnline={character.isOnline}
-              lastLogin={character.lastLogin}
               size='sm'
+              {...(character.lastLogin
+                ? { lastLogin: character.lastLogin }
+                : {})}
             />
           </div>
 

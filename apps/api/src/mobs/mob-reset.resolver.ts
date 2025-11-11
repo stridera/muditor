@@ -1,5 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { WearFlag } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateMobResetInput,
@@ -66,37 +67,48 @@ export class MobResetResolver {
     @Args('resetId', { type: () => ID }) resetId: number,
     @Args('objectZoneId', { type: () => Int }) objectZoneId: number,
     @Args('objectId', { type: () => Int }) objectId: number,
-    @Args('wearLocation', { type: () => String, nullable: true })
-    wearLocation?: string,
+    @Args('wearLocation', { type: () => WearFlag, nullable: true })
+    wearLocation?: WearFlag,
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
     probability?: number
   ): Promise<MobResetDto> {
-    return this.mobResetService.addEquipment(resetId, {
+    const equipmentData: {
+      objectZoneId: number;
+      objectId: number;
+      wearLocation?: WearFlag;
+      maxInstances?: number;
+      probability?: number;
+    } = {
       objectZoneId,
       objectId,
-      wearLocation,
-      maxInstances,
-      probability,
-    });
+    };
+    if (wearLocation !== undefined) equipmentData.wearLocation = wearLocation;
+    if (maxInstances !== undefined) equipmentData.maxInstances = maxInstances;
+    if (probability !== undefined) equipmentData.probability = probability;
+    return this.mobResetService.addEquipment(resetId, equipmentData);
   }
 
   @Mutation(() => Boolean)
   @UseGuards(JwtAuthGuard)
   async updateMobResetEquipment(
     @Args('id', { type: () => ID }) id: number,
-    @Args('wearLocation', { type: () => String, nullable: true })
-    wearLocation?: string,
+    @Args('wearLocation', { type: () => WearFlag, nullable: true })
+    wearLocation?: WearFlag,
     @Args('maxInstances', { type: () => Int, nullable: true })
     maxInstances?: number,
     @Args('probability', { type: () => Number, nullable: true })
     probability?: number
   ): Promise<boolean> {
-    return this.mobResetService.updateEquipment(id, {
-      wearLocation,
-      maxInstances,
-      probability,
-    });
+    const updates: {
+      wearLocation?: WearFlag;
+      maxInstances?: number;
+      probability?: number;
+    } = {};
+    if (wearLocation !== undefined) updates.wearLocation = wearLocation;
+    if (maxInstances !== undefined) updates.maxInstances = maxInstances;
+    if (probability !== undefined) updates.probability = probability;
+    return this.mobResetService.updateEquipment(id, updates);
   }
 }

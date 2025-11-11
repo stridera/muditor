@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 
 interface WorldMapRoom {
   id: number;
@@ -28,53 +28,53 @@ interface WorldMapCanvasProps {
 const getSectorColor = (sector: string): string => {
   const colors = {
     // Basic terrain
-    'structure': '#8b7355',      // Brown - buildings/structures
-    'field': '#90EE90',          // Light green - open fields
-    'forest': '#228B22',         // Forest green - wooded areas
-    'hills': '#9ACD32',          // Yellow green - hilly terrain
-    'mountain': '#8B7D6B',       // Gray brown - mountainous
-    'water_swim': '#4169E1',     // Royal blue - swimmable water
-    'water_noswim': '#000080',   // Navy - deep water
-    'underwater': '#006994',     // Deep blue - underwater areas
-    'flying': '#87CEEB',         // Sky blue - aerial areas
-    'desert': '#F4A460',         // Sandy brown - desert
-    'road': '#696969',           // Dim gray - roads/paths
-    'entrance': '#FFD700',       // Gold - entrances/gates
-    'swamp': '#556B2F',          // Dark olive - swampy areas
-    'jungle': '#006400',         // Dark green - dense jungle
-    'tundra': '#E0E0E0',         // Light gray - tundra
-    'arctic': '#F0F8FF',         // Alice blue - arctic
-    'prairie': '#ADFF2F',        // Green yellow - prairie
-    'ocean': '#1E90FF',          // Dodger blue - ocean
-    'river': '#00CED1',          // Dark turquoise - rivers
-    'lake': '#4682B4',           // Steel blue - lakes
-    'beach': '#F5DEB3',          // Wheat - sandy beaches
-    'cave': '#2F4F4F',           // Dark slate gray - caves
-    'inside': '#D2B48C',         // Tan - indoor areas
-    'city': '#C0C0C0',           // Silver - urban areas
-    'farmland': '#ADFF2F',       // Green yellow - farmland
-    'ruins': '#8B8682',          // Gray - ruined areas
-    'magical': '#9370DB',        // Medium purple - magical areas
-    'volcanic': '#DC143C',       // Crimson - volcanic areas
-    'ice': '#B0E0E6',            // Powder blue - icy areas
-    'snow': '#FFFAFA',           // Snow - snowy areas
-    'mud': '#8B4513',            // Saddle brown - muddy areas
-    'sand': '#F5E050',           // Light sandy - sandy areas
-    'stone': '#708090',          // Slate gray - stone areas
-    'grass': '#32CD32',          // Lime green - grassy areas
-    'dirt': '#8B4513',           // Saddle brown - dirt paths
-    'gravel': '#A9A9A9',         // Dark gray - gravel
-    'air': '#E6E6FA',            // Lavender - air/sky
-    'void': '#000000',           // Black - void areas
-    'lava': '#FF4500',           // Orange red - lava
-    'quicksand': '#DAA520',      // Goldenrod - quicksand
-    'brambles': '#228B22',       // Forest green - thorny areas
-    'garden': '#98FB98',         // Pale green - gardens
-    'courtyard': '#F0E68C',      // Khaki - courtyards
-    'corridor': '#D2B48C',       // Tan - corridors
-    'room': '#DDD',              // Light gray - generic rooms
-    'hall': '#E6E6E6',           // Light gray - halls
-    'chamber': '#DCDCDC',        // Gainsboro - chambers
+    structure: '#8b7355', // Brown - buildings/structures
+    field: '#90EE90', // Light green - open fields
+    forest: '#228B22', // Forest green - wooded areas
+    hills: '#9ACD32', // Yellow green - hilly terrain
+    mountain: '#8B7D6B', // Gray brown - mountainous
+    water_swim: '#4169E1', // Royal blue - swimmable water
+    water_noswim: '#000080', // Navy - deep water
+    underwater: '#006994', // Deep blue - underwater areas
+    flying: '#87CEEB', // Sky blue - aerial areas
+    desert: '#F4A460', // Sandy brown - desert
+    road: '#696969', // Dim gray - roads/paths
+    entrance: '#FFD700', // Gold - entrances/gates
+    swamp: '#556B2F', // Dark olive - swampy areas
+    jungle: '#006400', // Dark green - dense jungle
+    tundra: '#E0E0E0', // Light gray - tundra
+    arctic: '#F0F8FF', // Alice blue - arctic
+    prairie: '#ADFF2F', // Green yellow - prairie
+    ocean: '#1E90FF', // Dodger blue - ocean
+    river: '#00CED1', // Dark turquoise - rivers
+    lake: '#4682B4', // Steel blue - lakes
+    beach: '#F5DEB3', // Wheat - sandy beaches
+    cave: '#2F4F4F', // Dark slate gray - caves
+    inside: '#D2B48C', // Tan - indoor areas
+    city: '#C0C0C0', // Silver - urban areas
+    farmland: '#ADFF2F', // Green yellow - farmland
+    ruins: '#8B8682', // Gray - ruined areas
+    magical: '#9370DB', // Medium purple - magical areas
+    volcanic: '#DC143C', // Crimson - volcanic areas
+    ice: '#B0E0E6', // Powder blue - icy areas
+    snow: '#FFFAFA', // Snow - snowy areas
+    mud: '#8B4513', // Saddle brown - muddy areas
+    sand: '#F5E050', // Light sandy - sandy areas
+    stone: '#708090', // Slate gray - stone areas
+    grass: '#32CD32', // Lime green - grassy areas
+    dirt: '#8B4513', // Saddle brown - dirt paths
+    gravel: '#A9A9A9', // Dark gray - gravel
+    air: '#E6E6FA', // Lavender - air/sky
+    void: '#000000', // Black - void areas
+    lava: '#FF4500', // Orange red - lava
+    quicksand: '#DAA520', // Goldenrod - quicksand
+    brambles: '#228B22', // Forest green - thorny areas
+    garden: '#98FB98', // Pale green - gardens
+    courtyard: '#F0E68C', // Khaki - courtyards
+    corridor: '#D2B48C', // Tan - corridors
+    room: '#DDD', // Light gray - generic rooms
+    hall: '#E6E6E6', // Light gray - halls
+    chamber: '#DCDCDC', // Gainsboro - chambers
   };
 
   // Normalize sector string (lowercase, remove special chars)
@@ -100,7 +100,7 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
   clusters,
   zoom,
   onRoomClick,
-  className = ''
+  className = '',
 }) => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
@@ -111,7 +111,7 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    const performanceStart = performance.now();
+    // const performanceStart = performance.now();
 
     // Clear canvas
     ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -124,17 +124,17 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
 
     // Limit canvas size to reasonable dimensions
     const maxCanvasSize = 2000; // Reasonable maximum size
-    const worldWidth = Math.min((maxX - minX) + 400, maxCanvasSize);
-    const worldHeight = Math.min((maxY - minY) + 400, maxCanvasSize);
+    const worldWidth = Math.min(maxX - minX + 400, maxCanvasSize);
+    const worldHeight = Math.min(maxY - minY + 400, maxCanvasSize);
 
     // Set canvas size with reasonable limits
     canvas.width = worldWidth;
     canvas.height = worldHeight;
 
     // Render each cluster as a colored circle (coordinates are already scaled)
-    clusters.forEach((cluster) => {
-      const x = (cluster.centerX - minX) + 200;
-      const y = (cluster.centerY - minY) + 200;
+    clusters.forEach(cluster => {
+      const x = cluster.centerX - minX + 200;
+      const y = cluster.centerY - minY + 200;
       const radius = Math.max(8, Math.min(40, cluster.size));
 
       // Get sector color
@@ -160,46 +160,61 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
       }
     });
 
-    const performanceEnd = performance.now();
+    // const performanceEnd = performance.now();
     // Performance logging disabled to reduce console spam during interactions
     // console.log(`🎨 Canvas rendered ${clusters.length} clusters in ${(performanceEnd - performanceStart).toFixed(1)}ms`);
   }, [clusters, zoom]);
 
   // Handle canvas click events
-  const handleCanvasClick = useCallback((event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!onRoomClick) return;
+  const handleCanvasClick = useCallback(
+    (event: React.MouseEvent<HTMLCanvasElement>) => {
+      if (!onRoomClick) return;
 
-    const canvas = canvasRef.current;
-    if (!canvas) return;
+      const canvas = canvasRef.current;
+      if (!canvas) return;
 
-    const rect = canvas.getBoundingClientRect();
-    const x = event.clientX - rect.left;
-    const y = event.clientY - rect.top;
+      const rect = canvas.getBoundingClientRect();
+      const x = event.clientX - rect.left;
+      const y = event.clientY - rect.top;
 
-    // Find the closest cluster to the click position (coordinates are already scaled)
-    const minX = Math.min(...clusters.map(c => c.centerX));
-    const minY = Math.min(...clusters.map(c => c.centerY));
+      // Find the closest cluster to the click position (coordinates are already scaled)
+      const minX = Math.min(...clusters.map(c => c.centerX));
+      const minY = Math.min(...clusters.map(c => c.centerY));
 
-    let closestCluster: CanvasCluster | null = null;
-    let closestDistance = Infinity;
+      let closestCluster: CanvasCluster | null = null;
+      let closestDistance = Infinity;
 
-    clusters.forEach((cluster) => {
-      const clusterX = (cluster.centerX - minX) + 200;
-      const clusterY = (cluster.centerY - minY) + 200;
-      const distance = Math.sqrt(Math.pow(x - clusterX, 2) + Math.pow(y - clusterY, 2));
+      clusters.forEach(cluster => {
+        const clusterX = cluster.centerX - minX + 200;
+        const clusterY = cluster.centerY - minY + 200;
+        const distance = Math.sqrt(
+          Math.pow(x - clusterX, 2) + Math.pow(y - clusterY, 2)
+        );
 
-      const clickRadius = Math.max(8, Math.min(40, cluster.size));
-      if (distance < closestDistance && distance <= clickRadius) {
-        closestDistance = distance;
-        closestCluster = cluster;
+        const clickRadius = Math.max(8, Math.min(40, cluster.size));
+        if (distance < closestDistance && distance <= clickRadius) {
+          closestDistance = distance;
+          closestCluster = cluster;
+        }
+      });
+
+      let firstRoomId: number | undefined;
+      if (
+        closestCluster &&
+        (closestCluster as CanvasCluster).rooms &&
+        (closestCluster as CanvasCluster).rooms.length > 0
+      ) {
+        const rooms = (closestCluster as CanvasCluster).rooms;
+        if (rooms && rooms.length > 0) {
+          firstRoomId = rooms![0]!.id;
+        }
       }
-    });
-
-    if (closestCluster && 'rooms' in closestCluster && (closestCluster as CanvasCluster).rooms.length > 0) {
-      // Click on the first room in the cluster as a representative
-      onRoomClick((closestCluster as CanvasCluster).rooms[0].id);
-    }
-  }, [clusters, onRoomClick]);
+      if (typeof firstRoomId === 'number') {
+        onRoomClick(firstRoomId);
+      }
+    },
+    [clusters, onRoomClick]
+  );
 
   // Re-render when clusters or zoom changes
   useEffect(() => {

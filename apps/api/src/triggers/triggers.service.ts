@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { ScriptType } from '@prisma/client';
+import { Prisma, ScriptType } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -112,20 +112,27 @@ export class TriggersService {
   }
 
   async create(data: CreateTriggerInput, userId?: string) {
-    const triggerData: any = {
+    const triggerData: Prisma.TriggersUncheckedCreateInput = {
       name: data.name,
       attachType: data.attachType,
-      script: data.commands,
-      arguments: data.argList || [],
-      createdBy: userId,
+      commands: data.commands,
+      argList: data.argList || [],
+      numArgs: (data.argList || []).length,
+      createdBy: userId ?? null,
+      mobZoneId: null,
+      mobId: null,
+      objectZoneId: null,
+      objectId: null,
+      zoneId: null,
+      variables: {},
+      flags: [],
     };
 
-    // Set the appropriate attachment based on attachType
     if (data.mobId) {
-      triggerData.mobZoneId = data.zoneId;
+      triggerData.mobZoneId = data.zoneId ?? null;
       triggerData.mobId = data.mobId;
     } else if (data.objectId) {
-      triggerData.objectZoneId = data.zoneId;
+      triggerData.objectZoneId = data.zoneId ?? null;
       triggerData.objectId = data.objectId;
     } else if (data.zoneId) {
       triggerData.zoneId = data.zoneId;
@@ -159,19 +166,22 @@ export class TriggersService {
   }
 
   async update(id: number, data: UpdateTriggerInput, userId?: string) {
-    const existing = await this.findOne(id);
+    await this.findOne(id);
 
-    const updateData: any = {
-      ...data,
-      updatedBy: userId,
-    };
-
-    // Handle variables JSON conversion
+    const updateData: Prisma.TriggersUncheckedUpdateInput = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.attachType !== undefined) updateData.attachType = data.attachType;
+    if (data.commands !== undefined) updateData.commands = data.commands;
+    if (userId !== undefined) updateData.updatedBy = userId;
+    if (data.argList) {
+      updateData.argList = {
+        set: data.argList,
+      } as Prisma.TriggersUpdateargListInput;
+      updateData.numArgs = data.argList.length;
+    }
     if (data.variables) {
       updateData.variables = JSON.parse(data.variables);
     }
-
-    // Handle attachment changes
     if (data.mobId !== undefined) {
       updateData.mobId = data.mobId;
       updateData.objectId = null;
@@ -225,17 +235,15 @@ export class TriggersService {
   }
 
   async attachToEntity(data: AttachTriggerInput, userId?: string) {
-    const updateData: any = {
+    const updateData: Prisma.TriggersUncheckedUpdateInput = {
       attachType: data.attachType,
-      updatedBy: userId,
     };
+    if (userId !== undefined) updateData.updatedBy = userId;
 
-    // Clear all attachments first
     updateData.mobId = null;
     updateData.objectId = null;
     updateData.zoneId = null;
 
-    // Set the appropriate attachment
     if (data.mobId && data.attachType === ScriptType.MOB) {
       updateData.mobId = data.mobId;
     } else if (data.objectId && data.attachType === ScriptType.OBJECT) {
@@ -273,16 +281,17 @@ export class TriggersService {
   }
 
   async detachFromEntity(triggerId: number, userId?: string) {
+    const data: Prisma.TriggersUncheckedUpdateInput = {
+      mobZoneId: null,
+      mobId: null,
+      objectZoneId: null,
+      objectId: null,
+      zoneId: null,
+    };
+    if (userId !== undefined) data.updatedBy = userId;
     return this.prisma.triggers.update({
       where: { id: triggerId },
-      data: {
-        mobZoneId: null,
-        mobId: null,
-        objectZoneId: null,
-        objectId: null,
-        zoneId: null,
-        updatedBy: userId,
-      },
+      data,
       include: {
         mobs: {
           select: {

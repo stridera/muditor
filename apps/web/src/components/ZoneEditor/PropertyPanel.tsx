@@ -136,19 +136,23 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
   const handleCreateExit = () => {
     if (newExitDirection && newExitDestination) {
+      const destinationStr = newExitDestination.trim();
+      if (!destinationStr) return;
       // Parse destination - could be "roomId" or "zoneId:roomId"
       let destZoneId: number;
       let destRoomId: number;
 
-      if (newExitDestination.includes(':')) {
+      if (destinationStr.includes(':')) {
         // Format: "zoneId:roomId"
-        const [zoneStr, roomStr] = newExitDestination.split(':');
-        destZoneId = parseInt(zoneStr);
-        destRoomId = parseInt(roomStr);
+        const parts = destinationStr.split(':');
+        const zoneStr = parts[0] ?? '';
+        const roomStr = parts[1] ?? '';
+        destZoneId = parseInt(zoneStr, 10);
+        destRoomId = parseInt(roomStr, 10);
       } else {
         // Format: "roomId" - assume same zone
         destZoneId = room.zoneId;
-        destRoomId = parseInt(newExitDestination);
+        destRoomId = parseInt(destinationStr, 10);
       }
 
       if (!isNaN(destZoneId) && !isNaN(destRoomId)) {
@@ -160,7 +164,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       }
       setShowCreateExit(false);
       setNewExitDirection('NORTH');
-      setNewExitDestination('');
+      setNewExitDestination(''); // always reset to empty string (never undefined)
       setNewExitDescription('');
       setNewExitKeyword('');
     }
@@ -333,7 +337,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           ].map(tab => (
             <button
               key={tab.key}
-              onClick={() => setActiveTab(tab.key as any)}
+              onClick={() => setActiveTab(tab.key as typeof activeTab)}
               className={`flex-1 px-2 py-2 text-xs font-medium rounded-md transition-colors ${
                 activeTab === tab.key
                   ? 'bg-white text-blue-700 shadow-sm'
@@ -532,7 +536,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         </div>
 
                         {/* Exit State Badges */}
-                        {(exit.flags?.length || exit.keywords?.length || exit.key) && (
+                        {(exit.flags?.length ||
+                          exit.keywords?.length ||
+                          exit.key) && (
                           <div className='flex flex-wrap gap-1 mt-2'>
                             {exit.flags?.includes('IS_DOOR') && (
                               <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
@@ -560,7 +566,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               </span>
                             )}
                             {exit.keywords?.map((keyword, idx) => (
-                              <span key={idx} className='inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full border border-blue-300'>
+                              <span
+                                key={idx}
+                                className='inline-flex items-center gap-1 text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded-full border border-blue-300'
+                              >
                                 🔑 {keyword}
                               </span>
                             ))}
@@ -618,11 +627,16 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 </label>
                                 <input
                                   type='text'
-                                  value={(editExitData.keywords || []).join(', ')}
+                                  value={(editExitData.keywords || []).join(
+                                    ', '
+                                  )}
                                   onChange={e =>
                                     setEditExitData({
                                       ...editExitData,
-                                      keywords: e.target.value.split(',').map(k => k.trim()).filter(k => k),
+                                      keywords: e.target.value
+                                        .split(',')
+                                        .map(k => k.trim())
+                                        .filter(k => k),
                                     })
                                   }
                                   placeholder='e.g., door, gate, entrance'
@@ -636,19 +650,33 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                   Exit Flags
                                 </label>
 
-                                {['IS_DOOR', 'CLOSED', 'LOCKED', 'PICKPROOF', 'HIDDEN'].map(flag => (
-                                  <div key={flag} className='flex items-center gap-2'>
+                                {[
+                                  'IS_DOOR',
+                                  'CLOSED',
+                                  'LOCKED',
+                                  'PICKPROOF',
+                                  'HIDDEN',
+                                ].map(flag => (
+                                  <div
+                                    key={flag}
+                                    className='flex items-center gap-2'
+                                  >
                                     <input
                                       type='checkbox'
                                       id={`${flag}-${exit.id}`}
-                                      checked={(editExitData.flags || []).includes(flag)}
+                                      checked={(
+                                        editExitData.flags || []
+                                      ).includes(flag)}
                                       onChange={e => {
-                                        const currentFlags = editExitData.flags || [];
+                                        const currentFlags =
+                                          editExitData.flags || [];
                                         setEditExitData({
                                           ...editExitData,
                                           flags: e.target.checked
                                             ? [...currentFlags, flag]
-                                            : currentFlags.filter(f => f !== flag),
+                                            : currentFlags.filter(
+                                                f => f !== flag
+                                              ),
                                         });
                                       }}
                                       className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
@@ -657,11 +685,15 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                       htmlFor={`${flag}-${exit.id}`}
                                       className='text-xs text-gray-700'
                                     >
-                                      {flag === 'IS_DOOR' ? '🚪 Door' :
-                                       flag === 'CLOSED' ? '🚧 Closed' :
-                                       flag === 'LOCKED' ? '🔒 Locked' :
-                                       flag === 'PICKPROOF' ? '🛡️ Pickproof' :
-                                       '👁️ Hidden'}
+                                      {flag === 'IS_DOOR'
+                                        ? '🚪 Door'
+                                        : flag === 'CLOSED'
+                                          ? '🚧 Closed'
+                                          : flag === 'LOCKED'
+                                            ? '🔒 Locked'
+                                            : flag === 'PICKPROOF'
+                                              ? '🛡️ Pickproof'
+                                              : '👁️ Hidden'}
                                     </label>
                                   </div>
                                 ))}

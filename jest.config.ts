@@ -3,7 +3,7 @@
 // paths to the `projects` array as unit test setups are introduced elsewhere.
 /** @type {import('jest').Config} */
 const config = {
-  projects: ['<rootDir>/apps/api'],
+  projects: ['<rootDir>/apps/api', '<rootDir>/apps/web'],
   // Fail fast on deprecated / incorrect usage.
   notify: false,
   testLocationInResults: true,
