@@ -1,6 +1,3 @@
-#!/usr/bin/env sh
-. "$(dirname -- "$0")/_/husky.sh"
-
 # Fast safety gates (keep lightweight to avoid dev friction)
 # 1. Type check API & shared packages (fail fast on types) - skip web full lint due to current warnings
 pnpm --filter @muditor/api type-check || exit 1

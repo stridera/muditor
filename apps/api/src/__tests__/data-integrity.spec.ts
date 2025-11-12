@@ -43,7 +43,7 @@ describe('Data Integrity Tests', () => {
     // Clean previous test artifacts (id collisions) if rerunning without DB reset
     await prisma.mobs.deleteMany({ where: { zoneId: 1000 } });
     await prisma.objects.deleteMany({ where: { zoneId: 1000 } });
-    await prisma.rooms.deleteMany({ where: { zoneId: 1000 } });
+    await prisma.room.deleteMany({ where: { zoneId: 1000 } });
   });
 
   afterAll(async () => {
@@ -264,7 +264,7 @@ describe('Data Integrity Tests', () => {
       expect(createdRoom.sector).toBe(testRoomData.sector);
 
       // Verify in database
-      const dbRoom = await prisma.rooms.findUnique({
+      const dbRoom = await prisma.room.findUnique({
         where: {
           zoneId_id: { zoneId: createdRoom.zoneId, id: createdRoom.id },
         },

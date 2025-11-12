@@ -1,5 +1,6 @@
 'use client';
 
+import { AdminCharactersList } from '@/components/characters/admin-characters-list';
 import { CharacterCard } from '@/components/characters/character-card';
 import { CharacterCreationForm } from '@/components/characters/character-creation-form';
 import { CharacterDetails } from '@/components/characters/character-details';
@@ -20,6 +21,7 @@ import {
 } from '@/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import { Gamepad2, Plus, Users } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useState } from 'react';
 
 // Using generated CharacterDto type via GetMyCharactersQuery; custom Character interface removed.
@@ -27,10 +29,11 @@ import { useState } from 'react';
 type MyCharactersQueryResult = GetMyCharactersQuery;
 
 export default function CharactersPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const characterId = searchParams.get('id');
+
   const [activeTab, setActiveTab] = useState('my-characters');
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    null
-  );
   const { data, loading, error, refetch } = useQuery<MyCharactersQueryResult>(
     GetMyCharactersDocument,
     { pollInterval: 30000 }
@@ -43,32 +46,32 @@ export default function CharactersPage() {
   };
 
   const handleCharacterClick = (characterId: string) => {
-    setSelectedCharacterId(characterId);
+    router.push(`/dashboard/characters?id=${characterId}`);
   };
 
   const handleBackToList = () => {
-    setSelectedCharacterId(null);
+    router.push('/dashboard/characters');
   };
 
   if (error) {
     console.error('Error loading characters:', error);
   }
 
-  // If a character is selected, show the details view
-  if (selectedCharacterId) {
+  // If a character is selected (via URL param), show the details view
+  if (characterId) {
     return (
       <DualInterface
         title='Character Details'
         description='Detailed character information and management'
         playerView={
           <CharacterDetails
-            characterId={selectedCharacterId}
+            characterId={characterId}
             onBack={handleBackToList}
           />
         }
         adminView={
           <CharacterDetails
-            characterId={selectedCharacterId}
+            characterId={characterId}
             onBack={handleBackToList}
           />
         }
@@ -249,25 +252,7 @@ export default function CharactersPage() {
         </div>
       </div>
 
-      {/* Admin character management would go here */}
-      <Card>
-        <CardHeader>
-          <CardTitle className='flex items-center gap-2'>
-            <Users className='h-5 w-5' />
-            System Characters
-          </CardTitle>
-          <CardDescription>
-            Advanced character management features for administrators
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className='text-center py-12'>
-            <p className='text-muted-foreground'>
-              Advanced admin character management features coming soon...
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+      <AdminCharactersList onCharacterClick={handleCharacterClick} />
     </div>
   );
 

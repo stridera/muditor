@@ -146,7 +146,7 @@ input BatchRoomPositionUpdateInput {
 }
 
 type BatchUpdateResult {
-  errors: [String!]!
+  errors: [String!]
   updatedCount: Int!
 }
 
@@ -179,7 +179,7 @@ type CharacterDto {
   description: String
   dexterity: Int!
   effectFlags: [String!]!
-  effects: [CharacterEffectDto!]!
+  effects: [CharacterEffectDto!]
   experience: Int!
   gender: String!
   gold: Int!
@@ -193,7 +193,7 @@ type CharacterDto {
   intelligence: Int!
   invisLevel: Int!
   isOnline: Boolean!
-  items: [CharacterItemDto!]!
+  items: [CharacterItemDto!]
   lastLogin: DateTime
   level: Int!
   luck: Int!
@@ -235,6 +235,13 @@ type CharacterEffectDto {
   sourceId: Int
   sourceType: String
   strength: Int!
+}
+
+input CharacterFilterInput {
+  isOnline: Boolean
+  name: String
+  playerClass: String
+  raceType: String
 }
 
 type CharacterItemDto {
@@ -600,7 +607,6 @@ input CreateRaceInput {
 
 input CreateRoomExitInput {
   description: String
-  destination: Int
   direction: Direction!
   key: String
   keywords: [String!]
@@ -611,17 +617,12 @@ input CreateRoomExitInput {
 }
 
 input CreateRoomInput {
-  directionFromSource: Direction
+  description: String!
   flags: [RoomFlag!]! = []
   id: Int!
-  layoutX: Int
-  layoutY: Int
-  layoutZ: Int
   name: String!
-  roomDescription: String!
+  roomDescription: String
   sector: Sector! = STRUCTURE
-  sourceRoomId: Int
-  sourceZoneId: Int
   zoneId: Int!
 }
 
@@ -1312,8 +1313,8 @@ type Query {
   characterItems(characterId: ID!): [CharacterItemDto!]!
   characterLinkingInfo(characterName: String!): CharacterLinkingInfoDto!
   characterSessionInfo(characterId: ID!): CharacterSessionInfoDto!
-  characters(skip: Int, take: Int): [CharacterDto!]!
-  charactersCount: Int!
+  characters(filter: CharacterFilterInput, skip: Int, take: Int): [CharacterDto!]!
+  charactersCount(filter: CharacterFilterInput): Int!
   class(id: ID!): ClassDto!
   classByName(name: String!): ClassDto
 
@@ -1499,6 +1500,7 @@ input ResetPasswordInput {
 type RoomDto {
   createdAt: DateTime!
   createdBy: String
+  description: String!
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
   flags: [RoomFlag!]!
@@ -1509,7 +1511,7 @@ type RoomDto {
   mobs: [MobDto!]!
   name: String!
   objects: [ObjectDto!]!
-  roomDescription: String!
+  roomDescription: String! @deprecated(reason: "Use description instead")
   sector: Sector!
   shops: [ShopDto!]!
   updatedAt: DateTime!
@@ -1519,12 +1521,12 @@ type RoomDto {
 
 type RoomExitDto {
   description: String
-  destination: Int
   direction: Direction!
   flags: [ExitFlag!]!
   id: String!
   key: String
-  keywords: [String!]
+  keyword: String @deprecated(reason: "Use keywords array instead")
+  keywords: [String!]!
   roomId: Int!
   roomZoneId: Int!
   toRoomId: Int
@@ -2001,6 +2003,7 @@ input UpdateRaceSkillInput {
 }
 
 input UpdateRoomInput {
+  description: String
   flags: [RoomFlag!]
   layoutX: Int
   layoutY: Int

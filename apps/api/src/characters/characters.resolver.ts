@@ -12,6 +12,7 @@ import {
   OnlineCharacterDto,
 } from './character.dto';
 import {
+  CharacterFilterInput,
   CreateCharacterEffectInput,
   CreateCharacterInput,
   CreateCharacterItemInput,
@@ -32,9 +33,10 @@ export class CharactersResolver {
   @Query(() => [CharacterDto], { name: 'characters' })
   async findAllCharacters(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number
+    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @Args('filter', { nullable: true }) filter?: CharacterFilterInput
   ) {
-    return this.charactersService.findAllCharacters(skip, take);
+    return this.charactersService.findAllCharacters(skip, take, filter);
   }
 
   @Query(() => CharacterDto, { name: 'character' })
@@ -48,8 +50,10 @@ export class CharactersResolver {
   }
 
   @Query(() => Int, { name: 'charactersCount' })
-  async getCharactersCount() {
-    return this.charactersService.getCharactersCount();
+  async getCharactersCount(
+    @Args('filter', { nullable: true }) filter?: CharacterFilterInput
+  ) {
+    return this.charactersService.getCharactersCount(filter);
   }
 
   // Character mutations

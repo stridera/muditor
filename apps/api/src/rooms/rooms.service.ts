@@ -1,440 +1,217 @@
+// CLEAN REWRITE START -------------------------------------------------------
 import { Injectable, NotFoundException } from '@nestjs/common';
-import type { Prisma, RoomExits } from '@prisma/client';
-import { Direction } from '@prisma/client';
-import { LoggingService } from '../common/logging/logging.service';
 import { DatabaseService } from '../database/database.service';
 import {
   BatchUpdateResult,
   CreateRoomExitInput,
   CreateRoomInput,
-  RoomDto,
   UpdateRoomInput,
   UpdateRoomPositionInput,
 } from './room.dto';
 
-// Internal type for what the service actually returns (before GraphQL field resolvers)
-type RoomServiceResult = Omit<RoomDto, 'mobs' | 'objects' | 'shops'> & {
-  mobResets: Array<{
-    id: string;
-    zoneId: number;
-    maxInstances: number;
-    probability: number;
-    comment: string | null;
-    mobZoneId: number;
-    mobId: number;
-    roomZoneId: number;
-    roomId: number;
-  }>;
-  objectResets: Array<{
-    id: string;
-    zoneId: number;
-    maxInstances: number;
-    probability: number;
-    comment: string | null;
-    objectZoneId: number;
-    objectId: number;
-    roomZoneId: number;
-    roomId: number;
-  }>;
-  exits: Array<{
-    id: string;
-    direction: string;
-    description?: string;
-    keywords?: string[];
-    destination?: number | null;
-    roomZoneId: number;
-    roomId: number;
-  }>;
-  extraDescs: Array<{
-    id: string;
-    keywords: string[];
-    description: string;
-    roomZoneId: number;
-    roomId: number;
-  }>;
-};
+interface LegacyCreateExitFields {
+  keyword?: string;
+  destination?: number;
+}
+
+interface RoomExitResult {
+  id: number;
+  roomZoneId: number;
+  roomId: number;
+  direction: string;
+  description: string | null;
+  keywords: string[];
+  toZoneId: number | null;
+  toRoomId: number | null;
+  key: string | null;
+  flags: string[];
+}
+
+import { RoomFlag, Sector } from '@prisma/client';
+
+interface RoomServiceResultBase {
+  id: number;
+  zoneId: number;
+  name: string;
+  description: string; // canonical
+  roomDescription: string; // deprecated alias value (same as description)
+  sector: Sector; // Prisma enum Sector
+  flags: RoomFlag[];
+  exits: RoomExitResult[]; // full exits (lightweight will be empty array)
+  extraDescs: Array<{ id: number; keywords: string[]; description: string }>;
+  createdAt: Date;
+  updatedAt: Date;
+  createdBy: string | null;
+  updatedBy: string | null;
+  layoutX: number | null;
+  layoutY: number | null;
+  layoutZ: number | null;
+}
+
+type RoomServiceResult = RoomServiceResultBase;
 
 @Injectable()
 export class RoomsService {
-  constructor(
-    private readonly db: DatabaseService,
-    private readonly logging: LoggingService
-  ) {}
+  constructor(private readonly db: DatabaseService) {}
 
-  // Shared include pattern to prevent stack overflow from circular references
-  private readonly roomInclude = {
+  private readonly includeFull = {
     exits: true,
     roomExtraDescriptions: true,
-    mobResets: {
-      select: {
-        id: true,
-        zoneId: true,
-        maxInstances: true,
-        probability: true,
-        comment: true,
-        mobZoneId: true,
-        mobId: true,
-        roomZoneId: true,
-        roomId: true,
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            keywords: true,
-            name: true,
-            level: true,
-            race: true,
-          },
-        },
-      },
-    },
-    objectResets: {
-      select: {
-        id: true,
-        zoneId: true,
-        maxInstances: true,
-        probability: true,
-        comment: true,
-        objectZoneId: true,
-        objectId: true,
-        roomZoneId: true,
-        roomId: true,
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            keywords: true,
-            name: true,
-            type: true,
-          },
-        },
-      },
-    },
   } as const;
 
+  // Accept a subset of the Prisma Room shape; use indexed access type for flexibility without any
+  private mapRoom(room: {
+    id: number;
+    zoneId: number;
+    name: string;
+    roomDescription: string;
+    sector: Sector;
+    flags: RoomFlag[];
+    exits?: RoomExitResult[];
+    roomExtraDescriptions?: Array<{
+      id: number;
+      keywords: string[];
+      description: string;
+    }>;
+    createdAt: Date;
+    updatedAt: Date;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+    layoutX?: number | null;
+    layoutY?: number | null;
+    layoutZ?: number | null;
+  }): RoomServiceResult {
+    return {
+      id: room.id,
+      zoneId: room.zoneId,
+      name: room.name,
+      description: room.roomDescription, // DB column still roomDescription
+      roomDescription: room.roomDescription, // alias
+      sector: room.sector,
+      flags: room.flags as RoomFlag[],
+      exits: room.exits ?? [],
+      extraDescs: room.roomExtraDescriptions ?? [],
+      createdAt: room.createdAt,
+      updatedAt: room.updatedAt,
+      createdBy: room.createdBy ?? null,
+      updatedBy: room.updatedBy ?? null,
+      layoutX: room.layoutX ?? null,
+      layoutY: room.layoutY ?? null,
+      layoutZ: room.layoutZ ?? null,
+    };
+  }
+
+  async findMany(params?: {
+    skip?: number;
+    take?: number;
+    zoneId?: number;
+    lightweight?: boolean;
+  }): Promise<RoomServiceResult[]> {
+    const { skip, take, zoneId, lightweight } = params || {};
+    if (lightweight) {
+      const clauses: string[] = [];
+      if (zoneId !== undefined) clauses.push(`r.zone_id = ${zoneId}`);
+      const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+      const limit = take !== undefined ? `LIMIT ${take}` : '';
+      const offset = skip !== undefined ? `OFFSET ${skip}` : '';
+      const rows = await this.db.$queryRawUnsafe<
+        Array<{
+          id: number;
+          zoneId: number;
+          name: string;
+          roomDescription: string;
+          sector: Sector;
+          flags: string[];
+          createdAt: Date;
+          updatedAt: Date;
+          layoutX: number | null;
+          layoutY: number | null;
+          layoutZ: number | null;
+        }>
+      >(`
+        SELECT r.id,
+               r.zone_id as "zoneId",
+               r.name,
+               r.room_description as "roomDescription",
+               r.sector,
+               r.flags,
+               r.created_at as "createdAt",
+               r.updated_at as "updatedAt",
+               r.layout_x as "layoutX",
+               r.layout_y as "layoutY",
+               r.layout_z as "layoutZ"
+        FROM rooms r
+        ${where}
+        ORDER BY r.id
+        ${limit} ${offset}
+      `);
+      return rows.map(r =>
+        this.mapRoom({
+          ...r,
+          exits: [],
+          roomExtraDescriptions: [],
+          flags: (r.flags as unknown as RoomFlag[]) || [],
+        })
+      );
+    }
+    const query: {
+      include: typeof RoomsService.prototype.includeFull;
+      orderBy: { id: 'asc' };
+      where?: { zoneId: number };
+      skip?: number;
+      take?: number;
+    } = { include: this.includeFull, orderBy: { id: 'asc' } };
+    if (zoneId !== undefined) query.where = { zoneId };
+    if (skip !== undefined) query.skip = skip;
+    if (take !== undefined) query.take = take;
+    const rooms = await this.db.room.findMany(query);
+    return rooms.map(r => this.mapRoom(r));
+  }
+
+  // Backward-compatible alias used by existing tests/specs
   async findAll(params?: {
     skip?: number;
     take?: number;
     zoneId?: number;
     lightweight?: boolean;
   }): Promise<RoomServiceResult[]> {
-    const { skip, take, zoneId, lightweight = false } = params || {};
-
-    // Lightweight query for map rendering - only essential fields
-    if (lightweight) {
-      // Use raw query to avoid stack depth issues with large datasets and composite keys
-      const whereClause = zoneId ? `WHERE r.zone_id = ${zoneId}` : '';
-      const limitClause = take ? `LIMIT ${take}` : '';
-      const offsetClause = skip ? `OFFSET ${skip}` : '';
-
-      const rooms = await this.db.$queryRawUnsafe(`
-        SELECT
-          r.id,
-          r.zone_id as "zoneId",
-          r.name,
-          r.sector,
-          r.layout_x as "layoutX",
-          r.layout_y as "layoutY",
-          r.layout_z as "layoutZ",
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', e.id,
-                'direction', e.direction,
-                'toZoneId', e.to_zone_id,
-                'toRoomId', e.to_room_id,
-                'destination', dest.id,
-                'description', e.description,
-                'keywords', e.keywords,
-                'key', e.key,
-                'flags', e.flags
-              )
-            ) FILTER (WHERE e.id IS NOT NULL),
-            '[]'::json
-          ) as exits,
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', mr.id,
-                'zoneId', mr.zone_id,
-                'maxInstances', mr.max_instances,
-                'probability', mr.probability,
-                'comment', mr.comment,
-                'mobZoneId', mr.mob_zone_id,
-                'mobId', mr.mob_id,
-                'roomZoneId', mr.room_zone_id,
-                'roomId', mr.room_id,
-                'mobs', jsonb_build_object(
-                  'id', m.id,
-                  'zoneId', m.zone_id,
-                  'keywords', m.keywords,
-                  'name', m.name,
-                  'level', m.level,
-                  'race', m.race
-                )
-              )
-            ) FILTER (WHERE mr.id IS NOT NULL),
-            '[]'::json
-          ) as mob_resets,
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', orst.id,
-                'zoneId', orst.zone_id,
-                'maxInstances', orst.max_instances,
-                'probability', orst.probability,
-                'comment', orst.comment,
-                'objectZoneId', orst.object_zone_id,
-                'objectId', orst.object_id,
-                'roomZoneId', orst.room_zone_id,
-                'roomId', orst.room_id,
-                'objects', jsonb_build_object(
-                  'id', o.id,
-                  'zoneId', o.zone_id,
-                  'keywords', o.keywords,
-                  'name', o.name,
-                  'type', o.type
-                )
-              )
-            ) FILTER (WHERE orst.id IS NOT NULL),
-            '[]'::json
-          ) as object_resets
-        FROM "Rooms" r
-        LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
-        LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
-        LEFT JOIN "MobResets" mr ON mr.room_zone_id = r.zone_id AND mr.room_id = r.id
-        LEFT JOIN "Mobs" m ON m.zone_id = mr.mob_zone_id AND m.id = mr.mob_id
-        LEFT JOIN "ObjectResets" orst ON orst.room_zone_id = r.zone_id AND orst.room_id = r.id
-        LEFT JOIN "Objects" o ON o.zone_id = orst.object_zone_id AND o.id = orst.object_id
-        ${whereClause}
-        GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
-        ORDER BY r.id
-        ${limitClause}
-        ${offsetClause}
-  `);
-      return rooms as unknown as RoomServiceResult[];
-    }
-
-    // Full query with all data
-    const findArgs: Prisma.RoomsFindManyArgs = {
-      include: this.roomInclude,
-      orderBy: { id: 'asc' },
-    };
-    if (zoneId !== undefined) findArgs.where = { zoneId };
-    if (skip !== undefined) findArgs.skip = skip;
-    if (take !== undefined) findArgs.take = take;
-
-    const rooms = await this.db.rooms.findMany(findArgs);
-    return rooms as unknown as RoomServiceResult[];
+    return this.findMany(params);
   }
 
-  async findOne(zoneId: number, id: number): Promise<RoomServiceResult | null> {
-    const room = await this.db.rooms.findUnique({
-      where: {
-        zoneId_id: {
-          zoneId,
-          id,
-        },
-      },
-      include: this.roomInclude,
+  async findOne(zoneId: number, id: number): Promise<RoomServiceResult> {
+    const room = await this.db.room.findUnique({
+      where: { zoneId_id: { zoneId, id } },
+      include: this.includeFull,
     });
-
-    if (!room) {
-      throw new NotFoundException(
-        `Room with zoneId ${zoneId} and id ${id} not found`
-      );
-    }
-
-    return room as unknown as RoomServiceResult;
+    if (!room) throw new NotFoundException(`Room ${zoneId}/${id} not found`);
+    return this.mapRoom(room);
   }
 
   async findByZone(
     zoneId: number,
     lightweight = false
   ): Promise<RoomServiceResult[]> {
-    // Lightweight query for map rendering - only essential fields
-    if (lightweight) {
-      // Use raw query to avoid stack depth issues with large datasets and composite keys
-      const rooms = await this.db.$queryRawUnsafe(`
-        SELECT
-          r.id,
-          r.zone_id as "zoneId",
-          r.name,
-          r.sector,
-          r.layout_x as "layoutX",
-          r.layout_y as "layoutY",
-          r.layout_z as "layoutZ",
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', e.id,
-                'direction', e.direction,
-                'toZoneId', e.to_zone_id,
-                'toRoomId', e.to_room_id,
-                'destination', dest.id,
-                'description', e.description,
-                'keywords', e.keywords,
-                'key', e.key,
-                'flags', e.flags
-              )
-            ) FILTER (WHERE e.id IS NOT NULL),
-            '[]'::json
-          ) as exits,
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', mr.id,
-                'zoneId', mr.zone_id,
-                'maxInstances', mr.max_instances,
-                'probability', mr.probability,
-                'comment', mr.comment,
-                'mobZoneId', mr.mob_zone_id,
-                'mobId', mr.mob_id,
-                'roomZoneId', mr.room_zone_id,
-                'roomId', mr.room_id,
-                'mobs', jsonb_build_object(
-                  'id', m.id,
-                  'zoneId', m.zone_id,
-                  'keywords', m.keywords,
-                  'name', m.name,
-                  'level', m.level,
-                  'race', m.race
-                )
-              )
-            ) FILTER (WHERE mr.id IS NOT NULL),
-            '[]'::json
-          ) as mob_resets,
-          COALESCE(
-            json_agg(
-              DISTINCT jsonb_build_object(
-                'id', orst.id,
-                'zoneId', orst.zone_id,
-                'maxInstances', orst.max_instances,
-                'probability', orst.probability,
-                'comment', orst.comment,
-                'objectZoneId', orst.object_zone_id,
-                'objectId', orst.object_id,
-                'roomZoneId', orst.room_zone_id,
-                'roomId', orst.room_id,
-                'objects', jsonb_build_object(
-                  'id', o.id,
-                  'zoneId', o.zone_id,
-                  'keywords', o.keywords,
-                  'name', o.name,
-                  'type', o.type
-                )
-              )
-            ) FILTER (WHERE orst.id IS NOT NULL),
-            '[]'::json
-          ) as object_resets
-        FROM "Rooms" r
-        LEFT JOIN "RoomExits" e ON e.room_zone_id = r.zone_id AND e.room_id = r.id
-        LEFT JOIN "Rooms" dest ON dest.zone_id = e.to_zone_id AND dest.id = e.to_room_id
-        LEFT JOIN "MobResets" mr ON mr.room_zone_id = r.zone_id AND mr.room_id = r.id
-        LEFT JOIN "Mobs" m ON m.zone_id = mr.mob_zone_id AND m.id = mr.mob_id
-        LEFT JOIN "ObjectResets" orst ON orst.room_zone_id = r.zone_id AND orst.room_id = r.id
-        LEFT JOIN "Objects" o ON o.zone_id = orst.object_zone_id AND o.id = orst.object_id
-        WHERE r.zone_id = ${zoneId}
-        GROUP BY r.id, r.zone_id, r.name, r.sector, r.layout_x, r.layout_y, r.layout_z
-        ORDER BY r.id
-  `);
-      return rooms as unknown as RoomServiceResult[];
-    }
-
-    // Full query with all data
-    const rooms = await this.db.rooms.findMany({
-      where: { zoneId },
-      include: this.roomInclude,
-      orderBy: { id: 'asc' },
-    });
-    return rooms as unknown as RoomServiceResult[];
+    return this.findMany({ zoneId, lightweight });
   }
 
   async count(zoneId?: number): Promise<number> {
-    if (zoneId === undefined) {
-      return this.db.rooms.count();
-    }
-    return this.db.rooms.count({ where: { zoneId } });
+    if (zoneId !== undefined) return this.db.room.count({ where: { zoneId } });
+    return this.db.room.count();
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {
-    // Compute layout offsets if a source room + direction are provided and no explicit layout given
-    let layoutX = data.layoutX;
-    let layoutY = data.layoutY;
-    let layoutZ = data.layoutZ;
-
-    if (
-      layoutX === undefined &&
-      layoutY === undefined &&
-      layoutZ === undefined &&
-      data.sourceZoneId !== undefined &&
-      data.sourceRoomId !== undefined &&
-      data.directionFromSource !== undefined
-    ) {
-      const source = await this.db.rooms.findUnique({
-        where: {
-          zoneId_id: {
-            zoneId: data.sourceZoneId,
-            id: data.sourceRoomId,
-          },
-        },
-        select: { layoutX: true, layoutY: true, layoutZ: true },
-      });
-
-      const baseX = source?.layoutX ?? 0;
-      const baseY = source?.layoutY ?? 0;
-      const baseZ = source?.layoutZ ?? 0;
-
-      const deltas: Record<Direction, { dx: number; dy: number; dz: number }> =
-        {
-          NORTH: { dx: 0, dy: 1, dz: 0 },
-          SOUTH: { dx: 0, dy: -1, dz: 0 },
-          EAST: { dx: 1, dy: 0, dz: 0 },
-          WEST: { dx: -1, dy: 0, dz: 0 },
-          UP: { dx: 0, dy: 0, dz: 1 },
-          DOWN: { dx: 0, dy: 0, dz: -1 },
-        };
-
-      const delta = deltas[data.directionFromSource];
-      layoutX = baseX + delta.dx;
-      layoutY = baseY + delta.dy;
-      layoutZ = baseZ + delta.dz;
-
-      // Optional: guard against duplicate position in the same zone
-      const existingAtTarget = await this.db.rooms.findFirst({
-        where: {
-          zoneId: data.zoneId,
-          layoutX,
-          layoutY,
-          layoutZ,
-        },
-        select: { id: true },
-      });
-      if (existingAtTarget) {
-        // Simple fallback: don't throw; revert to undefined so createData will persist null via ?? logic below
-        layoutX = undefined;
-        layoutY = undefined;
-        layoutZ = undefined;
-      }
-    }
-
-    const createData: Prisma.RoomsUncheckedCreateInput = {
-      id: data.id,
-      zoneId: data.zoneId,
-      name: data.name,
-      roomDescription: data.roomDescription,
-      sector: data.sector || 'STRUCTURE',
-      flags: data.flags || [],
-      layoutX: layoutX ?? null,
-      layoutY: layoutY ?? null,
-      layoutZ: layoutZ ?? null,
-    };
-
-    const room = await this.db.rooms.create({
-      data: createData,
-      include: this.roomInclude,
+    const room = await this.db.room.create({
+      data: {
+        id: data.id,
+        zoneId: data.zoneId,
+        name: data.name,
+        roomDescription: data.description ?? data.roomDescription ?? '',
+        sector: data.sector || 'STRUCTURE',
+        flags: data.flags || [],
+      },
+      include: this.includeFull,
     });
-    return room as unknown as RoomServiceResult;
+    return this.mapRoom(room);
   }
 
   async update(
@@ -442,72 +219,79 @@ export class RoomsService {
     id: number,
     data: UpdateRoomInput
   ): Promise<RoomServiceResult> {
-    const updateData: Prisma.RoomsUpdateInput = {};
-    if (data.name !== undefined) updateData.name = { set: data.name };
-    if (data.roomDescription !== undefined)
-      updateData.roomDescription = { set: data.roomDescription };
-    if (data.sector !== undefined) updateData.sector = { set: data.sector };
-    if (data.flags !== undefined) updateData.flags = { set: data.flags };
-    if (data.layoutX !== undefined) updateData.layoutX = { set: data.layoutX };
-    if (data.layoutY !== undefined) updateData.layoutY = { set: data.layoutY };
-    if (data.layoutZ !== undefined) updateData.layoutZ = { set: data.layoutZ };
-
-    const room = await this.db.rooms.update({
+    const update: Record<string, unknown> = {};
+    if (data.name !== undefined) update.name = data.name;
+    if (data.description !== undefined)
+      update.roomDescription = data.description;
+    else if (data.roomDescription !== undefined)
+      update.roomDescription = data.roomDescription; // legacy alias
+    if (data.sector !== undefined) update.sector = data.sector;
+    if (data.flags !== undefined) update.flags = data.flags;
+    const room = await this.db.room.update({
       where: { zoneId_id: { zoneId, id } },
-      data: updateData,
-      include: this.roomInclude,
+      data: update,
+      include: this.includeFull,
     });
-    return room as unknown as RoomServiceResult;
+    return this.mapRoom(room);
   }
 
   async delete(zoneId: number, id: number): Promise<RoomServiceResult> {
-    const room = await this.db.rooms.delete({
+    const room = await this.db.room.delete({
       where: { zoneId_id: { zoneId, id } },
-      include: this.roomInclude,
+      include: this.includeFull,
     });
-    return room as unknown as RoomServiceResult;
+    return this.mapRoom(room);
   }
 
-  async createExit(data: CreateRoomExitInput): Promise<RoomExits> {
-    const exitData: Prisma.RoomExitsUncheckedCreateInput = {
-      direction: data.direction,
-      roomZoneId: data.roomZoneId,
-      roomId: data.roomId,
-      keywords: data.keywords || [],
-      description: data.description ?? null,
-      toZoneId: data.toZoneId ?? null,
-      toRoomId: data.toRoomId ?? null,
-    };
-    const exit = await this.db.roomExits.create({ data: exitData });
-    return exit;
+  async createExit(
+    data: CreateRoomExitInput & LegacyCreateExitFields
+  ): Promise<RoomExitResult> {
+    const keywords = (data.keywords || []).filter(
+      k => !!k && k.trim().length > 0
+    );
+    if (!keywords.length && data.keyword) keywords.push(data.keyword);
+    let toZoneId = data.toZoneId ?? null;
+    let toRoomId = data.toRoomId ?? null;
+    if ((toZoneId == null || toRoomId == null) && data.destination != null) {
+      toZoneId = Math.floor(data.destination / 100);
+      toRoomId = data.destination % 100;
+    }
+    const exit = await this.db.roomExit.create({
+      data: {
+        roomZoneId: data.roomZoneId,
+        roomId: data.roomId,
+        direction: data.direction,
+        description: data.description ?? null,
+        keywords,
+        toZoneId,
+        toRoomId,
+        key: data.key ?? null,
+        flags: [],
+      },
+    });
+    return exit as RoomExitResult;
   }
 
-  async deleteExit(exitId: number): Promise<RoomExits> {
-    const exit = await this.db.roomExits.delete({
-      where: { id: exitId },
-    });
-    return exit;
+  async deleteExit(exitId: number): Promise<RoomExitResult> {
+    const exit = await this.db.roomExit.delete({ where: { id: exitId } });
+    return exit as RoomExitResult;
   }
 
   async updatePosition(
     zoneId: number,
     id: number,
-    position: UpdateRoomPositionInput
+    input: UpdateRoomPositionInput
   ): Promise<RoomServiceResult> {
-    const positionData: Prisma.RoomsUpdateInput = {};
-    if (position.layoutX !== undefined)
-      positionData.layoutX = { set: position.layoutX };
-    if (position.layoutY !== undefined)
-      positionData.layoutY = { set: position.layoutY };
-    if (position.layoutZ !== undefined)
-      positionData.layoutZ = { set: position.layoutZ };
-
-    const room = await this.db.rooms.update({
+    const data: Record<string, unknown> = {};
+    if (input.layoutX !== undefined) data.layoutX = input.layoutX;
+    if (input.layoutY !== undefined) data.layoutY = input.layoutY;
+    if (input.layoutZ !== undefined) data.layoutZ = input.layoutZ;
+    const room = await this.db.room.update({
       where: { zoneId_id: { zoneId, id } },
-      data: positionData,
-      include: this.roomInclude,
+      data,
+      include: this.includeFull,
     });
-    return room as unknown as RoomServiceResult;
+    return this.mapRoom(room);
   }
 
   async batchUpdatePositions(
@@ -521,79 +305,32 @@ export class RoomsService {
   ): Promise<BatchUpdateResult> {
     const errors: string[] = [];
     let updatedCount = 0;
-
     try {
-      // Use a transaction to ensure all updates succeed or fail together
       await this.db.$transaction(async tx => {
-        const updatePromises = updates.map(async update => {
+        for (const u of updates) {
           try {
-            const data: Prisma.RoomsUpdateInput = {};
-            if (update.layoutX !== undefined)
-              data.layoutX = { set: update.layoutX };
-            if (update.layoutY !== undefined)
-              data.layoutY = { set: update.layoutY };
-            if (update.layoutZ !== undefined)
-              data.layoutZ = { set: update.layoutZ };
-
-            await tx.rooms.update({
-              where: {
-                zoneId_id: { zoneId: update.zoneId, id: update.roomId },
-              },
+            const data: Record<string, unknown> = {};
+            if (u.layoutX !== undefined) data.layoutX = u.layoutX;
+            if (u.layoutY !== undefined) data.layoutY = u.layoutY;
+            if (u.layoutZ !== undefined) data.layoutZ = u.layoutZ;
+            await tx.room.update({
+              where: { zoneId_id: { zoneId: u.zoneId, id: u.roomId } },
               data,
             });
-            return {
-              success: true,
-              zoneId: update.zoneId,
-              roomId: update.roomId,
-            };
-          } catch (error) {
-            // Centralized logging (see common/logging.ts)
-            this.logging.logError(
-              `Failed to update room ${update.zoneId}/${update.roomId}`,
-              'RoomsService.batchUpdatePositions',
-              { zoneId: update.zoneId, roomId: update.roomId },
-              error instanceof Error ? error.stack : undefined
-            );
-            return {
-              success: false,
-              zoneId: update.zoneId,
-              roomId: update.roomId,
-              error: error instanceof Error ? error.message : 'Unknown error',
-            };
-          }
-        });
-
-        const results = await Promise.all(updatePromises);
-
-        // Count successful updates and collect errors
-        for (const result of results) {
-          if (result.success) {
             updatedCount++;
-          } else {
-            errors.push(
-              `Room ${result.zoneId}/${result.roomId}: ${result.error}`
-            );
+          } catch (err) {
+            const msg = err instanceof Error ? err.message : String(err);
+            // Swallow individual errors into the batch result list
+            errors.push(`Room ${u.zoneId}/${u.roomId}: ${msg}`);
           }
         }
       });
-
-      return {
-        updatedCount,
-        errors,
-      };
-    } catch (error) {
-      this.logging.logError(
-        'Batch update transaction failed',
-        'RoomsService.batchUpdatePositions',
-        { updates: updates.length },
-        error instanceof Error ? error.stack : undefined
-      );
-      return {
-        updatedCount: 0,
-        errors: [
-          `Transaction failed: ${error instanceof Error ? error.message : 'Unknown error'}`,
-        ],
-      };
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      return { updatedCount: 0, errors: [`Transaction failed: ${msg}`] };
+      return { updatedCount: 0, errors: [`Transaction failed: ${msg}`] };
     }
+    return errors.length ? { updatedCount, errors } : { updatedCount };
   }
 }
+// CLEAN REWRITE END ---------------------------------------------------------

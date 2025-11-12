@@ -93,13 +93,8 @@ mutation CreateCharacter($data: CreateCharacterInput!) {
   }
 }
 
-mutation LinkCharacter($characterName: String!, $characterPassword: String!) {
-  linkCharacter(
-    data: {
-      characterName: $characterName
-      characterPassword: $characterPassword
-    }
-  ) {
+mutation LinkCharacter($data: LinkCharacterInput!) {
+  linkCharacter(data: $data) {
     id
     name
     level
@@ -108,4 +103,45 @@ mutation LinkCharacter($characterName: String!, $characterPassword: String!) {
 
 query ValidateCharacterPassword($characterName: String!, $password: String!) {
   validateCharacterPassword(characterName: $characterName, password: $password)
+}
+
+mutation UpdateCharacter($id: ID!, $data: UpdateCharacterInput!) {
+  updateCharacter(id: $id, data: $data) {
+    id
+    name
+    level
+    raceType
+    playerClass
+    description
+    title
+    strength
+    intelligence
+    wisdom
+    dexterity
+    constitution
+    charisma
+    luck
+    hitPoints
+    hitPointsMax
+    movement
+    movementMax
+    alignment
+  }
+}
+
+mutation DeleteCharacter($id: ID!) {
+  deleteCharacter(id: $id) {
+    id
+    name
+  }
+}
+
+query GetAllCharacters($skip: Int, $take: Int, $filter: CharacterFilterInput) {
+  characters(skip: $skip, take: $take, filter: $filter) {
+    ...CharacterCardFields
+  }
+}
+
+query GetCharactersCount($filter: CharacterFilterInput) {
+  charactersCount(filter: $filter)
 }

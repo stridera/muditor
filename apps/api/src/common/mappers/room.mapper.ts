@@ -8,21 +8,25 @@ import { RoomMapperSource } from './types';
 export function mapRoom(db: RoomMapperSource): RoomDto {
   const exitsSource = db.exits || [];
   const exits: RoomExitDto[] = exitsSource.map(e => {
+    const singleKeyword =
+      e.keywords && e.keywords.length === 1 ? e.keywords[0] : undefined;
     const exit: RoomExitDto = {
       id: String(e.id),
       direction: e.direction,
+      keywords: e.keywords || [],
       flags: e.flags || [],
       roomZoneId: e.roomZoneId,
       roomId: e.roomId,
-      keywords: e.keywords || [],
+      ...(e.description ? { description: e.description } : {}),
+      ...(singleKeyword ? { keyword: singleKeyword } : {}),
+      ...(e.key ? { key: e.key } : {}),
+      ...(e.toZoneId !== null && e.toZoneId !== undefined
+        ? { toZoneId: e.toZoneId }
+        : {}),
+      ...(e.toRoomId !== null && e.toRoomId !== undefined
+        ? { toRoomId: e.toRoomId }
+        : {}),
     };
-    if (e.description !== null && e.description !== undefined)
-      exit.description = e.description;
-    if (e.key !== null && e.key !== undefined) exit.key = e.key;
-    if (e.toZoneId !== null && e.toZoneId !== undefined)
-      exit.toZoneId = e.toZoneId;
-    if (e.toRoomId !== null && e.toRoomId !== undefined)
-      exit.toRoomId = e.toRoomId;
     return exit;
   });
 
@@ -36,7 +40,8 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
   const dto: RoomDto = {
     id: db.id,
     name: db.name,
-    roomDescription: db.roomDescription,
+    description: db.roomDescription,
+    roomDescription: db.roomDescription, // deprecated alias
     sector: db.sector,
     flags: db.flags,
     zoneId: db.zoneId,

@@ -11,13 +11,13 @@ async function validateImportedData() {
       users: await prisma.users.count(),
       characters: await prisma.characters.count(),
       zones: await prisma.zones.count(),
-      rooms: await prisma.rooms.count(),
+      rooms: await prisma.room.count(),
       mobs: await prisma.mobs.count(),
       objects: await prisma.objects.count(),
       shops: await prisma.shops.count(),
       triggers: await prisma.triggers.count(),
       mobResets: await prisma.mobResets.count(),
-      roomExits: await prisma.roomExits.count(),
+      roomExits: await prisma.roomExit.count(),
     };
     
     console.log('📊 Import Statistics:');
@@ -53,7 +53,7 @@ async function validateImportedData() {
     }
     
     // Check room connectivity
-    const roomsWithExits = await prisma.rooms.count({
+    const roomsWithExits = await prisma.room.count({
       where: {
         exits: {
           some: {}

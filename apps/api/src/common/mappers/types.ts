@@ -5,7 +5,7 @@
 import {
   Mobs,
   Objects,
-  RoomExits,
+  RoomExit as PrismaRoomExit,
   RoomExtraDescriptions,
   RoomFlag,
   Sector,
@@ -26,7 +26,7 @@ export interface RoomMapperSource {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
-  exits?: RoomExits[];
+  exits?: PrismaRoomExit[];
   roomExtraDescriptions?: RoomExtraDescriptions[];
   deletedAt?: Date | null;
   [key: string]: unknown;

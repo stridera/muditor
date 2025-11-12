@@ -106,7 +106,7 @@ const ADD_MOB_RESET_EQUIPMENT = gql`
     $resetId: ID!
     $objectZoneId: Int!
     $objectId: Int!
-    $wearLocation: String
+    $wearLocation: WearFlag
     $maxInstances: Int
     $probability: Float
   ) {
@@ -140,7 +140,7 @@ const ADD_MOB_RESET_EQUIPMENT = gql`
 const UPDATE_MOB_RESET_EQUIPMENT = gql`
   mutation UpdateMobResetEquipment(
     $id: ID!
-    $wearLocation: String
+    $wearLocation: WearFlag
     $maxInstances: Int
     $probability: Float
   ) {

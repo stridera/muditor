@@ -342,7 +342,7 @@ model Characters {
   bankPlatinum       Int                  @default(0) @map("bank_platinum")
   totalWealth        Int                  @default(0) @map("total_wealth")
   averageStats       Int                  @default(13) @map("average_stats")
-  passwordHash       String?              @map("password_hash")
+  passwordHash       String               @default("") @map("password_hash")
   raceType           String               @default("human") @map("race_type")
   race               Race                 @default(HUMAN)
   gender             String               @default("neutral")

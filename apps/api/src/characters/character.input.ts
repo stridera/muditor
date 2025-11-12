@@ -1,5 +1,5 @@
 import { Field, ID, InputType, Int } from '@nestjs/graphql';
-import { IsString, IsNotEmpty } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
 
 @InputType()
 export class CreateCharacterInput {
@@ -259,4 +259,27 @@ export class LinkCharacterInput {
 export class UnlinkCharacterInput {
   @Field(() => ID)
   characterId: string;
+}
+
+@InputType()
+export class CharacterFilterInput {
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  name?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  raceType?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  playerClass?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isOnline?: boolean;
 }
