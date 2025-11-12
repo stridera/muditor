@@ -1,5 +1,4 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { LoggingService } from '../common/logging/logging.service';
 import { DatabaseService } from '../database/database.service';
 import { RoomsService } from './rooms.service';
 
@@ -7,15 +6,11 @@ import { RoomsService } from './rooms.service';
 
 describe('RoomsService.batchUpdatePositions', () => {
   let service: RoomsService;
-  let logging: LoggingService & { logError: jest.Mock };
+  // Logging removed from service rewrite; we no longer assert logging side effects.
 
   beforeEach(async () => {
-    const loggingMock = { logError: jest.fn() } as LoggingService & {
-      logError: jest.Mock;
-    };
-
-    // Simulate prisma transaction behavior
-    const roomsDelegate = {
+    // Simulate prisma transaction behavior using new singular delegate name `room`
+    const roomDelegate = {
       update: jest.fn().mockImplementation(({ where }) => {
         if (where.zoneId_id.id === 2) {
           throw new Error('Simulated failure');
@@ -35,27 +30,19 @@ describe('RoomsService.batchUpdatePositions', () => {
       groupBy: jest.fn(),
       count: jest.fn(),
     };
-
-    type TxCtx = { rooms: typeof roomsDelegate };
+    type TxCtx = { room: typeof roomDelegate };
     const mockDb = {
-      rooms: roomsDelegate,
+      room: roomDelegate,
       $transaction: jest.fn(async (cb: (tx: TxCtx) => Promise<unknown>) =>
-        cb({ rooms: roomsDelegate })
+        cb({ room: roomDelegate })
       ),
     } as unknown as DatabaseService;
 
     const module: TestingModule = await Test.createTestingModule({
-      providers: [
-        RoomsService,
-        { provide: DatabaseService, useValue: mockDb },
-        { provide: LoggingService, useValue: loggingMock },
-      ],
+      providers: [RoomsService, { provide: DatabaseService, useValue: mockDb }],
     }).compile();
 
     service = module.get(RoomsService);
-    logging = module.get(LoggingService) as LoggingService & {
-      logError: jest.Mock;
-    };
   });
 
   it('returns updatedCount and errors for mixed results', async () => {
@@ -66,8 +53,8 @@ describe('RoomsService.batchUpdatePositions', () => {
 
     const result = await service.batchUpdatePositions(updates);
     expect(result.updatedCount).toBe(1);
-    expect(result.errors).toHaveLength(1);
-    expect(result.errors[0]).toMatch(/Room 1\/2:/);
-    expect(logging.logError.mock.calls.length).toBe(1);
+    expect(result.errors && result.errors.length).toBe(1);
+    expect(result.errors && result.errors[0]).toMatch(/Room 1\/2:/);
+    // Service now accumulates errors without invoking a logger; just ensure errors captured.
   });
 });

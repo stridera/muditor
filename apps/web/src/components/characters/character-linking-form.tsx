@@ -157,7 +157,9 @@ export function CharacterLinkingForm({
         setStep('verify');
       }
     } catch (err: any) {
-      setError(err.message || 'Character not found');
+      // Provide user-friendly error messages
+      const message = err.message || 'Character not found';
+      setError(message.replace(/GraphQL error:?\s*/i, ''));
     }
   };
 
@@ -168,30 +170,12 @@ export function CharacterLinkingForm({
     setSuccess(null);
 
     try {
-      if (character.hasPassword) {
-        setStep('password');
-        return;
-      }
-
-      // No password required, link directly
-      await linkCharacter({
-        variables: {
-          data: {
-            characterName: character.name,
-            characterPassword: '', // Empty password for passwordless characters
-          },
-        },
-      });
-
-      setSuccess(
-        `Successfully linked ${character.name} to your account! Your role has been updated.`
-      );
-      setStep('search');
-      setCharacterName('');
-      await refetchUser(); // Refresh user role
-      onCharacterLinked();
+      // All characters require password verification
+      setStep('password');
     } catch (err: any) {
-      setError(err.message || 'Failed to link character');
+      // Provide user-friendly error messages
+      const message = err.message || 'Failed to link character';
+      setError(message.replace(/GraphQL error:?\s*/i, ''));
     }
   };
 
@@ -236,7 +220,9 @@ export function CharacterLinkingForm({
       await refetchUser(); // Refresh user role
       onCharacterLinked();
     } catch (err: any) {
-      setError(err.message || 'Failed to link character');
+      // Provide user-friendly error messages
+      const message = err.message || 'Failed to link character';
+      setError(message.replace(/GraphQL error:?\s*/i, ''));
     }
   };
 

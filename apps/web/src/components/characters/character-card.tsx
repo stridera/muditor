@@ -134,20 +134,10 @@ export function CharacterCard({
                 size='sm'
               />
             </CardTitle>
-            <CardDescription className='flex items-center gap-2 mt-1'>
-              <span>Level {character.level}</span>
-              {character.raceType && (
-                <>
-                  <span>•</span>
-                  <span>{character.raceType}</span>
-                </>
-              )}
-              {character.playerClass && (
-                <>
-                  <span>•</span>
-                  <span>{character.playerClass}</span>
-                </>
-              )}
+            <CardDescription className='mt-1'>
+              Level {character.level}
+              {character.raceType && ` ${character.raceType}`}
+              {character.playerClass && ` ${character.playerClass}`}
             </CardDescription>
             {character.title && (
               <div className='text-xs text-muted-foreground italic mt-1'>
@@ -155,9 +145,6 @@ export function CharacterCard({
               </div>
             )}
           </div>
-          <Badge variant='outline' className='text-xs'>
-            Level {character.level}
-          </Badge>
         </div>
       </CardHeader>
 

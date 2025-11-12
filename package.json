@@ -8,7 +8,7 @@
   },
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.20.0",
+  "packageManager": "pnpm@10.21.0",
   "engines": {
     "node": ">=18.0.0",
     "pnpm": ">=8.0.0"
@@ -84,7 +84,7 @@
     "prisma": "^6.16.1",
     "tsx": "^4.20.6",
     "turbo": "^2.6.0",
-    "typescript": "5.9.0",
+    "typescript": "5.9.3",
     "typescript-eslint": "^8.46.2"
   },
   "lint-staged": {
@@ -112,5 +112,8 @@
       "axios": "^1.12.0",
       "@types/node": "24.9.2"
     }
+  },
+  "dependencies": {
+    "unix-crypt-td-js": "^1.1.4"
   }
 }

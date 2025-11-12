@@ -24,8 +24,31 @@ export class CharactersService {
   ) {}
 
   // Character operations
-  async findAllCharacters(skip?: number, take?: number) {
-    const args: Parameters<typeof this.db.characters.findMany>[0] = {
+  async findAllCharacters(skip?: number, take?: number, filter?: any) {
+    const where: any = {};
+
+    // Build filter conditions
+    if (filter?.name) {
+      where.name = {
+        contains: filter.name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (filter?.raceType) {
+      where.raceType = filter.raceType;
+    }
+
+    if (filter?.playerClass) {
+      where.playerClass = filter.playerClass;
+    }
+
+    if (filter?.isOnline !== undefined) {
+      where.isOnline = filter.isOnline;
+    }
+
+    const query: any = {
+      where,
       include: {
         characterItems: {
           include: {
@@ -40,9 +63,11 @@ export class CharactersService {
       },
       orderBy: { name: 'asc' },
     };
-    if (skip !== undefined) args.skip = skip;
-    if (take !== undefined) args.take = take;
-    return this.db.characters.findMany(args);
+
+    if (skip !== undefined) query.skip = skip;
+    if (take !== undefined) query.take = take;
+
+    return this.db.characters.findMany(query);
   }
 
   async findCharacterById(id: string) {
@@ -96,8 +121,30 @@ export class CharactersService {
     });
   }
 
-  async getCharactersCount() {
-    return this.db.characters.count();
+  async getCharactersCount(filter?: any) {
+    const where: any = {};
+
+    // Build filter conditions (same as findAllCharacters)
+    if (filter?.name) {
+      where.name = {
+        contains: filter.name,
+        mode: 'insensitive',
+      };
+    }
+
+    if (filter?.raceType) {
+      where.raceType = filter.raceType;
+    }
+
+    if (filter?.playerClass) {
+      where.playerClass = filter.playerClass;
+    }
+
+    if (filter?.isOnline !== undefined) {
+      where.isOnline = filter.isOnline;
+    }
+
+    return this.db.characters.count({ where });
   }
 
   async createCharacter(data: CreateCharacterInput, userId: string) {
@@ -589,16 +636,35 @@ export class CharactersService {
     }
 
     // Validate character password
-    if (!character.passwordHash) {
-      throw new BadRequestException(
-        `Character '${characterName}' does not have a password set`
+    // Supports both legacy Unix crypt() hashes (10 chars) and modern bcrypt hashes
+    const isLegacyHash = character.passwordHash.length === 10;
+    let isPasswordValid = false;
+
+    if (isLegacyHash) {
+      // Legacy Unix crypt() hash - validate and upgrade to bcrypt
+      const crypt = require('unix-crypt-td-js');
+      const hashedPassword = crypt(characterPassword, character.passwordHash);
+      // Compare only first 10 characters (legacy system truncated to 10 chars)
+      isPasswordValid = hashedPassword.substring(0, 10) === character.passwordHash;
+
+      if (isPasswordValid) {
+        // Upgrade to bcrypt for future logins
+        const bcryptHash = await bcrypt.hash(characterPassword, 10);
+        await this.db.characters.update({
+          where: { id: character.id },
+          data: { passwordHash: bcryptHash },
+        });
+        console.log(
+          `Upgraded legacy password to bcrypt for character: ${character.name}`
+        );
+      }
+    } else {
+      // Modern bcrypt hash
+      isPasswordValid = await bcrypt.compare(
+        characterPassword,
+        character.passwordHash
       );
     }
-
-    const isPasswordValid = await bcrypt.compare(
-      characterPassword,
-      character.passwordHash
-    );
 
     if (!isPasswordValid) {
       throw new BadRequestException('Invalid character password');
@@ -694,6 +760,8 @@ export class CharactersService {
         },
       },
       select: {
+        id: true,
+        name: true,
         passwordHash: true,
       },
     });
@@ -702,7 +770,34 @@ export class CharactersService {
       return false;
     }
 
-    return bcrypt.compare(password, character.passwordHash);
+    // Supports both legacy Unix crypt() hashes (10 chars) and modern bcrypt hashes
+    const isLegacyHash = character.passwordHash.length === 10;
+    let isPasswordValid = false;
+
+    if (isLegacyHash) {
+      // Legacy Unix crypt() hash
+      const crypt = require('unix-crypt-td-js');
+      const hashedPassword = crypt(password, character.passwordHash);
+      // Compare only first 10 characters (legacy system truncated to 10 chars)
+      isPasswordValid = hashedPassword.substring(0, 10) === character.passwordHash;
+
+      if (isPasswordValid) {
+        // Upgrade to bcrypt for future logins
+        const bcryptHash = await bcrypt.hash(password, 10);
+        await this.db.characters.update({
+          where: { id: character.id },
+          data: { passwordHash: bcryptHash },
+        });
+        console.log(
+          `Upgraded legacy password to bcrypt for character: ${character.name}`
+        );
+      }
+    } else {
+      // Modern bcrypt hash
+      isPasswordValid = await bcrypt.compare(password, character.passwordHash);
+    }
+
+    return isPasswordValid;
   }
 
   async getCharacterLinkingInfo(characterName: string) {

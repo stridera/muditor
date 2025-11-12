@@ -191,11 +191,11 @@ export class CharacterDto {
   skillPoints: number;
 
   // Relations
-  @Field(() => [CharacterItemDto])
-  items: CharacterItemDto[];
+  @Field(() => [CharacterItemDto], { nullable: true })
+  items?: CharacterItemDto[];
 
-  @Field(() => [CharacterEffectDto])
-  effects: CharacterEffectDto[];
+  @Field(() => [CharacterEffectDto], { nullable: true })
+  effects?: CharacterEffectDto[];
 }
 
 @ObjectType()

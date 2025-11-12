@@ -3,6 +3,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
@@ -12,14 +19,19 @@ import {
   Backpack,
   Clock,
   Coins,
+  Edit,
   Heart,
   MapPin,
   Shield,
   Sparkles,
+  Trash2,
   TrendingUp,
   User,
   Zap,
 } from 'lucide-react';
+import { useState } from 'react';
+import { CharacterDeleteDialog } from './character-delete-dialog';
+import { CharacterEditForm } from './character-edit-form';
 import { OnlineStatus } from './online-status';
 
 const GET_CHARACTER_DETAILS = gql`
@@ -124,7 +136,10 @@ export function CharacterDetails({
   characterId,
   onBack,
 }: CharacterDetailsProps) {
-  const { data, loading, error } = useQuery<CharacterDetailsQueryResult>(
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+
+  const { data, loading, error, refetch } = useQuery<CharacterDetailsQueryResult>(
     GET_CHARACTER_DETAILS,
     {
       variables: { id: characterId },
@@ -140,6 +155,18 @@ export function CharacterDetails({
       skip: !data?.character?.isOnline,
     }
   );
+
+  const handleCharacterUpdated = () => {
+    setEditDialogOpen(false);
+    refetch();
+  };
+
+  const handleCharacterDeleted = () => {
+    setDeleteDialogOpen(false);
+    if (onBack) {
+      onBack();
+    }
+  };
 
   if (loading) {
     return (
@@ -212,13 +239,13 @@ export function CharacterDetails({
     return 'text-red-600';
   };
 
-  const equippedItems = character.items.filter(
+  const equippedItems = (character.items || []).filter(
     (item: any) => item.equippedLocation
   );
-  const inventoryItems = character.items.filter(
+  const inventoryItems = (character.items || []).filter(
     (item: any) => !item.equippedLocation
   );
-  const activeEffects = character.effects.filter(
+  const activeEffects = (character.effects || []).filter(
     (effect: any) =>
       !effect.expiresAt || new Date(effect.expiresAt) > new Date()
   );
@@ -243,21 +270,47 @@ export function CharacterDetails({
               />
             </h1>
             <p className='text-muted-foreground flex items-center gap-2'>
-              Level {character.level} {character.raceType}{' '}
-              {character.playerClass}
+              Level {character.level}
+              {character.raceType && ` ${character.raceType}`}
+              {character.playerClass && ` ${character.playerClass}`}
               {character.title && (
                 <>
-                  <span>•</span>
+                  <span className='ml-2'>•</span>
                   <span className='italic'>"{character.title}"</span>
                 </>
               )}
             </p>
           </div>
         </div>
-        <Badge variant='outline' className='text-lg px-3 py-1'>
-          Level {character.level}
-        </Badge>
+        <div className='flex items-center gap-2'>
+          <Button
+            variant='outline'
+            onClick={() => setEditDialogOpen(true)}
+            disabled={character.isOnline}
+          >
+            <Edit className='h-4 w-4 mr-2' />
+            Edit Character
+          </Button>
+          <Button
+            variant='destructive'
+            onClick={() => setDeleteDialogOpen(true)}
+            disabled={character.isOnline}
+          >
+            <Trash2 className='h-4 w-4 mr-2' />
+            Delete
+          </Button>
+          <Badge variant='outline' className='text-lg px-3 py-1'>
+            Level {character.level}
+          </Badge>
+        </div>
       </div>
+
+      {character.isOnline && (
+        <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800'>
+          ⚠️ This character is currently online. You cannot edit or delete while
+          the character is in the game.
+        </div>
+      )}
 
       <Tabs defaultValue='overview' className='space-y-6'>
         <TabsList>
@@ -732,6 +785,32 @@ export function CharacterDetails({
           </div>
         </TabsContent>
       </Tabs>
+
+      {/* Edit Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>Edit Character: {character.name}</DialogTitle>
+            <DialogDescription>
+              Update your character's stats, appearance, and other details.
+            </DialogDescription>
+          </DialogHeader>
+          <CharacterEditForm
+            character={character}
+            onCharacterUpdated={handleCharacterUpdated}
+            onCancel={() => setEditDialogOpen(false)}
+          />
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Dialog */}
+      <CharacterDeleteDialog
+        characterId={character.id}
+        characterName={character.name}
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        onCharacterDeleted={handleCharacterDeleted}
+      />
     </div>
   );
 }

@@ -37,8 +37,15 @@ export class RoomExitDto {
   @Field({ nullable: true })
   description?: string;
 
-  @Field(() => [String], { nullable: true })
-  keywords?: string[];
+  // Deprecated single keyword field retained for backward compatibility
+  @Field({ nullable: true, deprecationReason: 'Use keywords array instead' })
+  keyword?: string;
+
+  @Field(() => [String], { defaultValue: [] })
+  keywords: string[];
+
+  @Field(() => [ExitFlag], { defaultValue: [] })
+  flags: ExitFlag[];
 
   @Field({ nullable: true })
   key?: string;
@@ -49,17 +56,11 @@ export class RoomExitDto {
   @Field(() => Int, { nullable: true })
   toRoomId?: number;
 
-  @Field(() => [ExitFlag], { defaultValue: [] })
-  flags: ExitFlag[];
-
   @Field(() => Int)
   roomZoneId: number;
 
   @Field(() => Int)
   roomId: number;
-
-  @Field(() => Int, { nullable: true })
-  destination?: number;
 }
 
 @ObjectType()
@@ -82,7 +83,12 @@ export class RoomDto {
   @Field()
   name: string;
 
+  // Canonical field (reverted decision): description
   @Field()
+  description: string;
+
+  // Deprecated alias retained for backward compatibility
+  @Field({ deprecationReason: 'Use description instead' })
   roomDescription: string;
 
   @Field(() => Sector)
@@ -145,7 +151,13 @@ export class CreateRoomInput {
 
   @Field()
   @IsString()
-  roomDescription: string;
+  description: string;
+
+  // Optional deprecated alias (will be ignored if description provided)
+  @Field({ nullable: true, deprecationReason: 'Use description instead' })
+  @IsOptional()
+  @IsString()
+  roomDescription?: string;
 
   @Field(() => Sector, { defaultValue: Sector.STRUCTURE })
   @IsOptional()
@@ -161,38 +173,6 @@ export class CreateRoomInput {
   @Field(() => Int)
   @IsNumber()
   zoneId: number;
-
-  // Optional spatial coordinates (auto-computed when creating relative to an existing room)
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  layoutX?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  layoutY?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  layoutZ?: number;
-
-  // Create relative to an existing room (e.g. "New room, North")
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  sourceZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsInt()
-  sourceRoomId?: number;
-
-  @Field(() => Direction, { nullable: true })
-  @IsOptional()
-  @IsEnum(Direction)
-  directionFromSource?: Direction;
 }
 
 @InputType()
@@ -205,7 +185,12 @@ export class UpdateRoomInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  roomDescription?: string;
+  description?: string;
+
+  @Field({ nullable: true, deprecationReason: 'Use description instead' })
+  @IsOptional()
+  @IsString()
+  roomDescription?: string; // legacy alias
 
   @Field(() => Sector, { nullable: true })
   @IsOptional()
@@ -303,8 +288,8 @@ export class BatchUpdateResult {
   @Field(() => Int)
   updatedCount: number;
 
-  @Field(() => [String])
-  errors: string[];
+  @Field(() => [String], { nullable: true })
+  errors?: string[];
 }
 
 @InputType()
@@ -321,17 +306,13 @@ export class CreateRoomExitInput {
   @Field(() => [String], { nullable: true })
   @IsOptional()
   @IsArray()
+  @IsString({ each: true })
   keywords?: string[];
 
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
   key?: string;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  destination?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
