@@ -35,6 +35,7 @@ import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
 import { WorldMapZone } from './WorldMapZone';
 import { WorldMapRoom } from './WorldMapRoom';
+import { PortalNode } from './PortalNode';
 import { WorldMapCanvas } from './WorldMapCanvas';
 import { PropertyPanel } from './PropertyPanel';
 import { EntityPalette, Mob, type Object as EntityObject } from './EntityPalette';
@@ -180,6 +181,7 @@ interface Room {
 interface RoomExit {
   id: string;
   direction: string;
+  toZoneId: number | null;
   toRoomId: number | null;
   description?: string;
   keyword?: string;
@@ -195,6 +197,7 @@ interface Zone {
 
 interface EnhancedZoneEditorProps {
   zoneId?: number; // Optional for world map mode
+  initialRoomId?: number; // Initial room to select from URL
   worldMapMode?: boolean; // Enable world map viewing all zones
 }
 
@@ -204,10 +207,12 @@ const nodeTypes = {
   object: ObjectNode,
   zone: WorldMapZone,
   worldRoom: WorldMapRoom,
+  portal: PortalNode,
 };
 
 const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   zoneId,
+  initialRoomId,
   worldMapMode = false,
 }) => {
   const router = useRouter();
@@ -231,7 +236,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     setSelectedRoomId(roomId);
     const room = rooms.find(r => r.id === roomId);
     setEditedRoom(room ? { ...room } : null);
-  }, [rooms]);
+
+    // Update URL to include room parameter for refresh persistence
+    if (zoneId) {
+      const newUrl = `/dashboard/zones/editor?zone=${zoneId}&room=${roomId}`;
+      router.replace(newUrl, { scroll: false });
+    }
+  }, [rooms, zoneId, router]);
+
+  // Handler for cross-zone navigation
+  const handleNavigateToZone = useCallback((targetZoneId: number, targetRoomId: number) => {
+    console.log(`🌐 Navigating to zone ${targetZoneId}, room ${targetRoomId}`);
+    // Navigate to the target zone with the room selected
+    router.push(`/dashboard/zones/editor?zone=${targetZoneId}&room=${targetRoomId}`);
+  }, [router]);
+
   const [editedRoom, setEditedRoom] = useState<Room | null>(null);
   const [saving, setSaving] = useState(false);
   const [managingExits, setManagingExits] = useState(false);
@@ -1050,6 +1069,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 exits {
                   id
                   direction
+                  toZoneId
                   toRoomId
                 }
               }
@@ -1366,6 +1386,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     exits {
                       id
                       direction
+                      toZoneId
                       toRoomId
                     }
                   }
@@ -1547,6 +1568,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
     fetchData();
   }, [zoneId]);
+
+  // Select initial room from URL parameter
+  useEffect(() => {
+    if (initialRoomId && rooms.length > 0 && !selectedRoomId) {
+      const room = rooms.find(r => r.id === initialRoomId);
+      if (room) {
+        console.log(`📍 Selecting initial room from URL: ${initialRoomId}`);
+        handleSelectRoom(initialRoomId);
+      }
+    }
+  }, [initialRoomId, rooms, selectedRoomId, handleSelectRoom]);
 
   // Generate world map nodes for zone viewing
   const generateWorldMapNodes = useCallback((mapData: ZoneMapData): Node[] => {
@@ -2549,6 +2581,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         },
         data: {
           roomId: room.id,
+          zoneId: room.zoneId,
           name: room.name,
           sector: room.sector,
           description: room.description,
@@ -2599,11 +2632,16 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
     // Create edges from exits with enhanced styling for one-way exits
     const newEdges: Edge[] = [];
+    const portalNodes: Node[] = []; // Portal nodes for cross-zone exits
     const exitDirections = { NORTH: 0, SOUTH: 0, EAST: 0, WEST: 0, NORTHEAST: 0, NORTHWEST: 0, SOUTHEAST: 0, SOUTHWEST: 0, UP: 0, DOWN: 0 };
 
     rooms.forEach(room => {
       room.exits.forEach(exit => {
-        const targetRoom = rooms.find(r => r.id === exit.toRoomId);
+        // Find target room by matching BOTH zone ID and room ID
+        // This correctly handles both intra-zone and cross-zone exits
+        const targetZoneId = exit.toZoneId ?? room.zoneId;
+        const targetRoom = rooms.find(r => r.zoneId === targetZoneId && r.id === exit.toRoomId);
+
         if (exit.toRoomId && targetRoom) {
           // Count exits by direction for analysis
           exitDirections[exit.direction as keyof typeof exitDirections]++;
@@ -2691,14 +2729,90 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           newEdges.push(edge);
           // console.log(`✅ Edge added: ${edge.id} (${exit.direction}${isOneWay ? ' - ONE-WAY' : ''})`);
-        } else if (exit.toRoomId) {
-          // console.log(`⚠️  Exit ${exit.direction} from room ${room.id} points to room ${exit.toRoomId} which is not in current zone`);
+        } else if (exit.toRoomId && exit.toZoneId && exit.toZoneId !== room.zoneId) {
+          // Cross-zone exit - create a portal node
+          const roomNode = newNodes.find(n => n.id === room.id.toString());
+          if (roomNode) {
+            // Calculate portal position based on exit direction
+            const directionOffsets = {
+              NORTH: { x: 0, y: -120 },
+              SOUTH: { x: 0, y: 120 },
+              EAST: { x: 200, y: 0 },
+              WEST: { x: -200, y: 0 },
+              NORTHEAST: { x: 140, y: -85 },
+              NORTHWEST: { x: -140, y: -85 },
+              SOUTHEAST: { x: 140, y: 85 },
+              SOUTHWEST: { x: -140, y: 85 },
+              UP: { x: 0, y: -100 },
+              DOWN: { x: 0, y: 100 },
+            };
+
+            const offset = directionOffsets[exit.direction as keyof typeof directionOffsets] || { x: 0, y: 0 };
+            const portalId = `portal-${room.zoneId}-${room.id}-${exit.direction}-${exit.toZoneId}-${exit.toRoomId}`;
+
+            // Create portal node
+            const portalNode: Node = {
+              id: portalId,
+              type: 'portal',
+              position: {
+                x: roomNode.position.x + offset.x,
+                y: roomNode.position.y + offset.y,
+              },
+              data: {
+                direction: exit.direction,
+                destZoneId: exit.toZoneId,
+                destRoomId: exit.toRoomId,
+                zoneName: `Zone ${exit.toZoneId}`,
+              },
+              draggable: false,
+            };
+
+            portalNodes.push(portalNode);
+
+            // Create edge from room to portal
+            const portalEdge: Edge = {
+              id: `${room.id}-${portalId}-${exit.direction}`,
+              source: room.id.toString(),
+              target: portalId,
+              type: 'straight',
+              animated: true,
+              style: {
+                stroke: getThemeColor('#8b5cf6', '#a78bfa'), // Purple for portals
+                strokeWidth: 2.5,
+                strokeDasharray: '8,4',
+              },
+              markerEnd: {
+                type: MarkerType.ArrowClosed,
+                width: 18,
+                height: 18,
+                color: getThemeColor('#8b5cf6', '#a78bfa'),
+              },
+              sourceHandle: exit.direction === 'EAST' ? 'right' :
+                exit.direction === 'WEST' ? 'left' :
+                  exit.direction === 'NORTH' ? 'top' :
+                    exit.direction === 'SOUTH' ? 'bottom' :
+                      exit.direction === 'UP' ? 'up' :
+                        exit.direction === 'DOWN' ? 'down' : null,
+              targetHandle: exit.direction === 'EAST' ? 'left-target' :
+                exit.direction === 'WEST' ? 'right-target' :
+                  exit.direction === 'NORTH' ? 'bottom-target' :
+                    exit.direction === 'SOUTH' ? 'top-target' :
+                      exit.direction === 'UP' ? 'down-target' :
+                        exit.direction === 'DOWN' ? 'up-target' : null,
+            };
+
+            newEdges.push(portalEdge);
+            console.log(`🌀 Created portal: Room ${room.zoneId}:${room.id} → Zone ${exit.toZoneId}:${exit.toRoomId} via ${exit.direction}`);
+          }
         }
       });
     });
 
-    console.log(`✅ Generated ${newNodes.length} room nodes and ${newEdges.length} edges for zone view`);
-    setNodes(newNodes);
+    // Append portal nodes to the nodes array
+    const allNodes = [...newNodes, ...portalNodes];
+
+    console.log(`✅ Generated ${newNodes.length} room nodes, ${portalNodes.length} portal nodes, and ${newEdges.length} edges for zone view`);
+    setNodes(allNodes);
     setEdges(newEdges);
   }, [rooms, viewMode, setNodes, setEdges, currentZLevel, overlaps, selectedRoomId, worldMapMode, worldMapNodes, currentViewMode]);
 
@@ -3374,6 +3488,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 exits {
                   id
                   direction
+                  toZoneId
                   toRoomId
                 }
               }
@@ -3767,8 +3882,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           // Find exit in that direction
           const exit = room.exits.find(e => e.direction === direction);
           if (exit && exit.toRoomId) {
-            // Check if destination room exists in our current zone
-            const destinationRoom = rooms.find(r => r.id === exit.toRoomId);
+            // Check if destination room exists with matching zone ID and room ID
+            const targetZoneId = exit.toZoneId ?? room.zoneId;
+            const destinationRoom = rooms.find(r => r.zoneId === targetZoneId && r.id === exit.toRoomId);
             if (destinationRoom) {
               console.log(
                 `🧭 Navigating ${direction.toLowerCase()} to room ${exit.toRoomId}: "${destinationRoom.name}"`
@@ -3788,9 +3904,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 );
               }
             } else {
-              console.log(
-                `🚫 Cannot navigate ${direction.toLowerCase()}: destination room ${exit.toRoomId} not found in current zone`
-              );
+              // Check if it's a cross-zone exit
+              if (targetZoneId !== room.zoneId) {
+                console.log(
+                  `🌐 Navigating ${direction} to Zone ${targetZoneId}, Room ${exit.toRoomId} (cross-zone portal)`
+                );
+                // Navigate to the destination zone and room
+                router.push(`/dashboard/zones/editor?zone=${targetZoneId}&room=${exit.toRoomId}`);
+              } else {
+                console.log(
+                  `🚫 Cannot navigate ${direction.toLowerCase()}: destination room ${exit.toRoomId} not found`
+                );
+              }
             }
           } else {
             console.log(
@@ -5008,6 +5133,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           onDeleteExit={handleDeleteExit}
           onUpdateExit={handleUpdateExit}
           onSelectRoom={handleSelectRoom}
+          onNavigateToZone={handleNavigateToZone}
           onUpdateZLevel={handleUpdateZLevel}
           onRemoveMob={handleRemoveMob}
           onRemoveObject={handleRemoveObject}
