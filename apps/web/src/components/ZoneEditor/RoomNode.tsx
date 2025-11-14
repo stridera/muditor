@@ -12,6 +12,7 @@ interface OverlapInfo {
 
 interface RoomData {
   roomId: number;
+  zoneId: number;
   name: string;
   sector: string;
   roomDescription: string;
@@ -469,9 +470,9 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
               <div className='border-t border-gray-700 pt-2'>
                 <div className='font-semibold mb-1'>Exits:</div>
                 {data.exits.map((exit, idx) => {
-                  const hasZoneInfo =
-                    exit.toZoneId != null && exit.toRoomId != null;
-                  const displayText = hasZoneInfo
+                  // Show zone ID only for cross-zone exits
+                  const isCrossZone = exit.toZoneId != null && exit.toZoneId !== data.zoneId;
+                  const displayText = isCrossZone
                     ? `Zone ${exit.toZoneId}:${exit.toRoomId}`
                     : exit.toRoomId != null
                       ? `Room ${exit.toRoomId}`

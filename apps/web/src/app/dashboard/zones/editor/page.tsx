@@ -12,6 +12,7 @@ import { Suspense, useEffect, useState } from 'react';
 function ZoneEditorContent() {
   const searchParams = useSearchParams();
   const zoneIdParam = searchParams.get('zone');
+  const roomIdParam = searchParams.get('room');
   const { zoneId: contextZoneId } = useZoneContext();
   const [localStorageZone, setLocalStorageZone] = useState<number | null>(null);
 
@@ -32,6 +33,9 @@ function ZoneEditorContent() {
   const zoneId = zoneIdParam
     ? parseInt(zoneIdParam)
     : localStorageZone;
+
+  // Parse room ID from URL
+  const initialRoomId = roomIdParam ? parseInt(roomIdParam) : undefined;
 
   // If no zone, show world map mode
   const worldMapMode = !zoneId;
@@ -81,7 +85,11 @@ function ZoneEditorContent() {
 
       {/* Full-screen Zone Editor */}
       <div className='h-[calc(100vh-73px)]'>
-        <EnhancedZoneEditor zoneId={zoneId ?? undefined} worldMapMode={worldMapMode} />
+        <EnhancedZoneEditor
+          zoneId={zoneId ?? undefined}
+          initialRoomId={initialRoomId}
+          worldMapMode={worldMapMode}
+        />
       </div>
     </div>
   );
