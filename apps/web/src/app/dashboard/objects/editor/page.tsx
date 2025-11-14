@@ -79,17 +79,18 @@ interface ObjectFormData {
   decomposeTimer: number;
   level: number;
   concealment: number;
-  values: Record<string, any>;
+  values: Record<string, unknown>;
   zoneId: number;
 }
 
-// Helper function to safely get values from formData.values
-const getValueSafe = (
-  values: Record<string, any>,
+// Helper function to safely get typed values from formData.values
+const getValueSafe = <T,>(
+  values: Record<string, unknown>,
   key: string,
-  defaultValue: any = ''
-) => {
-  return values?.[key] ?? defaultValue;
+  defaultValue: T
+): T => {
+  const raw = values?.[key];
+  return (raw as T) ?? defaultValue;
 };
 
 const OBJECT_TYPES = [
@@ -257,9 +258,17 @@ function ObjectEditorContent() {
   const [createObject, { loading: createLoading }] = useMutation(CREATE_OBJECT);
 
   useEffect(() => {
-    const typedData = data as any;
+    const typedData = data as
+      | {
+          object?: Partial<ObjectFormData> & {
+            flags?: string[];
+            wearFlags?: string[];
+            values?: Record<string, unknown>;
+          };
+        }
+      | undefined;
     if (typedData?.object) {
-      const object = typedData.object; // Use any for now since we don't have proper GraphQL codegen
+      const object = typedData.object;
       setFormData({
         type: object.type || 'NOTHING',
         keywords: object.keywords || '',
@@ -302,7 +311,7 @@ function ObjectEditorContent() {
 
   const handleTypeValueChange = (
     key: string,
-    value: string | number | boolean | any[]
+    value: string | number | boolean | string[] | number[]
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -359,7 +368,7 @@ function ObjectEditorContent() {
       // Redirect back to objects list
       window.location.href = '/dashboard/objects';
     } catch (err) {
-      console.error('Error saving object:', err);
+      void err; // LoggingService.error('Error saving object', { error: err, objectId });
       setGeneralError('Failed to save object. Please try again.');
     }
   };
@@ -380,20 +389,20 @@ function ObjectEditorContent() {
       {/* Header */}
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900'>
+          <h1 className='text-3xl font-bold text-foreground'>
             {isNew
               ? 'Create New Object'
               : formData.name
                 ? `Edit Object: ${formData.name}`
                 : `Edit Object ${objectId}`}
           </h1>
-          <p className='text-gray-600 mt-1'>
+          <p className='text-muted-foreground mt-1'>
             Configure object properties, flags, and type-specific values
           </p>
         </div>
         <div className='flex gap-2'>
           <Link href='/dashboard/objects'>
-            <button className='inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'>
+            <button className='inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Objects
             </button>
@@ -401,7 +410,7 @@ function ObjectEditorContent() {
           <button
             onClick={handleSave}
             disabled={updateLoading || createLoading}
-            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
+            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
           >
             <Save className='w-4 h-4 mr-2' />
             {isNew ? 'Create Object' : 'Save Changes'}
@@ -410,7 +419,7 @@ function ObjectEditorContent() {
       </div>
 
       {generalError && (
-        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4'>
+        <div className='bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-4'>
           {generalError}
         </div>
       )}
@@ -424,8 +433,8 @@ function ObjectEditorContent() {
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               {tab.label}
@@ -438,8 +447,8 @@ function ObjectEditorContent() {
       <div className='space-y-6'>
         {/* Basic Information Tab */}
         {activeTab === 'basic' && (
-          <div className='bg-white shadow rounded-lg p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          <div className='bg-card shadow rounded-lg p-6 border border-border'>
+            <h3 className='text-lg font-medium text-foreground mb-4'>
               Basic Information
             </h3>
             <div className='space-y-4'>
@@ -447,7 +456,7 @@ function ObjectEditorContent() {
                 <div>
                   <label
                     htmlFor='keywords'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Keywords *
                   </label>
@@ -458,7 +467,7 @@ function ObjectEditorContent() {
                     error={!!errors.keywords}
                   />
                   {errors.keywords && (
-                    <p className='text-red-500 text-xs mt-1'>
+                    <p className='text-destructive text-xs mt-1'>
                       {errors.keywords}
                     </p>
                   )}
@@ -467,7 +476,7 @@ function ObjectEditorContent() {
                 <div>
                   <label
                     htmlFor='type'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Object Type
                   </label>
@@ -962,13 +971,13 @@ function ObjectEditorContent() {
                                 checked={getValueSafe(
                                   formData.values,
                                   'containerFlags',
-                                  []
+                                  [] as string[]
                                 ).includes(flag)}
                                 onChange={e => {
                                   const flags = getValueSafe(
                                     formData.values,
                                     'containerFlags',
-                                    []
+                                    [] as string[]
                                   );
                                   if (e.target.checked) {
                                     handleTypeValueChange('containerFlags', [
@@ -978,7 +987,7 @@ function ObjectEditorContent() {
                                   } else {
                                     handleTypeValueChange(
                                       'containerFlags',
-                                      flags.filter((f: any) => f !== flag)
+                                      flags.filter((f: string) => f !== flag)
                                     );
                                   }
                                 }}

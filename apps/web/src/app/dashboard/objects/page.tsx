@@ -1,6 +1,8 @@
 'use client';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { FlagBadge } from '@/components/ui/flag-badge';
+import { TypeBadge } from '@/components/ui/type-badge';
 import { useZone } from '@/contexts/zone-context';
 import {
   CreateObjectDocument,
@@ -171,8 +173,8 @@ function ObjectsContent() {
             [objectId]: objDetails,
           }));
         }
-      } catch (err) {
-        console.error('Error loading object details:', err);
+      } catch {
+        /* LoggingService.error('Error loading object details'); */
       } finally {
         setLoadingDetails(
           new Set([...loadingDetails].filter(id => id !== objectId))
@@ -198,8 +200,8 @@ function ObjectsContent() {
       }
       await deleteObject({ variables: { id, zoneId: obj.zoneId! } });
       await refetch();
-    } catch (err) {
-      console.error('Error deleting object:', err);
+    } catch {
+      /* LoggingService.error('Error deleting object'); */
       alert('Failed to delete object. Please try again.');
     } finally {
       setDeletingId(null);
@@ -253,7 +255,7 @@ function ObjectsContent() {
       await refetch();
       clearSelection();
     } catch (err) {
-      console.error('Error deleting objects:', err);
+      /* LoggingService.error('Error deleting objects:', err); */
       alert(
         `Failed to delete objects: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -317,7 +319,7 @@ function ObjectsContent() {
         `Object cloned successfully! New object ID: ${createResult.data?.createObject.id}`
       );
     } catch (err) {
-      console.error('Error cloning object:', err);
+      /* LoggingService.error('Error cloning object:', err); */
       alert(
         `Failed to clone object: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -367,7 +369,7 @@ function ObjectsContent() {
       cost: o.cost,
       weight: o.weight,
       zoneId: o.zoneId,
-    } as ObjectSearchShape; // assertion to satisfy exactOptionalPropertyTypes during incremental build
+    };
     if (o.type) {
       // Only include type if defined; avoid assigning undefined
       base.type = o.type as string;
@@ -419,16 +421,16 @@ function ObjectsContent() {
 
   if (loading) return <div className='p-4'>Loading objects...</div>;
   if (error)
-    return <div className='p-4 text-red-600'>Error: {error.message}</div>;
+    return <div className='p-4 text-destructive'>Error: {error.message}</div>;
 
   return (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-2xl font-bold text-gray-900'>
+          <h1 className='text-2xl font-bold text-foreground'>
             {selectedZone ? `Zone ${selectedZone} Objects` : 'Objects'}
           </h1>
-          <p className='text-sm text-gray-500 mt-1'>
+          <p className='text-sm text-muted-foreground mt-1'>
             Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
             objects (Page {currentPage} of {totalPages})
             {selectedZone && ' in this zone'}
@@ -436,7 +438,7 @@ function ObjectsContent() {
         </div>
         <Link
           href='/dashboard/objects/editor'
-          className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700'
+          className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/80'
         >
           <Plus className='w-4 h-4 mr-2' />
           Create New Object
@@ -452,16 +454,18 @@ function ObjectsContent() {
       </div>
 
       {/* Sort and Items Per Page Controls */}
-      <div className='flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg'>
+      <div className='flex items-center gap-4 mb-4 p-4 bg-muted rounded-lg'>
         <div className='flex items-center gap-2'>
-          <label className='text-sm font-medium text-gray-700'>Sort by:</label>
+          <label className='text-sm font-medium text-muted-foreground'>
+            Sort by:
+          </label>
           <select
             value={sortBy}
             onChange={e => {
               setSortBy(e.target.value);
               setCurrentPage(1);
             }}
-            className='border border-gray-300 rounded px-2 py-1 text-sm'
+            className='border border-border rounded px-2 py-1 text-sm bg-background'
           >
             <option value='level'>Level</option>
             <option value='name'>Name</option>
@@ -476,7 +480,7 @@ function ObjectsContent() {
               setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
               setCurrentPage(1);
             }}
-            className='p-1 hover:bg-gray-200 rounded'
+            className='p-1 hover:bg-muted rounded'
             title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
           >
             {sortOrder === 'asc' ? (
@@ -487,7 +491,7 @@ function ObjectsContent() {
           </button>
         </div>
         <div className='flex items-center gap-2'>
-          <label className='text-sm font-medium text-gray-700'>
+          <label className='text-sm font-medium text-muted-foreground'>
             Items per page:
           </label>
           <select
@@ -496,7 +500,7 @@ function ObjectsContent() {
               setItemsPerPage(parseInt(e.target.value));
               setCurrentPage(1);
             }}
-            className='border border-gray-300 rounded px-2 py-1 text-sm'
+            className='border border-border rounded px-2 py-1 text-sm bg-background'
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -535,24 +539,24 @@ function ObjectsContent() {
 
       {/* Bulk Actions Toolbar */}
       {selectedObjects.size > 0 && (
-        <div className='bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6'>
+        <div className='bg-card border border-border rounded-lg p-4 mb-6'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-4'>
-              <span className='text-blue-900 font-medium'>
+              <span className='text-primary font-medium'>
                 {selectedObjects.size} object
                 {selectedObjects.size !== 1 ? 's' : ''} selected
               </span>
               <div className='flex items-center gap-2'>
                 <button
                   onClick={selectAllObjects}
-                  className='text-blue-600 hover:text-blue-800 text-sm underline'
+                  className='text-primary hover:text-primary/80 text-sm underline'
                   disabled={selectedObjects.size === paginatedObjects.length}
                 >
                   Select All ({paginatedObjects.length})
                 </button>
                 <button
                   onClick={clearSelection}
-                  className='text-blue-600 hover:text-blue-800 text-sm underline'
+                  className='text-primary hover:text-primary/80 text-sm underline'
                 >
                   Clear Selection
                 </button>
@@ -561,7 +565,7 @@ function ObjectsContent() {
             <div className='flex items-center gap-2'>
               <button
                 onClick={exportSelectedObjects}
-                className='inline-flex items-center px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700'
+                className='inline-flex items-center px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded hover:bg-secondary/80'
               >
                 <Download className='w-3 h-3 mr-1' />
                 Export JSON
@@ -569,7 +573,7 @@ function ObjectsContent() {
               <button
                 onClick={handleBulkDelete}
                 disabled={isDeleting}
-                className='inline-flex items-center px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50'
+                className='inline-flex items-center px-3 py-1.5 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/80 disabled:opacity-50'
               >
                 <Trash2 className='w-3 h-3 mr-1' />
                 {isDeleting ? 'Deleting...' : 'Delete All'}
@@ -581,10 +585,10 @@ function ObjectsContent() {
 
       {filteredObjects.length === 0 ? (
         <div className='text-center py-12'>
-          <div className='text-gray-500 mb-4'>No objects found</div>
+          <div className='text-muted-foreground mb-4'>No objects found</div>
           <Link
             href='/dashboard/objects/editor'
-            className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'
+            className='bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90'
           >
             Create Object
           </Link>
@@ -598,7 +602,7 @@ function ObjectsContent() {
             return (
               <div
                 key={fullObject.id}
-                className='bg-white border rounded-lg hover:shadow-md transition-shadow'
+                className='bg-card border rounded-lg hover:shadow-md transition-shadow'
               >
                 <div
                   className='p-4 cursor-pointer'
@@ -612,37 +616,35 @@ function ObjectsContent() {
                           e.stopPropagation();
                           toggleObjectSelection(fullObject.id);
                         }}
-                        className='mt-1 text-gray-400 hover:text-blue-600'
+                        className='mt-1 text-muted-foreground hover:text-primary'
                       >
                         {selectedObjects.has(fullObject.id) ? (
-                          <CheckSquare className='w-5 h-5 text-blue-600' />
+                          <CheckSquare className='w-5 h-5 text-primary' />
                         ) : (
                           <Square className='w-5 h-5' />
                         )}
                       </button>
                       <div className='flex-1'>
                         <div className='flex items-center gap-2 mb-1'>
-                          <h3 className='font-semibold text-lg text-gray-900'>
+                          <h3 className='font-semibold text-lg text-foreground'>
                             #{fullObject.id} - {fullObject.name}
                           </h3>
-                          <span className='px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-full uppercase'>
-                            {(fullObject.type ?? '').replace('_', ' ')}
-                          </span>
+                          <TypeBadge type={fullObject.type ?? ''} />
                           <ChevronDown
-                            className={`w-4 h-4 text-gray-400 transition-transform ${
+                            className={`w-4 h-4 text-muted-foreground transition-transform ${
                               expandedObjects.has(fullObject.id)
                                 ? 'rotate-180'
                                 : ''
                             }`}
                           />
                         </div>
-                        <p className='text-sm text-gray-600 mb-2'>
+                        <p className='text-sm text-muted-foreground mb-2'>
                           Keywords:{' '}
                           {Array.isArray(fullObject.keywords)
                             ? fullObject.keywords.join(', ')
                             : fullObject.keywords}
                         </p>
-                        <div className='flex items-center gap-4 text-sm text-gray-500'>
+                        <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                           <span>Level {fullObject.level}</span>
                           <span>{fullObject.weight} lbs</span>
                           <span>{fullObject.cost} coins</span>
@@ -653,7 +655,7 @@ function ObjectsContent() {
                     <div className='flex items-center gap-2 ml-4'>
                       <Link
                         href={`/dashboard/objects/editor?zone=${fullObject.zoneId}&id=${fullObject.id}`}
-                        className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
+                        className='inline-flex items-center text-primary hover:text-primary/80 px-3 py-1 text-sm'
                         onClick={e => e.stopPropagation()}
                       >
                         <Edit className='w-3 h-3 mr-1' />
@@ -665,7 +667,7 @@ function ObjectsContent() {
                           handleCloneObject(fullObject.id);
                         }}
                         disabled={cloningId === fullObject.id}
-                        className='inline-flex items-center text-green-600 hover:text-green-800 px-3 py-1 text-sm disabled:opacity-50'
+                        className='inline-flex items-center text-secondary hover:text-secondary/80 px-3 py-1 text-sm disabled:opacity-50'
                       >
                         <Copy className='w-3 h-3 mr-1' />
                         {cloningId === fullObject.id ? 'Cloning...' : 'Clone'}
@@ -676,7 +678,7 @@ function ObjectsContent() {
                           handleDelete(fullObject.id!, fullObject.name ?? '');
                         }}
                         disabled={deletingId === fullObject.id}
-                        className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm disabled:opacity-50'
+                        className='inline-flex items-center text-destructive hover:text-destructive/80 px-3 py-1 text-sm disabled:opacity-50'
                       >
                         <Trash2 className='w-3 h-3 mr-1' />
                         {deletingId === fullObject.id
@@ -689,12 +691,12 @@ function ObjectsContent() {
 
                 {/* Expanded Details */}
                 {expandedObjects.has(fullObject.id) && (
-                  <div className='border-t border-gray-200 p-4 bg-gray-50'>
+                  <div className='border-t border-border p-4 bg-muted'>
                     {loadingDetails.has(fullObject.id) ? (
                       <div className='text-center py-4'>
                         <div className='inline-flex items-center'>
-                          <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2'></div>
-                          <span className='text-sm text-gray-600'>
+                          <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2'></div>
+                          <span className='text-sm text-muted-foreground'>
                             Loading object details...
                           </span>
                         </div>
@@ -705,10 +707,10 @@ function ObjectsContent() {
                         {isDetailed(fullObject) &&
                           fullObject.examineDescription && (
                             <div>
-                              <h4 className='font-medium text-gray-900 mb-2'>
+                              <h4 className='font-medium text-foreground mb-2'>
                                 Examine Description
                               </h4>
-                              <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                              <p className='text-foreground text-sm bg-card p-3 rounded border'>
                                 {fullObject.examineDescription}
                               </p>
                             </div>
@@ -718,10 +720,10 @@ function ObjectsContent() {
                         {isDetailed(fullObject) &&
                           fullObject.actionDescription && (
                             <div>
-                              <h4 className='font-medium text-gray-900 mb-2'>
+                              <h4 className='font-medium text-foreground mb-2'>
                                 Action Description
                               </h4>
-                              <p className='text-gray-700 text-sm bg-white p-3 rounded border'>
+                              <p className='text-foreground text-sm bg-card p-3 rounded border'>
                                 {fullObject.actionDescription}
                               </p>
                             </div>
@@ -729,31 +731,37 @@ function ObjectsContent() {
 
                         {/* Technical Details */}
                         <div>
-                          <h4 className='font-medium text-gray-900 mb-2'>
+                          <h4 className='font-medium text-foreground mb-2'>
                             Technical Details
                           </h4>
-                          <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                          <div className='bg-card p-3 rounded border text-sm space-y-2'>
                             <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
                               <div>
-                                <span className='text-gray-600'>Weight:</span>
+                                <span className='text-muted-foreground'>
+                                  Weight:
+                                </span>
                                 <span className='ml-1 font-medium'>
                                   {fullObject.weight} lbs
                                 </span>
                               </div>
                               <div>
-                                <span className='text-gray-600'>Cost:</span>
+                                <span className='text-muted-foreground'>
+                                  Cost:
+                                </span>
                                 <span className='ml-1 font-medium'>
                                   {fullObject.cost} coins
                                 </span>
                               </div>
                               <div>
-                                <span className='text-gray-600'>Level:</span>
+                                <span className='text-muted-foreground'>
+                                  Level:
+                                </span>
                                 <span className='ml-1 font-medium'>
                                   {fullObject.level}
                                 </span>
                               </div>
                               <div>
-                                <span className='text-gray-600'>
+                                <span className='text-muted-foreground'>
                                   Concealment:
                                 </span>
                                 <span className='ml-1 font-medium'>
@@ -765,7 +773,7 @@ function ObjectsContent() {
                               {isDetailed(fullObject) &&
                                 fullObject.timer > 0 && (
                                   <div>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Timer:
                                     </span>
                                     <span className='ml-1 font-medium'>
@@ -776,7 +784,7 @@ function ObjectsContent() {
                               {isDetailed(fullObject) &&
                                 fullObject.decomposeTimer > 0 && (
                                   <div>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Decompose Timer:
                                     </span>
                                     <span className='ml-1 font-medium'>
@@ -794,41 +802,31 @@ function ObjectsContent() {
                             fullObject.effectFlags.length > 0 ||
                             fullObject.wearFlags.length > 0) && (
                             <div>
-                              <h4 className='font-medium text-gray-900 mb-2'>
+                              <h4 className='font-medium text-foreground mb-2'>
                                 Flags
                               </h4>
-                              <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                              <div className='bg-card p-3 rounded border text-sm space-y-2'>
                                 {fullObject.flags.length > 0 && (
                                   <div>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Object Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1 mt-1'>
                                       {fullObject.flags.map((flag: string) => (
-                                        <span
-                                          key={flag}
-                                          className='px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded'
-                                        >
-                                          {flag.replace('_', ' ')}
-                                        </span>
+                                        <FlagBadge key={flag} flag={flag} />
                                       ))}
                                     </div>
                                   </div>
                                 )}
                                 {fullObject.effectFlags.length > 0 && (
                                   <div>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Effect Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1 mt-1'>
                                       {fullObject.effectFlags.map(
                                         (flag: string) => (
-                                          <span
-                                            key={flag}
-                                            className='px-2 py-1 bg-green-100 text-green-700 text-xs rounded'
-                                          >
-                                            {flag.replace('_', ' ')}
-                                          </span>
+                                          <FlagBadge key={flag} flag={flag} />
                                         )
                                       )}
                                     </div>
@@ -836,18 +834,13 @@ function ObjectsContent() {
                                 )}
                                 {fullObject.wearFlags.length > 0 && (
                                   <div>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Wear Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1 mt-1'>
                                       {fullObject.wearFlags.map(
                                         (flag: string) => (
-                                          <span
-                                            key={flag}
-                                            className='px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded'
-                                          >
-                                            {flag.replace('_', ' ')}
-                                          </span>
+                                          <FlagBadge key={flag} flag={flag} />
                                         )
                                       )}
                                     </div>
@@ -859,20 +852,12 @@ function ObjectsContent() {
 
                         {/* Type-Specific Information */}
                         <div>
-                          <h4 className='font-medium text-gray-900 mb-2'>
+                          <h4 className='font-medium text-foreground mb-2'>
                             Type Details
                           </h4>
-                          <div className='bg-white p-3 rounded border text-sm space-y-2'>
+                          <div className='bg-card p-3 rounded border text-sm space-y-2'>
                             {(() => {
-                              console.log(
-                                `Object ${fullObject.id} values:`,
-                                fullObject.values
-                              );
-                              console.log(
-                                `Has values:`,
-                                fullObject.values &&
-                                  Object.keys(fullObject.values).length > 0
-                              );
+                              // LoggingService.debug('Object values', fullObject.id, fullObject.values);
                               return (
                                 fullObject.values &&
                                 Object.keys(fullObject.values).length > 0
@@ -884,7 +869,7 @@ function ObjectsContent() {
                                   fullObject.values['Hit Dice'] && (
                                     <>
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Damage:
                                         </span>
                                         <span>
@@ -898,13 +883,13 @@ function ObjectsContent() {
                                         </span>
                                       </div>
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Average Damage:
                                         </span>
                                         <span>{fullObject.values.Average}</span>
                                       </div>
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Damage Type:
                                         </span>
                                         <span>
@@ -913,7 +898,7 @@ function ObjectsContent() {
                                       </div>
                                       {fullObject.values.HitRoll !== 0 && (
                                         <div className='flex justify-between'>
-                                          <span className='text-gray-600'>
+                                          <span className='text-muted-foreground'>
                                             Hit Bonus:
                                           </span>
                                           <span>
@@ -932,7 +917,7 @@ function ObjectsContent() {
                                   fullObject.type === 'DRINKCONTAINER') && (
                                   <>
                                     <div className='flex justify-between'>
-                                      <span className='text-gray-600'>
+                                      <span className='text-muted-foreground'>
                                         Capacity:
                                       </span>
                                       <span>{fullObject.values.Capacity}</span>
@@ -940,7 +925,7 @@ function ObjectsContent() {
                                     {fullObject.values.Remaining !==
                                       undefined && (
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Remaining:
                                         </span>
                                         <span>
@@ -950,7 +935,7 @@ function ObjectsContent() {
                                     )}
                                     {fullObject.values.Liquid && (
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Contains:
                                         </span>
                                         <span>{fullObject.values.Liquid}</span>
@@ -959,14 +944,14 @@ function ObjectsContent() {
                                     {fullObject.values.Poisoned !==
                                       undefined && (
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Poisoned:
                                         </span>
                                         <span
                                           className={
                                             fullObject.values.Poisoned
-                                              ? 'text-red-600'
-                                              : 'text-green-600'
+                                              ? 'text-destructive'
+                                              : 'text-primary'
                                           }
                                         >
                                           {fullObject.values.Poisoned
@@ -980,7 +965,7 @@ function ObjectsContent() {
                                       fullObject.values['Weight Reduction'] >
                                         0 && (
                                         <div className='flex justify-between'>
-                                          <span className='text-gray-600'>
+                                          <span className='text-muted-foreground'>
                                             Weight Reduction:
                                           </span>
                                           <span>
@@ -1000,7 +985,7 @@ function ObjectsContent() {
                                 {fullObject.type === 'LIGHT' && (
                                   <>
                                     <div className='flex justify-between'>
-                                      <span className='text-gray-600'>
+                                      <span className='text-muted-foreground'>
                                         Duration:
                                       </span>
                                       <span>
@@ -1009,14 +994,14 @@ function ObjectsContent() {
                                       </span>
                                     </div>
                                     <div className='flex justify-between'>
-                                      <span className='text-gray-600'>
+                                      <span className='text-muted-foreground'>
                                         Status:
                                       </span>
                                       <span
                                         className={
                                           fullObject.values['Is_Lit:']
-                                            ? 'text-yellow-600'
-                                            : 'text-gray-600'
+                                            ? 'text-secondary'
+                                            : 'text-muted-foreground'
                                         }
                                       >
                                         {fullObject.values['Is_Lit:']
@@ -1031,7 +1016,7 @@ function ObjectsContent() {
                                 {fullObject.type === 'FOOD' && (
                                   <>
                                     <div className='flex justify-between'>
-                                      <span className='text-gray-600'>
+                                      <span className='text-muted-foreground'>
                                         Filling:
                                       </span>
                                       <span>{fullObject.values.Filling}</span>
@@ -1039,14 +1024,14 @@ function ObjectsContent() {
                                     {fullObject.values.Poisoned !==
                                       undefined && (
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           Poisoned:
                                         </span>
                                         <span
                                           className={
                                             fullObject.values.Poisoned
-                                              ? 'text-red-600'
-                                              : 'text-green-600'
+                                              ? 'text-destructive'
+                                              : 'text-primary'
                                           }
                                         >
                                           {fullObject.values.Poisoned
@@ -1063,7 +1048,7 @@ function ObjectsContent() {
                                   <>
                                     {fullObject.values['AC Apply'] && (
                                       <div className='flex justify-between'>
-                                        <span className='text-gray-600'>
+                                        <span className='text-muted-foreground'>
                                           AC Bonus:
                                         </span>
                                         <span>
@@ -1093,7 +1078,7 @@ function ObjectsContent() {
                                           key={key}
                                           className='flex justify-between'
                                         >
-                                          <span className='text-gray-600'>
+                                          <span className='text-muted-foreground'>
                                             {key}:
                                           </span>
                                           <span>
@@ -1108,7 +1093,7 @@ function ObjectsContent() {
                                 )}
                               </>
                             ) : (
-                              <div className='text-gray-500 italic'>
+                              <div className='text-muted-foreground italic'>
                                 No additional type-specific details available
                               </div>
                             )}
@@ -1119,13 +1104,13 @@ function ObjectsContent() {
                         {isDetailed(fullObject) &&
                           (fullObject.createdAt || fullObject.updatedAt) && (
                             <div>
-                              <h4 className='font-medium text-gray-900 mb-2'>
+                              <h4 className='font-medium text-foreground mb-2'>
                                 Timestamps
                               </h4>
-                              <div className='bg-white p-3 rounded border text-sm space-y-1'>
+                              <div className='bg-card p-3 rounded border text-sm space-y-1'>
                                 {fullObject.createdAt && (
                                   <div className='flex justify-between'>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Created:
                                     </span>
                                     <span>
@@ -1137,7 +1122,7 @@ function ObjectsContent() {
                                 )}
                                 {fullObject.updatedAt && (
                                   <div className='flex justify-between'>
-                                    <span className='text-gray-600'>
+                                    <span className='text-muted-foreground'>
                                       Updated:
                                     </span>
                                     <span>
@@ -1151,7 +1136,7 @@ function ObjectsContent() {
                             </div>
                           )}
                         {!isDetailed(fullObject) && (
-                          <div className='text-xs text-gray-500 italic'>
+                          <div className='text-xs text-muted-foreground italic'>
                             Detailed data not loaded yet.
                           </div>
                         )}
@@ -1167,8 +1152,8 @@ function ObjectsContent() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className='flex items-center justify-between mt-6 px-4 py-3 bg-gray-50 rounded-lg'>
-          <div className='text-sm text-gray-500'>
+        <div className='flex items-center justify-between mt-6 px-4 py-3 bg-muted rounded-lg'>
+          <div className='text-sm text-muted-foreground'>
             Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
             results
           </div>
@@ -1176,7 +1161,7 @@ function ObjectsContent() {
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className='inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='inline-flex items-center px-3 py-2 border border-border rounded-md text-sm font-medium text-muted-foreground bg-background hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed'
             >
               <ChevronLeft className='w-4 h-4 mr-1' />
               Previous
@@ -1217,8 +1202,8 @@ function ObjectsContent() {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`px-3 py-2 text-sm rounded-md ${
                       currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-muted-foreground hover:bg-muted'
                     }`}
                   >
                     {pageNum}
@@ -1227,10 +1212,10 @@ function ObjectsContent() {
               })()}
               {totalPages > 5 && currentPage < totalPages - 2 && (
                 <>
-                  <span className='px-2 text-gray-500'>...</span>
+                  <span className='px-2 text-muted-foreground'>...</span>
                   <button
                     onClick={() => setCurrentPage(totalPages)}
-                    className='px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md'
+                    className='px-3 py-2 text-sm text-muted-foreground hover:bg-muted rounded-md'
                   >
                     {totalPages}
                   </button>
@@ -1243,7 +1228,7 @@ function ObjectsContent() {
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }
               disabled={currentPage === totalPages}
-              className='inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='inline-flex items-center px-3 py-2 border border-border rounded-md text-sm font-medium text-muted-foreground bg-background hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed'
             >
               Next
               <ChevronRight className='w-4 h-4 ml-1' />

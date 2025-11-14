@@ -8,6 +8,7 @@ import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
 import { BanUserInput } from './dto/ban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { UpdatePreferencesInput } from './dto/update-preferences.input';
 
 @Injectable()
 export class UsersService {
@@ -92,6 +93,7 @@ export class UsersService {
     return {
       ...updatedUser,
       isBanned: false, // After an update, we assume not banned
+      preferences: updatedUser.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
     };
   }
 
@@ -203,6 +205,17 @@ export class UsersService {
     } as const;
   }
 
+  async isUserBanned(userId: string): Promise<boolean> {
+    const activeBan = await this.databaseService.banRecords.findFirst({
+      where: {
+        userId,
+        active: true,
+      },
+    });
+
+    return activeBan !== null;
+  }
+
   async getUserWithBanStatus(id: string) {
     const user = await this.databaseService.users.findUnique({
       where: { id },
@@ -231,6 +244,7 @@ export class UsersService {
       isBanned: user.banRecords.length > 0,
       // Preserve original nullable fields (null instead of undefined)
       banRecords: user.banRecords.map(r => ({ ...r })),
+      preferences: user.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
     };
   }
 
@@ -257,6 +271,7 @@ export class UsersService {
       ...user,
       isBanned: user.banRecords.length > 0,
       banRecords: user.banRecords.map(r => ({ ...r })),
+      preferences: user.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
     }));
   }
 
@@ -392,6 +407,41 @@ export class UsersService {
     return {
       ...user,
       permissions,
+    };
+  }
+
+  async updateUserPreferences(userId: string, input: UpdatePreferencesInput) {
+    // Verify user exists
+    await this.findOne(userId);
+
+    // Get current preferences
+    const user = await this.databaseService.users.findUnique({
+      where: { id: userId },
+      select: { preferences: true },
+    });
+
+    // Merge existing preferences with new ones
+    const currentPreferences = (user?.preferences as any) || {};
+    const updatedPreferences = {
+      ...currentPreferences,
+      ...Object.fromEntries(
+        Object.entries(input).filter(([_, v]) => v !== undefined && v !== null)
+      ),
+    };
+
+    // Update user
+    const updatedUser = await this.databaseService.users.update({
+      where: { id: userId },
+      data: { preferences: updatedPreferences },
+    });
+
+    // Check if banned
+    const isBanned = await this.isUserBanned(userId);
+
+    return {
+      ...updatedUser,
+      isBanned,
+      preferences: updatedUser.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
     };
   }
 }

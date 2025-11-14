@@ -7,6 +7,7 @@ import {
 } from '@nestjs/graphql';
 import { UserRole } from '@prisma/client';
 import { BanRecord } from './ban-record.entity';
+import { UserPreferences } from './user-preferences.entity';
 
 // Register enum with GraphQL
 registerEnumType(UserRole, {
@@ -60,4 +61,7 @@ export class User {
 
   @Field({ description: 'Whether the user is currently banned' })
   isBanned: boolean;
+
+  @Field(() => UserPreferences, { nullable: true, description: 'User preferences for UI and navigation' })
+  preferences?: UserPreferences;
 }

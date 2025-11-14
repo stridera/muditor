@@ -1,13 +1,11 @@
 'use client';
 
-import Link from 'next/link';
-import { usePathname } from 'next/navigation';
-import { useAuth } from '@/contexts/auth-context';
-import { usePermissions } from '@/hooks/use-permissions';
 import { EnvironmentSelector } from '@/components/environment-selector';
-import { Button } from '@/components/ui/button';
+import { Breadcrumb } from '@/components/navigation/breadcrumb';
+import { ZoneEntityTabs } from '@/components/navigation/zone-entity-tabs';
+import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
-import { RoleBadge } from '@/components/role-badge';
+import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -16,285 +14,283 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useAuth } from '@/contexts/auth-context';
+import { gql } from '@/generated/gql';
+import { usePermissions } from '@/hooks/use-permissions';
+import { useZoneContext } from '@/hooks/use-zone-context';
+import { useMutation } from '@apollo/client/react';
 import {
-  User,
+  Box,
+  FileCode,
+  Home,
   LogOut,
+  Map,
   Settings,
   Shield,
-  Code,
-  Crown,
+  ShoppingBag,
+  User,
   Users,
-  ChevronDown,
+  Users2,
 } from 'lucide-react';
+import Link from 'next/link';
+import { usePathname } from 'next/navigation';
+import { useEffect, useState } from 'react';
 
-// Navigation items for different user types
-type NavItem = {
-  name: string;
-  href?: string;
-  children?: Array<{ name: string; href: string }>;
+const UPDATE_PREFERENCES = gql(`
+  mutation UpdateViewMode($input: UpdatePreferencesInput!) {
+    updateUserPreferences(input: $input) {
+      id
+      preferences {
+        viewMode
+      }
+    }
+  }
+`);
+
+// Map routes to their display info
+const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
+  '/dashboard': { name: 'Dashboard', icon: <Home className='h-5 w-5' /> },
+  '/dashboard/zones': { name: 'Zones', icon: <Map className='h-5 w-5' /> },
+  '/dashboard/rooms': { name: 'Rooms', icon: <Box className='h-5 w-5' /> },
+  '/dashboard/mobs': { name: 'Mobs', icon: <Users2 className='h-5 w-5' /> },
+  '/dashboard/objects': { name: 'Objects', icon: <Box className='h-5 w-5' /> },
+  '/dashboard/shops': {
+    name: 'Shops',
+    icon: <ShoppingBag className='h-5 w-5' />,
+  },
+  '/dashboard/scripts': {
+    name: 'Scripts',
+    icon: <FileCode className='h-5 w-5' />,
+  },
+  '/dashboard/characters': {
+    name: 'Characters',
+    icon: <Users className='h-5 w-5' />,
+  },
+  '/dashboard/users': { name: 'Users', icon: <Users className='h-5 w-5' /> },
 };
-
-const playerNavItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard' },
-  { name: 'My Characters', href: '/dashboard/characters' },
-];
-
-const immortalNavItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard' },
-  {
-    name: 'World',
-    children: [
-      { name: 'Zones', href: '/dashboard/zones' },
-      { name: 'Rooms', href: '/dashboard/rooms' },
-      { name: 'Mobs', href: '/dashboard/mobs' },
-      { name: 'Objects', href: '/dashboard/objects' },
-      { name: 'Shops', href: '/dashboard/shops' },
-      { name: 'Scripts', href: '/dashboard/scripts' },
-    ],
-  },
-  {
-    name: 'Game Systems',
-    children: [
-      { name: 'Classes', href: '/dashboard/classes' },
-      { name: 'Races', href: '/dashboard/races' },
-      { name: 'Abilities', href: '/dashboard/abilities' },
-      { name: 'Effects', href: '/dashboard/effects' },
-    ],
-  },
-];
-
-const coderNavItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard' },
-  {
-    name: 'World',
-    children: [
-      { name: 'Zones', href: '/dashboard/zones' },
-      { name: 'Rooms', href: '/dashboard/rooms' },
-      { name: 'Mobs', href: '/dashboard/mobs' },
-      { name: 'Objects', href: '/dashboard/objects' },
-      { name: 'Shops', href: '/dashboard/shops' },
-      { name: 'Scripts', href: '/dashboard/scripts' },
-    ],
-  },
-  {
-    name: 'Game Systems',
-    children: [
-      { name: 'Classes', href: '/dashboard/classes' },
-      { name: 'Races', href: '/dashboard/races' },
-      { name: 'Abilities', href: '/dashboard/abilities' },
-      { name: 'Effects', href: '/dashboard/effects' },
-    ],
-  },
-  { name: 'Validation', href: '/dashboard/validation' },
-];
-
-const godNavItems: NavItem[] = [
-  { name: 'Dashboard', href: '/dashboard' },
-  {
-    name: 'World',
-    children: [
-      { name: 'Zones', href: '/dashboard/zones' },
-      { name: 'Rooms', href: '/dashboard/rooms' },
-      { name: 'Mobs', href: '/dashboard/mobs' },
-      { name: 'Objects', href: '/dashboard/objects' },
-      { name: 'Shops', href: '/dashboard/shops' },
-      { name: 'Scripts', href: '/dashboard/scripts' },
-    ],
-  },
-  {
-    name: 'Game Systems',
-    children: [
-      { name: 'Classes', href: '/dashboard/classes' },
-      { name: 'Races', href: '/dashboard/races' },
-      { name: 'Abilities', href: '/dashboard/abilities' },
-      { name: 'Effects', href: '/dashboard/effects' },
-    ],
-  },
-  { name: 'Validation', href: '/dashboard/validation' },
-  { name: 'Users', href: '/dashboard/users' },
-];
 
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { permissions, isPlayer, isImmortal, isCoder, isGod } =
-    usePermissions();
+  const { isPlayer, isImmortal } = usePermissions();
+  const { isInZoneContext } = useZoneContext();
+  const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
-  // Build navigation items based on user role and permissions
-  const getNavItems = () => {
-    if (isGod) return godNavItems;
-    if (isCoder) return coderNavItems;
-    if (isImmortal) return immortalNavItems;
-    if (isPlayer) return playerNavItems;
-    return playerNavItems; // fallback to player view
-  };
-
-  const navItems = getNavItems();
-
-  const isMenuActive = (item: NavItem) => {
-    if (item.href) {
-      return (
-        pathname === item.href ||
-        (item.href !== '/dashboard' && pathname.startsWith(item.href))
-      );
+  // View mode state - read from user preferences or localStorage
+  const [viewMode, setViewMode] = useState<'player' | 'admin'>(() => {
+    if (typeof window !== 'undefined') {
+      const saved = localStorage.getItem('muditor-view-preference');
+      return (saved as 'player' | 'admin') || 'admin';
     }
-    if (item.children) {
-      return item.children.some(
-        (child) =>
-          pathname === child.href ||
-          (child.href !== '/dashboard' && pathname.startsWith(child.href))
-      );
-    }
-    return false;
-  };
+    return 'admin';
+  });
 
-  const getRoleIcon = () => {
-    switch (user?.role) {
-      case 'PLAYER':
-        return <Users className='h-4 w-4' />;
-      case 'IMMORTAL':
-        return <Shield className='h-4 w-4' />;
-      case 'CODER':
-        return <Code className='h-4 w-4' />;
-      case 'GOD':
-        return <Crown className='h-4 w-4' />;
-      default:
-        return <Users className='h-4 w-4' />;
+  // Sync viewMode to localStorage and database
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('muditor-view-preference', viewMode);
+    }
+  }, [viewMode]);
+
+  const handleViewModeToggle = async (mode: 'player' | 'admin') => {
+    setViewMode(mode);
+
+    // Sync to database
+    try {
+      await updatePreferences({
+        variables: {
+          input: { viewMode: mode },
+        },
+      });
+    } catch (error) {
+      console.error('Failed to sync view mode:', error);
     }
   };
+
+  // Get current page info
+  const getCurrentPageInfo = () => {
+    // Check for exact match first
+    if (routeInfo[pathname]) {
+      return routeInfo[pathname];
+    }
+
+    // Check for partial match (e.g., /dashboard/zones/editor)
+    const matchingRoute = Object.keys(routeInfo).find(
+      route => route !== '/dashboard' && pathname.startsWith(route)
+    );
+
+    if (matchingRoute) {
+      return routeInfo[matchingRoute];
+    }
+
+    return { name: 'Dashboard', icon: <Home className='h-5 w-5' /> };
+  };
+
+  const currentPage = getCurrentPageInfo();
+  const canSwitchViews = isImmortal;
+  const showPlayerView = viewMode === 'player';
+
+  // Quick links based on view mode
+  const playerQuickLinks = [
+    {
+      name: 'My Characters',
+      href: '/dashboard/characters',
+      icon: <Users className='h-4 w-4' />,
+    },
+    {
+      name: 'Settings',
+      href: '/profile',
+      icon: <Settings className='h-4 w-4' />,
+    },
+  ];
+
+  const adminQuickLinks = [
+    {
+      name: 'Zones',
+      href: '/dashboard/zones',
+      icon: <Map className='h-4 w-4' />,
+    },
+    {
+      name: 'Rooms',
+      href: '/dashboard/rooms',
+      icon: <Box className='h-4 w-4' />,
+    },
+    {
+      name: 'Mobs',
+      href: '/dashboard/mobs',
+      icon: <Users2 className='h-4 w-4' />,
+    },
+    {
+      name: 'Objects',
+      href: '/dashboard/objects',
+      icon: <Box className='h-4 w-4' />,
+    },
+    {
+      name: 'Shops',
+      href: '/dashboard/shops',
+      icon: <Box className='h-4 w-4' />,
+    },
+  ];
+
+  const quickLinks = showPlayerView ? playerQuickLinks : adminQuickLinks;
 
   return (
-    <nav className='bg-white shadow-sm border-b'>
+    <nav className='bg-background/95 backdrop-blur-md border-b border-border shadow-sm sticky top-0 z-50'>
       <div className='container mx-auto px-4'>
         <div className='flex items-center justify-between h-16'>
-          <div className='flex items-center space-x-8'>
-            <Link
-              href='/'
-              className='text-xl font-bold text-gray-900 hover:text-blue-600 transition-colors'
-            >
-              Muditor
-            </Link>
-            <div className='flex space-x-4'>
-              {navItems.map((item) => {
-                const isActive = isMenuActive(item);
-
-                // Regular menu item with direct link
-                if (item.href) {
-                  return (
-                    <Link
-                      key={item.name}
-                      href={item.href}
-                      className={`px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                        isActive
-                          ? 'bg-blue-100 text-blue-700'
-                          : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                      }`}
-                    >
-                      {item.name}
-                    </Link>
-                  );
-                }
-
-                // Parent menu with children (dropdown)
-                if (item.children) {
-                  return (
-                    <DropdownMenu key={item.name}>
-                      <DropdownMenuTrigger asChild>
-                        <button
-                          className={`flex items-center gap-1 px-3 py-2 rounded-md text-sm font-medium transition-colors ${
-                            isActive
-                              ? 'bg-blue-100 text-blue-700'
-                              : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
-                          }`}
-                        >
-                          {item.name}
-                          <ChevronDown className='h-4 w-4' />
-                        </button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align='start'>
-                        {item.children.map((child) => {
-                          const isChildActive =
-                            pathname === child.href ||
-                            (child.href !== '/dashboard' &&
-                              pathname.startsWith(child.href));
-
-                          return (
-                            <DropdownMenuItem key={child.name} asChild>
-                              <Link
-                                href={child.href}
-                                className={
-                                  isChildActive ? 'bg-blue-50 text-blue-700' : ''
-                                }
-                              >
-                                {child.name}
-                              </Link>
-                            </DropdownMenuItem>
-                          );
-                        })}
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  );
-                }
-
-                return null;
-              })}
-            </div>
+          {/* Left: Breadcrumbs and Zone Tabs */}
+          <div className='flex items-center gap-4'>
+            <Breadcrumb />
+            <ZoneEntityTabs />
           </div>
 
-          <div className='flex items-center space-x-4'>
-            <EnvironmentSelector />
-            {user && (
-              <div className='flex items-center space-x-3'>
-                <div className='text-sm'>
-                  <div className='flex items-center gap-2'>
-                    <span className='text-gray-900 font-medium'>
-                      {user.username}
-                    </span>
-                    <RoleBadge role={user.role} size='sm' />
-                  </div>
-                  <div className='text-gray-500 text-xs'>
-                    {permissions && (
-                      <span>
-                        Max Character Level: {permissions.maxCharacterLevel}
-                      </span>
-                    )}
-                  </div>
-                </div>
+          {/* Center: Quick Links (only show when NOT in zone context) */}
+          <div
+            className={`hidden md:flex items-center gap-2 ${isInZoneContext ? 'md:hidden' : ''}`}
+          >
+            {quickLinks.map(link => {
+              const isActive =
+                pathname === link.href ||
+                (link.href !== '/dashboard' && pathname.startsWith(link.href));
 
-                <DropdownMenu>
-                  <DropdownMenuTrigger asChild>
-                    <Button
-                      variant='ghost'
-                      className='h-8 w-8 rounded-full p-0'
-                    >
-                      <div className='h-8 w-8 bg-blue-600 rounded-full flex items-center justify-center'>
-                        <span className='text-white text-sm font-medium'>
-                          {user.username.charAt(0).toUpperCase()}
-                        </span>
-                      </div>
-                    </Button>
-                  </DropdownMenuTrigger>
-                  <DropdownMenuContent align='end'>
-                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem asChild>
-                      <Link href='/profile'>
-                        <User className='mr-2 h-4 w-4' />
-                        Profile
-                      </Link>
-                    </DropdownMenuItem>
-                    <DropdownMenuItem>
-                      <Settings className='mr-2 h-4 w-4' />
-                      Settings
-                    </DropdownMenuItem>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuItem onClick={logout}>
-                      <LogOut className='mr-2 h-4 w-4' />
-                      Log out
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+              return (
+                <Link key={link.href} href={link.href}>
+                  <Button
+                    variant={isActive ? 'default' : 'ghost'}
+                    size='sm'
+                    className={`flex items-center gap-2 transition-all duration-200 ${
+                      isActive
+                        ? 'bg-primary text-primary-foreground hover:bg-primary/80'
+                        : 'hover:bg-muted'
+                    }`}
+                  >
+                    {link.icon}
+                    <span className='hidden lg:inline'>{link.name}</span>
+                  </Button>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Right: View Toggle, Theme, Environment, User */}
+          <div className='flex items-center gap-3'>
+            {/* View Mode Toggle (only for Immortal+) */}
+            {canSwitchViews && (
+              <div className='hidden md:flex items-center bg-muted rounded-lg p-1'>
+                <Button
+                  variant={showPlayerView ? 'default' : 'ghost'}
+                  size='sm'
+                  onClick={() => handleViewModeToggle('player')}
+                  className={`flex items-center gap-1 h-8 transition-all duration-200 ${
+                    showPlayerView
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-transparent hover:bg-muted'
+                  }`}
+                >
+                  <Users className='h-4 w-4' />
+                  <span className='text-xs'>Player</span>
+                </Button>
+                <Button
+                  variant={!showPlayerView ? 'default' : 'ghost'}
+                  size='sm'
+                  onClick={() => handleViewModeToggle('admin')}
+                  className={`flex items-center gap-1 h-8 transition-all duration-200 ${
+                    !showPlayerView
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-transparent hover:bg-muted'
+                  }`}
+                >
+                  <Shield className='h-4 w-4' />
+                  <span className='text-xs'>Admin</span>
+                </Button>
               </div>
+            )}
+
+            {/* Theme Toggle */}
+            <ThemeToggle />
+
+            {/* Environment Selector */}
+            <EnvironmentSelector />
+
+            {/* User Menu */}
+            {user && (
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant='ghost' className='h-9 w-9 rounded-full p-0'>
+                    <div className='h-9 w-9 bg-primary rounded-full flex items-center justify-center'>
+                      <span className='text-primary-foreground text-sm font-medium'>
+                        {user.username.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align='end' className='w-56'>
+                  <DropdownMenuLabel>
+                    <div className='flex flex-col gap-1'>
+                      <span className='font-medium'>{user.username}</span>
+                      <Badge variant='outline' className='w-fit text-xs'>
+                        {user.role}
+                      </Badge>
+                    </div>
+                  </DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem asChild>
+                    <Link href='/profile'>
+                      <User className='mr-2 h-4 w-4' />
+                      Profile
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem>
+                    <Settings className='mr-2 h-4 w-4' />
+                    Settings
+                  </DropdownMenuItem>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem onClick={logout}>
+                    <LogOut className='mr-2 h-4 w-4' />
+                    Log out
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
             )}
           </div>
         </div>

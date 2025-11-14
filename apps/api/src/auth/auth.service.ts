@@ -125,8 +125,8 @@ export class AuthService {
       lastFailedLogin: _lfl,
       ...rest
     } = user as Users;
-    const authUser: SanitizedUser = {
-      ...(rest as Users),
+    const authUser = {
+      ...rest,
       isBanned: false,
     } as SanitizedUser;
     if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;
@@ -166,8 +166,8 @@ export class AuthService {
       lastFailedLogin: _lfl2,
       ...rest2
     } = user as Users;
-    const authUser: SanitizedUser = {
-      ...(rest2 as Users),
+    const authUser = {
+      ...rest2,
       isBanned: false,
     } as SanitizedUser;
     if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;

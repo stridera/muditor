@@ -28,6 +28,7 @@ import ReactFlow, {
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './zone-editor.css';
+import { useTheme } from 'next-themes';
 
 import { RoomNode } from './RoomNode';
 import { MobNode } from './MobNode';
@@ -137,7 +138,7 @@ const convertToAutoLayoutRoom = (room: Room): AutoLayoutRoom => ({
   layoutZ: room.layoutZ,
   exits: room.exits.map(exit => ({
     direction: exit.direction,
-    destination: exit.destination
+    toRoomId: exit.toRoomId
   }))
 });
 
@@ -179,7 +180,7 @@ interface Room {
 interface RoomExit {
   id: string;
   direction: string;
-  destination: number | null;
+  toRoomId: number | null;
   description?: string;
   keyword?: string;
 }
@@ -212,6 +213,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const router = useRouter();
   const reactFlowInstance = useReactFlow();
   const { canEditZone, isBuilder, isCoder, isGod } = usePermissions();
+  const { theme } = useTheme();
 
   // State
   const [zone, setZone] = useState<Zone | null>(null);
@@ -269,6 +271,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Overlap management state - tracks which room is currently active in each overlapped position
   const [activeOverlapRooms, setActiveOverlapRooms] = useState<Record<string, number>>({});
+
+  // Theme-aware color helpers
+  const isDark = theme === 'dark';
+  const getThemeColor = useCallback((lightColor: string, darkColor: string) => {
+    return isDark ? darkColor : lightColor;
+  }, [isDark]);
 
   // Helper functions for overlap management
   const getPositionKey = (x: number, y: number, z: number = 0) => `${x},${y},${z}`;
@@ -760,14 +768,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     });
 
     // Create exit lookup map
-    const exitsByRoom = new Map<number, { direction: string; destination: number | null }[]>();
+    const exitsByRoom = new Map<number, { direction: string; toRoomId: number | null }[]>();
     allRooms.forEach(room => {
-      const exits: Array<{ direction: string; destination: number | null }> = [];
+      const exits: Array<{ direction: string; toRoomId: number | null }> = [];
       // Parse exits from room data - assuming they're in a property like 'exits'
       if ((room as any).exits && Array.isArray((room as any).exits)) {
         (room as any).exits.forEach((exit: any) => {
-          if (exit.destination) {
-            exits.push({ direction: exit.direction, destination: exit.destination });
+          if (exit.toRoomId) {
+            exits.push({ direction: exit.direction, toRoomId: exit.toRoomId });
           }
         });
       }
@@ -819,10 +827,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const exits = exitsByRoom.get(current.roomId) || [];
 
       for (const exit of exits) {
-        if (!exit.destination) continue;
+        if (!exit.toRoomId) continue;
 
-        const destinationRoom = roomById.get(exit.destination);
-        if (!destinationRoom || processedRooms.has(exit.destination)) continue;
+        const destinationRoom = roomById.get(exit.toRoomId);
+        if (!destinationRoom || processedRooms.has(exit.toRoomId)) continue;
 
         const direction = exit.direction.toUpperCase();
         const vector = directionVectors[direction as keyof typeof directionVectors];
@@ -867,22 +875,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           if (existingRoomId) {
             layout.get(existingRoomId)!.isOverlapping = true;
-            console.log(`⚠️ Overlap detected at (${newX},${newY},${newZ}): rooms ${existingRoomId} and ${exit.destination}`);
+            console.log(`⚠️ Overlap detected at (${newX},${newY},${newZ}): rooms ${existingRoomId} and ${exit.toRoomId}`);
           }
 
           // Move overlapping room to a new Z level
           newZ += 10; // Move up by 10 levels to create separation
         }
 
-        layout.set(exit.destination, {
+        layout.set(exit.toRoomId, {
           x: newX,
           y: newY,
           z: newZ,
           zoneId: destinationRoom.zoneId,
           isOverlapping: !!existingRoom
         });
-        processedRooms.add(exit.destination);
-        roomQueue.push({ roomId: exit.destination, x: newX, y: newY, z: newZ });
+        processedRooms.add(exit.toRoomId);
+        roomQueue.push({ roomId: exit.toRoomId, x: newX, y: newY, z: newZ });
       }
     }
 
@@ -1042,7 +1050,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 exits {
                   id
                   direction
-                  destination
+                  toRoomId
                 }
               }
             }
@@ -1358,7 +1366,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     exits {
                       id
                       direction
-                      destination
+                      toRoomId
                     }
                   }
                 }
@@ -1374,8 +1382,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   mobsByZone(zoneId: $zoneId) {
                     id
                     keywords
-                    shortDesc
-                    longDesc
+                    roomDescription
+                    examineDescription
                     level
                     mobFlags
                     lifeForce
@@ -1394,8 +1402,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   objectsByZone(zoneId: $zoneId) {
                     id
                     keywords
-                    shortDesc
-                    description
+                    roomDescription
+                    examineDescription
                     type
                     cost
                     weight
@@ -1426,7 +1434,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               ...room,
               mobs: room.mobs?.map((mob: any) => ({
                 ...mob,
-                name: mob.shortDesc, // Add name field mapping from shortDesc
+                name: mob.roomDescription, // Add name field mapping from roomDescription
               })) || [],
             }));
             setRooms(transformedRooms);
@@ -1470,7 +1478,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const transformedMobs = mobsData.data.mobsByZone.map(
               (mob: any) => ({
                 id: mob.id,
-                name: mob.shortDesc,
+                name: mob.roomDescription,
                 level: mob.level,
                 race: mob.race || 'HUMAN',
                 class: mob.mobClass,
@@ -1504,7 +1512,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const transformedObjects = objectsData.data.objectsByZone.map(
               (obj: any) => ({
                 id: obj.id,
-                name: obj.shortDesc,
+                name: obj.roomDescription,
                 type: obj.type,
                 value: obj.cost,
                 weight: obj.weight,
@@ -1830,8 +1838,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           style: {
             width: 8,
             height: 8,
-            backgroundColor: '#10b981', // Simple green color for fallback
-            border: '1px solid #374151',
+            backgroundColor: getThemeColor('#10b981', '#10b981'), // Green color for rooms
+            border: `1px solid ${getThemeColor('#374151', '#6b7280')}`,
             borderRadius: '2px',
             opacity: 0.9,
           },
@@ -2174,8 +2182,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             style: {
               width: roomSize,
               height: roomSize,
-              backgroundColor: '#10b981', // Green for normal rooms in world map
-              border: '1px solid #374151',
+              backgroundColor: getThemeColor('#10b981', '#10b981'), // Green for normal rooms in world map
+              border: `1px solid ${getThemeColor('#374151', '#6b7280')}`,
               borderRadius: '3px',
               zIndex: 10, // Ensure rooms appear above zone boundaries
               opacity: zoom > 0.4 ? 1.0 : 0.8, // Better visibility control
@@ -2582,7 +2590,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       layoutZ: room.layoutZ,
       exits: room.exits.map(exit => ({
         direction: exit.direction,
-        destination: exit.destination
+        toRoomId: exit.toRoomId
       }))
     }));
 
@@ -2595,39 +2603,39 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
     rooms.forEach(room => {
       room.exits.forEach(exit => {
-        const targetRoom = rooms.find(r => r.id === exit.destination);
-        if (exit.destination && targetRoom) {
+        const targetRoom = rooms.find(r => r.id === exit.toRoomId);
+        if (exit.toRoomId && targetRoom) {
           // Count exits by direction for analysis
           exitDirections[exit.direction as keyof typeof exitDirections]++;
 
           // Debug logging for exit processing (commented out to prevent spam)
-          // console.log(`🔍 Creating edge: Room ${room.id} → Room ${exit.destination} via ${exit.direction}`);
+          // console.log(`🔍 Creating edge: Room ${room.id} → Room ${exit.toRoomId} via ${exit.direction}`);
           // console.log(`   Source room position: (${room.layoutX}, ${room.layoutY})`);
           // console.log(`   Target room position: (${targetRoom.layoutX}, ${targetRoom.layoutY})`);
 
           // Check if source or target room is in an overlap
           const isOverlappingEdge = overlaps.some(overlap =>
             overlap.roomIds.includes(room.id) ||
-            overlap.roomIds.includes(exit.destination!)
+            overlap.roomIds.includes(exit.toRoomId!)
           );
 
           // Check if this is a one-way exit
           const oneWayExit = oneWayExits.find(owe =>
-            owe.fromRoom === room.id && owe.toRoom === exit.destination
+            owe.fromRoom === room.id && owe.toRoom === exit.toRoomId
           );
           const isOneWay = oneWayExit?.isOneWay || false;
 
           // Enhanced styling for different exit types
-          let edgeColor = '#6b7280'; // Default gray
+          let edgeColor = getThemeColor('#6b7280', '#9ca3af'); // Default gray
           let strokeWidth = 2;
           let strokeDasharray = undefined;
           let animated = false;
 
           if (isOverlappingEdge) {
-            edgeColor = '#ea580c'; // Orange for overlapping edges
+            edgeColor = getThemeColor('#ea580c', '#f97316'); // Orange for overlapping edges
             strokeWidth = 3;
           } else if (isOneWay) {
-            edgeColor = '#dc2626'; // Red for one-way exits
+            edgeColor = getThemeColor('#dc2626', '#ef4444'); // Red for one-way exits
             strokeWidth = 2.5;
             strokeDasharray = '8,4'; // Dashed line for one-way
             animated = true; // Subtle animation for one-way exits
@@ -2644,9 +2652,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           };
 
           const edge = {
-            id: `${room.id}-${exit.destination}-${exit.direction}`,
+            id: `${room.id}-${exit.toRoomId}-${exit.direction}`,
             source: room.id.toString(),
-            target: exit.destination.toString(),
+            target: exit.toRoomId.toString(),
             type: 'straight',
             animated,
             style: edgeStyle,
@@ -2659,10 +2667,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             // Add label for one-way exits with reason
             label: isOneWay ? `🚫 One-way (${oneWayExit?.reason?.replace('_', ' ')})` : undefined,
             labelStyle: isOneWay ? {
-              fill: '#dc2626',
+              fill: getThemeColor('#dc2626', '#ef4444'),
               fontWeight: 'bold',
               fontSize: '11px',
-              background: 'rgba(255,255,255,0.9)',
+              background: getThemeColor('rgba(255,255,255,0.9)', 'rgba(0,0,0,0.9)'),
               padding: '2px 4px',
               borderRadius: '3px'
             } : undefined,
@@ -2683,8 +2691,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           newEdges.push(edge);
           // console.log(`✅ Edge added: ${edge.id} (${exit.direction}${isOneWay ? ' - ONE-WAY' : ''})`);
-        } else if (exit.destination) {
-          // console.log(`⚠️  Exit ${exit.direction} from room ${room.id} points to room ${exit.destination} which is not in current zone`);
+        } else if (exit.toRoomId) {
+          // console.log(`⚠️  Exit ${exit.direction} from room ${room.id} points to room ${exit.toRoomId} which is not in current zone`);
         }
       });
     });
@@ -2887,7 +2895,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               updateRoom(id: $id, data: $data) {
                 id
                 name
-                description
+                roomDescription
                 sector
               }
             }
@@ -2929,7 +2937,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   const handleCreateExit = async (exitData: {
     direction: string;
-    destination: number;
+    toRoomId: number;
   }) => {
     if (!selectedRoomId) return;
     if (!canEditZone(zoneId)) {
@@ -2941,9 +2949,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     try {
       // Mock API call for now
       const newExit = {
-        id: `exit_${selectedRoomId}_${exitData.destination}_${Date.now()}`,
+        id: `exit_${selectedRoomId}_${exitData.toRoomId}_${Date.now()}`,
         direction: exitData.direction,
-        destination: exitData.destination,
+        toRoomId: exitData.toRoomId,
         description: '',
         keyword: '',
       };
@@ -3358,7 +3366,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               createRoom(data: $data) {
                 id
                 name
-                description
+                roomDescription
                 sector
                 layoutX
                 layoutY
@@ -3366,7 +3374,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 exits {
                   id
                   direction
-                  destination
+                  toRoomId
                 }
               }
             }
@@ -3758,19 +3766,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           // Find exit in that direction
           const exit = room.exits.find(e => e.direction === direction);
-          if (exit && exit.destination) {
+          if (exit && exit.toRoomId) {
             // Check if destination room exists in our current zone
-            const destinationRoom = rooms.find(r => r.id === exit.destination);
+            const destinationRoom = rooms.find(r => r.id === exit.toRoomId);
             if (destinationRoom) {
               console.log(
-                `🧭 Navigating ${direction.toLowerCase()} to room ${exit.destination}: "${destinationRoom.name}"`
+                `🧭 Navigating ${direction.toLowerCase()} to room ${exit.toRoomId}: "${destinationRoom.name}"`
               );
-              setSelectedRoomId(exit.destination);
+              setSelectedRoomId(exit.toRoomId);
               setEditedRoom({ ...destinationRoom });
 
               // Auto-focus the node in the viewport
               const targetNode = nodes.find(
-                n => n.id === exit.destination!.toString()
+                n => n.id === exit.toRoomId!.toString()
               );
               if (targetNode && reactFlowInstance) {
                 reactFlowInstance.setCenter(
@@ -3781,7 +3789,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             } else {
               console.log(
-                `🚫 Cannot navigate ${direction.toLowerCase()}: destination room ${exit.destination} not found in current zone`
+                `🚫 Cannot navigate ${direction.toLowerCase()}: destination room ${exit.toRoomId} not found in current zone`
               );
             }
           } else {
@@ -3928,10 +3936,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         const room = rooms.find(r => r.id === roomId);
         if (room?.exits) {
           room.exits.forEach(exit => {
-            if (exit.destination && !visited.has(exit.destination)) {
+            if (exit.toRoomId && !visited.has(exit.toRoomId)) {
               const offset = directionOffsets[exit.direction] || { x: 1, y: 1, z: 0 };
               queue.push({
-                roomId: exit.destination,
+                roomId: exit.toRoomId,
                 x: x + offset.x,
                 y: y + offset.y,
                 z: z + offset.z,
@@ -4052,7 +4060,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   }
 
   return (
-    <div className='h-screen flex bg-gray-50'>
+    <div className={`h-screen flex ${isDark ? 'bg-gray-900' : 'bg-gray-50'}`}>
       {/* Entity Palette - Only show for users with edit permissions */}
       {showEntityPalette && canEditZone(zoneId) && (
         <EntityPalette
@@ -4464,15 +4472,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           snapGrid={[GRID_SIZE, GRID_SIZE]}
           minZoom={0.01}
           maxZoom={4}
-          className='bg-gray-50'
+          className={isDark ? 'bg-gray-900' : 'bg-gray-50'}
         >
           <Controls position='top-left' />
           <MiniMap
             position='top-right'
             nodeColor={node => {
-              if (node.type === 'room') return '#374151';
-              if (node.type === 'mob') return '#dc2626';
-              if (node.type === 'object') return '#2563eb';
+              if (node.type === 'room') return getThemeColor('#374151', '#6b7280');
+              if (node.type === 'mob') return getThemeColor('#dc2626', '#ef4444');
+              if (node.type === 'object') return getThemeColor('#2563eb', '#3b82f6');
               if (node.type === 'zone') {
                 // Color zones by climate
                 const climate = node.data?.climate || 'NONE';
@@ -4492,7 +4500,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 };
                 return colors[climate as keyof typeof colors] || '#6b7280';
               }
-              return '#6b7280';
+              return getThemeColor('#6b7280', '#9ca3af');
             }}
             onNodeClick={(event, node) => {
               // Enhanced minimap navigation with intelligent zoom
@@ -4535,12 +4543,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 });
               }
             }}
-            maskColor='rgba(0, 0, 0, 0.1)'
-            style={{ backgroundColor: '#f9fafb', border: '1px solid #e5e7eb' }}
+            maskColor={getThemeColor('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')}
+            style={{
+              backgroundColor: getThemeColor('#f9fafb', '#1f2937'),
+              border: `1px solid ${getThemeColor('#e5e7eb', '#374151')}`
+            }}
           />
           <Background
             variant={BackgroundVariant.Dots}
-            color='#d1d5db'
+            color={getThemeColor('#d1d5db', '#4b5563')}
             gap={GRID_SIZE}
             size={1.5}
           />
@@ -4548,18 +4559,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           {/* Top Panel */}
           <Panel
             position='top-center'
-            className='bg-white shadow-lg rounded-lg border border-gray-200'
+            className={`shadow-lg rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
           >
             <div className='px-6 py-4'>
               <div className='flex items-center justify-between'>
                 <div className="flex items-center gap-4">
                   <div>
-                    <h2 className='text-lg font-semibold text-gray-900'>
+                    <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
                       {worldMapMode || currentViewMode === 'world-map'
                         ? 'World Map View'
                         : `${zone?.name} (Zone ${zoneId})`}
                     </h2>
-                    <p className='text-sm text-gray-600'>
+                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                       {worldMapMode || currentViewMode === 'world-map'
                         ? `View Mode: ${currentViewMode} • ${allZones.length} zones, ${rooms.length} rooms total`
                         : `Climate: ${zone?.climate} • ${rooms.length} rooms • ${mobs.length} mobs • ${objects.length} objects`}
@@ -4590,7 +4601,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
 
                   {/* View Mode Toggle */}
-                  <div className='flex bg-gray-100 p-1 rounded-lg'>
+                  <div className={`flex p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
                     {[
                       ...(canEditZone(zoneId)
                         ? [{ key: 'edit', label: 'Edit', icon: '✏️' }]
@@ -4601,8 +4612,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                         key={mode.key}
                         onClick={() => setViewMode(mode.key as any)}
                         className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${viewMode === mode.key
-                          ? 'bg-white text-blue-700 shadow-sm'
-                          : 'text-gray-500 hover:text-gray-700'
+                          ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
+                          : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
                           }`}
                       >
                         <span className='mr-1'>{mode.icon}</span>
@@ -4612,8 +4623,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   </div>
 
                   {/* Floor Navigation Controls */}
-                  <div className='flex items-center gap-2 bg-gray-100 p-1 rounded-lg'>
-                    <span className='text-sm font-medium text-gray-700'>Floor:</span>
+                  <div className={`flex items-center gap-2 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Floor:</span>
                     <div className='flex items-center gap-1'>
                       <button
                         onClick={() => setCurrentZLevel(currentZLevel + 1)}
@@ -4622,7 +4633,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       >
                         ⬆️
                       </button>
-                      <span className='px-2 py-1 text-sm font-medium bg-white rounded border min-w-[3rem] text-center'>
+                      <span className={`px-2 py-1 text-sm font-medium rounded border min-w-[3rem] text-center ${isDark ? 'bg-gray-600 border-gray-500 text-gray-100' : 'bg-white border-gray-300'}`}>
                         {currentZLevel === 0 ? 'Ground' : `${currentZLevel > 0 ? '+' : ''}${currentZLevel}`}
                       </span>
                       <button
@@ -4715,15 +4726,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           {viewMode === 'edit' && canEditZone(zoneId) && showLayoutTools && (
             <Panel
               position='top-center'
-              className='bg-white shadow-lg rounded-lg border border-gray-200'
+              className={`shadow-lg rounded-lg border ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
               style={{ marginTop: '120px' }} // Position below the main panel
             >
               <div className='px-6 py-3'>
                 <div className='flex items-center justify-between'>
-                  <h3 className='text-md font-medium text-gray-900'>Layout Tools</h3>
+                  <h3 className={`text-md font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Layout Tools</h3>
                   <button
                     onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
-                    className='px-2 py-1 text-sm text-gray-600 hover:text-gray-800 rounded transition-colors'
+                    className={`px-2 py-1 text-sm rounded transition-colors ${isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
                     title='Show keyboard shortcuts'
                   >
                     ⌨️ Help
@@ -4733,7 +4744,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 <div className='mt-3 flex flex-wrap items-center gap-4'>
                   {/* Auto Layout and Reset */}
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm font-medium text-gray-700'>Layout:</span>
+                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Layout:</span>
                     <button
                       onClick={handleAutoLayout}
                       className='px-3 py-1.5 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
@@ -4752,7 +4763,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                   {/* Room Actions */}
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm font-medium text-gray-700'>Rooms:</span>
+                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Rooms:</span>
                     <button
                       onClick={() => handleCreateNewRoom()}
                       className='px-3 py-1.5 text-sm font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors'
@@ -4773,8 +4784,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                   {/* Undo/Redo Controls */}
                   <div className='flex items-center gap-2'>
-                    <span className='text-sm font-medium text-gray-700'>History:</span>
-                    <div className='flex items-center gap-1 border border-gray-300 rounded-lg p-1 bg-white'>
+                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>History:</span>
+                    <div className={`flex items-center gap-1 border rounded-lg p-1 ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}>
                       <button
                         onClick={handleUndo}
                         disabled={!canUndo}
@@ -4803,7 +4814,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   {/* Selected Room Controls */}
                   {selectedRoomId && (
                     <div className='flex items-center gap-2'>
-                      <span className='text-sm font-medium text-gray-700'>Selected Room:</span>
+                      <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Selected Room:</span>
                       <div className='flex items-center gap-1'>
                         <button
                           onClick={() => {
@@ -4840,7 +4851,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   {/* Issues/Overlaps */}
                   {overlaps.length > 0 && (
                     <div className='flex items-center gap-2'>
-                      <span className='text-sm font-medium text-gray-700'>Issues:</span>
+                      <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Issues:</span>
                       <button
                         onClick={() => setShowOverlapInfo(!showOverlapInfo)}
                         className='px-3 py-1.5 text-sm font-medium bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors'
@@ -4857,12 +4868,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           {/* Keyboard Shortcuts Help Panel */}
           {showKeyboardHelp && (
-            <div className='absolute top-48 left-4 bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-lg z-20'>
+            <div className={`absolute top-48 left-4 border rounded-lg shadow-lg p-4 max-w-lg z-20 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
               <div className='flex items-center justify-between mb-3'>
-                <h3 className='font-semibold text-gray-900'>⌨️ Keyboard Shortcuts</h3>
+                <h3 className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>⌨️ Keyboard Shortcuts</h3>
                 <button
                   onClick={() => setShowKeyboardHelp(false)}
-                  className='text-gray-400 hover:text-gray-600'
+                  className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   ✕
                 </button>
@@ -4871,48 +4882,48 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               <div className='space-y-4 text-sm'>
                 {/* Mode & Navigation */}
                 <div>
-                  <h4 className='font-medium text-gray-800 mb-2'>Mode & Navigation</h4>
-                  <div className='space-y-1 text-gray-600'>
-                    <div className='flex justify-between'><span>Switch to Edit mode:</span><kbd className='bg-gray-100 px-1 rounded'>E</kbd></div>
-                    <div className='flex justify-between'><span>Switch to View mode:</span><kbd className='bg-gray-100 px-1 rounded'>V</kbd></div>
-                    <div className='flex justify-between'><span>Navigate room (View mode):</span><kbd className='bg-gray-100 px-1 rounded'>Arrow Keys</kbd></div>
-                    <div className='flex justify-between'><span>Navigate Up/Down:</span><kbd className='bg-gray-100 px-1 rounded'>Page Up/Down</kbd></div>
+                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Mode & Navigation</h4>
+                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className='flex justify-between'><span>Switch to Edit mode:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>E</kbd></div>
+                    <div className='flex justify-between'><span>Switch to View mode:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>V</kbd></div>
+                    <div className='flex justify-between'><span>Navigate room (View mode):</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Arrow Keys</kbd></div>
+                    <div className='flex justify-between'><span>Navigate Up/Down:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Page Up/Down</kbd></div>
                   </div>
                 </div>
 
                 {/* Floor Navigation */}
                 <div>
-                  <h4 className='font-medium text-gray-800 mb-2'>Floor Navigation</h4>
-                  <div className='space-y-1 text-gray-600'>
-                    <div className='flex justify-between'><span>Ground floor:</span><kbd className='bg-gray-100 px-1 rounded'>Home</kbd></div>
-                    <div className='flex justify-between'><span>Top floor:</span><kbd className='bg-gray-100 px-1 rounded'>End</kbd></div>
-                    <div className='flex justify-between'><span>Floor up/down:</span><kbd className='bg-gray-100 px-1 rounded'>Page Up/Down</kbd></div>
+                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Floor Navigation</h4>
+                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className='flex justify-between'><span>Ground floor:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Home</kbd></div>
+                    <div className='flex justify-between'><span>Top floor:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>End</kbd></div>
+                    <div className='flex justify-between'><span>Floor up/down:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Page Up/Down</kbd></div>
                   </div>
                 </div>
 
                 {/* Room Editing */}
                 <div>
-                  <h4 className='font-medium text-gray-800 mb-2'>Room Editing (Edit Mode)</h4>
-                  <div className='space-y-1 text-gray-600'>
-                    <div className='flex justify-between'><span>New room:</span><kbd className='bg-gray-100 px-1 rounded'>N</kbd></div>
-                    <div className='flex justify-between'><span>Delete selected room:</span><kbd className='bg-gray-100 px-1 rounded'>Delete</kbd></div>
-                    <div className='flex justify-between'><span>Move room Z-level:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + ↑/↓</kbd></div>
-                    <div className='flex justify-between'><span>Room to ground level:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + 0</kbd></div>
+                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Room Editing (Edit Mode)</h4>
+                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className='flex justify-between'><span>New room:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>N</kbd></div>
+                    <div className='flex justify-between'><span>Delete selected room:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Delete</kbd></div>
+                    <div className='flex justify-between'><span>Move room Z-level:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + ↑/↓</kbd></div>
+                    <div className='flex justify-between'><span>Room to ground level:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + 0</kbd></div>
                   </div>
                 </div>
 
                 {/* Layout Actions */}
                 <div>
-                  <h4 className='font-medium text-gray-800 mb-2'>Layout Actions (Edit Mode)</h4>
-                  <div className='space-y-1 text-gray-600'>
-                    <div className='flex justify-between'><span>Auto layout:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + A</kbd></div>
-                    <div className='flex justify-between'><span>Reset layout:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + R</kbd></div>
-                    <div className='flex justify-between'><span>Undo:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + Z</kbd></div>
-                    <div className='flex justify-between'><span>Redo:</span><kbd className='bg-gray-100 px-1 rounded'>Ctrl + Y</kbd></div>
+                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Layout Actions (Edit Mode)</h4>
+                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <div className='flex justify-between'><span>Auto layout:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + A</kbd></div>
+                    <div className='flex justify-between'><span>Reset layout:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + R</kbd></div>
+                    <div className='flex justify-between'><span>Undo:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + Z</kbd></div>
+                    <div className='flex justify-between'><span>Redo:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + Y</kbd></div>
                   </div>
                 </div>
 
-                <div className='text-xs text-gray-500 mt-4 pt-3 border-t border-gray-200'>
+                <div className={`text-xs mt-4 pt-3 border-t ${isDark ? 'text-gray-500 border-gray-700' : 'text-gray-500 border-gray-200'}`}>
                   💡 Tip: Most shortcuts work only when not typing in text fields
                 </div>
               </div>
@@ -4921,23 +4932,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           {/* Overlap Info Panel */}
           {showOverlapInfo && overlaps.length > 0 && (
-            <div className='absolute top-48 right-4 bg-white border border-orange-200 rounded-lg shadow-lg p-4 max-w-md z-10'>
+            <div className={`absolute top-48 right-4 border rounded-lg shadow-lg p-4 max-w-md z-10 ${isDark ? 'bg-gray-800 border-orange-700' : 'bg-white border-orange-200'}`}>
               <div className='flex items-center justify-between mb-3'>
-                <h3 className='font-semibold text-orange-800'>Room Overlaps Detected</h3>
+                <h3 className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-800'}`}>Room Overlaps Detected</h3>
                 <button
                   onClick={() => setShowOverlapInfo(false)}
-                  className='text-gray-400 hover:text-gray-600'
+                  className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
                 >
                   ✕
                 </button>
               </div>
               <div className='space-y-2'>
                 {overlaps.map((overlap, index) => (
-                  <div key={index} className='p-2 bg-orange-50 rounded border-l-4 border-orange-400'>
-                    <div className='text-sm font-medium text-orange-800'>
+                  <div key={index} className={`p-2 rounded border-l-4 ${isDark ? 'bg-orange-900/30 border-orange-600' : 'bg-orange-50 border-orange-400'}`}>
+                    <div className={`text-sm font-medium ${isDark ? 'text-orange-400' : 'text-orange-800'}`}>
                       Position ({overlap.position.x}, {overlap.position.y})
                     </div>
-                    <div className='text-xs text-orange-600 mt-1'>
+                    <div className={`text-xs mt-1 ${isDark ? 'text-orange-500' : 'text-orange-600'}`}>
                       {overlap.count} rooms: {overlap.roomIds.map(id => {
                         const room = rooms.find(r => r.id === id);
                         return room ? `#${id} ${room.name}` : `#${id}`;

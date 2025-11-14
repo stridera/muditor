@@ -14,6 +14,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
+    "\n  mutation UpdateViewMode($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        viewMode\n      }\n    }\n  }\n": typeof types.UpdateViewModeDocument,
     "\n  query GetObjectInline($id: Int!, $zoneId: Int!) {\n    object(id: $id, zoneId: $zoneId) {\n      id\n      type\n      keywords\n      name\n      examineDescription\n      actionDescription\n      weight\n      cost\n      timer\n      decomposeTimer\n      level\n      concealment\n      values\n      zoneId\n      flags\n      effectFlags\n      wearFlags\n      createdAt\n      updatedAt\n    }\n  }\n": typeof types.GetObjectInlineDocument,
     "\n  mutation UpdateObjectInline(\n    $id: Int!\n    $zoneId: Int!\n    $data: UpdateObjectInput!\n  ) {\n    updateObject(id: $id, zoneId: $zoneId, data: $data) {\n      id\n      keywords\n      name\n      examineDescription\n    }\n  }\n": typeof types.UpdateObjectInlineDocument,
     "\n  mutation CreateObjectInline($data: CreateObjectInput!) {\n    createObject(data: $data) {\n      id\n      keywords\n      name\n    }\n  }\n": typeof types.CreateObjectInlineDocument,
@@ -68,6 +69,7 @@ type Documents = {
     "\n  mutation DeleteMobResetEquipment($id: ID!) {\n    deleteMobResetEquipment(id: $id)\n  }\n": typeof types.DeleteMobResetEquipmentDocument,
     "\n  mutation AddMobResetEquipment(\n    $resetId: ID!\n    $objectZoneId: Int!\n    $objectId: Int!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    addMobResetEquipment(\n      resetId: $resetId\n      objectZoneId: $objectZoneId\n      objectId: $objectId\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    ) {\n      id\n      equipment {\n        id\n        objectId\n        objectZoneId\n        wearLocation\n        maxInstances\n        probability\n        object {\n          id\n          zoneId\n          name\n          type\n        }\n      }\n    }\n  }\n": typeof types.AddMobResetEquipmentDocument,
     "\n  mutation UpdateMobResetEquipment(\n    $id: ID!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    updateMobResetEquipment(\n      id: $id\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    )\n  }\n": typeof types.UpdateMobResetEquipmentDocument,
+    "\n  mutation UpdateThemePreference($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        theme\n      }\n    }\n  }\n": typeof types.UpdateThemePreferenceDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      user {\n        id\n        username\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": typeof types.LoginDocument,
     "\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      accessToken\n      user {\n        id\n        username\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": typeof types.RegisterDocument,
     "\n  query Me {\n    me {\n      id\n      username\n      email\n      role\n      createdAt\n    }\n  }\n": typeof types.MeDocument,
@@ -94,6 +96,7 @@ type Documents = {
     "\n  query MyPermissions {\n    myPermissions {\n      isPlayer\n      isImmortal\n      isBuilder\n      isCoder\n      isGod\n      canAccessDashboard\n      canManageUsers\n      canViewValidation\n      maxCharacterLevel\n      role\n    }\n  }\n": typeof types.MyPermissionsDocument,
 };
 const documents: Documents = {
+    "\n  mutation UpdateViewMode($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        viewMode\n      }\n    }\n  }\n": types.UpdateViewModeDocument,
     "\n  query GetObjectInline($id: Int!, $zoneId: Int!) {\n    object(id: $id, zoneId: $zoneId) {\n      id\n      type\n      keywords\n      name\n      examineDescription\n      actionDescription\n      weight\n      cost\n      timer\n      decomposeTimer\n      level\n      concealment\n      values\n      zoneId\n      flags\n      effectFlags\n      wearFlags\n      createdAt\n      updatedAt\n    }\n  }\n": types.GetObjectInlineDocument,
     "\n  mutation UpdateObjectInline(\n    $id: Int!\n    $zoneId: Int!\n    $data: UpdateObjectInput!\n  ) {\n    updateObject(id: $id, zoneId: $zoneId, data: $data) {\n      id\n      keywords\n      name\n      examineDescription\n    }\n  }\n": types.UpdateObjectInlineDocument,
     "\n  mutation CreateObjectInline($data: CreateObjectInput!) {\n    createObject(data: $data) {\n      id\n      keywords\n      name\n    }\n  }\n": types.CreateObjectInlineDocument,
@@ -148,6 +151,7 @@ const documents: Documents = {
     "\n  mutation DeleteMobResetEquipment($id: ID!) {\n    deleteMobResetEquipment(id: $id)\n  }\n": types.DeleteMobResetEquipmentDocument,
     "\n  mutation AddMobResetEquipment(\n    $resetId: ID!\n    $objectZoneId: Int!\n    $objectId: Int!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    addMobResetEquipment(\n      resetId: $resetId\n      objectZoneId: $objectZoneId\n      objectId: $objectId\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    ) {\n      id\n      equipment {\n        id\n        objectId\n        objectZoneId\n        wearLocation\n        maxInstances\n        probability\n        object {\n          id\n          zoneId\n          name\n          type\n        }\n      }\n    }\n  }\n": types.AddMobResetEquipmentDocument,
     "\n  mutation UpdateMobResetEquipment(\n    $id: ID!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    updateMobResetEquipment(\n      id: $id\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    )\n  }\n": types.UpdateMobResetEquipmentDocument,
+    "\n  mutation UpdateThemePreference($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        theme\n      }\n    }\n  }\n": types.UpdateThemePreferenceDocument,
     "\n  mutation Login($input: LoginInput!) {\n    login(input: $input) {\n      accessToken\n      user {\n        id\n        username\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": types.LoginDocument,
     "\n  mutation Register($input: RegisterInput!) {\n    register(input: $input) {\n      accessToken\n      user {\n        id\n        username\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": types.RegisterDocument,
     "\n  query Me {\n    me {\n      id\n      username\n      email\n      role\n      createdAt\n    }\n  }\n": types.MeDocument,
@@ -188,6 +192,10 @@ const documents: Documents = {
  */
 export function gql(source: string): unknown;
 
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateViewMode($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        viewMode\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateViewMode($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        viewMode\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
@@ -404,6 +412,10 @@ export function gql(source: "\n  mutation AddMobResetEquipment(\n    $resetId: I
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation UpdateMobResetEquipment(\n    $id: ID!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    updateMobResetEquipment(\n      id: $id\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    )\n  }\n"): (typeof documents)["\n  mutation UpdateMobResetEquipment(\n    $id: ID!\n    $wearLocation: WearFlag\n    $maxInstances: Int\n    $probability: Float\n  ) {\n    updateMobResetEquipment(\n      id: $id\n      wearLocation: $wearLocation\n      maxInstances: $maxInstances\n      probability: $probability\n    )\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation UpdateThemePreference($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        theme\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation UpdateThemePreference($input: UpdatePreferencesInput!) {\n    updateUserPreferences(input: $input) {\n      id\n      preferences {\n        theme\n      }\n    }\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

@@ -14,6 +14,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import { formatDistanceToNow } from 'date-fns';
+import { formatRace, formatClass } from '@/lib/utils';
 import {
   Activity,
   Backpack,
@@ -271,8 +272,8 @@ export function CharacterDetails({
             </h1>
             <p className='text-muted-foreground flex items-center gap-2'>
               Level {character.level}
-              {character.raceType && ` ${character.raceType}`}
-              {character.playerClass && ` ${character.playerClass}`}
+              {character.raceType && ` ${formatRace(character.raceType)}`}
+              {character.playerClass && ` ${formatClass(character.playerClass)}`}
               {character.title && (
                 <>
                   <span className='ml-2'>•</span>

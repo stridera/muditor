@@ -637,12 +637,13 @@ export type CreateRaceInput = {
 
 export type CreateRoomExitInput = {
   description?: InputMaybe<Scalars['String']['input']>;
-  destination?: InputMaybe<Scalars['Int']['input']>;
   direction: Direction;
   key?: InputMaybe<Scalars['String']['input']>;
-  keyword?: InputMaybe<Scalars['String']['input']>;
+  keywords?: InputMaybe<Array<Scalars['String']['input']>>;
   roomId: Scalars['Int']['input'];
   roomZoneId: Scalars['Int']['input'];
+  toRoomId?: InputMaybe<Scalars['Int']['input']>;
+  toZoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type CreateRoomInput = {
@@ -650,6 +651,7 @@ export type CreateRoomInput = {
   flags?: Array<RoomFlag>;
   id: Scalars['Int']['input'];
   name: Scalars['String']['input'];
+  roomDescription?: InputMaybe<Scalars['String']['input']>;
   sector?: Sector;
   zoneId: Scalars['Int']['input'];
 };
@@ -842,6 +844,13 @@ export type EquipmentSetItemDto = {
   quantity: Scalars['Int']['output'];
   slot?: Maybe<Scalars['String']['output']>;
 };
+
+export type ExitFlag =
+  | 'CLOSED'
+  | 'HIDDEN'
+  | 'IS_DOOR'
+  | 'LOCKED'
+  | 'PICKPROOF';
 
 export type Gender =
   | 'FEMALE'
@@ -1151,6 +1160,7 @@ export type Mutation = {
   updateShopInventory: ShopDto;
   updateTrigger: TriggerDto;
   updateUser: User;
+  updateUserPreferences: User;
   updateZone: ZoneDto;
 };
 
@@ -1669,6 +1679,11 @@ export type MutationUpdateTriggerArgs = {
 
 export type MutationUpdateUserArgs = {
   input: UpdateUserInput;
+};
+
+
+export type MutationUpdateUserPreferencesArgs = {
+  input: UpdatePreferencesInput;
 };
 
 
@@ -2338,6 +2353,8 @@ export type RoomDto = {
   mobs: Array<MobDto>;
   name: Scalars['String']['output'];
   objects: Array<ObjectDto>;
+  /** @deprecated Use description instead */
+  roomDescription: Scalars['String']['output'];
   sector: Sector;
   shops: Array<ShopDto>;
   updatedAt: Scalars['DateTime']['output'];
@@ -2348,12 +2365,17 @@ export type RoomDto = {
 export type RoomExitDto = {
   __typename?: 'RoomExitDto';
   description?: Maybe<Scalars['String']['output']>;
-  destination?: Maybe<Scalars['Int']['output']>;
   direction: Direction;
+  flags: Array<ExitFlag>;
   id: Scalars['String']['output'];
   key?: Maybe<Scalars['String']['output']>;
+  /** @deprecated Use keywords array instead */
   keyword?: Maybe<Scalars['String']['output']>;
+  keywords: Array<Scalars['String']['output']>;
+  roomId: Scalars['Int']['output'];
+  roomZoneId: Scalars['Int']['output'];
   toRoomId?: Maybe<Scalars['Int']['output']>;
+  toZoneId?: Maybe<Scalars['Int']['output']>;
 };
 
 export type RoomExtraDescriptionDto = {
@@ -2402,6 +2424,17 @@ export type RoomFlag =
   | 'UNDERDARK'
   | 'VERY_SMALL'
   | 'WORLDMAP';
+
+export type RoomReference = {
+  __typename?: 'RoomReference';
+  vnum: Scalars['Int']['output'];
+  zoneId: Scalars['Int']['output'];
+};
+
+export type RoomReferenceInput = {
+  vnum: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
 
 export type RoomSummaryDto = {
   __typename?: 'RoomSummaryDto';
@@ -2784,6 +2817,19 @@ export type UpdateObjectInput = {
   zoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdatePreferencesInput = {
+  /** List of favorite zone IDs */
+  favoriteZones?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Recently visited rooms */
+  recentRooms?: InputMaybe<Array<RoomReferenceInput>>;
+  /** Recently visited zone IDs */
+  recentZones?: InputMaybe<Array<Scalars['Int']['input']>>;
+  /** Theme preference: light, dark, or system */
+  theme?: InputMaybe<Scalars['String']['input']>;
+  /** View mode preference: player or admin */
+  viewMode?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateProfileInput = {
   email?: InputMaybe<Scalars['String']['input']>;
 };
@@ -2828,6 +2874,7 @@ export type UpdateRoomInput = {
   layoutY?: InputMaybe<Scalars['Int']['input']>;
   layoutZ?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+  roomDescription?: InputMaybe<Scalars['String']['input']>;
   sector?: InputMaybe<Sector>;
 };
 
@@ -2897,6 +2944,8 @@ export type User = {
   /** Whether the user is currently banned */
   isBanned: Scalars['Boolean']['output'];
   lastLoginAt?: Maybe<Scalars['DateTime']['output']>;
+  /** User preferences for UI and navigation */
+  preferences?: Maybe<UserPreferences>;
   role: UserRole;
   updatedAt: Scalars['DateTime']['output'];
   username: Scalars['String']['output'];
@@ -2931,6 +2980,20 @@ export type UserPermissions = {
   isPlayer: Scalars['Boolean']['output'];
   maxCharacterLevel: Scalars['Float']['output'];
   role: UserRole;
+};
+
+export type UserPreferences = {
+  __typename?: 'UserPreferences';
+  /** List of favorite zone IDs */
+  favoriteZones?: Maybe<Array<Scalars['Int']['output']>>;
+  /** Recently visited rooms (max 10) */
+  recentRooms?: Maybe<Array<RoomReference>>;
+  /** Recently visited zone IDs (max 5) */
+  recentZones?: Maybe<Array<Scalars['Int']['output']>>;
+  /** Theme preference: light, dark, or system */
+  theme?: Maybe<Scalars['String']['output']>;
+  /** View mode preference: player or admin */
+  viewMode?: Maybe<Scalars['String']['output']>;
 };
 
 /** User role in the MUD system */
@@ -3073,6 +3136,13 @@ export type ZoneRoomDto = {
   name: Scalars['String']['output'];
   sector: Scalars['String']['output'];
 };
+
+export type UpdateViewModeMutationVariables = Exact<{
+  input: UpdatePreferencesInput;
+}>;
+
+
+export type UpdateViewModeMutation = { __typename?: 'Mutation', updateUserPreferences: { __typename?: 'User', id: string, preferences?: { __typename?: 'UserPreferences', viewMode?: string | null } | null } };
 
 export type GetObjectInlineQueryVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -3454,6 +3524,13 @@ export type UpdateMobResetEquipmentMutationVariables = Exact<{
 
 
 export type UpdateMobResetEquipmentMutation = { __typename?: 'Mutation', updateMobResetEquipment: boolean };
+
+export type UpdateThemePreferenceMutationVariables = Exact<{
+  input: UpdatePreferencesInput;
+}>;
+
+
+export type UpdateThemePreferenceMutation = { __typename?: 'Mutation', updateUserPreferences: { __typename?: 'User', id: string, preferences?: { __typename?: 'UserPreferences', theme?: string | null } | null } };
 
 export type LoginMutationVariables = Exact<{
   input: LoginInput;
@@ -4071,6 +4148,7 @@ export type MyPermissionsQuery = { __typename?: 'Query', myPermissions: { __type
 export const CharacterCardFieldsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"CharacterCardFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"CharacterDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"raceType"}},{"kind":"Field","name":{"kind":"Name","value":"playerClass"}},{"kind":"Field","name":{"kind":"Name","value":"lastLogin"}},{"kind":"Field","name":{"kind":"Name","value":"isOnline"}},{"kind":"Field","name":{"kind":"Name","value":"timePlayed"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"hitPointsMax"}},{"kind":"Field","name":{"kind":"Name","value":"movement"}},{"kind":"Field","name":{"kind":"Name","value":"movementMax"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"luck"}},{"kind":"Field","name":{"kind":"Name","value":"experience"}},{"kind":"Field","name":{"kind":"Name","value":"copper"}},{"kind":"Field","name":{"kind":"Name","value":"silver"}},{"kind":"Field","name":{"kind":"Name","value":"gold"}},{"kind":"Field","name":{"kind":"Name","value":"platinum"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"title"}},{"kind":"Field","name":{"kind":"Name","value":"currentRoom"}}]}}]} as unknown as DocumentNode<CharacterCardFieldsFragment, unknown>;
 export const ObjectSummaryFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<ObjectSummaryFragment, unknown>;
 export const ObjectDetailsFragmentDoc = {"kind":"Document","definitions":[{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectDetails"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ObjectSummary"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDescription"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ObjectSummary"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"ObjectDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"values"}}]}}]} as unknown as DocumentNode<ObjectDetailsFragment, unknown>;
+export const UpdateViewModeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateViewMode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePreferencesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUserPreferences"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"preferences"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"viewMode"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateViewModeMutation, UpdateViewModeMutationVariables>;
 export const GetObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"object"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"actionDescription"}},{"kind":"Field","name":{"kind":"Name","value":"weight"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}},{"kind":"Field","name":{"kind":"Name","value":"timer"}},{"kind":"Field","name":{"kind":"Name","value":"decomposeTimer"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"values"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"effectFlags"}},{"kind":"Field","name":{"kind":"Name","value":"wearFlags"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetObjectInlineQuery, GetObjectInlineQueryVariables>;
 export const UpdateObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<UpdateObjectInlineMutation, UpdateObjectInlineMutationVariables>;
 export const CreateObjectInlineDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateObjectInline"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateObjectInlineMutation, CreateObjectInlineMutationVariables>;
@@ -4125,6 +4203,7 @@ export const RemoveMobEquipmentSetDocument = {"kind":"Document","definitions":[{
 export const DeleteMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteMobResetEquipmentMutation, DeleteMobResetEquipmentMutationVariables>;
 export const AddMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"AddMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"resetId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"objectZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"objectId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"WearFlag"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"probability"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"addMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"resetId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"resetId"}}},{"kind":"Argument","name":{"kind":"Name","value":"objectZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"objectZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"objectId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"objectId"}}},{"kind":"Argument","name":{"kind":"Name","value":"wearLocation"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxInstances"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}}},{"kind":"Argument","name":{"kind":"Name","value":"probability"},"value":{"kind":"Variable","name":{"kind":"Name","value":"probability"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"equipment"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"wearLocation"}},{"kind":"Field","name":{"kind":"Name","value":"maxInstances"}},{"kind":"Field","name":{"kind":"Name","value":"probability"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}}]}}]}}]}}]}}]} as unknown as DocumentNode<AddMobResetEquipmentMutation, AddMobResetEquipmentMutationVariables>;
 export const UpdateMobResetEquipmentDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMobResetEquipment"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"WearFlag"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"probability"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMobResetEquipment"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"wearLocation"},"value":{"kind":"Variable","name":{"kind":"Name","value":"wearLocation"}}},{"kind":"Argument","name":{"kind":"Name","value":"maxInstances"},"value":{"kind":"Variable","name":{"kind":"Name","value":"maxInstances"}}},{"kind":"Argument","name":{"kind":"Name","value":"probability"},"value":{"kind":"Variable","name":{"kind":"Name","value":"probability"}}}]}]}}]} as unknown as DocumentNode<UpdateMobResetEquipmentMutation, UpdateMobResetEquipmentMutationVariables>;
+export const UpdateThemePreferenceDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateThemePreference"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdatePreferencesInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateUserPreferences"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"preferences"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"theme"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateThemePreferenceMutation, UpdateThemePreferenceMutationVariables>;
 export const LoginDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Login"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"LoginInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"login"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<LoginMutation, LoginMutationVariables>;
 export const RegisterDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"Register"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"RegisterInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"register"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"accessToken"}},{"kind":"Field","name":{"kind":"Name","value":"user"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]}}]} as unknown as DocumentNode<RegisterMutation, RegisterMutationVariables>;
 export const MeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"Me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"me"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"username"}},{"kind":"Field","name":{"kind":"Name","value":"email"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<MeQuery, MeQueryVariables>;

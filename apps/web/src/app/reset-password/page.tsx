@@ -101,7 +101,7 @@ function ResetPasswordContent() {
 
   if (isSuccess) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+      <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
         <div className='max-w-md w-full space-y-8'>
           <Card>
             <CardHeader className='text-center'>
@@ -137,13 +137,13 @@ function ResetPasswordContent() {
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
       <div className='max-w-md w-full space-y-8'>
         <div>
-          <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+          <h2 className='mt-6 text-center text-3xl font-extrabold text-foreground'>
             Reset your password
           </h2>
-          <p className='mt-2 text-center text-sm text-gray-600'>
+          <p className='mt-2 text-center text-sm text-muted-foreground'>
             Enter your new password below
           </p>
         </div>
@@ -176,7 +176,7 @@ function ResetPasswordContent() {
                   minLength={8}
                   maxLength={128}
                 />
-                <p className='text-xs text-gray-500'>
+                <p className='text-xs text-muted-foreground'>
                   8-128 characters required
                 </p>
               </div>
@@ -213,7 +213,7 @@ function ResetPasswordContent() {
             <div className='mt-4 text-center'>
               <Link
                 href='/login'
-                className='inline-flex items-center text-sm text-blue-600 hover:text-blue-500'
+                className='inline-flex items-center text-sm text-primary hover:text-primary-foreground'
               >
                 <ArrowLeft className='mr-1 h-4 w-4' />
                 Back to login
@@ -230,7 +230,7 @@ export default function ResetPasswordPage() {
   return (
     <Suspense
       fallback={
-        <div className='min-h-screen flex items-center justify-center'>
+        <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
           Loading...
         </div>
       }

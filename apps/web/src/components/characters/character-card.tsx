@@ -28,6 +28,8 @@ import {
   User,
   Zap,
 } from 'lucide-react';
+import { memo } from 'react';
+import { formatRace, formatClass } from '@/lib/utils';
 import { OnlineStatus } from './online-status';
 
 // Use a narrowed subset of CharacterDto for display (all selected via fragment)
@@ -70,12 +72,12 @@ interface CharacterCardProps {
   onCharacterClick?: (characterId: string) => void;
 }
 
-export function CharacterCard({
+const CharacterCardComponent = ({
   character,
   showFullDetails = false,
   showActions = true,
   onCharacterClick,
-}: CharacterCardProps) {
+}: CharacterCardProps) => {
   const formatPlayTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const days = Math.floor(hours / 24);
@@ -136,8 +138,8 @@ export function CharacterCard({
             </CardTitle>
             <CardDescription className='mt-1'>
               Level {character.level}
-              {character.raceType && ` ${character.raceType}`}
-              {character.playerClass && ` ${character.playerClass}`}
+              {character.raceType && ` ${formatRace(character.raceType)}`}
+              {character.playerClass && ` ${formatClass(character.playerClass)}`}
             </CardDescription>
             {character.title && (
               <div className='text-xs text-muted-foreground italic mt-1'>
@@ -346,4 +348,50 @@ export function CharacterCard({
       </CardContent>
     </Card>
   );
-}
+};
+
+// Custom comparison function to prevent unnecessary re-renders
+// Only re-render if session-related data actually changes
+const arePropsEqual = (
+  prevProps: CharacterCardProps,
+  nextProps: CharacterCardProps
+) => {
+  const prev = prevProps.character;
+  const next = nextProps.character;
+
+  // Compare all character properties that affect rendering
+  return (
+    prev.id === next.id &&
+    prev.name === next.name &&
+    prev.level === next.level &&
+    prev.raceType === next.raceType &&
+    prev.playerClass === next.playerClass &&
+    prev.lastLogin === next.lastLogin &&
+    prev.isOnline === next.isOnline &&
+    prev.timePlayed === next.timePlayed &&
+    prev.hitPoints === next.hitPoints &&
+    prev.hitPointsMax === next.hitPointsMax &&
+    prev.movement === next.movement &&
+    prev.movementMax === next.movementMax &&
+    prev.alignment === next.alignment &&
+    prev.strength === next.strength &&
+    prev.intelligence === next.intelligence &&
+    prev.wisdom === next.wisdom &&
+    prev.dexterity === next.dexterity &&
+    prev.constitution === next.constitution &&
+    prev.charisma === next.charisma &&
+    prev.luck === next.luck &&
+    prev.experience === next.experience &&
+    prev.copper === next.copper &&
+    prev.silver === next.silver &&
+    prev.gold === next.gold &&
+    prev.platinum === next.platinum &&
+    prev.description === next.description &&
+    prev.title === next.title &&
+    prev.currentRoom === next.currentRoom &&
+    prevProps.showFullDetails === nextProps.showFullDetails &&
+    prevProps.showActions === nextProps.showActions
+  );
+};
+
+export const CharacterCard = memo(CharacterCardComponent, arePropsEqual);

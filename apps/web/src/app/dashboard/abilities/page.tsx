@@ -47,6 +47,7 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
+import { TypeBadge } from '@/components/ui/type-badge';
 import {
   CreateAbilityDocument,
   DeleteAbilityDocument,
@@ -82,13 +83,11 @@ import {
   ChevronsLeft,
   ChevronsRight,
   Loader2,
-  Music,
   Pencil,
   Plus,
   Search,
   Shield,
   Sparkles,
-  Sword,
   Trash2,
   Zap,
 } from 'lucide-react';
@@ -139,19 +138,7 @@ const ABILITY_TYPES = ['SPELL', 'SKILL', 'SONG', 'CHANT'];
 
 const POSITIONS = ['PRONE', 'SITTING', 'KNEELING', 'STANDING', 'FLYING'];
 
-const abilityTypeIcons: Record<string, any> = {
-  SPELL: Sparkles,
-  SKILL: Sword,
-  SONG: Music,
-  CHANT: BookOpen,
-};
-
-const abilityTypeColors: Record<string, string> = {
-  SPELL: 'bg-purple-100 text-purple-700',
-  SKILL: 'bg-red-100 text-red-700',
-  SONG: 'bg-blue-100 text-blue-700',
-  CHANT: 'bg-green-100 text-green-700',
-};
+// Icon mapping removed; TypeBadge handles visual differentiation.
 
 export default function AbilitiesPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -341,10 +328,7 @@ export default function AbilitiesPage() {
     }
   };
 
-  const getAbilityTypeIcon = (type: string) => {
-    const Icon = abilityTypeIcons[type] || Sparkles;
-    return Icon;
-  };
+  // getAbilityTypeIcon removed; TypeBadge provides type visualization.
 
   return (
     <div className='space-y-6'>
@@ -496,7 +480,6 @@ export default function AbilitiesPage() {
                   </TableHeader>
                   <TableBody>
                     {filteredAbilities.map(ability => {
-                      const Icon = getAbilityTypeIcon(ability.abilityType);
                       return (
                         <TableRow
                           key={ability.id}
@@ -507,16 +490,7 @@ export default function AbilitiesPage() {
                             {ability.name}
                           </TableCell>
                           <TableCell>
-                            <Badge
-                              variant='secondary'
-                              className={
-                                abilityTypeColors[ability.abilityType] ||
-                                'bg-gray-100 text-gray-700'
-                              }
-                            >
-                              <Icon className='h-3 w-3 mr-1' />
-                              {ability.abilityType}
-                            </Badge>
+                            <TypeBadge type={ability.abilityType} />
                           </TableCell>
                           <TableCell>
                             {ability.school?.name || (
@@ -1018,7 +992,7 @@ export default function AbilitiesPage() {
                       </h3>
                       <div className='space-y-2'>
                         {abilityDetailsData.ability.restrictions.requirements.map(
-                          (req: any, idx: number) => (
+                          (req: unknown, idx: number) => (
                             <div key={idx} className='border rounded-lg p-3'>
                               <pre className='text-xs'>
                                 {JSON.stringify(req, null, 2)}

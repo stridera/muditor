@@ -177,12 +177,12 @@ function ProfileContent() {
   };
 
   return (
-    <div className='min-h-screen bg-gray-50 py-8'>
+    <div className='min-h-screen bg-background py-8 text-foreground'>
       <div className='container mx-auto px-4'>
         <div className='max-w-4xl mx-auto'>
           <div className='mb-8'>
-            <h1 className='text-3xl font-bold text-gray-900'>Profile</h1>
-            <p className='text-gray-600 mt-2'>
+            <h1 className='text-3xl font-bold text-foreground'>Profile</h1>
+            <p className='text-muted-foreground mt-2'>
               Manage your account settings and preferences
             </p>
           </div>
@@ -192,8 +192,8 @@ function ProfileContent() {
             <div className='lg:col-span-1'>
               <Card>
                 <CardHeader className='text-center'>
-                  <div className='mx-auto h-20 w-20 bg-blue-600 rounded-full flex items-center justify-center mb-4'>
-                    <span className='text-white text-2xl font-bold'>
+                  <div className='mx-auto h-20 w-20 bg-primary rounded-full flex items-center justify-center mb-4'>
+                    <span className='text-primary-foreground text-2xl font-bold'>
                       {user.username.charAt(0).toUpperCase()}
                     </span>
                   </div>
@@ -202,7 +202,7 @@ function ProfileContent() {
                 </CardHeader>
                 <CardContent className='space-y-4'>
                   <div className='flex items-center justify-between'>
-                    <span className='text-sm font-medium text-gray-500'>
+                    <span className='text-sm font-medium text-muted-foreground'>
                       Role
                     </span>
                     <RoleBadge role={user.role} size='sm' />
@@ -212,7 +212,7 @@ function ProfileContent() {
                     <span className='text-sm font-medium text-gray-500'>
                       Member Since
                     </span>
-                    <span className='text-sm text-gray-900'>
+                    <span className='text-sm text-foreground'>
                       {formatDistanceToNow(new Date(user.createdAt), {
                         addSuffix: true,
                       })}
@@ -221,7 +221,7 @@ function ProfileContent() {
 
                   <div className='pt-4 border-t'>
                     <div className='flex items-center justify-between mb-2'>
-                      <span className='text-sm font-medium text-gray-500'>
+                      <span className='text-sm font-medium text-muted-foreground'>
                         Linked Characters
                       </span>
                       <Badge variant='secondary'>{characters.length}</Badge>
@@ -231,10 +231,10 @@ function ProfileContent() {
                         {characters.map((char: any) => (
                           <div
                             key={char.id}
-                            className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                            className='flex items-center justify-between p-2 bg-card rounded'
                           >
                             <div className='flex items-center gap-2'>
-                              <Gamepad2 className='h-4 w-4 text-gray-500' />
+                              <Gamepad2 className='h-4 w-4 text-muted-foreground' />
                               <span className='text-sm font-medium'>
                                 {char.name}
                               </span>
@@ -246,7 +246,7 @@ function ProfileContent() {
                         ))}
                       </div>
                     ) : (
-                      <p className='text-xs text-gray-500'>
+                      <p className='text-xs text-muted-foreground'>
                         No characters linked. Visit the Characters page to link
                         your game characters.
                       </p>
@@ -291,9 +291,9 @@ function ProfileContent() {
                             id='username'
                             value={user.username}
                             disabled
-                            className='bg-gray-50'
+                            className='bg-card'
                           />
-                          <p className='text-xs text-gray-500'>
+                          <p className='text-xs text-muted-foreground'>
                             Username cannot be changed
                           </p>
                         </div>
@@ -306,7 +306,7 @@ function ProfileContent() {
                             value={email}
                             onChange={e => setEmail(e.target.value)}
                             disabled={!isEditingProfile || profileLoading}
-                            className={isEditingProfile ? '' : 'bg-gray-50'}
+                            className={isEditingProfile ? '' : 'bg-card'}
                           />
                         </div>
                       </div>
@@ -380,10 +380,10 @@ function ProfileContent() {
 
                     <div className='space-y-4'>
                       <div>
-                        <h4 className='font-medium text-gray-900 mb-2'>
+                        <h4 className='font-medium text-foreground mb-2'>
                           Password
                         </h4>
-                        <p className='text-sm text-gray-600 mb-4'>
+                        <p className='text-sm text-muted-foreground mb-4'>
                           Update your password to keep your account secure
                         </p>
 
@@ -493,38 +493,38 @@ function ProfileContent() {
                   </CardHeader>
                   <CardContent>
                     <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                      <div className='text-center p-4 bg-gray-50 rounded-lg'>
-                        <div className='text-2xl font-bold text-blue-600'>
-                          -
-                        </div>
-                        <div className='text-sm text-gray-600'>
+                      <div className='text-center p-4 bg-card rounded-lg'>
+                        <div className='text-2xl font-bold text-primary'>-</div>
+                        <div className='text-sm text-muted-foreground'>
                           Zones Created
                         </div>
                       </div>
-                      <div className='text-center p-4 bg-gray-50 rounded-lg'>
+                      <div className='text-center p-4 bg-card rounded-lg'>
                         <div className='text-2xl font-bold text-green-600'>
                           -
                         </div>
-                        <div className='text-sm text-gray-600'>Rooms Built</div>
+                        <div className='text-sm text-muted-foreground'>
+                          Rooms Built
+                        </div>
                       </div>
-                      <div className='text-center p-4 bg-gray-50 rounded-lg'>
+                      <div className='text-center p-4 bg-card rounded-lg'>
                         <div className='text-2xl font-bold text-purple-600'>
                           -
                         </div>
-                        <div className='text-sm text-gray-600'>
+                        <div className='text-sm text-muted-foreground'>
                           Mobs Created
                         </div>
                       </div>
-                      <div className='text-center p-4 bg-gray-50 rounded-lg'>
+                      <div className='text-center p-4 bg-card rounded-lg'>
                         <div className='text-2xl font-bold text-orange-600'>
                           -
                         </div>
-                        <div className='text-sm text-gray-600'>
+                        <div className='text-sm text-muted-foreground'>
                           Objects Made
                         </div>
                       </div>
                     </div>
-                    <p className='text-xs text-gray-500 mt-4'>
+                    <p className='text-xs text-muted-foreground mt-4'>
                       Statistics will be tracked as you create and edit world
                       content
                     </p>

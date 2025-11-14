@@ -1519,7 +1519,6 @@ type RoomDto {
 
 type RoomExitDto {
   description: String
-  destination: Int
   direction: Direction!
   flags: [ExitFlag!]!
   id: String!

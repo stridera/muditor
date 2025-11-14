@@ -237,6 +237,7 @@ describe('AuthService', () => {
       failedLoginAttempts: 0,
       lockedUntil: null,
       lastFailedLogin: null,
+      preferences: {},
     };
 
     beforeEach(() => {

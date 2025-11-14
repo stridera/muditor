@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useTheme } from 'next-themes';
 import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
 
@@ -46,6 +47,8 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
   onObjectDragStart,
   zoneId,
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
   const [activeTab, setActiveTab] = useState<'mobs' | 'objects'>('mobs');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('');
@@ -94,21 +97,21 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
   };
 
   return (
-    <div className='w-80 bg-white border-l border-gray-200 flex flex-col h-full'>
+    <div className={`w-80 border-l flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
       {/* Header */}
-      <div className='p-4 border-b border-gray-200'>
-        <h3 className='text-lg font-semibold text-gray-900 mb-3'>
+      <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
           Entity Palette
         </h3>
 
         {/* Tabs */}
-        <div className='flex space-x-1 bg-gray-100 p-1 rounded-lg'>
+        <div className={`flex space-x-1 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
           <button
             onClick={() => setActiveTab('mobs')}
             className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'mobs'
-                ? 'bg-white text-blue-700 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
+                : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             👹 Mobs ({mobs.length})
@@ -117,8 +120,8 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
             onClick={() => setActiveTab('objects')}
             className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'objects'
-                ? 'bg-white text-blue-700 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
+                : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             📦 Objects ({objects.length})
@@ -127,10 +130,10 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
       </div>
 
       {/* Filters */}
-      <div className='p-4 border-b border-gray-200 space-y-3'>
+      <div className={`p-4 border-b space-y-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
         {/* Search */}
         <div>
-          <label className='block text-xs font-medium text-gray-700 mb-1'>
+          <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
             Search
           </label>
           <input
@@ -138,20 +141,28 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
             value={searchTerm}
             onChange={e => setSearchTerm(e.target.value)}
             placeholder={`Search ${activeTab}...`}
-            className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500'
+            className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+              isDark
+                ? 'bg-gray-700 border-gray-600 text-gray-100 placeholder-gray-400'
+                : 'bg-white border-gray-300 focus:border-blue-500'
+            }`}
           />
         </div>
 
         {/* Tab-specific filters */}
         {activeTab === 'mobs' && (
           <div>
-            <label className='block text-xs font-medium text-gray-700 mb-1'>
+            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Difficulty
             </label>
             <select
               value={selectedDifficulty}
               onChange={e => setSelectedDifficulty(e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isDark
+                  ? 'bg-gray-700 border-gray-600 text-gray-100'
+                  : 'bg-white border-gray-300'
+              }`}
             >
               <option value=''>All difficulties</option>
               {uniqueDifficulties.map(difficulty => (
@@ -167,13 +178,17 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
 
         {activeTab === 'objects' && (
           <div>
-            <label className='block text-xs font-medium text-gray-700 mb-1'>
+            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               Type
             </label>
             <select
               value={selectedType}
               onChange={e => setSelectedType(e.target.value)}
-              className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className={`w-full px-3 py-2 text-sm border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 ${
+                isDark
+                  ? 'bg-gray-700 border-gray-600 text-gray-100'
+                  : 'bg-white border-gray-300'
+              }`}
             >
               <option value=''>All types</option>
               {uniqueTypes.map(type => (
@@ -192,12 +207,12 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
           {activeTab === 'mobs' && (
             <>
               {filteredMobs.length === 0 ? (
-                <div className='text-center py-8 text-gray-500'>
+                <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   <p className='text-sm'>No mobs found</p>
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
-                      className='text-blue-600 hover:text-blue-800 text-sm mt-1'
+                      className={`text-sm mt-1 ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
                     >
                       Clear search
                     </button>
@@ -231,12 +246,12 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
           {activeTab === 'objects' && (
             <>
               {filteredObjects.length === 0 ? (
-                <div className='text-center py-8 text-gray-500'>
+                <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   <p className='text-sm'>No objects found</p>
                   {searchTerm && (
                     <button
                       onClick={() => setSearchTerm('')}
-                      className='text-blue-600 hover:text-blue-800 text-sm mt-1'
+                      className={`text-sm mt-1 ${isDark ? 'text-blue-400 hover:text-blue-300' : 'text-blue-600 hover:text-blue-800'}`}
                     >
                       Clear search
                     </button>
@@ -270,12 +285,12 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
       </div>
 
       {/* Footer */}
-      <div className='p-4 border-t border-gray-200 bg-gray-50'>
-        <div className='text-xs text-gray-600'>
+      <div className={`p-4 border-t ${isDark ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}>
+        <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
           <p className='mb-1'>
             💡 <strong>Tip:</strong> Drag entities onto room nodes to place them
           </p>
-          <p className='text-gray-500'>
+          <p className={isDark ? 'text-gray-500' : 'text-gray-500'}>
             Zone {zoneId} • {filteredMobs.length + filteredObjects.length}{' '}
             entities visible
           </p>

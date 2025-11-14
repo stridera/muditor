@@ -1,6 +1,11 @@
 'use client';
+import { FlagBadge } from '@/components/ui/flag-badge';
+import { SeverityBadge } from '@/components/ui/severity-badge';
 
-import React, { useState, useEffect } from 'react';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -8,27 +13,23 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Progress } from '@/components/ui/progress';
-import { Button } from '@/components/ui/button';
-import { PermissionGuard } from '@/components/auth/permission-guard';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { authenticatedFetch } from '@/lib/authenticated-fetch';
 import {
-  AlertTriangle,
   AlertCircle,
-  Info,
-  CheckCircle2,
-  MapPin,
-  Users,
-  Package,
+  AlertTriangle,
   Building2,
-  ShieldAlert,
-  RefreshCw,
+  CheckCircle2,
   Clock,
-  ExternalLink,
+  Info,
+  MapPin,
+  Package,
+  RefreshCw,
+  ShieldAlert,
+  Users,
 } from 'lucide-react';
+import { useEffect, useState } from 'react';
 
 // TypeScript interfaces for validation data
 interface ValidationIssue {
@@ -177,30 +178,15 @@ function ValidationPageContent() {
   const getSeverityIcon = (severity: string) => {
     switch (severity) {
       case 'critical':
-        return <ShieldAlert className='h-4 w-4 text-red-600' />;
+        return <ShieldAlert className='h-4 w-4 text-destructive' />;
       case 'high':
-        return <AlertCircle className='h-4 w-4 text-red-500' />;
+        return <AlertCircle className='h-4 w-4 text-destructive' />;
       case 'medium':
-        return <AlertTriangle className='h-4 w-4 text-orange-500' />;
+        return <AlertTriangle className='h-4 w-4 text-muted-foreground' />;
       case 'low':
-        return <Info className='h-4 w-4 text-blue-500' />;
+        return <Info className='h-4 w-4 text-muted-foreground' />;
       default:
-        return <Info className='h-4 w-4 text-gray-500' />;
-    }
-  };
-
-  const getSeverityBadgeColor = (severity: string) => {
-    switch (severity) {
-      case 'critical':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'high':
-        return 'bg-red-50 text-red-700 border-red-150';
-      case 'medium':
-        return 'bg-orange-100 text-orange-800 border-orange-200';
-      case 'low':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+        return <Info className='h-4 w-4 text-muted-foreground' />;
     }
   };
 
@@ -403,26 +389,17 @@ function ValidationPageContent() {
                       </span>
                       <div className='flex items-center gap-2'>
                         {report.errorCount > 0 && (
-                          <Badge variant='destructive' className='text-xs'>
+                          <SeverityBadge
+                            severity='critical'
+                            className='text-xs'
+                          >
                             {report.errorCount} errors
-                          </Badge>
+                          </SeverityBadge>
                         )}
                         {report.warningCount > 0 && (
-                          <Badge
-                            variant='secondary'
-                            className='text-xs bg-orange-100 text-orange-800'
-                          >
-                            {report.warningCount} warnings
-                          </Badge>
+                          <FlagBadge flag={`warnings:${report.warningCount}`} />
                         )}
-                        {report.totalIssues === 0 && (
-                          <Badge
-                            variant='secondary'
-                            className='text-xs bg-green-100 text-green-800'
-                          >
-                            ✓ Clean
-                          </Badge>
-                        )}
+                        {report.totalIssues === 0 && <FlagBadge flag='clean' />}
                       </div>
                     </div>
                   ))}
@@ -458,27 +435,14 @@ function ValidationPageContent() {
                       <AlertTriangle className='h-4 w-4 mr-2 text-orange-500' />
                       Quality Issues
                     </span>
-                    <Badge
-                      variant='secondary'
-                      className='bg-orange-100 text-orange-800'
-                    >
-                      {allIssues.filter(i => i.category === 'quality').length}
-                    </Badge>
+                    <FlagBadge flag='quality' />
                   </div>
                   <div className='flex items-center justify-between'>
                     <span className='text-sm flex items-center'>
                       <Info className='h-4 w-4 mr-2 text-blue-500' />
                       Consistency Issues
                     </span>
-                    <Badge
-                      variant='secondary'
-                      className='bg-blue-100 text-blue-800'
-                    >
-                      {
-                        allIssues.filter(i => i.category === 'consistency')
-                          .length
-                      }
-                    </Badge>
+                    <FlagBadge flag='consistency' />
                   </div>
                 </div>
               </CardContent>
@@ -500,25 +464,15 @@ function ValidationPageContent() {
                       </CardTitle>
                       <div className='flex items-center gap-2'>
                         {report.errorCount > 0 && (
-                          <Badge variant='destructive'>
+                          <SeverityBadge severity='critical'>
                             {report.errorCount} errors
-                          </Badge>
+                          </SeverityBadge>
                         )}
                         {report.warningCount > 0 && (
-                          <Badge
-                            variant='secondary'
-                            className='bg-orange-100 text-orange-800'
-                          >
-                            {report.warningCount} warnings
-                          </Badge>
+                          <FlagBadge flag={`warnings:${report.warningCount}`} />
                         )}
                         {report.infoCount > 0 && (
-                          <Badge
-                            variant='secondary'
-                            className='bg-blue-100 text-blue-800'
-                          >
-                            {report.infoCount} info
-                          </Badge>
+                          <FlagBadge flag={`info:${report.infoCount}`} />
                         )}
                       </div>
                     </div>
@@ -536,13 +490,15 @@ function ValidationPageContent() {
                               <span className='font-medium text-sm'>
                                 {issue.title}
                               </span>
-                              <Badge
-                                className={getSeverityBadgeColor(
-                                  issue.severity
-                                )}
-                              >
-                                {issue.severity}
-                              </Badge>
+                              <SeverityBadge
+                                severity={
+                                  issue.severity as
+                                    | 'critical'
+                                    | 'high'
+                                    | 'medium'
+                                    | 'low'
+                                }
+                              />
                             </div>
                             <div className='flex items-center gap-1 text-xs text-gray-500'>
                               {getEntityIcon(issue.entity)}
@@ -596,11 +552,15 @@ function ValidationPageContent() {
                         <span className='font-medium text-sm'>
                           {issue.title}
                         </span>
-                        <Badge
-                          className={getSeverityBadgeColor(issue.severity)}
-                        >
-                          {issue.severity}
-                        </Badge>
+                        <SeverityBadge
+                          severity={
+                            issue.severity as
+                              | 'critical'
+                              | 'high'
+                              | 'medium'
+                              | 'low'
+                          }
+                        />
                       </div>
                       <div className='flex items-center gap-2 text-xs text-gray-500'>
                         <MapPin className='h-3 w-3' />

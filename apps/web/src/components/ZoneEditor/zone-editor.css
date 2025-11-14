@@ -21,6 +21,40 @@
   overflow: visible;
 }
 
+/* Theme-aware React Flow controls */
+.dark .react-flow__controls {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+.dark .react-flow__controls button {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+}
+
+.dark .react-flow__controls button:hover {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+/* Theme-aware React Flow minimap */
+.dark .react-flow__minimap {
+  background: hsl(var(--card));
+  border-color: hsl(var(--border));
+}
+
+/* Theme-aware React Flow edges */
+.dark .react-flow__edge-path {
+  stroke: hsl(var(--muted-foreground));
+}
+
+/* Theme-aware selection box */
+.dark .react-flow__selection {
+  background: hsla(var(--primary) / 0.1);
+  border-color: hsl(var(--primary));
+}
+
 /* Overlapping room highlighting */
 .room-overlapping {
   /* Animation disabled - was causing visibility issues with transform/stacking context */

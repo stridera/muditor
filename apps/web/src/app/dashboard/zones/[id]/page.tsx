@@ -1,16 +1,10 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { PermissionGuard } from '@/components/auth/permission-guard';
+import { ClimateBadge } from '@/components/ui/climate-badge';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { PermissionGuard } from '@/components/auth/permission-guard';
-
-interface Room {
-  id: number;
-  name: string;
-  description: string;
-  sector: string;
-}
+import { useEffect, useState } from 'react';
 
 interface ZoneDetail {
   id: number;
@@ -132,147 +126,153 @@ function ZoneDetailContent() {
     );
   }
 
+  // Calculate zone health score (simple heuristic)
+  const hasRooms = zone._count.rooms > 0;
+  const hasMobs = zone._count.mobs > 0;
+  const hasObjects = zone._count.objects > 0;
+  const healthScore = [hasRooms, hasMobs, hasObjects].filter(Boolean).length;
+  const healthStatus =
+    healthScore === 3
+      ? 'healthy'
+      : healthScore >= 2
+        ? 'moderate'
+        : 'needs-attention';
+
   return (
-    <div>
-      <div className='flex items-center justify-between mb-6'>
-        <div>
-          <nav className='flex items-center text-sm text-gray-500 mb-2'>
-            <Link href='/dashboard' className='hover:text-gray-700'>
-              Dashboard
-            </Link>
-            <span className='mx-2'>/</span>
-            <Link href='/dashboard/zones' className='hover:text-gray-700'>
-              Zones
-            </Link>
-            <span className='mx-2'>/</span>
-            <span className='text-gray-900'>{zone.name}</span>
-          </nav>
-          <h1 className='text-3xl font-bold text-gray-900'>{zone.name}</h1>
-          <p className='text-gray-600 mt-1'>Zone ID: {zone.id}</p>
-        </div>
-        <div className='flex space-x-3'>
-          <Link
-            href={`/dashboard/zones/editor?zone=${zone.id}`}
-            className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-          >
-            Edit Zone
-          </Link>
-          <Link
-            href={`/dashboard/zones/${zone.id}/rooms`}
-            className='bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors'
-          >
-            View Rooms
-          </Link>
-        </div>
-      </div>
-
-      <div className='grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8'>
-        <div className='bg-white rounded-lg shadow p-6'>
-          <h2 className='text-xl font-semibold text-gray-900 mb-4'>
-            Zone Information
-          </h2>
-          <div className='space-y-4'>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Lifespan
-                </label>
-                <p className='text-gray-900 mt-1'>{zone.lifespan} minutes</p>
-              </div>
-            </div>
-            <div className='grid grid-cols-2 gap-4'>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Climate
-                </label>
-                <span
-                  className={`inline-block px-2 py-1 rounded text-xs font-medium mt-1 ${
-                    zone.climate === 'NONE'
-                      ? 'bg-gray-100 text-gray-700'
-                      : zone.climate === 'TEMPERATE'
-                        ? 'bg-green-100 text-green-700'
-                        : zone.climate === 'TROPICAL'
-                          ? 'bg-yellow-100 text-yellow-700'
-                          : zone.climate === 'ARCTIC'
-                            ? 'bg-cyan-100 text-cyan-700'
-                            : zone.climate === 'ARID'
-                              ? 'bg-orange-100 text-orange-700'
-                              : 'bg-gray-100 text-gray-700'
-                  }`}
-                >
-                  {zone.climate}
-                </span>
-              </div>
-              <div>
-                <label className='block text-sm font-medium text-gray-700'>
-                  Reset Mode
-                </label>
-                <p className='text-gray-900 mt-1'>{zone.resetMode}</p>
-              </div>
-            </div>
-            <div>
-              <label className='block text-sm font-medium text-gray-700'>
-                Hemisphere
-              </label>
-              <p className='text-gray-900 mt-1'>{zone.hemisphere}</p>
-            </div>
+    <div className='space-y-6'>
+      {/* Zone Header with Health Status */}
+      <div className='bg-card rounded-lg border p-6'>
+        <div className='flex items-center justify-between'>
+          <div className='flex-1'>
+            <h1 className='text-3xl font-bold text-foreground'>{zone.name}</h1>
+            <p className='text-muted-foreground mt-1'>Zone ID: {zone.id}</p>
           </div>
-        </div>
-
-        <div className='bg-white rounded-lg shadow p-6'>
-          <h2 className='text-xl font-semibold text-gray-900 mb-4'>
-            Zone Statistics
-          </h2>
-          <div className='grid grid-cols-2 gap-4'>
-            <div className='text-center p-4 bg-blue-50 rounded-lg'>
-              <div className='text-2xl font-bold text-blue-600'>
-                {zone._count.rooms}
-              </div>
-              <div className='text-sm text-blue-800'>Rooms</div>
-            </div>
-            <div className='text-center p-4 bg-green-50 rounded-lg'>
-              <div className='text-2xl font-bold text-green-600'>
-                {zone._count.mobs}
-              </div>
-              <div className='text-sm text-green-800'>Mobs</div>
-            </div>
-            <div className='text-center p-4 bg-purple-50 rounded-lg'>
-              <div className='text-2xl font-bold text-purple-600'>
-                {zone._count.objects}
-              </div>
-              <div className='text-sm text-purple-800'>Objects</div>
-            </div>
-            <div className='text-center p-4 bg-orange-50 rounded-lg'>
-              <div className='text-2xl font-bold text-orange-600'>
-                {zone._count.shops}
-              </div>
-              <div className='text-sm text-orange-800'>Shops</div>
-            </div>
+          <div className='flex items-center gap-2'>
+            <span className='inline-flex items-center gap-1 rounded-md border border-border bg-muted text-muted-foreground px-3 py-1 text-sm'>
+              <span
+                className={`w-2 h-2 rounded-full ${healthStatus === 'healthy' ? 'bg-primary' : healthStatus === 'moderate' ? 'bg-secondary' : 'bg-destructive'}`}
+              />
+              {healthStatus === 'healthy'
+                ? 'Healthy'
+                : healthStatus === 'moderate'
+                  ? 'Moderate'
+                  : 'Needs Attention'}
+            </span>
           </div>
         </div>
       </div>
 
-      <div className='bg-white rounded-lg shadow p-6'>
-        <h2 className='text-xl font-semibold text-gray-900 mb-4'>
-          Rooms in Zone
+      {/* Statistics Grid - Now full width at top */}
+      <div className='bg-card rounded-lg border p-6'>
+        <h2 className='text-xl font-semibold text-foreground mb-4'>
+          Zone Content
         </h2>
-        <p className='text-gray-600 mb-4'>
-          This zone contains {zone._count.rooms} room
-          {zone._count.rooms !== 1 ? 's' : ''}.
-        </p>
-        <div className='flex space-x-3'>
+        <div className='grid grid-cols-2 lg:grid-cols-4 gap-4'>
           <Link
             href={`/dashboard/rooms?zone=${zone.id}`}
-            className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+            className='text-center p-6 bg-card border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer'
           >
-            View All Rooms
+            <div className='text-3xl font-bold text-foreground'>
+              {zone._count.rooms}
+            </div>
+            <div className='text-sm text-muted-foreground mt-1'>Rooms</div>
           </Link>
           <Link
-            href={`/dashboard/zones/editor?zone=${zone.id}`}
-            className='bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition-colors'
+            href={`/dashboard/mobs?zone=${zone.id}`}
+            className='text-center p-6 bg-card border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer'
           >
-            Visual Editor
+            <div className='text-3xl font-bold text-foreground'>
+              {zone._count.mobs}
+            </div>
+            <div className='text-sm text-muted-foreground mt-1'>Mobs</div>
           </Link>
+          <Link
+            href={`/dashboard/objects?zone=${zone.id}`}
+            className='text-center p-6 bg-card border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer'
+          >
+            <div className='text-3xl font-bold text-foreground'>
+              {zone._count.objects}
+            </div>
+            <div className='text-sm text-muted-foreground mt-1'>Objects</div>
+          </Link>
+          <Link
+            href={`/dashboard/shops?zone=${zone.id}`}
+            className='text-center p-6 bg-card border rounded-lg hover:bg-accent/50 transition-colors cursor-pointer'
+          >
+            <div className='text-3xl font-bold text-foreground'>
+              {zone._count.shops}
+            </div>
+            <div className='text-sm text-muted-foreground mt-1'>Shops</div>
+          </Link>
+        </div>
+      </div>
+
+      {/* Zone Configuration */}
+      <div className='grid grid-cols-1 lg:grid-cols-3 gap-6'>
+        <div className='bg-card rounded-lg border p-6'>
+          <h3 className='text-lg font-semibold text-foreground mb-4'>
+            Reset Configuration
+          </h3>
+          <div className='space-y-3'>
+            <div>
+              <label className='block text-sm font-medium text-muted-foreground'>
+                Lifespan
+              </label>
+              <p className='text-foreground font-semibold mt-1'>
+                {zone.lifespan} minutes
+              </p>
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-muted-foreground'>
+                Reset Mode
+              </label>
+              <p className='text-foreground font-semibold mt-1'>
+                {zone.resetMode}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className='bg-card rounded-lg border p-6'>
+          <h3 className='text-lg font-semibold text-foreground mb-4'>
+            Environment
+          </h3>
+          <div className='space-y-3'>
+            <div>
+              <label className='block text-sm font-medium text-muted-foreground'>
+                Climate
+              </label>
+              <ClimateBadge climate={zone.climate} />
+            </div>
+            <div>
+              <label className='block text-sm font-medium text-muted-foreground'>
+                Hemisphere
+              </label>
+              <p className='text-foreground font-semibold mt-1'>
+                {zone.hemisphere}
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className='bg-card rounded-lg border p-6'>
+          <h3 className='text-lg font-semibold text-foreground mb-4'>
+            Quick Actions
+          </h3>
+          <div className='space-y-2'>
+            <Link
+              href={`/dashboard/zones/editor?zone=${zone.id}`}
+              className='block w-full bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-center'
+            >
+              Visual Editor
+            </Link>
+            <Link
+              href={`/dashboard/rooms?zone=${zone.id}`}
+              className='block w-full bg-secondary text-secondary-foreground px-4 py-2 rounded-lg hover:bg-secondary/80 transition-colors text-center'
+            >
+              Browse Rooms
+            </Link>
+          </div>
         </div>
       </div>
     </div>

@@ -18,6 +18,7 @@ import { RolesGuard } from '../auth/guards/roles.guard';
 import { BanUserInput } from './dto/ban-user.input';
 import { UnbanUserInput } from './dto/unban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
+import { UpdatePreferencesInput } from './dto/update-preferences.input';
 import { BanRecord } from './entities/ban-record.entity';
 import { User } from './entities/user.entity';
 import { UsersService } from './users.service';
@@ -135,5 +136,14 @@ export class UsersResolver {
   ): Promise<UserPermissions> {
     const user = await this.usersService.findOne(userId);
     return this.usersService.getUserPermissions(user);
+  }
+
+  @Mutation(() => User)
+  @UseGuards(GraphQLJwtAuthGuard)
+  async updateUserPreferences(
+    @Args('input') input: UpdatePreferencesInput,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<User> {
+    return this.usersService.updateUserPreferences(currentUser.id, input);
   }
 }
