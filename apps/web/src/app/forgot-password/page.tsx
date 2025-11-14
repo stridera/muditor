@@ -65,7 +65,7 @@ export default function ForgotPasswordPage() {
 
   if (isSubmitted) {
     return (
-      <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+      <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
         <div className='max-w-md w-full space-y-8'>
           <Card>
             <CardHeader className='text-center'>
@@ -88,7 +88,7 @@ export default function ForgotPasswordPage() {
               </Alert>
 
               <div className='text-center space-y-2'>
-                <p className='text-sm text-gray-600'>
+                <p className='text-sm text-muted-foreground'>
                   Didn't receive an email?
                 </p>
                 <Button
@@ -105,7 +105,7 @@ export default function ForgotPasswordPage() {
               <div className='text-center'>
                 <Link
                   href='/login'
-                  className='inline-flex items-center text-sm text-blue-600 hover:text-blue-500'
+                  className='inline-flex items-center text-sm text-primary hover:text-primary-foreground'
                 >
                   <ArrowLeft className='mr-1 h-4 w-4' />
                   Back to login
@@ -119,13 +119,13 @@ export default function ForgotPasswordPage() {
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
       <div className='max-w-md w-full space-y-8'>
         <div>
-          <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+          <h2 className='mt-6 text-center text-3xl font-extrabold text-foreground'>
             Reset your password
           </h2>
-          <p className='mt-2 text-center text-sm text-gray-600'>
+          <p className='mt-2 text-center text-sm text-muted-foreground'>
             Enter your email address and we'll send you a link to reset your
             password
           </p>
@@ -174,7 +174,7 @@ export default function ForgotPasswordPage() {
             <div className='mt-4 text-center'>
               <Link
                 href='/login'
-                className='inline-flex items-center text-sm text-blue-600 hover:text-blue-500'
+                className='inline-flex items-center text-sm text-primary hover:text-primary-foreground'
               >
                 <ArrowLeft className='mr-1 h-4 w-4' />
                 Back to login
@@ -182,10 +182,12 @@ export default function ForgotPasswordPage() {
             </div>
 
             <div className='mt-2 text-center text-sm'>
-              <span className='text-gray-600'>Don't have an account? </span>
+              <span className='text-muted-foreground'>
+                Don't have an account?{' '}
+              </span>
               <Link
                 href='/register'
-                className='font-medium text-blue-600 hover:text-blue-500'
+                className='font-medium text-primary hover:text-primary-foreground'
               >
                 Sign up
               </Link>

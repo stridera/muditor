@@ -44,10 +44,10 @@ export default function ZoneSelector({
   if (loading) {
     return (
       <div className={className}>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1'>
           Filter by zone
         </label>
-        <div className='w-full px-3 py-2 border border-gray-300 rounded-md bg-gray-50'>
+        <div className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-800 dark:text-gray-200'>
           Loading zones...
         </div>
       </div>
@@ -57,10 +57,10 @@ export default function ZoneSelector({
   if (error) {
     return (
       <div className={className}>
-        <label className='block text-sm font-medium text-gray-700 mb-1'>
+        <label className='block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1'>
           Filter by zone
         </label>
-        <div className='w-full px-3 py-2 border border-red-300 rounded-md bg-red-50 text-red-700'>
+        <div className='w-full px-3 py-2 border border-red-300 dark:border-red-700 rounded-md bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-300'>
           Error loading zones
         </div>
       </div>
@@ -71,13 +71,13 @@ export default function ZoneSelector({
     <div className={className}>
       <label
         htmlFor='zone-selector'
-        className='block text-sm font-medium text-gray-700 mb-1'
+        className='block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1'
       >
         Filter by zone
       </label>
       <select
         id='zone-selector'
-        className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+        className='w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-blue-500 dark:focus:ring-blue-400'
         value={selectedZone || 'all'}
         onChange={handleChange}
       >

@@ -8,7 +8,7 @@ export interface SearchFilters {
   levelMin?: number;
   levelMax?: number;
   types?: string[];
-  customFilters?: Record<string, any>;
+  customFilters?: Record<string, string | boolean | undefined>;
 }
 
 export interface SearchPreset {
@@ -76,14 +76,15 @@ export default function EnhancedSearch({
   const updateFilters = (updates: Partial<SearchFilters>) => {
     setFilters(prev => {
       const next: SearchFilters = { ...prev };
-      for (const [key, value] of Object.entries(updates)) {
+      (
+        Object.entries(updates) as Array<[keyof SearchFilters, unknown]>
+      ).forEach(([key, value]) => {
         if (value === undefined) {
-          // Omit undefined keys entirely to satisfy exactOptionalPropertyTypes
-          delete (next as any)[key];
+          delete (next as unknown as Record<string, unknown>)[key as string];
         } else {
-          (next as any)[key] = value;
+          (next as unknown as Record<string, unknown>)[key as string] = value;
         }
-      }
+      });
       return next;
     });
   };
@@ -117,18 +118,18 @@ export default function EnhancedSearch({
     Object.keys(filters.customFilters || {}).length > 0;
 
   return (
-    <div className={`bg-white rounded-lg shadow ${className}`}>
+    <div className={`bg-card border rounded-lg ${className}`}>
       {/* Basic Search */}
       <div className='p-4'>
         <div className='flex gap-2'>
           <div className='relative flex-1'>
-            <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+            <Search className='absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground' />
             <input
               type='text'
               placeholder={placeholder}
               value={filters.searchTerm}
               onChange={e => updateFilters({ searchTerm: e.target.value })}
-              className='w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full pl-10 pr-4 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary'
             />
           </div>
 
@@ -136,14 +137,14 @@ export default function EnhancedSearch({
             onClick={() => setIsExpanded(!isExpanded)}
             className={`inline-flex items-center px-3 py-2 border rounded-md text-sm font-medium transition-colors ${
               hasActiveFilters
-                ? 'border-blue-500 text-blue-700 bg-blue-50'
-                : 'border-gray-300 text-gray-700 bg-white hover:bg-gray-50'
+                ? 'border-primary text-primary bg-primary/10 hover:bg-primary/20'
+                : 'border-border text-muted-foreground bg-background hover:bg-muted'
             }`}
           >
             <Filter className='h-4 w-4 mr-1' />
             Filters
             {hasActiveFilters && (
-              <span className='ml-1 px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded-full'>
+              <span className='ml-1 px-1.5 py-0.5 bg-primary/20 text-primary text-xs rounded-full'>
                 {
                   [
                     filters.searchTerm && 'text',
@@ -167,7 +168,7 @@ export default function EnhancedSearch({
           {hasActiveFilters && (
             <button
               onClick={clearAllFilters}
-              className='inline-flex items-center px-3 py-2 border border-gray-300 text-gray-700 bg-white hover:bg-gray-50 rounded-md text-sm'
+              className='inline-flex items-center px-3 py-2 border border-border text-muted-foreground bg-background hover:bg-muted rounded-md text-sm'
             >
               <X className='h-4 w-4 mr-1' />
               Clear
@@ -178,14 +179,14 @@ export default function EnhancedSearch({
         {/* Quick Presets */}
         {allPresets.length > 0 && (
           <div className='flex flex-wrap gap-2 mt-3'>
-            <span className='text-xs text-gray-500 font-medium'>
+            <span className='text-xs text-muted-foreground font-medium'>
               Quick filters:
             </span>
             {allPresets.map(preset => (
               <button
                 key={preset.id}
                 onClick={() => applyPreset(preset)}
-                className='text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200 transition-colors'
+                className='text-xs px-2 py-1 bg-muted text-muted-foreground rounded hover:bg-accent/50 transition-colors'
               >
                 {preset.name}
               </button>
@@ -196,12 +197,12 @@ export default function EnhancedSearch({
 
       {/* Advanced Filters */}
       {isExpanded && (
-        <div className='border-t p-4 space-y-4'>
+        <div className='border-t border-border p-4 space-y-4'>
           <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
             {/* Level Range Filter */}
             {showLevelFilter && (
               <div className='space-y-2'>
-                <label className='block text-sm font-medium text-gray-700'>
+                <label className='block text-sm font-medium text-muted-foreground'>
                   Level Range
                 </label>
                 <div className='grid grid-cols-2 gap-2'>
@@ -220,7 +221,7 @@ export default function EnhancedSearch({
                         updateFilters({ levelMin: parseInt(raw, 10) });
                       }
                     }}
-                    className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    className='px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm'
                   />
                   <input
                     type='number'
@@ -237,7 +238,7 @@ export default function EnhancedSearch({
                         updateFilters({ levelMax: parseInt(raw, 10) });
                       }
                     }}
-                    className='px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    className='px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm'
                   />
                 </div>
               </div>
@@ -246,17 +247,17 @@ export default function EnhancedSearch({
             {/* Type Filter */}
             {availableTypes.length > 0 && (
               <div className='space-y-2'>
-                <label className='block text-sm font-medium text-gray-700'>
+                <label className='block text-sm font-medium text-muted-foreground'>
                   Types ({filters.types?.length || 0} selected)
                 </label>
-                <div className='max-h-32 overflow-y-auto space-y-1 border border-gray-200 rounded-md p-2'>
+                <div className='max-h-32 overflow-y-auto space-y-1 border border-border rounded-md p-2 bg-background'>
                   {availableTypes.map(type => (
                     <label key={type} className='flex items-center text-sm'>
                       <input
                         type='checkbox'
                         checked={filters.types?.includes(type) || false}
                         onChange={() => toggleType(type)}
-                        className='mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                        className='mr-2 rounded border-border text-primary focus:ring-primary'
                       />
                       <span className='capitalize'>{type}</span>
                     </label>
@@ -268,13 +269,17 @@ export default function EnhancedSearch({
             {/* Custom Filters */}
             {customFilterOptions.map(option => (
               <div key={option.key} className='space-y-2'>
-                <label className='block text-sm font-medium text-gray-700'>
+                <label className='block text-sm font-medium text-muted-foreground'>
                   {option.label}
                 </label>
 
                 {option.type === 'select' && option.options && (
                   <select
-                    value={filters.customFilters?.[option.key] || ''}
+                    value={
+                      typeof filters.customFilters?.[option.key] === 'string'
+                        ? (filters.customFilters?.[option.key] as string)
+                        : ''
+                    }
                     onChange={e =>
                       updateFilters({
                         customFilters: {
@@ -283,7 +288,7 @@ export default function EnhancedSearch({
                         },
                       })
                     }
-                    className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm'
+                    className='w-full px-3 py-2 border border-border rounded-md bg-background focus:outline-none focus:ring-2 focus:ring-primary text-sm'
                   >
                     <option value=''>All</option>
                     {option.options.map(opt => (
@@ -298,7 +303,7 @@ export default function EnhancedSearch({
                   <label className='flex items-center text-sm'>
                     <input
                       type='checkbox'
-                      checked={filters.customFilters?.[option.key] || false}
+                      checked={Boolean(filters.customFilters?.[option.key])}
                       onChange={e =>
                         updateFilters({
                           customFilters: {
@@ -307,7 +312,7 @@ export default function EnhancedSearch({
                           },
                         })
                       }
-                      className='mr-2 rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                      className='mr-2 rounded border-border text-primary focus:ring-primary'
                     />
                     Enable {option.label}
                   </label>
@@ -318,26 +323,26 @@ export default function EnhancedSearch({
 
           {/* Active Filters Summary */}
           {hasActiveFilters && (
-            <div className='pt-2 border-t'>
-              <div className='text-sm text-gray-600'>
+            <div className='pt-2 border-t border-border'>
+              <div className='text-sm text-muted-foreground'>
                 <span className='font-medium'>Active filters:</span>
                 <div className='flex flex-wrap gap-1 mt-1'>
                   {filters.searchTerm && (
-                    <span className='inline-flex items-center px-2 py-1 bg-blue-100 text-blue-800 text-xs rounded'>
+                    <span className='inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs rounded'>
                       Text: "{filters.searchTerm}"
                     </span>
                   )}
                   {filters.types?.map(type => (
                     <span
                       key={type}
-                      className='inline-flex items-center px-2 py-1 bg-green-100 text-green-800 text-xs rounded'
+                      className='inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs rounded capitalize'
                     >
                       {type}
                     </span>
                   ))}
                   {(filters.levelMin !== undefined ||
                     filters.levelMax !== undefined) && (
-                    <span className='inline-flex items-center px-2 py-1 bg-purple-100 text-purple-800 text-xs rounded'>
+                    <span className='inline-flex items-center px-2 py-1 bg-muted text-muted-foreground text-xs rounded'>
                       Level: {filters.levelMin || 0}-{filters.levelMax || '∞'}
                     </span>
                   )}

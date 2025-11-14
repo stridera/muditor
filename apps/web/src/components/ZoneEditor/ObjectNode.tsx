@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { useTheme } from 'next-themes';
 import type { NodeProps } from 'reactflow';
 
 interface ObjectData {
@@ -39,43 +40,43 @@ const getObjectTypeIcon = (type: string) => {
   return iconMap[type.toUpperCase()] || '📦';
 };
 
-const getRarityStyle = (rarity?: string) => {
+const getRarityStyle = (rarity?: string, isDark?: boolean) => {
   switch (rarity) {
     case 'common':
       return {
-        bg: 'bg-gray-100',
-        border: 'border-gray-400',
-        text: 'text-gray-800',
+        bg: isDark ? 'bg-gray-800' : 'bg-gray-100',
+        border: isDark ? 'border-gray-600' : 'border-gray-400',
+        text: isDark ? 'text-gray-300' : 'text-gray-800',
       };
     case 'uncommon':
       return {
-        bg: 'bg-green-100',
-        border: 'border-green-400',
-        text: 'text-green-800',
+        bg: isDark ? 'bg-green-900/40' : 'bg-green-100',
+        border: isDark ? 'border-green-600' : 'border-green-400',
+        text: isDark ? 'text-green-300' : 'text-green-800',
       };
     case 'rare':
       return {
-        bg: 'bg-blue-100',
-        border: 'border-blue-400',
-        text: 'text-blue-800',
+        bg: isDark ? 'bg-blue-900/40' : 'bg-blue-100',
+        border: isDark ? 'border-blue-600' : 'border-blue-400',
+        text: isDark ? 'text-blue-300' : 'text-blue-800',
       };
     case 'epic':
       return {
-        bg: 'bg-purple-100',
-        border: 'border-purple-400',
-        text: 'text-purple-800',
+        bg: isDark ? 'bg-purple-900/40' : 'bg-purple-100',
+        border: isDark ? 'border-purple-600' : 'border-purple-400',
+        text: isDark ? 'text-purple-300' : 'text-purple-800',
       };
     case 'legendary':
       return {
-        bg: 'bg-orange-100',
-        border: 'border-orange-400',
-        text: 'text-orange-800',
+        bg: isDark ? 'bg-orange-900/40' : 'bg-orange-100',
+        border: isDark ? 'border-orange-600' : 'border-orange-400',
+        text: isDark ? 'text-orange-300' : 'text-orange-800',
       };
     default:
       return {
-        bg: 'bg-slate-100',
-        border: 'border-slate-400',
-        text: 'text-slate-800',
+        bg: isDark ? 'bg-slate-800' : 'bg-slate-100',
+        border: isDark ? 'border-slate-600' : 'border-slate-400',
+        text: isDark ? 'text-slate-300' : 'text-slate-800',
       };
   }
 };
@@ -84,7 +85,9 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
   data,
   selected,
 }) => {
-  const style = getRarityStyle(data.rarity);
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const style = getRarityStyle(data.rarity, isDark);
   const typeIcon = getObjectTypeIcon(data.type);
   const [isHovered, setIsHovered] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
@@ -116,14 +119,14 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
         onMouseLeave={handleMouseLeave}
       >
         {/* Header */}
-        <div className='px-3 py-2 border-b border-opacity-30 border-gray-400'>
+        <div className={`px-3 py-2 border-b border-opacity-30 ${isDark ? 'border-gray-600' : 'border-gray-400'}`}>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-2'>
               <span className='text-lg'>{typeIcon}</span>
               <span className='font-bold text-sm'>{data.type}</span>
             </div>
             {data.rarity && (
-              <span className='bg-white bg-opacity-60 px-1.5 py-0.5 rounded text-xs font-medium capitalize'>
+              <span className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}>
                 {data.rarity}
               </span>
             )}
@@ -138,12 +141,12 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
         <div className='px-3 py-2'>
           <div className='flex flex-wrap gap-1 mb-2'>
             {data.material && (
-              <span className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full'>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}>
                 {data.material}
               </span>
             )}
             {data.level && (
-              <span className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full'>
+              <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}>
                 Lvl {data.level}
               </span>
             )}
@@ -194,7 +197,9 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
         typeof document !== 'undefined' &&
         createPortal(
           <div
-            className='fixed bg-gray-900 text-white text-xs rounded-lg p-3 shadow-xl border border-gray-700 pointer-events-none min-w-[200px] max-w-[300px] z-[9999]'
+            className={`fixed text-xs rounded-lg p-3 shadow-xl border pointer-events-none min-w-[200px] max-w-[300px] z-[9999] ${
+              isDark ? 'bg-gray-900 text-white border-gray-700' : 'bg-white text-gray-900 border-gray-200'
+            }`}
             style={{
               left: `${popupPosition.x}px`,
               top: `${popupPosition.y}px`,
@@ -202,44 +207,44 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
           >
             <div className='font-semibold mb-2'>{data.name}</div>
 
-            <div className='grid grid-cols-2 gap-2 text-gray-300 mb-2'>
+            <div className={`grid grid-cols-2 gap-2 mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
               <div>
-                <span className='text-gray-400'>Type:</span> {data.type}
+                <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Type:</span> {data.type}
               </div>
               {data.material && (
                 <div>
-                  <span className='text-gray-400'>Material:</span>{' '}
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Material:</span>{' '}
                   {data.material}
                 </div>
               )}
               {data.level && (
                 <div>
-                  <span className='text-gray-400'>Level:</span> {data.level}
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Level:</span> {data.level}
                 </div>
               )}
               {data.rarity && (
                 <div>
-                  <span className='text-gray-400'>Rarity:</span> {data.rarity}
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Rarity:</span> {data.rarity}
                 </div>
               )}
               {data.condition && (
                 <div>
-                  <span className='text-gray-400'>Condition:</span>{' '}
+                  <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Condition:</span>{' '}
                   {data.condition}
                 </div>
               )}
             </div>
 
             {(data.value || data.weight) && (
-              <div className='grid grid-cols-2 gap-2 text-gray-300 mb-2'>
+              <div className={`grid grid-cols-2 gap-2 mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                 {data.value && (
                   <div>
-                    <span className='text-gray-400'>Value:</span> {data.value}g
+                    <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Value:</span> {data.value}g
                   </div>
                 )}
                 {data.weight && (
                   <div>
-                    <span className='text-gray-400'>Weight:</span> {data.weight}
+                    <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>Weight:</span> {data.weight}
                     lb
                   </div>
                 )}
@@ -247,12 +252,12 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
             )}
 
             {data.roomId && (
-              <div className='border-t border-gray-700 pt-2 mt-2 text-gray-300'>
+              <div className={`border-t pt-2 mt-2 ${isDark ? 'border-gray-700 text-gray-300' : 'border-gray-300 text-gray-700'}`}>
                 Currently in Room {data.roomId}
               </div>
             )}
 
-            <div className='border-t border-gray-700 pt-2 mt-2 text-gray-400 text-xs'>
+            <div className={`border-t pt-2 mt-2 text-xs ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'}`}>
               💡 Drag to a room to place this object
             </div>
           </div>,

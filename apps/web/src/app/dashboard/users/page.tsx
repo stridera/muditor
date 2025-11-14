@@ -31,6 +31,7 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { LoadingError } from '@/components/ui/error-display';
+import { FlagBadge } from '@/components/ui/flag-badge';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/loading';
@@ -56,9 +57,7 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import {
   Ban,
   Calendar,
-  Crown,
   Edit,
-  Shield,
   ShieldBan,
   ShieldCheck,
   User,
@@ -165,7 +164,10 @@ function UsersContent() {
   const [unbanUser] = useMutation(UNBAN_USER_MUTATION);
   const { handleError } = useErrorHandler();
 
-  const handleUpdateUser = async (userId: string, updates: any) => {
+  const handleUpdateUser = async (
+    userId: string,
+    updates: Partial<{ email: string; role: string }>
+  ) => {
     try {
       await updateUser({
         variables: {
@@ -175,7 +177,7 @@ function UsersContent() {
       toast.success('User updated successfully');
       refetch();
       setEditDialogOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const errorDisplay = handleError(err, 'updating user');
       toast.error(errorDisplay.message);
     }
@@ -195,7 +197,7 @@ function UsersContent() {
       toast.success('User banned successfully');
       refetch();
       setBanDialogOpen(false);
-    } catch (err: any) {
+    } catch (err: unknown) {
       const errorDisplay = handleError(err, 'banning user');
       toast.error(errorDisplay.message);
     }
@@ -210,45 +212,15 @@ function UsersContent() {
       });
       toast.success('User unbanned successfully');
       refetch();
-    } catch (err: any) {
+    } catch (err: unknown) {
       const errorDisplay = handleError(err, 'unbanning user');
       toast.error(errorDisplay.message);
     }
   };
 
-  const getRoleBadgeColor = (role: string) => {
-    switch (role) {
-      case 'GOD':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'CODER':
-        return 'bg-red-100 text-red-800 border-red-200';
-      case 'BUILDER':
-        return 'bg-blue-100 text-blue-800 border-blue-200';
-      case 'IMMORTAL':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'PLAYER':
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
-    }
-  };
+  // Legacy role color mapping removed; FlagBadge now used for roles.
 
-  const getRoleIcon = (role: string) => {
-    switch (role) {
-      case 'GOD':
-        return <Crown className='w-3 h-3' />;
-      case 'CODER':
-        return <Shield className='w-3 h-3' />;
-      case 'BUILDER':
-        return <ShieldCheck className='w-3 h-3' />;
-      case 'IMMORTAL':
-        return <ShieldCheck className='w-3 h-3' />;
-      case 'PLAYER':
-        return <User className='w-3 h-3' />;
-      default:
-        return <User className='w-3 h-3' />;
-    }
-  };
+  // Role icon mapping deferred; FlagBadge currently text-only. Implement later if needed.
 
   if (loading) return <Loading text='Loading users...' className='py-8' />;
   if (error)
@@ -287,10 +259,7 @@ function UsersContent() {
                   </div>
                 </TableCell>
                 <TableCell>
-                  <Badge className={getRoleBadgeColor(user.role)}>
-                    {getRoleIcon(user.role)}
-                    <span className='ml-1'>{user.role}</span>
-                  </Badge>
+                  <FlagBadge flag={user.role} />
                 </TableCell>
                 <TableCell>
                   {user.isBanned ? (
@@ -420,7 +389,10 @@ function EditUserDialog({
   onClose,
 }: {
   user: User;
-  onUpdate: (userId: string, updates: any) => void;
+  onUpdate: (
+    userId: string,
+    updates: Partial<{ email: string; role: string }>
+  ) => void;
   onClose: () => void;
 }) {
   const [email, setEmail] = useState(user.email);

@@ -201,11 +201,7 @@ function MobsContent() {
 
         const result = await response.json();
         if (result.errors) {
-          // If pagination fails, fall back to basic query
-          console.warn(
-            'Pagination query failed, falling back to basic query:',
-            result.errors[0].message
-          );
+          // If pagination fails, fall back to basic query (TODO: integrate LoggingService.warn)
           const fallbackQuery = selectedZone
             ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`
             : `query { mobs { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
@@ -504,7 +500,7 @@ function MobsContent() {
       // Show success message (could be replaced with a toast notification)
       alert(`Mob cloned successfully! New mob ID: ${newMob.id}`);
     } catch (err) {
-      console.error('Error cloning mob:', err);
+      /* LoggingService.error('Error cloning mob:', err); */
       alert(
         `Failed to clone mob: ${err instanceof Error ? err.message : 'Unknown error'}`
       );
@@ -604,10 +600,7 @@ function MobsContent() {
 
           const result = await response.json();
           if (result.errors) {
-            console.error(
-              'Error loading mob details:',
-              result.errors[0].message
-            );
+            /* LoggingService.error('Error loading mob details:', result.errors[0].message); */
           } else if (result.data.mob) {
             // Update the mob in the list with detailed data
             setMobs(prevMobs =>
@@ -616,8 +609,8 @@ function MobsContent() {
               )
             );
           }
-        } catch (err) {
-          console.error('Error loading mob details:', err);
+        } catch {
+          /* LoggingService.error('Error loading mob details'); */
         } finally {
           setLoadingDetails(prev => {
             const newSet = new Set(prev);
@@ -642,17 +635,17 @@ function MobsContent() {
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-2xl font-bold text-gray-900'>
+          <h1 className='text-2xl font-bold text-foreground'>
             {selectedZone ? `Zone ${selectedZone} Mobs` : 'Mobs'}
           </h1>
-          <p className='text-sm text-gray-500 mt-1'>
+          <p className='text-sm text-muted-foreground mt-1'>
             Showing {startItem}-{endItem} of {mobsCount} mobs
             {selectedZone && ' in this zone'} (Page {currentPage} of{' '}
             {totalPages})
           </p>
         </div>
         <Link href='/dashboard/mobs/editor'>
-          <button className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700'>
+          <button className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/80'>
             <Plus className='w-4 h-4 mr-2' />
             Create New Mob
           </button>
@@ -668,16 +661,18 @@ function MobsContent() {
       </div>
 
       {/* Sort and Items Per Page Controls */}
-      <div className='flex items-center gap-4 mb-4 p-4 bg-gray-50 rounded-lg'>
+      <div className='flex items-center gap-4 mb-4 p-4 bg-muted rounded-lg'>
         <div className='flex items-center gap-2'>
-          <label className='text-sm font-medium text-gray-700'>Sort by:</label>
+          <label className='text-sm font-medium text-muted-foreground'>
+            Sort by:
+          </label>
           <select
             value={sortBy}
             onChange={e => {
               setSortBy(e.target.value);
               setCurrentPage(1);
             }}
-            className='border border-gray-300 rounded px-2 py-1 text-sm'
+            className='border border-border rounded px-2 py-1 text-sm bg-background'
           >
             <option value='level'>Level</option>
             <option value='name'>Name</option>
@@ -689,7 +684,7 @@ function MobsContent() {
               setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
               setCurrentPage(1);
             }}
-            className='p-1 hover:bg-gray-200 rounded'
+            className='p-1 hover:bg-muted rounded'
             title={`Sort ${sortOrder === 'asc' ? 'descending' : 'ascending'}`}
           >
             {sortOrder === 'asc' ? (
@@ -700,7 +695,7 @@ function MobsContent() {
           </button>
         </div>
         <div className='flex items-center gap-2'>
-          <label className='text-sm font-medium text-gray-700'>
+          <label className='text-sm font-medium text-muted-foreground'>
             Items per page:
           </label>
           <select
@@ -709,7 +704,7 @@ function MobsContent() {
               setItemsPerPage(parseInt(e.target.value));
               setCurrentPage(1);
             }}
-            className='border border-gray-300 rounded px-2 py-1 text-sm'
+            className='border border-border rounded px-2 py-1 text-sm bg-background'
           >
             <option value={10}>10</option>
             <option value={25}>25</option>
@@ -742,24 +737,24 @@ function MobsContent() {
 
       {/* Bulk Actions Toolbar */}
       {selectedMobs.size > 0 && (
-        <div className='bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6'>
+        <div className='bg-primary/10 border border-primary rounded-lg p-4 mb-6'>
           <div className='flex items-center justify-between'>
             <div className='flex items-center gap-4'>
-              <span className='text-blue-900 font-medium'>
+              <span className='text-primary font-medium'>
                 {selectedMobs.size} mob{selectedMobs.size !== 1 ? 's' : ''}{' '}
                 selected
               </span>
               <div className='flex items-center gap-2'>
                 <button
                   onClick={selectAllMobs}
-                  className='text-blue-600 hover:text-blue-800 text-sm underline'
+                  className='text-primary hover:text-primary-foreground text-sm underline'
                   disabled={selectedMobs.size === filteredMobs.length}
                 >
                   Select All ({filteredMobs.length})
                 </button>
                 <button
                   onClick={clearSelection}
-                  className='text-blue-600 hover:text-blue-800 text-sm underline'
+                  className='text-primary hover:text-primary-foreground text-sm underline'
                 >
                   Clear Selection
                 </button>
@@ -768,7 +763,7 @@ function MobsContent() {
             <div className='flex items-center gap-2'>
               <button
                 onClick={exportSelectedMobs}
-                className='inline-flex items-center px-3 py-1.5 text-sm bg-green-600 text-white rounded hover:bg-green-700'
+                className='inline-flex items-center px-3 py-1.5 text-sm bg-secondary text-secondary-foreground rounded hover:bg-secondary/80'
               >
                 <Download className='w-3 h-3 mr-1' />
                 Export JSON
@@ -776,7 +771,7 @@ function MobsContent() {
               <button
                 onClick={handleBulkDelete}
                 disabled={isDeleting}
-                className='inline-flex items-center px-3 py-1.5 text-sm bg-red-600 text-white rounded hover:bg-red-700 disabled:opacity-50'
+                className='inline-flex items-center px-3 py-1.5 text-sm bg-destructive text-destructive-foreground rounded hover:bg-destructive/80 disabled:opacity-50'
               >
                 <Trash2 className='w-3 h-3 mr-1' />
                 {isDeleting ? 'Deleting...' : 'Delete All'}
@@ -788,9 +783,9 @@ function MobsContent() {
 
       {filteredMobs.length === 0 ? (
         <div className='text-center py-12'>
-          <div className='text-gray-500 mb-4'>No mobs found</div>
+          <div className='text-muted-foreground mb-4'>No mobs found</div>
           <Link href='/dashboard/mobs/editor'>
-            <button className='bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700'>
+            <button className='bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/80'>
               Create Mob
             </button>
           </Link>
@@ -800,7 +795,7 @@ function MobsContent() {
           {filteredMobs.map(mob => (
             <div
               key={mob.id}
-              className='bg-white border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
+              className='bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
               onClick={() => toggleMobExpanded(mob.id)}
             >
               <div className='flex items-start justify-between'>
@@ -811,7 +806,7 @@ function MobsContent() {
                       e.stopPropagation();
                       toggleMobSelection(mob.id);
                     }}
-                    className='mt-1 text-gray-400 hover:text-blue-600'
+                    className='mt-1 text-muted-foreground hover:text-primary'
                   >
                     {selectedMobs.has(mob.id) ? (
                       <CheckSquare className='w-5 h-5 text-blue-600' />
@@ -821,11 +816,11 @@ function MobsContent() {
                   </button>
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
-                      <h3 className='font-semibold text-lg text-gray-900'>
+                      <h3 className='font-semibold text-lg text-foreground'>
                         #{mob.id} - {mob.name}
                       </h3>
                       {/* Visual indicator for expand state */}
-                      <div className='text-gray-400'>
+                      <div className='text-muted-foreground'>
                         {loadingDetails.has(mob.id) ? (
                           <div className='w-4 h-4 border-2 border-blue-600 border-t-transparent rounded-full animate-spin' />
                         ) : expandedMobs.has(mob.id) ? (
@@ -835,13 +830,13 @@ function MobsContent() {
                         )}
                       </div>
                     </div>
-                    <p className='text-sm text-gray-600 mb-2'>
+                    <p className='text-sm text-muted-foreground mb-2'>
                       Keywords: {mob.keywords}
                     </p>
-                    <p className='text-gray-700 mb-2 line-clamp-2'>
+                    <p className='text-muted-foreground mb-2 line-clamp-2'>
                       {mob.roomDescription}
                     </p>
-                    <div className='flex items-center gap-4 text-sm text-gray-500'>
+                    <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                       <span>Level {mob.level}</span>
                       <span>HP: {mob.hpDice}</span>
                       <span>Zone {mob.zoneId}</span>
@@ -849,34 +844,40 @@ function MobsContent() {
 
                     {/* Expanded Details */}
                     {expandedMobs.has(mob.id) && (
-                      <div className='mt-4 pt-4 border-t border-gray-200'>
+                      <div className='mt-4 pt-4 border-t border-border'>
                         <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4'>
                           {/* Basic Info */}
                           <div>
-                            <h4 className='font-semibold text-sm text-gray-700 mb-2'>
+                            <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                               Basic Info
                             </h4>
                             <div className='space-y-1 text-sm'>
                               <div>
-                                <span className='text-gray-500'>ID:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  ID:
+                                </span>{' '}
                                 {mob.id}
                               </div>
                               <div>
-                                <span className='text-gray-500'>Class:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  Class:
+                                </span>{' '}
                                 {mob.mobClass || 'N/A'}
                               </div>
                               <div>
-                                <span className='text-gray-500'>Race:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  Race:
+                                </span>{' '}
                                 {mob.race || 'N/A'}
                               </div>
                               <div>
-                                <span className='text-gray-500'>
+                                <span className='text-muted-foreground'>
                                   Alignment:
                                 </span>{' '}
                                 {mob.alignment || 0}
                               </div>
                               <div>
-                                <span className='text-gray-500'>
+                                <span className='text-muted-foreground'>
                                   Life Force:
                                 </span>{' '}
                                 {mob.lifeForce || 'N/A'}
@@ -886,28 +887,36 @@ function MobsContent() {
 
                           {/* Combat Stats */}
                           <div>
-                            <h4 className='font-semibold text-sm text-gray-700 mb-2'>
+                            <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                               Combat Stats
                             </h4>
                             <div className='space-y-1 text-sm'>
                               <div>
-                                <span className='text-gray-500'>HP:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  HP:
+                                </span>{' '}
                                 {mob.hpDice}
                               </div>
                               <div>
-                                <span className='text-gray-500'>Damage:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  Damage:
+                                </span>{' '}
                                 {mob.damageDice}
                               </div>
                               <div>
-                                <span className='text-gray-500'>AC:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  AC:
+                                </span>{' '}
                                 {mob.armorClass || 0}
                               </div>
                               <div>
-                                <span className='text-gray-500'>Hit Roll:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  Hit Roll:
+                                </span>{' '}
                                 {mob.hitRoll || 0}
                               </div>
                               <div>
-                                <span className='text-gray-500'>
+                                <span className='text-muted-foreground'>
                                   Damage Type:
                                 </span>{' '}
                                 {mob.damageType || 'HIT'}
@@ -917,32 +926,44 @@ function MobsContent() {
 
                           {/* Attributes */}
                           <div>
-                            <h4 className='font-semibold text-sm text-gray-700 mb-2'>
+                            <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                               Attributes
                             </h4>
                             <div className='grid grid-cols-2 gap-1 text-sm'>
                               <div>
-                                <span className='text-gray-500'>STR:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  STR:
+                                </span>{' '}
                                 {mob.strength || 13}
                               </div>
                               <div>
-                                <span className='text-gray-500'>INT:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  INT:
+                                </span>{' '}
                                 {mob.intelligence || 13}
                               </div>
                               <div>
-                                <span className='text-gray-500'>WIS:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  WIS:
+                                </span>{' '}
                                 {mob.wisdom || 13}
                               </div>
                               <div>
-                                <span className='text-gray-500'>DEX:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  DEX:
+                                </span>{' '}
                                 {mob.dexterity || 13}
                               </div>
                               <div>
-                                <span className='text-gray-500'>CON:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  CON:
+                                </span>{' '}
                                 {mob.constitution || 13}
                               </div>
                               <div>
-                                <span className='text-gray-500'>CHA:</span>{' '}
+                                <span className='text-muted-foreground'>
+                                  CHA:
+                                </span>{' '}
                                 {mob.charisma || 13}
                               </div>
                             </div>
@@ -952,13 +973,13 @@ function MobsContent() {
                           {(mob.mobFlags?.length ||
                             mob.effectFlags?.length) && (
                             <div className='md:col-span-2'>
-                              <h4 className='font-semibold text-sm text-gray-700 mb-2'>
+                              <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                                 Flags
                               </h4>
                               <div className='space-y-2'>
                                 {mob.mobFlags && mob.mobFlags.length > 0 && (
                                   <div>
-                                    <span className='text-xs text-gray-500 block'>
+                                    <span className='text-xs text-muted-foreground block'>
                                       Mob Flags:
                                     </span>
                                     <div className='flex flex-wrap gap-1'>
@@ -966,7 +987,7 @@ function MobsContent() {
                                         (flag: string, index: number) => (
                                           <span
                                             key={index}
-                                            className='inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded'
+                                            className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                           >
                                             {flag}
                                           </span>
@@ -978,7 +999,7 @@ function MobsContent() {
                                 {mob.effectFlags &&
                                   mob.effectFlags.length > 0 && (
                                     <div>
-                                      <span className='text-xs text-gray-500 block'>
+                                      <span className='text-xs text-muted-foreground block'>
                                         Effect Flags:
                                       </span>
                                       <div className='flex flex-wrap gap-1'>
@@ -986,7 +1007,7 @@ function MobsContent() {
                                           (flag: string, index: number) => (
                                             <span
                                               key={index}
-                                              className='inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded'
+                                              className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                             >
                                               {flag}
                                             </span>
@@ -1002,11 +1023,11 @@ function MobsContent() {
 
                         {/* Detailed Description */}
                         {mob.examineDescription && (
-                          <div className='mt-4 pt-4 border-t border-gray-200'>
-                            <h4 className='font-semibold text-sm text-gray-700 mb-2'>
+                          <div className='mt-4 pt-4 border-t border-border'>
+                            <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                               Detailed Description
                             </h4>
-                            <p className='text-sm text-gray-700'>
+                            <p className='text-sm text-muted-foreground'>
                               {mob.examineDescription}
                             </p>
                           </div>
@@ -1021,7 +1042,7 @@ function MobsContent() {
                   >
                     <button
                       onClick={e => e.stopPropagation()}
-                      className='inline-flex items-center text-blue-600 hover:text-blue-800 px-3 py-1 text-sm'
+                      className='inline-flex items-center text-primary hover:text-primary-foreground px-3 py-1 text-sm'
                     >
                       <Edit className='w-3 h-3 mr-1' />
                       Edit
@@ -1033,14 +1054,14 @@ function MobsContent() {
                       handleCloneMob(mob.id);
                     }}
                     disabled={cloningId === mob.id}
-                    className='inline-flex items-center text-green-600 hover:text-green-800 px-3 py-1 text-sm disabled:opacity-50'
+                    className='inline-flex items-center text-secondary hover:text-secondary-foreground px-3 py-1 text-sm disabled:opacity-50'
                   >
                     <Copy className='w-3 h-3 mr-1' />
                     {cloningId === mob.id ? 'Cloning...' : 'Clone'}
                   </button>
                   <button
                     onClick={e => e.stopPropagation()}
-                    className='inline-flex items-center text-red-600 hover:text-red-800 px-3 py-1 text-sm'
+                    className='inline-flex items-center text-destructive hover:text-destructive-foreground px-3 py-1 text-sm'
                   >
                     <Trash2 className='w-3 h-3 mr-1' />
                     Delete
@@ -1054,15 +1075,15 @@ function MobsContent() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className='flex items-center justify-between mt-6 px-4 py-3 bg-gray-50 rounded-lg'>
-          <div className='text-sm text-gray-500'>
+        <div className='flex items-center justify-between mt-6 px-4 py-3 bg-muted rounded-lg'>
+          <div className='text-sm text-muted-foreground'>
             Showing {startItem}-{endItem} of {mobsCount} results
           </div>
           <div className='flex items-center gap-2'>
             <button
               onClick={() => setCurrentPage(Math.max(1, currentPage - 1))}
               disabled={currentPage === 1}
-              className='inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='inline-flex items-center px-3 py-2 border border-border rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed'
             >
               <ChevronLeft className='w-4 h-4 mr-1' />
               Previous
@@ -1103,8 +1124,8 @@ function MobsContent() {
                     onClick={() => setCurrentPage(pageNum)}
                     className={`px-3 py-2 text-sm rounded-md ${
                       currentPage === pageNum
-                        ? 'bg-blue-600 text-white'
-                        : 'text-gray-700 hover:bg-gray-100'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'text-foreground hover:bg-muted'
                     }`}
                   >
                     {pageNum}
@@ -1116,7 +1137,7 @@ function MobsContent() {
                   <span className='px-2 text-gray-500'>...</span>
                   <button
                     onClick={() => setCurrentPage(totalPages)}
-                    className='px-3 py-2 text-sm text-gray-700 hover:bg-gray-100 rounded-md'
+                    className='px-3 py-2 text-sm text-foreground hover:bg-muted rounded-md'
                   >
                     {totalPages}
                   </button>
@@ -1129,7 +1150,7 @@ function MobsContent() {
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }
               disabled={currentPage === totalPages}
-              className='inline-flex items-center px-3 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed'
+              className='inline-flex items-center px-3 py-2 border border-border rounded-md text-sm font-medium text-foreground bg-card hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed'
             >
               Next
               <ChevronRight className='w-4 h-4 ml-1' />

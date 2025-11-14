@@ -80,7 +80,7 @@ export default function DashboardPage() {
 
   // Player-focused dashboard view
   const playerView = (
-    <div className='space-y-6'>
+    <div className='space-y-6 bg-background text-foreground'>
       {/* Online Status Stats */}
       <OnlineStats showMyStats={true} />
 
@@ -157,12 +157,14 @@ export default function DashboardPage() {
           <Link
             key={item.name}
             href={item.href}
-            className='bg-white p-6 rounded-lg shadow hover:shadow-md transition-shadow'
+            className='bg-card p-6 rounded-lg shadow hover:shadow-md transition-shadow'
           >
             <div className='flex items-center'>
               <div>
-                <p className='text-sm font-medium text-gray-600'>{item.name}</p>
-                <p className='text-2xl font-semibold text-gray-900'>
+                <p className='text-sm font-medium text-muted-foreground'>
+                  {item.name}
+                </p>
+                <p className='text-2xl font-semibold text-foreground'>
                   {loading ? '...' : (stats?.[item.key] ?? '—')}
                 </p>
               </div>
@@ -174,44 +176,59 @@ export default function DashboardPage() {
       <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
         {/* Quick Actions */}
         <div className='lg:col-span-2'>
-          <div className='bg-white rounded-lg shadow p-6'>
-            <h2 className='text-xl font-semibold text-gray-900 mb-4'>
+          <div className='bg-card rounded-lg shadow p-6'>
+            <h2 className='text-xl font-semibold text-foreground mb-4'>
               Quick Actions
             </h2>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <Link
                 href='/dashboard/zones'
-                className='p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors'
+                className='p-4 border border-border rounded-lg hover:bg-muted transition-colors'
               >
-                <h3 className='font-medium text-gray-900'>🗺️ Browse Zones</h3>
-                <p className='text-sm text-gray-600'>
+                <h3 className='font-medium text-foreground'>🗺️ Browse Zones</h3>
+                <p className='text-sm text-muted-foreground'>
                   View and edit zone configurations
                 </p>
               </Link>
               <Link
                 href='/dashboard/zones/editor?zone=511'
-                className='p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors'
+                className='p-4 border border-border rounded-lg hover:bg-muted transition-colors'
               >
-                <h3 className='font-medium text-gray-900'>✏️ Visual Editor</h3>
-                <p className='text-sm text-gray-600'>
+                <h3 className='font-medium text-foreground'>
+                  ✏️ Visual Editor
+                </h3>
+                <p className='text-sm text-muted-foreground'>
                   Edit zones with visual interface
                 </p>
               </Link>
               <Link
                 href='/dashboard/scripts'
-                className='p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors'
+                className='p-4 border border-border rounded-lg hover:bg-muted transition-colors'
               >
-                <h3 className='font-medium text-gray-900'>📝 Script Editor</h3>
-                <p className='text-sm text-gray-600'>
+                <h3 className='font-medium text-foreground'>
+                  📝 Script Editor
+                </h3>
+                <p className='text-sm text-muted-foreground'>
                   Lua script editing with Monaco Editor
                 </p>
               </Link>
               <Link
-                href='/dashboard/mobs'
-                className='p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors'
+                href='/dashboard/characters'
+                className='p-4 border border-border rounded-lg hover:bg-muted transition-colors'
               >
-                <h3 className='font-medium text-gray-900'>👹 Browse Mobs</h3>
-                <p className='text-sm text-gray-600'>
+                <h3 className='font-medium text-foreground'>
+                  👥 View Characters
+                </h3>
+                <p className='text-sm text-muted-foreground'>
+                  Manage characters and player accounts
+                </p>
+              </Link>
+              <Link
+                href='/dashboard/mobs'
+                className='p-4 border border-border rounded-lg hover:bg-muted transition-colors'
+              >
+                <h3 className='font-medium text-foreground'>👹 Browse Mobs</h3>
+                <p className='text-sm text-muted-foreground'>
                   View and edit mob configurations
                 </p>
               </Link>
@@ -228,31 +245,31 @@ export default function DashboardPage() {
             maxHeight='300px'
           />
 
-          <div className='bg-white rounded-lg shadow p-6'>
-            <h3 className='text-lg font-semibold text-gray-900 mb-4'>
+          <div className='bg-card rounded-lg shadow p-6'>
+            <h3 className='text-lg font-semibold text-foreground mb-4'>
               🔗 Quick Navigation
             </h3>
             <div className='space-y-3'>
               <div>
-                <h4 className='text-sm font-medium text-gray-700 mb-2'>
+                <h4 className='text-sm font-medium text-muted-foreground mb-2'>
                   Featured Zones
                 </h4>
                 <div className='space-y-1'>
                   <Link
                     href='/dashboard/zones/editor?zone=511'
-                    className='block text-sm text-blue-600 hover:text-blue-800 hover:underline'
+                    className='block text-sm text-primary hover:text-primary-foreground hover:underline'
                   >
                     📍 Zone 511 - Test Zone
                   </Link>
                   <Link
                     href='/dashboard/zones/editor?zone=1000'
-                    className='block text-sm text-blue-600 hover:text-blue-800 hover:underline'
+                    className='block text-sm text-primary hover:text-primary-foreground hover:underline'
                   >
                     📍 Zone 1000 - Starting Area
                   </Link>
                   <Link
                     href='/dashboard/zones/editor?zone=1'
-                    className='block text-sm text-blue-600 hover:text-blue-800 hover:underline'
+                    className='block text-sm text-primary hover:text-primary-foreground hover:underline'
                   >
                     📍 Zone 1 - Main Area
                   </Link>
@@ -260,7 +277,7 @@ export default function DashboardPage() {
               </div>
 
               <div className='border-t pt-3'>
-                <h4 className='text-sm font-medium text-gray-700 mb-2'>
+                <h4 className='text-sm font-medium text-muted-foreground mb-2'>
                   Development Tools
                 </h4>
                 <div className='space-y-1'>
@@ -284,31 +301,35 @@ export default function DashboardPage() {
               </div>
 
               <div className='border-t pt-3'>
-                <h4 className='text-sm font-medium text-gray-700 mb-2'>
+                <h4 className='text-sm font-medium text-muted-foreground mb-2'>
                   Entity Shortcuts
                 </h4>
                 <div className='grid grid-cols-2 gap-2'>
                   <Link
                     href='/dashboard/mobs'
-                    className='text-xs bg-red-50 text-red-700 px-2 py-1 rounded hover:bg-red-100 transition-colors text-center'
+                    className='text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-center'
+                    aria-label='Manage mobs'
                   >
                     Mobs
                   </Link>
                   <Link
                     href='/dashboard/objects'
-                    className='text-xs bg-blue-50 text-blue-700 px-2 py-1 rounded hover:bg-blue-100 transition-colors text-center'
+                    className='text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-center'
+                    aria-label='Manage objects'
                   >
                     Objects
                   </Link>
                   <Link
                     href='/dashboard/rooms'
-                    className='text-xs bg-green-50 text-green-700 px-2 py-1 rounded hover:bg-green-100 transition-colors text-center'
+                    className='text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-center'
+                    aria-label='Manage rooms'
                   >
                     Rooms
                   </Link>
                   <Link
                     href='/dashboard/shops'
-                    className='text-xs bg-purple-50 text-purple-700 px-2 py-1 rounded hover:bg-purple-100 transition-colors text-center'
+                    className='text-xs px-2 py-1 rounded border border-border bg-muted text-muted-foreground hover:bg-accent hover:text-accent-foreground transition-colors text-center'
+                    aria-label='Manage shops'
                   >
                     Shops
                   </Link>

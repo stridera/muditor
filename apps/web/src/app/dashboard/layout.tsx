@@ -1,8 +1,8 @@
 'use client';
 
-import { Navigation } from './components/Navigation';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { ErrorBoundary } from '@/components/error-boundary';
+import { Navigation } from './components/Navigation';
 
 export default function DashboardLayout({
   children,
@@ -11,7 +11,7 @@ export default function DashboardLayout({
 }) {
   return (
     <ProtectedRoute>
-      <div className='min-h-screen bg-gray-50'>
+      <div className='min-h-screen bg-background text-foreground'>
         <Navigation />
         <main className='container mx-auto px-4 py-8'>
           <ErrorBoundary>{children}</ErrorBoundary>

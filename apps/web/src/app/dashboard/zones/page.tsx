@@ -2,6 +2,7 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
+import { ClimateBadge } from '@/components/ui/climate-badge';
 import { LoadingError } from '@/components/ui/error-display';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
@@ -47,7 +48,8 @@ function ZonesContent() {
   const { data, loading, error, refetch } =
     useQuery<ZonesQueryResult>(ZONES_QUERY);
 
-  const zones = data?.zones || [];
+  // Memoize zones array to satisfy hook dependency linting and avoid recreating on each render
+  const zones = useMemo(() => data?.zones || [], [data?.zones]);
   const roomsCount = data?.roomsCount || 0;
 
   const filteredZones = useMemo(() => {
@@ -57,7 +59,6 @@ function ZonesContent() {
         zone.id.toString().includes(searchTerm);
       const matchesClimate =
         selectedClimate === 'all' || zone.climate === selectedClimate;
-
       return matchesSearch && matchesClimate;
     });
   }, [zones, searchTerm, selectedClimate]);
@@ -70,16 +71,16 @@ function ZonesContent() {
   if (loading) {
     return (
       <div className='animate-pulse'>
-        <div className='h-8 bg-gray-200 rounded w-1/4 mb-6'></div>
+        <div className='h-8 bg-muted rounded w-1/4 mb-6'></div>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4 mb-6'>
-          <div className='h-10 bg-gray-200 rounded'></div>
-          <div className='h-10 bg-gray-200 rounded'></div>
+          <div className='h-10 bg-muted rounded'></div>
+          <div className='h-10 bg-muted rounded'></div>
         </div>
         <div className='space-y-4'>
           {Array.from({ length: 8 }).map((_, i) => (
-            <div key={i} className='bg-white p-4 rounded-lg shadow'>
-              <div className='h-4 bg-gray-200 rounded w-1/3 mb-2'></div>
-              <div className='h-3 bg-gray-200 rounded w-1/4'></div>
+            <div key={i} className='bg-card p-4 rounded-lg shadow'>
+              <div className='h-4 bg-muted rounded w-1/3 mb-2'></div>
+              <div className='h-3 bg-muted rounded w-1/4'></div>
             </div>
           ))}
         </div>
@@ -97,8 +98,8 @@ function ZonesContent() {
     <div>
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900'>Zones</h1>
-          <p className='text-gray-600 mt-1'>
+          <h1 className='text-3xl font-bold text-foreground'>Zones</h1>
+          <p className='text-muted-foreground mt-1'>
             {filteredZones.length} of {zones.length} zones,{' '}
             {roomsCount.toLocaleString()} rooms total
           </p>
@@ -106,25 +107,25 @@ function ZonesContent() {
         <div className='flex items-center gap-3'>
           <Link
             href='/dashboard/zones/world-map'
-            className='bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors'
+            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors'
           >
             🗺️ World Map
           </Link>
           <Link
             href='/dashboard/zones/new'
-            className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
+            className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/80 transition-colors'
           >
             Create Zone
           </Link>
         </div>
       </div>
 
-      <div className='bg-white rounded-lg shadow mb-6 p-4'>
+      <div className='bg-card rounded-lg shadow mb-6 p-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
             <label
               htmlFor='search'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium text-muted-foreground mb-1'
             >
               Search zones
             </label>
@@ -132,22 +133,21 @@ function ZonesContent() {
               type='text'
               id='search'
               placeholder='Search by name or ID...'
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
           </div>
-
           <div>
             <label
               htmlFor='climate'
-              className='block text-sm font-medium text-gray-700 mb-1'
+              className='block text-sm font-medium text-muted-foreground mb-1'
             >
               Filter by climate
             </label>
             <select
               id='climate'
-              className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
               value={selectedClimate}
               onChange={e => setSelectedClimate(e.target.value)}
             >
@@ -167,41 +167,18 @@ function ZonesContent() {
           <Link
             key={zone.id}
             href={`/dashboard/zones/${zone.id}`}
-            className='bg-white rounded-lg shadow hover:shadow-md transition-shadow p-4'
+            className='bg-card rounded-lg shadow hover:shadow-md transition-shadow p-4'
           >
             <div className='flex items-start justify-between'>
               <div className='flex-1'>
-                <h3 className='font-semibold text-gray-900 text-lg mb-1'>
+                <h3 className='font-semibold text-foreground text-lg mb-1'>
                   {zone.name}
                 </h3>
-                <div className='flex items-center text-sm text-gray-600 space-x-4'>
+                <div className='flex items-center text-sm text-muted-foreground space-x-4'>
                   <span>ID: {zone.id}</span>
-                  <span
-                    className={`px-2 py-1 rounded text-xs font-medium ${
-                      zone.climate === 'NONE'
-                        ? 'bg-gray-100 text-gray-700'
-                        : zone.climate === 'OCEANIC'
-                          ? 'bg-blue-100 text-blue-700'
-                          : zone.climate === 'TEMPERATE'
-                            ? 'bg-green-100 text-green-700'
-                            : zone.climate === 'TROPICAL'
-                              ? 'bg-yellow-100 text-yellow-700'
-                              : zone.climate === 'SUBARCTIC'
-                                ? 'bg-cyan-100 text-cyan-700'
-                                : zone.climate === 'ARID'
-                                  ? 'bg-orange-100 text-orange-700'
-                                  : zone.climate === 'SEMIARID'
-                                    ? 'bg-amber-100 text-amber-700'
-                                    : zone.climate === 'ALPINE'
-                                      ? 'bg-purple-100 text-purple-700'
-                                      : 'bg-gray-100 text-gray-700'
-                    }`}
-                  >
-                    {zone.climate}
-                  </span>
+                  <ClimateBadge climate={zone.climate} />
                 </div>
               </div>
-
               <div className='flex items-center space-x-2 ml-4'>
                 <button
                   onClick={e => {
@@ -209,7 +186,7 @@ function ZonesContent() {
                     e.stopPropagation();
                     router.push(`/dashboard/zones/editor?zone=${zone.id}`);
                   }}
-                  className='text-blue-600 hover:text-blue-800 text-sm'
+                  className='text-primary hover:text-primary-foreground text-sm'
                 >
                   Edit
                 </button>
@@ -221,10 +198,10 @@ function ZonesContent() {
 
       {filteredZones.length === 0 && (
         <div className='text-center py-12'>
-          <p className='text-gray-500 text-lg'>
+          <p className='text-muted-foreground text-lg'>
             No zones found matching your criteria
           </p>
-          <p className='text-gray-400 text-sm mt-2'>
+          <p className='text-muted-foreground text-sm mt-2'>
             Try adjusting your search or filter
           </p>
         </div>

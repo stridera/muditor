@@ -1149,6 +1149,7 @@ type Mutation {
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
   updateTrigger(id: Float!, input: UpdateTriggerInput!): TriggerDto!
   updateUser(input: UpdateUserInput!): User!
+  updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
 }
 
@@ -1580,6 +1581,16 @@ enum RoomFlag {
   WORLDMAP
 }
 
+type RoomReference {
+  vnum: Int!
+  zoneId: Int!
+}
+
+input RoomReferenceInput {
+  vnum: Int!
+  zoneId: Int!
+}
+
 type RoomSummaryDto {
   id: Int!
   name: String!
@@ -1965,6 +1976,23 @@ input UpdateObjectInput {
   zoneId: Int
 }
 
+input UpdatePreferencesInput {
+  """List of favorite zone IDs"""
+  favoriteZones: [Int!]
+
+  """Recently visited rooms"""
+  recentRooms: [RoomReferenceInput!]
+
+  """Recently visited zone IDs"""
+  recentZones: [Int!]
+
+  """Theme preference: light, dark, or system"""
+  theme: String
+
+  """View mode preference: player or admin"""
+  viewMode: String
+}
+
 input UpdateProfileInput {
   email: String
 }
@@ -2079,6 +2107,9 @@ type User {
   """Whether the user is currently banned"""
   isBanned: Boolean!
   lastLoginAt: DateTime
+
+  """User preferences for UI and navigation"""
+  preferences: UserPreferences
   role: UserRole!
   updatedAt: DateTime!
   username: String!
@@ -2113,6 +2144,23 @@ type UserPermissions {
   isPlayer: Boolean!
   maxCharacterLevel: Float!
   role: UserRole!
+}
+
+type UserPreferences {
+  """List of favorite zone IDs"""
+  favoriteZones: [Int!]
+
+  """Recently visited rooms (max 10)"""
+  recentRooms: [RoomReference!]
+
+  """Recently visited zone IDs (max 5)"""
+  recentZones: [Int!]
+
+  """Theme preference: light, dark, or system"""
+  theme: String
+
+  """View mode preference: player or admin"""
+  viewMode: String
 }
 
 """User role in the MUD system"""

@@ -1,11 +1,7 @@
 'use client';
 
-import { useState } from 'react';
-import { useAuth } from '@/contexts/auth-context';
-import Link from 'next/link';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import {
   Card,
   CardContent,
@@ -13,8 +9,12 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { useAuth } from '@/contexts/auth-context';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useState } from 'react';
 
 export default function LoginPage() {
   const { login, loading } = useAuth();
@@ -39,20 +39,20 @@ export default function LoginPage() {
 
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
         <Loader2 className='h-8 w-8 animate-spin' />
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8'>
+    <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
       <div className='max-w-md w-full space-y-8'>
         <div>
-          <h2 className='mt-6 text-center text-3xl font-extrabold text-gray-900'>
+          <h2 className='mt-6 text-center text-3xl font-extrabold text-foreground'>
             Sign in to Muditor
           </h2>
-          <p className='mt-2 text-center text-sm text-gray-600'>
+          <p className='mt-2 text-center text-sm text-muted-foreground'>
             World building and administration tool
           </p>
         </div>
@@ -111,10 +111,12 @@ export default function LoginPage() {
             </form>
 
             <div className='mt-4 text-center text-sm'>
-              <span className='text-gray-600'>Don't have an account? </span>
+              <span className='text-muted-foreground'>
+                Don't have an account?{' '}
+              </span>
               <Link
                 href='/register'
-                className='font-medium text-blue-600 hover:text-blue-500'
+                className='font-medium text-primary hover:text-primary-foreground'
               >
                 Sign up
               </Link>
@@ -123,7 +125,7 @@ export default function LoginPage() {
             <div className='mt-2 text-center text-sm'>
               <Link
                 href='/forgot-password'
-                className='font-medium text-blue-600 hover:text-blue-500'
+                className='font-medium text-primary hover:text-primary-foreground'
               >
                 Forgot your password?
               </Link>

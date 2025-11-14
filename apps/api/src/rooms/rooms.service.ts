@@ -9,11 +9,6 @@ import {
   UpdateRoomPositionInput,
 } from './room.dto';
 
-interface LegacyCreateExitFields {
-  keyword?: string;
-  destination?: number;
-}
-
 interface RoomExitResult {
   id: number;
   roomZoneId: number;
@@ -52,7 +47,7 @@ type RoomServiceResult = RoomServiceResultBase;
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly db: DatabaseService) {}
+  constructor(private readonly db: DatabaseService) { }
 
   private readonly includeFull = {
     exits: true,
@@ -140,19 +135,67 @@ export class RoomsService {
                r.layout_x as "layoutX",
                r.layout_y as "layoutY",
                r.layout_z as "layoutZ"
-        FROM rooms r
+        FROM "Room" r
         ${where}
         ORDER BY r.id
         ${limit} ${offset}
       `);
-      return rows.map(r =>
-        this.mapRoom({
+
+      // Fetch exits for all rooms in lightweight mode
+      const exitWhere = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
+      const exits = await this.db.$queryRawUnsafe<
+        Array<{
+          id: number;
+          roomZoneId: number;
+          roomId: number;
+          direction: string;
+          toZoneId: number | null;
+          toRoomId: number | null;
+        }>
+      >(`
+        SELECT e.id,
+               e.room_zone_id as "roomZoneId",
+               e.room_id as "roomId",
+               e.direction,
+               e.to_zone_id as "toZoneId",
+               e.to_room_id as "toRoomId"
+        FROM "RoomExit" e
+        INNER JOIN "Room" r ON e.room_zone_id = r.zone_id AND e.room_id = r.id
+        ${exitWhere}
+        ORDER BY e.room_zone_id, e.room_id
+      `);
+
+      // Group exits by room
+      const exitsByRoom = new Map<string, RoomExitResult[]>();
+      for (const exit of exits) {
+        const key = `${exit.roomZoneId}-${exit.roomId}`;
+        if (!exitsByRoom.has(key)) {
+          exitsByRoom.set(key, []);
+        }
+        exitsByRoom.get(key)!.push({
+          id: exit.id,
+          roomZoneId: exit.roomZoneId,
+          roomId: exit.roomId,
+          direction: exit.direction,
+          description: null,
+          keywords: [],
+          toZoneId: exit.toZoneId,
+          toRoomId: exit.toRoomId,
+          key: null,
+          flags: [],
+        });
+      }
+
+      return rows.map(r => {
+        const roomKey = `${r.zoneId}-${r.id}`;
+        const roomExits = exitsByRoom.get(roomKey) || [];
+        return this.mapRoom({
           ...r,
-          exits: [],
+          exits: roomExits,
           roomExtraDescriptions: [],
           flags: (r.flags as unknown as RoomFlag[]) || [],
-        })
-      );
+        });
+      });
     }
     const query: {
       include: typeof RoomsService.prototype.includeFull;
@@ -244,18 +287,13 @@ export class RoomsService {
   }
 
   async createExit(
-    data: CreateRoomExitInput & LegacyCreateExitFields
+    data: CreateRoomExitInput
   ): Promise<RoomExitResult> {
     const keywords = (data.keywords || []).filter(
       k => !!k && k.trim().length > 0
     );
-    if (!keywords.length && data.keyword) keywords.push(data.keyword);
-    let toZoneId = data.toZoneId ?? null;
-    let toRoomId = data.toRoomId ?? null;
-    if ((toZoneId == null || toRoomId == null) && data.destination != null) {
-      toZoneId = Math.floor(data.destination / 100);
-      toRoomId = data.destination % 100;
-    }
+    const toZoneId = data.toZoneId ?? null;
+    const toRoomId = data.toRoomId ?? null;
     const exit = await this.db.roomExit.create({
       data: {
         roomZoneId: data.roomZoneId,

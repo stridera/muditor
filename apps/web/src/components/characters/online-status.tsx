@@ -9,20 +9,22 @@ import {
 } from '@/components/ui/tooltip';
 import { formatDistanceToNow } from 'date-fns';
 import { Circle, Clock, User } from 'lucide-react';
+import { memo } from 'react';
+import { formatRace, formatClass } from '@/lib/utils';
 
-interface OnlineStatusProps {
+export interface OnlineStatusProps {
   isOnline: boolean;
   lastLogin?: Date | string; // optional: omit key entirely when unknown
   showText?: boolean;
   size?: 'sm' | 'md' | 'lg';
 }
 
-export function OnlineStatus({
+const OnlineStatusComponent = ({
   isOnline,
   lastLogin,
   showText = true,
   size = 'md',
-}: OnlineStatusProps) {
+}: OnlineStatusProps) => {
   const iconSize = {
     sm: 'h-2 w-2',
     md: 'h-3 w-3',
@@ -77,7 +79,17 @@ export function OnlineStatus({
       </Tooltip>
     </TooltipProvider>
   );
-}
+};
+
+// Memoize to prevent re-renders when session data polls but status hasn't changed
+export const OnlineStatus = memo(
+  OnlineStatusComponent,
+  (prevProps, nextProps) =>
+    prevProps.isOnline === nextProps.isOnline &&
+    prevProps.lastLogin === nextProps.lastLogin &&
+    prevProps.showText === nextProps.showText &&
+    prevProps.size === nextProps.size
+);
 
 interface PlayTimeDisplayProps {
   totalSeconds: number;
@@ -85,11 +97,11 @@ interface PlayTimeDisplayProps {
   showCurrentSession?: boolean;
 }
 
-export function PlayTimeDisplay({
+const PlayTimeDisplayComponent = ({
   totalSeconds,
   currentSessionSeconds = 0,
   showCurrentSession = false,
-}: PlayTimeDisplayProps) {
+}: PlayTimeDisplayProps) => {
   const formatPlayTime = (seconds: number) => {
     const hours = Math.floor(seconds / 3600);
     const minutes = Math.floor((seconds % 3600) / 60);
@@ -129,7 +141,16 @@ export function PlayTimeDisplay({
       </Tooltip>
     </TooltipProvider>
   );
-}
+};
+
+// Memoize to prevent re-renders when session data polls
+export const PlayTimeDisplay = memo(
+  PlayTimeDisplayComponent,
+  (prevProps, nextProps) =>
+    prevProps.totalSeconds === nextProps.totalSeconds &&
+    prevProps.currentSessionSeconds === nextProps.currentSessionSeconds &&
+    prevProps.showCurrentSession === nextProps.showCurrentSession
+);
 
 interface CharacterStatusCardProps {
   character: {
@@ -181,13 +202,13 @@ export function CharacterStatusCard({
               {character.raceType && (
                 <>
                   <span>•</span>
-                  <span>{character.raceType}</span>
+                  <span>{formatRace(character.raceType)}</span>
                 </>
               )}
               {character.playerClass && (
                 <>
                   <span>•</span>
-                  <span>{character.playerClass}</span>
+                  <span>{formatClass(character.playerClass)}</span>
                 </>
               )}
             </div>

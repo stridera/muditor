@@ -1,10 +1,10 @@
 'use client';
 
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import { useAuth } from '@/contexts/auth-context';
 import { Loader2 } from 'lucide-react';
+import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function HomePage() {
   const { isAuthenticated, loading } = useAuth();
@@ -18,7 +18,7 @@ export default function HomePage() {
 
   if (loading) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
         <Loader2 className='h-8 w-8 animate-spin' />
       </div>
     );
@@ -26,16 +26,16 @@ export default function HomePage() {
 
   if (isAuthenticated) {
     return (
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
         <Loader2 className='h-8 w-8 animate-spin' />
       </div>
     );
   }
   return (
-    <div className='min-h-screen bg-gray-50 flex items-center justify-center'>
+    <div className='min-h-screen bg-background flex items-center justify-center text-foreground'>
       <div className='text-center'>
-        <h1 className='text-6xl font-bold text-gray-900 mb-4'>Muditor</h1>
-        <p className='text-xl text-gray-600 mb-8'>
+        <h1 className='text-6xl font-bold text-foreground mb-4'>Muditor</h1>
+        <p className='text-xl text-muted-foreground mb-8'>
           A modern, database-driven MUD editor and administration tool
         </p>
         <div className='space-y-4 mb-8'>
@@ -52,7 +52,7 @@ export default function HomePage() {
         <div className='space-x-4'>
           <Link
             href='/login'
-            className='bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition-colors inline-block'
+            className='bg-primary text-primary-foreground px-6 py-3 rounded-lg hover:bg-primary/80 transition-colors inline-block'
           >
             Sign In
           </Link>
@@ -68,7 +68,7 @@ export default function HomePage() {
             href='http://localhost:4000/graphql'
             target='_blank'
             rel='noopener noreferrer'
-            className='text-blue-600 hover:text-blue-500 text-sm'
+            className='text-primary hover:text-primary-foreground text-sm'
           >
             GraphQL Playground →
           </a>
