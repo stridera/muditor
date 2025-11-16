@@ -188,7 +188,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
     <>
       <div
         className={`
-          relative w-[180px] h-[180px]
+          relative w-[180px] h-[140px]
           ${sectorStyle.bg} ${depthEffects.borderStyle} ${sectorStyle.text}
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
           ${depthEffects.additionalClasses}
@@ -399,11 +399,6 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                   ⬇️
                 </span>
               )}
-              {exitCount > 0 && (
-                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-white bg-opacity-60 text-gray-800'}`}>
-                  {exitCount} exit{exitCount !== 1 ? 's' : ''}
-                </span>
-              )}
             </div>
           </div>
 
@@ -413,13 +408,9 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
         </div>
 
         {/* Content */}
-        <div className='px-3 py-2'>
-          <div className='text-xs opacity-75 mb-2 line-clamp-2'>
-            {data.roomDescription}
-          </div>
-
+        <div className='px-3 py-2 flex items-center justify-center flex-1'>
           {/* Entity indicators */}
-          <div className='flex gap-2 mt-2'>
+          <div className='flex gap-2'>
             {mobCount > 0 && (
               <div className='flex items-center gap-1 bg-red-500 bg-opacity-20 px-2 py-1 rounded-full'>
                 <span className='text-xs'>👹</span>
@@ -438,13 +429,6 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                 <span className='text-xs font-medium'>{shopCount}</span>
               </div>
             )}
-          </div>
-
-          {/* Sector tag */}
-          <div className='mt-2'>
-            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-white bg-opacity-60 text-gray-800'}`}>
-              {data.sector.toLowerCase()}
-            </span>
           </div>
         </div>
       </div>

@@ -1,47 +1,50 @@
 'use client';
 
+import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
 import React, {
-  useState,
+  useCallback,
   useEffect,
   useMemo,
-  useCallback,
   useRef,
+  useState,
 } from 'react';
-import { useRouter } from 'next/navigation';
 import ReactFlow, {
-  Node,
-  Edge,
-  Controls,
-  MiniMap,
+  addEdge,
   Background,
   BackgroundVariant,
-  useNodesState,
-  useEdgesState,
-  addEdge,
   Connection,
   ConnectionMode,
+  Controls,
+  Edge,
+  MarkerType,
+  MiniMap,
+  Node,
   Panel,
   ReactFlowProvider,
+  useEdgesState,
+  useNodesState,
   useReactFlow,
-  MarkerType,
-  Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import './zone-editor.css';
-import { useTheme } from 'next-themes';
 
-import { RoomNode } from './RoomNode';
+import ZoneSelector from '@/components/ZoneSelector';
+import { usePermissions } from '@/hooks/use-permissions';
+import { authenticatedFetch } from '@/lib/authenticated-fetch';
+import {
+  EntityPalette,
+  Mob,
+  type Object as EntityObject,
+} from './EntityPalette';
 import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
-import { WorldMapZone } from './WorldMapZone';
-import { WorldMapRoom } from './WorldMapRoom';
 import { PortalNode } from './PortalNode';
-import { WorldMapCanvas } from './WorldMapCanvas';
 import { PropertyPanel } from './PropertyPanel';
-import { EntityPalette, Mob, type Object as EntityObject } from './EntityPalette';
-import { authenticatedFetch, authenticatedGraphQLFetch } from '@/lib/authenticated-fetch';
-import { usePermissions } from '@/hooks/use-permissions';
-import ZoneSelector from '../ZoneSelector';
+import { RoomNode } from './RoomNode';
+import { WorldMapCanvas } from './WorldMapCanvas';
+import { WorldMapRoom } from './WorldMapRoom';
+import { WorldMapZone } from './WorldMapZone';
 
 // Grid Configuration
 const GRID_SIZE = 180; // Grid cell size in pixels (matches room size)
@@ -51,13 +54,13 @@ const ROOM_SPACING_MULTIPLIER = 1.5; // Multiply database coordinates for better
 // Helper functions
 const snapToGrid = (value: number): number =>
   Math.round(value / GRID_SIZE) * GRID_SIZE;
-const pixelsToGrid = (pixels: number): number => Math.round(pixels / (GRID_SIZE * ROOM_SPACING_MULTIPLIER));
-const gridToPixels = (grid: number): number => grid * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
+const pixelsToGrid = (pixels: number): number =>
+  Math.round(pixels / (GRID_SIZE * ROOM_SPACING_MULTIPLIER));
+const gridToPixels = (grid: number): number =>
+  grid * GRID_SIZE * ROOM_SPACING_MULTIPLIER;
 // Y-axis conversion helpers (inverted for screen coordinates)
 const pixelsToGridY = (pixels: number): number => -pixelsToGrid(pixels); // Negate to convert screen Y back to world Y
 const gridToPixelsY = (grid: number): number => gridToPixels(-grid); // Negate world Y to get screen Y
-
-
 
 // World map types
 interface ZoneBounds {
@@ -125,9 +128,17 @@ interface WorldMapRoomNode {
   style?: React.CSSProperties;
 }
 
-
 // Import shared auto-layout utilities
-import { autoLayoutRooms as sharedAutoLayoutRooms, resolveOverlaps as sharedResolveOverlaps, detectOverlaps as sharedDetectOverlaps, detectOneWayExits, LayoutPosition, OverlapInfo, AutoLayoutRoom, AutoLayoutExit } from '@muditor/types';
+import { isValidRoomId } from '@/lib/room-utils';
+import {
+  AutoLayoutRoom,
+  detectOneWayExits,
+  LayoutPosition,
+  OverlapInfo,
+  autoLayoutRooms as sharedAutoLayoutRooms,
+  detectOverlaps as sharedDetectOverlaps,
+  resolveOverlaps as sharedResolveOverlaps,
+} from '@muditor/types';
 
 // Adapter function to convert editor Room type to shared AutoLayoutRoom type
 const convertToAutoLayoutRoom = (room: Room): AutoLayoutRoom => ({
@@ -139,12 +150,15 @@ const convertToAutoLayoutRoom = (room: Room): AutoLayoutRoom => ({
   layoutZ: room.layoutZ,
   exits: room.exits.map(exit => ({
     direction: exit.direction,
-    toRoomId: exit.toRoomId
-  }))
+    toRoomId: exit.toRoomId,
+  })),
 });
 
 // Wrapper function for the shared algorithm
-const autoLayoutRooms = (rooms: Room[], startRoomId?: number): Record<number, LayoutPosition> => {
+const autoLayoutRooms = (
+  rooms: Room[],
+  startRoomId?: number
+): Record<number, LayoutPosition> => {
   // Convert rooms to the shared format
   const sharedRooms = rooms.map(convertToAutoLayoutRoom);
   // Call the shared algorithm
@@ -152,16 +166,18 @@ const autoLayoutRooms = (rooms: Room[], startRoomId?: number): Record<number, La
 };
 
 // Wrapper for overlap detection
-const detectOverlaps = (positions: Record<number, LayoutPosition>): OverlapInfo[] => {
+const detectOverlaps = (
+  positions: Record<number, LayoutPosition>
+): OverlapInfo[] => {
   return sharedDetectOverlaps(positions);
 };
 
 // Wrapper for overlap resolution
-const resolveOverlaps = (positions: Record<number, LayoutPosition>): Record<number, LayoutPosition> => {
+const resolveOverlaps = (
+  positions: Record<number, LayoutPosition>
+): Record<number, LayoutPosition> => {
   return sharedResolveOverlaps(positions);
 };
-
-
 
 // Types
 interface Room {
@@ -176,7 +192,13 @@ interface Room {
   exits: RoomExit[];
   mobs?: Mob[];
   objects?: EntityObject[];
-  shops?: Array<{ id: number; buyProfit: number; sellProfit: number; keeperId: number; zoneId: number }>;
+  shops?: Array<{
+    id: number;
+    buyProfit: number;
+    sellProfit: number;
+    keeperId: number;
+    zoneId: number;
+  }>;
 }
 
 interface RoomExit {
@@ -233,31 +255,43 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
 
   // Wrapper for setSelectedRoomId
-  const handleSelectRoom = useCallback((roomId: number) => {
-    setSelectedRoomId(roomId);
-    const room = rooms.find(r => r.id === roomId);
-    setEditedRoom(room ? { ...room } : null);
+  const handleSelectRoom = useCallback(
+    (roomId: number) => {
+      setSelectedRoomId(roomId);
+      const room = rooms.find(r => r.id === roomId);
+      setEditedRoom(room ? { ...room } : null);
 
-    // Auto-switch to the selected room's floor so it's fully visible
-    if (room) {
-      const roomFloor = room.layoutZ ?? 0;
-      setCurrentZLevel(roomFloor);
-      console.log(`🏢 Auto-switched to floor Z${roomFloor} for selected room ${roomId}`);
-    }
+      // Auto-switch to the selected room's floor so it's fully visible
+      if (room) {
+        const roomFloor = room.layoutZ ?? 0;
+        setCurrentZLevel(roomFloor);
+        console.log(
+          `🏢 Auto-switched to floor Z${roomFloor} for selected room ${roomId}`
+        );
+      }
 
-    // Update URL to include room parameter for refresh persistence
-    if (zoneId) {
-      const newUrl = `/dashboard/zones/editor?zone=${zoneId}&room=${roomId}`;
-      router.replace(newUrl, { scroll: false });
-    }
-  }, [rooms, zoneId, router]);
+      // Update URL to include room parameter for refresh persistence
+      if (zoneId) {
+        const newUrl = `/dashboard/zones/editor?zone=${zoneId}&room=${roomId}`;
+        router.replace(newUrl, { scroll: false });
+      }
+    },
+    [rooms, zoneId, router]
+  );
 
   // Handler for cross-zone navigation
-  const handleNavigateToZone = useCallback((targetZoneId: number, targetRoomId: number) => {
-    console.log(`🌐 Navigating to zone ${targetZoneId}, room ${targetRoomId}`);
-    // Navigate to the target zone with the room selected
-    router.push(`/dashboard/zones/editor?zone=${targetZoneId}&room=${targetRoomId}`);
-  }, [router]);
+  const handleNavigateToZone = useCallback(
+    (targetZoneId: number, targetRoomId: number) => {
+      console.log(
+        `🌐 Navigating to zone ${targetZoneId}, room ${targetRoomId}`
+      );
+      // Navigate to the target zone with the room selected
+      router.push(
+        `/dashboard/zones/editor?zone=${targetZoneId}&room=${targetRoomId}`
+      );
+    },
+    [router]
+  );
 
   const [editedRoom, setEditedRoom] = useState<Room | null>(null);
   const [saving, setSaving] = useState(false);
@@ -272,82 +306,122 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const [allZones, setAllZones] = useState<Zone[]>([]);
   const [zoneMapData, setZoneMapData] = useState<ZoneMapData | null>(null);
   const [useCanvasRendering, setUseCanvasRendering] = useState(false);
-  const [canvasClusters, setCanvasClusters] = useState<Array<{
-    rooms: WorldMapRoom[];
-    centerX: number;
-    centerY: number;
-    dominantSector: string;
-    size: number;
-  }>>([]);
+  const [canvasClusters, setCanvasClusters] = useState<
+    Array<{
+      rooms: WorldMapRoom[];
+      centerX: number;
+      centerY: number;
+      dominantSector: string;
+      size: number;
+    }>
+  >([]);
 
   // Performance optimization and caching
   const lastLODUpdate = useRef<number>(0);
   const LOD_THROTTLE_MS = 300; // Further increased throttle for better performance
-  const lastViewportRef = useRef<{ x: number; y: number; zoom: number } | null>(null);
-  const worldNodesCache = useRef<Map<string, { nodes: Node[]; timestamp: number }>>(new Map());
+  const lastViewportRef = useRef<{ x: number; y: number; zoom: number } | null>(
+    null
+  );
+  const worldNodesCache = useRef<
+    Map<string, { nodes: Node[]; timestamp: number }>
+  >(new Map());
   const CACHE_DURATION = 120000; // Cache world nodes for 2 minutes for better performance
   const viewModeTransitionRef = useRef<NodeJS.Timeout | null>(null);
   const worldMapTransitionRef = useRef<boolean>(false);
   const customZoneTransitionDone = useRef<boolean>(false);
-  const [currentViewMode, setCurrentViewMode] = useState<ViewMode>('room-detail');
-  const [selectedZoneId, setSelectedZoneId] = useState<number | undefined>(zoneId);
+  const [currentViewMode, setCurrentViewMode] =
+    useState<ViewMode>('room-detail');
+  const [selectedZoneId, setSelectedZoneId] = useState<number | undefined>(
+    zoneId
+  );
   const [overlaps, setOverlaps] = useState<OverlapInfo[]>([]);
   const [showOverlapInfo, setShowOverlapInfo] = useState(false);
   const [showKeyboardHelp, setShowKeyboardHelp] = useState(false);
   const [showLayoutTools, setShowLayoutTools] = useState(false);
+  // Prevent infinite re-render loop when there are 0 rooms by only clearing nodes once
+  const emptyNodesSetRef = useRef<boolean>(false);
+  // Prevent redundant node regeneration (stabilize ReactFlow updates in tests)
+  const lastGenerationSignatureRef = useRef<string>('');
 
   // Overlap management state - tracks which room is currently active in each overlapped position
-  const [activeOverlapRooms, setActiveOverlapRooms] = useState<Record<string, number>>({});
+  const [activeOverlapRooms, setActiveOverlapRooms] = useState<
+    Record<string, number>
+  >({});
 
   // Theme-aware color helpers
   const isDark = theme === 'dark';
-  const getThemeColor = useCallback((lightColor: string, darkColor: string) => {
-    return isDark ? darkColor : lightColor;
-  }, [isDark]);
+  const getThemeColor = useCallback(
+    (lightColor: string, darkColor: string) => {
+      return isDark ? darkColor : lightColor;
+    },
+    [isDark]
+  );
 
   // Helper functions for overlap management
-  const getPositionKey = (x: number, y: number, z: number = 0) => `${x},${y},${z}`;
+  const getPositionKey = (x: number, y: number, z: number = 0) =>
+    `${x},${y},${z}`;
 
-  const getActiveOverlapIndex = useCallback((roomId: number, overlappedRoomIds: number[]) => {
-    if (!overlappedRoomIds.includes(roomId)) return 0;
+  const getActiveOverlapIndex = useCallback(
+    (roomId: number, overlappedRoomIds: number[]) => {
+      if (!overlappedRoomIds.includes(roomId)) return 0;
 
-    const positionKey = `overlapped-${overlappedRoomIds.join('-')}`;
-    const activeRoomId = activeOverlapRooms[positionKey];
+      const positionKey = `overlapped-${overlappedRoomIds.join('-')}`;
+      const activeRoomId = activeOverlapRooms[positionKey];
 
-    if (activeRoomId && overlappedRoomIds.includes(activeRoomId)) {
-      return overlappedRoomIds.indexOf(activeRoomId);
-    }
+      // Treat roomId 0 as valid; explicitly check for null/undefined instead of truthiness
+      if (
+        activeRoomId !== null &&
+        activeRoomId !== undefined &&
+        overlappedRoomIds.includes(activeRoomId)
+      ) {
+        return overlappedRoomIds.indexOf(activeRoomId);
+      }
 
-    // Default to first room if no active room is set
-    return overlappedRoomIds.indexOf(roomId);
-  }, [activeOverlapRooms]);
+      // Default to first room if no active room is set
+      return overlappedRoomIds.indexOf(roomId);
+    },
+    [activeOverlapRooms]
+  );
 
-  const handleSwitchOverlapRoom = useCallback((roomId: number, overlappedRoomIds: number[], direction: 'next' | 'prev') => {
-    if (overlappedRoomIds.length <= 1) return;
+  const handleSwitchOverlapRoom = useCallback(
+    (
+      roomId: number,
+      overlappedRoomIds: number[],
+      direction: 'next' | 'prev'
+    ) => {
+      if (overlappedRoomIds.length <= 1) return;
 
-    const currentIndex = overlappedRoomIds.indexOf(roomId);
-    if (currentIndex === -1) return;
+      const currentIndex = overlappedRoomIds.indexOf(roomId);
+      if (currentIndex === -1) return;
 
-    let newIndex: number;
-    if (direction === 'next') {
-      newIndex = (currentIndex + 1) % overlappedRoomIds.length;
-    } else {
-      newIndex = currentIndex === 0 ? overlappedRoomIds.length - 1 : currentIndex - 1;
-    }
+      let newIndex: number;
+      if (direction === 'next') {
+        newIndex = (currentIndex + 1) % overlappedRoomIds.length;
+      } else {
+        newIndex =
+          currentIndex === 0 ? overlappedRoomIds.length - 1 : currentIndex - 1;
+      }
+      // Always a valid number; explicitly type to avoid undefined inference
+      const newActiveRoomId = overlappedRoomIds[newIndex]!; // Non-null assertion: index guaranteed in bounds
+      const positionKey = `overlapped-${overlappedRoomIds.join('-')}`;
 
-    const newActiveRoomId = overlappedRoomIds[newIndex];
-    const positionKey = `overlapped-${overlappedRoomIds.join('-')}`;
+      setActiveOverlapRooms(prev => {
+        const updated: Record<string, number> = {
+          ...prev,
+          [positionKey]: newActiveRoomId,
+        };
+        return updated;
+      });
 
-    setActiveOverlapRooms(prev => ({
-      ...prev,
-      [positionKey]: newActiveRoomId
-    }));
+      // Update selected room to the new active room
+      setSelectedRoomId(newActiveRoomId);
 
-    // Update selected room to the new active room
-    setSelectedRoomId(newActiveRoomId);
-
-    console.log(`🔄 Switched overlap room from ${roomId} to ${newActiveRoomId} (direction: ${direction})`);
-  }, [activeOverlapRooms, setSelectedRoomId]);
+      console.log(
+        `🔄 Switched overlap room from ${roomId} to ${newActiveRoomId} (direction: ${direction})`
+      );
+    },
+    [activeOverlapRooms, setSelectedRoomId]
+  );
 
   // Undo system for room positions
   interface UndoAction {
@@ -373,26 +447,31 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const nodePositionsRef = useRef<Record<string, { x: number; y: number }>>({});
 
   // Store original positions for reset functionality
-  const [originalPositions, setOriginalPositions] = useState<Record<number, { x: number; y: number }>>({});
+  const [originalPositions, setOriginalPositions] = useState<
+    Record<number, { x: number; y: number }>
+  >({});
 
   // Undo/Redo functionality (defined early to avoid initialization order issues)
-  const addToUndoHistory = useCallback((action: UndoAction) => {
-    setUndoHistory(prevHistory => {
-      // Remove any redo history if we're not at the end
-      const newHistory = prevHistory.slice(0, undoIndex + 1);
-      newHistory.push(action);
+  const addToUndoHistory = useCallback(
+    (action: UndoAction) => {
+      setUndoHistory(prevHistory => {
+        // Remove any redo history if we're not at the end
+        const newHistory = prevHistory.slice(0, undoIndex + 1);
+        newHistory.push(action);
 
-      // Limit history size
-      if (newHistory.length > MAX_UNDO_HISTORY) {
-        newHistory.shift();
+        // Limit history size
+        if (newHistory.length > MAX_UNDO_HISTORY) {
+          newHistory.shift();
+          return newHistory;
+        }
+
         return newHistory;
-      }
+      });
 
-      return newHistory;
-    });
-
-    setUndoIndex(prevIndex => Math.min(prevIndex + 1, MAX_UNDO_HISTORY - 1));
-  }, [undoIndex]);
+      setUndoIndex(prevIndex => Math.min(prevIndex + 1, MAX_UNDO_HISTORY - 1));
+    },
+    [undoIndex]
+  );
 
   const canUndo = undoIndex >= 0;
   const canRedo = undoIndex < undoHistory.length - 1;
@@ -404,7 +483,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // console.log('🔄 Undoing action:', action.type);
 
     try {
-      if (action.type === 'MOVE_ROOM' && action.roomId && action.previousPosition) {
+      if (
+        action.type === 'MOVE_ROOM' &&
+        action.roomId !== null &&
+        action.roomId !== undefined &&
+        action.previousPosition
+      ) {
         // Undo single room move
         const roomId = action.roomId;
         const prevPos = action.previousPosition;
@@ -456,35 +540,46 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               prevRooms.map(room =>
                 room.id === roomId
                   ? {
-                    ...room,
-                    layoutX: pixelsToGrid(prevPos.x),
-                    layoutY: pixelsToGridY(prevPos.y),
-                  }
+                      ...room,
+                      layoutX: pixelsToGrid(prevPos.x),
+                      layoutY: pixelsToGridY(prevPos.y),
+                    }
                   : room
               )
             );
 
             // console.log(`✅ Undid movement for room ${roomId}`);
           } else {
-            console.error(`❌ GraphQL error for undo room ${roomId}:`, data.errors[0].message);
+            console.error(
+              `❌ GraphQL error for undo room ${roomId}:`,
+              data.errors[0].message
+            );
           }
         } else {
-          console.error(`❌ HTTP error for undo room ${roomId}:`, response.status);
+          console.error(
+            `❌ HTTP error for undo room ${roomId}:`,
+            response.status
+          );
         }
-      } else if (action.type === 'MOVE_MULTIPLE_ROOMS' && action.previousPositions) {
+      } else if (
+        action.type === 'MOVE_MULTIPLE_ROOMS' &&
+        action.previousPositions
+      ) {
         // Undo multiple room moves (from auto-layout) using batch update
-        const updates = Object.entries(action.previousPositions).map(([roomIdStr, prevPos]) => {
-          const roomId = parseInt(roomIdStr);
-          const currentRoom = rooms.find(r => r.id === roomId);
-          const currentZ = currentRoom?.layoutZ ?? 0;
+        const updates = Object.entries(action.previousPositions).map(
+          ([roomIdStr, prevPos]) => {
+            const roomId = parseInt(roomIdStr);
+            const currentRoom = rooms.find(r => r.id === roomId);
+            const currentZ = currentRoom?.layoutZ ?? 0;
 
-          return {
-            roomId,
-            layoutX: pixelsToGrid(prevPos.x),
-            layoutY: pixelsToGridY(prevPos.y),
-            layoutZ: currentZ,
-          };
-        });
+            return {
+              roomId,
+              layoutX: pixelsToGrid(prevPos.x),
+              layoutY: pixelsToGridY(prevPos.y),
+              layoutZ: currentZ,
+            };
+          }
+        );
 
         // console.log(`🔄 Batch undoing ${updates.length} room positions...`);
 
@@ -517,7 +612,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             // console.log(`✅ Batch undid ${result.updatedCount} room positions successfully`);
 
             if (result.errors && result.errors.length > 0) {
-              console.warn(`⚠️ Some undo operations had issues:`, result.errors);
+              console.warn(
+                `⚠️ Some undo operations had issues:`,
+                result.errors
+              );
             }
 
             // Update React Flow nodes
@@ -543,11 +641,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               })
             );
           } else {
-            console.error(`❌ GraphQL error in batch undo:`, data.errors[0].message);
+            console.error(
+              `❌ GraphQL error in batch undo:`,
+              data.errors[0].message
+            );
             throw new Error(data.errors[0].message);
           }
         } else {
-          console.error(`❌ HTTP error in batch undo:`, response.status, response.statusText);
+          console.error(
+            `❌ HTTP error in batch undo:`,
+            response.status,
+            response.statusText
+          );
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       }
@@ -566,7 +671,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // console.log('🔄 Redoing action:', action.type);
 
     try {
-      if (action.type === 'MOVE_ROOM' && action.roomId && action.newPosition) {
+      if (
+        action.type === 'MOVE_ROOM' &&
+        action.roomId !== null &&
+        action.roomId !== undefined &&
+        action.newPosition
+      ) {
         // Redo single room move
         const roomId = action.roomId;
         const newPos = action.newPosition;
@@ -618,35 +728,43 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               prevRooms.map(room =>
                 room.id === roomId
                   ? {
-                    ...room,
-                    layoutX: pixelsToGrid(newPos.x),
-                    layoutY: pixelsToGrid(newPos.y),
-                  }
+                      ...room,
+                      layoutX: pixelsToGrid(newPos.x),
+                      layoutY: pixelsToGrid(newPos.y),
+                    }
                   : room
               )
             );
 
             // console.log(`✅ Redid movement for room ${roomId}`);
           } else {
-            console.error(`❌ GraphQL error for redo room ${roomId}:`, data.errors[0].message);
+            console.error(
+              `❌ GraphQL error for redo room ${roomId}:`,
+              data.errors[0].message
+            );
           }
         } else {
-          console.error(`❌ HTTP error for redo room ${roomId}:`, response.status);
+          console.error(
+            `❌ HTTP error for redo room ${roomId}:`,
+            response.status
+          );
         }
       } else if (action.type === 'MOVE_MULTIPLE_ROOMS' && action.newPositions) {
         // Redo multiple room moves (from auto-layout) using batch update
-        const updates = Object.entries(action.newPositions).map(([roomIdStr, newPos]) => {
-          const roomId = parseInt(roomIdStr);
-          const currentRoom = rooms.find(r => r.id === roomId);
-          const currentZ = currentRoom?.layoutZ ?? 0;
+        const updates = Object.entries(action.newPositions).map(
+          ([roomIdStr, newPos]) => {
+            const roomId = parseInt(roomIdStr);
+            const currentRoom = rooms.find(r => r.id === roomId);
+            const currentZ = currentRoom?.layoutZ ?? 0;
 
-          return {
-            roomId,
-            layoutX: pixelsToGrid(newPos.x),
-            layoutY: pixelsToGridY(newPos.y),
-            layoutZ: currentZ,
-          };
-        });
+            return {
+              roomId,
+              layoutX: pixelsToGrid(newPos.x),
+              layoutY: pixelsToGridY(newPos.y),
+              layoutZ: currentZ,
+            };
+          }
+        );
 
         // console.log(`🔄 Batch redoing ${updates.length} room positions...`);
 
@@ -679,7 +797,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             // console.log(`✅ Batch redid ${result.updatedCount} room positions successfully`);
 
             if (result.errors && result.errors.length > 0) {
-              console.warn(`⚠️ Some redo operations had issues:`, result.errors);
+              console.warn(
+                `⚠️ Some redo operations had issues:`,
+                result.errors
+              );
             }
 
             // Update React Flow nodes
@@ -705,11 +826,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               })
             );
           } else {
-            console.error(`❌ GraphQL error in batch redo:`, data.errors[0].message);
+            console.error(
+              `❌ GraphQL error in batch redo:`,
+              data.errors[0].message
+            );
             throw new Error(data.errors[0].message);
           }
         } else {
-          console.error(`❌ HTTP error in batch redo:`, response.status, response.statusText);
+          console.error(
+            `❌ HTTP error in batch redo:`,
+            response.status,
+            response.statusText
+          );
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       }
@@ -721,7 +849,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   }, [canRedo, undoIndex, undoHistory, rooms, setNodes, setRooms]);
 
   const handleResetLayout = useCallback(async () => {
-    if (!rooms || rooms.length === 0 || Object.keys(originalPositions).length === 0) return;
+    if (
+      !rooms ||
+      rooms.length === 0 ||
+      Object.keys(originalPositions).length === 0
+    )
+      return;
 
     try {
       // console.log(`🔄 Resetting layout to original load positions...`);
@@ -763,10 +896,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         roomIds: rooms.map(r => r.id),
         previousPositions,
         newPositions: Object.fromEntries(
-          resetNodes.map(node => [
-            parseInt(node.id),
-            node.position,
-          ])
+          resetNodes.map(node => [parseInt(node.id), node.position])
         ),
       });
 
@@ -778,270 +908,349 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       setShowOverlapInfo(false);
 
       // console.log(`✅ Layout reset to original load positions for ${resetNodes.length} rooms`);
-
     } catch (error) {
       console.error('❌ Failed to reset layout:', error);
     }
   }, [rooms, nodes, setNodes, addToUndoHistory, originalPositions]);
 
   // Auto-layout algorithm for systematic room positioning
-  const generateAutoLayout = useCallback((allRooms: WorldMapRoom[], startRoomId: number = 3001): Map<number, { x: number; y: number; z: number; zoneId: number; isOverlapping?: boolean; group?: string }> => {
-    // console.log('🗺️ Starting auto-layout algorithm from room', startRoomId);
-
-    // Create room lookup maps
-    const roomById = new Map(allRooms.map(room => [room.id, room]));
-    const roomsByZone = new Map<number, WorldMapRoom[]>();
-    allRooms.forEach(room => {
-      if (!roomsByZone.has(room.zoneId)) {
-        roomsByZone.set(room.zoneId, []);
+  const generateAutoLayout = useCallback(
+    (
+      allRooms: WorldMapRoom[],
+      startRoomId: number = 3001
+    ): Map<
+      number,
+      {
+        x: number;
+        y: number;
+        z: number;
+        zoneId: number;
+        isOverlapping?: boolean;
+        group?: string;
       }
-      roomsByZone.get(room.zoneId)!.push(room);
-    });
+    > => {
+      // console.log('🗺️ Starting auto-layout algorithm from room', startRoomId);
 
-    // Create exit lookup map
-    const exitsByRoom = new Map<number, { direction: string; toRoomId: number | null }[]>();
-    allRooms.forEach(room => {
-      const exits: Array<{ direction: string; toRoomId: number | null }> = [];
-      // Parse exits from room data - assuming they're in a property like 'exits'
-      if ((room as any).exits && Array.isArray((room as any).exits)) {
-        (room as any).exits.forEach((exit: any) => {
-          if (exit.toRoomId) {
-            exits.push({ direction: exit.direction, toRoomId: exit.toRoomId });
-          }
-        });
-      }
-      exitsByRoom.set(room.id, exits);
-    });
-
-    // Direction vectors: North=+Y, South=-Y, East=+X, West=-X, Up=+Z, Down=-Z
-    const directionVectors = {
-      'NORTH': { x: 0, y: 1, z: 0 },
-      'SOUTH': { x: 0, y: -1, z: 0 },
-      'EAST': { x: 1, y: 0, z: 0 },
-      'WEST': { x: -1, y: 0, z: 0 },
-      'UP': { x: 0, y: 0, z: 1 },
-      'DOWN': { x: 0, y: 0, z: -1 }
-    };
-
-    // Final layout positions
-    const layout = new Map<number, { x: number; y: number; z: number; zoneId: number; isOverlapping?: boolean; group?: string }>();
-    const processedRooms = new Set<number>();
-    const roomQueue: Array<{ roomId: number; x: number; y: number; z: number }> = [];
-    const zoneOffsets = new Map<number, { x: number; y: number; z: number }>();
-
-    // Find starting room
-    const startRoom = roomById.get(startRoomId);
-    if (!startRoom) {
-      console.warn(`⚠️ Start room ${startRoomId} not found, using first available room`);
-      const firstRoom = allRooms[0];
-      if (firstRoom) {
-        roomQueue.push({ roomId: firstRoom.id, x: 0, y: 0, z: 0 });
-        layout.set(firstRoom.id, { x: 0, y: 0, z: 0, zoneId: firstRoom.zoneId });
-        processedRooms.add(firstRoom.id);
-        zoneOffsets.set(firstRoom.zoneId, { x: 0, y: 0, z: 0 });
-      }
-    } else {
-      // Start from room 3001 at origin
-      roomQueue.push({ roomId: startRoomId, x: 0, y: 0, z: 0 });
-      layout.set(startRoomId, { x: 0, y: 0, z: 0, zoneId: startRoom.zoneId });
-      processedRooms.add(startRoomId);
-      zoneOffsets.set(startRoom.zoneId, { x: 0, y: 0, z: 0 });
-      // console.log(`📍 Placed start room ${startRoomId} at (0,0,0) in zone ${startRoom.zoneId}`);
-    }
-
-    // Process rooms using BFS to maintain connectivity
-    while (roomQueue.length > 0) {
-      const current = roomQueue.shift()!;
-      const currentRoom = roomById.get(current.roomId);
-      if (!currentRoom) continue;
-
-      const exits = exitsByRoom.get(current.roomId) || [];
-
-      for (const exit of exits) {
-        if (!exit.toRoomId) continue;
-
-        const destinationRoom = roomById.get(exit.toRoomId);
-        if (!destinationRoom || processedRooms.has(exit.toRoomId)) continue;
-
-        const direction = exit.direction.toUpperCase();
-        const vector = directionVectors[direction as keyof typeof directionVectors];
-        if (!vector) continue;
-
-        let newX = current.x + vector.x;
-        let newY = current.y + vector.y;
-        let newZ = current.z + vector.z;
-
-        // Check for zone boundary crossing
-        if (destinationRoom.zoneId !== currentRoom.zoneId) {
-          // This is a zone transition - no buffer, zones should touch naturally
-          const currentZoneOffset = zoneOffsets.get(currentRoom.zoneId) || { x: 0, y: 0, z: 0 };
-
-          if (!zoneOffsets.has(destinationRoom.zoneId)) {
-            // Calculate new zone offset with natural connection (no separation)
-            const newZoneOffset = {
-              x: currentZoneOffset.x + vector.x,
-              y: currentZoneOffset.y + vector.y,
-              z: currentZoneOffset.z + vector.z
-            };
-            zoneOffsets.set(destinationRoom.zoneId, newZoneOffset);
-            // console.log(`🌉 Zone transition: ${currentRoom.zoneId} → ${destinationRoom.zoneId} at offset (${newZoneOffset.x},${newZoneOffset.y},${newZoneOffset.z})`);
-          }
-
-          const destZoneOffset = zoneOffsets.get(destinationRoom.zoneId)!;
-          newX = destZoneOffset.x;
-          newY = destZoneOffset.y;
-          newZ = destZoneOffset.z;
+      // Create room lookup maps
+      const roomById = new Map(allRooms.map(room => [room.id, room]));
+      const roomsByZone = new Map<number, WorldMapRoom[]>();
+      allRooms.forEach(room => {
+        if (!roomsByZone.has(room.zoneId)) {
+          roomsByZone.set(room.zoneId, []);
         }
+        roomsByZone.get(room.zoneId)!.push(room);
+      });
 
-        // Check for overlaps
-        const existingRoom = Array.from(layout.values()).find(pos =>
-          pos.x === newX && pos.y === newY && pos.z === newZ
-        );
-
-        if (existingRoom) {
-          // Mark both rooms as overlapping
-          const existingRoomId = Array.from(layout.entries()).find(([_, pos]) =>
-            pos.x === newX && pos.y === newY && pos.z === newZ
-          )?.[0];
-
-          if (existingRoomId) {
-            layout.get(existingRoomId)!.isOverlapping = true;
-            console.log(`⚠️ Overlap detected at (${newX},${newY},${newZ}): rooms ${existingRoomId} and ${exit.toRoomId}`);
-          }
-
-          // Move overlapping room to a new Z level
-          newZ += 10; // Move up by 10 levels to create separation
-        }
-
-        layout.set(exit.toRoomId, {
-          x: newX,
-          y: newY,
-          z: newZ,
-          zoneId: destinationRoom.zoneId,
-          isOverlapping: !!existingRoom
-        });
-        processedRooms.add(exit.toRoomId);
-        roomQueue.push({ roomId: exit.toRoomId, x: newX, y: newY, z: newZ });
-      }
-    }
-
-    // Handle unconnected rooms - move them to unused Z levels by zone
-    let unconnectedZLevel = 1000; // Start unconnected rooms at Z=1000
-    allRooms.forEach(room => {
-      if (!processedRooms.has(room.id)) {
-        // Group unconnected rooms by zone
-        const zoneRooms = roomsByZone.get(room.zoneId) || [];
-        const zoneUnconnected = zoneRooms.filter(r => !processedRooms.has(r.id));
-
-        if (zoneUnconnected.length > 0) {
-          const zoneOffset = zoneOffsets.get(room.zoneId) || { x: 0, y: 0, z: unconnectedZLevel };
-          if (!zoneOffsets.has(room.zoneId)) {
-            zoneOffsets.set(room.zoneId, zoneOffset);
-          }
-
-          // Arrange unconnected rooms in a grid pattern at the zone's Z level
-          const gridSize = Math.ceil(Math.sqrt(zoneUnconnected.length));
-          zoneUnconnected.forEach((unconnectedRoom, index) => {
-            if (!processedRooms.has(unconnectedRoom.id)) {
-              const gridX = index % gridSize;
-              const gridY = Math.floor(index / gridSize);
-
-              layout.set(unconnectedRoom.id, {
-                x: zoneOffset.x + gridX * 10,
-                y: zoneOffset.y + gridY * 10,
-                z: unconnectedZLevel,
-                zoneId: unconnectedRoom.zoneId,
-                group: 'unconnected'
+      // Create exit lookup map
+      const exitsByRoom = new Map<
+        number,
+        { direction: string; toRoomId: number | null }[]
+      >();
+      allRooms.forEach(room => {
+        const exits: Array<{ direction: string; toRoomId: number | null }> = [];
+        // Parse exits from room data - assuming they're in a property like 'exits'
+        if ((room as any).exits && Array.isArray((room as any).exits)) {
+          (room as any).exits.forEach((exit: any) => {
+            if (exit.toRoomId) {
+              exits.push({
+                direction: exit.direction,
+                toRoomId: exit.toRoomId,
               });
-              processedRooms.add(unconnectedRoom.id);
             }
           });
+        }
+        exitsByRoom.set(room.id, exits);
+      });
 
-          unconnectedZLevel += 100; // Space out unconnected zone levels
-          console.log(`🏝️ Placed ${zoneUnconnected.length} unconnected rooms from zone ${room.zoneId} at Z=${unconnectedZLevel - 100}`);
+      // Direction vectors: North=+Y, South=-Y, East=+X, West=-X, Up=+Z, Down=-Z
+      const directionVectors = {
+        NORTH: { x: 0, y: 1, z: 0 },
+        SOUTH: { x: 0, y: -1, z: 0 },
+        EAST: { x: 1, y: 0, z: 0 },
+        WEST: { x: -1, y: 0, z: 0 },
+        UP: { x: 0, y: 0, z: 1 },
+        DOWN: { x: 0, y: 0, z: -1 },
+      };
+
+      // Final layout positions
+      const layout = new Map<
+        number,
+        {
+          x: number;
+          y: number;
+          z: number;
+          zoneId: number;
+          isOverlapping?: boolean;
+          group?: string;
+        }
+      >();
+      const processedRooms = new Set<number>();
+      const roomQueue: Array<{
+        roomId: number;
+        x: number;
+        y: number;
+        z: number;
+      }> = [];
+      const zoneOffsets = new Map<
+        number,
+        { x: number; y: number; z: number }
+      >();
+
+      // Find starting room
+      const startRoom = roomById.get(startRoomId);
+      if (!startRoom) {
+        console.warn(
+          `⚠️ Start room ${startRoomId} not found, using first available room`
+        );
+        const firstRoom = allRooms[0];
+        if (firstRoom) {
+          roomQueue.push({ roomId: firstRoom.id, x: 0, y: 0, z: 0 });
+          layout.set(firstRoom.id, {
+            x: 0,
+            y: 0,
+            z: 0,
+            zoneId: firstRoom.zoneId,
+          });
+          processedRooms.add(firstRoom.id);
+          zoneOffsets.set(firstRoom.zoneId, { x: 0, y: 0, z: 0 });
+        }
+      } else {
+        // Start from room 3001 at origin
+        roomQueue.push({ roomId: startRoomId, x: 0, y: 0, z: 0 });
+        layout.set(startRoomId, { x: 0, y: 0, z: 0, zoneId: startRoom.zoneId });
+        processedRooms.add(startRoomId);
+        zoneOffsets.set(startRoom.zoneId, { x: 0, y: 0, z: 0 });
+        // console.log(`📍 Placed start room ${startRoomId} at (0,0,0) in zone ${startRoom.zoneId}`);
+      }
+
+      // Process rooms using BFS to maintain connectivity
+      while (roomQueue.length > 0) {
+        const current = roomQueue.shift()!;
+        const currentRoom = roomById.get(current.roomId);
+        if (!currentRoom) continue;
+
+        const exits = exitsByRoom.get(current.roomId) || [];
+
+        for (const exit of exits) {
+          if (!exit.toRoomId) continue;
+
+          const destinationRoom = roomById.get(exit.toRoomId);
+          if (!destinationRoom || processedRooms.has(exit.toRoomId)) continue;
+
+          const direction = exit.direction.toUpperCase();
+          const vector =
+            directionVectors[direction as keyof typeof directionVectors];
+          if (!vector) continue;
+
+          let newX = current.x + vector.x;
+          let newY = current.y + vector.y;
+          let newZ = current.z + vector.z;
+
+          // Check for zone boundary crossing
+          if (destinationRoom.zoneId !== currentRoom.zoneId) {
+            // This is a zone transition - no buffer, zones should touch naturally
+            const currentZoneOffset = zoneOffsets.get(currentRoom.zoneId) || {
+              x: 0,
+              y: 0,
+              z: 0,
+            };
+
+            if (!zoneOffsets.has(destinationRoom.zoneId)) {
+              // Calculate new zone offset with natural connection (no separation)
+              const newZoneOffset = {
+                x: currentZoneOffset.x + vector.x,
+                y: currentZoneOffset.y + vector.y,
+                z: currentZoneOffset.z + vector.z,
+              };
+              zoneOffsets.set(destinationRoom.zoneId, newZoneOffset);
+              // console.log(`🌉 Zone transition: ${currentRoom.zoneId} → ${destinationRoom.zoneId} at offset (${newZoneOffset.x},${newZoneOffset.y},${newZoneOffset.z})`);
+            }
+
+            const destZoneOffset = zoneOffsets.get(destinationRoom.zoneId)!;
+            newX = destZoneOffset.x;
+            newY = destZoneOffset.y;
+            newZ = destZoneOffset.z;
+          }
+
+          // Check for overlaps
+          const existingRoom = Array.from(layout.values()).find(
+            pos => pos.x === newX && pos.y === newY && pos.z === newZ
+          );
+
+          if (existingRoom) {
+            // Mark both rooms as overlapping
+            const existingRoomId = Array.from(layout.entries()).find(
+              ([_, pos]) => pos.x === newX && pos.y === newY && pos.z === newZ
+            )?.[0];
+
+            if (existingRoomId) {
+              layout.get(existingRoomId)!.isOverlapping = true;
+              console.log(
+                `⚠️ Overlap detected at (${newX},${newY},${newZ}): rooms ${existingRoomId} and ${exit.toRoomId}`
+              );
+            }
+
+            // Move overlapping room to a new Z level
+            newZ += 10; // Move up by 10 levels to create separation
+          }
+
+          layout.set(exit.toRoomId, {
+            x: newX,
+            y: newY,
+            z: newZ,
+            zoneId: destinationRoom.zoneId,
+            isOverlapping: !!existingRoom,
+          });
+          processedRooms.add(exit.toRoomId);
+          roomQueue.push({ roomId: exit.toRoomId, x: newX, y: newY, z: newZ });
         }
       }
-    });
 
-    // console.log(`✅ Auto-layout complete: ${layout.size} rooms positioned, ${Array.from(layout.values()).filter(p => p.isOverlapping).length} overlaps detected`);
-    return layout;
-  }, []);
+      // Handle unconnected rooms - move them to unused Z levels by zone
+      let unconnectedZLevel = 1000; // Start unconnected rooms at Z=1000
+      allRooms.forEach(room => {
+        if (!processedRooms.has(room.id)) {
+          // Group unconnected rooms by zone
+          const zoneRooms = roomsByZone.get(room.zoneId) || [];
+          const zoneUnconnected = zoneRooms.filter(
+            r => !processedRooms.has(r.id)
+          );
+
+          if (zoneUnconnected.length > 0) {
+            const zoneOffset = zoneOffsets.get(room.zoneId) || {
+              x: 0,
+              y: 0,
+              z: unconnectedZLevel,
+            };
+            if (!zoneOffsets.has(room.zoneId)) {
+              zoneOffsets.set(room.zoneId, zoneOffset);
+            }
+
+            // Arrange unconnected rooms in a grid pattern at the zone's Z level
+            const gridSize = Math.ceil(Math.sqrt(zoneUnconnected.length));
+            zoneUnconnected.forEach((unconnectedRoom, index) => {
+              if (!processedRooms.has(unconnectedRoom.id)) {
+                const gridX = index % gridSize;
+                const gridY = Math.floor(index / gridSize);
+
+                layout.set(unconnectedRoom.id, {
+                  x: zoneOffset.x + gridX * 10,
+                  y: zoneOffset.y + gridY * 10,
+                  z: unconnectedZLevel,
+                  zoneId: unconnectedRoom.zoneId,
+                  group: 'unconnected',
+                });
+                processedRooms.add(unconnectedRoom.id);
+              }
+            });
+
+            unconnectedZLevel += 100; // Space out unconnected zone levels
+            console.log(
+              `🏝️ Placed ${zoneUnconnected.length} unconnected rooms from zone ${room.zoneId} at Z=${unconnectedZLevel - 100}`
+            );
+          }
+        }
+      });
+
+      // console.log(`✅ Auto-layout complete: ${layout.size} rooms positioned, ${Array.from(layout.values()).filter(p => p.isOverlapping).length} overlaps detected`);
+      return layout;
+    },
+    []
+  );
 
   // World map helper functions
-  const calculateZoneBounds = useCallback((zoneData: { id: number; name: string; climate: string; rooms: Room[] }): ZoneBounds => {
-    const { id, name, climate, rooms } = zoneData;
+  const calculateZoneBounds = useCallback(
+    (zoneData: {
+      id: number;
+      name: string;
+      climate: string;
+      rooms: Room[];
+    }): ZoneBounds => {
+      const { id, name, climate, rooms } = zoneData;
 
-    if (rooms.length === 0) {
+      if (rooms.length === 0) {
+        return {
+          id,
+          name,
+          climate,
+          minX: 0,
+          minY: 0,
+          maxX: 0,
+          maxY: 0,
+          centerX: 0,
+          centerY: 0,
+          roomCount: 0,
+        };
+      }
+
+      // Filter out rooms with null coordinates and get valid coordinates
+      const roomsWithCoords = rooms.filter(
+        r => r.layoutX !== null && r.layoutY !== null
+      );
+
+      if (roomsWithCoords.length === 0) {
+        // No rooms have valid coordinates, use default bounds
+        return {
+          id,
+          name,
+          climate,
+          minX: 0,
+          minY: 0,
+          maxX: 1,
+          maxY: 1,
+          centerX: 0.5,
+          centerY: 0.5,
+          roomCount: rooms.length,
+        };
+      }
+
+      // Get coordinates from rooms that have valid positions
+      const xs = roomsWithCoords.map(r => r.layoutX!);
+      const ys = roomsWithCoords.map(r => r.layoutY!);
+
+      const minX = Math.min(...xs);
+      const maxX = Math.max(...xs);
+      const minY = Math.min(...ys);
+      const maxY = Math.max(...ys);
+
+      // Ensure minimum bounds size for better visualization with adequate padding
+      const boundsPadding = Math.max(2, Math.sqrt(roomsWithCoords.length)); // Dynamic padding based on room count
+      const finalMinX = minX - boundsPadding * 0.5;
+      const finalMaxX = Math.max(
+        maxX + boundsPadding * 0.5,
+        minX + boundsPadding
+      );
+      const finalMinY = minY - boundsPadding * 0.5;
+      const finalMaxY = Math.max(
+        maxY + boundsPadding * 0.5,
+        minY + boundsPadding
+      );
+
       return {
         id,
         name,
         climate,
-        minX: 0,
-        minY: 0,
-        maxX: 0,
-        maxY: 0,
-        centerX: 0,
-        centerY: 0,
-        roomCount: 0,
-      };
-    }
-
-    // Filter out rooms with null coordinates and get valid coordinates
-    const roomsWithCoords = rooms.filter(r => r.layoutX !== null && r.layoutY !== null);
-
-    if (roomsWithCoords.length === 0) {
-      // No rooms have valid coordinates, use default bounds
-      return {
-        id,
-        name,
-        climate,
-        minX: 0,
-        minY: 0,
-        maxX: 1,
-        maxY: 1,
-        centerX: 0.5,
-        centerY: 0.5,
+        minX: finalMinX,
+        minY: finalMinY,
+        maxX: finalMaxX,
+        maxY: finalMaxY,
+        centerX: (finalMinX + finalMaxX) / 2,
+        centerY: (finalMinY + finalMaxY) / 2,
         roomCount: rooms.length,
       };
-    }
-
-    // Get coordinates from rooms that have valid positions
-    const xs = roomsWithCoords.map(r => r.layoutX!);
-    const ys = roomsWithCoords.map(r => r.layoutY!);
-
-    const minX = Math.min(...xs);
-    const maxX = Math.max(...xs);
-    const minY = Math.min(...ys);
-    const maxY = Math.max(...ys);
-
-    // Ensure minimum bounds size for better visualization with adequate padding
-    const boundsPadding = Math.max(2, Math.sqrt(roomsWithCoords.length)); // Dynamic padding based on room count
-    const finalMinX = minX - boundsPadding * 0.5;
-    const finalMaxX = Math.max(maxX + boundsPadding * 0.5, minX + boundsPadding);
-    const finalMinY = minY - boundsPadding * 0.5;
-    const finalMaxY = Math.max(maxY + boundsPadding * 0.5, minY + boundsPadding);
-
-    return {
-      id,
-      name,
-      climate,
-      minX: finalMinX,
-      minY: finalMinY,
-      maxX: finalMaxX,
-      maxY: finalMaxY,
-      centerX: (finalMinX + finalMaxX) / 2,
-      centerY: (finalMinY + finalMaxY) / 2,
-      roomCount: rooms.length,
-    };
-  }, []);
+    },
+    []
+  );
 
   const fetchAllZones = useCallback(async (): Promise<ZoneMapData | null> => {
     try {
       // First, fetch all zones
-      const zonesResponse = await authenticatedFetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        body: JSON.stringify({
-          query: `
+      const zonesResponse = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `
             query GetAllZones {
               zones {
                 id
@@ -1050,8 +1259,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-        }),
-      });
+          }),
+        }
+      );
 
       const zonesData = await zonesResponse.json();
       if (zonesData.errors) {
@@ -1065,10 +1275,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Then, fetch all rooms with lightweight query for world map
       // Note: We can't use roomsByZone with lightweight here because we need ALL zones
       // So we fetch each zone's rooms separately with lightweight mode
-      const roomsResponse = await authenticatedFetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        body: JSON.stringify({
-          query: `
+      const roomsResponse = await authenticatedFetch(
+        'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `
             query GetAllRooms($lightweight: Boolean) {
               rooms(take: 15000, lightweight: $lightweight) {
                 id
@@ -1087,9 +1299,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               }
             }
           `,
-          variables: { lightweight: true },
-        }),
-      });
+            variables: { lightweight: true },
+          }),
+        }
+      );
 
       const roomsData = await roomsResponse.json();
       if (roomsData.errors) {
@@ -1141,12 +1354,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             layoutY: layoutPos.y,
             layoutZ: layoutPos.z || room.layoutZ || 0,
             isOverlapping: layoutPos.isOverlapping,
-            group: layoutPos.group
+            group: layoutPos.group,
           };
         }
         return room;
       });
-      console.log(`🗺️ Room positioning: ${roomsWithDbCoords} using DB coords, ${roomsWithAutoLayout} using auto-layout`);
+      console.log(
+        `🗺️ Room positioning: ${roomsWithDbCoords} using DB coords, ${roomsWithAutoLayout} using auto-layout`
+      );
 
       // Group updated rooms by zoneId
       const roomsByZone = updatedRooms.reduce((acc: any, room: any) => {
@@ -1201,69 +1416,84 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   }, [calculateZoneBounds]);
 
   // Zoom level detection with hysteresis to prevent bouncing
-  const detectViewMode = useCallback((zoom: number, currentMode?: ViewMode): ViewMode => {
-    // Use different thresholds based on current mode to prevent bouncing (hysteresis)
-    if (currentMode === 'world-map') {
-      // Coming FROM world map - need higher zoom to switch to zone
-      if (zoom < 0.25) return 'world-map';
-      if (zoom < 1.2) return 'zone-overview';
-      return 'room-detail';
-    } else if (currentMode === 'zone-overview') {
-      // Coming FROM zone - need MUCH lower zoom to switch to world map (allow whole zone viewing)
-      if (zoom < 0.05) return 'world-map'; // Very low threshold to allow full zone viewing
-      if (zoom < 1.2) return 'zone-overview';
-      return 'room-detail';
-    } else {
-      // Default thresholds (room-detail or initial)
-      if (zoom < 0.1) return 'world-map'; // Lower default threshold
-      if (zoom < 1.2) return 'zone-overview';
-      return 'room-detail';
-    }
-  }, []);
+  const detectViewMode = useCallback(
+    (zoom: number, currentMode?: ViewMode): ViewMode => {
+      // Use different thresholds based on current mode to prevent bouncing (hysteresis)
+      if (currentMode === 'world-map') {
+        // Coming FROM world map - need higher zoom to switch to zone
+        if (zoom < 0.25) return 'world-map';
+        if (zoom < 1.2) return 'zone-overview';
+        return 'room-detail';
+      } else if (currentMode === 'zone-overview') {
+        // Coming FROM zone - need MUCH lower zoom to switch to world map (allow whole zone viewing)
+        if (zoom < 0.05) return 'world-map'; // Very low threshold to allow full zone viewing
+        if (zoom < 1.2) return 'zone-overview';
+        return 'room-detail';
+      } else {
+        // Default thresholds (room-detail or initial)
+        if (zoom < 0.1) return 'world-map'; // Lower default threshold
+        if (zoom < 1.2) return 'zone-overview';
+        return 'room-detail';
+      }
+    },
+    []
+  );
 
   // Zone selection handler with smooth transition
-  const handleZoneSelect = useCallback((newZoneId: number) => {
-    setSelectedZoneId(newZoneId);
+  const handleZoneSelect = useCallback(
+    (newZoneId: number) => {
+      setSelectedZoneId(newZoneId);
 
-    // If we're in world map mode, zoom into the selected zone (any zone)
-    if (worldMapMode || currentViewMode === 'world-map') {
-      const zoneBounds = zoneMapData?.zones.find(z => z.id === newZoneId);
-      if (zoneBounds && reactFlowInstance) {
-        // Store session data for smooth transition
-        sessionStorage.setItem('selectedZoneFromWorldMap', newZoneId.toString());
-        sessionStorage.setItem('lastWorldMapViewport', JSON.stringify({
-          x: reactFlowInstance.getViewport().x,
-          y: reactFlowInstance.getViewport().y,
-          zoom: reactFlowInstance.getViewport().zoom
-        }));
+      // If we're in world map mode, zoom into the selected zone (any zone)
+      if (worldMapMode || currentViewMode === 'world-map') {
+        const zoneBounds = zoneMapData?.zones.find(z => z.id === newZoneId);
+        if (zoneBounds && reactFlowInstance) {
+          // Store session data for smooth transition
+          sessionStorage.setItem(
+            'selectedZoneFromWorldMap',
+            newZoneId.toString()
+          );
+          sessionStorage.setItem(
+            'lastWorldMapViewport',
+            JSON.stringify({
+              x: reactFlowInstance.getViewport().x,
+              y: reactFlowInstance.getViewport().y,
+              zoom: reactFlowInstance.getViewport().zoom,
+            })
+          );
 
-        // If it's a different zone, navigate to it
-        if (newZoneId !== zoneId) {
-          router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
-        } else {
-          // If it's the same zone, navigate back to the zone editor
-          router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
-          setCurrentViewMode('zone-overview');
-          // Force a reload of the zone data to ensure proper centering
-          setTimeout(() => {
-            if (reactFlowInstance) {
-              reactFlowInstance.fitView({
-                padding: 0.2,
-                minZoom: 0.15, // Stay above world map threshold (0.05)
-                maxZoom: 1.5,
-                duration: 800,
-              });
-            }
-          }, 100);
+          // If it's a different zone, navigate to it
+          if (newZoneId !== zoneId) {
+            router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
+          } else {
+            // If it's the same zone, navigate back to the zone editor
+            router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
+            setCurrentViewMode('zone-overview');
+            // Force a reload of the zone data to ensure proper centering
+            setTimeout(() => {
+              if (reactFlowInstance) {
+                reactFlowInstance.fitView({
+                  padding: 0.2,
+                  minZoom: 0.15, // Stay above world map threshold (0.05)
+                  maxZoom: 1.5,
+                  duration: 800,
+                });
+              }
+            }, 100);
+          }
+          return;
         }
-        return;
+      } else if (newZoneId !== zoneId) {
+        // If not in world map mode and different zone, navigate
+        sessionStorage.setItem(
+          'selectedZoneFromWorldMap',
+          newZoneId.toString()
+        );
+        router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
       }
-    } else if (newZoneId !== zoneId) {
-      // If not in world map mode and different zone, navigate
-      sessionStorage.setItem('selectedZoneFromWorldMap', newZoneId.toString());
-      router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
-    }
-  }, [zoneId, zoneMapData, reactFlowInstance, worldMapMode, router]);
+    },
+    [zoneId, zoneMapData, reactFlowInstance, worldMapMode, router]
+  );
 
   // Smooth transition to world map view
   const transitionToWorldMap = useCallback(() => {
@@ -1277,8 +1507,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const { globalBounds } = zoneMapData;
       const ZONE_SCALE = 200;
 
-      const centerX = ((globalBounds.minX + globalBounds.maxX) / 2) * ZONE_SCALE;
-      const centerY = ((globalBounds.minY + globalBounds.maxY) / 2) * ZONE_SCALE;
+      const centerX =
+        ((globalBounds.minX + globalBounds.maxX) / 2) * ZONE_SCALE;
+      const centerY =
+        ((globalBounds.minY + globalBounds.maxY) / 2) * ZONE_SCALE;
       const worldWidth = (globalBounds.maxX - globalBounds.minX) * ZONE_SCALE;
       const worldHeight = (globalBounds.maxY - globalBounds.minY) * ZONE_SCALE;
 
@@ -1300,7 +1532,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
       reactFlowInstance.setCenter(centerX, centerY, {
         duration: 800, // Reduced duration for better performance
-        zoom: targetZoom
+        zoom: targetZoom,
       });
 
       // Update view mode after transition and clear transition flag
@@ -1321,7 +1553,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         const mapData = await fetchAllZones();
         if (mapData) {
           setZoneMapData(mapData);
-          setAllZones(mapData.zones.map(z => ({ id: z.id, name: z.name, climate: z.climate })));
+          setAllZones(
+            mapData.zones.map(z => ({
+              id: z.id,
+              name: z.name,
+              climate: z.climate,
+            }))
+          );
         }
       } catch (error) {
         console.error('Failed to fetch world map data:', error);
@@ -1344,7 +1582,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           const mapData = await fetchAllZones();
           if (mapData) {
             setZoneMapData(mapData);
-            setAllZones(mapData.zones.map(z => ({ id: z.id, name: z.name, climate: z.climate })));
+            setAllZones(
+              mapData.zones.map(z => ({
+                id: z.id,
+                name: z.name,
+                climate: z.climate,
+              }))
+            );
             // console.log('🌍 World map data loaded for zoom-out:', mapData.zones.length, 'zones');
           }
         } catch (error) {
@@ -1509,7 +1753,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 // Use fallback grid layout position
                 const total = transformedRooms.length;
                 if (total === 1) {
-                  originals[room.id] = { x: gridToPixels(2), y: gridToPixels(1) };
+                  originals[room.id] = {
+                    x: gridToPixels(2),
+                    y: gridToPixels(1),
+                  };
                 } else {
                   const cols = Math.max(3, Math.ceil(Math.sqrt(total * 1.2)));
                   const col = index % cols;
@@ -1606,7 +1853,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Select initial room from URL parameter
   useEffect(() => {
-    if (initialRoomId && rooms.length > 0 && !selectedRoomId) {
+    // Only select the initial room if none currently selected (treat 0 as valid)
+    if (
+      initialRoomId !== null &&
+      initialRoomId !== undefined &&
+      rooms.length > 0 &&
+      (selectedRoomId === null || selectedRoomId === undefined)
+    ) {
       const room = rooms.find(r => r.id === initialRoomId);
       if (room) {
         console.log(`📍 Selecting initial room from URL: ${initialRoomId}`);
@@ -1616,408 +1869,68 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   }, [initialRoomId, rooms, selectedRoomId, handleSelectRoom]);
 
   // Generate world map nodes for zone viewing
-  const generateWorldMapNodes = useCallback((mapData: ZoneMapData): Node[] => {
-    const ZONE_SCALE = 200; // Scale factor for world map positioning
+  const generateWorldMapNodes = useCallback(
+    (mapData: ZoneMapData): Node[] => {
+      const ZONE_SCALE = 200; // Scale factor for world map positioning
 
-    return mapData.zones.map((zoneBounds) => {
-      const centerX = zoneBounds.centerX * ZONE_SCALE;
-      const centerY = zoneBounds.centerY * ZONE_SCALE;
+      return mapData.zones.map(zoneBounds => {
+        const centerX = zoneBounds.centerX * ZONE_SCALE;
+        const centerY = zoneBounds.centerY * ZONE_SCALE;
 
-      return {
-        id: `zone-${zoneBounds.id}`,
-        type: 'zone',
-        position: { x: centerX, y: centerY },
-        data: {
-          zoneId: zoneBounds.id,
-          name: zoneBounds.name,
-          climate: zoneBounds.climate,
-          roomCount: zoneBounds.roomCount,
-          bounds: zoneBounds,
-          onZoneSelect: handleZoneSelect,
-        },
-        draggable: false,
-        selectable: true,
-      };
-    });
-  }, [handleZoneSelect]);
+        return {
+          id: `zone-${zoneBounds.id}`,
+          type: 'zone',
+          position: { x: centerX, y: centerY },
+          data: {
+            zoneId: zoneBounds.id,
+            name: zoneBounds.name,
+            climate: zoneBounds.climate,
+            roomCount: zoneBounds.roomCount,
+            bounds: zoneBounds,
+            onZoneSelect: handleZoneSelect,
+          },
+          draggable: false,
+          selectable: true,
+        };
+      });
+    },
+    [handleZoneSelect]
+  );
 
   // Generate world map room nodes with enhanced Level of Detail (LOD) system
-  const generateWorldMapRoomNodes = useCallback((mapData: ZoneMapData, zoom: number = 0.5): Node[] => {
-    const performanceStart = performance.now();
+  const generateWorldMapRoomNodes = useCallback(
+    (mapData: ZoneMapData, zoom: number = 0.5): Node[] => {
+      const performanceStart = performance.now();
 
-    // Dynamic scaling based on zoom level for better visibility
-    const ROOM_SCALE = zoom < 0.3 ? 200 : zoom < 0.5 ? 100 : 50; // Much larger scale for world view
-    const MIN_ZONE_PADDING = 200; // Minimum padding between zone boundaries
+      // Dynamic scaling based on zoom level for better visibility
+      const ROOM_SCALE = zoom < 0.3 ? 200 : zoom < 0.5 ? 100 : 50; // Much larger scale for world view
+      const MIN_ZONE_PADDING = 200; // Minimum padding between zone boundaries
 
-    const zoneNameMap = mapData.zones.reduce((acc, zone) => {
-      acc[zone.id] = zone.name;
-      return acc;
-    }, {} as Record<number, string>);
+      const zoneNameMap = mapData.zones.reduce(
+        (acc, zone) => {
+          acc[zone.id] = zone.name;
+          return acc;
+        },
+        {} as Record<number, string>
+      );
 
-    // Create a smart zone-based layout that prevents overlapping using actual zone bounds
-    const zonePositions = new Map<number, { x: number; y: number }>();
+      // Create a smart zone-based layout that prevents overlapping using actual zone bounds
+      const zonePositions = new Map<number, { x: number; y: number }>();
 
-    // Calculate actual zone dimensions in world coordinates
-    const zoneMetrics = mapData.zones.map(zone => ({
-      id: zone.id,
-      width: (zone.maxX - zone.minX) * ROOM_SCALE,
-      height: (zone.maxY - zone.minY) * ROOM_SCALE,
-      bounds: zone
-    }));
-
-    // Sort zones by area (largest first) for better packing
-    const sortedZones = [...zoneMetrics].sort((a, b) => (b.width * b.height) - (a.width * a.height));
-
-    // Use a simple but effective bin-packing algorithm
-    const placedZones: Array<{ id: number; x: number; y: number; width: number; height: number }> = [];
-
-    sortedZones.forEach(zone => {
-      let bestPosition = { x: 0, y: 0 };
-      let bestWaste = Infinity;
-
-      // Try to find the best position that minimizes wasted space
-      for (let x = 0; x <= 5000; x += 100) { // Reasonable search space
-        for (let y = 0; y <= 5000; y += 100) {
-          // Check if this position would cause overlap
-          const wouldOverlap = placedZones.some(placed => {
-            const overlap = !(
-              x >= placed.x + placed.width + MIN_ZONE_PADDING ||
-              x + zone.width + MIN_ZONE_PADDING <= placed.x ||
-              y >= placed.y + placed.height + MIN_ZONE_PADDING ||
-              y + zone.height + MIN_ZONE_PADDING <= placed.y
-            );
-            return overlap;
-          });
-
-          if (!wouldOverlap) {
-            // Calculate waste (distance from origin - prefer positions closer to origin)
-            const waste = Math.sqrt(x * x + y * y);
-            if (waste < bestWaste) {
-              bestWaste = waste;
-              bestPosition = { x, y };
-            }
-          }
-        }
-      }
-
-      // Place the zone at the best position found
-      placedZones.push({
+      // Calculate actual zone dimensions in world coordinates
+      const zoneMetrics = mapData.zones.map(zone => ({
         id: zone.id,
-        x: bestPosition.x,
-        y: bestPosition.y,
-        width: zone.width,
-        height: zone.height
-      });
+        width: (zone.maxX - zone.minX) * ROOM_SCALE,
+        height: (zone.maxY - zone.minY) * ROOM_SCALE,
+        bounds: zone,
+      }));
 
-      // Store the position offset for this zone (center the zone content)
-      zonePositions.set(zone.id, {
-        x: bestPosition.x + zone.width / 2,
-        y: bestPosition.y + zone.height / 2,
-      });
-    });
+      // Sort zones by area (largest first) for better packing
+      const sortedZones = [...zoneMetrics].sort(
+        (a, b) => b.width * b.height - a.width * a.height
+      );
 
-    // Enhanced Level of Detail based on zoom level with performance optimization
-    let clusterSize = 1; // Default: show individual rooms
-    let maxNodes = 10000; // Maximum nodes to render
-    let lodLevel = 'detailed';
-
-    if (zoom < 0.1) {
-      // Extreme zoom out: use Canvas rendering for ultimate performance (disabled for now)
-      clusterSize = 32;
-      maxNodes = 100;
-      lodLevel = 'canvas-micro';
-      setUseCanvasRendering(false); // Temporarily disabled
-    } else if (zoom < 0.2) {
-      // Ultra zoomed out: maximum clustering for overview
-      clusterSize = 16;
-      maxNodes = 200;
-      lodLevel = 'ultra-overview';
-      setUseCanvasRendering(false);
-    } else if (zoom < 0.3) {
-      // Very zoomed out: cluster rooms heavily
-      clusterSize = 8;
-      maxNodes = 500;
-      lodLevel = 'overview';
-      setUseCanvasRendering(false);
-    } else if (zoom < 0.5) {
-      // Moderately zoomed out: some clustering
-      clusterSize = 4;
-      maxNodes = 1500;
-      lodLevel = 'medium';
-      setUseCanvasRendering(false);
-    } else if (zoom < 0.8) {
-      // Somewhat zoomed in: minimal clustering
-      clusterSize = 2;
-      maxNodes = 3000;
-      lodLevel = 'detailed';
-      setUseCanvasRendering(false);
-    } else {
-      // zoom >= 0.8: show all individual rooms (full detail)
-      setUseCanvasRendering(false);
-    }
-
-    const validRooms = mapData.rooms.filter(room =>
-      room.layoutX !== null && room.layoutY !== null
-    );
-
-    // Enhanced clustering algorithm for better performance and visual organization
-    if (clusterSize > 1) {
-      const clusters = new Map<string, {
-        rooms: WorldMapRoom[];
-        centerX: number;
-        centerY: number;
-        dominantSector: string;
-        sectorDistribution: Record<string, number>;
-      }>();
-
-      // Group rooms into clusters with zone-based positioning
-      validRooms.forEach(room => {
-        const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
-
-        // Get the zone bounds to calculate the origin offset from center
-        const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
-        if (!zoneBounds) return; // Skip rooms without zone bounds
-
-        // Calculate zone origin from center position
-        const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
-        const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
-        const zoneOriginX = zonePos.x - zoneWidth / 2;
-        const zoneOriginY = zonePos.y - zoneHeight / 2;
-
-        // Use room's local coordinates within the zone
-        const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
-        const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
-
-        const clusterX = Math.floor(roomLocalX / clusterSize) * clusterSize;
-        const clusterY = Math.floor(roomLocalY / clusterSize) * clusterSize;
-        const clusterKey = `${room.zoneId}-${clusterX},${clusterY}`;
-
-        if (!clusters.has(clusterKey)) {
-          clusters.set(clusterKey, {
-            rooms: [],
-            centerX: zoneOriginX + (clusterX + clusterSize / 2) * ROOM_SCALE,
-            centerY: zoneOriginY + (clusterY + clusterSize / 2) * ROOM_SCALE,
-            dominantSector: room.sector,
-            sectorDistribution: {},
-          });
-        }
-
-        const cluster = clusters.get(clusterKey)!;
-        cluster.rooms.push(room);
-
-        // Track sector distribution for better visualization
-        cluster.sectorDistribution[room.sector] = (cluster.sectorDistribution[room.sector] || 0) + 1;
-      });
-
-      // Convert clusters to nodes with improved visual differentiation
-      const clusterNodes = Array.from(clusters.entries()).map(([key, cluster], index) => {
-        // Use the sector distribution to find the most dominant sector
-        const dominantSector = Object.entries(cluster.sectorDistribution)
-          .sort(([, a], [, b]) => b - a)[0][0];
-
-        const x = cluster.centerX;
-        const y = cluster.centerY;
-
-        // Use the first room's zone info for the cluster
-        const firstRoom = cluster.rooms[0];
-
-        // Calculate cluster size based on room count and LOD level - very large for easy interaction
-        const baseSize = lodLevel === 'canvas-micro' ? 32 :
-          lodLevel === 'ultra-overview' ? 80 :
-            lodLevel === 'overview' ? 100 :
-              lodLevel === 'medium' ? 120 : 140;
-
-        const clusterNodeSize = Math.min(baseSize + 32, baseSize + Math.floor(cluster.rooms.length * 1.5));
-
-        return {
-          id: `cluster-${key}`,
-          type: 'worldRoom',
-          position: { x, y },
-          data: {
-            roomId: firstRoom.id, // Representative room
-            name: `${cluster.rooms.length} rooms`,
-            sector: dominantSector,
-            zoneId: firstRoom.zoneId,
-            zoneName: zoneNameMap[firstRoom.zoneId] || `Zone ${firstRoom.zoneId}`,
-            onRoomSelect: handleRoomSelect,
-          },
-          draggable: false,
-          selectable: true,
-          style: {
-            width: clusterNodeSize,
-            height: clusterNodeSize,
-            opacity: 0.9,
-            minWidth: clusterNodeSize,
-            minHeight: clusterNodeSize,
-          },
-        } as Node;
-      });
-
-      const finalClusterNodes = clusterNodes.slice(0, maxNodes);
-      const performanceEnd = performance.now();
-
-      // For canvas rendering mode, also set the canvas clusters
-      if (lodLevel === 'canvas-micro') {
-        const canvasClusterData = Array.from(clusters.entries()).map(([key, cluster]) => ({
-          rooms: cluster.rooms,
-          centerX: cluster.centerX,
-          centerY: cluster.centerY,
-          dominantSector: Object.entries(cluster.sectorDistribution)
-            .sort(([, a], [, b]) => b - a)[0][0],
-          size: Math.max(16, Math.min(48, cluster.rooms.length * 3)),
-        }));
-        setCanvasClusters(canvasClusterData);
-      }
-
-      // Performance logging disabled to reduce console spam during interactions
-      // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, clusterSize=${clusterSize}, ` +
-      //             `clusters=${finalClusterNodes.length}/${clusters.size}, ` +
-      //             `rooms=${validRooms.length}, time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
-
-      return finalClusterNodes;
-    }
-
-    // No clustering: show individual rooms (but respect maxNodes limit)
-    const limitedRooms = validRooms.slice(0, maxNodes);
-    const roomNodes = limitedRooms.map((room) => {
-      const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
-
-      // Get the zone bounds to calculate the origin offset from center
-      const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
-      if (!zoneBounds) {
-        // Fallback to simple positioning if zone bounds not found
-        const x = zonePos.x + (room.layoutX || 0) * ROOM_SCALE;
-        const y = zonePos.y + (room.layoutY || 0) * ROOM_SCALE;
-        return {
-          id: `room-${room.id}`,
-          type: 'worldRoom',
-          position: { x, y },
-          data: {
-            roomId: room.id,
-            name: room.name || `Room ${room.id}`,
-            sector: room.sector || 'UNKNOWN',
-            zoneId: room.zoneId,
-            zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
-            onRoomSelect: handleRoomSelect,
-          },
-          draggable: false,
-          selectable: true,
-          style: {
-            width: 8,
-            height: 8,
-            backgroundColor: getThemeColor('#10b981', '#10b981'), // Green color for rooms
-            border: `1px solid ${getThemeColor('#374151', '#6b7280')}`,
-            borderRadius: '2px',
-            opacity: 0.9,
-          },
-        } as Node;
-      }
-
-      // Calculate zone origin from center position
-      const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
-      const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
-      const zoneOriginX = zonePos.x - zoneWidth / 2;
-      const zoneOriginY = zonePos.y - zoneHeight / 2;
-
-      // Position room relative to zone origin, accounting for zone's internal coordinate system
-      const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
-      const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
-      const x = zoneOriginX + roomLocalX * ROOM_SCALE;
-      const y = zoneOriginY + roomLocalY * ROOM_SCALE;
-
-      return {
-        id: `worldroom-${room.id}`,
-        type: 'worldRoom',
-        position: { x, y },
-        data: {
-          roomId: room.id,
-          name: room.name,
-          sector: room.sector,
-          zoneId: room.zoneId,
-          zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
-          onRoomSelect: handleRoomSelect,
-        },
-        draggable: false,
-        selectable: true,
-        style: {
-          width: 80,
-          height: 80,
-          minWidth: 80,
-          minHeight: 80,
-          opacity: 1.0,
-        },
-      } as Node;
-    });
-
-    const performanceEnd = performance.now();
-    // Performance logging disabled to reduce console spam during interactions
-    // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, individual rooms=${roomNodes.length}/${validRooms.length}, ` +
-    //             `time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
-
-    return roomNodes;
-  }, []);
-
-  // Handle room selection in world map mode
-  const handleRoomSelect = useCallback((roomId: number) => {
-    // Navigate to the room's zone editor
-    const room = zoneMapData?.rooms.find(r => r.id === roomId);
-    if (room) {
-      window.location.href = `/dashboard/zones/editor?zone=${room.zoneId}&room=${roomId}`;
-    }
-  }, [zoneMapData]);
-
-  // Generate enhanced world map with zone boundaries spread out based on XYZ ranges
-  // Memoize the expensive world map calculation
-  const generateEnhancedWorldMapNodes = useCallback((mapData: ZoneMapData, zoom: number = 0.5): Node[] => {
-    console.log(`🔍 generateEnhancedWorldMapNodes called with:`, {
-      zones: mapData.zones?.length || 0,
-      rooms: mapData.rooms?.length || 0,
-      zoom: zoom.toFixed(3)
-    });
-
-    if (!mapData.zones || mapData.zones.length === 0) {
-      console.error(`❌ No zones in mapData!`, mapData);
-      return [];
-    }
-
-    // Improved cache system for better performance
-    const zoomLevel = Math.round(zoom * 5) / 5; // Round to nearest 0.2 for better cache efficiency
-    const cacheKey = `${mapData.zones.length}-${zoomLevel}`;
-    const cached = worldNodesCache.current.get(cacheKey);
-
-    console.log(`📋 Cache key: ${cacheKey}, has cached: ${!!cached}, cached nodes: ${cached?.nodes?.length || 'none'}`);
-
-    const now = Date.now();
-    if (cached && (now - cached.timestamp) < CACHE_DURATION) {
-      console.log(`🔄 Returning cached world map nodes: ${cached.nodes.length}`);
-      return cached.nodes;
-    }
-
-    // More aggressive throttling for world map generation, but allow initial generation
-    console.log(`⏱️ Checking throttle: timeSince=${now - lastLODUpdate.current}ms, threshold=${LOD_THROTTLE_MS}ms, zoom=${zoom}, hasCached=${!!cached}`);
-    if (now - lastLODUpdate.current < LOD_THROTTLE_MS && zoom < 1.0 && cached?.nodes?.length > 0) {
-      console.log(`⏸️ Throttling world map generation - returning cached: ${cached.nodes.length}`);
-      return cached.nodes; // Only throttle if we have valid cached nodes
-    }
-    lastLODUpdate.current = now;
-
-    console.log(`🚀 Starting fresh world map node generation...`);
-    const ZONE_SCALE = 100; // Scale factor for positioning
-    const ZONE_SPACING = 200; // Minimum spacing between zones
-    const nodes: Node[] = [];
-
-    // Calculate zone positions using a proper layout algorithm
-    const calculateZonePositions = (zones: typeof mapData.zones) => {
-      const positions = new Map<number, { x: number; y: number }>();
-
-      // Sort zones by size (largest first) for better packing
-      const sortedZones = [...zones].sort((a, b) => {
-        const aSize = (a.maxX - a.minX) * (a.maxY - a.minY);
-        const bSize = (b.maxX - b.minX) * (b.maxY - b.minY);
-        return bSize - aSize;
-      });
-
-      // Place zones using a grid-based approach with proper spacing
+      // Use a simple but effective bin-packing algorithm
       const placedZones: Array<{
         id: number;
         x: number;
@@ -2026,257 +1939,732 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         height: number;
       }> = [];
 
-      sortedZones.forEach((zone, index) => {
-        const zoneWidth = (zone.maxX - zone.minX) * ZONE_SCALE + ZONE_SPACING;
-        const zoneHeight = (zone.maxY - zone.minY) * ZONE_SCALE + ZONE_SPACING;
+      sortedZones.forEach(zone => {
+        let bestPosition = { x: 0, y: 0 };
+        let bestWaste = Infinity;
 
-        let placed = false;
-        let attempts = 0;
-        const maxAttempts = 1000;
+        // Try to find the best position that minimizes wasted space
+        for (let x = 0; x <= 5000; x += 100) {
+          // Reasonable search space
+          for (let y = 0; y <= 5000; y += 100) {
+            // Check if this position would cause overlap
+            const wouldOverlap = placedZones.some(placed => {
+              const overlap = !(
+                x >= placed.x + placed.width + MIN_ZONE_PADDING ||
+                x + zone.width + MIN_ZONE_PADDING <= placed.x ||
+                y >= placed.y + placed.height + MIN_ZONE_PADDING ||
+                y + zone.height + MIN_ZONE_PADDING <= placed.y
+              );
+              return overlap;
+            });
 
-        // Try to find a non-overlapping position
-        while (!placed && attempts < maxAttempts) {
-          let x, y;
-
-          if (index === 0) {
-            // Place first zone at origin
-            x = 0;
-            y = 0;
-          } else {
-            // For subsequent zones, try positions around existing zones
-            const gridSize = Math.ceil(Math.sqrt(sortedZones.length));
-            const row = Math.floor(attempts / gridSize);
-            const col = attempts % gridSize;
-
-            x = col * (zoneWidth + ZONE_SPACING);
-            y = row * (zoneHeight + ZONE_SPACING);
-
-            // Add some randomness to avoid perfect grid
-            if (attempts > gridSize * gridSize) {
-              x += (Math.random() - 0.5) * ZONE_SPACING;
-              y += (Math.random() - 0.5) * ZONE_SPACING;
+            if (!wouldOverlap) {
+              // Calculate waste (distance from origin - prefer positions closer to origin)
+              const waste = Math.sqrt(x * x + y * y);
+              if (waste < bestWaste) {
+                bestWaste = waste;
+                bestPosition = { x, y };
+              }
             }
           }
-
-          // Check for overlaps with existing zones
-          const overlaps = placedZones.some(existing => {
-            const dx = Math.abs(x - existing.x);
-            const dy = Math.abs(y - existing.y);
-            const minDistX = (zoneWidth + existing.width) / 2;
-            const minDistY = (zoneHeight + existing.height) / 2;
-            return dx < minDistX && dy < minDistY;
-          });
-
-          if (!overlaps) {
-            positions.set(zone.id, { x, y });
-            placedZones.push({ id: zone.id, x, y, width: zoneWidth, height: zoneHeight });
-            placed = true;
-          }
-
-          attempts++;
         }
 
-        // Fallback: place in a spiral if we can't find a good position
-        if (!placed) {
-          const spiralRadius = Math.ceil(Math.sqrt(index)) * (zoneWidth + ZONE_SPACING);
-          const angle = (index * 137.5) % 360; // Golden angle for nice distribution
-          const x = spiralRadius * Math.cos(angle * Math.PI / 180);
-          const y = spiralRadius * Math.sin(angle * Math.PI / 180);
-          positions.set(zone.id, { x, y });
-        }
-      });
-
-      return positions;
-    };
-
-    const zonePositions = calculateZonePositions(mapData.zones);
-    console.log(`🗺️ Zone positions calculated for ${zonePositions.size} zones:`, Array.from(zonePositions.entries()).slice(0, 3));
-
-    // First pass: calculate room positions and determine actual zone bounds
-    const zoneRoomPositions = new Map<number, Array<{ roomId: number; x: number; y: number }>>();
-
-    console.log(`📍 Starting first pass: calculating room positions for ${mapData.zones.length} zones`);
-    mapData.zones.forEach((zoneBounds) => {
-      const zonePos = zonePositions.get(zoneBounds.id) || { x: 0, y: 0 };
-      const zoneRooms = mapData.rooms.filter(room => room.zoneId === zoneBounds.id);
-      const roomPositions: Array<{ roomId: number; x: number; y: number }> = [];
-
-      // Calculate room positions first - only for rooms with valid layout coordinates
-      zoneRooms
-        .filter(room => room.layoutX !== null && room.layoutY !== null)
-        .forEach((room) => {
-          const roomLocalX = room.layoutX! - zoneBounds.minX;
-          const roomLocalY = room.layoutY! - zoneBounds.minY;
-
-          // Normalize room position to [0,1] range within zone
-          const normalizedX = zoneBounds.maxX !== zoneBounds.minX ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX) : 0.5;
-          const normalizedY = zoneBounds.maxY !== zoneBounds.minY ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY) : 0.5;
-
-          // Calculate room position relative to zone position
-          const baseWidth = Math.max((zoneBounds.maxX - zoneBounds.minX) * ZONE_SCALE, 120);
-          const baseHeight = Math.max((zoneBounds.maxY - zoneBounds.minY) * ZONE_SCALE, 120);
-
-          const x = zonePos.x + (normalizedX - 0.5) * baseWidth;
-          const y = zonePos.y + (normalizedY - 0.5) * baseHeight;
-
-          roomPositions.push({ roomId: room.id, x, y });
+        // Place the zone at the best position found
+        placedZones.push({
+          id: zone.id,
+          x: bestPosition.x,
+          y: bestPosition.y,
+          width: zone.width,
+          height: zone.height,
         });
 
-      zoneRoomPositions.set(zoneBounds.id, roomPositions);
-    });
-
-    console.log(`📍 First pass complete. Zone room positions: ${zoneRoomPositions.size} zones processed`);
-
-    // Second pass: create zone boundaries that encompass all rooms
-    console.log(`🏗️ Starting second pass: creating ${mapData.zones.length} zone boundary nodes`);
-    mapData.zones.forEach((zoneBounds, zoneIndex) => {
-      const zonePos = zonePositions.get(zoneBounds.id) || { x: 0, y: 0 };
-      const roomPositions = zoneRoomPositions.get(zoneBounds.id) || [];
-
-      // Calculate actual bounds from room positions
-      let minX = zonePos.x, maxX = zonePos.x, minY = zonePos.y, maxY = zonePos.y;
-
-      if (roomPositions.length > 0) {
-        // Get all actual room positions to properly calculate bounds
-        const allRoomPositions: Array<{ x: number; y: number }> = [];
-
-        // Recalculate all room positions to ensure we capture everything
-        // Only include rooms with valid layout coordinates (matching zone bounds calculation)
-        mapData.rooms
-          .filter(room => room.zoneId === zoneBounds.id && room.layoutX !== null && room.layoutY !== null)
-          .forEach((room) => {
-            const roomLocalX = room.layoutX! - zoneBounds.minX;
-            const roomLocalY = room.layoutY! - zoneBounds.minY;
-
-            // Normalize room position to [0,1] range within zone
-            const normalizedX = zoneBounds.maxX !== zoneBounds.minX ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX) : 0.5;
-            const normalizedY = zoneBounds.maxY !== zoneBounds.minY ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY) : 0.5;
-
-            // Calculate room position relative to zone position
-            const baseWidth = Math.max((zoneBounds.maxX - zoneBounds.minX) * ZONE_SCALE, 120);
-            const baseHeight = Math.max((zoneBounds.maxY - zoneBounds.minY) * ZONE_SCALE, 120);
-
-            const x = zonePos.x + (normalizedX - 0.5) * baseWidth;
-            const y = zonePos.y + (normalizedY - 0.5) * baseHeight;
-
-            allRoomPositions.push({ x, y });
-          });
-
-        if (allRoomPositions.length > 0) {
-          const roomXs = allRoomPositions.map(r => r.x);
-          const roomYs = allRoomPositions.map(r => r.y);
-          minX = Math.min(...roomXs);
-          maxX = Math.max(...roomXs);
-          minY = Math.min(...roomYs);
-          maxY = Math.max(...roomYs);
-        }
-      }
-
-      // Add generous padding around the room positions to ensure visibility
-      const padding = 60; // Increased padding for better visibility
-      const zoneWidth = Math.max(maxX - minX + 2 * padding, 160); // Increased minimum width
-      const zoneHeight = Math.max(maxY - minY + 2 * padding, 120); // Increased minimum height
-
-      // Center the zone boundary around the room cluster
-      const zoneCenterX = (minX + maxX) / 2;
-      const zoneCenterY = (minY + maxY) / 2;
-
-      // Create zone boundary node using the WorldMapZone component
-      console.log(`🏗️ Creating zone boundary node ${zoneIndex + 1}/${mapData.zones.length}: Zone ${zoneBounds.id} (${zoneBounds.name})`);
-      nodes.push({
-        id: `zone-boundary-${zoneBounds.id}`,
-        type: 'zone',
-        position: { x: zoneCenterX - zoneWidth / 2, y: zoneCenterY - zoneHeight / 2 }, // Position top-left for React Flow
-        data: {
-          zoneId: zoneBounds.id,
-          name: zoneBounds.name,
-          climate: zoneBounds.climate,
-          roomCount: zoneBounds.roomCount,
-          bounds: zoneBounds,
-          width: zoneWidth,
-          height: zoneHeight,
-          onZoneSelect: handleZoneSelect,
-        },
-        draggable: false,
-        selectable: true,
-        style: {
-          zIndex: 1, // Zone boundaries behind rooms
-        },
+        // Store the position offset for this zone (center the zone content)
+        zonePositions.set(zone.id, {
+          x: bestPosition.x + zone.width / 2,
+          y: bestPosition.y + zone.height / 2,
+        });
       });
 
-      // Add room nodes positioned within the zone boundary (optimize based on zoom level)
-      // PERFORMANCE: Only show individual rooms at very high zoom levels (0.8+) to prevent lag
-      if (zoom > 0.8) { // Much more restrictive zoom threshold for room visibility
-        // Limit room count per zone for performance (show max 20 rooms per zone)
-        const maxRoomsPerZone = 20;
-        const limitedRoomPositions = roomPositions.slice(0, maxRoomsPerZone);
-        console.log(`🏠 Adding ${limitedRoomPositions.length}/${roomPositions.length} room nodes for zone ${zoneBounds.id} at zoom ${zoom}`);
+      // Enhanced Level of Detail based on zoom level with performance optimization
+      let clusterSize = 1; // Default: show individual rooms
+      let maxNodes = 10000; // Maximum nodes to render
+      let lodLevel = 'detailed';
 
-        limitedRoomPositions.forEach(({ roomId }) => {
-          const room = mapData.rooms.find(r => r.id === roomId);
-          if (!room || room.layoutX === null || room.layoutY === null) return;
+      if (zoom < 0.1) {
+        // Extreme zoom out: use Canvas rendering for ultimate performance (disabled for now)
+        clusterSize = 32;
+        maxNodes = 100;
+        lodLevel = 'canvas-micro';
+        setUseCanvasRendering(false); // Temporarily disabled
+      } else if (zoom < 0.2) {
+        // Ultra zoomed out: maximum clustering for overview
+        clusterSize = 16;
+        maxNodes = 200;
+        lodLevel = 'ultra-overview';
+        setUseCanvasRendering(false);
+      } else if (zoom < 0.3) {
+        // Very zoomed out: cluster rooms heavily
+        clusterSize = 8;
+        maxNodes = 500;
+        lodLevel = 'overview';
+        setUseCanvasRendering(false);
+      } else if (zoom < 0.5) {
+        // Moderately zoomed out: some clustering
+        clusterSize = 4;
+        maxNodes = 1500;
+        lodLevel = 'medium';
+        setUseCanvasRendering(false);
+      } else if (zoom < 0.8) {
+        // Somewhat zoomed in: minimal clustering
+        clusterSize = 2;
+        maxNodes = 3000;
+        lodLevel = 'detailed';
+        setUseCanvasRendering(false);
+      } else {
+        // zoom >= 0.8: show all individual rooms (full detail)
+        setUseCanvasRendering(false);
+      }
 
-          // Calculate room position within the zone boundary
-          const roomLocalX = room.layoutX - zoneBounds.minX;
-          const roomLocalY = room.layoutY - zoneBounds.minY;
+      const validRooms = mapData.rooms.filter(
+        room => room.layoutX !== null && room.layoutY !== null
+      );
 
-          // Normalize room position to [0,1] range within zone
-          const normalizedX = zoneBounds.maxX !== zoneBounds.minX ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX) : 0.5;
-          const normalizedY = zoneBounds.maxY !== zoneBounds.minY ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY) : 0.5;
+      // Enhanced clustering algorithm for better performance and visual organization
+      if (clusterSize > 1) {
+        const clusters = new Map<
+          string,
+          {
+            rooms: WorldMapRoom[];
+            centerX: number;
+            centerY: number;
+            dominantSector: string;
+            sectorDistribution: Record<string, number>;
+          }
+        >();
 
-          // Position within the actual zone boundary with padding
-          const zonePadding = 20; // Padding inside zone boundary
-          const roomX = (zoneCenterX - zoneWidth / 2) + zonePadding + normalizedX * (zoneWidth - 2 * zonePadding);
-          const roomY = (zoneCenterY - zoneHeight / 2) + zonePadding + normalizedY * (zoneHeight - 2 * zonePadding);
+        // Group rooms into clusters with zone-based positioning
+        validRooms.forEach(room => {
+          const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
 
-          // Room size based on zoom level - smaller for world map performance
-          const roomSize = 3; // Fixed small size for world map
+          // Get the zone bounds to calculate the origin offset from center
+          const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
+          if (!zoneBounds) return; // Skip rooms without zone bounds
 
-          nodes.push({
+          // Calculate zone origin from center position
+          const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
+          const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
+          const zoneOriginX = zonePos.x - zoneWidth / 2;
+          const zoneOriginY = zonePos.y - zoneHeight / 2;
+
+          // Use room's local coordinates within the zone
+          const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
+          const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
+
+          const clusterX = Math.floor(roomLocalX / clusterSize) * clusterSize;
+          const clusterY = Math.floor(roomLocalY / clusterSize) * clusterSize;
+          const clusterKey = `${room.zoneId}-${clusterX},${clusterY}`;
+
+          if (!clusters.has(clusterKey)) {
+            clusters.set(clusterKey, {
+              rooms: [],
+              centerX: zoneOriginX + (clusterX + clusterSize / 2) * ROOM_SCALE,
+              centerY: zoneOriginY + (clusterY + clusterSize / 2) * ROOM_SCALE,
+              dominantSector: room.sector,
+              sectorDistribution: {},
+            });
+          }
+
+          const cluster = clusters.get(clusterKey)!;
+          cluster.rooms.push(room);
+
+          // Track sector distribution for better visualization
+          cluster.sectorDistribution[room.sector] =
+            (cluster.sectorDistribution[room.sector] || 0) + 1;
+        });
+
+        // Convert clusters to nodes with improved visual differentiation
+        const clusterNodes = Array.from(clusters.entries()).map(
+          ([key, cluster], index) => {
+            // Use the sector distribution to find the most dominant sector
+            const dominantSector = Object.entries(
+              cluster.sectorDistribution
+            ).sort(([, a], [, b]) => b - a)[0][0];
+
+            const x = cluster.centerX;
+            const y = cluster.centerY;
+
+            // Use the first room's zone info for the cluster
+            const firstRoom = cluster.rooms[0];
+
+            // Calculate cluster size based on room count and LOD level - very large for easy interaction
+            const baseSize =
+              lodLevel === 'canvas-micro'
+                ? 32
+                : lodLevel === 'ultra-overview'
+                  ? 80
+                  : lodLevel === 'overview'
+                    ? 100
+                    : lodLevel === 'medium'
+                      ? 120
+                      : 140;
+
+            const clusterNodeSize = Math.min(
+              baseSize + 32,
+              baseSize + Math.floor(cluster.rooms.length * 1.5)
+            );
+
+            return {
+              id: `cluster-${key}`,
+              type: 'worldRoom',
+              position: { x, y },
+              data: {
+                roomId: firstRoom.id, // Representative room
+                name: `${cluster.rooms.length} rooms`,
+                sector: dominantSector,
+                zoneId: firstRoom.zoneId,
+                zoneName:
+                  zoneNameMap[firstRoom.zoneId] || `Zone ${firstRoom.zoneId}`,
+                onRoomSelect: handleRoomSelect,
+              },
+              draggable: false,
+              selectable: true,
+              style: {
+                width: clusterNodeSize,
+                height: clusterNodeSize,
+                opacity: 0.9,
+                minWidth: clusterNodeSize,
+                minHeight: clusterNodeSize,
+              },
+            } as Node;
+          }
+        );
+
+        const finalClusterNodes = clusterNodes.slice(0, maxNodes);
+        const performanceEnd = performance.now();
+
+        // For canvas rendering mode, also set the canvas clusters
+        if (lodLevel === 'canvas-micro') {
+          const canvasClusterData = Array.from(clusters.entries()).map(
+            ([key, cluster]) => ({
+              rooms: cluster.rooms,
+              centerX: cluster.centerX,
+              centerY: cluster.centerY,
+              dominantSector: Object.entries(cluster.sectorDistribution).sort(
+                ([, a], [, b]) => b - a
+              )[0][0],
+              size: Math.max(16, Math.min(48, cluster.rooms.length * 3)),
+            })
+          );
+          setCanvasClusters(canvasClusterData);
+        }
+
+        // Performance logging disabled to reduce console spam during interactions
+        // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, clusterSize=${clusterSize}, ` +
+        //             `clusters=${finalClusterNodes.length}/${clusters.size}, ` +
+        //             `rooms=${validRooms.length}, time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
+
+        return finalClusterNodes;
+      }
+
+      // No clustering: show individual rooms (but respect maxNodes limit)
+      const limitedRooms = validRooms.slice(0, maxNodes);
+      const roomNodes = limitedRooms.map(room => {
+        const zonePos = zonePositions.get(room.zoneId) || { x: 0, y: 0 };
+
+        // Get the zone bounds to calculate the origin offset from center
+        const zoneBounds = mapData.zones.find(z => z.id === room.zoneId);
+        if (!zoneBounds) {
+          // Fallback to simple positioning if zone bounds not found
+          const x = zonePos.x + (room.layoutX || 0) * ROOM_SCALE;
+          const y = zonePos.y + (room.layoutY || 0) * ROOM_SCALE;
+          return {
             id: `room-${room.id}`,
             type: 'worldRoom',
-            position: { x: roomX, y: roomY },
+            position: { x, y },
             data: {
               roomId: room.id,
-              name: room.name,
-              sector: room.sector,
+              name: room.name || `Room ${room.id}`,
+              sector: room.sector || 'UNKNOWN',
               zoneId: room.zoneId,
-              zoneName: zoneBounds.name,
+              zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
               onRoomSelect: handleRoomSelect,
             },
             draggable: false,
             selectable: true,
             style: {
-              width: roomSize,
-              height: roomSize,
-              backgroundColor: getThemeColor('#10b981', '#10b981'), // Green for normal rooms in world map
+              width: 8,
+              height: 8,
+              backgroundColor: getThemeColor('#10b981', '#10b981'), // Green color for rooms
               border: `1px solid ${getThemeColor('#374151', '#6b7280')}`,
-              borderRadius: '3px',
-              zIndex: 10, // Ensure rooms appear above zone boundaries
-              opacity: zoom > 0.4 ? 1.0 : 0.8, // Better visibility control
+              borderRadius: '2px',
+              opacity: 0.9,
             },
+          } as Node;
+        }
+
+        // Calculate zone origin from center position
+        const zoneWidth = (zoneBounds.maxX - zoneBounds.minX) * ROOM_SCALE;
+        const zoneHeight = (zoneBounds.maxY - zoneBounds.minY) * ROOM_SCALE;
+        const zoneOriginX = zonePos.x - zoneWidth / 2;
+        const zoneOriginY = zonePos.y - zoneHeight / 2;
+
+        // Position room relative to zone origin, accounting for zone's internal coordinate system
+        const roomLocalX = (room.layoutX || 0) - zoneBounds.minX;
+        const roomLocalY = (room.layoutY || 0) - zoneBounds.minY;
+        const x = zoneOriginX + roomLocalX * ROOM_SCALE;
+        const y = zoneOriginY + roomLocalY * ROOM_SCALE;
+
+        return {
+          id: `worldroom-${room.id}`,
+          type: 'worldRoom',
+          position: { x, y },
+          data: {
+            roomId: room.id,
+            name: room.name,
+            sector: room.sector,
+            zoneId: room.zoneId,
+            zoneName: zoneNameMap[room.zoneId] || `Zone ${room.zoneId}`,
+            onRoomSelect: handleRoomSelect,
+          },
+          draggable: false,
+          selectable: true,
+          style: {
+            width: 80,
+            height: 80,
+            minWidth: 80,
+            minHeight: 80,
+            opacity: 1.0,
+          },
+        } as Node;
+      });
+
+      const performanceEnd = performance.now();
+      // Performance logging disabled to reduce console spam during interactions
+      // console.log(`🎯 LOD ${lodLevel}: zoom=${zoom.toFixed(2)}, individual rooms=${roomNodes.length}/${validRooms.length}, ` +
+      //             `time=${(performanceEnd - performanceStart).toFixed(1)}ms`);
+
+      return roomNodes;
+    },
+    []
+  );
+
+  // Handle room selection in world map mode
+  const handleRoomSelect = useCallback(
+    (roomId: number) => {
+      // Navigate to the room's zone editor
+      const room = zoneMapData?.rooms.find(r => r.id === roomId);
+      if (room) {
+        window.location.href = `/dashboard/zones/editor?zone=${room.zoneId}&room=${roomId}`;
+      }
+    },
+    [zoneMapData]
+  );
+
+  // Generate enhanced world map with zone boundaries spread out based on XYZ ranges
+  // Memoize the expensive world map calculation
+  const generateEnhancedWorldMapNodes = useCallback(
+    (mapData: ZoneMapData, zoom: number = 0.5): Node[] => {
+      console.log(`🔍 generateEnhancedWorldMapNodes called with:`, {
+        zones: mapData.zones?.length || 0,
+        rooms: mapData.rooms?.length || 0,
+        zoom: zoom.toFixed(3),
+      });
+
+      if (!mapData.zones || mapData.zones.length === 0) {
+        console.error(`❌ No zones in mapData!`, mapData);
+        return [];
+      }
+
+      // Improved cache system for better performance
+      const zoomLevel = Math.round(zoom * 5) / 5; // Round to nearest 0.2 for better cache efficiency
+      const cacheKey = `${mapData.zones.length}-${zoomLevel}`;
+      const cached = worldNodesCache.current.get(cacheKey);
+
+      console.log(
+        `📋 Cache key: ${cacheKey}, has cached: ${!!cached}, cached nodes: ${cached?.nodes?.length || 'none'}`
+      );
+
+      const now = Date.now();
+      if (cached && now - cached.timestamp < CACHE_DURATION) {
+        console.log(
+          `🔄 Returning cached world map nodes: ${cached.nodes.length}`
+        );
+        return cached.nodes;
+      }
+
+      // More aggressive throttling for world map generation, but allow initial generation
+      console.log(
+        `⏱️ Checking throttle: timeSince=${now - lastLODUpdate.current}ms, threshold=${LOD_THROTTLE_MS}ms, zoom=${zoom}, hasCached=${!!cached}`
+      );
+      if (
+        now - lastLODUpdate.current < LOD_THROTTLE_MS &&
+        zoom < 1.0 &&
+        cached?.nodes?.length > 0
+      ) {
+        console.log(
+          `⏸️ Throttling world map generation - returning cached: ${cached.nodes.length}`
+        );
+        return cached.nodes; // Only throttle if we have valid cached nodes
+      }
+      lastLODUpdate.current = now;
+
+      console.log(`🚀 Starting fresh world map node generation...`);
+      const ZONE_SCALE = 100; // Scale factor for positioning
+      const ZONE_SPACING = 200; // Minimum spacing between zones
+      const nodes: Node[] = [];
+
+      // Calculate zone positions using a proper layout algorithm
+      const calculateZonePositions = (zones: typeof mapData.zones) => {
+        const positions = new Map<number, { x: number; y: number }>();
+
+        // Sort zones by size (largest first) for better packing
+        const sortedZones = [...zones].sort((a, b) => {
+          const aSize = (a.maxX - a.minX) * (a.maxY - a.minY);
+          const bSize = (b.maxX - b.minX) * (b.maxY - b.minY);
+          return bSize - aSize;
+        });
+
+        // Place zones using a grid-based approach with proper spacing
+        const placedZones: Array<{
+          id: number;
+          x: number;
+          y: number;
+          width: number;
+          height: number;
+        }> = [];
+
+        sortedZones.forEach((zone, index) => {
+          const zoneWidth = (zone.maxX - zone.minX) * ZONE_SCALE + ZONE_SPACING;
+          const zoneHeight =
+            (zone.maxY - zone.minY) * ZONE_SCALE + ZONE_SPACING;
+
+          let placed = false;
+          let attempts = 0;
+          const maxAttempts = 1000;
+
+          // Try to find a non-overlapping position
+          while (!placed && attempts < maxAttempts) {
+            let x, y;
+
+            if (index === 0) {
+              // Place first zone at origin
+              x = 0;
+              y = 0;
+            } else {
+              // For subsequent zones, try positions around existing zones
+              const gridSize = Math.ceil(Math.sqrt(sortedZones.length));
+              const row = Math.floor(attempts / gridSize);
+              const col = attempts % gridSize;
+
+              x = col * (zoneWidth + ZONE_SPACING);
+              y = row * (zoneHeight + ZONE_SPACING);
+
+              // Add some randomness to avoid perfect grid
+              if (attempts > gridSize * gridSize) {
+                x += (Math.random() - 0.5) * ZONE_SPACING;
+                y += (Math.random() - 0.5) * ZONE_SPACING;
+              }
+            }
+
+            // Check for overlaps with existing zones
+            const overlaps = placedZones.some(existing => {
+              const dx = Math.abs(x - existing.x);
+              const dy = Math.abs(y - existing.y);
+              const minDistX = (zoneWidth + existing.width) / 2;
+              const minDistY = (zoneHeight + existing.height) / 2;
+              return dx < minDistX && dy < minDistY;
+            });
+
+            if (!overlaps) {
+              positions.set(zone.id, { x, y });
+              placedZones.push({
+                id: zone.id,
+                x,
+                y,
+                width: zoneWidth,
+                height: zoneHeight,
+              });
+              placed = true;
+            }
+
+            attempts++;
+          }
+
+          // Fallback: place in a spiral if we can't find a good position
+          if (!placed) {
+            const spiralRadius =
+              Math.ceil(Math.sqrt(index)) * (zoneWidth + ZONE_SPACING);
+            const angle = (index * 137.5) % 360; // Golden angle for nice distribution
+            const x = spiralRadius * Math.cos((angle * Math.PI) / 180);
+            const y = spiralRadius * Math.sin((angle * Math.PI) / 180);
+            positions.set(zone.id, { x, y });
+          }
+        });
+
+        return positions;
+      };
+
+      const zonePositions = calculateZonePositions(mapData.zones);
+      console.log(
+        `🗺️ Zone positions calculated for ${zonePositions.size} zones:`,
+        Array.from(zonePositions.entries()).slice(0, 3)
+      );
+
+      // First pass: calculate room positions and determine actual zone bounds
+      const zoneRoomPositions = new Map<
+        number,
+        Array<{ roomId: number; x: number; y: number }>
+      >();
+
+      console.log(
+        `📍 Starting first pass: calculating room positions for ${mapData.zones.length} zones`
+      );
+      mapData.zones.forEach(zoneBounds => {
+        const zonePos = zonePositions.get(zoneBounds.id) || { x: 0, y: 0 };
+        const zoneRooms = mapData.rooms.filter(
+          room => room.zoneId === zoneBounds.id
+        );
+        const roomPositions: Array<{ roomId: number; x: number; y: number }> =
+          [];
+
+        // Calculate room positions first - only for rooms with valid layout coordinates
+        zoneRooms
+          .filter(room => room.layoutX !== null && room.layoutY !== null)
+          .forEach(room => {
+            const roomLocalX = room.layoutX! - zoneBounds.minX;
+            const roomLocalY = room.layoutY! - zoneBounds.minY;
+
+            // Normalize room position to [0,1] range within zone
+            const normalizedX =
+              zoneBounds.maxX !== zoneBounds.minX
+                ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX)
+                : 0.5;
+            const normalizedY =
+              zoneBounds.maxY !== zoneBounds.minY
+                ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY)
+                : 0.5;
+
+            // Calculate room position relative to zone position
+            const baseWidth = Math.max(
+              (zoneBounds.maxX - zoneBounds.minX) * ZONE_SCALE,
+              120
+            );
+            const baseHeight = Math.max(
+              (zoneBounds.maxY - zoneBounds.minY) * ZONE_SCALE,
+              120
+            );
+
+            const x = zonePos.x + (normalizedX - 0.5) * baseWidth;
+            const y = zonePos.y + (normalizedY - 0.5) * baseHeight;
+
+            roomPositions.push({ roomId: room.id, x, y });
           });
+
+        zoneRoomPositions.set(zoneBounds.id, roomPositions);
+      });
+
+      console.log(
+        `📍 First pass complete. Zone room positions: ${zoneRoomPositions.size} zones processed`
+      );
+
+      // Second pass: create zone boundaries that encompass all rooms
+      console.log(
+        `🏗️ Starting second pass: creating ${mapData.zones.length} zone boundary nodes`
+      );
+      mapData.zones.forEach((zoneBounds, zoneIndex) => {
+        const zonePos = zonePositions.get(zoneBounds.id) || { x: 0, y: 0 };
+        const roomPositions = zoneRoomPositions.get(zoneBounds.id) || [];
+
+        // Calculate actual bounds from room positions
+        let minX = zonePos.x,
+          maxX = zonePos.x,
+          minY = zonePos.y,
+          maxY = zonePos.y;
+
+        if (roomPositions.length > 0) {
+          // Get all actual room positions to properly calculate bounds
+          const allRoomPositions: Array<{ x: number; y: number }> = [];
+
+          // Recalculate all room positions to ensure we capture everything
+          // Only include rooms with valid layout coordinates (matching zone bounds calculation)
+          mapData.rooms
+            .filter(
+              room =>
+                room.zoneId === zoneBounds.id &&
+                room.layoutX !== null &&
+                room.layoutY !== null
+            )
+            .forEach(room => {
+              const roomLocalX = room.layoutX! - zoneBounds.minX;
+              const roomLocalY = room.layoutY! - zoneBounds.minY;
+
+              // Normalize room position to [0,1] range within zone
+              const normalizedX =
+                zoneBounds.maxX !== zoneBounds.minX
+                  ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX)
+                  : 0.5;
+              const normalizedY =
+                zoneBounds.maxY !== zoneBounds.minY
+                  ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY)
+                  : 0.5;
+
+              // Calculate room position relative to zone position
+              const baseWidth = Math.max(
+                (zoneBounds.maxX - zoneBounds.minX) * ZONE_SCALE,
+                120
+              );
+              const baseHeight = Math.max(
+                (zoneBounds.maxY - zoneBounds.minY) * ZONE_SCALE,
+                120
+              );
+
+              const x = zonePos.x + (normalizedX - 0.5) * baseWidth;
+              const y = zonePos.y + (normalizedY - 0.5) * baseHeight;
+
+              allRoomPositions.push({ x, y });
+            });
+
+          if (allRoomPositions.length > 0) {
+            const roomXs = allRoomPositions.map(r => r.x);
+            const roomYs = allRoomPositions.map(r => r.y);
+            minX = Math.min(...roomXs);
+            maxX = Math.max(...roomXs);
+            minY = Math.min(...roomYs);
+            maxY = Math.max(...roomYs);
+          }
+        }
+
+        // Add generous padding around the room positions to ensure visibility
+        const padding = 60; // Increased padding for better visibility
+        const zoneWidth = Math.max(maxX - minX + 2 * padding, 160); // Increased minimum width
+        const zoneHeight = Math.max(maxY - minY + 2 * padding, 120); // Increased minimum height
+
+        // Center the zone boundary around the room cluster
+        const zoneCenterX = (minX + maxX) / 2;
+        const zoneCenterY = (minY + maxY) / 2;
+
+        // Create zone boundary node using the WorldMapZone component
+        console.log(
+          `🏗️ Creating zone boundary node ${zoneIndex + 1}/${mapData.zones.length}: Zone ${zoneBounds.id} (${zoneBounds.name})`
+        );
+        nodes.push({
+          id: `zone-boundary-${zoneBounds.id}`,
+          type: 'zone',
+          position: {
+            x: zoneCenterX - zoneWidth / 2,
+            y: zoneCenterY - zoneHeight / 2,
+          }, // Position top-left for React Flow
+          data: {
+            zoneId: zoneBounds.id,
+            name: zoneBounds.name,
+            climate: zoneBounds.climate,
+            roomCount: zoneBounds.roomCount,
+            bounds: zoneBounds,
+            width: zoneWidth,
+            height: zoneHeight,
+            onZoneSelect: handleZoneSelect,
+          },
+          draggable: false,
+          selectable: true,
+          style: {
+            zIndex: 1, // Zone boundaries behind rooms
+          },
+        });
+
+        // Add room nodes positioned within the zone boundary (optimize based on zoom level)
+        // PERFORMANCE: Only show individual rooms at very high zoom levels (0.8+) to prevent lag
+        if (zoom > 0.8) {
+          // Much more restrictive zoom threshold for room visibility
+          // Limit room count per zone for performance (show max 20 rooms per zone)
+          const maxRoomsPerZone = 20;
+          const limitedRoomPositions = roomPositions.slice(0, maxRoomsPerZone);
+          console.log(
+            `🏠 Adding ${limitedRoomPositions.length}/${roomPositions.length} room nodes for zone ${zoneBounds.id} at zoom ${zoom}`
+          );
+
+          limitedRoomPositions.forEach(({ roomId }) => {
+            const room = mapData.rooms.find(r => r.id === roomId);
+            if (!room || room.layoutX === null || room.layoutY === null) return;
+
+            // Calculate room position within the zone boundary
+            const roomLocalX = room.layoutX - zoneBounds.minX;
+            const roomLocalY = room.layoutY - zoneBounds.minY;
+
+            // Normalize room position to [0,1] range within zone
+            const normalizedX =
+              zoneBounds.maxX !== zoneBounds.minX
+                ? roomLocalX / (zoneBounds.maxX - zoneBounds.minX)
+                : 0.5;
+            const normalizedY =
+              zoneBounds.maxY !== zoneBounds.minY
+                ? roomLocalY / (zoneBounds.maxY - zoneBounds.minY)
+                : 0.5;
+
+            // Position within the actual zone boundary with padding
+            const zonePadding = 20; // Padding inside zone boundary
+            const roomX =
+              zoneCenterX -
+              zoneWidth / 2 +
+              zonePadding +
+              normalizedX * (zoneWidth - 2 * zonePadding);
+            const roomY =
+              zoneCenterY -
+              zoneHeight / 2 +
+              zonePadding +
+              normalizedY * (zoneHeight - 2 * zonePadding);
+
+            // Room size based on zoom level - smaller for world map performance
+            const roomSize = 3; // Fixed small size for world map
+
+            nodes.push({
+              id: `room-${room.id}`,
+              type: 'worldRoom',
+              position: { x: roomX, y: roomY },
+              data: {
+                roomId: room.id,
+                name: room.name,
+                sector: room.sector,
+                zoneId: room.zoneId,
+                zoneName: zoneBounds.name,
+                onRoomSelect: handleRoomSelect,
+              },
+              draggable: false,
+              selectable: true,
+              style: {
+                width: roomSize,
+                height: roomSize,
+                backgroundColor: getThemeColor('#10b981', '#10b981'), // Green for normal rooms in world map
+                border: `1px solid ${getThemeColor('#374151', '#6b7280')}`,
+                borderRadius: '3px',
+                zIndex: 10, // Ensure rooms appear above zone boundaries
+                opacity: zoom > 0.4 ? 1.0 : 0.8, // Better visibility control
+              },
+            });
+          });
+        }
+      });
+
+      console.log(
+        `✅ World map generation complete: ${nodes.length} total nodes created`
+      );
+
+      // Cache the generated nodes for better performance
+      worldNodesCache.current.set(cacheKey, { nodes, timestamp: now });
+
+      // Clean up old cache entries (keep only last 5)
+      if (worldNodesCache.current.size > 5) {
+        const entries = Array.from(worldNodesCache.current.entries());
+        entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
+        worldNodesCache.current.clear();
+        entries.slice(0, 5).forEach(([key, value]) => {
+          worldNodesCache.current.set(key, value);
         });
       }
-    });
 
-    console.log(`✅ World map generation complete: ${nodes.length} total nodes created`);
-
-    // Cache the generated nodes for better performance
-    worldNodesCache.current.set(cacheKey, { nodes, timestamp: now });
-
-    // Clean up old cache entries (keep only last 5)
-    if (worldNodesCache.current.size > 5) {
-      const entries = Array.from(worldNodesCache.current.entries());
-      entries.sort((a, b) => b[1].timestamp - a[1].timestamp);
-      worldNodesCache.current.clear();
-      entries.slice(0, 5).forEach(([key, value]) => {
-        worldNodesCache.current.set(key, value);
-      });
-    }
-
-    return nodes;
-  }, [handleZoneSelect, handleRoomSelect]);
+      return nodes;
+    },
+    [handleZoneSelect, handleRoomSelect]
+  );
 
   // Reset flags and cached positions when zone changes
   useEffect(() => {
@@ -2310,7 +2698,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         }
       });
 
-      console.log(`🏢 Setting default Z-level to ${mostPopulatedZ} (${maxCount} rooms)`);
+      console.log(
+        `🏢 Setting default Z-level to ${mostPopulatedZ} (${maxCount} rooms)`
+      );
       setCurrentZLevel(mostPopulatedZ);
       hasInitializedZLevel.current = true;
     }
@@ -2318,33 +2708,47 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
   // Initial positioning when rooms are loaded
   useEffect(() => {
-    console.log(`📍 Initial positioning useEffect: rooms=${rooms.length}, nodes=${nodes.length}, reactFlow=${!!reactFlowInstance}, worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, transitionFlag=${worldMapTransitionRef.current}, customTransitionDone=${customZoneTransitionDone.current}, hasPerformedInitialFit=${hasPerformedInitialFit.current}, initialRoomId=${initialRoomId}`);
+    console.log(
+      `📍 Initial positioning useEffect: rooms=${rooms.length}, nodes=${nodes.length}, reactFlow=${!!reactFlowInstance}, worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, transitionFlag=${worldMapTransitionRef.current}, customTransitionDone=${customZoneTransitionDone.current}, hasPerformedInitialFit=${hasPerformedInitialFit.current}, initialRoomId=${initialRoomId}`
+    );
 
     // Only perform initial fit once - don't re-trigger on Z-level changes
     // Also need nodes to be ready for positioning
-    if (rooms.length > 0 && nodes.length > 0 && reactFlowInstance && !worldMapMode && currentViewMode !== 'world-map' && !worldMapTransitionRef.current && !customZoneTransitionDone.current && !hasPerformedInitialFit.current) {
-      console.log(`🎯 Running initial positioning logic with initialRoomId=${initialRoomId}`);
+    if (
+      rooms.length > 0 &&
+      nodes.length > 0 &&
+      reactFlowInstance &&
+      !worldMapMode &&
+      currentViewMode !== 'world-map' &&
+      !worldMapTransitionRef.current &&
+      !customZoneTransitionDone.current &&
+      !hasPerformedInitialFit.current
+    ) {
+      console.log(
+        `🎯 Running initial positioning logic with initialRoomId=${initialRoomId}`
+      );
       // Check if we came from world map (session storage flag)
-      const cameFromWorldMap = sessionStorage.getItem('selectedZoneFromWorldMap');
+      const cameFromWorldMap = sessionStorage.getItem(
+        'selectedZoneFromWorldMap'
+      );
 
       // Add a delay to ensure React Flow has rendered the nodes properly
       const timer = setTimeout(() => {
         if (cameFromWorldMap) {
           // console.log('🎯 Centering view from world map transition');
           // If coming from world map, center on rooms at the current Z-level (largest cluster)
-          const roomNodes = nodes.filter(node =>
-            node.type === 'room' &&
-            node.position &&
-            node.data.isCurrentFloor // Only center on rooms at current Z-level
+          const roomNodes = nodes.filter(
+            node =>
+              node.type === 'room' && node.position && node.data.isCurrentFloor // Only center on rooms at current Z-level
           );
 
           if (roomNodes.length > 0) {
             // Calculate bounds of all rooms for better centering
             const roomBounds = roomNodes.map(node => ({
               minX: node.position.x,
-              maxX: node.position.x + (node.width || 180),
+              maxX: node.position.x + (node.width || 140),
               minY: node.position.y,
-              maxY: node.position.y + (node.height || 180)
+              maxY: node.position.y + (node.height || 140),
             }));
 
             const minX = Math.min(...roomBounds.map(b => b.minX));
@@ -2379,7 +2783,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             // Set center with calculated zoom for optimal zone view
             reactFlowInstance.setCenter(centerX, centerY, {
               zoom: Math.max(targetZoom, 0.15), // Minimum zoom of 0.15 to stay above world map threshold (0.05)
-              duration: 1000 // Slightly longer transition for better UX
+              duration: 1000, // Slightly longer transition for better UX
             });
           } else {
             // console.log('🎯 No room nodes found, using fitView fallback');
@@ -2388,7 +2792,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               padding: 0.3,
               minZoom: 0.15, // Stay above world map threshold (0.05)
               maxZoom: 0.8,
-              duration: 1000
+              duration: 1000,
             });
           }
 
@@ -2396,45 +2800,58 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           sessionStorage.removeItem('selectedZoneFromWorldMap');
         } else {
           // Check if we should center on a specific initial room
-          if (initialRoomId) {
-            const targetRoomNode = nodes.find(node =>
-              node.type === 'room' &&
-              parseInt(node.id) === initialRoomId
+          if (initialRoomId !== null && initialRoomId !== undefined) {
+            const targetRoomNode = nodes.find(
+              node =>
+                node.type === 'room' && parseInt(node.id) === initialRoomId
             );
 
             if (targetRoomNode && targetRoomNode.position) {
               // Center on the specific room with a comfortable zoom level
-              const centerX = targetRoomNode.position.x + (targetRoomNode.width || 180) / 2;
-              const centerY = targetRoomNode.position.y + (targetRoomNode.height || 180) / 2;
+              const centerX =
+                targetRoomNode.position.x + (targetRoomNode.width || 140) / 2;
+              const centerY =
+                targetRoomNode.position.y + (targetRoomNode.height || 140) / 2;
 
-              console.log(`🎯 Centering on initial room ${initialRoomId}: center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), zoom=1.0`);
+              console.log(
+                `🎯 Centering on initial room ${initialRoomId}: center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), zoom=1.0`
+              );
 
               reactFlowInstance.setCenter(centerX, centerY, {
                 zoom: 1.0, // Comfortable zoom level to see the room and its neighbors
-                duration: 800 // Smooth animation to the target room
+                duration: 800, // Smooth animation to the target room
               });
             } else {
-              console.log(`⚠️ Initial room ${initialRoomId} not found in nodes, falling back to zone view`);
+              console.log(
+                `⚠️ Initial room ${initialRoomId} not found in nodes, falling back to zone view`
+              );
               // Fall through to normal zone centering below
             }
           }
 
           // Normal fitView for regular navigation - center on rooms at current Z-level
           // (only runs if no initialRoomId or room not found)
-          if (!initialRoomId || !nodes.find(n => n.type === 'room' && parseInt(n.id) === initialRoomId)) {
-            const roomNodes = nodes.filter(node =>
-              node.type === 'room' &&
-              node.position &&
-              node.data.isCurrentFloor // Only center on rooms at current Z-level
+          if (
+            initialRoomId === null ||
+            initialRoomId === undefined ||
+            !nodes.find(
+              n => n.type === 'room' && parseInt(n.id) === initialRoomId
+            )
+          ) {
+            const roomNodes = nodes.filter(
+              node =>
+                node.type === 'room' &&
+                node.position &&
+                node.data.isCurrentFloor // Only center on rooms at current Z-level
             );
 
             if (roomNodes.length > 0) {
               // Use same bounds calculation as first entry for consistent behavior
               const roomBounds = roomNodes.map(node => ({
                 minX: node.position.x,
-                maxX: node.position.x + (node.width || 180),
+                maxX: node.position.x + (node.width || 140),
                 minY: node.position.y,
-                maxY: node.position.y + (node.height || 180)
+                maxY: node.position.y + (node.height || 140),
               }));
 
               const minX = Math.min(...roomBounds.map(b => b.minX));
@@ -2459,12 +2876,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 0.8 // Same maximum zoom as first entry
               );
 
-              console.log(`🔄 Regular navigation using same centering logic: zoom=${Math.max(targetZoom, 0.15).toFixed(3)}, center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)})`);
+              console.log(
+                `🔄 Regular navigation using same centering logic: zoom=${Math.max(targetZoom, 0.15).toFixed(3)}, center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)})`
+              );
 
               // Use setCenter like first entry for consistent behavior
               reactFlowInstance.setCenter(centerX, centerY, {
                 zoom: Math.max(targetZoom, 0.15), // Same minimum zoom as first entry
-                duration: 0 // No animation for regular navigation
+                duration: 0, // No animation for regular navigation
               });
             } else {
               // Fallback to fitView if no room nodes
@@ -2472,7 +2891,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 padding: 0.2,
                 minZoom: 0.15, // Stay above world map threshold (0.05)
                 maxZoom: 1.2,
-                duration: 0
+                duration: 0,
               });
             }
           }
@@ -2484,11 +2903,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
       return () => clearTimeout(timer);
     }
-  }, [rooms.length, nodes.length, reactFlowInstance, worldMapMode, currentViewMode, zoneId, initialRoomId]);
+  }, [
+    rooms.length,
+    nodes.length,
+    reactFlowInstance,
+    worldMapMode,
+    currentViewMode,
+    zoneId,
+    initialRoomId,
+  ]);
 
   // Memoized world map nodes to prevent unnecessary recalculations
   const worldMapNodes = useMemo(() => {
-    console.log(`🌐 worldMapNodes memoization: worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, hasZoneMapData=${!!zoneMapData}, hasReactFlow=${!!reactFlowInstance}`);
+    console.log(
+      `🌐 worldMapNodes memoization: worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, hasZoneMapData=${!!zoneMapData}, hasReactFlow=${!!reactFlowInstance}`
+    );
 
     if ((worldMapMode || currentViewMode === 'world-map') && zoneMapData) {
       const currentZoom = reactFlowInstance?.getZoom() || 0.5;
@@ -2506,11 +2935,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
     console.log(`🌐 Not generating world map nodes - conditions not met`);
     return [];
-  }, [worldMapMode, currentViewMode, zoneMapData, generateEnhancedWorldMapNodes]);
+  }, [
+    worldMapMode,
+    currentViewMode,
+    zoneMapData,
+    generateEnhancedWorldMapNodes,
+  ]);
 
   // Convert rooms to React Flow nodes and edges
   useEffect(() => {
-    console.log(`🔄 Node generation useEffect: worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, worldMapNodes=${worldMapNodes.length}, zoneMapData=${!!zoneMapData}, rooms=${rooms.length}`);
+    console.log(
+      `🔄 Node generation useEffect: worldMapMode=${worldMapMode}, currentViewMode=${currentViewMode}, worldMapNodes=${worldMapNodes.length}, zoneMapData=${!!zoneMapData}, rooms=${rooms.length}`
+    );
 
     // Handle world map mode OR world-map view mode
     if (worldMapMode || currentViewMode === 'world-map') {
@@ -2522,24 +2958,33 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
         // Check if we need to center on a specific zone after world map nodes are set
         const centerOnZone = sessionStorage.getItem('centerOnZoneInWorldMap');
-        if (centerOnZone && reactFlowInstance && zoneMapData && !worldMapTransitionRef.current) {
+        if (
+          centerOnZone &&
+          reactFlowInstance &&
+          zoneMapData &&
+          !worldMapTransitionRef.current
+        ) {
           console.log(`🎯 Post-generation centering on zone ${centerOnZone}`);
 
           // Find the zone node and center on it
           const targetZoneId = parseInt(centerOnZone);
-          const currentZoneNode = worldMapNodes.find(node =>
-            node.id === `zone-boundary-${targetZoneId}`
+          const currentZoneNode = worldMapNodes.find(
+            node => node.id === `zone-boundary-${targetZoneId}`
           );
 
           if (currentZoneNode) {
             const targetZoom = 0.15;
-            const zoneCenterX = currentZoneNode.position.x + (currentZoneNode.data?.width || 200) / 2;
-            const zoneCenterY = currentZoneNode.position.y + (currentZoneNode.data?.height || 120) / 2;
+            const zoneCenterX =
+              currentZoneNode.position.x +
+              (currentZoneNode.data?.width || 200) / 2;
+            const zoneCenterY =
+              currentZoneNode.position.y +
+              (currentZoneNode.data?.height || 120) / 2;
 
             setTimeout(() => {
               reactFlowInstance.setCenter(zoneCenterX, zoneCenterY, {
                 zoom: targetZoom,
-                duration: 300
+                duration: 300,
               });
               sessionStorage.removeItem('centerOnZoneInWorldMap');
             }, 100);
@@ -2559,11 +3004,36 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     console.log(`🏠 Should show zone room view with ${rooms.length} rooms`);
 
     if (rooms.length === 0) {
-      console.log(`⚠️ No rooms to generate nodes from - setting empty`);
-      setNodes([]);
-      setEdges([]);
+      // Only perform the empty state update once until rooms arrive
+      if (!emptyNodesSetRef.current) {
+        console.log(
+          `⚠️ No rooms to generate nodes from - setting empty (once)`
+        );
+        setNodes([]);
+        setEdges([]);
+        emptyNodesSetRef.current = true;
+      }
+      return;
+    } else if (emptyNodesSetRef.current) {
+      // Reset the guard once we actually have rooms
+      emptyNodesSetRef.current = false;
+    }
+
+    // Build a lightweight signature to detect if meaningful generation inputs changed
+    const generationSignature = JSON.stringify({
+      roomIds: rooms.map(r => r.id),
+      overlaps: overlaps.map(o => o.roomIds).sort(),
+      selectedRoomId,
+      currentZLevel,
+      viewMode,
+      worldMapMode,
+      currentViewMode,
+    });
+    if (generationSignature === lastGenerationSignatureRef.current) {
+      // Skip regeneration (prevents ReactFlow internal update depth explosion in tests)
       return;
     }
+    lastGenerationSignatureRef.current = generationSignature;
 
     // Grid-based layout algorithm with saved position support
     const getNodePosition = (room: Room, index: number, total: number) => {
@@ -2628,15 +3098,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       // Z-level offset for different floors (diagonal: up-left for upper, down-right for lower)
       if (!isCurrentFloor) {
         if (floorDifference > 0) {
-          // Upper floors - reduced opacity, northwest (up-left) diagonal offset
-          opacity = Math.max(0.5, 1 - (floorDifference * 0.15)); // Gentler opacity reduction (0.5 min instead of 0.3)
-          offsetX = -floorDifference * 18;  // Move up-left diagonally (reduced to 18px to prevent neighbor overlap)
+          // Upper floors - very low opacity (40%), northwest (up-left) diagonal offset
+          opacity = 0.4; // Low opacity - visible but clearly not current floor
+          offsetX = -floorDifference * 18; // Move up-left diagonally (reduced to 18px to prevent neighbor overlap)
           offsetY = -floorDifference * 18;
           zIndex = 100 - floorDifference; // Higher floors appear behind (lower z-index)
         } else {
-          // Lower floors - reduced opacity, southeast (down-right) diagonal offset
-          opacity = Math.max(0.5, 1 - (Math.abs(floorDifference) * 0.15));
-          offsetX = Math.abs(floorDifference) * 18;  // Move down-right diagonally (reduced to 18px)
+          // Lower floors - very low opacity (40%), southeast (down-right) diagonal offset
+          opacity = 0.4; // Low opacity - visible but clearly not current floor
+          offsetX = Math.abs(floorDifference) * 18; // Move down-right diagonally (reduced to 18px)
           offsetY = Math.abs(floorDifference) * 18;
           zIndex = 100 - Math.abs(floorDifference); // Lower floors appear behind (lower z-index) - FIXED: was 100 + abs
         }
@@ -2677,7 +3147,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           y: nodePosition.y + offsetY,
         },
         width: 180,
-        height: 180,
+        height: 140,
         data: {
           roomId: room.id,
           zoneId: room.zoneId,
@@ -2697,14 +3167,25 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           depthOpacity: opacity,
           isSelected: room.id === selectedRoomId,
           // New overlap management properties
-          overlappedRooms: overlappingWith?.roomIds?.map(id => {
-            const r = rooms.find(room => room.id === id);
-            return { id, name: r?.name || `Room ${id}` };
-          }) || [],
-          overlapIndex: overlappingWith ? overlappingWith.roomIds.indexOf(room.id) : undefined,
+          overlappedRooms:
+            overlappingWith?.roomIds?.map(id => {
+              const r = rooms.find(room => room.id === id);
+              return { id, name: r?.name || `Room ${id}` };
+            }) || [],
+          overlapIndex: overlappingWith
+            ? overlappingWith.roomIds.indexOf(room.id)
+            : undefined,
           totalOverlaps: totalOverlaps > 1 ? totalOverlaps : undefined,
-          activeOverlapIndex: getActiveOverlapIndex(room.id, overlappingWith?.roomIds || []),
-          onSwitchOverlapRoom: (direction: 'next' | 'prev') => handleSwitchOverlapRoom(room.id, overlappingWith?.roomIds || [], direction),
+          activeOverlapIndex: getActiveOverlapIndex(
+            room.id,
+            overlappingWith?.roomIds || []
+          ),
+          onSwitchOverlapRoom: (direction: 'next' | 'prev') =>
+            handleSwitchOverlapRoom(
+              room.id,
+              overlappingWith?.roomIds || [],
+              direction
+            ),
         },
         draggable: viewMode === 'edit' && isCurrentFloor, // Only allow dragging rooms on current floor
         className: overlappingWith ? 'room-overlapping' : undefined,
@@ -2726,8 +3207,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       layoutZ: room.layoutZ,
       exits: room.exits.map(exit => ({
         direction: exit.direction,
-        toRoomId: exit.toRoomId
-      }))
+        toRoomId: exit.toRoomId,
+      })),
     }));
 
     const oneWayExits = detectOneWayExits(autoLayoutRooms);
@@ -2735,7 +3216,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // Create edges from exits with enhanced styling for one-way exits
     const newEdges: Edge[] = [];
     const portalNodes: Node[] = []; // Portal nodes for cross-zone exits
-    const exitDirections = { NORTH: 0, SOUTH: 0, EAST: 0, WEST: 0, NORTHEAST: 0, NORTHWEST: 0, SOUTHEAST: 0, SOUTHWEST: 0, UP: 0, DOWN: 0 };
+    const exitDirections = {
+      NORTH: 0,
+      SOUTH: 0,
+      EAST: 0,
+      WEST: 0,
+      NORTHEAST: 0,
+      NORTHWEST: 0,
+      SOUTHEAST: 0,
+      SOUTHWEST: 0,
+      UP: 0,
+      DOWN: 0,
+    };
 
     rooms.forEach(room => {
       // Calculate z-index based on room's Z-level (for all edges from this room)
@@ -2752,9 +3244,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         // Find target room by matching BOTH zone ID and room ID
         // This correctly handles both intra-zone and cross-zone exits
         const targetZoneId = exit.toZoneId ?? room.zoneId;
-        const targetRoom = rooms.find(r => r.zoneId === targetZoneId && r.id === exit.toRoomId);
+        const targetRoom = rooms.find(
+          r => r.zoneId === targetZoneId && r.id === exit.toRoomId
+        );
 
-        if (exit.toRoomId && targetRoom) {
+        if (
+          exit.toRoomId !== null &&
+          exit.toRoomId !== undefined &&
+          targetRoom
+        ) {
           // Count exits by direction for analysis
           exitDirections[exit.direction as keyof typeof exitDirections]++;
 
@@ -2764,14 +3262,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           // console.log(`   Target room position: (${targetRoom.layoutX}, ${targetRoom.layoutY})`);
 
           // Check if source or target room is in an overlap
-          const isOverlappingEdge = overlaps.some(overlap =>
-            overlap.roomIds.includes(room.id) ||
-            overlap.roomIds.includes(exit.toRoomId!)
+          const isOverlappingEdge = overlaps.some(
+            overlap =>
+              overlap.roomIds.includes(room.id) ||
+              overlap.roomIds.includes(exit.toRoomId!)
           );
 
           // Check if this is a one-way exit
-          const oneWayExit = oneWayExits.find(owe =>
-            owe.fromRoom === room.id && owe.toRoom === exit.toRoomId
+          const oneWayExit = oneWayExits.find(
+            owe => owe.fromRoom === room.id && owe.toRoom === exit.toRoomId
           );
           const isOneWay = oneWayExit?.isOneWay || false;
 
@@ -2796,7 +3295,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           }
 
           // Calculate opacity based on Z-level distance (same as rooms)
-          const edgeOpacity = floorDifference === 0 ? 1.0 : Math.max(0.15, 1.0 - floorDifference * 0.35);
+          const edgeOpacity =
+            floorDifference === 0
+              ? 1.0
+              : Math.max(0.15, 1.0 - floorDifference * 0.35);
 
           const edgeStyle = {
             stroke: edgeColor,
@@ -2820,51 +3322,116 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               color: edgeColor,
             },
             // Add label for one-way exits with reason
-            label: isOneWay ? `🚫 One-way (${oneWayExit?.reason?.replace('_', ' ')})` : undefined,
-            labelStyle: isOneWay ? {
-              fill: getThemeColor('#dc2626', '#ef4444'),
-              fontWeight: 'bold',
-              fontSize: '11px',
-              background: getThemeColor('rgba(255,255,255,0.9)', 'rgba(0,0,0,0.9)'),
-              padding: '2px 4px',
-              borderRadius: '3px'
-            } : undefined,
+            label: isOneWay
+              ? `🚫 One-way (${oneWayExit?.reason?.replace('_', ' ')})`
+              : undefined,
+            labelStyle: isOneWay
+              ? {
+                  fill: getThemeColor('#dc2626', '#ef4444'),
+                  fontWeight: 'bold',
+                  fontSize: '11px',
+                  background: getThemeColor(
+                    'rgba(255,255,255,0.9)',
+                    'rgba(0,0,0,0.9)'
+                  ),
+                  padding: '2px 4px',
+                  borderRadius: '3px',
+                }
+              : undefined,
             // Add source/target handles for proper directional connections
-            sourceHandle: exit.direction === 'EAST' ? 'right' :
-              exit.direction === 'WEST' ? 'left' :
-                exit.direction === 'NORTH' ? 'top' :
-                  exit.direction === 'SOUTH' ? 'bottom' :
-                    exit.direction === 'UP' ? 'up' :
-                      exit.direction === 'DOWN' ? 'down' : undefined,
-            targetHandle: exit.direction === 'EAST' ? 'left-target' :
-              exit.direction === 'WEST' ? 'right-target' :
-                exit.direction === 'NORTH' ? 'bottom-target' :
-                  exit.direction === 'SOUTH' ? 'top-target' :
-                    exit.direction === 'UP' ? 'down-target' :
-                      exit.direction === 'DOWN' ? 'up-target' : undefined,
+            sourceHandle:
+              exit.direction === 'EAST'
+                ? 'right'
+                : exit.direction === 'WEST'
+                  ? 'left'
+                  : exit.direction === 'NORTH'
+                    ? 'top'
+                    : exit.direction === 'SOUTH'
+                      ? 'bottom'
+                      : exit.direction === 'UP'
+                        ? 'up'
+                        : exit.direction === 'DOWN'
+                          ? 'down'
+                          : undefined,
+            targetHandle:
+              exit.direction === 'EAST'
+                ? 'left-target'
+                : exit.direction === 'WEST'
+                  ? 'right-target'
+                  : exit.direction === 'NORTH'
+                    ? 'bottom-target'
+                    : exit.direction === 'SOUTH'
+                      ? 'top-target'
+                      : exit.direction === 'UP'
+                        ? 'down-target'
+                        : exit.direction === 'DOWN'
+                          ? 'up-target'
+                          : undefined,
           };
 
           newEdges.push(edge);
           // console.log(`✅ Edge added: ${edge.id} (${exit.direction}${isOneWay ? ' - ONE-WAY' : ''})`);
-        } else if (exit.toRoomId && exit.toZoneId && exit.toZoneId !== room.zoneId) {
+        } else if (
+          exit.toRoomId !== null &&
+          exit.toRoomId !== undefined &&
+          exit.toZoneId &&
+          exit.toZoneId !== room.zoneId
+        ) {
           // Cross-zone exit - create a portal node
           const roomNode = newNodes.find(n => n.id === room.id.toString());
           if (roomNode) {
             // Calculate portal position based on exit direction
+            // Room: 180w × 140h, Portal: ~80w × ~70h
+            // Position portal so it aligns with the exit handle (centered on the direction)
+            const ROOM_WIDTH = 180;
+            const ROOM_HEIGHT = 140;
+            const PORTAL_WIDTH = 80;
+            const PORTAL_HEIGHT = 70;
+            const SPACING = 20; // Gap between room edge and portal
+
             const directionOffsets = {
-              NORTH: { x: 0, y: -120 },
-              SOUTH: { x: 0, y: 120 },
-              EAST: { x: 200, y: 0 },
-              WEST: { x: -200, y: 0 },
-              NORTHEAST: { x: 140, y: -85 },
-              NORTHWEST: { x: -140, y: -85 },
-              SOUTHEAST: { x: 140, y: 85 },
-              SOUTHWEST: { x: -140, y: 85 },
-              UP: { x: 0, y: -100 },
-              DOWN: { x: 0, y: 100 },
+              NORTH: {
+                x: (ROOM_WIDTH - PORTAL_WIDTH) / 2,
+                y: -(ROOM_HEIGHT / 2 + SPACING + PORTAL_HEIGHT / 2),
+              },
+              SOUTH: {
+                x: (ROOM_WIDTH - PORTAL_WIDTH) / 2,
+                y: ROOM_HEIGHT / 2 + SPACING + PORTAL_HEIGHT / 2,
+              },
+              EAST: {
+                x: ROOM_WIDTH / 2 + SPACING + PORTAL_WIDTH,
+                y: (ROOM_HEIGHT - PORTAL_HEIGHT) / 2,
+              }, // Extra spacing to avoid zoom controls
+              WEST: {
+                x: -(ROOM_WIDTH / 2 + SPACING + PORTAL_WIDTH / 2),
+                y: (ROOM_HEIGHT - PORTAL_HEIGHT) / 2,
+              },
+              NORTHEAST: {
+                x: ROOM_WIDTH - 10,
+                y: -(ROOM_HEIGHT / 2 + SPACING),
+              },
+              NORTHWEST: {
+                x: -PORTAL_WIDTH + 10,
+                y: -(ROOM_HEIGHT / 2 + SPACING),
+              },
+              SOUTHEAST: { x: ROOM_WIDTH - 10, y: ROOM_HEIGHT / 2 + SPACING },
+              SOUTHWEST: {
+                x: -PORTAL_WIDTH + 10,
+                y: ROOM_HEIGHT / 2 + SPACING,
+              },
+              UP: {
+                x: (ROOM_WIDTH - PORTAL_WIDTH) / 2,
+                y: -(ROOM_HEIGHT / 2 + SPACING + PORTAL_HEIGHT),
+              },
+              DOWN: {
+                x: (ROOM_WIDTH - PORTAL_WIDTH) / 2,
+                y: ROOM_HEIGHT / 2 + SPACING,
+              },
             };
 
-            const offset = directionOffsets[exit.direction as keyof typeof directionOffsets] || { x: 0, y: 0 };
+            const offset = directionOffsets[
+              exit.direction as keyof typeof directionOffsets
+            ] || { x: 0, y: 0 };
             const portalId = `portal-${room.zoneId}-${room.id}-${exit.direction}-${exit.toZoneId}-${exit.toRoomId}`;
 
             // Create portal node
@@ -2887,7 +3454,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             portalNodes.push(portalNode);
 
             // Create edge from room to portal
-            const portalOpacity = floorDifference === 0 ? 1.0 : Math.max(0.15, 1.0 - floorDifference * 0.35);
+            const portalOpacity =
+              floorDifference === 0
+                ? 1.0
+                : Math.max(0.15, 1.0 - floorDifference * 0.35);
             const portalEdge: Edge = {
               id: `${room.id}-${portalId}-${exit.direction}`,
               source: room.id.toString(),
@@ -2907,22 +3477,40 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 height: 18,
                 color: getThemeColor('#8b5cf6', '#a78bfa'),
               },
-              sourceHandle: exit.direction === 'EAST' ? 'right' :
-                exit.direction === 'WEST' ? 'left' :
-                  exit.direction === 'NORTH' ? 'top' :
-                    exit.direction === 'SOUTH' ? 'bottom' :
-                      exit.direction === 'UP' ? 'up' :
-                        exit.direction === 'DOWN' ? 'down' : null,
-              targetHandle: exit.direction === 'EAST' ? 'left-target' :
-                exit.direction === 'WEST' ? 'right-target' :
-                  exit.direction === 'NORTH' ? 'bottom-target' :
-                    exit.direction === 'SOUTH' ? 'top-target' :
-                      exit.direction === 'UP' ? 'down-target' :
-                        exit.direction === 'DOWN' ? 'up-target' : null,
+              sourceHandle:
+                exit.direction === 'EAST'
+                  ? 'right'
+                  : exit.direction === 'WEST'
+                    ? 'left'
+                    : exit.direction === 'NORTH'
+                      ? 'top'
+                      : exit.direction === 'SOUTH'
+                        ? 'bottom'
+                        : exit.direction === 'UP'
+                          ? 'up'
+                          : exit.direction === 'DOWN'
+                            ? 'down'
+                            : null,
+              targetHandle:
+                exit.direction === 'EAST'
+                  ? 'left-target'
+                  : exit.direction === 'WEST'
+                    ? 'right-target'
+                    : exit.direction === 'NORTH'
+                      ? 'bottom-target'
+                      : exit.direction === 'SOUTH'
+                        ? 'top-target'
+                        : exit.direction === 'UP'
+                          ? 'down-target'
+                          : exit.direction === 'DOWN'
+                            ? 'up-target'
+                            : null,
             };
 
             newEdges.push(portalEdge);
-            console.log(`🌀 Created portal: Room ${room.zoneId}:${room.id} → Zone ${exit.toZoneId}:${exit.toRoomId} via ${exit.direction}`);
+            console.log(
+              `🌀 Created portal: Room ${room.zoneId}:${room.id} → Zone ${exit.toZoneId}:${exit.toRoomId} via ${exit.direction}`
+            );
           }
         }
       });
@@ -2956,19 +3544,37 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       return bDistance - aDistance;
     });
 
-    console.log(`✅ Generated ${newNodes.length} room nodes, ${portalNodes.length} portal nodes, and ${newEdges.length} edges for zone view`);
+    console.log(
+      `✅ Generated ${newNodes.length} room nodes, ${portalNodes.length} portal nodes, and ${newEdges.length} edges for zone view`
+    );
     setNodes(sortedNodes);
     setEdges(sortedEdges);
-  }, [rooms, viewMode, setNodes, setEdges, currentZLevel, overlaps, selectedRoomId, worldMapMode, worldMapNodes, currentViewMode]);
+  }, [
+    rooms,
+    viewMode,
+    setNodes,
+    setEdges,
+    currentZLevel,
+    overlaps,
+    selectedRoomId,
+    worldMapMode,
+    worldMapNodes,
+    currentViewMode,
+  ]);
 
   // Detect overlaps when rooms are loaded
   useEffect(() => {
     if (rooms.length > 0 && !worldMapMode && currentViewMode !== 'world-map') {
       // Build position map from room layoutX, layoutY, layoutZ
-      const positions: Record<number, { x: number; y: number; z?: number }> = {};
+      const positions: Record<number, { x: number; y: number; z?: number }> =
+        {};
       rooms.forEach(room => {
-        if (room.layoutX !== null && room.layoutX !== undefined &&
-            room.layoutY !== null && room.layoutY !== undefined) {
+        if (
+          room.layoutX !== null &&
+          room.layoutX !== undefined &&
+          room.layoutY !== null &&
+          room.layoutY !== undefined
+        ) {
           positions[room.id] = {
             x: room.layoutX,
             y: room.layoutY,
@@ -3020,17 +3626,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           if (room) {
             const roomFloor = room.layoutZ ?? 0;
             setCurrentZLevel(roomFloor);
-            console.log(`🏢 Auto-switched to floor Z${roomFloor} for selected room ${roomId}`);
+            console.log(
+              `🏢 Auto-switched to floor Z${roomFloor} for selected room ${roomId}`
+            );
           }
 
           // Center and zoom to the selected room with animation
           if (reactFlowInstance && node.position) {
-            const centerX = node.position.x + (node.width || 180) / 2;
-            const centerY = node.position.y + (node.height || 180) / 2;
+            const centerX = node.position.x + (node.width || 140) / 2;
+            const centerY = node.position.y + (node.height || 140) / 2;
 
             reactFlowInstance.setCenter(centerX, centerY, {
               zoom: 1.0, // Comfortable zoom level to see the room and its neighbors
-              duration: 800 // Smooth animation to the target room
+              duration: 800, // Smooth animation to the target room
             });
           }
 
@@ -3043,7 +3651,16 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         handleZoneSelect(zoneId);
       }
     },
-    [rooms, handleZoneSelect, handleRoomSelect, worldMapMode, selectedRoomId, router, zoneId, reactFlowInstance]
+    [
+      rooms,
+      handleZoneSelect,
+      handleRoomSelect,
+      worldMapMode,
+      selectedRoomId,
+      router,
+      zoneId,
+      reactFlowInstance,
+    ]
   );
 
   const onNodeDragStop = useCallback(
@@ -3057,9 +3674,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         const originalPosition = dragStartPositions.current[node.id];
 
         // Check if the node was actually moved (not just clicked)
-        if (!originalPosition ||
+        if (
+          !originalPosition ||
           (Math.abs(originalPosition.x - node.position.x) < 5 &&
-            Math.abs(originalPosition.y - node.position.y) < 5)) {
+            Math.abs(originalPosition.y - node.position.y) < 5)
+        ) {
           // No significant movement, this was likely just a click
           return;
         }
@@ -3131,19 +3750,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 prevRooms.map(room =>
                   room.id === parseInt(node.id)
                     ? {
-                      ...room,
-                      layoutX: gridX,
-                      layoutY: gridY,
-                      layoutZ: currentZ,
-                    }
+                        ...room,
+                        layoutX: gridX,
+                        layoutY: gridY,
+                        layoutZ: currentZ,
+                      }
                     : room
                 )
               );
               // Add to undo history if position actually changed
-              if (originalPosition && (
-                Math.abs(originalPosition.x - snappedX) > 1 ||
-                Math.abs(originalPosition.y - snappedY) > 1
-              )) {
+              if (
+                originalPosition &&
+                (Math.abs(originalPosition.x - snappedX) > 1 ||
+                  Math.abs(originalPosition.y - snappedY) > 1)
+              ) {
                 addToUndoHistory({
                   type: 'MOVE_ROOM',
                   timestamp: Date.now(),
@@ -3187,7 +3807,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   );
 
   const handleSaveRoom = async () => {
-    if (!editedRoom || !selectedRoomId) return;
+    if (!editedRoom || selectedRoomId === null || selectedRoomId === undefined)
+      return;
     if (!canEditZone(zoneId)) {
       setError('You do not have permission to edit this zone.');
       return;
@@ -3238,7 +3859,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       console.error('Error saving room:', err);
       alert(
         'Error saving room: ' +
-        (err instanceof Error ? err.message : 'Unknown error')
+          (err instanceof Error ? err.message : 'Unknown error')
       );
     } finally {
       setSaving(false);
@@ -3249,7 +3870,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     direction: string;
     toRoomId: number;
   }) => {
-    if (!selectedRoomId) return;
+    if (selectedRoomId === null || selectedRoomId === undefined) return;
     if (!canEditZone(zoneId)) {
       setError('You do not have permission to edit this zone.');
       return;
@@ -3289,7 +3910,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   };
 
   const handleDeleteExit = async (exitId: string) => {
-    if (!selectedRoomId) return;
+    if (selectedRoomId === null || selectedRoomId === undefined) return;
     if (!canEditZone(zoneId)) {
       setError('You do not have permission to edit this zone.');
       return;
@@ -3309,9 +3930,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         setEditedRoom(prev =>
           prev
             ? {
-              ...prev,
-              exits: prev.exits.filter(exit => exit.id !== exitId),
-            }
+                ...prev,
+                exits: prev.exits.filter(exit => exit.id !== exitId),
+              }
             : null
         );
       }
@@ -3325,7 +3946,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   };
 
   const handleUpdateExit = async (exitId: string, exitData: any) => {
-    if (!selectedRoomId) return;
+    if (selectedRoomId === null || selectedRoomId === undefined) return;
     if (!canEditZone(zoneId)) {
       setError('You do not have permission to edit this zone.');
       return;
@@ -3337,11 +3958,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         prevRooms.map(room =>
           room.id === selectedRoomId
             ? {
-              ...room,
-              exits: room.exits.map(exit =>
-                exit.id === exitId ? { ...exit, ...exitData } : exit
-              ),
-            }
+                ...room,
+                exits: room.exits.map(exit =>
+                  exit.id === exitId ? { ...exit, ...exitData } : exit
+                ),
+              }
             : room
         )
       );
@@ -3350,11 +3971,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         setEditedRoom(prev =>
           prev
             ? {
-              ...prev,
-              exits: prev.exits.map(exit =>
-                exit.id === exitId ? { ...exit, ...exitData } : exit
-              ),
-            }
+                ...prev,
+                exits: prev.exits.map(exit =>
+                  exit.id === exitId ? { ...exit, ...exitData } : exit
+                ),
+              }
             : null
         );
       }
@@ -3368,7 +3989,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   };
 
   const handleRemoveMob = async (mobId: number) => {
-    if (!selectedRoomId || !canEditZone(zoneId)) {
+    if (
+      selectedRoomId === null ||
+      selectedRoomId === undefined ||
+      !canEditZone(zoneId)
+    ) {
       setError('You do not have permission to edit this zone.');
       return;
     }
@@ -3378,9 +4003,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         prevRooms.map(room =>
           room.id === selectedRoomId
             ? {
-              ...room,
-              mobs: room.mobs?.filter(mob => mob.id !== mobId) || [],
-            }
+                ...room,
+                mobs: room.mobs?.filter(mob => mob.id !== mobId) || [],
+              }
             : room
         )
       );
@@ -3389,9 +4014,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         setEditedRoom(prev =>
           prev
             ? {
-              ...prev,
-              mobs: prev.mobs?.filter(mob => mob.id !== mobId) || [],
-            }
+                ...prev,
+                mobs: prev.mobs?.filter(mob => mob.id !== mobId) || [],
+              }
             : null
         );
       }
@@ -3403,17 +4028,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   };
 
   const handleRemoveObject = async (objectId: number) => {
-    if (!selectedRoomId || !canEditZone(zoneId)) {
+    if (
+      selectedRoomId === null ||
+      selectedRoomId === undefined ||
+      !canEditZone(zoneId)
+    ) {
       setError('You do not have permission to edit this zone.');
       return;
     }
 
     try {
-      setRooms(prevRooms =>
-        prevRooms.map(room =>
-          room
-        )
-      );
+      setRooms(prevRooms => prevRooms.map(room => room));
 
       if (editedRoom?.id === selectedRoomId) {
         // Objects are managed separately, no need to update editedRoom
@@ -3426,68 +4051,79 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   };
 
   // Helper function to find the nearest room to a position
-  const findNearestRoom = useCallback((position: { x: number; y: number }) => {
-    let nearestRoom = null;
-    let minDistance = Infinity;
+  const findNearestRoom = useCallback(
+    (position: { x: number; y: number }) => {
+      let nearestRoom = null;
+      let minDistance = Infinity;
 
-    rooms.forEach(room => {
-      const roomX = room.layoutX ?? 0;
-      const roomY = room.layoutY ?? 0;
-      const distance = Math.sqrt(Math.pow(position.x - roomX, 2) + Math.pow(position.y - roomY, 2));
+      rooms.forEach(room => {
+        const roomX = room.layoutX ?? 0;
+        const roomY = room.layoutY ?? 0;
+        const distance = Math.sqrt(
+          Math.pow(position.x - roomX, 2) + Math.pow(position.y - roomY, 2)
+        );
 
-      if (distance < minDistance) {
-        minDistance = distance;
-        nearestRoom = room;
-      }
-    });
+        if (distance < minDistance) {
+          minDistance = distance;
+          nearestRoom = room;
+        }
+      });
 
-    return nearestRoom;
-  }, [rooms]);
+      return nearestRoom;
+    },
+    [rooms]
+  );
 
   // Handler to add a mob to a room
-  const handleAddMobToRoom = useCallback(async (roomId: number, mob: any) => {
-    try {
-      setRooms(prevRooms =>
-        prevRooms.map(room =>
-          room.id === roomId
-            ? {
-              ...room,
-              mobs: [...(room.mobs || []), { ...mob, roomId }],
-            }
-            : room
-        )
-      );
-
-      // Also update editedRoom if it's the target room
-      if (editedRoom?.id === roomId) {
-        setEditedRoom(prev =>
-          prev
-            ? {
-              ...prev,
-              mobs: [...(prev.mobs || []), { ...mob, roomId }],
-            }
-            : null
+  const handleAddMobToRoom = useCallback(
+    async (roomId: number, mob: any) => {
+      try {
+        setRooms(prevRooms =>
+          prevRooms.map(room =>
+            room.id === roomId
+              ? {
+                  ...room,
+                  mobs: [...(room.mobs || []), { ...mob, roomId }],
+                }
+              : room
+          )
         );
-      }
 
-      console.log(`✅ Added mob "${mob.name}" to room ${roomId}`);
-    } catch (err) {
-      console.error('Error adding mob to room:', err);
-      setError('Failed to add mob to room.');
-    }
-  }, [editedRoom]);
+        // Also update editedRoom if it's the target room
+        if (editedRoom?.id === roomId) {
+          setEditedRoom(prev =>
+            prev
+              ? {
+                  ...prev,
+                  mobs: [...(prev.mobs || []), { ...mob, roomId }],
+                }
+              : null
+          );
+        }
+
+        console.log(`✅ Added mob "${mob.name}" to room ${roomId}`);
+      } catch (err) {
+        console.error('Error adding mob to room:', err);
+        setError('Failed to add mob to room.');
+      }
+    },
+    [editedRoom]
+  );
 
   // Handler to add an object to a room
-  const handleAddObjectToRoom = useCallback(async (roomId: number, object: any) => {
-    try {
-      // Objects are managed separately at the zone level, not per room
+  const handleAddObjectToRoom = useCallback(
+    async (roomId: number, object: any) => {
+      try {
+        // Objects are managed separately at the zone level, not per room
 
-      console.log(`✅ Added object "${object.name}" to room ${roomId}`);
-    } catch (err) {
-      console.error('Error adding object to room:', err);
-      setError('Failed to add object to room.');
-    }
-  }, [editedRoom]);
+        console.log(`✅ Added object "${object.name}" to room ${roomId}`);
+      } catch (err) {
+        console.error('Error adding object to room:', err);
+        setError('Failed to add object to room.');
+      }
+    },
+    [editedRoom]
+  );
 
   const handleUpdateZLevel = async (roomId: number, newZLevel: number) => {
     console.log(`Updating room ${roomId} Z-level to ${newZLevel}`);
@@ -3597,12 +4233,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           setRooms(prevRooms => prevRooms.filter(r => r.id !== roomId));
 
           // Remove node from React Flow
-          setNodes(prevNodes => prevNodes.filter(n => parseInt(n.id) !== roomId));
+          setNodes(prevNodes =>
+            prevNodes.filter(n => parseInt(n.id) !== roomId)
+          );
 
           // Remove edges connected to this room
           setEdges(prevEdges =>
-            prevEdges.filter(e =>
-              e.source !== roomId.toString() && e.target !== roomId.toString()
+            prevEdges.filter(
+              e =>
+                e.source !== roomId.toString() && e.target !== roomId.toString()
             )
           );
 
@@ -3614,16 +4253,24 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           console.log(`✅ Room ${roomId} deleted successfully`);
         } else {
-          console.error(`❌ GraphQL error deleting room ${roomId}:`, data.errors[0].message);
+          console.error(
+            `❌ GraphQL error deleting room ${roomId}:`,
+            data.errors[0].message
+          );
           alert(`Failed to delete room: ${data.errors[0].message}`);
         }
       } else {
-        console.error(`❌ HTTP error deleting room ${roomId}:`, response.status);
+        console.error(
+          `❌ HTTP error deleting room ${roomId}:`,
+          response.status
+        );
         alert(`Failed to delete room: HTTP ${response.status}`);
       }
     } catch (error) {
       console.error(`❌ Error deleting room ${roomId}:`, error);
-      alert(`Failed to delete room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Failed to delete room: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
@@ -3636,10 +4283,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // Prompt for direction if not provided and a room is selected
     let selectedDirection = direction;
     if (!selectedDirection && selectedRoomId) {
-      const availableDirections = ['NORTH', 'SOUTH', 'EAST', 'WEST', 'NORTHEAST', 'NORTHWEST', 'SOUTHEAST', 'SOUTHWEST', 'UP', 'DOWN'];
+      const availableDirections = [
+        'NORTH',
+        'SOUTH',
+        'EAST',
+        'WEST',
+        'NORTHEAST',
+        'NORTHWEST',
+        'SOUTHEAST',
+        'SOUTHWEST',
+        'UP',
+        'DOWN',
+      ];
       const currentRoom = rooms.find(r => r.id === selectedRoomId);
       const usedDirections = currentRoom?.exits.map(e => e.direction) || [];
-      const unusedDirections = availableDirections.filter(d => !usedDirections.includes(d));
+      const unusedDirections = availableDirections.filter(
+        d => !usedDirections.includes(d)
+      );
 
       if (unusedDirections.length > 0) {
         const promptResult = prompt(
@@ -3647,8 +4307,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         );
         selectedDirection = promptResult || undefined;
 
-        if (selectedDirection && !unusedDirections.includes(selectedDirection.toUpperCase())) {
-          alert(`Invalid direction. Available directions: ${unusedDirections.join(', ')}`);
+        if (
+          selectedDirection &&
+          !unusedDirections.includes(selectedDirection.toUpperCase())
+        ) {
+          alert(
+            `Invalid direction. Available directions: ${unusedDirections.join(', ')}`
+          );
           return;
         }
       }
@@ -3719,11 +4384,21 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           console.log(`✅ Room ${newRoom.id} created successfully`);
 
           // TODO: Add exit creation functionality between rooms when direction is specified
-          if (selectedRoomId && selectedDirection && selectedDirection.trim()) {
-            console.log(`📝 Note: Would create ${selectedDirection} exit from room ${selectedRoomId} to new room ${newRoom.id}`);
+          if (
+            isValidRoomId(selectedRoomId) &&
+            selectedDirection &&
+            selectedDirection.trim()
+          ) {
+            // selectedRoomId may be 0; use explicit null/undefined check above for future logic
+            console.log(
+              `📝 Note: Would create ${selectedDirection} exit from room ${selectedRoomId} to new room ${newRoom.id}`
+            );
           }
         } else {
-          console.error(`❌ GraphQL error creating room:`, data.errors[0].message);
+          console.error(
+            `❌ GraphQL error creating room:`,
+            data.errors[0].message
+          );
           alert(`Failed to create room: ${data.errors[0].message}`);
         }
       } else {
@@ -3732,11 +4407,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       }
     } catch (error) {
       console.error(`❌ Error creating room:`, error);
-      alert(`Failed to create room: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      alert(
+        `Failed to create room: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
   };
 
-  // Auto-layout functionality  
+  // Auto-layout functionality
   const handleAutoLayout = useCallback(async () => {
     // Only allow auto-layout in edit mode
     if (viewMode !== 'edit') {
@@ -3759,7 +4436,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     if (!rooms || rooms.length === 0) return;
 
     // Check if we have authentication token
-    const token = typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
+    const token =
+      typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
     if (!token) {
       console.error('❌ No auth token found - cannot perform auto-layout');
       return;
@@ -3772,20 +4450,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       const resolvedPositions = resolveOverlaps(newPositions);
 
       // Prepare batch updates
-      const updates = Object.entries(resolvedPositions).map(([roomIdStr, pos]) => {
-        const roomId = parseInt(roomIdStr);
-        const currentRoom = rooms.find(r => r.id === roomId);
+      const updates = Object.entries(resolvedPositions).map(
+        ([roomIdStr, pos]) => {
+          const roomId = parseInt(roomIdStr);
+          const currentRoom = rooms.find(r => r.id === roomId);
 
-        // Use Z-level from auto-layout calculation if available, otherwise keep current
-        const newZ = pos.z !== undefined ? pos.z : (currentRoom?.layoutZ ?? 0);
+          // Use Z-level from auto-layout calculation if available, otherwise keep current
+          const newZ =
+            pos.z !== undefined ? pos.z : (currentRoom?.layoutZ ?? 0);
 
-        return {
-          roomId,
-          layoutX: pos.x,
-          layoutY: pos.y,
-          layoutZ: newZ,
-        };
-      });
+          return {
+            roomId,
+            layoutX: pos.x,
+            layoutY: pos.y,
+            layoutZ: newZ,
+          };
+        }
+      );
 
       console.log(`🔄 Batch updating ${updates.length} room positions...`);
 
@@ -3817,7 +4498,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           const data = await response.json();
           if (!data.errors) {
             const result = data.data.batchUpdateRoomPositions;
-            console.log(`✅ Batch updated ${result.updatedCount} rooms successfully`);
+            console.log(
+              `✅ Batch updated ${result.updatedCount} rooms successfully`
+            );
 
             if (result.errors && result.errors.length > 0) {
               console.warn(`⚠️ Some updates had issues:`, result.errors);
@@ -3827,13 +4510,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             const successful = updates.length;
             const failed = result.errors ? result.errors.length : 0;
 
-            console.log(`📊 Batch update completed: ${successful} successful, ${failed} failed`);
+            console.log(
+              `📊 Batch update completed: ${successful} successful, ${failed} failed`
+            );
           } else {
-            console.error(`❌ GraphQL error in batch update:`, data.errors[0].message);
+            console.error(
+              `❌ GraphQL error in batch update:`,
+              data.errors[0].message
+            );
             throw new Error(data.errors[0].message);
           }
         } else {
-          console.error(`❌ HTTP error in batch update:`, response.status, response.statusText);
+          console.error(
+            `❌ HTTP error in batch update:`,
+            response.status,
+            response.statusText
+          );
           throw new Error(`HTTP ${response.status}: ${response.statusText}`);
         }
       } catch (error) {
@@ -3846,7 +4538,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         return prevRooms.map(room => {
           const newPos = resolvedPositions[room.id];
           if (newPos) {
-            const newZ = newPos.z !== undefined ? newPos.z : (room.layoutZ ?? 0);
+            const newZ =
+              newPos.z !== undefined ? newPos.z : (room.layoutZ ?? 0);
             return {
               ...room,
               layoutX: newPos.x,
@@ -3904,9 +4597,13 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         newPositions: finalPositions,
       });
 
-      console.log(`✅ Auto-layout applied: ${updates.length} rooms updated successfully`);
+      console.log(
+        `✅ Auto-layout applied: ${updates.length} rooms updated successfully`
+      );
       if (remainingOverlaps.length > 0) {
-        console.log(`⚠️ ${remainingOverlaps.length} overlaps detected and marked`);
+        console.log(
+          `⚠️ ${remainingOverlaps.length} overlaps detected and marked`
+        );
       }
     } catch (error) {
       console.error('❌ Failed to apply auto-layout:', error);
@@ -3934,7 +4631,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           event.preventDefault();
           if (canUndo) {
             handleUndo();
-            console.log(`🔄 Undo triggered (${undoHistory.length - undoIndex} actions remaining)`);
+            console.log(
+              `🔄 Undo triggered (${undoHistory.length - undoIndex} actions remaining)`
+            );
           } else {
             console.log('⚠️ No actions to undo');
           }
@@ -3972,14 +4671,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
       // Layout shortcuts (only in edit mode with permissions)
       if (viewMode === 'edit' && canEditZone(zoneId)) {
-        if (event.key.toLowerCase() === 'a' && (event.ctrlKey || event.metaKey)) {
+        if (
+          event.key.toLowerCase() === 'a' &&
+          (event.ctrlKey || event.metaKey)
+        ) {
           event.preventDefault();
           handleAutoLayout();
           console.log('🔄 Auto-layout triggered');
           return;
         }
 
-        if (event.key.toLowerCase() === 'r' && (event.ctrlKey || event.metaKey)) {
+        if (
+          event.key.toLowerCase() === 'r' &&
+          (event.ctrlKey || event.metaKey)
+        ) {
           event.preventDefault();
           handleResetLayout();
           console.log('🔄 Reset layout triggered');
@@ -4014,7 +4719,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
       if (event.key === 'PageUp' && !event.ctrlKey && !event.metaKey) {
         // Only if not in navigation mode (view mode uses PageUp for room navigation)
-        if (viewMode === 'edit' || !selectedRoomId) {
+        if (
+          viewMode === 'edit' ||
+          selectedRoomId === null ||
+          selectedRoomId === undefined
+        ) {
           event.preventDefault();
           setCurrentZLevel(currentZLevel + 1);
           console.log(`⬆️ Moved to floor Z${currentZLevel + 1}`);
@@ -4024,7 +4733,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
       if (event.key === 'PageDown' && !event.ctrlKey && !event.metaKey) {
         // Only if not in navigation mode (view mode uses PageDown for room navigation)
-        if (viewMode === 'edit' || !selectedRoomId) {
+        if (
+          viewMode === 'edit' ||
+          selectedRoomId === null ||
+          selectedRoomId === undefined
+        ) {
           event.preventDefault();
           setCurrentZLevel(currentZLevel - 1);
           console.log(`⬇️ Moved to floor Z${currentZLevel - 1}`);
@@ -4033,7 +4746,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       }
 
       // Room-specific shortcuts (require a selected room)
-      if (!selectedRoomId) return;
+      if (selectedRoomId === null || selectedRoomId === undefined) return;
 
       const room = rooms.find(r => r.id === selectedRoomId);
       if (!room) return;
@@ -4072,10 +4785,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           // Find exit in that direction
           const exit = room.exits.find(e => e.direction === direction);
-          if (exit && exit.toRoomId) {
+          if (exit && exit.toRoomId !== null && exit.toRoomId !== undefined) {
             // Check if destination room exists with matching zone ID and room ID
             const targetZoneId = exit.toZoneId ?? room.zoneId;
-            const destinationRoom = rooms.find(r => r.zoneId === targetZoneId && r.id === exit.toRoomId);
+            const destinationRoom = rooms.find(
+              r => r.zoneId === targetZoneId && r.id === exit.toRoomId
+            );
             if (destinationRoom) {
               console.log(
                 `🧭 Navigating ${direction.toLowerCase()} to room ${exit.toRoomId}: "${destinationRoom.name}"`
@@ -4086,7 +4801,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               // Auto-switch to the destination room's floor so it's fully visible
               const roomFloor = destinationRoom.layoutZ ?? 0;
               setCurrentZLevel(roomFloor);
-              console.log(`🏢 Auto-switched to floor Z${roomFloor} for navigation to room ${exit.toRoomId}`);
+              console.log(
+                `🏢 Auto-switched to floor Z${roomFloor} for navigation to room ${exit.toRoomId}`
+              );
 
               // Update URL to include room parameter for refresh persistence
               if (zoneId) {
@@ -4112,7 +4829,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   `🌐 Navigating ${direction} to Zone ${targetZoneId}, Room ${exit.toRoomId} (cross-zone portal)`
                 );
                 // Navigate to the destination zone and room
-                router.push(`/dashboard/zones/editor?zone=${targetZoneId}&room=${exit.toRoomId}`);
+                router.push(
+                  `/dashboard/zones/editor?zone=${targetZoneId}&room=${exit.toRoomId}`
+                );
               } else {
                 console.log(
                   `🚫 Cannot navigate ${direction.toLowerCase()}: destination room ${exit.toRoomId} not found`
@@ -4129,22 +4848,32 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       }
 
       // Handle Z-level shortcuts for selected room (with Ctrl/Cmd modifier) - only in edit mode
-      if ((event.ctrlKey || event.metaKey) && viewMode === 'edit' && canEditZone(zoneId)) {
+      if (
+        (event.ctrlKey || event.metaKey) &&
+        viewMode === 'edit' &&
+        canEditZone(zoneId)
+      ) {
         switch (event.key) {
           case 'ArrowUp':
             event.preventDefault();
             handleUpdateZLevel(selectedRoomId, currentZ + 1);
-            console.log(`🔼 Z-level increased to ${currentZ + 1} for room ${selectedRoomId}`);
+            console.log(
+              `🔼 Z-level increased to ${currentZ + 1} for room ${selectedRoomId}`
+            );
             break;
           case 'ArrowDown':
             event.preventDefault();
             handleUpdateZLevel(selectedRoomId, currentZ - 1);
-            console.log(`🔽 Z-level decreased to ${currentZ - 1} for room ${selectedRoomId}`);
+            console.log(
+              `🔽 Z-level decreased to ${currentZ - 1} for room ${selectedRoomId}`
+            );
             break;
           case '0':
             event.preventDefault();
             handleUpdateZLevel(selectedRoomId, 0); // Ground level
-            console.log(`🏠 Z-level reset to ground level (0) for room ${selectedRoomId}`);
+            console.log(
+              `🏠 Z-level reset to ground level (0) for room ${selectedRoomId}`
+            );
             break;
         }
       }
@@ -4189,7 +4918,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
       });
 
       try {
-        const rawData = JSON.parse(event.dataTransfer.getData('application/json'));
+        const rawData = JSON.parse(
+          event.dataTransfer.getData('application/json')
+        );
         const type = rawData.type as 'mob' | 'object';
         const entity = rawData.entity as any;
 
@@ -4205,7 +4936,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         } else if (type === 'object') {
           // Handle object drop - place in nearest room
           const objectEntity: any = entity;
-          console.log('Dropped object:', objectEntity, 'at position:', position);
+          console.log(
+            'Dropped object:',
+            objectEntity,
+            'at position:',
+            position
+          );
           const nearestRoom = findNearestRoom(position);
           if (nearestRoom && canEditZone(zoneId)) {
             // @ts-ignore - Entity type inference issue
@@ -4216,7 +4952,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         console.warn('Invalid drop data:', error);
       }
     },
-    [reactFlowInstance, findNearestRoom, handleAddMobToRoom, handleAddObjectToRoom, canEditZone, zoneId]
+    [
+      reactFlowInstance,
+      findNearestRoom,
+      handleAddMobToRoom,
+      handleAddObjectToRoom,
+      canEditZone,
+      zoneId,
+    ]
   );
 
   const handleDragOver = useCallback((event: React.DragEvent) => {
@@ -4230,15 +4973,24 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
   const autoLayoutRooms = useCallback((rooms: Room[]) => {
     const positions: Record<number, { x: number; y: number; z?: number }> = {};
     const visited = new Set<number>();
-    const queue: Array<{ roomId: number; x: number; y: number; z: number }> = [];
+    const queue: Array<{ roomId: number; x: number; y: number; z: number }> =
+      [];
 
     // Start with the first room at origin
     const startRoom = rooms[0];
     if (startRoom) {
-      queue.push({ roomId: startRoom.id, x: 0, y: 0, z: startRoom.layoutZ ?? 0 });
+      queue.push({
+        roomId: startRoom.id,
+        x: 0,
+        y: 0,
+        z: startRoom.layoutZ ?? 0,
+      });
 
       // Direction mappings for layout
-      const directionOffsets: Record<string, { x: number; y: number; z: number }> = {
+      const directionOffsets: Record<
+        string,
+        { x: number; y: number; z: number }
+      > = {
         NORTH: { x: 0, y: -2, z: 0 },
         SOUTH: { x: 0, y: 2, z: 0 },
         EAST: { x: 2, y: 0, z: 0 },
@@ -4263,8 +5015,16 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         const room = rooms.find(r => r.id === roomId);
         if (room?.exits) {
           room.exits.forEach(exit => {
-            if (exit.toRoomId && !visited.has(exit.toRoomId)) {
-              const offset = directionOffsets[exit.direction] || { x: 1, y: 1, z: 0 };
+            if (
+              exit.toRoomId !== null &&
+              exit.toRoomId !== undefined &&
+              !visited.has(exit.toRoomId)
+            ) {
+              const offset = directionOffsets[exit.direction] || {
+                x: 1,
+                y: 1,
+                z: 0,
+              };
               queue.push({
                 roomId: exit.toRoomId,
                 x: x + offset.x,
@@ -4300,67 +5060,79 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     return positions;
   }, []);
 
-  const detectOverlaps = useCallback((positions: Record<number, { x: number; y: number; z?: number }>) => {
-    const overlaps: OverlapInfo[] = [];
-    const positionMap = new Map<string, number[]>();
+  const detectOverlaps = useCallback(
+    (positions: Record<number, { x: number; y: number; z?: number }>) => {
+      const overlaps: OverlapInfo[] = [];
+      const positionMap = new Map<string, number[]>();
 
-    // Group rooms by position (including Z-level - rooms on different floors aren't overlapping)
-    Object.entries(positions).forEach(([roomIdStr, pos]) => {
-      const roomId = parseInt(roomIdStr);
-      const key = `${pos.x},${pos.y},${pos.z ?? 0}`; // Include Z-level in position key
-      if (!positionMap.has(key)) {
-        positionMap.set(key, []);
-      }
-      positionMap.get(key)!.push(roomId);
-    });
+      // Group rooms by position (including Z-level - rooms on different floors aren't overlapping)
+      Object.entries(positions).forEach(([roomIdStr, pos]) => {
+        const roomId = parseInt(roomIdStr);
+        const key = `${pos.x},${pos.y},${pos.z ?? 0}`; // Include Z-level in position key
+        if (!positionMap.has(key)) {
+          positionMap.set(key, []);
+        }
+        positionMap.get(key)!.push(roomId);
+      });
 
-    // Find overlaps
-    positionMap.forEach((roomIds, posKey) => {
-      if (roomIds.length > 1) {
-        const [x, y] = posKey.split(',').map(Number);
-        overlaps.push({
-          roomIds,
-          position: { x, y },
-          count: roomIds.length,
-        });
-      }
-    });
-
-    return overlaps;
-  }, []);
-
-  const resolveOverlaps = useCallback((positions: Record<number, { x: number; y: number; z?: number }>) => {
-    const resolved = { ...positions };
-    const overlaps = detectOverlaps(positions);
-
-    // Simple overlap resolution: spread overlapping rooms in a small grid
-    overlaps.forEach(overlap => {
-      const { roomIds, position } = overlap;
-      roomIds.forEach((roomId, index) => {
-        if (index > 0) { // Keep first room in original position
-          const offsetX = (index % 2) === 0 ? -1 : 1;
-          const offsetY = Math.floor(index / 2);
-          resolved[roomId] = {
-            ...resolved[roomId],
-            x: position.x + offsetX,
-            y: position.y + offsetY,
-          };
+      // Find overlaps
+      positionMap.forEach((roomIds, posKey) => {
+        if (roomIds.length > 1) {
+          const [x, y] = posKey.split(',').map(Number);
+          overlaps.push({
+            roomIds,
+            position: { x, y },
+            count: roomIds.length,
+          });
         }
       });
-    });
 
-    return resolved;
-  }, [detectOverlaps]);
+      return overlaps;
+    },
+    []
+  );
+
+  const resolveOverlaps = useCallback(
+    (positions: Record<number, { x: number; y: number; z?: number }>) => {
+      const resolved = { ...positions };
+      const overlaps = detectOverlaps(positions);
+
+      // Simple overlap resolution: spread overlapping rooms in a small grid
+      overlaps.forEach(overlap => {
+        const { roomIds, position } = overlap;
+        roomIds.forEach((roomId, index) => {
+          if (index > 0) {
+            // Keep first room in original position
+            const offsetX = index % 2 === 0 ? -1 : 1;
+            const offsetY = Math.floor(index / 2);
+            resolved[roomId] = {
+              ...resolved[roomId],
+              x: position.x + offsetX,
+              y: position.y + offsetY,
+            };
+          }
+        });
+      });
+
+      return resolved;
+    },
+    [detectOverlaps]
+  );
 
   // Track drag start positions for undo
-  const dragStartPositions = useRef<Record<string, { x: number; y: number }>>({});
+  const dragStartPositions = useRef<Record<string, { x: number; y: number }>>(
+    {}
+  );
 
-  const onNodeDragStart = useCallback((event: React.MouseEvent, node: Node) => {
-    if (viewMode === 'edit') {
-      // Store the original position before drag starts
-      dragStartPositions.current[node.id] = { ...node.position };
-    }
-  }, [viewMode]);
+  const onNodeDragStart = useCallback(
+    (event: React.MouseEvent, node: Node) => {
+      if (viewMode === 'edit') {
+        // Store the original position before drag starts
+        dragStartPositions.current[node.id] = { ...node.position };
+      }
+    },
+    [viewMode]
+  );
 
   // Loading and error states
   if (loading) {
@@ -4393,10 +5165,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
         <EntityPalette
           mobs={mobs}
           objects={objects}
-          onMobDragStart={(mob) => {
+          onMobDragStart={mob => {
             // Drag data is handled in the drag event handlers
           }}
-          onObjectDragStart={(obj) => {
+          onObjectDragStart={obj => {
             // Drag data is handled in the drag event handlers
           }}
           zoneId={zoneId || 0}
@@ -4433,18 +5205,26 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                 // Store for use in zone transition - use a more reliable reference
                 if (reactFlowInstance) {
-                  (reactFlowInstance as any).lastMouseWorldPos = { x: worldX, y: worldY };
+                  (reactFlowInstance as any).lastMouseWorldPos = {
+                    x: worldX,
+                    y: worldY,
+                  };
                 }
               } catch (error) {
-                console.warn('Could not capture mouse position for zoom centering:', error);
+                console.warn(
+                  'Could not capture mouse position for zoom centering:',
+                  error
+                );
               }
             }
 
             // More aggressive early return for better performance
-            if (lastViewport &&
+            if (
+              lastViewport &&
               Math.abs((lastViewport.zoom || 1) - viewport.zoom) < 0.05 &&
               Math.abs((lastViewport.x || 0) - viewport.x) < 25 &&
-              Math.abs((lastViewport.y || 0) - viewport.y) < 25) {
+              Math.abs((lastViewport.y || 0) - viewport.y) < 25
+            ) {
               return;
             }
 
@@ -4452,15 +5232,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             if (worldMapTransitionRef.current) {
               // Add timestamp to track how long transition has been active
               if (typeof worldMapTransitionRef.current === 'boolean') {
-                worldMapTransitionRef.current = { active: true, startTime: now };
+                worldMapTransitionRef.current = {
+                  active: true,
+                  startTime: now,
+                };
               }
 
-              const transitionDuration = now - (worldMapTransitionRef.current as any).startTime;
-              console.log(`🚫 Skipping zoom detection - transition in progress (${transitionDuration}ms)`);
+              const transitionDuration =
+                now - (worldMapTransitionRef.current as any).startTime;
+              console.log(
+                `🚫 Skipping zoom detection - transition in progress (${transitionDuration}ms)`
+              );
 
               // Failsafe: Clear transition flag after 3 seconds to prevent permanent lock
               if (transitionDuration > 3000) {
-                console.log(`⚠️ Transition flag stuck for >3s - force clearing`);
+                console.log(
+                  `⚠️ Transition flag stuck for >3s - force clearing`
+                );
                 worldMapTransitionRef.current = false;
                 customZoneTransitionDone.current = false;
               } else {
@@ -4470,12 +5258,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
             // Handle view mode detection for both world map and single zone
             // Skip automatic view mode detection during initial positioning to prevent unwanted world map transitions
-            if (now - lastLODUpdate.current > LOD_THROTTLE_MS && hasPerformedInitialFit.current) {
-              const newViewMode = detectViewMode(viewport.zoom, currentViewMode);
-              console.log(`🔍 Zoom detection: zoom=${viewport.zoom.toFixed(3)}, currentMode=${currentViewMode}, newMode=${newViewMode}, transitionFlag=${worldMapTransitionRef.current}`);
+            if (
+              now - lastLODUpdate.current > LOD_THROTTLE_MS &&
+              hasPerformedInitialFit.current
+            ) {
+              const newViewMode = detectViewMode(
+                viewport.zoom,
+                currentViewMode
+              );
+              console.log(
+                `🔍 Zoom detection: zoom=${viewport.zoom.toFixed(3)}, currentMode=${currentViewMode}, newMode=${newViewMode}, transitionFlag=${worldMapTransitionRef.current}`
+              );
 
               if (newViewMode !== currentViewMode) {
-                console.log(`🔄 View mode change detected: ${currentViewMode} → ${newViewMode}`);
+                console.log(
+                  `🔄 View mode change detected: ${currentViewMode} → ${newViewMode}`
+                );
 
                 // Debounce view mode changes to prevent rapid switching
                 if (viewModeTransitionRef.current) {
@@ -4483,7 +5281,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   console.log(`⏱️ Cleared existing transition timeout`);
                 }
                 viewModeTransitionRef.current = setTimeout(() => {
-                  console.log(`✅ Executing view mode change: ${currentViewMode} → ${newViewMode}`);
+                  console.log(
+                    `✅ Executing view mode change: ${currentViewMode} → ${newViewMode}`
+                  );
                   setCurrentViewMode(newViewMode);
 
                   // When transitioning from world-map to zone-overview, find and select the closest zone
@@ -4492,31 +5292,50 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     newViewMode,
                     worldMapMode,
                     hasZoneMapData: !!zoneMapData,
-                    hasReactFlowInstance: !!reactFlowInstance
+                    hasReactFlowInstance: !!reactFlowInstance,
                   });
 
-                  if (currentViewMode === 'world-map' && newViewMode === 'zone-overview' && zoneMapData && reactFlowInstance) {
-                    console.log(`🎯 Starting zone-overview transition from world map`);
+                  if (
+                    currentViewMode === 'world-map' &&
+                    newViewMode === 'zone-overview' &&
+                    zoneMapData &&
+                    reactFlowInstance
+                  ) {
+                    console.log(
+                      `🎯 Starting zone-overview transition from world map`
+                    );
                     // Set transition flag to prevent zoom feedback loop
-                    worldMapTransitionRef.current = { active: true, startTime: Date.now() };
+                    worldMapTransitionRef.current = {
+                      active: true,
+                      startTime: Date.now(),
+                    };
                     customZoneTransitionDone.current = true;
 
                     const currentViewport = reactFlowInstance.getViewport();
 
                     // Try to get the actual mouse/cursor position first
-                    const mouseWorldPos = (reactFlowInstance as any).lastMouseWorldPos;
+                    const mouseWorldPos = (reactFlowInstance as any)
+                      .lastMouseWorldPos;
                     let detectionX, detectionY;
 
                     if (mouseWorldPos) {
                       // Use cursor position for more accurate zone detection
                       detectionX = mouseWorldPos.x;
                       detectionY = mouseWorldPos.y;
-                      console.log(`🎯 Using cursor position for zone detection: (${detectionX.toFixed(1)}, ${detectionY.toFixed(1)})`);
+                      console.log(
+                        `🎯 Using cursor position for zone detection: (${detectionX.toFixed(1)}, ${detectionY.toFixed(1)})`
+                      );
                     } else {
                       // Fallback to viewport center if no cursor position available
-                      detectionX = (-currentViewport.x + window.innerWidth / 2) / currentViewport.zoom;
-                      detectionY = (-currentViewport.y + window.innerHeight / 2) / currentViewport.zoom;
-                      console.log(`📍 Using viewport center for zone detection: (${detectionX.toFixed(1)}, ${detectionY.toFixed(1)})`);
+                      detectionX =
+                        (-currentViewport.x + window.innerWidth / 2) /
+                        currentViewport.zoom;
+                      detectionY =
+                        (-currentViewport.y + window.innerHeight / 2) /
+                        currentViewport.zoom;
+                      console.log(
+                        `📍 Using viewport center for zone detection: (${detectionX.toFixed(1)}, ${detectionY.toFixed(1)})`
+                      );
                     }
 
                     // Find the zone that contains the detection point (instead of closest to center)
@@ -4524,40 +5343,60 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     let closestZone = null;
                     let closestDistance = Infinity;
 
-                    console.log(`🔍 Checking ${zoneMapData.zones.length} zones for detection point...`);
+                    console.log(
+                      `🔍 Checking ${zoneMapData.zones.length} zones for detection point...`
+                    );
 
                     for (const zone of zoneMapData.zones) {
                       // Check if the detection point is actually INSIDE this zone's boundary
                       // Convert detection point to world map coordinates to match zone positioning
-                      const worldMapNodes = generateEnhancedWorldMapNodes(zoneMapData, 0.5);
-                      const zoneNode = worldMapNodes.find(node => node.id === `zone-boundary-${zone.id}`);
+                      const worldMapNodes = generateEnhancedWorldMapNodes(
+                        zoneMapData,
+                        0.5
+                      );
+                      const zoneNode = worldMapNodes.find(
+                        node => node.id === `zone-boundary-${zone.id}`
+                      );
 
                       if (zoneNode) {
                         const zoneBounds = {
                           left: zoneNode.position.x,
-                          right: zoneNode.position.x + (zoneNode.data?.width || 200),
+                          right:
+                            zoneNode.position.x + (zoneNode.data?.width || 200),
                           top: zoneNode.position.y,
-                          bottom: zoneNode.position.y + (zoneNode.data?.height || 120)
+                          bottom:
+                            zoneNode.position.y +
+                            (zoneNode.data?.height || 120),
                         };
 
                         // Check if detection point is inside this zone's world map boundary
-                        if (detectionX >= zoneBounds.left && detectionX <= zoneBounds.right &&
-                          detectionY >= zoneBounds.top && detectionY <= zoneBounds.bottom) {
+                        if (
+                          detectionX >= zoneBounds.left &&
+                          detectionX <= zoneBounds.right &&
+                          detectionY >= zoneBounds.top &&
+                          detectionY <= zoneBounds.bottom
+                        ) {
                           selectedZone = zone;
-                          console.log(`✅ Found zone containing cursor: ${zone.id} (${zone.name})`);
+                          console.log(
+                            `✅ Found zone containing cursor: ${zone.id} (${zone.name})`
+                          );
                           break;
                         }
                       }
 
                       // Also calculate distance as fallback
-                      const zoneCenterX = zoneNode ? (zoneNode.position.x + (zoneNode.data?.width || 200) / 2) :
-                        (zone.minX + zone.maxX) / 2 * GRID_SCALE;
-                      const zoneCenterY = zoneNode ? (zoneNode.position.y + (zoneNode.data?.height || 120) / 2) :
-                        (zone.minY + zone.maxY) / 2 * GRID_SCALE;
+                      const zoneCenterX = zoneNode
+                        ? zoneNode.position.x +
+                          (zoneNode.data?.width || 200) / 2
+                        : ((zone.minX + zone.maxX) / 2) * GRID_SCALE;
+                      const zoneCenterY = zoneNode
+                        ? zoneNode.position.y +
+                          (zoneNode.data?.height || 120) / 2
+                        : ((zone.minY + zone.maxY) / 2) * GRID_SCALE;
 
                       const distance = Math.sqrt(
                         Math.pow(detectionX - zoneCenterX, 2) +
-                        Math.pow(detectionY - zoneCenterY, 2)
+                          Math.pow(detectionY - zoneCenterY, 2)
                       );
 
                       if (distance < closestDistance) {
@@ -4572,33 +5411,47 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     // Select the detected zone and center viewport on it
                     if (targetZone) {
                       if (selectedZone) {
-                        console.log(`🎯 Selected zone containing cursor: ${targetZone.id} (${targetZone.name})`);
+                        console.log(
+                          `🎯 Selected zone containing cursor: ${targetZone.id} (${targetZone.name})`
+                        );
                       } else {
-                        console.log(`🏴 Using closest zone as fallback: ${targetZone.id} (${targetZone.name})`);
+                        console.log(
+                          `🏴 Using closest zone as fallback: ${targetZone.id} (${targetZone.name})`
+                        );
                       }
-                      console.log(`🔄 Current URL zone: ${zoneId}, transitioning to zone: ${targetZone.id}`);
+                      console.log(
+                        `🔄 Current URL zone: ${zoneId}, transitioning to zone: ${targetZone.id}`
+                      );
 
                       // If it's a different zone, navigate to it
                       if (targetZone.id !== zoneId) {
-                        console.log(`🚀 Navigating to zone ${targetZone.id} (different from current ${zoneId})`);
-                        router.push(`/dashboard/zones/editor?zone=${targetZone.id}`);
+                        console.log(
+                          `🚀 Navigating to zone ${targetZone.id} (different from current ${zoneId})`
+                        );
+                        router.push(
+                          `/dashboard/zones/editor?zone=${targetZone.id}`
+                        );
                         return; // Let the new page load handle the positioning
                       }
 
                       setSelectedZoneId(targetZone.id);
 
                       // Try to get the cursor position for more precise centering
-                      const mouseWorldPos = (reactFlowInstance as any).lastMouseWorldPos;
+                      const mouseWorldPos = (reactFlowInstance as any)
+                        .lastMouseWorldPos;
                       let targetCenterX, targetCenterY;
 
                       if (mouseWorldPos && zoneMapData?.rooms) {
-                        console.log(`🎯 Using cursor position for centering: (${mouseWorldPos.x.toFixed(1)}, ${mouseWorldPos.y.toFixed(1)})`);
+                        console.log(
+                          `🎯 Using cursor position for centering: (${mouseWorldPos.x.toFixed(1)}, ${mouseWorldPos.y.toFixed(1)})`
+                        );
 
                         // Find the room closest to the cursor position within the selected zone
-                        const zoneRooms = zoneMapData.rooms.filter(room =>
-                          room.zoneId === targetZone.id &&
-                          room.layoutX !== null &&
-                          room.layoutY !== null
+                        const zoneRooms = zoneMapData.rooms.filter(
+                          room =>
+                            room.zoneId === targetZone.id &&
+                            room.layoutX !== null &&
+                            room.layoutY !== null
                         );
 
                         if (zoneRooms.length > 0) {
@@ -4610,7 +5463,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                             const roomY = room.layoutY! * GRID_SCALE;
                             const distance = Math.sqrt(
                               Math.pow(mouseWorldPos.x - roomX, 2) +
-                              Math.pow(mouseWorldPos.y - roomY, 2)
+                                Math.pow(mouseWorldPos.y - roomY, 2)
                             );
 
                             if (distance < closestRoomDistance) {
@@ -4622,9 +5475,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                           if (closestRoom) {
                             targetCenterX = closestRoom.layoutX! * GRID_SCALE;
                             targetCenterY = closestRoom.layoutY! * GRID_SCALE;
-                            console.log(`🎯 Centering on closest room: ${closestRoom.id} (${closestRoom.name || 'Unnamed'})`);
-                            console.log(`   Room coordinates: layoutX=${closestRoom.layoutX}, layoutY=${closestRoom.layoutY}`);
-                            console.log(`   Scaled coordinates: (${targetCenterX}, ${targetCenterY})`);
+                            console.log(
+                              `🎯 Centering on closest room: ${closestRoom.id} (${closestRoom.name || 'Unnamed'})`
+                            );
+                            console.log(
+                              `   Room coordinates: layoutX=${closestRoom.layoutX}, layoutY=${closestRoom.layoutY}`
+                            );
+                            console.log(
+                              `   Scaled coordinates: (${targetCenterX}, ${targetCenterY})`
+                            );
                             console.log(`   GRID_SCALE=${GRID_SCALE}`);
                           }
                         }
@@ -4632,12 +5491,20 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                       // Fallback to zone center if no cursor position or room found
                       if (!targetCenterX || !targetCenterY) {
-                        targetCenterX = (targetZone.minX + targetZone.maxX) / 2 * GRID_SCALE;
-                        targetCenterY = (targetZone.minY + targetZone.maxY) / 2 * GRID_SCALE;
-                        console.log(`🎯 Using zone center fallback: (${targetCenterX}, ${targetCenterY})`);
+                        targetCenterX =
+                          ((targetZone.minX + targetZone.maxX) / 2) *
+                          GRID_SCALE;
+                        targetCenterY =
+                          ((targetZone.minY + targetZone.maxY) / 2) *
+                          GRID_SCALE;
+                        console.log(
+                          `🎯 Using zone center fallback: (${targetCenterX}, ${targetCenterY})`
+                        );
                       }
-                      const zoneWidth = (targetZone.maxX - targetZone.minX) * GRID_SCALE;
-                      const zoneHeight = (targetZone.maxY - targetZone.minY) * GRID_SCALE;
+                      const zoneWidth =
+                        (targetZone.maxX - targetZone.minX) * GRID_SCALE;
+                      const zoneHeight =
+                        (targetZone.maxY - targetZone.minY) * GRID_SCALE;
 
                       // Calculate appropriate zoom to fit the zone with some padding
                       const padding = 100;
@@ -4645,77 +5512,137 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       const viewportHeight = window.innerHeight;
                       const zoomX = viewportWidth / (zoneWidth + padding * 2);
                       const zoomY = viewportHeight / (zoneHeight + padding * 2);
-                      const targetZoom = Math.max(0.3, Math.min(zoomX, zoomY, 1.1)); // Ensure zoom stays above hysteresis threshold and cap at 1.1
+                      const targetZoom = Math.max(
+                        0.3,
+                        Math.min(zoomX, zoomY, 1.1)
+                      ); // Ensure zoom stays above hysteresis threshold and cap at 1.1
 
-                      console.log(`📐 Zone transition: center=(${targetCenterX}, ${targetCenterY}), targetZoom=${targetZoom.toFixed(3)}`);
+                      console.log(
+                        `📐 Zone transition: center=(${targetCenterX}, ${targetCenterY}), targetZoom=${targetZoom.toFixed(3)}`
+                      );
 
                       // Set the viewport to center on the target (room or zone center) - try both approaches
-                      console.log(`🔧 Attempting viewport centering with setViewport...`);
+                      console.log(
+                        `🔧 Attempting viewport centering with setViewport...`
+                      );
 
                       // Try setViewport first
-                      reactFlowInstance.setViewport({
-                        x: -targetCenterX * targetZoom + viewportWidth / 2,
-                        y: -targetCenterY * targetZoom + viewportHeight / 2,
-                        zoom: targetZoom
-                      }, { duration: 300 });
+                      reactFlowInstance.setViewport(
+                        {
+                          x: -targetCenterX * targetZoom + viewportWidth / 2,
+                          y: -targetCenterY * targetZoom + viewportHeight / 2,
+                          zoom: targetZoom,
+                        },
+                        { duration: 300 }
+                      );
 
                       // Backup approach: use setCenter after a short delay
                       setTimeout(() => {
                         console.log(`🔧 Backup: Using setCenter approach...`);
-                        reactFlowInstance.setCenter(targetCenterX, targetCenterY, {
-                          zoom: targetZoom,
-                          duration: 100
-                        });
+                        reactFlowInstance.setCenter(
+                          targetCenterX,
+                          targetCenterY,
+                          {
+                            zoom: targetZoom,
+                            duration: 100,
+                          }
+                        );
 
                         // Debug and fix: center on actual rendered room positions
                         setTimeout(() => {
                           const currentNodes = reactFlowInstance.getNodes();
-                          console.log(`🔍 Current nodes after centering: ${currentNodes.length}`);
+                          console.log(
+                            `🔍 Current nodes after centering: ${currentNodes.length}`
+                          );
 
                           if (currentNodes.length > 0) {
-                            const roomNodes = currentNodes.filter(n => n.type === 'room');
-                            console.log(`   Room nodes found: ${roomNodes.length}`);
+                            const roomNodes = currentNodes.filter(
+                              n => n.type === 'room'
+                            );
+                            console.log(
+                              `   Room nodes found: ${roomNodes.length}`
+                            );
 
                             if (roomNodes.length > 0) {
                               // Calculate the center of all room nodes
-                              const roomPositions = roomNodes.map(node => node.position);
-                              const minX = Math.min(...roomPositions.map(p => p.x));
-                              const maxX = Math.max(...roomPositions.map(p => p.x));
-                              const minY = Math.min(...roomPositions.map(p => p.y));
-                              const maxY = Math.max(...roomPositions.map(p => p.y));
+                              const roomPositions = roomNodes.map(
+                                node => node.position
+                              );
+                              const minX = Math.min(
+                                ...roomPositions.map(p => p.x)
+                              );
+                              const maxX = Math.max(
+                                ...roomPositions.map(p => p.x)
+                              );
+                              const minY = Math.min(
+                                ...roomPositions.map(p => p.y)
+                              );
+                              const maxY = Math.max(
+                                ...roomPositions.map(p => p.y)
+                              );
 
                               const actualRoomCenterX = (minX + maxX) / 2;
                               const actualRoomCenterY = (minY + maxY) / 2;
 
-                              console.log(`🎯 Fixing center using actual room positions:`);
-                              console.log(`   Room bounds: x=[${minX}, ${maxX}], y=[${minY}, ${maxY}]`);
-                              console.log(`   Calculated center: (${actualRoomCenterX}, ${actualRoomCenterY})`);
+                              console.log(
+                                `🎯 Fixing center using actual room positions:`
+                              );
+                              console.log(
+                                `   Room bounds: x=[${minX}, ${maxX}], y=[${minY}, ${maxY}]`
+                              );
+                              console.log(
+                                `   Calculated center: (${actualRoomCenterX}, ${actualRoomCenterY})`
+                              );
 
                               // Validate that the center point is reasonable before applying
                               const roomBoundsCheck = {
                                 minX: minX - 500, // Use already calculated bounds with 500px padding
                                 maxX: maxX + 500,
                                 minY: minY - 500,
-                                maxY: maxY + 500
+                                maxY: maxY + 500,
                               };
 
                               // Clamp the center point to reasonable bounds
-                              const clampedCenterX = Math.max(roomBoundsCheck.minX, Math.min(roomBoundsCheck.maxX, actualRoomCenterX));
-                              const clampedCenterY = Math.max(roomBoundsCheck.minY, Math.min(roomBoundsCheck.maxY, actualRoomCenterY));
+                              const clampedCenterX = Math.max(
+                                roomBoundsCheck.minX,
+                                Math.min(
+                                  roomBoundsCheck.maxX,
+                                  actualRoomCenterX
+                                )
+                              );
+                              const clampedCenterY = Math.max(
+                                roomBoundsCheck.minY,
+                                Math.min(
+                                  roomBoundsCheck.maxY,
+                                  actualRoomCenterY
+                                )
+                              );
 
-                              if (clampedCenterX !== actualRoomCenterX || clampedCenterY !== actualRoomCenterY) {
-                                console.log(`⚠️ Clamped center from (${actualRoomCenterX}, ${actualRoomCenterY}) to (${clampedCenterX}, ${clampedCenterY})`);
+                              if (
+                                clampedCenterX !== actualRoomCenterX ||
+                                clampedCenterY !== actualRoomCenterY
+                              ) {
+                                console.log(
+                                  `⚠️ Clamped center from (${actualRoomCenterX}, ${actualRoomCenterY}) to (${clampedCenterX}, ${clampedCenterY})`
+                                );
                               }
 
                               // Use the validated center for final centering
-                              reactFlowInstance.setCenter(clampedCenterX, clampedCenterY, {
-                                zoom: targetZoom,
-                                duration: 200
-                              });
+                              reactFlowInstance.setCenter(
+                                clampedCenterX,
+                                clampedCenterY,
+                                {
+                                  zoom: targetZoom,
+                                  duration: 200,
+                                }
+                              );
 
                               setTimeout(() => {
-                                const finalViewport = reactFlowInstance.getViewport();
-                                console.log(`   Final viewport: x=${finalViewport.x.toFixed(1)}, y=${finalViewport.y.toFixed(1)}, zoom=${finalViewport.zoom.toFixed(3)}`);
+                                const finalViewport =
+                                  reactFlowInstance.getViewport();
+                                console.log(
+                                  `   Final viewport: x=${finalViewport.x.toFixed(1)}, y=${finalViewport.y.toFixed(1)}, zoom=${finalViewport.zoom.toFixed(3)}`
+                                );
                               }, 250);
                             }
                           }
@@ -4724,7 +5651,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                       // Clear transition flag after animation completes - extended time to prevent interference
                       setTimeout(() => {
-                        console.log(`🔓 Clearing transition flag after animation`);
+                        console.log(
+                          `🔓 Clearing transition flag after animation`
+                        );
                         worldMapTransitionRef.current = false;
                       }, 1500); // Extended to 1.5s to prevent competing viewport changes
                     } else {
@@ -4735,34 +5664,62 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   }
 
                   // When transitioning from zone-overview to world-map, center on the current zone
-                  if (currentViewMode === 'zone-overview' && newViewMode === 'world-map' && zoneMapData && reactFlowInstance && zoneId) {
-                    console.log(`🔙 Transitioning from zone ${zoneId} to world map - centering on zone position`);
+                  if (
+                    currentViewMode === 'zone-overview' &&
+                    newViewMode === 'world-map' &&
+                    zoneMapData &&
+                    reactFlowInstance &&
+                    zoneId
+                  ) {
+                    console.log(
+                      `🔙 Transitioning from zone ${zoneId} to world map - centering on zone position`
+                    );
 
                     // Set transition flag to prevent interference
-                    worldMapTransitionRef.current = { active: true, startTime: Date.now() };
+                    worldMapTransitionRef.current = {
+                      active: true,
+                      startTime: Date.now(),
+                    };
 
                     // Store the current zone ID for centering
-                    sessionStorage.setItem('centerOnZoneInWorldMap', zoneId.toString());
+                    sessionStorage.setItem(
+                      'centerOnZoneInWorldMap',
+                      zoneId.toString()
+                    );
 
                     setTimeout(() => {
                       if (reactFlowInstance && zoneMapData) {
                         // Find the zone node in the world map
-                        const zoneWorldNodes = generateEnhancedWorldMapNodes(zoneMapData, 0.3); // Use 0.3 zoom for calculation
-                        const currentZoneNode = zoneWorldNodes.find(node =>
-                          node.id === `zone-boundary-${zoneId}`
+                        const zoneWorldNodes = generateEnhancedWorldMapNodes(
+                          zoneMapData,
+                          0.3
+                        ); // Use 0.3 zoom for calculation
+                        const currentZoneNode = zoneWorldNodes.find(
+                          node => node.id === `zone-boundary-${zoneId}`
                         );
 
                         if (currentZoneNode) {
-                          console.log(`🎯 Centering world map on zone ${zoneId} at position:`, currentZoneNode.position);
+                          console.log(
+                            `🎯 Centering world map on zone ${zoneId} at position:`,
+                            currentZoneNode.position
+                          );
                           // Center on the zone's position in world map with better zoom level
                           const targetZoom = 0.15; // Lower zoom for better context viewing
-                          const zoneCenterX = currentZoneNode.position.x + (currentZoneNode.data?.width || 200) / 2;
-                          const zoneCenterY = currentZoneNode.position.y + (currentZoneNode.data?.height || 120) / 2;
+                          const zoneCenterX =
+                            currentZoneNode.position.x +
+                            (currentZoneNode.data?.width || 200) / 2;
+                          const zoneCenterY =
+                            currentZoneNode.position.y +
+                            (currentZoneNode.data?.height || 120) / 2;
 
-                          reactFlowInstance.setCenter(zoneCenterX, zoneCenterY, {
-                            zoom: targetZoom,
-                            duration: 500
-                          });
+                          reactFlowInstance.setCenter(
+                            zoneCenterX,
+                            zoneCenterY,
+                            {
+                              zoom: targetZoom,
+                              duration: 500,
+                            }
+                          );
 
                           // Clear the flag after centering is complete
                           setTimeout(() => {
@@ -4770,7 +5727,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                             sessionStorage.removeItem('centerOnZoneInWorldMap');
                           }, 600);
                         } else {
-                          console.log(`⚠️ Could not find zone node for centering zone ${zoneId}`);
+                          console.log(
+                            `⚠️ Could not find zone node for centering zone ${zoneId}`
+                          );
                           // Clear transition flag even if centering fails
                           worldMapTransitionRef.current = false;
                           sessionStorage.removeItem('centerOnZoneInWorldMap');
@@ -4783,7 +5742,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 }, 100);
               }
               lastLODUpdate.current = now;
-              lastViewportRef.current = { x: viewport.x, y: viewport.y, zoom: viewport.zoom };
+              lastViewportRef.current = {
+                x: viewport.x,
+                y: viewport.y,
+                zoom: viewport.zoom,
+              };
             }
 
             // Handle world map LOD updates with improved throttling
@@ -4807,9 +5770,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           <MiniMap
             position='top-right'
             nodeColor={node => {
-              if (node.type === 'room') return getThemeColor('#374151', '#6b7280');
-              if (node.type === 'mob') return getThemeColor('#dc2626', '#ef4444');
-              if (node.type === 'object') return getThemeColor('#2563eb', '#3b82f6');
+              if (node.type === 'room')
+                return getThemeColor('#374151', '#6b7280');
+              if (node.type === 'mob')
+                return getThemeColor('#dc2626', '#ef4444');
+              if (node.type === 'object')
+                return getThemeColor('#2563eb', '#3b82f6');
               if (node.type === 'zone') {
                 // Color zones by climate
                 const climate = node.data?.climate || 'NONE';
@@ -4868,14 +5834,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 const currentZoom = reactFlowInstance.getZoom();
                 reactFlowInstance.setCenter(position.x, position.y, {
                   zoom: currentZoom,
-                  duration: 600
+                  duration: 600,
                 });
               }
             }}
-            maskColor={getThemeColor('rgba(0, 0, 0, 0.1)', 'rgba(255, 255, 255, 0.1)')}
+            maskColor={getThemeColor(
+              'rgba(0, 0, 0, 0.1)',
+              'rgba(255, 255, 255, 0.1)'
+            )}
             style={{
               backgroundColor: getThemeColor('#f9fafb', '#1f2937'),
-              border: `1px solid ${getThemeColor('#e5e7eb', '#374151')}`
+              border: `1px solid ${getThemeColor('#e5e7eb', '#374151')}`,
             }}
           />
           <Background
@@ -4892,14 +5861,18 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           >
             <div className='px-6 py-4'>
               <div className='flex items-center justify-between'>
-                <div className="flex items-center gap-4">
+                <div className='flex items-center gap-4'>
                   <div>
-                    <h2 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+                    <h2
+                      className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                    >
                       {worldMapMode || currentViewMode === 'world-map'
                         ? 'World Map View'
                         : `${zone?.name} (Zone ${zoneId})`}
                     </h2>
-                    <p className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                    <p
+                      className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                    >
                       {worldMapMode || currentViewMode === 'world-map'
                         ? `View Mode: ${currentViewMode} • ${allZones.length} zones, ${rooms.length} rooms total`
                         : `Climate: ${zone?.climate} • ${rooms.length} rooms • ${mobs.length} mobs • ${objects.length} objects`}
@@ -4907,15 +5880,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   </div>
 
                   {/* Zone Selector - show always for easy zone switching */}
-                  <div className="ml-auto">
+                  <div className='ml-auto'>
                     <ZoneSelector
                       selectedZone={zoneId}
-                      onZoneChange={(newZoneId) => {
+                      onZoneChange={newZoneId => {
                         if (newZoneId && newZoneId !== zoneId) {
-                          router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
+                          router.push(
+                            `/dashboard/zones/editor?zone=${newZoneId}`
+                          );
                         }
                       }}
-                      className="min-w-[200px]"
+                      className='min-w-[200px]'
                     />
                   </div>
                 </div>
@@ -4928,9 +5903,10 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     </div>
                   )}
 
-
                   {/* View Mode Toggle */}
-                  <div className={`flex p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+                  <div
+                    className={`flex p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                  >
                     {[
                       ...(canEditZone(zoneId)
                         ? [{ key: 'edit', label: 'Edit', icon: '✏️' }]
@@ -4940,10 +5916,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       <button
                         key={mode.key}
                         onClick={() => setViewMode(mode.key as any)}
-                        className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${viewMode === mode.key
-                          ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
-                          : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
-                          }`}
+                        className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                          viewMode === mode.key
+                            ? isDark
+                              ? 'bg-gray-600 text-blue-400 shadow-sm'
+                              : 'bg-white text-blue-700 shadow-sm'
+                            : isDark
+                              ? 'text-gray-400 hover:text-gray-200'
+                              : 'text-gray-500 hover:text-gray-700'
+                        }`}
                       >
                         <span className='mr-1'>{mode.icon}</span>
                         {mode.label}
@@ -4952,8 +5933,14 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   </div>
 
                   {/* Floor Navigation Controls */}
-                  <div className={`flex items-center gap-2 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
-                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Floor:</span>
+                  <div
+                    className={`flex items-center gap-2 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                  >
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                    >
+                      Floor:
+                    </span>
                     <div className='flex items-center gap-1'>
                       <button
                         onClick={() => setCurrentZLevel(currentZLevel + 1)}
@@ -4962,8 +5949,12 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       >
                         ⬆️
                       </button>
-                      <span className={`px-2 py-1 text-sm font-medium rounded border min-w-[3rem] text-center ${isDark ? 'bg-gray-600 border-gray-500 text-gray-100' : 'bg-white border-gray-300'}`}>
-                        {currentZLevel === 0 ? 'Ground' : `${currentZLevel > 0 ? '+' : ''}${currentZLevel}`}
+                      <span
+                        className={`px-2 py-1 text-sm font-medium rounded border min-w-[3rem] text-center ${isDark ? 'bg-gray-600 border-gray-500 text-gray-100' : 'bg-white border-gray-300'}`}
+                      >
+                        {currentZLevel === 0
+                          ? 'Ground'
+                          : `${currentZLevel > 0 ? '+' : ''}${currentZLevel}`}
                       </span>
                       <button
                         onClick={() => setCurrentZLevel(currentZLevel - 1)}
@@ -4998,17 +5989,29 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     <button
                       onClick={() => {
                         // Restore previous viewport if available
-                        const savedViewport = sessionStorage.getItem('lastWorldMapViewport');
+                        const savedViewport = sessionStorage.getItem(
+                          'lastWorldMapViewport'
+                        );
                         if (savedViewport && reactFlowInstance) {
                           try {
                             const viewport = JSON.parse(savedViewport);
-                            reactFlowInstance.setViewport(viewport, { duration: 500 });
+                            reactFlowInstance.setViewport(viewport, {
+                              duration: 500,
+                            });
                           } catch (e) {
                             // Fallback to fit view
-                            reactFlowInstance.fitView({ padding: 0.2, duration: 500, minZoom: 0.15 });
+                            reactFlowInstance.fitView({
+                              padding: 0.2,
+                              duration: 500,
+                              minZoom: 0.15,
+                            });
                           }
                         } else if (reactFlowInstance) {
-                          reactFlowInstance.fitView({ padding: 0.2, duration: 500, minZoom: 0.15 });
+                          reactFlowInstance.fitView({
+                            padding: 0.2,
+                            duration: 500,
+                            minZoom: 0.15,
+                          });
                         }
                         setCurrentViewMode('room-detail');
                         sessionStorage.removeItem('lastWorldMapViewport');
@@ -5024,10 +6027,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   {canEditZone(zoneId) && viewMode === 'edit' && (
                     <button
                       onClick={() => setShowLayoutTools(!showLayoutTools)}
-                      className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${showLayoutTools
-                        ? 'bg-green-100 text-green-700'
-                        : 'bg-gray-100 text-gray-600 hover:text-gray-800'
-                        }`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                        showLayoutTools
+                          ? 'bg-green-100 text-green-700'
+                          : 'bg-gray-100 text-gray-600 hover:text-gray-800'
+                      }`}
                       title='Toggle layout tools'
                     >
                       🔧 Layout
@@ -5038,10 +6042,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   {canEditZone(zoneId) && (
                     <button
                       onClick={() => setShowEntityPalette(!showEntityPalette)}
-                      className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${showEntityPalette
-                        ? 'bg-blue-100 text-blue-700'
-                        : 'bg-gray-100 text-gray-600 hover:text-gray-800'
-                        }`}
+                      className={`px-3 py-1.5 text-sm font-medium rounded transition-colors ${
+                        showEntityPalette
+                          ? 'bg-blue-100 text-blue-700'
+                          : 'bg-gray-100 text-gray-600 hover:text-gray-800'
+                      }`}
                     >
                       🎨 Palette
                     </button>
@@ -5060,7 +6065,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             >
               <div className='px-6 py-3'>
                 <div className='flex items-center justify-between'>
-                  <h3 className={`text-md font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>Layout Tools</h3>
+                  <h3
+                    className={`text-md font-medium ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                  >
+                    Layout Tools
+                  </h3>
                   <div className='flex items-center gap-2'>
                     <button
                       onClick={() => setShowKeyboardHelp(!showKeyboardHelp)}
@@ -5082,7 +6091,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 <div className='mt-3 flex flex-wrap items-center gap-4'>
                   {/* Auto Layout and Reset */}
                   <div className='flex items-center gap-2'>
-                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Layout:</span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                    >
+                      Layout:
+                    </span>
                     <button
                       onClick={handleAutoLayout}
                       className='px-3 py-1.5 text-sm font-medium bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors'
@@ -5101,7 +6114,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                   {/* Room Actions */}
                   <div className='flex items-center gap-2'>
-                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Rooms:</span>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                    >
+                      Rooms:
+                    </span>
                     <button
                       onClick={() => handleCreateNewRoom()}
                       className='px-3 py-1.5 text-sm font-medium bg-green-600 hover:bg-green-700 text-white rounded-lg transition-colors'
@@ -5109,7 +6126,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                     >
                       ➕ New Room
                     </button>
-                    {selectedRoomId && (
+                    {isValidRoomId(selectedRoomId) && (
                       <button
                         onClick={() => handleDeleteRoom(selectedRoomId)}
                         className='px-3 py-1.5 text-sm font-medium bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors'
@@ -5122,15 +6139,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
                   {/* Undo/Redo Controls */}
                   <div className='flex items-center gap-2'>
-                    <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>History:</span>
-                    <div className={`flex items-center gap-1 border rounded-lg p-1 ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}>
+                    <span
+                      className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                    >
+                      History:
+                    </span>
+                    <div
+                      className={`flex items-center gap-1 border rounded-lg p-1 ${isDark ? 'border-gray-600 bg-gray-700' : 'border-gray-300 bg-white'}`}
+                    >
                       <button
                         onClick={handleUndo}
                         disabled={!canUndo}
-                        className={`px-2 py-1 text-sm rounded transition-colors ${canUndo
-                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          }`}
+                        className={`px-2 py-1 text-sm rounded transition-colors ${
+                          canUndo
+                            ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                         title={`Undo last action (Ctrl+Z)${canUndo ? ` - ${undoHistory.length - undoIndex} actions available` : ''}`}
                       >
                         ↺ Undo
@@ -5138,10 +6162,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                       <button
                         onClick={handleRedo}
                         disabled={!canRedo}
-                        className={`px-2 py-1 text-sm rounded transition-colors ${canRedo
-                          ? 'bg-blue-500 hover:bg-blue-600 text-white'
-                          : 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                          }`}
+                        className={`px-2 py-1 text-sm rounded transition-colors ${
+                          canRedo
+                            ? 'bg-blue-500 hover:bg-blue-600 text-white'
+                            : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        }`}
                         title='Redo last undone action (Ctrl+Shift+Z or Ctrl+Y)'
                       >
                         ↻ Redo
@@ -5150,13 +6175,19 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   </div>
 
                   {/* Selected Room Controls */}
-                  {selectedRoomId && (
+                  {isValidRoomId(selectedRoomId) && (
                     <div className='flex items-center gap-2'>
-                      <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Selected Room:</span>
+                      <span
+                        className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                      >
+                        Selected Room:
+                      </span>
                       <div className='flex items-center gap-1'>
                         <button
                           onClick={() => {
-                            const room = rooms.find(r => r.id === selectedRoomId);
+                            const room = rooms.find(
+                              r => r.id === selectedRoomId
+                            );
                             if (room) {
                               const newZ = (room.layoutZ ?? 0) + 1;
                               handleUpdateZLevel(selectedRoomId, newZ);
@@ -5170,7 +6201,9 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                         </button>
                         <button
                           onClick={() => {
-                            const room = rooms.find(r => r.id === selectedRoomId);
+                            const room = rooms.find(
+                              r => r.id === selectedRoomId
+                            );
                             if (room) {
                               const newZ = (room.layoutZ ?? 0) - 1;
                               handleUpdateZLevel(selectedRoomId, newZ);
@@ -5189,7 +6222,11 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                   {/* Issues/Overlaps */}
                   {overlaps.length > 0 && (
                     <div className='flex items-center gap-2'>
-                      <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>Issues:</span>
+                      <span
+                        className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                      >
+                        Issues:
+                      </span>
                       <button
                         onClick={() => setShowOverlapInfo(!showOverlapInfo)}
                         className='px-3 py-1.5 text-sm font-medium bg-orange-600 hover:bg-orange-700 text-white rounded-lg transition-colors'
@@ -5206,12 +6243,22 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           {/* Keyboard Shortcuts Help Panel */}
           {showKeyboardHelp && (
-            <div className={`absolute top-48 left-4 border rounded-lg shadow-lg p-4 max-w-lg z-20 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+            <div
+              className={`absolute top-48 left-4 border rounded-lg shadow-lg p-4 max-w-lg z-20 ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+            >
               <div className='flex items-center justify-between mb-3'>
-                <h3 className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>⌨️ Keyboard Shortcuts</h3>
+                <h3
+                  className={`font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+                >
+                  ⌨️ Keyboard Shortcuts
+                </h3>
                 <button
                   onClick={() => setShowKeyboardHelp(false)}
-                  className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
+                  className={
+                    isDark
+                      ? 'text-gray-400 hover:text-gray-200'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }
                 >
                   ✕
                 </button>
@@ -5220,49 +6267,181 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               <div className='space-y-4 text-sm'>
                 {/* Mode & Navigation */}
                 <div>
-                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Mode & Navigation</h4>
-                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <div className='flex justify-between'><span>Switch to Edit mode:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>E</kbd></div>
-                    <div className='flex justify-between'><span>Switch to View mode:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>V</kbd></div>
-                    <div className='flex justify-between'><span>Navigate room (View mode):</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Arrow Keys</kbd></div>
-                    <div className='flex justify-between'><span>Navigate Up/Down:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Page Up/Down</kbd></div>
+                  <h4
+                    className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                  >
+                    Mode & Navigation
+                  </h4>
+                  <div
+                    className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    <div className='flex justify-between'>
+                      <span>Switch to Edit mode:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        E
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Switch to View mode:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        V
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Navigate room (View mode):</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Arrow Keys
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Navigate Up/Down:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Page Up/Down
+                      </kbd>
+                    </div>
                   </div>
                 </div>
 
                 {/* Floor Navigation */}
                 <div>
-                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Floor Navigation</h4>
-                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <div className='flex justify-between'><span>Ground floor:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Home</kbd></div>
-                    <div className='flex justify-between'><span>Top floor:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>End</kbd></div>
-                    <div className='flex justify-between'><span>Floor up/down:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Page Up/Down</kbd></div>
+                  <h4
+                    className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                  >
+                    Floor Navigation
+                  </h4>
+                  <div
+                    className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    <div className='flex justify-between'>
+                      <span>Ground floor:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Home
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Top floor:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        End
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Floor up/down:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Page Up/Down
+                      </kbd>
+                    </div>
                   </div>
                 </div>
 
                 {/* Room Editing */}
                 <div>
-                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Room Editing (Edit Mode)</h4>
-                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <div className='flex justify-between'><span>New room:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>N</kbd></div>
-                    <div className='flex justify-between'><span>Delete selected room:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Delete</kbd></div>
-                    <div className='flex justify-between'><span>Move room Z-level:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + ↑/↓</kbd></div>
-                    <div className='flex justify-between'><span>Room to ground level:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + 0</kbd></div>
+                  <h4
+                    className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                  >
+                    Room Editing (Edit Mode)
+                  </h4>
+                  <div
+                    className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    <div className='flex justify-between'>
+                      <span>New room:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        N
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Delete selected room:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Delete
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Move room Z-level:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + ↑/↓
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Room to ground level:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + 0
+                      </kbd>
+                    </div>
                   </div>
                 </div>
 
                 {/* Layout Actions */}
                 <div>
-                  <h4 className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}>Layout Actions (Edit Mode)</h4>
-                  <div className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
-                    <div className='flex justify-between'><span>Auto layout:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + A</kbd></div>
-                    <div className='flex justify-between'><span>Reset layout:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + R</kbd></div>
-                    <div className='flex justify-between'><span>Undo:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + Z</kbd></div>
-                    <div className='flex justify-between'><span>Redo:</span><kbd className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>Ctrl + Y</kbd></div>
+                  <h4
+                    className={`font-medium mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+                  >
+                    Layout Actions (Edit Mode)
+                  </h4>
+                  <div
+                    className={`space-y-1 ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+                  >
+                    <div className='flex justify-between'>
+                      <span>Auto layout:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + A
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Reset layout:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + R
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Undo:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + Z
+                      </kbd>
+                    </div>
+                    <div className='flex justify-between'>
+                      <span>Redo:</span>
+                      <kbd
+                        className={`px-1 rounded ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+                      >
+                        Ctrl + Y
+                      </kbd>
+                    </div>
                   </div>
                 </div>
 
-                <div className={`text-xs mt-4 pt-3 border-t ${isDark ? 'text-gray-500 border-gray-700' : 'text-gray-500 border-gray-200'}`}>
-                  💡 Tip: Most shortcuts work only when not typing in text fields
+                <div
+                  className={`text-xs mt-4 pt-3 border-t ${isDark ? 'text-gray-500 border-gray-700' : 'text-gray-500 border-gray-200'}`}
+                >
+                  💡 Tip: Most shortcuts work only when not typing in text
+                  fields
                 </div>
               </div>
             </div>
@@ -5270,27 +6449,47 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
 
           {/* Overlap Info Panel */}
           {showOverlapInfo && overlaps.length > 0 && (
-            <div className={`absolute top-48 right-4 border rounded-lg shadow-lg p-4 max-w-md z-10 ${isDark ? 'bg-gray-800 border-orange-700' : 'bg-white border-orange-200'}`}>
+            <div
+              className={`absolute top-48 right-4 border rounded-lg shadow-lg p-4 max-w-md z-10 ${isDark ? 'bg-gray-800 border-orange-700' : 'bg-white border-orange-200'}`}
+            >
               <div className='flex items-center justify-between mb-3'>
-                <h3 className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-800'}`}>Room Overlaps Detected</h3>
+                <h3
+                  className={`font-semibold ${isDark ? 'text-orange-400' : 'text-orange-800'}`}
+                >
+                  Room Overlaps Detected
+                </h3>
                 <button
                   onClick={() => setShowOverlapInfo(false)}
-                  className={isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-400 hover:text-gray-600'}
+                  className={
+                    isDark
+                      ? 'text-gray-400 hover:text-gray-200'
+                      : 'text-gray-400 hover:text-gray-600'
+                  }
                 >
                   ✕
                 </button>
               </div>
               <div className='space-y-2'>
                 {overlaps.map((overlap, index) => (
-                  <div key={index} className={`p-2 rounded border-l-4 ${isDark ? 'bg-orange-900/30 border-orange-600' : 'bg-orange-50 border-orange-400'}`}>
-                    <div className={`text-sm font-medium ${isDark ? 'text-orange-400' : 'text-orange-800'}`}>
+                  <div
+                    key={index}
+                    className={`p-2 rounded border-l-4 ${isDark ? 'bg-orange-900/30 border-orange-600' : 'bg-orange-50 border-orange-400'}`}
+                  >
+                    <div
+                      className={`text-sm font-medium ${isDark ? 'text-orange-400' : 'text-orange-800'}`}
+                    >
                       Position ({overlap.position.x}, {overlap.position.y})
                     </div>
-                    <div className={`text-xs mt-1 ${isDark ? 'text-orange-500' : 'text-orange-600'}`}>
-                      {overlap.count} rooms: {overlap.roomIds.map(id => {
-                        const room = rooms.find(r => r.id === id);
-                        return room ? `#${id} ${room.name}` : `#${id}`;
-                      }).join(', ')}
+                    <div
+                      className={`text-xs mt-1 ${isDark ? 'text-orange-500' : 'text-orange-600'}`}
+                    >
+                      {overlap.count} rooms:{' '}
+                      {overlap.roomIds
+                        .map(id => {
+                          const room = rooms.find(r => r.id === id);
+                          return room ? `#${id} ${room.name}` : `#${id}`;
+                        })
+                        .join(', ')}
                     </div>
                     <div className='mt-2 flex gap-2'>
                       {overlap.roomIds.map(roomId => (
@@ -5299,9 +6498,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                           onClick={() => {
                             setSelectedRoomId(roomId);
                             // Focus on the room in the viewport
-                            const roomNode = nodes.find(n => n.id === roomId.toString());
+                            const roomNode = nodes.find(
+                              n => n.id === roomId.toString()
+                            );
                             if (roomNode && reactFlowInstance) {
-                              reactFlowInstance.setCenter(roomNode.position.x + 90, roomNode.position.y + 60, { zoom: 1.2 });
+                              reactFlowInstance.setCenter(
+                                roomNode.position.x + 90,
+                                roomNode.position.y + 60,
+                                { zoom: 1.2 }
+                              );
                             }
                           }}
                           className='px-2 py-1 text-xs bg-orange-600 hover:bg-orange-700 text-white rounded transition-colors'
@@ -5314,19 +6519,23 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 ))}
               </div>
               <div className='mt-3 text-xs text-orange-600'>
-                💡 Tip: Use the Auto Layout button again to try resolving overlaps automatically, or manually drag rooms to new positions.
+                💡 Tip: Use the Auto Layout button again to try resolving
+                overlaps automatically, or manually drag rooms to new positions.
               </div>
             </div>
           )}
 
           {/* Canvas-based rendering overlay for ultra-dense views */}
           {useCanvasRendering && canvasClusters.length > 0 && (
-            <div className="absolute inset-0 pointer-events-none" style={{ zIndex: 1000 }}>
+            <div
+              className='absolute inset-0 pointer-events-none'
+              style={{ zIndex: 1000 }}
+            >
               <WorldMapCanvas
                 clusters={canvasClusters}
                 zoom={reactFlowInstance?.getZoom() || 0.1}
                 onRoomClick={handleRoomSelect}
-                className="pointer-events-auto"
+                className='pointer-events-auto'
               />
             </div>
           )}
