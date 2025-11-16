@@ -2344,7 +2344,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
               minX: node.position.x,
               maxX: node.position.x + (node.width || 180),
               minY: node.position.y,
-              maxY: node.position.y + (node.height || 120)
+              maxY: node.position.y + (node.height || 180)
             }));
 
             const minX = Math.min(...roomBounds.map(b => b.minX));
@@ -2405,7 +2405,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             if (targetRoomNode && targetRoomNode.position) {
               // Center on the specific room with a comfortable zoom level
               const centerX = targetRoomNode.position.x + (targetRoomNode.width || 180) / 2;
-              const centerY = targetRoomNode.position.y + (targetRoomNode.height || 120) / 2;
+              const centerY = targetRoomNode.position.y + (targetRoomNode.height || 180) / 2;
 
               console.log(`🎯 Centering on initial room ${initialRoomId}: center=(${centerX.toFixed(1)}, ${centerY.toFixed(1)}), zoom=1.0`);
 
@@ -2434,7 +2434,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 minX: node.position.x,
                 maxX: node.position.x + (node.width || 180),
                 minY: node.position.y,
-                maxY: node.position.y + (node.height || 120)
+                maxY: node.position.y + (node.height || 180)
               }));
 
               const minX = Math.min(...roomBounds.map(b => b.minX));
@@ -2676,6 +2676,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           x: nodePosition.x + offsetX,
           y: nodePosition.y + offsetY,
         },
+        width: 180,
+        height: 180,
         data: {
           roomId: room.id,
           zoneId: room.zoneId,
@@ -2736,7 +2738,17 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     const exitDirections = { NORTH: 0, SOUTH: 0, EAST: 0, WEST: 0, NORTHEAST: 0, NORTHWEST: 0, SOUTHEAST: 0, SOUTHWEST: 0, UP: 0, DOWN: 0 };
 
     rooms.forEach(room => {
+      // Calculate z-index based on room's Z-level (for all edges from this room)
+      const roomZLevel = room.layoutZ ?? 0;
+      const floorDifference = Math.abs(currentZLevel - roomZLevel);
+      const edgeZIndex = 100 - floorDifference;
+
       room.exits.forEach(exit => {
+        // Skip UP/DOWN exits - they're shown with icons on the room nodes
+        if (exit.direction === 'UP' || exit.direction === 'DOWN') {
+          return;
+        }
+
         // Find target room by matching BOTH zone ID and room ID
         // This correctly handles both intra-zone and cross-zone exits
         const targetZoneId = exit.toZoneId ?? room.zoneId;
@@ -2783,10 +2795,15 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             strokeDasharray = strokeDasharray || '5,5'; // Dotted for exits without description
           }
 
+          // Calculate opacity based on Z-level distance (same as rooms)
+          const edgeOpacity = floorDifference === 0 ? 1.0 : Math.max(0.15, 1.0 - floorDifference * 0.35);
+
           const edgeStyle = {
             stroke: edgeColor,
             strokeWidth,
             strokeDasharray,
+            opacity: edgeOpacity,
+            zIndex: edgeZIndex,
           };
 
           const edge = {
@@ -2870,6 +2887,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
             portalNodes.push(portalNode);
 
             // Create edge from room to portal
+            const portalOpacity = floorDifference === 0 ? 1.0 : Math.max(0.15, 1.0 - floorDifference * 0.35);
             const portalEdge: Edge = {
               id: `${room.id}-${portalId}-${exit.direction}`,
               source: room.id.toString(),
@@ -2880,6 +2898,8 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
                 stroke: getThemeColor('#8b5cf6', '#a78bfa'), // Purple for portals
                 strokeWidth: 2.5,
                 strokeDasharray: '8,4',
+                opacity: portalOpacity,
+                zIndex: edgeZIndex, // Same z-index as room's edges
               },
               markerEnd: {
                 type: MarkerType.ArrowClosed,
@@ -2911,9 +2931,34 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
     // Append portal nodes to the nodes array
     const allNodes = [...newNodes, ...portalNodes];
 
+    // Sort nodes and edges by Z-level so current floor renders last (on top)
+    // Lower floors render first, current floor renders last
+    const sortedNodes = allNodes.sort((a, b) => {
+      const aZ = a.data?.layoutZ ?? 0;
+      const bZ = b.data?.layoutZ ?? 0;
+      const aDistance = Math.abs(currentZLevel - aZ);
+      const bDistance = Math.abs(currentZLevel - bZ);
+
+      // Items further from current floor render first (lower in DOM)
+      // Items on current floor render last (higher in DOM, on top)
+      return bDistance - aDistance;
+    });
+
+    const sortedEdges = newEdges.sort((a, b) => {
+      // Get source room Z-level for each edge
+      const aSourceNode = allNodes.find(n => n.id === a.source);
+      const bSourceNode = allNodes.find(n => n.id === b.source);
+      const aZ = aSourceNode?.data?.layoutZ ?? 0;
+      const bZ = bSourceNode?.data?.layoutZ ?? 0;
+      const aDistance = Math.abs(currentZLevel - aZ);
+      const bDistance = Math.abs(currentZLevel - bZ);
+
+      return bDistance - aDistance;
+    });
+
     console.log(`✅ Generated ${newNodes.length} room nodes, ${portalNodes.length} portal nodes, and ${newEdges.length} edges for zone view`);
-    setNodes(allNodes);
-    setEdges(newEdges);
+    setNodes(sortedNodes);
+    setEdges(sortedEdges);
   }, [rooms, viewMode, setNodes, setEdges, currentZLevel, overlaps, selectedRoomId, worldMapMode, worldMapNodes, currentViewMode]);
 
   // Detect overlaps when rooms are loaded
@@ -2981,7 +3026,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           // Center and zoom to the selected room with animation
           if (reactFlowInstance && node.position) {
             const centerX = node.position.x + (node.width || 180) / 2;
-            const centerY = node.position.y + (node.height || 120) / 2;
+            const centerY = node.position.y + (node.height || 180) / 2;
 
             reactFlowInstance.setCenter(centerX, centerY, {
               zoom: 1.0, // Comfortable zoom level to see the room and its neighbors
@@ -4755,6 +4800,7 @@ const EnhancedZoneEditorFlow: React.FC<EnhancedZoneEditorProps> = ({
           snapGrid={[GRID_SIZE, GRID_SIZE]}
           minZoom={0.01}
           maxZoom={4}
+          elevateEdgesOnSelect={true}
           className={isDark ? 'bg-gray-900' : 'bg-gray-50'}
         >
           <Controls position='top-left' />

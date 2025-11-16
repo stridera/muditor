@@ -188,7 +188,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
     <>
       <div
         className={`
-          relative min-w-[160px] max-w-[200px]
+          relative w-[180px] h-[180px]
           ${sectorStyle.bg} ${depthEffects.borderStyle} ${sectorStyle.text}
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
           ${depthEffects.additionalClasses}
@@ -200,7 +200,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
               : ''
           }
           border-2 rounded-xl ${depthEffects.shadow} hover:shadow-xl transition-all duration-200
-          cursor-pointer
+          cursor-pointer flex flex-col overflow-hidden
         `}
         style={{
           opacity: depthEffects.opacity,
