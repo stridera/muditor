@@ -1,8 +1,9 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { ArrowRight, ArrowLeft, ArrowUp, ArrowDown } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { isValidRoomId } from '@/lib/room-utils';
+import { ArrowDown, ArrowLeft, ArrowRight, ArrowUp } from 'lucide-react';
+import { useState } from 'react';
 
 interface Room {
   id: number;
@@ -140,7 +141,7 @@ export function RoomConnectionHelper({
         </div>
 
         {/* Direction Selection */}
-        {targetRoomId && (
+        {isValidRoomId(targetRoomId) && (
           <div>
             <label className='text-sm font-medium'>Direction:</label>
             <div className='grid grid-cols-3 gap-2 mt-1'>
@@ -166,7 +167,7 @@ export function RoomConnectionHelper({
         )}
 
         {/* Bidirectional Option */}
-        {targetRoomId && selectedDirection && (
+        {isValidRoomId(targetRoomId) && selectedDirection && (
           <div className='flex items-center gap-2'>
             <input
               type='checkbox'
@@ -186,7 +187,7 @@ export function RoomConnectionHelper({
         )}
 
         {/* Create Button */}
-        {targetRoomId && selectedDirection && (
+        {isValidRoomId(targetRoomId) && selectedDirection && (
           <Button onClick={handleCreateConnection} size='sm' className='w-full'>
             Create Connection
           </Button>

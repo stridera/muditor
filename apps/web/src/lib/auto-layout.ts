@@ -77,11 +77,14 @@ const DIRECTION_OFFSETS: Record<string, { x: number; y: number }> = {
 /**
  * Smart starting room selection
  */
+import { isValidRoomId } from './room-utils';
+
 function selectStartingRoom(
   rooms: AutoLayoutRoom[],
   startRoomId?: number
 ): AutoLayoutRoom | null {
-  if (startRoomId) {
+  // Use shared helper to allow 0 as valid starting room
+  if (isValidRoomId(startRoomId)) {
     const specifiedRoom = rooms.find(r => r.id === startRoomId);
     if (specifiedRoom) {
       console.log(`🎯 Using specified starting room: ${startRoomId}`);
@@ -185,7 +188,7 @@ function calculateLayoutQuality(
 ): number {
   let totalPathLength = 0;
   let pathCount = 0;
-  let overlapCount = 0;
+  let overlapCount = 0; // retained for potential future metrics
 
   // Calculate total path length between connected rooms
   for (const room of rooms) {
@@ -209,27 +212,13 @@ function calculateLayoutQuality(
 
   // Count overlaps
   const overlaps = detectOverlaps(positions);
-  overlapCount = overlaps.reduce((sum, overlap) => sum + overlap.count - 1, 0);
+  overlapCount = overlaps.reduce((sum, overlap) => sum + overlap.count - 1, 0); // computed but not logged
 
   // Calculate quality score (lower is better) - overlaps are acceptable
   const averagePathLength = pathCount > 0 ? totalPathLength / pathCount : 0;
   const qualityScore = averagePathLength; // Don't penalize overlaps
 
-  console.log(
-    `📊 Layout quality: avg path length: ${averagePathLength.toFixed(2)}, overlaps: ${overlapCount}, score: ${qualityScore.toFixed(2)}`
-  );
-
-  // Debug: Log overlap details
-  if (overlaps.length > 0) {
-    console.log(`🔍 Detected ${overlaps.length} overlap groups:`);
-    overlaps.forEach((overlap, idx) => {
-      console.log(
-        `  ${idx + 1}. Position (${overlap.position.x}, ${overlap.position.y}, ${overlap.position.z}): Rooms ${overlap.roomIds.join(', ')}`
-      );
-    });
-  } else {
-    console.log(`✅ No overlaps detected in auto-layout`);
-  }
+  // Logging removed per lint rules.
 
   return qualityScore;
 }
@@ -245,19 +234,16 @@ export function autoLayoutRooms(
   const visited = new Set<number>();
   const queue: Array<{ roomId: number; position: LayoutPosition }> = [];
 
-  console.log(
-    `🔍 autoLayoutRooms called with ${rooms.length} rooms, startRoomId: ${startRoomId}`
-  );
+  // Logging removed per lint rules.
 
   // Smart starting room selection
   const startRoom = selectStartingRoom(rooms, startRoomId);
 
   if (!startRoom) {
-    console.log('❌ No start room found, returning empty positions');
     return positions;
   }
 
-  console.log(`🔍 Starting auto-layout from room ${startRoom.id}`);
+  // Begin processing from start room
 
   // Start at origin with Z-level from existing room data
   const startZ = startRoom.layoutZ || 0;
@@ -266,9 +252,7 @@ export function autoLayoutRooms(
   visited.add(startRoom.id);
   queue.push({ roomId: startRoom.id, position: startPos });
 
-  console.log(
-    `🔍 Initial position: room ${startRoom.id} at (${startPos.x}, ${startPos.y}, Z${startPos.z})`
-  );
+  // Initial position recorded
 
   // BFS to place rooms following exits
   while (queue.length > 0) {
@@ -276,13 +260,11 @@ export function autoLayoutRooms(
     const room = rooms.find(r => r.id === roomId);
     if (!room) continue;
 
-    console.log(
-      `🔍 Processing room ${roomId} at (${position.x}, ${position.y}) with ${room.exits.length} exits`
-    );
+    // Process each room's exits
 
     // Process each exit
     for (const exit of room.exits) {
-      console.log(`🔍 Found exit: ${exit.direction} → room ${exit.toRoomId}`);
+      // Exit discovered
       if (
         exit.toRoomId === null ||
         exit.toRoomId === undefined ||
@@ -295,9 +277,7 @@ export function autoLayoutRooms(
 
       // Validate direction
       if (!validateDirection(exit.direction)) {
-        console.warn(
-          `⚠️ Unknown direction: ${exit.direction}, using default offset`
-        );
+        // Unknown direction; fallback to default offset
       }
 
       // Calculate new position based on direction
@@ -313,16 +293,12 @@ export function autoLayoutRooms(
           y: position.y, // Same Y coordinate
           z: currentZ + zChange, // Change Z-level
         };
-        console.log(
-          `🔍 Placing room ${exit.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z}) via ${exit.direction} exit (Z-level change: ${zChange > 0 ? '+' : ''}${zChange})`
-        );
+        // Vertical placement
       } else {
         // Horizontal exits use X/Y offset mapping
         const offset = DIRECTION_OFFSETS[exit.direction];
         if (!offset) {
-          console.warn(
-            `⚠️ No offset mapping for direction: ${exit.direction}, using default east offset`
-          );
+          // No offset mapping; use default east offset
           // Use east as default for unknown directions (allowing overlaps)
           const defaultOffset = { x: 1, y: 0 };
           newPosition = {
@@ -337,9 +313,7 @@ export function autoLayoutRooms(
             z: position.z || 0, // Maintain current Z-level
           };
         }
-        console.log(
-          `🔍 Placing room ${exit.toRoomId} at (${newPosition.x}, ${newPosition.y}, Z${newPosition.z || 0}) via ${exit.direction} exit (offset: ${JSON.stringify(offset || 'calculated')})`
-        );
+        // Horizontal/diagonal placement
       }
 
       positions[exit.toRoomId] = newPosition;
@@ -351,14 +325,12 @@ export function autoLayoutRooms(
   // Place unconnected rooms in a separate area
   let unconnectedX = 10; // Start further away to avoid connected rooms
   let unconnectedY = 0;
-  let unconnectedCount = 0;
+  // Track unconnected rooms (count removed to satisfy lint rules)
   for (const room of rooms) {
     if (!visited.has(room.id)) {
       positions[room.id] = { x: unconnectedX, y: unconnectedY };
-      console.log(
-        `🔍 Placing unconnected room ${room.id} at (${unconnectedX}, ${unconnectedY})`
-      );
-      unconnectedCount++;
+      // Place unconnected room
+      // (Count removed to satisfy lint rules)
       unconnectedX += 1; // Use 1-unit spacing
       if (unconnectedX > 15) {
         // Wrap after 6 rooms per row
@@ -368,9 +340,7 @@ export function autoLayoutRooms(
     }
   }
 
-  console.log(
-    `🔍 Auto-layout complete: ${Object.keys(positions).length} total positions, ${visited.size} connected, ${unconnectedCount} unconnected`
-  );
+  // Auto-layout summary (logging removed)
 
   // Calculate and log layout quality
   calculateLayoutQuality(positions, rooms);
@@ -385,9 +355,7 @@ export function resolveOverlaps(
   positions: Record<number, LayoutPosition>
 ): Record<number, LayoutPosition> {
   // Return original positions without any changes - overlaps are now allowed
-  console.log(
-    `🔍 LOCAL resolveOverlaps: Keeping original positions (overlaps allowed)`
-  );
+  // Overlaps kept intentionally
   return { ...positions };
 }
 
