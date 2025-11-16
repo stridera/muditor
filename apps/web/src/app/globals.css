@@ -97,3 +97,13 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* React Flow Z-level layering fix */
+/* Ensure edges render above nodes from other floors by using CSS transform */
+.react-flow__edges {
+  z-index: 10 !important;
+}
+
+.react-flow__nodes {
+  z-index: 5 !important;
+}
