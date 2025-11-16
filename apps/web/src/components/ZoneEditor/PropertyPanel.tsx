@@ -2,6 +2,7 @@
 
 import { getExitDestinationZone, hasValidDestination } from '@/lib/room-utils';
 import React, { useEffect, useState } from 'react';
+import { useTheme } from 'next-themes';
 
 interface Room {
   id: number;
@@ -112,6 +113,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   managingExits,
   viewMode,
 }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+
   const [activeTab, setActiveTab] = useState<
     'basic' | 'exits' | 'entities' | 'advanced'
   >('basic');
@@ -199,18 +203,18 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   const shopCount = room.shops?.length || 0;
 
   return (
-    <div className='w-96 bg-white border-l border-gray-200 flex flex-col h-full'>
+    <div className={`w-96 ${isDark ? 'bg-gray-800' : 'bg-white'} border-l ${isDark ? 'border-gray-700' : 'border-gray-200'} flex flex-col h-full`}>
       {/* Header */}
-      <div className='p-4 border-b border-gray-200'>
-        <h3 className='text-lg font-semibold text-gray-900 mb-2'>
-          Room {room.id} Properties
+      <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        <h3 className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'} mb-2`}>
+          Room {room.id}: {room.name}
         </h3>
 
         {/* Layout Coordinates (Debug) */}
-        <div className='bg-gray-50 rounded px-2 py-1.5 mb-3 border border-gray-200'>
-          <div className='text-xs font-mono text-gray-600'>
+        <div className={`${isDark ? 'bg-gray-800' : 'bg-gray-50'} rounded px-2 py-1.5 mb-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+          <div className={`text-xs font-mono ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
             <span className='font-semibold'>Layout:</span>{' '}
-            <span className='text-gray-800'>
+            <span className={isDark ? 'text-gray-200' : 'text-gray-800'}>
               X={room.layoutX ?? 'null'}, Y={room.layoutY ?? 'null'}, Z=
               {room.layoutZ ?? 0}
             </span>
@@ -239,7 +243,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
         <div className='space-y-3'>
           {/* Z-Level Controls */}
           <div className='flex items-center gap-2'>
-            <span className='text-sm font-medium text-gray-700 min-w-[45px]'>
+            <span className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} min-w-[45px]`}>
               Floor:
             </span>
             <div className='flex items-center gap-1'>
@@ -250,7 +254,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               >
                 ⬇️
               </button>
-              <div className='px-3 py-1 text-sm font-medium text-gray-700 min-w-[60px] text-center bg-gray-50 rounded border'>
+              <div className={`px-3 py-1 text-sm font-medium ${isDark ? 'text-gray-300 bg-gray-800' : 'text-gray-700 bg-gray-50'} min-w-[60px] text-center rounded border`}>
                 {(room.layoutZ ?? 0) === 0
                   ? 'Ground'
                   : `${(room.layoutZ ?? 0) > 0 ? '+' : ''}${room.layoutZ}`}
@@ -268,7 +272,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           {/* Available Exits Navigation (View Mode) */}
           {viewMode === 'view' && room.exits.length > 0 && (
             <div>
-              <div className='text-sm font-medium text-gray-700 mb-2'>
+              <div className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 🧭 Available exits:
               </div>
               <div className='flex flex-wrap gap-1'>
@@ -327,8 +331,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       </div>
 
       {/* Tabs */}
-      <div className='p-4 border-b border-gray-200'>
-        <div className='flex space-x-1 bg-gray-100 p-1 rounded-lg'>
+      <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+        <div className={`flex space-x-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}>
           {[
             { key: 'basic', label: 'Basic', icon: '⚙️' },
             { key: 'exits', label: 'Exits', icon: '🚪' },
@@ -340,8 +344,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               onClick={() => setActiveTab(tab.key as typeof activeTab)}
               className={`flex-1 px-2 py-2 text-xs font-medium rounded-md transition-colors ${
                 activeTab === tab.key
-                  ? 'bg-white text-blue-700 shadow-sm'
-                  : 'text-gray-500 hover:text-gray-700'
+                  ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
+                  : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
               }`}
             >
               <span className='mr-1'>{tab.icon}</span>
@@ -357,7 +361,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           <div className='space-y-4'>
             {/* Room Name */}
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Room Name
               </label>
               <input
@@ -371,7 +375,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
             {/* Description */}
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Description
               </label>
               <textarea
@@ -388,7 +392,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
             {/* Sector Type */}
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
+              <label className={`block text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}>
                 Sector Type
               </label>
               <div className='grid grid-cols-3 gap-2'>
@@ -876,14 +880,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           <div className='space-y-4'>
             {/* Mobs in room */}
             <div>
-              <h4 className='text-sm font-medium text-gray-700 mb-3'>
+              <h4 className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                 Mobs ({mobCount})
               </h4>
               {mobCount === 0 ? (
-                <div className='text-center py-6 text-gray-500'>
+                <div className={`text-center py-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   <div className='text-2xl mb-2'>👹</div>
                   <p className='text-sm'>No mobs in this room</p>
-                  <p className='text-xs text-gray-400 mt-1'>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     Drag mobs from the palette to place them here
                   </p>
                 </div>
@@ -892,26 +896,28 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                   {room.mobs?.map(mob => (
                     <div
                       key={mob.id}
-                      className='p-3 bg-red-50 border border-red-200 rounded-lg'
+                      className={`p-3 rounded-lg border ${isDark ? 'bg-red-900/20 border-red-800/50' : 'bg-red-50 border-red-200'}`}
                     >
                       <div className='flex items-center justify-between'>
                         <div className='flex-1'>
                           <div className='flex items-center gap-2 mb-1'>
-                            <span className='font-medium text-sm'>
+                            <span className={`font-medium text-sm ${isDark ? 'text-red-200' : 'text-gray-900'}`}>
                               {mob.name}
                             </span>
-                            <span className='text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded'>
-                              Level {mob.level}
-                            </span>
+                            {mob.level && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded ${isDark ? 'bg-gray-700 text-gray-300' : 'text-gray-600 bg-gray-100'}`}>
+                                Level {mob.level}
+                              </span>
+                            )}
                           </div>
                           <div className='flex gap-1'>
                             {mob.race && (
-                              <span className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full text-gray-700'>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}>
                                 {mob.race}
                               </span>
                             )}
                             {mob.mobClass && (
-                              <span className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full text-gray-700'>
+                              <span className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}>
                                 {mob.mobClass}
                               </span>
                             )}
@@ -922,7 +928,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             href={`/dashboard/mobs/editor?zoneId=${mob.zoneId}&id=${mob.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='text-blue-600 hover:text-blue-800 text-xs px-2 py-1 bg-blue-100 hover:bg-blue-200 rounded transition-colors'
+                            className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-blue-400 bg-blue-900/30 hover:bg-blue-900/50' : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'}`}
                             title='Edit mob in new tab'
                           >
                             ✏️ Edit
@@ -930,7 +936,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           {viewMode === 'edit' && onRemoveMob && (
                             <button
                               onClick={() => onRemoveMob(mob.id)}
-                              className='text-red-600 hover:text-red-800 text-xs px-2 py-1 hover:bg-red-50 rounded transition-colors'
+                              className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:text-red-800 hover:bg-red-50'}`}
                             >
                               Remove
                             </button>
@@ -945,14 +951,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
             {/* Objects in room */}
             <div>
-              <h4 className='text-sm font-medium text-gray-700 mb-3'>
+              <h4 className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                 Objects ({objectCount})
               </h4>
               {objectCount === 0 ? (
-                <div className='text-center py-6 text-gray-500'>
+                <div className={`text-center py-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   <div className='text-2xl mb-2'>📦</div>
                   <p className='text-sm'>No objects in this room</p>
-                  <p className='text-xs text-gray-400 mt-1'>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     Drag objects from the palette to place them here
                   </p>
                 </div>
@@ -961,24 +967,26 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                   {room.objects?.map(obj => (
                     <div
                       key={obj.id}
-                      className='p-3 bg-purple-50 border border-purple-200 rounded-lg'
+                      className={`p-3 rounded-lg border ${isDark ? 'bg-purple-900/20 border-purple-800/50' : 'bg-purple-50 border-purple-200'}`}
                     >
                       <div className='flex items-center justify-between'>
                         <div className='flex-1'>
                           <div className='flex items-center gap-2 mb-1'>
-                            <span className='font-medium text-sm'>
+                            <span className={`font-medium text-sm ${isDark ? 'text-purple-200' : 'text-gray-900'}`}>
                               {obj.name}
                             </span>
-                            <span className='text-xs text-gray-600 bg-gray-100 px-1.5 py-0.5 rounded'>
-                              {obj.type}
-                            </span>
+                            {obj.type && (
+                              <span className={`text-xs px-1.5 py-0.5 rounded ${isDark ? 'bg-gray-700 text-gray-300' : 'text-gray-600 bg-gray-100'}`}>
+                                {obj.type}
+                              </span>
+                            )}
                           </div>
                           {obj.keywords && obj.keywords.length > 0 && (
                             <div className='flex flex-wrap gap-1 mt-1'>
                               {obj.keywords.map((keyword, idx) => (
                                 <span
                                   key={idx}
-                                  className='text-xs bg-white bg-opacity-60 px-2 py-0.5 rounded-full text-gray-700'
+                                  className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}
                                 >
                                   {keyword}
                                 </span>
@@ -991,7 +999,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             href={`/dashboard/objects/editor?zoneId=${obj.zoneId}&id=${obj.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
-                            className='text-purple-600 hover:text-purple-800 text-xs px-2 py-1 bg-purple-100 hover:bg-purple-200 rounded transition-colors'
+                            className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-purple-400 bg-purple-900/30 hover:bg-purple-900/50' : 'text-purple-600 hover:text-purple-800 bg-purple-100 hover:bg-purple-200'}`}
                             title='Edit object in new tab'
                           >
                             ✏️ Edit
@@ -999,7 +1007,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           {viewMode === 'edit' && onRemoveObject && (
                             <button
                               onClick={() => onRemoveObject(obj.id)}
-                              className='text-red-600 hover:text-red-800 text-xs px-2 py-1 hover:bg-red-50 rounded transition-colors'
+                              className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-red-400 hover:bg-red-900/30' : 'text-red-600 hover:text-red-800 hover:bg-red-50'}`}
                             >
                               Remove
                             </button>
@@ -1014,14 +1022,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
             {/* Shops in room */}
             <div>
-              <h4 className='text-sm font-medium text-gray-700 mb-3'>
+              <h4 className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
                 Shops ({shopCount})
               </h4>
               {shopCount === 0 ? (
-                <div className='text-center py-6 text-gray-500'>
+                <div className={`text-center py-6 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
                   <div className='text-2xl mb-2'>🏪</div>
                   <p className='text-sm'>No shops in this room</p>
-                  <p className='text-xs text-gray-400 mt-1'>
+                  <p className={`text-xs mt-1 ${isDark ? 'text-gray-500' : 'text-gray-400'}`}>
                     Shops are managed by specific shopkeeper mobs
                   </p>
                 </div>
@@ -1035,25 +1043,25 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                     return (
                       <div
                         key={shop.id}
-                        className='p-3 bg-amber-50 border border-amber-200 rounded-lg'
+                        className={`p-3 rounded-lg border ${isDark ? 'bg-amber-900/20 border-amber-800/50' : 'bg-amber-50 border-amber-200'}`}
                       >
                         <div className='flex items-center justify-between'>
                           <div className='flex-1'>
                             <div className='flex items-center gap-2 mb-1'>
-                              <span className='font-medium text-sm'>
+                              <span className={`font-medium text-sm ${isDark ? 'text-amber-200' : 'text-gray-900'}`}>
                                 🏪 Shop #{shop.id}
                               </span>
                               {shopkeeper && (
-                                <span className='text-xs text-gray-600'>
+                                <span className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
                                   Keeper: {shopkeeper.name}
                                 </span>
                               )}
                             </div>
                             <div className='flex gap-2 text-xs'>
-                              <span className='bg-green-100 text-green-700 px-2 py-0.5 rounded'>
+                              <span className={`px-2 py-0.5 rounded ${isDark ? 'bg-green-900/30 text-green-300' : 'bg-green-100 text-green-700'}`}>
                                 Buys at {Math.round(shop.buyProfit * 100)}%
                               </span>
-                              <span className='bg-red-100 text-red-700 px-2 py-0.5 rounded'>
+                              <span className={`px-2 py-0.5 rounded ${isDark ? 'bg-red-900/30 text-red-300' : 'bg-red-100 text-red-700'}`}>
                                 Sells at {Math.round(shop.sellProfit * 100)}%
                               </span>
                             </div>
@@ -1063,7 +1071,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               href={`/dashboard/shops/editor?zoneId=${shop.zoneId}&id=${shop.id}`}
                               target='_blank'
                               rel='noopener noreferrer'
-                              className='text-amber-600 hover:text-amber-800 text-xs px-2 py-1 bg-amber-100 hover:bg-amber-200 rounded transition-colors'
+                              className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-amber-400 bg-amber-900/30 hover:bg-amber-900/50' : 'text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200'}`}
                               title='Edit shop in new tab'
                             >
                               ✏️ Edit
