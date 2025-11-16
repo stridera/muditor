@@ -41,6 +41,8 @@ interface RoomServiceResultBase {
   layoutX: number | null;
   layoutY: number | null;
   layoutZ: number | null;
+  mobResets?: any[]; // Populated for GraphQL field resolvers
+  objectResets?: any[]; // Populated for GraphQL field resolvers
 }
 
 type RoomServiceResult = RoomServiceResultBase;
@@ -52,6 +54,16 @@ export class RoomsService {
   private readonly includeFull = {
     exits: true,
     roomExtraDescriptions: true,
+    mobResets: {
+      include: {
+        mobs: true,
+      },
+    },
+    objectResets: {
+      include: {
+        objects: true,
+      },
+    },
   } as const;
 
   // Accept a subset of the Prisma Room shape; use indexed access type for flexibility without any
@@ -68,6 +80,8 @@ export class RoomsService {
       keywords: string[];
       description: string;
     }>;
+    mobResets?: any[];
+    objectResets?: any[];
     createdAt: Date;
     updatedAt: Date;
     createdBy?: string | null;
@@ -86,6 +100,8 @@ export class RoomsService {
       flags: room.flags as RoomFlag[],
       exits: room.exits ?? [],
       extraDescs: room.roomExtraDescriptions ?? [],
+      mobResets: room.mobResets ?? [],
+      objectResets: room.objectResets ?? [],
       createdAt: room.createdAt,
       updatedAt: room.updatedAt,
       createdBy: room.createdBy ?? null,

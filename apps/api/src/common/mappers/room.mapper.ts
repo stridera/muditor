@@ -57,9 +57,10 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       db.layoutY !== undefined && { layoutY: db.layoutY }),
     ...(db.layoutZ !== null &&
       db.layoutZ !== undefined && { layoutZ: db.layoutZ }),
-    mobs: [],
-    objects: [],
-    shops: [],
+    // Pass through mobResets and objectResets for GraphQL field resolvers
+    // These will be undefined for rooms loaded without these relations
+    ...((db as any).mobResets && { mobResets: (db as any).mobResets }),
+    ...((db as any).objectResets && { objectResets: (db as any).objectResets }),
   };
   return dto;
 }

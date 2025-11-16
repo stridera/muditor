@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { Handle, Position, type NodeProps } from 'reactflow';
+import { useTheme } from 'next-themes';
 
 interface OverlapInfo {
   roomIds: number[];
@@ -44,68 +45,72 @@ interface RoomData {
   onSwitchOverlapRoom?: (direction: 'next' | 'prev') => void;
 }
 
-// Sector type styling and icons
-const sectorStyles: Record<
+// Sector type styling and icons - theme-aware
+const getSectorStyles = (isDark: boolean): Record<
   string,
   { bg: string; border: string; icon: string; text: string }
-> = {
+> => ({
   STRUCTURE: {
-    bg: 'bg-slate-100',
-    border: 'border-slate-400',
+    bg: isDark ? 'bg-slate-800' : 'bg-slate-100',
+    border: isDark ? 'border-slate-500' : 'border-slate-400',
     icon: '🏛️',
-    text: 'text-slate-800',
+    text: isDark ? 'text-slate-200' : 'text-slate-800',
   },
   FIELD: {
-    bg: 'bg-green-100',
-    border: 'border-green-400',
+    bg: isDark ? 'bg-green-900' : 'bg-green-100',
+    border: isDark ? 'border-green-500' : 'border-green-400',
     icon: '🌾',
-    text: 'text-green-800',
+    text: isDark ? 'text-green-200' : 'text-green-800',
   },
   FOREST: {
-    bg: 'bg-emerald-100',
-    border: 'border-emerald-400',
+    bg: isDark ? 'bg-emerald-900' : 'bg-emerald-100',
+    border: isDark ? 'border-emerald-500' : 'border-emerald-400',
     icon: '🌲',
-    text: 'text-emerald-800',
+    text: isDark ? 'text-emerald-200' : 'text-emerald-800',
   },
   HILLS: {
-    bg: 'bg-amber-100',
-    border: 'border-amber-400',
+    bg: isDark ? 'bg-amber-900' : 'bg-amber-100',
+    border: isDark ? 'border-amber-500' : 'border-amber-400',
     icon: '⛰️',
-    text: 'text-amber-800',
+    text: isDark ? 'text-amber-200' : 'text-amber-800',
   },
   MOUNTAIN: {
-    bg: 'bg-gray-100',
-    border: 'border-gray-400',
+    bg: isDark ? 'bg-gray-800' : 'bg-gray-100',
+    border: isDark ? 'border-gray-500' : 'border-gray-400',
     icon: '🏔️',
-    text: 'text-gray-800',
+    text: isDark ? 'text-gray-200' : 'text-gray-800',
   },
   WATER: {
-    bg: 'bg-blue-100',
-    border: 'border-blue-400',
+    bg: isDark ? 'bg-blue-900' : 'bg-blue-100',
+    border: isDark ? 'border-blue-500' : 'border-blue-400',
     icon: '🌊',
-    text: 'text-blue-800',
+    text: isDark ? 'text-blue-200' : 'text-blue-800',
   },
   SWAMP: {
-    bg: 'bg-teal-100',
-    border: 'border-teal-400',
+    bg: isDark ? 'bg-teal-900' : 'bg-teal-100',
+    border: isDark ? 'border-teal-500' : 'border-teal-400',
     icon: '🐊',
-    text: 'text-teal-800',
+    text: isDark ? 'text-teal-200' : 'text-teal-800',
   },
   CITY: {
-    bg: 'bg-purple-100',
-    border: 'border-purple-400',
+    bg: isDark ? 'bg-purple-900' : 'bg-purple-100',
+    border: isDark ? 'border-purple-500' : 'border-purple-400',
     icon: '🏙️',
-    text: 'text-purple-800',
+    text: isDark ? 'text-purple-200' : 'text-purple-800',
   },
   ROAD: {
-    bg: 'bg-yellow-100',
-    border: 'border-yellow-400',
+    bg: isDark ? 'bg-yellow-900' : 'bg-yellow-100',
+    border: isDark ? 'border-yellow-500' : 'border-yellow-400',
     icon: '🛤️',
-    text: 'text-yellow-800',
+    text: isDark ? 'text-yellow-200' : 'text-yellow-800',
   },
-};
+});
 
 export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
+  const sectorStyles = getSectorStyles(isDark);
+
   // Rename to sectorStyle to avoid shadowing NodeProps.style and improve clarity.
   // Explicit annotation ensures it is never treated as possibly undefined.
   const sectorStyle = (sectorStyles[data.sector] ?? sectorStyles.STRUCTURE) as {
@@ -395,7 +400,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                 </span>
               )}
               {exitCount > 0 && (
-                <span className='bg-white bg-opacity-60 px-2 py-0.5 rounded-full text-xs font-medium'>
+                <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-white bg-opacity-60 text-gray-800'}`}>
                   {exitCount} exit{exitCount !== 1 ? 's' : ''}
                 </span>
               )}
@@ -437,7 +442,7 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
 
           {/* Sector tag */}
           <div className='mt-2'>
-            <span className='text-xs px-2 py-0.5 bg-white bg-opacity-60 rounded-full font-medium'>
+            <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-white bg-opacity-60 text-gray-800'}`}>
               {data.sector.toLowerCase()}
             </span>
           </div>
