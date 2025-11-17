@@ -2,17 +2,18 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useSearchParams } from 'next/navigation';
-import { EnhancedZoneEditor } from '@/components/ZoneEditor/EnhancedZoneEditor';
+import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrchestrator';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import Link from 'next/link';
-import { Suspense, useEffect, useState } from 'react';
+import { useSearchParams } from 'next/navigation';
+import { Suspense, useEffect, useMemo, useState } from 'react';
+import { isValidZoneId } from '@/lib/room-utils';
 
 function ZoneEditorContent() {
   const searchParams = useSearchParams();
-  const zoneIdParam = searchParams.get('zone');
-  const roomIdParam = searchParams.get('room');
+  const zoneIdParam = searchParams.get('zone_id');
+  const roomIdParam = searchParams.get('room_id');
   const { zoneId: contextZoneId } = useZoneContext();
   const [localStorageZone, setLocalStorageZone] = useState<number | null>(null);
 
@@ -30,15 +31,28 @@ function ZoneEditorContent() {
   }, []);
 
   // Priority: URL param > localStorage > null (world map)
-  const zoneId = zoneIdParam
-    ? parseInt(zoneIdParam)
-    : localStorageZone;
+  // Use useMemo to ensure recalculation when searchParams changes
+  const zoneId = useMemo(() => {
+    if (zoneIdParam != null) {
+      const parsed = parseInt(zoneIdParam);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return localStorageZone;
+  }, [zoneIdParam, localStorageZone]);
 
   // Parse room ID from URL
-  const initialRoomId = roomIdParam ? parseInt(roomIdParam) : undefined;
+  const initialRoomId = useMemo(() => {
+    if (roomIdParam != null) {
+      const parsed = parseInt(roomIdParam);
+      if (!isNaN(parsed)) return parsed;
+    }
+    return undefined;
+  }, [roomIdParam]);
 
-  // If no zone, show world map mode
-  const worldMapMode = !zoneId;
+  // If no zone, show world map mode (use isValidZoneId to allow zone 0)
+  const worldMapMode = useMemo(() => {
+    return !isValidZoneId(zoneId);
+  }, [zoneId]);
 
   return (
     <div className='fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900'>
@@ -85,7 +99,7 @@ function ZoneEditorContent() {
 
       {/* Full-screen Zone Editor */}
       <div className='h-[calc(100vh-73px)]'>
-        <EnhancedZoneEditor
+        <ZoneEditorOrchestrator
           zoneId={zoneId ?? undefined}
           initialRoomId={initialRoomId}
           worldMapMode={worldMapMode}

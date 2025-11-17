@@ -73,6 +73,10 @@ interface PropertyPanelProps {
   saving: boolean;
   managingExits: boolean;
   viewMode: 'edit' | 'view';
+  onEntityClick?: (entity: {
+    type: 'mob' | 'object' | 'shop';
+    id: number;
+  }) => void;
 }
 
 const sectorOptions = [
@@ -116,6 +120,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   saving,
   managingExits,
   viewMode,
+  onEntityClick,
 }) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
@@ -220,172 +225,411 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           Room {room.id}: {room.name}
         </h3>
 
-        {/* Layout Coordinates (Debug) */}
-        <div
-          className={`${isDark ? 'bg-gray-800' : 'bg-gray-50'} rounded px-2 py-1.5 mb-3 border ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-        >
+        {/* Condensed Meta Strip (no duplicate exits/entities) */}
+        <div className='mb-4'>
           <div
-            className={`text-xs font-mono ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+            className={`flex flex-wrap items-center gap-2 text-xs ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
           >
-            <span className='font-semibold'>Layout:</span>{' '}
-            <span className={isDark ? 'text-gray-200' : 'text-gray-800'}>
-              X={room.layoutX ?? 'null'}, Y={room.layoutY ?? 'null'}, Z=
-              {room.layoutZ ?? 0}
-            </span>
-          </div>
-        </div>
-
-        {/* Quick stats */}
-        <div className='flex gap-2 text-xs mb-3'>
-          <span className='bg-blue-100 text-blue-800 px-2 py-1 rounded-full'>
-            {room.exits.length} exit{room.exits.length !== 1 ? 's' : ''}
-          </span>
-          <span className='bg-green-100 text-green-800 px-2 py-1 rounded-full'>
-            {mobCount} mob{mobCount !== 1 ? 's' : ''}
-          </span>
-          <span className='bg-purple-100 text-purple-800 px-2 py-1 rounded-full'>
-            {objectCount} object{objectCount !== 1 ? 's' : ''}
-          </span>
-          {shopCount > 0 && (
-            <span className='bg-amber-100 text-amber-800 px-2 py-1 rounded-full'>
-              {shopCount} shop{shopCount !== 1 ? 's' : ''}
-            </span>
-          )}
-        </div>
-
-        {/* Room Navigation & Z-Level Controls */}
-        <div className='space-y-3'>
-          {/* Z-Level Controls */}
-          <div className='flex items-center gap-2'>
-            <span
-              className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} min-w-[45px]`}
+            <div
+              className={`px-2 py-1 rounded-md font-mono ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
             >
-              Floor:
-            </span>
-            <div className='flex items-center gap-1'>
-              <button
-                onClick={() => onUpdateZLevel(room.id, (room.layoutZ ?? 0) - 1)}
-                className='flex items-center justify-center w-7 h-7 bg-red-100 hover:bg-red-200 text-red-700 rounded text-sm font-bold transition-colors'
-                title='Lower floor (Ctrl+↓)'
-              >
-                ⬇️
-              </button>
+              X:{room.layoutX ?? '∅'} Y:{room.layoutY ?? '∅'} Z:
+              {room.layoutZ ?? 0}
+            </div>
+            {(() => {
+              const sector = sectorOptions.find(s => s.value === room.sector);
+              return (
+                <div
+                  className={`px-2 py-1 rounded-md flex items-center gap-1 ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+                  title={`Sector: ${sector?.label || room.sector}`}
+                >
+                  <span>{sector?.icon || '❓'}</span>
+                  <span className='font-medium'>
+                    {sector?.label || room.sector}
+                  </span>
+                </div>
+              );
+            })()}
+            {viewMode === 'edit' ? (
+              <div className='flex items-center gap-1'>
+                <button
+                  onClick={() =>
+                    onUpdateZLevel(room.id, (room.layoutZ ?? 0) - 1)
+                  }
+                  className='w-6 h-6 flex items-center justify-center rounded bg-red-100 text-red-700 hover:bg-red-200 font-bold'
+                  title='Lower floor (Ctrl+↓)'
+                >
+                  -
+                </button>
+                <div
+                  className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+                >
+                  {(room.layoutZ ?? 0) === 0
+                    ? 'Ground'
+                    : `${(room.layoutZ ?? 0) > 0 ? '+' : ''}${room.layoutZ}`}
+                </div>
+                <button
+                  onClick={() =>
+                    onUpdateZLevel(room.id, (room.layoutZ ?? 0) + 1)
+                  }
+                  className='w-6 h-6 flex items-center justify-center rounded bg-blue-100 text-blue-700 hover:bg-blue-200 font-bold'
+                  title='Raise floor (Ctrl+↑)'
+                >
+                  +
+                </button>
+              </div>
+            ) : (
               <div
-                className={`px-3 py-1 text-sm font-medium ${isDark ? 'text-gray-300 bg-gray-800' : 'text-gray-700 bg-gray-50'} min-w-[60px] text-center rounded border`}
+                className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
               >
+                Floor:{' '}
                 {(room.layoutZ ?? 0) === 0
                   ? 'Ground'
                   : `${(room.layoutZ ?? 0) > 0 ? '+' : ''}${room.layoutZ}`}
               </div>
-              <button
-                onClick={() => onUpdateZLevel(room.id, (room.layoutZ ?? 0) + 1)}
-                className='flex items-center justify-center w-7 h-7 bg-blue-100 hover:bg-blue-200 text-blue-700 rounded text-sm font-bold transition-colors'
-                title='Raise floor (Ctrl+↑)'
-              >
-                ⬆️
-              </button>
-            </div>
-          </div>
-
-          {/* Available Exits Navigation (View Mode) */}
-          {viewMode === 'view' && room.exits.length > 0 && (
-            <div>
-              <div
-                className={`text-sm font-medium ${isDark ? 'text-gray-300' : 'text-gray-700'} mb-2`}
-              >
-                🧭 Available exits:
-              </div>
-              <div className='flex flex-wrap gap-1'>
-                {room.exits.map(exit => {
-                  const directionIcon =
-                    {
-                      NORTH: '⬆️',
-                      SOUTH: '⬇️',
-                      EAST: '➡️',
-                      WEST: '⬅️',
-                      NORTHEAST: '↗️',
-                      NORTHWEST: '↖️',
-                      SOUTHEAST: '↘️',
-                      SOUTHWEST: '↙️',
-                      UP: '🔺',
-                      DOWN: '🔻',
-                    }[exit.direction] || '➤';
-
-                  // Use toZoneId and toRoomId if available
-                  const destZoneId = getExitDestinationZone(exit, room.zoneId);
-                  const destRoomId = exit.toRoomId;
-                  const destinationRoom = allRooms.find(
-                    r => r.id === destRoomId && r.zoneId === destZoneId
-                  );
-                  const isInZone =
-                    destZoneId === room.zoneId && !!destinationRoom;
-
-                  return (
-                    <span
-                      key={exit.id}
-                      className={`inline-flex items-center gap-1 px-2 py-1 rounded-md text-xs ${
-                        isInZone
-                          ? 'bg-green-50 text-green-700 border border-green-200'
-                          : 'bg-gray-100 text-gray-500 border border-gray-200'
-                      }`}
-                      title={
-                        isInZone
-                          ? `${exit.direction}: ${destinationRoom?.name} (Room ${destRoomId})`
-                          : `${exit.direction}: Zone ${destZoneId}, Room ${destRoomId}${destinationRoom ? ` - ${destinationRoom.name}` : ''}`
-                      }
-                    >
-                      <span>{directionIcon}</span>
-                      <span className='font-medium'>
-                        {exit.direction.toLowerCase()}
-                      </span>
-                    </span>
-                  );
-                })}
-              </div>
-              <div className='text-xs text-gray-500 mt-2'>
-                💡 Use arrow keys to navigate, Page Up/Down for UP/DOWN
-              </div>
-            </div>
-          )}
-        </div>
-      </div>
-
-      {/* Tabs */}
-      <div
-        className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
-      >
-        <div
-          className={`flex space-x-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}
-        >
-          {[
-            { key: 'basic', label: 'Basic', icon: '⚙️' },
-            { key: 'exits', label: 'Exits', icon: '🚪' },
-            { key: 'entities', label: 'Entities', icon: '👹' },
-            { key: 'advanced', label: 'Advanced', icon: '🔧' },
-          ].map(tab => (
-            <button
-              key={tab.key}
-              onClick={() => setActiveTab(tab.key as typeof activeTab)}
-              className={`flex-1 px-2 py-2 text-xs font-medium rounded-md transition-colors ${
-                activeTab === tab.key
-                  ? isDark
-                    ? 'bg-gray-600 text-blue-400 shadow-sm'
-                    : 'bg-white text-blue-700 shadow-sm'
-                  : isDark
-                    ? 'text-gray-400 hover:text-gray-200'
-                    : 'text-gray-500 hover:text-gray-700'
-              }`}
+            )}
+            <span
+              className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
             >
-              <span className='mr-1'>{tab.icon}</span>
-              {tab.label}
-            </button>
-          ))}
+              {room.exits.length} exit{room.exits.length !== 1 ? 's' : ''}
+            </span>
+            {mobCount > 0 && (
+              <span
+                className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+              >
+                {mobCount} mob{mobCount !== 1 ? 's' : ''}
+              </span>
+            )}
+            {objectCount > 0 && (
+              <span
+                className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+              >
+                {objectCount} object{objectCount !== 1 ? 's' : ''}
+              </span>
+            )}
+            {shopCount > 0 && (
+              <span
+                className={`px-2 py-1 rounded-md ${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-100 text-gray-800'}`}
+              >
+                {shopCount} shop{shopCount !== 1 ? 's' : ''}
+              </span>
+            )}
+          </div>
         </div>
       </div>
+      {viewMode === 'edit' && (
+        <div
+          className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+        >
+          <div
+            className={`flex space-x-1 ${isDark ? 'bg-gray-700' : 'bg-gray-100'} p-1 rounded-lg`}
+          >
+            {[
+              { key: 'basic', label: 'Basic', icon: '⚙️' },
+              { key: 'exits', label: 'Exits', icon: '🚪' },
+              { key: 'entities', label: 'Entities', icon: '👹' },
+              { key: 'advanced', label: 'Advanced', icon: '🔧' },
+            ].map(tab => (
+              <button
+                key={tab.key}
+                onClick={() => setActiveTab(tab.key as typeof activeTab)}
+                className={`flex-1 px-2 py-2 text-xs font-medium rounded-md transition-colors ${
+                  activeTab === tab.key
+                    ? isDark
+                      ? 'bg-gray-600 text-blue-400 shadow-sm'
+                      : 'bg-white text-blue-700 shadow-sm'
+                    : isDark
+                      ? 'text-gray-400 hover:text-gray-200'
+                      : 'text-gray-500 hover:text-gray-700'
+                }`}
+              >
+                <span className='mr-1'>{tab.icon}</span>
+                {tab.label}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
-      {/* Tab Content */}
+      {/* Content */}
       <div className='flex-1 overflow-y-auto p-4'>
-        {activeTab === 'basic' && (
+        {viewMode === 'view' && (
+          <div className='space-y-6'>
+            {/* Description */}
+            <section>
+              <h4
+                className={`text-sm font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+              >
+                Description
+              </h4>
+              <div
+                className={`${isDark ? 'bg-gray-700 text-gray-200' : 'bg-gray-50 text-gray-700'} rounded-md p-3 text-sm leading-relaxed whitespace-pre-wrap`}
+              >
+                {room.roomDescription || 'No description.'}
+              </div>
+            </section>
+
+            {/* (Sector moved to header meta strip) */}
+
+            {/* Exits */}
+            <section>
+              <h4
+                className={`text-sm font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+              >
+                🚪 Exits{' '}
+                <span className='text-xs font-normal px-2 py-0.5 rounded-full bg-blue-100 text-blue-700'>
+                  {room.exits.length}
+                </span>
+              </h4>
+              {room.exits.length === 0 ? (
+                <div className='text-xs italic text-gray-500'>No exits.</div>
+              ) : (
+                <ul className='space-y-2'>
+                  {room.exits.map(exit => {
+                    const destZoneId = getExitDestinationZone(
+                      exit,
+                      room.zoneId
+                    );
+                    const rawRoomId = exit.toRoomId as
+                      | number
+                      | string
+                      | undefined
+                      | null;
+                    const destRoomId =
+                      typeof rawRoomId === 'string'
+                        ? parseInt(rawRoomId, 10)
+                        : (rawRoomId ?? undefined);
+                    const destinationRoom = allRooms.find(
+                      r => r.id === destRoomId && r.zoneId === destZoneId
+                    );
+                    const icon =
+                      {
+                        NORTH: '⬆️',
+                        SOUTH: '⬇️',
+                        EAST: '➡️',
+                        WEST: '⬅️',
+                        NORTHEAST: '↗️',
+                        NORTHWEST: '↖️',
+                        SOUTHEAST: '↘️',
+                        SOUTHWEST: '↙️',
+                        UP: '🔺',
+                        DOWN: '🔻',
+                      }[exit.direction] || '➤';
+                    return (
+                      <li
+                        key={exit.id}
+                        className={`border rounded-md p-2 text-xs ${isDark ? 'border-gray-700 bg-gray-800' : 'border-gray-200 bg-white'}`}
+                      >
+                        <div className='flex items-center justify-between'>
+                          <div className='flex items-center gap-2 font-medium'>
+                            <span>{icon}</span>
+                            <span className='uppercase tracking-wide'>
+                              {exit.direction}
+                            </span>
+                          </div>
+                          <div className='text-[10px] font-mono opacity-60'>
+                            ID:{destZoneId}:{destRoomId ?? '∅'}
+                          </div>
+                        </div>
+                        <div className='mt-1 text-gray-600 dark:text-gray-300'>
+                          {destinationRoom ? (
+                            <span>
+                              {destinationRoom.name} (Room {destRoomId}
+                              {destZoneId !== room.zoneId
+                                ? ` / Zone ${destZoneId}`
+                                : ''}
+                              )
+                            </span>
+                          ) : (
+                            <span className='italic'>Unlinked destination</span>
+                          )}
+                        </div>
+                        {(exit.flags?.length ||
+                          exit.keywords?.length ||
+                          exit.key) && (
+                          <div className='mt-2 flex flex-wrap gap-1'>
+                            {exit.flags?.includes('IS_DOOR') && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-gray-100 text-gray-700 border border-gray-300'>
+                                Door
+                              </span>
+                            )}
+                            {exit.flags?.includes('CLOSED') && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300'>
+                                Closed
+                              </span>
+                            )}
+                            {exit.flags?.includes('LOCKED') && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-red-100 text-red-700 border border-red-300'>
+                                Locked
+                              </span>
+                            )}
+                            {exit.flags?.includes('PICKPROOF') && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-700 border border-purple-300'>
+                                Pickproof
+                              </span>
+                            )}
+                            {exit.key && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 border border-blue-300'>
+                                Key
+                              </span>
+                            )}
+                          </div>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+              )}
+            </section>
+
+            {/* Entities */}
+            <section>
+              <h4
+                className={`text-sm font-semibold mb-2 flex items-center gap-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+              >
+                👹 Entities
+                <span className='text-xs font-normal px-2 py-0.5 rounded-full bg-green-100 text-green-700'>
+                  {(room.mobs?.length || 0) +
+                    (room.objects?.length || 0) +
+                    (room.shops?.length || 0)}{' '}
+                  total
+                </span>
+              </h4>
+              {!room.mobs?.length &&
+                !room.objects?.length &&
+                !room.shops?.length && (
+                  <div className='text-xs italic text-gray-500'>
+                    No entities.
+                  </div>
+                )}
+              <div className='space-y-4'>
+                {room.mobs?.length ? (
+                  <div>
+                    <h5 className='text-xs uppercase tracking-wide font-medium mb-1 opacity-70'>
+                      Mobs{' '}
+                      <span className='ml-1 font-normal'>
+                        ({room.mobs.length})
+                      </span>
+                    </h5>
+                    <ul className='space-y-1'>
+                      {room.mobs.map(m => (
+                        <li
+                          key={m.id}
+                          className={`text-xs flex items-center justify-between ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                        >
+                          <button
+                            type='button'
+                            onClick={() =>
+                              onEntityClick?.({ type: 'mob', id: m.id })
+                            }
+                            className='font-medium hover:underline text-left'
+                          >
+                            {m.name}
+                          </button>
+                          <span className='opacity-60'>
+                            Lv{m.level}
+                            {m.race ? ` / ${m.race}` : ''}
+                            {m.mobClass ? ` / ${m.mobClass}` : ''}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {room.objects?.length ? (
+                  <div>
+                    <h5 className='text-xs uppercase tracking-wide font-medium mb-1 opacity-70'>
+                      Objects{' '}
+                      <span className='ml-1 font-normal'>
+                        ({room.objects.length})
+                      </span>
+                    </h5>
+                    <ul className='space-y-1'>
+                      {room.objects.map(o => (
+                        <li
+                          key={o.id}
+                          className={`text-xs flex items-center justify-between ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                        >
+                          <button
+                            type='button'
+                            onClick={() =>
+                              onEntityClick?.({ type: 'object', id: o.id })
+                            }
+                            className='font-medium hover:underline text-left'
+                          >
+                            {o.name}
+                          </button>
+                          <span className='opacity-60'>{o.type}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                ) : null}
+                {room.shops?.length ? (
+                  <div>
+                    <h5 className='text-xs uppercase tracking-wide font-medium mb-1 opacity-70'>
+                      Shops{' '}
+                      <span className='ml-1 font-normal'>
+                        ({room.shops.length})
+                      </span>
+                    </h5>
+                    <ul className='space-y-1'>
+                      {room.shops.map(s => {
+                        const keeper = room.mobs?.find(
+                          m => m.id === s.keeperId
+                        );
+                        const label = keeper
+                          ? `${keeper.name}'s Shop`
+                          : `Shopkeeper ${s.keeperId}`;
+                        return (
+                          <li
+                            key={s.id}
+                            className={`text-xs flex items-center justify-between ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                          >
+                            <button
+                              type='button'
+                              onClick={() =>
+                                onEntityClick?.({ type: 'shop', id: s.id })
+                              }
+                              className='font-medium hover:underline text-left'
+                            >
+                              {label}
+                            </button>
+                            <span className='opacity-60'>
+                              Buy {s.buyProfit}% / Sell {s.sellProfit}%
+                            </span>
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                ) : null}
+              </div>
+            </section>
+
+            {/* Identifiers */}
+            <section>
+              <h4
+                className={`text-sm font-semibold mb-2 ${isDark ? 'text-gray-200' : 'text-gray-800'}`}
+              >
+                Identifiers
+              </h4>
+              <div
+                className={`grid grid-cols-2 gap-3 text-xs ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+              >
+                <div>
+                  <div className='font-medium'>Room ID</div>
+                  <div className='font-mono'>{room.id}</div>
+                </div>
+                <div>
+                  <div className='font-medium'>Zone ID</div>
+                  <div className='font-mono'>{room.zoneId}</div>
+                </div>
+              </div>
+            </section>
+          </div>
+        )}
+        {viewMode === 'edit' && activeTab === 'basic' && (
           <div className='space-y-4'>
             {/* Room Name */}
             <div>
@@ -449,7 +693,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           </div>
         )}
 
-        {activeTab === 'exits' && (
+        {viewMode === 'edit' && activeTab === 'exits' && (
           <div className='space-y-4'>
             {/* Current Exits */}
             <div>
@@ -910,7 +1154,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           </div>
         )}
 
-        {activeTab === 'entities' && (
+        {viewMode === 'edit' && activeTab === 'entities' && (
           <div className='space-y-4'>
             {/* Mobs in room */}
             <div>
@@ -1159,7 +1403,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
           </div>
         )}
 
-        {activeTab === 'advanced' && (
+        {viewMode === 'edit' && activeTab === 'advanced' && (
           <div className='space-y-4'>
             <div className='text-center py-8 text-gray-500'>
               <div className='text-2xl mb-2'>🔧</div>

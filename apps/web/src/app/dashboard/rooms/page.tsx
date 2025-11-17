@@ -387,7 +387,7 @@ function RoomsContent() {
                       Zone
                     </Link>
                     <Link
-                      href={`/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`}
+                      href={`/dashboard/zones/editor?zone_id=${room.zoneId}&room_id=${room.id}`}
                       className='text-primary hover:text-primary-foreground px-3 py-1 text-sm'
                       onClick={e => e.stopPropagation()}
                     >

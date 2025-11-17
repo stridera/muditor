@@ -17,6 +17,7 @@ interface MobData {
   alignment?: string;
   difficulty?: 'easy' | 'medium' | 'hard' | 'boss';
   roomId?: number;
+  forceFullWidth?: boolean; // Panel list variant
 }
 
 const getDifficultyStyle = (difficulty?: string, isDark?: boolean) => {
@@ -88,72 +89,121 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
     setIsHovered(false);
   };
 
+  // Unified list/card variant for panel
+  const isListVariant = !!data.forceFullWidth;
+
   return (
     <>
       <div
-        className={`
-          relative min-w-[140px] max-w-[180px]
+        className={`relative ${isListVariant ? 'w-full' : 'min-w-[140px] max-w-[180px]'}
           ${style.bg} ${style.border} ${style.text}
           ${selected ? 'ring-2 ring-red-500 ring-offset-2' : ''}
-          border-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200
-          cursor-grab active:cursor-grabbing
+          border-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-150
+          ${isListVariant ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}
         `}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Header */}
-        <div
-          className={`px-3 py-2 border-b border-opacity-30 ${isDark ? 'border-gray-600' : 'border-gray-400'}`}
-        >
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <span className='text-lg'>{alignmentIcon}</span>
-              <span className='font-bold text-sm'>Lvl {data.level}</span>
+        {isListVariant ? (
+          <div className='p-3 space-y-1.5'>
+            <div className='flex items-start justify-between gap-2'>
+              <div className='min-w-0'>
+                <div className='flex items-center gap-2 mb-0.5'>
+                  <span className='text-base leading-none'>
+                    {alignmentIcon}
+                  </span>
+                  <span className='text-[11px] font-semibold px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10'>
+                    Lvl {data.level}
+                  </span>
+                  {data.difficulty && (
+                    <span className='text-[10px] font-medium px-1 py-0.5 rounded bg-black/10 dark:bg-white/10 capitalize'>
+                      {data.difficulty}
+                    </span>
+                  )}
+                </div>
+                <h3 className='font-semibold text-sm leading-tight truncate'>
+                  {data.name || `Mob ${data.id}`}
+                </h3>
+              </div>
             </div>
-            {data.difficulty && (
-              <span
-                className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                {data.difficulty}
-              </span>
+            {(data.race || data.mobClass) && (
+              <div className='flex flex-wrap gap-1 text-[11px]'>
+                {data.race && (
+                  <span className='px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10'>
+                    {data.race}
+                  </span>
+                )}
+                {data.mobClass && (
+                  <span className='px-1.5 py-0.5 rounded bg-black/10 dark:bg:white/10'>
+                    {data.mobClass}
+                  </span>
+                )}
+              </div>
+            )}
+            {typeof data.hitpoints === 'number' && data.hitpoints > 0 && (
+              <div className='flex items-center gap-1 text-[11px]'>
+                <span>❤️</span>
+                <span>{data.hitpoints} HP</span>
+              </div>
+            )}
+            {isValidRoomId(data.roomId) && (
+              <div className='text-[10px] opacity-60'>Room {data.roomId}</div>
             )}
           </div>
-
-          <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-            {data.name}
-          </h3>
-        </div>
-
-        {/* Content */}
-        <div className='px-3 py-2'>
-          <div className='flex flex-wrap gap-1 mb-2'>
-            {data.race && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                {data.race}
-              </span>
-            )}
-            {data.mobClass && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                {data.mobClass}
-              </span>
-            )}
-          </div>
-
-          {data.hitpoints && (
-            <div className='flex items-center gap-1 text-xs'>
-              <span>❤️</span>
-              <span>{data.hitpoints} HP</span>
+        ) : (
+          <>
+            {/* Original canvas node layout */}
+            <div
+              className={`px-3 py-2 border-b border-opacity-30 ${isDark ? 'border-gray-600' : 'border-gray-400'}`}
+            >
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-lg'>{alignmentIcon}</span>
+                  <span className='font-bold text-sm'>Lvl {data.level}</span>
+                </div>
+                {data.difficulty && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    {data.difficulty}
+                  </span>
+                )}
+              </div>
+              <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
+                {data.name || `Mob ${data.id}`}
+              </h3>
             </div>
-          )}
-
-          {isValidRoomId(data.roomId) && (
-            <div className='mt-2 text-xs opacity-75'>📍 Room {data.roomId}</div>
-          )}
-        </div>
+            <div className='px-3 py-2'>
+              <div className='flex flex-wrap gap-1 mb-2'>
+                {data.race && (
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    {data.race}
+                  </span>
+                )}
+                {data.mobClass && (
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    {data.mobClass}
+                  </span>
+                )}
+              </div>
+              {typeof data.hitpoints === 'number' && (
+                <div className='flex items-center gap-1 text-xs'>
+                  <span>❤️</span>
+                  <span>{data.hitpoints} HP</span>
+                </div>
+              )}
+              {isValidRoomId(data.roomId) && (
+                <div className='mt-2 text-xs opacity-75'>
+                  📍 Room {data.roomId}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
       {/* Portal-based popup */}
@@ -172,7 +222,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
             }}
           >
             <div className='font-semibold mb-2'>
-              {data.name} (Level {data.level})
+              {data.name || `Mob ${data.id}`} • Lvl {data.level}
             </div>
 
             <div

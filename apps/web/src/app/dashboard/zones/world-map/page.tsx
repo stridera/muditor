@@ -2,7 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
-import { EnhancedZoneEditor } from '@/components/ZoneEditor/EnhancedZoneEditor';
+import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrchestrator';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import Link from 'next/link';
 
@@ -28,9 +28,7 @@ export default function WorldMapPage() {
                 Zones
               </Link>
               <span className='text-gray-300'>›</span>
-              <h1 className='text-lg font-semibold text-gray-900'>
-                World Map
-              </h1>
+              <h1 className='text-lg font-semibold text-gray-900'>World Map</h1>
             </div>
             <div className='flex items-center gap-3'>
               <Link
@@ -45,7 +43,7 @@ export default function WorldMapPage() {
 
         {/* Full-screen World Map Editor */}
         <div className='h-[calc(100vh-73px)]'>
-          <EnhancedZoneEditor worldMapMode={true} />
+          <ZoneEditorOrchestrator worldMapMode={true} />
         </div>
       </div>
     </PermissionGuard>

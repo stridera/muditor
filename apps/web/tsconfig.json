@@ -9,32 +9,16 @@
     // Enable React JSX transform locally for proper JSX namespace resolution
     "jsx": "preserve",
     // React type definitions are provided by local devDependencies; specify only needed globals
-    "types": [
-      "node",
-      "jest",
-      "react",
-      "react-dom"
-    ],
+    "types": ["node", "jest", "react", "react-dom"],
     // Ensure type resolution for monorepo when building in isolation
-    "typeRoots": [
-      "../../node_modules/@types",
-      "./node_modules/@types"
-    ],
+    "typeRoots": ["../../node_modules/@types", "./node_modules/@types"],
     // Temporarily relax lib checking to suppress 3rd-party ambient inconsistencies (Monaco/ReactFlow)
     "skipLibCheck": true,
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@muditor/db": [
-        "../../packages/db/src"
-      ],
-      "@muditor/types": [
-        "../../packages/types/src"
-      ],
-      "@muditor/ui": [
-        "../../packages/ui/src"
-      ]
+      "@/*": ["./src/*"],
+      "@muditor/db": ["../../packages/db/src"],
+      "@muditor/types": ["../../packages/types/src"],
+      "@muditor/ui": ["../../packages/ui/src"]
     }
   },
   "include": [
@@ -54,6 +38,7 @@
   "exclude": [
     "node_modules",
     "src/__tests__/**/*",
-    "dist-types"
+    "dist-types",
+    "src/components/ZoneEditor/EnhancedZoneEditor.tsx"
   ]
 }
