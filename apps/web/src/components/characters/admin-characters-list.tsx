@@ -354,7 +354,7 @@ export function AdminCharactersList({
                 key={character.id}
                 character={character}
                 showFullDetails={true}
-                onCharacterClick={onCharacterClick}
+                onCharacterClick={onCharacterClick ?? (() => {})}
               />
             ))}
           </div>

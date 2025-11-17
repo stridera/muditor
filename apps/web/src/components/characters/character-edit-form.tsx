@@ -177,10 +177,7 @@ export function CharacterEditForm({
     }));
   };
 
-  const handleStatChange = (
-    stat: keyof UpdateCharacterData,
-    value: number
-  ) => {
+  const handleStatChange = (stat: keyof UpdateCharacterData, value: number) => {
     // Ensure stats stay within valid range (1-25 for editing, allowing for magic items)
     const clampedValue = Math.max(1, Math.min(25, value));
     setFormData(prev => ({
@@ -315,7 +312,7 @@ export function CharacterEditForm({
               <div className='space-y-2'>
                 <Label htmlFor='race'>Race</Label>
                 <Select
-                  value={formData.raceType}
+                  value={formData.raceType || ''}
                   onValueChange={value => handleInputChange('raceType', value)}
                   disabled={loading}
                 >
@@ -335,7 +332,7 @@ export function CharacterEditForm({
               <div className='space-y-2'>
                 <Label htmlFor='class'>Class</Label>
                 <Select
-                  value={formData.playerClass}
+                  value={formData.playerClass || ''}
                   onValueChange={value =>
                     handleInputChange('playerClass', value)
                   }
@@ -379,7 +376,7 @@ export function CharacterEditForm({
                 maxLength={500}
               />
               <p className='text-xs text-muted-foreground'>
-                {(formData.description?.length || 0)}/500 characters
+                {formData.description?.length || 0}/500 characters
               </p>
             </div>
 
@@ -476,7 +473,10 @@ export function CharacterEditForm({
                   max={formData.hitPointsMax}
                   value={formData.hitPoints}
                   onChange={e =>
-                    handleInputChange('hitPoints', parseInt(e.target.value) || 0)
+                    handleInputChange(
+                      'hitPoints',
+                      parseInt(e.target.value) || 0
+                    )
                   }
                   disabled={loading}
                 />

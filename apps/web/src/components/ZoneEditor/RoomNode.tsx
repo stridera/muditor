@@ -46,7 +46,9 @@ interface RoomData {
 }
 
 // Sector type styling and icons - theme-aware
-const getSectorStyles = (isDark: boolean): Record<
+const getSectorStyles = (
+  isDark: boolean
+): Record<
   string,
   { bg: string; border: string; icon: string; text: string }
 > => ({
@@ -190,15 +192,16 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
         className={`
           relative w-[180px] h-[140px]
           ${sectorStyle.bg} ${depthEffects.borderStyle} ${sectorStyle.text}
-          ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-          ${depthEffects.additionalClasses}
           ${
-            data.isOverlapping &&
-            data.overlappedRooms &&
-            data.overlappedRooms.length > 1
-              ? 'ring-4 ring-orange-400 ring-offset-1 shadow-lg shadow-orange-300/50'
-              : ''
+            selected
+              ? 'ring-4 ring-cyan-400 ring-offset-2 shadow-xl shadow-cyan-400/60 dark:ring-cyan-300 dark:shadow-cyan-300/60'
+              : data.isOverlapping &&
+                  data.overlappedRooms &&
+                  data.overlappedRooms.length > 1
+                ? 'ring-4 ring-orange-400 ring-offset-1 shadow-lg shadow-orange-300/50'
+                : ''
           }
+          ${depthEffects.additionalClasses}
           border-2 rounded-xl ${depthEffects.shadow} hover:shadow-xl transition-all duration-200
           cursor-pointer flex flex-col overflow-hidden
         `}
@@ -460,7 +463,8 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
                 <div className='font-semibold mb-1'>Exits:</div>
                 {data.exits.map((exit, idx) => {
                   // Show zone ID only for cross-zone exits
-                  const isCrossZone = exit.toZoneId != null && exit.toZoneId !== data.zoneId;
+                  const isCrossZone =
+                    exit.toZoneId != null && exit.toZoneId !== data.zoneId;
                   const displayText = isCrossZone
                     ? `Zone ${exit.toZoneId}:${exit.toRoomId}`
                     : exit.toRoomId != null

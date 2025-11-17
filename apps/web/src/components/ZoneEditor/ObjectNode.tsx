@@ -18,6 +18,7 @@ interface ObjectData {
   condition?: string;
   rarity?: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary';
   roomId?: number;
+  forceFullWidth?: boolean; // Panel list variant
 }
 
 const getObjectTypeIcon = (type: string) => {
@@ -92,13 +93,9 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
   const typeIcon = getObjectTypeIcon(data.type);
   const [isHovered, setIsHovered] = useState(false);
   const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
-
   const handleMouseEnter = (event: React.MouseEvent) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    setPopupPosition({
-      x: rect.right + 8,
-      y: rect.top,
-    });
+    setPopupPosition({ x: rect.right + 8, y: rect.top });
     setIsHovered(true);
   };
 
@@ -106,102 +103,160 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
     setIsHovered(false);
   };
 
+  const isListVariant = !!data.forceFullWidth;
+
   return (
     <>
       <div
-        className={`
-          relative min-w-[140px] max-w-[180px]
+        className={`relative ${isListVariant ? 'w-full' : 'min-w-[140px] max-w-[180px]'}
           ${style.bg} ${style.border} ${style.text}
           ${selected ? 'ring-2 ring-blue-500 ring-offset-2' : ''}
-          border-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-200
-          cursor-grab active:cursor-grabbing
+          border-2 rounded-lg shadow-md hover:shadow-lg transition-all duration-150
+          ${isListVariant ? 'cursor-pointer' : 'cursor-grab active:cursor-grabbing'}
         `}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
       >
-        {/* Header */}
-        <div
-          className={`px-3 py-2 border-b border-opacity-30 ${isDark ? 'border-gray-600' : 'border-gray-400'}`}
-        >
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center gap-2'>
-              <span className='text-lg'>{typeIcon}</span>
-              <span className='font-bold text-sm'>{data.type}</span>
+        {isListVariant ? (
+          <div className='p-3 space-y-1.5'>
+            <div className='flex items-start justify-between gap-2'>
+              <div className='min-w-0'>
+                <div className='flex items-center gap-2 mb-0.5'>
+                  <span className='text-base leading-none'>{typeIcon}</span>
+                  {data.level !== undefined && data.level !== null && (
+                    <span className='text-[11px] font-semibold px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10'>
+                      Lvl {data.level}
+                    </span>
+                  )}
+                  {data.rarity && (
+                    <span className='text-[10px] font-medium px-1 py-0.5 rounded bg-black/10 dark:bg-white/10 capitalize'>
+                      {data.rarity}
+                    </span>
+                  )}
+                </div>
+                <h3 className='font-semibold text-sm leading-tight truncate'>
+                  {data.name || `Object ${data.id}`}
+                </h3>
+              </div>
             </div>
-            {data.rarity && (
-              <span
-                className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                {data.rarity}
-              </span>
-            )}
-          </div>
-
-          <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-            {data.name}
-          </h3>
-        </div>
-
-        {/* Content */}
-        <div className='px-3 py-2'>
-          <div className='flex flex-wrap gap-1 mb-2'>
-            {data.material && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                {data.material}
-              </span>
-            )}
-            {data.level && (
-              <span
-                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
-              >
-                Lvl {data.level}
-              </span>
-            )}
-          </div>
-
-          <div className='flex justify-between items-center text-xs mb-2'>
-            {data.value && (
-              <div className='flex items-center gap-1'>
-                <span>💰</span>
-                <span>{data.value}g</span>
+            {(data.type || data.material) && (
+              <div className='flex flex-wrap gap-1 text-[11px]'>
+                {data.type && (
+                  <span className='px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10'>
+                    {data.type}
+                  </span>
+                )}
+                {data.material && (
+                  <span className='px-1.5 py-0.5 rounded bg-black/10 dark:bg-white/10'>
+                    {data.material}
+                  </span>
+                )}
               </div>
             )}
-            {data.weight && (
-              <div className='flex items-center gap-1'>
-                <span>⚖️</span>
-                <span>{data.weight}lb</span>
+            {(data.value || data.weight) && (
+              <div className='flex flex-wrap gap-3 text-[11px]'>
+                {data.value !== undefined && data.value !== null && (
+                  <span className='flex items-center gap-1'>
+                    💰 {data.value}g
+                  </span>
+                )}
+                {data.weight !== undefined && data.weight !== null && (
+                  <span className='flex items-center gap-1'>
+                    ⚖️ {data.weight}lb
+                  </span>
+                )}
               </div>
             )}
+            {data.condition && (
+              <div className='text-[10px] opacity-70'>
+                Condition: {data.condition}
+              </div>
+            )}
+            {isValidRoomId(data.roomId) && (
+              <div className='text-[10px] opacity-60'>Room {data.roomId}</div>
+            )}
           </div>
-
-          {data.condition && (
-            <div className='text-xs mb-2'>
-              <span className='opacity-75'>Condition: </span>
-              <span
-                className={
-                  data.condition === 'perfect'
-                    ? 'text-green-600'
-                    : data.condition === 'good'
-                      ? 'text-blue-600'
-                      : data.condition === 'worn'
-                        ? 'text-yellow-600'
-                        : 'text-red-600'
-                }
-              >
-                {data.condition}
-              </span>
+        ) : (
+          <>
+            <div
+              className={`px-3 py-2 border-b border-opacity-30 ${isDark ? 'border-gray-600' : 'border-gray-400'}`}
+            >
+              <div className='flex items-center justify-between'>
+                <div className='flex items-center gap-2'>
+                  <span className='text-lg'>{typeIcon}</span>
+                  <span className='font-bold text-sm'>{data.type}</span>
+                </div>
+                {data.rarity && (
+                  <span
+                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    {data.rarity}
+                  </span>
+                )}
+              </div>
+              <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
+                {data.name}
+              </h3>
             </div>
-          )}
-
-          {isValidRoomId(data.roomId) && (
-            <div className='mt-2 text-xs opacity-75'>📍 Room {data.roomId}</div>
-          )}
-        </div>
+            <div className='px-3 py-2'>
+              <div className='flex flex-wrap gap-1 mb-2'>
+                {data.material && (
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    {data.material}
+                  </span>
+                )}
+                {data.level !== undefined && data.level !== null && (
+                  <span
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                  >
+                    Lvl {data.level}
+                  </span>
+                )}
+              </div>
+              <div className='flex justify-between items-center text-xs mb-2'>
+                {data.value && (
+                  <div className='flex items-center gap-1'>
+                    <span>💰</span>
+                    <span>{data.value}g</span>
+                  </div>
+                )}
+                {data.weight && (
+                  <div className='flex items-center gap-1'>
+                    <span>⚖️</span>
+                    <span>{data.weight}lb</span>
+                  </div>
+                )}
+              </div>
+              {data.condition && (
+                <div className='text-xs mb-2'>
+                  <span className='opacity-75'>Condition: </span>
+                  <span
+                    className={
+                      data.condition === 'perfect'
+                        ? 'text-green-600'
+                        : data.condition === 'good'
+                          ? 'text-blue-600'
+                          : data.condition === 'worn'
+                            ? 'text-yellow-600'
+                            : 'text-red-600'
+                    }
+                  >
+                    {data.condition}
+                  </span>
+                </div>
+              )}
+              {isValidRoomId(data.roomId) && (
+                <div className='mt-2 text-xs opacity-75'>
+                  📍 Room {data.roomId}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
-      {/* Portal-based popup */}
       {isHovered &&
         typeof document !== 'undefined' &&
         createPortal(
@@ -216,8 +271,9 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
               top: `${popupPosition.y}px`,
             }}
           >
-            <div className='font-semibold mb-2'>{data.name}</div>
-
+            <div className='font-semibold mb-2'>
+              {data.name || `Object ${data.id}`}
+            </div>
             <div
               className={`grid grid-cols-2 gap-2 mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
             >
@@ -235,7 +291,7 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                   {data.material}
                 </div>
               )}
-              {data.level && (
+              {data.level !== undefined && data.level !== null && (
                 <div>
                   <span className={isDark ? 'text-gray-400' : 'text-gray-500'}>
                     Level:
@@ -260,12 +316,11 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                 </div>
               )}
             </div>
-
             {(data.value || data.weight) && (
               <div
                 className={`grid grid-cols-2 gap-2 mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
               >
-                {data.value && (
+                {data.value !== undefined && data.value !== null && (
                   <div>
                     <span
                       className={isDark ? 'text-gray-400' : 'text-gray-500'}
@@ -275,20 +330,18 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                     {data.value}g
                   </div>
                 )}
-                {data.weight && (
+                {data.weight !== undefined && data.weight !== null && (
                   <div>
                     <span
                       className={isDark ? 'text-gray-400' : 'text-gray-500'}
                     >
                       Weight:
                     </span>{' '}
-                    {data.weight}
-                    lb
+                    {data.weight}lb
                   </div>
                 )}
               </div>
             )}
-
             {isValidRoomId(data.roomId) && (
               <div
                 className={`border-t pt-2 mt-2 ${isDark ? 'border-gray-700 text-gray-300' : 'border-gray-300 text-gray-700'}`}
@@ -296,7 +349,6 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                 Currently in Room {data.roomId}
               </div>
             )}
-
             <div
               className={`border-t pt-2 mt-2 text-xs ${isDark ? 'border-gray-700 text-gray-400' : 'border-gray-300 text-gray-500'}`}
             >

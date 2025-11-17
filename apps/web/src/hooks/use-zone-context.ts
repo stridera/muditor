@@ -32,7 +32,8 @@ export function useZoneContext(): ZoneContext {
 
   return useMemo(() => {
     // Check for zone in query params first (used by rooms, mobs, objects, visual editor)
-    const zoneParam = searchParams.get('zone');
+    // Support both 'zone' and 'zone_id' parameter names
+    const zoneParam = searchParams.get('zone') || searchParams.get('zone_id');
     if (zoneParam) {
       const zoneId = parseInt(zoneParam, 10);
       if (!isNaN(zoneId)) {
@@ -42,7 +43,8 @@ export function useZoneContext(): ZoneContext {
         else if (pathname.includes('/mobs')) entityType = 'mobs';
         else if (pathname.includes('/objects')) entityType = 'objects';
         else if (pathname.includes('/shops')) entityType = 'shops';
-        else if (pathname.includes('/zones/editor')) entityType = 'visual-editor';
+        else if (pathname.includes('/zones/editor'))
+          entityType = 'visual-editor';
 
         return {
           zoneId,
@@ -68,13 +70,25 @@ export function useZoneContext(): ZoneContext {
     // Fallback: Check if on entity pages with localStorage zone
     if (localStorageZone) {
       let entityType: ZoneContext['entityType'] = null;
-      if (pathname === '/dashboard/rooms' || pathname.startsWith('/dashboard/rooms/')) {
+      if (
+        pathname === '/dashboard/rooms' ||
+        pathname.startsWith('/dashboard/rooms/')
+      ) {
         entityType = 'rooms';
-      } else if (pathname === '/dashboard/mobs' || pathname.startsWith('/dashboard/mobs/')) {
+      } else if (
+        pathname === '/dashboard/mobs' ||
+        pathname.startsWith('/dashboard/mobs/')
+      ) {
         entityType = 'mobs';
-      } else if (pathname === '/dashboard/objects' || pathname.startsWith('/dashboard/objects/')) {
+      } else if (
+        pathname === '/dashboard/objects' ||
+        pathname.startsWith('/dashboard/objects/')
+      ) {
         entityType = 'objects';
-      } else if (pathname === '/dashboard/shops' || pathname.startsWith('/dashboard/shops/')) {
+      } else if (
+        pathname === '/dashboard/shops' ||
+        pathname.startsWith('/dashboard/shops/')
+      ) {
         entityType = 'shops';
       } else if (pathname === '/dashboard/zones/editor') {
         entityType = 'visual-editor';

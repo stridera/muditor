@@ -3,7 +3,8 @@ import { render, waitFor } from '@testing-library/react';
 import { ReactFlowProvider } from 'reactflow';
 
 // Component under test
-import { EnhancedZoneEditor } from '../EnhancedZoneEditor';
+// Import orchestrator directly; legacy file quarantined/removed
+import { ZoneEditorOrchestrator as EnhancedZoneEditor } from '../ZoneEditorOrchestrator';
 
 // Mock ZoneSelector (Apollo-dependent) to avoid provider setup
 jest.mock('@/components/ZoneSelector', () => () => (

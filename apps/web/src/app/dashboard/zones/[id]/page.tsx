@@ -261,7 +261,7 @@ function ZoneDetailContent() {
           </h3>
           <div className='space-y-2'>
             <Link
-              href={`/dashboard/zones/editor?zone=${zone.id}`}
+              href={`/dashboard/zones/editor?zone_id=${zone.id}`}
               className='block w-full bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-center'
             >
               Visual Editor

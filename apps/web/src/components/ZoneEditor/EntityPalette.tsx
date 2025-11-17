@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
 import { useTheme } from 'next-themes';
+import React, { useState } from 'react';
 import { MobNode } from './MobNode';
 import { ObjectNode } from './ObjectNode';
 
@@ -54,21 +54,30 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('');
   const [selectedType, setSelectedType] = useState<string>('');
 
+  const lowerSearch = searchTerm.toLowerCase();
   const filteredMobs = mobs.filter(mob => {
+    const name = (mob.name || '').toLowerCase();
+    const race = (mob.race || '').toLowerCase();
+    const mobClass = (mob.class || mob.mobClass || '').toLowerCase();
     const matchesSearch =
-      mob.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mob.race?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mob.class?.toLowerCase().includes(searchTerm.toLowerCase());
+      !lowerSearch ||
+      name.includes(lowerSearch) ||
+      race.includes(lowerSearch) ||
+      mobClass.includes(lowerSearch);
     const matchesDifficulty =
       !selectedDifficulty || mob.difficulty === selectedDifficulty;
     return matchesSearch && matchesDifficulty;
   });
 
   const filteredObjects = objects.filter(obj => {
+    const name = (obj.name || '').toLowerCase();
+    const type = (obj.type || '').toLowerCase();
+    const material = (obj.material || '').toLowerCase();
     const matchesSearch =
-      obj.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      obj.type.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      obj.material?.toLowerCase().includes(searchTerm.toLowerCase());
+      !lowerSearch ||
+      name.includes(lowerSearch) ||
+      type.includes(lowerSearch) ||
+      material.includes(lowerSearch);
     const matchesType = !selectedType || obj.type === selectedType;
     return matchesSearch && matchesType;
   });
@@ -97,21 +106,33 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
   };
 
   return (
-    <div className={`w-80 border-l flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}>
+    <div
+      className={`w-80 border-l flex flex-col h-full ${isDark ? 'bg-gray-800 border-gray-700' : 'bg-white border-gray-200'}`}
+    >
       {/* Header */}
-      <div className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
-        <h3 className={`text-lg font-semibold mb-3 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}>
+      <div
+        className={`p-4 border-b ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+      >
+        <h3
+          className={`text-lg font-semibold mb-3 ${isDark ? 'text-gray-100' : 'text-gray-900'}`}
+        >
           Entity Palette
         </h3>
 
         {/* Tabs */}
-        <div className={`flex space-x-1 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}>
+        <div
+          className={`flex space-x-1 p-1 rounded-lg ${isDark ? 'bg-gray-700' : 'bg-gray-100'}`}
+        >
           <button
             onClick={() => setActiveTab('mobs')}
             className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'mobs'
-                ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
-                : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                ? isDark
+                  ? 'bg-gray-600 text-blue-400 shadow-sm'
+                  : 'bg-white text-blue-700 shadow-sm'
+                : isDark
+                  ? 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             👹 Mobs ({mobs.length})
@@ -120,8 +141,12 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
             onClick={() => setActiveTab('objects')}
             className={`flex-1 px-3 py-2 text-sm font-medium rounded-md transition-colors ${
               activeTab === 'objects'
-                ? isDark ? 'bg-gray-600 text-blue-400 shadow-sm' : 'bg-white text-blue-700 shadow-sm'
-                : isDark ? 'text-gray-400 hover:text-gray-200' : 'text-gray-500 hover:text-gray-700'
+                ? isDark
+                  ? 'bg-gray-600 text-blue-400 shadow-sm'
+                  : 'bg-white text-blue-700 shadow-sm'
+                : isDark
+                  ? 'text-gray-400 hover:text-gray-200'
+                  : 'text-gray-500 hover:text-gray-700'
             }`}
           >
             📦 Objects ({objects.length})
@@ -130,10 +155,14 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
       </div>
 
       {/* Filters */}
-      <div className={`p-4 border-b space-y-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}>
+      <div
+        className={`p-4 border-b space-y-3 ${isDark ? 'border-gray-700' : 'border-gray-200'}`}
+      >
         {/* Search */}
         <div>
-          <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+          <label
+            className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+          >
             Search
           </label>
           <input
@@ -152,7 +181,9 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
         {/* Tab-specific filters */}
         {activeTab === 'mobs' && (
           <div>
-            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label
+              className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+            >
               Difficulty
             </label>
             <select
@@ -178,7 +209,9 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
 
         {activeTab === 'objects' && (
           <div>
-            <label className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}>
+            <label
+              className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+            >
               Type
             </label>
             <select
@@ -207,7 +240,9 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
           {activeTab === 'mobs' && (
             <>
               {filteredMobs.length === 0 ? (
-                <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div
+                  className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                >
                   <p className='text-sm'>No mobs found</p>
                   {searchTerm && (
                     <button
@@ -246,7 +281,9 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
           {activeTab === 'objects' && (
             <>
               {filteredObjects.length === 0 ? (
-                <div className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}>
+                <div
+                  className={`text-center py-8 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+                >
                   <p className='text-sm'>No objects found</p>
                   {searchTerm && (
                     <button
@@ -285,8 +322,12 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
       </div>
 
       {/* Footer */}
-      <div className={`p-4 border-t ${isDark ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}>
-        <div className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+      <div
+        className={`p-4 border-t ${isDark ? 'border-gray-700 bg-gray-750' : 'border-gray-200 bg-gray-50'}`}
+      >
+        <div
+          className={`text-xs ${isDark ? 'text-gray-400' : 'text-gray-600'}`}
+        >
           <p className='mb-1'>
             💡 <strong>Tip:</strong> Drag entities onto room nodes to place them
           </p>
