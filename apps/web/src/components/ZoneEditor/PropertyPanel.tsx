@@ -1417,15 +1417,19 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       </div>
 
       {/* Footer */}
-      <div className='p-4 border-t border-gray-200'>
-        <button
-          onClick={onSaveRoom}
-          disabled={saving}
-          className='w-full bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
-        >
-          {saving ? 'Saving Changes...' : 'Save Room'}
-        </button>
-      </div>
+      {viewMode === 'edit' && (
+        <div className='p-3 border-t border-gray-200'>
+          <div className='flex justify-end'>
+            <button
+              onClick={onSaveRoom}
+              disabled={saving}
+              className='px-4 py-2 bg-blue-600 text-white rounded-md shadow-sm hover:bg-blue-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'
+            >
+              {saving ? 'Saving…' : 'Save Room'}
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

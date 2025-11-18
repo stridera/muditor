@@ -9,7 +9,14 @@ import React, {
   useRef,
   useState,
 } from 'react';
-import type { Node, ReactFlowInstance } from 'reactflow';
+import {
+  Handle,
+  Position,
+  type Edge,
+  type Node,
+  type NodeProps,
+  type ReactFlowInstance,
+} from 'reactflow';
 import ReactFlow, {
   Background,
   Controls,
@@ -25,11 +32,14 @@ import {
   pixelsToGridY,
   snapToGrid,
 } from './editor-constants';
-import { useAutoLayout } from './hooks/useAutoLayout';
+import { EditorToolbar, type EditorMode } from './EditorToolbar';
 import { useUndoRedo } from './hooks/useUndoRedo';
+import { useRoomOverlaps } from './hooks/useRoomOverlaps';
 import { PortalNode } from './PortalNode';
+import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface RoomExit {
   id: string;
@@ -112,6 +122,204 @@ interface ZoneEditorOrchestratorProps {
   worldMapMode?: boolean; // retained for pages but not implemented here yet
 }
 
+type WorldMapRoom = {
+  id: number;
+  zoneId: number;
+  name: string;
+  sector: string;
+  layoutX: number | null;
+  layoutY: number | null;
+  layoutZ: number | null;
+  exits?: RoomExit[];
+};
+
+type ZoneBounds = {
+  id: number;
+  name: string;
+  climate: string;
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+  centerX: number;
+  centerY: number;
+  roomCount: number;
+};
+
+const SECTOR_COLORS: Record<string, string> = {
+  STRUCTURE: '#475569',
+  FIELD: '#4ade80',
+  FOREST: '#16a34a',
+  HILLS: '#ea580c',
+  MOUNTAIN: '#6b7280',
+  WATER: '#2563eb',
+  SWAMP: '#0d9488',
+  CITY: '#7c3aed',
+  ROAD: '#ca8a04',
+};
+
+const getSectorColorHex = (sector: string): string => {
+  const key = sector.toUpperCase();
+  return SECTOR_COLORS[key] || '#94a3b8';
+};
+
+const zoneTintForId = (zoneId: number): string => {
+  const hue = (zoneId * 47) % 360;
+  return `hsla(${hue}, 70%, 65%, 0.15)`;
+};
+
+// World-map rendering scale (pixels per grid unit) to avoid gigantic coordinate space
+const WORLD_SCALE = 12;
+const worldGridToPixels = (grid: number) => grid * WORLD_SCALE;
+const worldGridToPixelsY = (grid: number) => -grid * WORLD_SCALE;
+const worldRoomNodeId = (zoneId: number, roomId: number) =>
+  `world-room-${zoneId}-${roomId}`;
+
+const DIRECTION_DELTAS: Record<
+  string,
+  { dx: number; dy: number; dz?: number }
+> = {
+  NORTH: { dx: 0, dy: 1 },
+  SOUTH: { dx: 0, dy: -1 },
+  EAST: { dx: 1, dy: 0 },
+  WEST: { dx: -1, dy: 0 },
+  NORTHEAST: { dx: 1, dy: 1 },
+  NORTHWEST: { dx: -1, dy: 1 },
+  SOUTHEAST: { dx: 1, dy: -1 },
+  SOUTHWEST: { dx: -1, dy: -1 },
+  UP: { dx: 0, dy: 0, dz: 1 },
+  DOWN: { dx: 0, dy: 0, dz: -1 },
+};
+
+const REVERSE_DIRECTIONS: Record<string, string> = {
+  NORTH: 'SOUTH',
+  SOUTH: 'NORTH',
+  EAST: 'WEST',
+  WEST: 'EAST',
+  NORTHEAST: 'SOUTHWEST',
+  NORTHWEST: 'SOUTHEAST',
+  SOUTHEAST: 'NORTHWEST',
+  SOUTHWEST: 'NORTHEAST',
+  UP: 'DOWN',
+  DOWN: 'UP',
+};
+
+const computeZoneBounds = (
+  zones: { id: number; name: string; climate: string }[],
+  rooms: WorldMapRoom[]
+): ZoneBounds[] => {
+  const roomsByZone = new Map<number, WorldMapRoom[]>();
+  rooms.forEach(r => {
+    if (!roomsByZone.has(r.zoneId)) roomsByZone.set(r.zoneId, []);
+    roomsByZone.get(r.zoneId)!.push(r);
+  });
+
+  return zones.map(z => {
+    const zoneRooms = roomsByZone.get(z.id) || [];
+    const xs = zoneRooms
+      .map(r => r.layoutX)
+      .filter((v): v is number => v !== null && !isNaN(v));
+    const ys = zoneRooms
+      .map(r => r.layoutY)
+      .filter((v): v is number => v !== null && !isNaN(v));
+    const minX = xs.length ? Math.min(...xs) : 0;
+    const maxX = xs.length ? Math.max(...xs) : 1;
+    const minY = ys.length ? Math.min(...ys) : 0;
+    const maxY = ys.length ? Math.max(...ys) : 1;
+    return {
+      id: z.id,
+      name: z.name,
+      climate: z.climate,
+      minX,
+      minY,
+      maxX,
+      maxY,
+      centerX: (minX + maxX) / 2,
+      centerY: (minY + maxY) / 2,
+      roomCount: zoneRooms.length,
+    };
+  });
+};
+
+const computeOrbitOffsets = (
+  bounds: ZoneBounds[],
+  roomsByZone: Map<number, WorldMapRoom[]>
+): Map<number, { dx: number; dy: number }> => {
+  const orphans = bounds.filter(b => {
+    const rooms = roomsByZone.get(b.id) || [];
+    const hasCrossZoneExit = rooms.some(r =>
+      (r.exits || []).some(
+        ex => ex.toZoneId != null && ex.toZoneId !== r.zoneId
+      )
+    );
+    const nearOrigin = Math.hypot(b.centerX, b.centerY) < 2;
+    return nearOrigin && !hasCrossZoneExit;
+  });
+  const offsets = new Map<number, { dx: number; dy: number }>();
+  const radius = 50; // grid units away from origin
+  orphans.forEach((zone, idx) => {
+    const angle = (idx / Math.max(1, orphans.length)) * Math.PI * 2;
+    offsets.set(zone.id, {
+      dx: Math.cos(angle) * (radius + idx * 5),
+      dy: Math.sin(angle) * (radius + idx * 5),
+    });
+  });
+  return offsets;
+};
+
+const WorldRoomDotNode: React.FC<
+  NodeProps<{
+    zoneId: number;
+    roomId: number;
+    zoneName?: string;
+    sector: string;
+    color: string;
+  }>
+> = ({ data, selected }) => {
+  return (
+    <div
+      title={`${data.zoneName || 'Zone'} (${data.zoneId})`}
+      style={{
+        width: 8,
+        height: 8,
+        backgroundColor: data.color,
+        border: selected ? '1px solid #2563eb' : '1px solid rgba(0,0,0,0.35)',
+        borderRadius: 2,
+        boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.2)' : 'none',
+      }}
+    />
+  );
+};
+
+const ZoneBoundaryNode: React.FC<
+  NodeProps<{
+    zoneId: number;
+    name: string;
+    climate: string;
+    roomCount: number;
+    width: number;
+    height: number;
+    tint: string;
+  }>
+> = ({ data, selected }) => {
+  return (
+    <div
+      title={`${data.name} • ${data.roomCount} rooms`}
+      style={{
+        width: data.width,
+        height: data.height,
+        background: `radial-gradient(70% 70% at 50% 50%, ${data.tint} 0%, rgba(0,0,0,0.02) 68%, rgba(0,0,0,0) 100%)`,
+        border: selected
+          ? '1px solid rgba(37,99,235,0.4)'
+          : '1px solid rgba(15,23,42,0.1)',
+        borderRadius: 28,
+        boxShadow:
+          '0 0 32px 12px rgba(0,0,0,0.05), inset 0 0 0 1px rgba(255,255,255,0.04)',
+      }}
+    />
+  );
+};
+
 // Minimal orchestrator: rooms display + selection + drag persistence + basic undo + optional world map zones view
 const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   zoneId,
@@ -131,6 +339,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const [activeOverlapRooms, setActiveOverlapRooms] = useState<
     Record<string, number>
   >({});
+  const [editorMode, setEditorMode] = useState<EditorMode>('view');
+  const { canEditZone } = usePermissions();
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowRef = useRef<HTMLDivElement | null>(null);
@@ -213,7 +423,21 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const [worldZones, setWorldZones] = useState<
     { id: number; name: string; climate: string }[]
   >([]);
+  const [worldRooms, setWorldRooms] = useState<WorldMapRoom[]>([]);
+  const [worldZoneBounds, setWorldZoneBounds] = useState<ZoneBounds[]>([]);
+  const [worldOrbitOffsets, setWorldOrbitOffsets] = useState<
+    Map<number, { dx: number; dy: number }>
+  >(new Map());
+  const canEditCurrentZone = canEditZone(activeZoneId ?? undefined);
+  const isEditing =
+    viewMode === 'zone' && editorMode === 'edit' && canEditCurrentZone;
   const [managingExits, setManagingExits] = useState(false);
+
+  useEffect(() => {
+    if (editorMode === 'edit' && !canEditCurrentZone) {
+      setEditorMode('view');
+    }
+  }, [editorMode, canEditCurrentZone]);
   // Panel sizing/collapse scaffold
   const [leftPanelWidth, setLeftPanelWidth] = useState(260);
   const [rightPanelWidth, setRightPanelWidth] = useState(384);
@@ -228,6 +452,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     startX: 0,
     startWidth: 0,
   });
+  const { overlaps, showOverlapInfo, toggleOverlapInfo } =
+    useRoomOverlaps(rooms);
+  const [viewportZoom, setViewportZoom] = useState(1);
 
   // Local authenticated fetch stub (replace with real implementation if available)
   const authenticatedFetch = useCallback(
@@ -384,26 +611,57 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     };
   }, [activeZoneId, viewMode, authenticatedFetch]);
 
-  // Fetch world zones when in world-map mode
+  // Fetch world map data (zones + lightweight rooms) in world-map mode
   useEffect(() => {
     if (viewMode !== 'world-map') return;
     let cancelled = false;
-    const fetchZones = async () => {
+    const fetchWorld = async () => {
       setLoading(true);
       setError(null);
       try {
         const response: Response = await authenticatedFetch('/graphql', {
           method: 'POST',
           body: JSON.stringify({
-            query: `query GetZones { zones { id name climate } }`,
+            query: `query WorldMap($take:Int){ 
+              zones { id name climate } 
+              rooms(lightweight:true, take:$take){ id name sector zoneId layoutX layoutY layoutZ exits { id direction toZoneId toRoomId } } 
+            }`,
+            variables: { take: 120000 },
           }),
         });
         const data = await response.json();
         if (response.ok && !data.errors) {
-          if (!cancelled) setWorldZones(data.data.zones || []);
-        } else {
-          if (!cancelled)
-            setError(data.errors?.[0]?.message || 'Failed to load zones');
+          if (cancelled) return;
+          const zones = data.data.zones || [];
+          const rooms: WorldMapRoom[] = (data.data.rooms || []).map(
+            (r: any) => ({
+              id: r.id,
+              name: r.name,
+              sector: r.sector || 'STRUCTURE',
+              zoneId: r.zoneId,
+              layoutX: r.layoutX,
+              layoutY: r.layoutY,
+              layoutZ: r.layoutZ,
+              exits: (r.exits || []).map((e: any) => ({
+                id: String(e.id ?? `${r.id}-${e.direction}`),
+                direction: e.direction,
+                toZoneId: e.toZoneId ?? null,
+                toRoomId: e.toRoomId ?? null,
+              })),
+            })
+          );
+          setWorldZones(zones);
+          setWorldRooms(rooms);
+          const bounds = computeZoneBounds(zones, rooms);
+          setWorldZoneBounds(bounds);
+          const roomsByZone = new Map<number, WorldMapRoom[]>();
+          rooms.forEach((room: WorldMapRoom) => {
+            if (!roomsByZone.has(room.zoneId)) roomsByZone.set(room.zoneId, []);
+            roomsByZone.get(room.zoneId)!.push(room);
+          });
+          setWorldOrbitOffsets(computeOrbitOffsets(bounds, roomsByZone));
+        } else if (!cancelled) {
+          setError(data.errors?.[0]?.message || 'Failed to load world map');
         }
       } catch (e) {
         if (!cancelled)
@@ -412,7 +670,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         if (!cancelled) setLoading(false);
       }
     };
-    fetchZones();
+    fetchWorld();
     return () => {
       cancelled = true;
     };
@@ -609,7 +867,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             isCurrentFloor,
             floorDifference,
           },
-          draggable: true,
+          draggable: isEditing,
           selectable: true,
           style: {
             opacity,
@@ -679,37 +937,122 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       });
       return roomNodes;
     } else {
-      // world-map: simple horizontal spacing of zones
-      return worldZones.map((z, idx) => ({
-        id: `zone-${z.id}`,
-        type: 'default',
-        position: { x: idx * 300, y: 0 },
-        data: { label: `${z.name} (${z.climate})` },
-        draggable: false,
-        selectable: true,
-      }));
+      // world-map: render zones + all room dots (exits hidden for perf)
+      const nodes: Node[] = [];
+      const roomsByZone = new Map<number, WorldMapRoom[]>();
+      worldRooms.forEach(r => {
+        if (!roomsByZone.has(r.zoneId)) roomsByZone.set(r.zoneId, []);
+        roomsByZone.get(r.zoneId)!.push(r);
+      });
+
+      // Zone boundary backdrops
+      worldZoneBounds.forEach(zone => {
+        const offset = worldOrbitOffsets.get(zone.id) || { dx: 0, dy: 0 };
+        const zoneRooms = roomsByZone.get(zone.id) || [];
+        const points = zoneRooms
+          .filter(r => r.layoutX !== null && r.layoutY !== null)
+          .map(r => ({
+            x: worldGridToPixels((r.layoutX ?? 0) + offset.dx),
+            y: worldGridToPixelsY((r.layoutY ?? 0) + offset.dy),
+          }));
+        // Fallback to zone bounds if no room coords
+        if (points.length === 0) {
+          points.push({
+            x: worldGridToPixels(zone.minX + offset.dx),
+            y: worldGridToPixelsY(zone.minY + offset.dy),
+          });
+        }
+        const xs = points.map(p => p.x);
+        const ys = points.map(p => p.y);
+        const minXPx = Math.min(...xs);
+        const maxXPx = Math.max(...xs);
+        const minYPx = Math.min(...ys);
+        const maxYPx = Math.max(...ys);
+        const centerX = (minXPx + maxXPx) / 2;
+        const centerY = (minYPx + maxYPx) / 2;
+        const padding = 50;
+        const halfWidth = Math.max(80, (maxXPx - minXPx) / 2 + padding);
+        const halfHeight = Math.max(80, (maxYPx - minYPx) / 2 + padding);
+        const width = halfWidth * 2;
+        const height = halfHeight * 2;
+        const posX = centerX - halfWidth;
+        const posY = centerY - halfHeight;
+        nodes.push({
+          id: `zone-${zone.id}`,
+          type: 'zoneBoundary',
+          position: { x: posX, y: posY },
+          data: {
+            zoneId: zone.id,
+            name: zone.name,
+            climate: zone.climate,
+            roomCount: zone.roomCount,
+            width,
+            height,
+            tint: zoneTintForId(zone.id),
+            isZoneBoundary: true,
+          },
+          draggable: false,
+          selectable: true,
+          style: { zIndex: 0 },
+        });
+      });
+
+      worldRooms
+        .filter(r => r.layoutX !== null && r.layoutY !== null)
+        .forEach(room => {
+          const offset = worldOrbitOffsets.get(room.zoneId) || { dx: 0, dy: 0 };
+          const x = worldGridToPixels((room.layoutX ?? 0) + offset.dx);
+          const y = worldGridToPixelsY((room.layoutY ?? 0) + offset.dy);
+          const zoneName =
+            worldZoneBounds.find(z => z.id === room.zoneId)?.name ||
+            `Zone ${room.zoneId}`;
+          nodes.push({
+            id: worldRoomNodeId(room.zoneId, room.id),
+            type: 'worldRoomDot',
+            position: { x, y },
+            data: {
+              roomId: room.id,
+              zoneId: room.zoneId,
+              sector: room.sector,
+              zoneName,
+              color: getSectorColorHex(room.sector),
+            },
+            draggable: false,
+            selectable: false,
+            style: { zIndex: 2, cursor: 'default', pointerEvents: 'none' },
+            className: 'world-room-dot',
+          });
+        });
+
+      return nodes;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     roomsStructureKey,
     worldZones,
+    worldRooms,
+    worldZoneBounds,
+    worldOrbitOffsets,
     viewMode,
     currentZLevel,
     activeOverlapRooms,
+    isEditing,
   ]);
 
   // Apply generated nodes to React Flow state
   // This only runs when the memoized nodes actually change
   useEffect(() => {
     setNodes(generatedNodes);
-    if (viewMode !== 'zone') {
-      setEdges([]);
-    }
-  }, [generatedNodes, viewMode, setNodes, setEdges]);
+  }, [generatedNodes, setNodes]);
 
   // Derive edges from room exits (zone view only) including portal edges
   useEffect(() => {
     if (viewMode !== 'zone') return;
+    // Hide edges when zoomed far out to speed up render/interaction
+    if (viewportZoom < 0.4) {
+      setEdges([]);
+      return;
+    }
     const roomMap = new Map<number, Room>();
     rooms.forEach(r => roomMap.set(r.id, r));
 
@@ -802,7 +1145,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       }>;
     });
     setEdges(newEdges);
-  }, [rooms, viewMode, setEdges]);
+  }, [rooms, viewMode, setEdges, viewportZoom]);
+
+  // World-map edges (lightweight: only connect rooms that exist in payload; allow cross-zone now that IDs are composite)
+  useEffect(() => {
+    if (viewMode !== 'world-map') return;
+    // Rooms hidden in world view for performance; hide edges too
+    setEdges([]);
+  }, [viewMode, worldRooms, setEdges]);
 
   // Floor layering: dim non-selected floors and propagate depth metadata
   // NOTE: This updates node data properties but preserves positions and selection state
@@ -877,6 +1227,16 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     }, 150);
   }, [selectedRoomId, nodes, rooms, activeZoneId]);
 
+  // Fit world view to all zones/rooms when entering world-map
+  useEffect(() => {
+    if (viewMode !== 'world-map') return;
+    if (!reactFlowInstanceRef.current) return;
+    if (worldZoneBounds.length === 0 && worldRooms.length === 0) return;
+    setTimeout(() => {
+      reactFlowInstanceRef.current?.fitView({ padding: 0.1, duration: 600 });
+    }, 120);
+  }, [viewMode, worldZoneBounds, worldRooms]);
+
   // Room selection
   const handleSelectRoom = useCallback((roomId: number) => {
     setSelectedRoomId(roomId);
@@ -929,15 +1289,244 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       log: { error: () => {}, warn: () => {} },
     });
 
-  // Auto-layout integration
-  const { overlaps, showOverlapInfo, setShowOverlapInfo, handleAutoLayout } =
-    useAutoLayout({
-      rooms,
+  const selectedRoom = useMemo(
+    () => rooms.find(r => r.id === selectedRoomId) || null,
+    [rooms, selectedRoomId]
+  );
+
+  const handleKeyboardMoveRoom = useCallback(
+    async (direction: string) => {
+      if (!isEditing) return;
+      if (!selectedRoom) return;
+      const delta = DIRECTION_DELTAS[direction];
+      if (!delta) return;
+      const currentLayoutX = selectedRoom.layoutX ?? 0;
+      const currentLayoutY = selectedRoom.layoutY ?? 0;
+      const currentLayoutZ = selectedRoom.layoutZ ?? 0;
+      const nextX = currentLayoutX + delta.dx;
+      const nextY = currentLayoutY + delta.dy;
+      const nextZ = currentLayoutZ + (delta.dz ?? 0);
+      const previousPosition = {
+        x: gridToPixels(currentLayoutX),
+        y: gridToPixelsY(currentLayoutY),
+      };
+      const newPosition = {
+        x: gridToPixels(nextX),
+        y: gridToPixelsY(nextY),
+      };
+      setNodes(ns =>
+        ns.map(n =>
+          n.id === selectedRoom.id.toString()
+            ? { ...n, position: newPosition }
+            : n
+        )
+      );
+      setRooms(rs =>
+        rs.map(r =>
+          r.id === selectedRoom.id
+            ? { ...r, layoutX: nextX, layoutY: nextY, layoutZ: nextZ }
+            : r
+        )
+      );
+      addToUndoHistory({
+        type: 'MOVE_ROOM',
+        timestamp: Date.now(),
+        roomId: selectedRoom.id,
+        previousPosition,
+        newPosition,
+      });
+      setCurrentZLevel(nextZ);
+      try {
+        await authenticatedFetch('/graphql', {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `mutation UpdateRoomPosition($id:Int!,$position:UpdateRoomPositionInput!){ updateRoomPosition(id:$id, position:$position){ id layoutX layoutY layoutZ } }`,
+            variables: {
+              id: selectedRoom.id,
+              position: {
+                layoutX: nextX,
+                layoutY: nextY,
+                layoutZ: nextZ,
+              },
+            },
+          }),
+        });
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to update room position'
+        );
+      }
+    },
+    [
+      isEditing,
+      selectedRoom,
+      setNodes,
       setRooms,
-      authenticatedFetch: (u, o) => authenticatedFetch(u, o),
       addToUndoHistory,
-      setError,
-    });
+      authenticatedFetch,
+    ]
+  );
+
+  const handleCreateRoomInDirection = useCallback(
+    async (direction: string) => {
+      if (!isEditing) return;
+      if (!selectedRoom) return;
+      const delta = DIRECTION_DELTAS[direction];
+      if (!delta) return;
+      const baseX = selectedRoom.layoutX ?? 0;
+      const baseY = selectedRoom.layoutY ?? 0;
+      const baseZ = selectedRoom.layoutZ ?? 0;
+      const targetX = baseX + delta.dx;
+      const targetY = baseY + delta.dy;
+      const targetZ = baseZ + (delta.dz ?? 0);
+      const existing = rooms.find(
+        r =>
+          r.zoneId === selectedRoom.zoneId &&
+          (r.layoutX ?? 0) === targetX &&
+          (r.layoutY ?? 0) === targetY &&
+          (r.layoutZ ?? 0) === targetZ
+      );
+      if (existing) {
+        setSelectedRoomId(existing.id);
+        setCurrentZLevel(targetZ);
+        return;
+      }
+      const newId = Math.max(0, ...rooms.map(r => r.id)) + 1;
+      const tempRoom: Room = {
+        id: newId,
+        zoneId: selectedRoom.zoneId,
+        name: `New Room ${newId}`,
+        sector: selectedRoom.sector,
+        roomDescription: 'An unfinished room awaits construction.',
+        layoutX: targetX,
+        layoutY: targetY,
+        layoutZ: targetZ,
+        exits: [],
+        mobs: [],
+        objects: [],
+      };
+      setRooms(rs => [...rs, tempRoom]);
+      setSelectedRoomId(newId);
+      setCurrentZLevel(targetZ);
+      let roomCreated = false;
+      try {
+        const createResponse = await authenticatedFetch('/graphql', {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `mutation CreateRoom($data:CreateRoomInput!){ createRoom(data:$data){ id name roomDescription sector } }`,
+            variables: {
+              data: {
+                id: newId,
+                name: tempRoom.name,
+                description: tempRoom.roomDescription || '',
+                sector: tempRoom.sector,
+                zoneId: tempRoom.zoneId,
+              },
+            },
+          }),
+        });
+        const createJson = await createResponse.json();
+        if (!createResponse.ok || createJson.errors) {
+          throw new Error(
+            createJson.errors?.[0]?.message || 'Failed to create room'
+          );
+        }
+        roomCreated = true;
+        await authenticatedFetch('/graphql', {
+          method: 'POST',
+          body: JSON.stringify({
+            query: `mutation UpdateRoomPosition($id:Int!,$position:UpdateRoomPositionInput!){ updateRoomPosition(id:$id, position:$position){ id layoutX layoutY layoutZ } }`,
+            variables: {
+              id: newId,
+              position: {
+                layoutX: targetX,
+                layoutY: targetY,
+                layoutZ: targetZ,
+              },
+            },
+          }),
+        });
+
+        const persistExit = async (
+          fromRoomId: number,
+          toRoomId: number,
+          directionName: string
+        ) => {
+          const response = await authenticatedFetch('/graphql', {
+            method: 'POST',
+            body: JSON.stringify({
+              query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags } }`,
+              variables: {
+                data: {
+                  roomId: fromRoomId,
+                  roomZoneId: selectedRoom.zoneId,
+                  direction: directionName,
+                  toZoneId: selectedRoom.zoneId,
+                  toRoomId,
+                },
+              },
+            }),
+          });
+          const json = await response.json();
+          if (!response.ok || json.errors) {
+            throw new Error(
+              json.errors?.[0]?.message || 'Failed to create exit'
+            );
+          }
+          const created = json.data.createRoomExit;
+          setRooms(rs =>
+            rs.map(r =>
+              r.id === fromRoomId
+                ? {
+                    ...r,
+                    exits: [
+                      ...(r.exits || []),
+                      {
+                        id: created.id,
+                        direction: created.direction,
+                        toZoneId: created.toZoneId ?? null,
+                        toRoomId: created.toRoomId ?? null,
+                        description: created.description ?? null,
+                        keywords: created.keywords ?? [],
+                        key: created.key ?? null,
+                        flags: created.flags ?? [],
+                      },
+                    ],
+                  }
+                : r
+            )
+          );
+        };
+
+        await persistExit(selectedRoom.id, newId, direction);
+        const reverse = REVERSE_DIRECTIONS[direction];
+        if (reverse) {
+          await persistExit(newId, selectedRoom.id, reverse);
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to create room with exit'
+        );
+        if (!roomCreated) {
+          setRooms(rs => rs.filter(r => r.id !== newId));
+          setSelectedRoomId(selectedRoom.id);
+          setCurrentZLevel(baseZ);
+        } else {
+          setSelectedRoomId(newId);
+          setCurrentZLevel(targetZ);
+        }
+      }
+    },
+    [
+      isEditing,
+      selectedRoom,
+      rooms,
+      authenticatedFetch,
+      setRooms,
+      setSelectedRoomId,
+      setCurrentZLevel,
+    ]
+  );
 
   // Keyboard shortcuts for undo/redo and navigation
   useEffect(() => {
@@ -981,12 +1570,51 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         setCurrentZLevel(z => z - 1);
         return;
       }
+      const resolveDirection = (): string | null => {
+        switch (key) {
+          case 'ArrowUp':
+            return 'NORTH';
+          case 'ArrowDown':
+            return 'SOUTH';
+          case 'ArrowLeft':
+            return 'WEST';
+          case 'ArrowRight':
+            return 'EAST';
+          case 'PageUp':
+            return 'UP';
+          case 'PageDown':
+            return 'DOWN';
+          default:
+            if (lowered === 'w') return 'NORTH';
+            if (lowered === 's') return 'SOUTH';
+            if (lowered === 'a') return 'WEST';
+            if (lowered === 'd') return 'EAST';
+            if (lowered === 'q') return 'NORTHWEST';
+            if (lowered === 'e') return 'NORTHEAST';
+            if (lowered === 'z') return 'SOUTHWEST';
+            if (lowered === 'c') return 'SOUTHEAST';
+            return null;
+        }
+      };
+
+      const direction = resolveDirection();
+
+      if (editorMode === 'edit' && isEditing && direction) {
+        e.preventDefault();
+        if (e.shiftKey) {
+          handleCreateRoomInDirection(direction);
+        } else {
+          handleKeyboardMoveRoom(direction);
+        }
+        return;
+      }
+
+      if (editorMode === 'edit') return;
       // Navigation (arrows / WASD) only in zone view
       if (viewMode !== 'zone') return;
-      if (selectedRoomId == null) return;
-      const current = rooms.find(r => r.id === selectedRoomId);
-      if (!current) return;
-      const exits = current.exits || [];
+      if (!direction) return;
+      if (!selectedRoom) return;
+      const exits = selectedRoom.exits || [];
       const byDirection: Record<string, RoomExit | undefined> = {};
       exits.forEach(ex => {
         byDirection[ex.direction.toUpperCase()] = ex;
@@ -999,46 +1627,43 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           if (ex && isValidRoomId(ex.toRoomId)) {
             return {
               roomId: ex.toRoomId,
-              zoneId: ex.toZoneId ?? current.zoneId,
+              zoneId: ex.toZoneId ?? selectedRoom.zoneId,
             };
           }
         }
         return null;
       };
       let nextDest: { roomId: number; zoneId: number | null } | null = null;
-      switch (key) {
-        case 'ArrowUp':
-          // Only NORTH - no vertical movement on arrow keys
+      switch (direction) {
+        case 'NORTH':
           nextDest = pick('NORTH');
           break;
-        case 'ArrowDown':
-          // Only SOUTH - no vertical movement on arrow keys
+        case 'SOUTH':
           nextDest = pick('SOUTH');
           break;
-        case 'ArrowLeft':
+        case 'WEST':
           nextDest = pick('WEST');
           break;
-        case 'ArrowRight':
+        case 'EAST':
           nextDest = pick('EAST');
           break;
-        case 'PageUp':
-          // Only UP - pure vertical movement
+        case 'UP':
           nextDest = pick('UP');
           break;
-        case 'PageDown':
-          // Only DOWN - pure vertical movement
+        case 'DOWN':
           nextDest = pick('DOWN');
           break;
-        default:
-          // WASD - horizontal only, diagonals available
-          if (lowered === 'w') nextDest = pick('NORTH');
-          else if (lowered === 's') nextDest = pick('SOUTH');
-          else if (lowered === 'a') nextDest = pick('WEST');
-          else if (lowered === 'd') nextDest = pick('EAST');
-          else if (lowered === 'q') nextDest = pick('NORTHWEST');
-          else if (lowered === 'e') nextDest = pick('NORTHEAST');
-          else if (lowered === 'z') nextDest = pick('SOUTHWEST');
-          else if (lowered === 'c') nextDest = pick('SOUTHEAST');
+        case 'NORTHWEST':
+          nextDest = pick('NORTHWEST');
+          break;
+        case 'NORTHEAST':
+          nextDest = pick('NORTHEAST');
+          break;
+        case 'SOUTHWEST':
+          nextDest = pick('SOUTHWEST');
+          break;
+        case 'SOUTHEAST':
+          nextDest = pick('SOUTHEAST');
           break;
       }
       if (nextDest && nextDest.roomId !== selectedRoomId) {
@@ -1069,9 +1694,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     handleRedo,
     rooms,
     selectedRoomId,
+    selectedRoom,
     viewMode,
     activeZoneId,
     currentZLevel,
+    editorMode,
+    isEditing,
+    handleKeyboardMoveRoom,
+    handleCreateRoomInDirection,
   ]);
 
   // Reflect selectedRoomId into React Flow's node selected state for visual highlight
@@ -1109,14 +1739,19 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   }, [selectedRoomId]);
 
   // Drag start capture original position
-  const handleNodeDragStart = useCallback((_: unknown, node: Node) => {
-    isDraggingRef.current = true;
-    dragOriginRef.current[node.id] = { ...node.position };
-  }, []);
+  const handleNodeDragStart = useCallback(
+    (_: unknown, node: Node) => {
+      if (!isEditing) return;
+      isDraggingRef.current = true;
+      dragOriginRef.current[node.id] = { ...node.position };
+    },
+    [isEditing]
+  );
 
   // Drag stop persistence with undo history
   const handleNodeDragStop = useCallback(
     async (_: unknown, node: Node) => {
+      if (!isEditing) return;
       isDraggingRef.current = false;
       const roomId = parseInt(node.id, 10);
       const room = rooms.find(r => r.id === roomId);
@@ -1188,12 +1823,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         // TODO: surface persistence error via UI toast mechanism
       }
     },
-    [rooms, setNodes, addToUndoHistory, authenticatedFetch]
-  );
-
-  const selectedRoom = useMemo(
-    () => rooms.find(r => r.id === selectedRoomId) || null,
-    [rooms, selectedRoomId]
+    [rooms, setNodes, addToUndoHistory, authenticatedFetch, isEditing]
   );
 
   // Exit CRUD handlers
@@ -1407,7 +2037,15 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     [selectedRoom, rooms, authenticatedFetch]
   );
 
-  const nodeTypes = useMemo(() => ({ room: RoomNode, portal: PortalNode }), []);
+  const nodeTypes = useMemo(
+    () => ({
+      room: RoomNode,
+      portal: PortalNode,
+      worldRoomDot: WorldRoomDotNode,
+      zoneBoundary: ZoneBoundaryNode,
+    }),
+    []
+  );
 
   // Resize logic
   const handlePointerMove = useCallback(
@@ -1491,86 +2129,66 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         </div>
       )}
       <div className='flex-1 h-full relative' ref={reactFlowRef}>
-        <div className='absolute z-10 top-2 left-2 flex gap-2'>
-          <button
-            className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-            onClick={() =>
+        <div className='absolute z-10 top-0 left-0 right-0'>
+          <EditorToolbar
+            viewMode={viewMode}
+            onToggleViewMode={() =>
               setViewMode(m => (m === 'zone' ? 'world-map' : 'zone'))
             }
-            title='Toggle world map view'
-          >
-            {viewMode === 'zone' ? 'World Map' : 'Zone View'}
-          </button>
-          {loading && (
-            <span className='px-2 py-1 text-xs text-gray-700 dark:text-gray-300'>
-              Loading…
-            </span>
-          )}
-          {error && (
-            <span className='px-2 py-1 text-xs text-red-600' title={error}>
-              Error
-            </span>
-          )}
-          <button
-            className='px-2 py-1 text-xs rounded bg-blue-500 hover:bg-blue-600 text-white dark:bg-blue-600 dark:hover:bg-blue-700'
-            onClick={() => handleAutoLayout(selectedRoomId)}
-            title='Auto-layout rooms following exits (A)'
-          >
-            Auto-Layout
-          </button>
-          <div className='flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded'>
-            <button
-              className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-              onClick={() => setCurrentZLevel(z => z + 1)}
-              title='View floor above (Shift+PgUp)'
-            >
-              ↑
-            </button>
-            <span className='px-1 font-mono' title='Current floor level'>
-              Z{currentZLevel}
-            </span>
-            <button
-              className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-              onClick={() => setCurrentZLevel(z => z - 1)}
-              title='View floor below (Shift+PgDn)'
-            >
-              ↓
-            </button>
-          </div>
-          <button
-            className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-            disabled={!canUndo}
-            onClick={() => handleUndo()}
-            title='Undo (Ctrl+Z)'
-          >
-            Undo
-          </button>
-          <button
-            className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-            disabled={!canRedo}
-            onClick={() => handleRedo()}
-            title='Redo (Ctrl+Shift+Z / Ctrl+Y)'
-          >
-            Redo
-          </button>
-          {overlaps.length > 0 && (
-            <button
-              className='px-2 py-1 text-xs rounded bg-yellow-500 hover:bg-yellow-600 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700'
-              onClick={() => setShowOverlapInfo(!showOverlapInfo)}
-              title={`${overlaps.length} overlapping positions detected`}
-            >
-              Overlaps: {overlaps.length}
-            </button>
-          )}
+            loading={loading}
+            error={error}
+            currentZLevel={currentZLevel}
+            onChangeZLevel={delta => setCurrentZLevel(z => z + delta)}
+            canUndo={canUndo}
+            canRedo={canRedo}
+            onUndo={handleUndo}
+            onRedo={handleRedo}
+            editorMode={editorMode}
+            onModeChange={mode => setEditorMode(mode)}
+            canEdit={canEditCurrentZone}
+            overlapCount={overlaps.length}
+            showOverlapButton={isEditing && overlaps.length > 0}
+            onToggleOverlapInfo={toggleOverlapInfo}
+          />
         </div>
+        <OverlapPanel
+          visible={showOverlapInfo && isEditing && overlaps.length > 0}
+          overlaps={overlaps}
+          rooms={rooms.map(r => ({ id: r.id, name: r.name }))}
+          onClose={toggleOverlapInfo}
+        />
         <ReactFlow
           nodes={nodes}
           edges={edges}
+          nodesDraggable={isEditing}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeDragStop={handleNodeDragStop}
           onNodeDragStart={handleNodeDragStart}
+          minZoom={viewMode === 'world-map' ? 0.02 : 0.1}
+          maxZoom={viewMode === 'world-map' ? 6 : 2}
+          onMove={(_, vp) => setViewportZoom(vp.zoom)}
+          elementsSelectable={viewMode === 'zone'}
           onNodeClick={(_, node) => {
+            if (viewMode === 'world-map') {
+              const data = node.data as any;
+              if (data?.zoneId && data?.isZoneBoundary) {
+                setActiveZoneId(data.zoneId);
+                setViewMode('zone');
+                setSelectedRoomId(null);
+                setCurrentZLevel(0);
+                hasInitialZoomedRef.current = false;
+                return;
+              }
+              if (data?.roomId && data?.zoneId) {
+                setActiveZoneId(data.zoneId);
+                setSelectedRoomId(data.roomId);
+                setViewMode('zone');
+                hasInitialZoomedRef.current = false;
+                return;
+              }
+              return;
+            }
             const idNum = parseInt(node.id, 10);
             if (!isNaN(idNum)) {
               setSelectedRoomId(idNum);
@@ -1591,12 +2209,23 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             reactFlowInstanceRef.current = inst;
           }}
         >
+          {loading && viewMode === 'world-map' && (
+            <div className='absolute inset-0 z-20 flex items-center justify-center pointer-events-none'>
+              <div className='flex items-center space-x-2 px-3 py-2 rounded-md bg-black/60 text-white text-xs shadow-lg'>
+                <div className='animate-spin h-4 w-4 rounded-full border-2 border-white/60 border-t-transparent' />
+                <span>Rendering world…</span>
+              </div>
+            </div>
+          )}
           <Background gap={24} />
           <Controls />
           <MiniMap
             nodeColor={node => {
               // Color nodes based on type and selection state
               if (node.selected) return '#3b82f6'; // Blue for selected
+              if (node.type === 'worldRoomDot' && (node.data as any)?.color)
+                return (node.data as any).color as string;
+              if (node.type === 'zoneBoundary') return '#94a3b8';
               if (node.type === 'portal') return '#8b5cf6'; // Purple for portals
               return '#6b7280'; // Gray for regular rooms
             }}
@@ -1735,7 +2364,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 onRemoveObject={() => {}}
                 saving={false}
                 managingExits={managingExits}
-                viewMode={'view'}
+                viewMode={editorMode}
                 onEntityClick={() => {}}
               />
             );
