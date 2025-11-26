@@ -34,6 +34,11 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       title: 'Navigation',
       shortcuts: [
         { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
+        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
+        { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
+        { keys: 'Ctrl+G → O', description: 'Go to objects list' },
+        { keys: 'Ctrl+G → S', description: 'Go to shops list' },
         { keys: '?', description: 'Show this help dialog' },
         { keys: 'Esc', description: 'Close dialogs and modals' },
       ],
