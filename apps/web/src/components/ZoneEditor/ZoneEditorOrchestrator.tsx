@@ -42,6 +42,7 @@ import { RoomNode } from './RoomNode';
 import { usePermissions } from '@/hooks/use-permissions';
 import { EntityPanel, type Mob, type GameObject } from './EntityPanel';
 import type { EntityDetail } from './EntityDetailPanel';
+import { HelpModal, useHelpModal } from '@/components/HelpModal';
 
 // Portal positioning using center-to-center distances
 // This ensures uniform spacing in all directions
@@ -371,6 +372,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   >({});
   const [editorMode, setEditorMode] = useState<EditorMode>('view');
   const { canEditZone } = usePermissions();
+  const { open: helpOpen, setOpen: setHelpOpen } = useHelpModal('zone-editor');
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowRef = useRef<HTMLDivElement | null>(null);
@@ -791,15 +793,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Reset zoom flag and clear nodes when zone changes to allow initial zoom on new zone
   useEffect(() => {
-    console.log('[Zoom Reset Debug] Zone change effect triggered:', {
-      previousZone: previousZoneIdRef.current,
-      newZone: activeZoneId,
-      willReset: previousZoneIdRef.current !== activeZoneId,
-    });
     if (previousZoneIdRef.current !== activeZoneId) {
-      console.log(
-        '[Zoom Reset Debug] Resetting hasInitialZoomedRef and clearing nodes'
-      );
       previousZoneIdRef.current = activeZoneId;
       hasInitialZoomedRef.current = false;
       // Clear stale nodes immediately to prevent zoom from using old zone's data
@@ -1435,56 +1429,35 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Zoom to selected room on initial zone load, or fit view if no selection
   useEffect(() => {
-    console.log('[Zoom Debug] Effect triggered:', {
-      hasInitialZoomed: hasInitialZoomedRef.current,
-      nodes: nodes.length,
-      rooms: rooms.length,
-      selectedRoomId,
-      activeZoneId,
-      hasReactFlow: !!reactFlowInstanceRef.current,
-    });
-
     // Only zoom on initial load, not on every update
     if (hasInitialZoomedRef.current) {
-      console.log('[Zoom Debug] Skipping - already zoomed');
       return;
     }
     if (!reactFlowInstanceRef.current) {
-      console.log('[Zoom Debug] Skipping - no ReactFlow instance');
       return;
     }
     if (nodes.length === 0) {
-      console.log('[Zoom Debug] Skipping - no nodes');
       return;
     }
 
     // CRITICAL: Ensure nodes are from current zone, not stale nodes from previous zone
     // Check if we have rooms loaded for the current zone
     if (rooms.length === 0) {
-      console.log('[Zoom Debug] Skipping - no rooms');
       return;
     }
 
     // CRITICAL: Verify rooms are actually from the active zone, not stale data
     const firstRoom = rooms[0];
     if (firstRoom?.zoneId !== activeZoneId) {
-      console.log('[Zoom Debug] Skipping - rooms are from wrong zone:', {
-        roomsZoneId: firstRoom?.zoneId,
-        activeZoneId,
-        roomCount: rooms.length,
-      });
       return;
     }
 
-    console.log('[Zoom Debug] Performing zoom!');
     // Mark that we've done the initial zoom
     hasInitialZoomedRef.current = true;
 
     // Use setTimeout to ensure the layout has settled
     setTimeout(() => {
-      console.log('[Zoom Debug] Inside setTimeout');
       if (isValidRoomId(selectedRoomId)) {
-        console.log('[Zoom Debug] Zooming to selected room:', selectedRoomId);
         // Find the selected room node and zoom to it
         // Note: Don't check n.selected === true here, as that property may not be set yet
         const selectedNode = nodes.find(
@@ -1493,18 +1466,12 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         if (selectedNode) {
           const centerX = selectedNode.position.x + 100;
           const centerY = selectedNode.position.y + 50;
-          console.log(
-            '[Zoom Debug] Found node, centering at:',
-            centerX,
-            centerY
-          );
           reactFlowInstanceRef.current?.setCenter(
             centerX, // Offset by ~half node width
             centerY, // Offset by ~half node height
             { zoom: 1.2, duration: 800 }
           );
         } else {
-          console.log('[Zoom Debug] Selected room not found, fitting view');
           // Selected room not found, fit view instead
           reactFlowInstanceRef.current?.fitView({
             padding: 0.2,
@@ -1512,7 +1479,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           });
         }
       } else {
-        console.log('[Zoom Debug] No selected room, fitting view to all nodes');
         // No selected room, fit view to show all nodes
         reactFlowInstanceRef.current?.fitView({ padding: 0.2, duration: 800 });
       }
@@ -2738,6 +2704,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           />
         </div>
       )}
+
+      {/* Context-aware help modal */}
+      <HelpModal
+        open={helpOpen}
+        onOpenChange={setHelpOpen}
+        context='zone-editor'
+      />
     </div>
   );
 };
