@@ -4,7 +4,6 @@ import { isValidRoomId, isValidZoneId } from '@/lib/room-utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, {
   useCallback,
-  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -41,6 +40,8 @@ import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
 import { usePermissions } from '@/hooks/use-permissions';
+import { EntityPanel, type Mob, type GameObject } from './EntityPanel';
+import type { EntityDetail } from './EntityDetailPanel';
 
 // Portal positioning using center-to-center distances
 // This ensures uniform spacing in all directions
@@ -352,6 +353,12 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [rooms, setRooms] = useState<Room[]>([]);
   const [selectedRoomId, setSelectedRoomId] = useState<number | null>(null);
+  // Entity panel state
+  const [selectedEntity, setSelectedEntity] = useState<EntityDetail | null>(
+    null
+  );
+  const [draggedMob, setDraggedMob] = useState<Mob | null>(null);
+  const [draggedObject, setDraggedObject] = useState<GameObject | null>(null);
   // Track active zone separately from prop to enable cross-zone portal navigation
   const [activeZoneId, setActiveZoneId] = useState<number | null>(
     zoneId ?? null
@@ -428,8 +435,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       return;
     }
 
-    const zoneParam = searchParams.get('zone_id');
-    const roomParam = searchParams.get('room_id');
+    const zoneParam = searchParams.get('zone');
+    const roomParam = searchParams.get('room');
 
     const newZone = zoneParam ? parseInt(zoneParam, 10) : null;
     const newRoom = roomParam ? parseInt(roomParam, 10) : null;
@@ -594,7 +601,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     );
     if (viewMode !== 'zone') return;
     let cancelled = false;
-    // Reset initial zoom flag when zone changes
+    // Reset initial zoom flag when zone changes (room/z-level handled by URL or auto-select)
     hasInitialZoomedRef.current = false;
     const fetchRooms = async () => {
       if (!isValidZoneId(activeZoneId)) return;
@@ -782,13 +789,23 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     };
   }, [viewMode, authenticatedFetch]);
 
-  // Reset zoom flag when zone changes to allow initial zoom on new zone
+  // Reset zoom flag and clear nodes when zone changes to allow initial zoom on new zone
   useEffect(() => {
+    console.log('[Zoom Reset Debug] Zone change effect triggered:', {
+      previousZone: previousZoneIdRef.current,
+      newZone: activeZoneId,
+      willReset: previousZoneIdRef.current !== activeZoneId,
+    });
     if (previousZoneIdRef.current !== activeZoneId) {
+      console.log(
+        '[Zoom Reset Debug] Resetting hasInitialZoomedRef and clearing nodes'
+      );
       previousZoneIdRef.current = activeZoneId;
       hasInitialZoomedRef.current = false;
+      // Clear stale nodes immediately to prevent zoom from using old zone's data
+      setNodes([]);
     }
-  }, [activeZoneId]);
+  }, [activeZoneId, setNodes]);
 
   // Initialize selection from URL param once rooms load
   useEffect(() => {
@@ -802,8 +819,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   // Fallback: auto select first room if none selected
   useEffect(() => {
     if (viewMode !== 'zone') return;
-    // If a room_id is present in URL, do not override it
-    const hasRoomParam = !!searchParams.get('room_id');
+    // If a room is present in URL, do not override it
+    const hasRoomParam = !!searchParams.get('room');
     if (rooms.length > 0 && selectedRoomId === null && !hasRoomParam) {
       const first = rooms[0];
       if (first) setSelectedRoomId(first.id);
@@ -818,7 +835,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       selectedRoomId != null && rooms.some(r => r.id === selectedRoomId);
     if (currentExists) return;
     // Try URL param first
-    const param = searchParams.get('room_id');
+    const param = searchParams.get('room');
     if (param) {
       const parsed = parseInt(param, 10);
       if (!isNaN(parsed)) {
@@ -841,8 +858,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     if (selectedRoomId == null) return;
     try {
       const params = new URLSearchParams();
-      params.set('zone_id', String(activeZoneId ?? ''));
-      params.set('room_id', String(selectedRoomId));
+      params.set('zone', String(activeZoneId ?? ''));
+      params.set('room', String(selectedRoomId));
       const newUrl = params.toString();
 
       // Store the URL we're about to sync so the listener can ignore it
@@ -867,6 +884,44 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     };
   }, [rooms]);
 
+  // Aggregate all mobs from all rooms for EntityPanel
+  const allMobs = useMemo(() => {
+    const mobMap = new Map<number, Mob>();
+    rooms.forEach(room => {
+      room.mobs?.forEach(mob => {
+        if (!mobMap.has(mob.id)) {
+          mobMap.set(mob.id, {
+            id: mob.id,
+            name: mob.name,
+            level: mob.level ?? 0,
+            roomId: room.id,
+            description: mob.description ?? undefined,
+          });
+        }
+      });
+    });
+    return Array.from(mobMap.values());
+  }, [rooms]);
+
+  // Aggregate all objects from all rooms for EntityPanel
+  const allObjects = useMemo(() => {
+    const objMap = new Map<number, GameObject>();
+    rooms.forEach(room => {
+      room.objects?.forEach(obj => {
+        if (!objMap.has(obj.id)) {
+          objMap.set(obj.id, {
+            id: obj.id,
+            name: obj.name,
+            type: 'unknown', // We'll need to fetch this from a more detailed query
+            roomId: room.id,
+            description: obj.description ?? undefined,
+          });
+        }
+      });
+    });
+    return Array.from(objMap.values());
+  }, [rooms]);
+
   // Create a stable dependency key that changes only when room structure changes (not positions)
   // This prevents node regeneration when dragging
   // Optimized: Only track structural changes (ID, zone, exit count), not content (name, descriptions)
@@ -876,72 +931,27 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     return rooms.map(r => `${r.id}:${r.exits?.length ?? 0}`).join('|');
   }, [rooms]);
 
-  // Viewport-based virtualization: Only render rooms visible in viewport + buffer
-  // This dramatically reduces DOM nodes for large zones (300+ rooms)
-  // Optimized: Uses rounded viewport values to reduce recalculation frequency
+  // Render all rooms (viewport virtualization removed - not needed for individual zones)
   const visibleRooms = useMemo(() => {
-    // Disable virtualization until initial zoom completes to ensure all rooms are visible
-    if (!hasInitialZoomedRef.current) {
-      return rooms;
-    }
+    return rooms;
+  }, [rooms]);
 
-    // Apply virtualization for any view with many rooms
-    if (rooms.length < 50) {
-      return rooms;
-    }
-
-    // Calculate viewport bounds in pixel coordinates
-    const viewportWidth = reactFlowRef.current?.offsetWidth ?? 1000;
-    const viewportHeight = reactFlowRef.current?.offsetHeight ?? 800;
-
-    // For world-map with 130K+ rooms, use more aggressive rounding
-    const gridSize = viewMode === 'world-map' ? 200 : 50;
-    const zoomPrecision = viewMode === 'world-map' ? 20 : 10;
-
-    // Round viewport position to reduce recalculation frequency
-    const roundedX = Math.round(viewport.x / gridSize) * gridSize;
-    const roundedY = Math.round(viewport.y / gridSize) * gridSize;
-    const roundedZoom =
-      Math.round(viewport.zoom * zoomPrecision) / zoomPrecision;
-
-    // For world-map, use smaller buffer (less aggressive) to reduce node count
-    const bufferMultiplier = viewMode === 'world-map' ? 1.0 : 1.5;
-    const minX = -roundedX / roundedZoom - viewportWidth * bufferMultiplier;
-    const maxX =
-      -roundedX / roundedZoom + viewportWidth * (1 + bufferMultiplier);
-    const minY = -roundedY / roundedZoom - viewportHeight * bufferMultiplier;
-    const maxY =
-      -roundedY / roundedZoom + viewportHeight * (1 + bufferMultiplier);
-
-    // Filter rooms to only those within visible bounds
-    return rooms.filter(room => {
-      const roomX = gridToPixels(room.layoutX ?? 0);
-      const roomY = gridToPixelsY(room.layoutY ?? 0);
-
-      // Include room if it's within viewport bounds (with buffer)
-      return roomX >= minX && roomX <= maxX && roomY >= minY && roomY <= maxY;
-    });
-  }, [rooms, viewMode, viewport, reactFlowRef]);
-
-  // Defer visibleRooms updates to prevent blocking during initial render
-  // This keeps UI responsive during heavy calculations
-  const deferredVisibleRooms = useDeferredValue(visibleRooms);
+  // Viewport virtualization removed - not needed for individual zones
+  // Rooms now render synchronously to ensure proper initial zoom timing
 
   // Generate React Flow nodes when data changes (with overlap + portal nodes)
   // IMPORTANT: Use useMemo to avoid regenerating nodes unnecessarily
   // Only regenerate when room structure changes (add/remove/data), not when positions change
-  // Optimized: Uses deferredVisibleRooms for non-blocking viewport virtualization
   const generatedNodes = useMemo(() => {
     if (viewMode === 'zone') {
       const overlapGroups = new Map<string, Room[]>();
-      // Use deferredVisibleRooms for non-blocking virtualization
-      deferredVisibleRooms.forEach(r => {
+      visibleRooms.forEach(r => {
         const key = `${r.layoutX ?? 0}:${r.layoutY ?? 0}:${r.layoutZ ?? 0}`;
         const list = overlapGroups.get(key) || [];
         list.push(r);
         overlapGroups.set(key, list);
       });
-      const roomNodes = deferredVisibleRooms.flatMap(room => {
+      const roomNodes = visibleRooms.flatMap(room => {
         const baseX = gridToPixels(room.layoutX ?? 0);
         const baseY = gridToPixelsY(room.layoutY ?? 0);
         const roomZ = room.layoutZ ?? 0;
@@ -1222,7 +1232,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     roomsStructureKey,
-    deferredVisibleRooms, // Deferred viewport virtualization (non-blocking)
+    visibleRooms, // Synchronous room rendering for proper zoom timing
     worldZones,
     worldRooms,
     worldZoneBounds,
@@ -1262,13 +1272,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   }, [generatedNodes, setNodes]);
 
   // Generate base edges from room structure (no zoom dependency)
-  // Optimized: Uses deferredVisibleRooms for non-blocking viewport virtualization
+  // Synchronous rendering ensures all rooms are available for edge generation
   const baseEdges = useMemo(() => {
     if (viewMode !== 'zone') return [];
 
     const roomMap = new Map<number, Room>();
-    // Use deferredVisibleRooms for non-blocking virtualization
-    deferredVisibleRooms.forEach(r => roomMap.set(r.id, r));
+    // Use all visible rooms synchronously
+    visibleRooms.forEach(r => roomMap.set(r.id, r));
 
     // Map exit directions to source/target handle ids defined in RoomNode
     const sourceHandleMap: Record<string, string> = {
@@ -1307,8 +1317,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       SOUTHWEST: 'top-target',
     };
 
-    // Use deferredVisibleRooms for non-blocking virtualization
-    return deferredVisibleRooms.flatMap(room => {
+    // Use all visible rooms synchronously
+    return visibleRooms.flatMap(room => {
       const exits = room.exits || [];
       return exits
         .map(e => {
@@ -1359,7 +1369,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         targetHandle?: string;
       }>;
     });
-  }, [deferredVisibleRooms, viewMode]);
+  }, [visibleRooms, viewMode]);
 
   // Apply zoom-based visibility to edges (separate from generation)
   // This only updates styles, doesn't regenerate edges
@@ -1425,26 +1435,56 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Zoom to selected room on initial zone load, or fit view if no selection
   useEffect(() => {
+    console.log('[Zoom Debug] Effect triggered:', {
+      hasInitialZoomed: hasInitialZoomedRef.current,
+      nodes: nodes.length,
+      rooms: rooms.length,
+      selectedRoomId,
+      activeZoneId,
+      hasReactFlow: !!reactFlowInstanceRef.current,
+    });
+
     // Only zoom on initial load, not on every update
-    if (hasInitialZoomedRef.current) return;
-    if (!reactFlowInstanceRef.current) return;
-    if (nodes.length === 0) return;
+    if (hasInitialZoomedRef.current) {
+      console.log('[Zoom Debug] Skipping - already zoomed');
+      return;
+    }
+    if (!reactFlowInstanceRef.current) {
+      console.log('[Zoom Debug] Skipping - no ReactFlow instance');
+      return;
+    }
+    if (nodes.length === 0) {
+      console.log('[Zoom Debug] Skipping - no nodes');
+      return;
+    }
 
     // CRITICAL: Ensure nodes are from current zone, not stale nodes from previous zone
     // Check if we have rooms loaded for the current zone
-    if (rooms.length === 0) return;
+    if (rooms.length === 0) {
+      console.log('[Zoom Debug] Skipping - no rooms');
+      return;
+    }
 
-    // Verify nodes match current zone's rooms
-    const firstNode = nodes[0];
-    const firstRoom = rooms.find(r => r.id.toString() === firstNode?.id);
-    if (!firstRoom) return;
+    // CRITICAL: Verify rooms are actually from the active zone, not stale data
+    const firstRoom = rooms[0];
+    if (firstRoom?.zoneId !== activeZoneId) {
+      console.log('[Zoom Debug] Skipping - rooms are from wrong zone:', {
+        roomsZoneId: firstRoom?.zoneId,
+        activeZoneId,
+        roomCount: rooms.length,
+      });
+      return;
+    }
 
+    console.log('[Zoom Debug] Performing zoom!');
     // Mark that we've done the initial zoom
     hasInitialZoomedRef.current = true;
 
     // Use setTimeout to ensure the layout has settled
     setTimeout(() => {
+      console.log('[Zoom Debug] Inside setTimeout');
       if (isValidRoomId(selectedRoomId)) {
+        console.log('[Zoom Debug] Zooming to selected room:', selectedRoomId);
         // Find the selected room node and zoom to it
         // Note: Don't check n.selected === true here, as that property may not be set yet
         const selectedNode = nodes.find(
@@ -1453,12 +1493,18 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         if (selectedNode) {
           const centerX = selectedNode.position.x + 100;
           const centerY = selectedNode.position.y + 50;
+          console.log(
+            '[Zoom Debug] Found node, centering at:',
+            centerX,
+            centerY
+          );
           reactFlowInstanceRef.current?.setCenter(
             centerX, // Offset by ~half node width
             centerY, // Offset by ~half node height
             { zoom: 1.2, duration: 800 }
           );
         } else {
+          console.log('[Zoom Debug] Selected room not found, fitting view');
           // Selected room not found, fit view instead
           reactFlowInstanceRef.current?.fitView({
             padding: 0.2,
@@ -1466,6 +1512,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           });
         }
       } else {
+        console.log('[Zoom Debug] No selected room, fitting view to all nodes');
         // No selected room, fit view to show all nodes
         reactFlowInstanceRef.current?.fitView({ padding: 0.2, duration: 800 });
       }
@@ -2395,7 +2442,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         >
           <div className='flex items-center justify-between px-2 py-1 border-b text-xs bg-gray-100 dark:bg-gray-800'>
             <span className='font-semibold'>
-              {leftCollapsed ? '🗂️' : 'Panel'}
+              {leftCollapsed ? '🗂️' : 'Entities'}
             </span>
             <div className='flex gap-1'>
               <button
@@ -2409,11 +2456,19 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               </button>
             </div>
           </div>
-          {!leftCollapsed && (
-            <div className='flex-1 overflow-auto p-2 text-xs text-gray-600 dark:text-gray-300 space-y-2'>
-              <p className='font-medium'>Entity/tools panel placeholder.</p>
-              <p>Resize with handle; collapse to maximize canvas.</p>
-            </div>
+          {!leftCollapsed && activeZoneId !== null && (
+            <EntityPanel
+              mobs={allMobs}
+              objects={allObjects}
+              zoneId={activeZoneId}
+              selectedEntity={selectedEntity}
+              onSelectEntity={setSelectedEntity}
+              onClearSelection={() => setSelectedEntity(null)}
+              onMobDragStart={setDraggedMob}
+              onObjectDragStart={setDraggedObject}
+              viewMode={editorMode}
+              panelWidth={leftPanelWidth}
+            />
           )}
           <div
             onMouseDown={e => beginResize('left', e)}
