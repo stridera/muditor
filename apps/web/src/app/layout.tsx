@@ -1,4 +1,5 @@
 import { ThemeProvider } from '@/components/theme-provider';
+import { ZoneSearchModal } from '@/components/ZoneSearchModal';
 import { AuthProvider } from '@/contexts/auth-context';
 import { EnvironmentProvider } from '@/contexts/environment-context';
 import { ZoneProvider } from '@/contexts/zone-context';
@@ -28,7 +29,10 @@ export default function RootLayout({
           <ApolloWrapper>
             <EnvironmentProvider>
               <AuthProvider>
-                <ZoneProvider>{children}</ZoneProvider>
+                <ZoneProvider>
+                  {children}
+                  <ZoneSearchModal />
+                </ZoneProvider>
               </AuthProvider>
             </EnvironmentProvider>
           </ApolloWrapper>

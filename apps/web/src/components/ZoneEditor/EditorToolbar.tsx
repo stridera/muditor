@@ -9,6 +9,8 @@ interface ZoneEditorToolbarProps {
   error: string | null;
   currentZLevel: number;
   onChangeZLevel: (delta: number) => void;
+  minZLevel: number;
+  maxZLevel: number;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -28,6 +30,8 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
   error,
   currentZLevel,
   onChangeZLevel,
+  minZLevel,
+  maxZLevel,
   canUndo,
   canRedo,
   onUndo,
@@ -88,9 +92,14 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
       )}
       <div className='flex items-center gap-1 px-2 py-1 text-xs bg-gray-100 dark:bg-gray-800 rounded'>
         <button
-          className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+          className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
           onClick={() => onChangeZLevel(1)}
-          title='View floor above (Shift+PgUp)'
+          disabled={currentZLevel >= maxZLevel}
+          title={
+            currentZLevel >= maxZLevel
+              ? 'No rooms above this floor'
+              : 'View floor above (Shift+PgUp)'
+          }
         >
           ↑
         </button>
@@ -98,9 +107,14 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
           Z{currentZLevel}
         </span>
         <button
-          className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+          className='px-1 py-0.5 rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed'
           onClick={() => onChangeZLevel(-1)}
-          title='View floor below (Shift+PgDn)'
+          disabled={currentZLevel <= minZLevel}
+          title={
+            currentZLevel <= minZLevel
+              ? 'No rooms below this floor'
+              : 'View floor below (Shift+PgDn)'
+          }
         >
           ↓
         </button>

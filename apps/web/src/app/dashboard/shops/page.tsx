@@ -12,7 +12,6 @@ import { useEffect, useState } from 'react';
 import EnhancedSearch, {
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
-import ZoneSelector from '../../../components/ZoneSelector';
 import { applySearchFilters } from '../../../lib/search-utils';
 
 const GET_SHOPS = gql`
@@ -273,14 +272,6 @@ function ShopsContent() {
         </Link>
       </div>
 
-      {/* Zone Selector */}
-      <div className='mb-4'>
-        <ZoneSelector
-          selectedZone={selectedZone}
-          onZoneChange={setSelectedZone}
-        />
-      </div>
-
       {/* Enhanced Search */}
       <EnhancedSearch
         onFiltersChange={setSearchFilters}
@@ -374,7 +365,7 @@ function ShopsContent() {
                   </div>
                   <div className='flex items-center gap-2 ml-4'>
                     <Link
-                      href={`/dashboard/shops/editor?id=${shop.id}&zoneId=${shop.zoneId}`}
+                      href={`/dashboard/shops/editor?id=${shop.id}&zone={shop.zoneId}`}
                       className='inline-flex items-center text-primary hover:text-primary/80 px-3 py-1 text-sm'
                       onClick={e => e.stopPropagation()}
                     >

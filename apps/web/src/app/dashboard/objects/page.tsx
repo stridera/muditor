@@ -48,7 +48,6 @@ import { useEffect, useState } from 'react';
 import EnhancedSearch, {
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
-import ZoneSelector from '../../../components/ZoneSelector';
 import {
   applySearchFilters,
   createObjectPresets,
@@ -443,14 +442,6 @@ function ObjectsContent() {
           <Plus className='w-4 h-4 mr-2' />
           Create New Object
         </Link>
-      </div>
-
-      {/* Zone Selector */}
-      <div className='mb-4'>
-        <ZoneSelector
-          selectedZone={selectedZone}
-          onZoneChange={setSelectedZone}
-        />
       </div>
 
       {/* Sort and Items Per Page Controls */}

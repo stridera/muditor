@@ -16,7 +16,7 @@ export function ZoneEntityTabs() {
     label: 'Visual Editor',
     icon: <Map className='h-4 w-4' />,
     href: zoneId
-      ? `/dashboard/zones/editor?zone_id=${zoneId}`
+      ? `/dashboard/zones/editor?zone=${zoneId}`
       : '/dashboard/zones/editor',
   };
 

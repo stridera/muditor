@@ -4,6 +4,7 @@ import { isValidRoomId, isValidZoneId } from '@/lib/room-utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import React, {
   useCallback,
+  useDeferredValue,
   useEffect,
   useMemo,
   useRef,
@@ -40,6 +41,28 @@ import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
 import { usePermissions } from '@/hooks/use-permissions';
+
+// Portal positioning using center-to-center distances
+// This ensures uniform spacing in all directions
+const ROOM_SIZE = 180; // Room dimensions (rooms are 180x180px)
+const PORTAL_SIZE = 80; // Portal dimensions (minWidth: 80px, roughly square)
+const PORTAL_OFFSET = 150; // Distance from room center to portal center (increased for padding/content)
+
+// Direction unit vectors for positioning portal centers relative to room center
+// Diagonal vectors are normalized (divided by √2) to ensure uniform distance in all directions
+const SQRT2 = Math.sqrt(2);
+const PORTAL_DIRECTION_VECTORS: Record<string, { dx: number; dy: number }> = {
+  NORTH: { dx: 0, dy: -1 },
+  SOUTH: { dx: 0, dy: 1 },
+  EAST: { dx: 1, dy: 0 },
+  WEST: { dx: -1, dy: 0 },
+  NORTHEAST: { dx: 1 / SQRT2, dy: -1 / SQRT2 },
+  NORTHWEST: { dx: -1 / SQRT2, dy: -1 / SQRT2 },
+  SOUTHEAST: { dx: 1 / SQRT2, dy: 1 / SQRT2 },
+  SOUTHWEST: { dx: -1 / SQRT2, dy: 1 / SQRT2 },
+  UP: { dx: -1 / SQRT2, dy: -1 / SQRT2 }, // Northwest diagonal (normalized)
+  DOWN: { dx: 1 / SQRT2, dy: 1 / SQRT2 }, // Southeast diagonal (normalized)
+};
 
 interface RoomExit {
   id: string;
@@ -187,8 +210,8 @@ const DIRECTION_DELTAS: Record<
   NORTHWEST: { dx: -1, dy: 1 },
   SOUTHEAST: { dx: 1, dy: -1 },
   SOUTHWEST: { dx: -1, dy: -1 },
-  UP: { dx: 0, dy: 0, dz: 1 },
-  DOWN: { dx: 0, dy: 0, dz: -1 },
+  UP: { dx: -0.8, dy: -0.8, dz: 1 }, // Behind and up-left (northwest)
+  DOWN: { dx: 0.8, dy: 0.8, dz: -1 }, // Behind and down-right (southeast)
 };
 
 const REVERSE_DIRECTIONS: Record<string, string> = {
@@ -355,12 +378,25 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const searchParams = useSearchParams();
   const pathname = usePathname();
 
+  // Sync activeZoneId with zoneId prop when the PROP changes (not when state diverges)
+  // This allows cross-zone navigation while still responding to external prop changes
+  const prevZoneIdRef = useRef<number | undefined>(zoneId);
+  useEffect(() => {
+    // Only sync if the prop itself changed, not if activeZoneId changed independently
+    if (zoneId !== prevZoneIdRef.current) {
+      prevZoneIdRef.current = zoneId;
+      if (zoneId !== undefined) {
+        setActiveZoneId(zoneId ?? null);
+      }
+    }
+  }, [zoneId]);
+
   // Initialize from URL on mount only
   // After mount, state drives URL (not the other way around)
   useEffect(() => {
     try {
-      const zoneParam = searchParams.get('zone_id');
-      const roomParam = searchParams.get('room_id');
+      const zoneParam = searchParams.get('zone');
+      const roomParam = searchParams.get('room');
 
       if (zoneParam) {
         const z = parseInt(zoneParam, 10);
@@ -455,6 +491,56 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const { overlaps, showOverlapInfo, toggleOverlapInfo } =
     useRoomOverlaps(rooms);
   const [viewportZoom, setViewportZoom] = useState(1);
+  // Track full viewport for virtualization (x, y, zoom)
+  const [viewport, setViewport] = useState({ x: 0, y: 0, zoom: 1 });
+  // Throttle viewport updates to reduce recalculation frequency
+  const lastViewportUpdateRef = useRef<number>(0);
+  const pendingViewportRef = useRef<{
+    x: number;
+    y: number;
+    zoom: number;
+  } | null>(null);
+  // Track rendering state for static preview mode
+  const [isFullyInteractive, setIsFullyInteractive] = useState(false);
+  const renderTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Throttled viewport update with separate handling for zoom vs pan
+  // Zoom updates immediately (responsive), pan updates throttled (performance)
+  // In static preview mode: even more aggressive throttling for instant feel
+  const updateViewportThrottled = useCallback(
+    (vp: { x: number; y: number; zoom: number }) => {
+      const now = Date.now();
+      const timeSinceLastUpdate = now - lastViewportUpdateRef.current;
+
+      // More aggressive throttle during static preview (instant pan/zoom on static image)
+      const throttleInterval = isFullyInteractive ? 150 : 300;
+
+      // Always update zoom immediately for smooth zoom experience
+      setViewportZoom(vp.zoom);
+
+      // Throttle only the position updates (x, y) for performance
+      if (timeSinceLastUpdate >= throttleInterval) {
+        // Immediate position update
+        lastViewportUpdateRef.current = now;
+        setViewport(vp);
+        pendingViewportRef.current = null;
+      } else {
+        // Store pending position update
+        pendingViewportRef.current = vp;
+
+        // Schedule deferred position update
+        const remainingTime = throttleInterval - timeSinceLastUpdate;
+        setTimeout(() => {
+          if (pendingViewportRef.current) {
+            lastViewportUpdateRef.current = Date.now();
+            setViewport(pendingViewportRef.current);
+            pendingViewportRef.current = null;
+          }
+        }, remainingTime);
+      }
+    },
+    [isFullyInteractive]
+  );
 
   // Local authenticated fetch stub (replace with real implementation if available)
   const authenticatedFetch = useCallback(
@@ -500,19 +586,35 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Fetch zone rooms (full data) when in zone mode using activeZoneId
   useEffect(() => {
+    console.log(
+      '[Zone Fetch Debug] useEffect triggered, activeZoneId:',
+      activeZoneId,
+      'viewMode:',
+      viewMode
+    );
     if (viewMode !== 'zone') return;
     let cancelled = false;
     // Reset initial zoom flag when zone changes
     hasInitialZoomedRef.current = false;
     const fetchRooms = async () => {
       if (!isValidZoneId(activeZoneId)) return;
+      console.log('[Zone Fetch Debug] Fetching rooms for zone:', activeZoneId);
       setLoading(true);
       setError(null);
       try {
         const response: Response = await authenticatedFetch('/graphql', {
           method: 'POST',
           body: JSON.stringify({
-            query: `query GetRooms($zoneId: Int!, $lightweight: Boolean){\n              roomsByZone(zoneId: $zoneId, lightweight: $lightweight){\n                id zoneId name description roomDescription sector layoutX layoutY layoutZ \n                exits{ id direction toZoneId toRoomId description keywords key flags }\n                mobs{ id name level roomDescription }\n                objects{ id name roomDescription }\n                shops{ id buyProfit sellProfit keeperId }\n              }\n            }`,
+            query: `query GetRooms($zoneId: Int!, $lightweight: Boolean){
+              zones { id name climate }
+              roomsByZone(zoneId: $zoneId, lightweight: $lightweight){
+                id zoneId name description roomDescription sector layoutX layoutY layoutZ
+                exits{ id direction toZoneId toRoomId description keywords key flags }
+                mobs{ id name level roomDescription }
+                objects{ id name roomDescription }
+                shops{ id buyProfit sellProfit keeperId }
+              }
+            }`,
             variables: { zoneId: activeZoneId, lightweight: false },
           }),
         });
@@ -560,6 +662,10 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             objects?: RawObject[] | null;
             shops?: RawShop[] | null;
           };
+          // Extract zones data for cross-zone exit lookups
+          const zones = data.data.zones || [];
+          if (!cancelled) setWorldZones(zones);
+
           const fetched: Room[] = (data.data.roomsByZone || []).map(
             (r: RawRoom) => ({
               id: r.id,
@@ -748,27 +854,94 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     }
   }, [selectedRoomId, activeZoneId, router, pathname]);
 
+  // Calculate floor range (min/max Z levels with actual rooms)
+  // Used to disable floor navigation buttons when no rooms exist above/below
+  const floorRange = useMemo(() => {
+    if (rooms.length === 0) return { min: 0, max: 0 };
+    const zLevels = rooms
+      .map(r => r.layoutZ ?? 0)
+      .filter((z): z is number => z !== null && z !== undefined);
+    return {
+      min: Math.min(...zLevels),
+      max: Math.max(...zLevels),
+    };
+  }, [rooms]);
+
   // Create a stable dependency key that changes only when room structure changes (not positions)
   // This prevents node regeneration when dragging
+  // Optimized: Only track structural changes (ID, zone, exit count), not content (name, descriptions)
   const roomsStructureKey = useMemo(() => {
-    return rooms
-      .map(r => `${r.id}:${r.name}:${r.zoneId}:${r.exits?.length ?? 0}`)
-      .join('|');
+    // Use a more efficient key that only includes structural data
+    // Name changes don't require node regeneration (handled by RoomNode memo)
+    return rooms.map(r => `${r.id}:${r.exits?.length ?? 0}`).join('|');
   }, [rooms]);
+
+  // Viewport-based virtualization: Only render rooms visible in viewport + buffer
+  // This dramatically reduces DOM nodes for large zones (300+ rooms)
+  // Optimized: Uses rounded viewport values to reduce recalculation frequency
+  const visibleRooms = useMemo(() => {
+    // Disable virtualization until initial zoom completes to ensure all rooms are visible
+    if (!hasInitialZoomedRef.current) {
+      return rooms;
+    }
+
+    // Apply virtualization for any view with many rooms
+    if (rooms.length < 50) {
+      return rooms;
+    }
+
+    // Calculate viewport bounds in pixel coordinates
+    const viewportWidth = reactFlowRef.current?.offsetWidth ?? 1000;
+    const viewportHeight = reactFlowRef.current?.offsetHeight ?? 800;
+
+    // For world-map with 130K+ rooms, use more aggressive rounding
+    const gridSize = viewMode === 'world-map' ? 200 : 50;
+    const zoomPrecision = viewMode === 'world-map' ? 20 : 10;
+
+    // Round viewport position to reduce recalculation frequency
+    const roundedX = Math.round(viewport.x / gridSize) * gridSize;
+    const roundedY = Math.round(viewport.y / gridSize) * gridSize;
+    const roundedZoom =
+      Math.round(viewport.zoom * zoomPrecision) / zoomPrecision;
+
+    // For world-map, use smaller buffer (less aggressive) to reduce node count
+    const bufferMultiplier = viewMode === 'world-map' ? 1.0 : 1.5;
+    const minX = -roundedX / roundedZoom - viewportWidth * bufferMultiplier;
+    const maxX =
+      -roundedX / roundedZoom + viewportWidth * (1 + bufferMultiplier);
+    const minY = -roundedY / roundedZoom - viewportHeight * bufferMultiplier;
+    const maxY =
+      -roundedY / roundedZoom + viewportHeight * (1 + bufferMultiplier);
+
+    // Filter rooms to only those within visible bounds
+    return rooms.filter(room => {
+      const roomX = gridToPixels(room.layoutX ?? 0);
+      const roomY = gridToPixelsY(room.layoutY ?? 0);
+
+      // Include room if it's within viewport bounds (with buffer)
+      return roomX >= minX && roomX <= maxX && roomY >= minY && roomY <= maxY;
+    });
+  }, [rooms, viewMode, viewport, reactFlowRef]);
+
+  // Defer visibleRooms updates to prevent blocking during initial render
+  // This keeps UI responsive during heavy calculations
+  const deferredVisibleRooms = useDeferredValue(visibleRooms);
 
   // Generate React Flow nodes when data changes (with overlap + portal nodes)
   // IMPORTANT: Use useMemo to avoid regenerating nodes unnecessarily
   // Only regenerate when room structure changes (add/remove/data), not when positions change
+  // Optimized: Uses deferredVisibleRooms for non-blocking viewport virtualization
   const generatedNodes = useMemo(() => {
     if (viewMode === 'zone') {
       const overlapGroups = new Map<string, Room[]>();
-      rooms.forEach(r => {
+      // Use deferredVisibleRooms for non-blocking virtualization
+      deferredVisibleRooms.forEach(r => {
         const key = `${r.layoutX ?? 0}:${r.layoutY ?? 0}:${r.layoutZ ?? 0}`;
         const list = overlapGroups.get(key) || [];
         list.push(r);
         overlapGroups.set(key, list);
       });
-      const roomNodes = rooms.flatMap(room => {
+      const roomNodes = deferredVisibleRooms.flatMap(room => {
         const baseX = gridToPixels(room.layoutX ?? 0);
         const baseY = gridToPixelsY(room.layoutY ?? 0);
         const roomZ = room.layoutZ ?? 0;
@@ -784,15 +957,15 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         if (!isCurrentFloor) {
           if (floorDifference > 0) {
             // Upper floors - northwest (up-left) diagonal offset
-            opacity = Math.max(0.5, 1 - floorDifference * 0.15);
-            offsetX = -floorDifference * 18; // Move up-left diagonally
-            offsetY = -floorDifference * 18;
+            opacity = Math.max(0.3, 1 - floorDifference * 0.3); // More dramatic opacity change
+            offsetX = -floorDifference * 50; // Larger offset for visibility
+            offsetY = -floorDifference * 50;
             zIndex = 100 - floorDifference; // Higher floors appear behind
           } else {
             // Lower floors - southeast (down-right) diagonal offset
-            opacity = Math.max(0.5, 1 - Math.abs(floorDifference) * 0.15);
-            offsetX = Math.abs(floorDifference) * 18; // Move down-right diagonally
-            offsetY = Math.abs(floorDifference) * 18;
+            opacity = Math.max(0.3, 1 - Math.abs(floorDifference) * 0.3); // More dramatic opacity change
+            offsetX = Math.abs(floorDifference) * 50; // Larger offset for visibility
+            offsetY = Math.abs(floorDifference) * 50;
             zIndex = 100 - Math.abs(floorDifference); // Lower floors appear behind
           }
         }
@@ -863,6 +1036,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             onSwitchOverlapRoom,
             // Z-level visual properties
             opacity,
+            depthOpacity: opacity, // RoomNode uses this for visual opacity
             zIndex,
             isCurrentFloor,
             floorDifference,
@@ -876,63 +1050,62 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         };
         const out: Node[] = [node];
         // Portal nodes for cross-zone exits
-        (room.exits || [])
-          .filter(
-            e =>
-              e.toZoneId != null &&
-              e.toZoneId !== room.zoneId &&
-              e.toRoomId != null
-          )
-          .forEach(e => {
-            const dir = e.direction.toUpperCase();
-            const offset = 180;
-            let px = x,
-              py = y;
+        const crossZoneExits = (room.exits || []).filter(
+          e =>
+            e.toZoneId != null &&
+            e.toZoneId !== room.zoneId &&
+            e.toRoomId != null
+        );
+        crossZoneExits.forEach(e => {
+          const dir = e.direction.toUpperCase();
+          const dirVector = PORTAL_DIRECTION_VECTORS[dir] || { dx: 0, dy: 0 };
 
-            // Position portal based on exit direction
-            // Check for cardinal directions first, then diagonals
-            if (dir === 'NORTH') {
-              py -= offset;
-            } else if (dir === 'SOUTH') {
-              py += offset;
-            } else if (dir === 'EAST') {
-              px += offset;
-            } else if (dir === 'WEST') {
-              px -= offset;
-            } else if (dir === 'NORTHEAST') {
-              px += offset;
-              py -= offset;
-            } else if (dir === 'NORTHWEST') {
-              px -= offset;
-              py -= offset;
-            } else if (dir === 'SOUTHEAST') {
-              px += offset;
-              py += offset;
-            } else if (dir === 'SOUTHWEST') {
-              px -= offset;
-              py += offset;
-            }
+          // Portal floor visibility logic:
+          // All portals appear on the same floor as their source room
+          // This allows you to see all exits when viewing a room
+          // (UP/DOWN use diagonal positioning to indicate vertical direction)
+          if (roomZ !== currentZLevel) {
+            return; // Only show portals for rooms on current floor
+          }
 
-            // Look up zone name from worldZones
-            const destZone = worldZones.find(z => z.id === e.toZoneId);
-            const zoneName = destZone?.name || `Zone ${e.toZoneId}`;
+          // Center-based positioning for uniform spacing in all directions
+          // 1. Calculate room center (rooms are positioned by top-left, size 180x180)
+          const roomCenterX = baseX + ROOM_SIZE / 2;
+          const roomCenterY = baseY + ROOM_SIZE / 2;
 
-            out.push({
-              id: `portal-${room.id}-${e.id}`,
-              type: 'portal',
-              position: { x: px, y: py },
-              data: {
-                direction: e.direction,
-                destZoneId: e.toZoneId!,
-                destRoomId: e.toRoomId!,
-                zoneName,
-                isOneWayEntrance: false, // Could be calculated by checking if return exit exists
-                sourceDirection: undefined,
-              },
-              draggable: false,
-              selectable: true,
-            });
-          });
+          // 2. Calculate portal center using direction vector and offset
+          const portalCenterX = roomCenterX + dirVector.dx * PORTAL_OFFSET;
+          const portalCenterY = roomCenterY + dirVector.dy * PORTAL_OFFSET;
+
+          // 3. Convert to top-left position (React Flow positions nodes by top-left)
+          const px = portalCenterX - PORTAL_SIZE / 2;
+          const py = portalCenterY - PORTAL_SIZE / 2;
+
+          // Look up zone name from worldZones
+          const destZone = worldZones.find(z => z.id === e.toZoneId);
+          const zoneName = destZone?.name || `Zone ${e.toZoneId}`;
+
+          const portalNode = {
+            id: `portal-${room.id}-${e.id}`,
+            type: 'portal',
+            position: { x: px, y: py },
+            data: {
+              direction: e.direction,
+              destZoneId: e.toZoneId!,
+              destRoomId: e.toRoomId!,
+              zoneName,
+              isOneWayEntrance: false,
+              sourceDirection: undefined,
+            },
+            draggable: false,
+            selectable: true,
+            style: {
+              opacity: 0.9, // Slightly transparent to distinguish from rooms
+              zIndex: 110, // Above rooms (rooms are zIndex 100)
+            },
+          };
+          out.push(portalNode);
+        });
         return out;
       });
       return roomNodes;
@@ -997,12 +1170,32 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         });
       });
 
+      // Viewport virtualization for world-map: only render rooms in visible viewport
+      // Calculate viewport bounds in world coordinates
+      const viewportWidth = reactFlowRef.current?.offsetWidth ?? 2000;
+      const viewportHeight = reactFlowRef.current?.offsetHeight ?? 1600;
+      const bufferMultiplier = 2.0; // Larger buffer for world-map (zoomed out more)
+      const minX =
+        -viewport.x / viewport.zoom - viewportWidth * bufferMultiplier;
+      const maxX =
+        -viewport.x / viewport.zoom + viewportWidth * (1 + bufferMultiplier);
+      const minY =
+        -viewport.y / viewport.zoom - viewportHeight * bufferMultiplier;
+      const maxY =
+        -viewport.y / viewport.zoom + viewportHeight * (1 + bufferMultiplier);
+
+      // Filter and render rooms in a single pass (avoid duplicate calculations)
       worldRooms
         .filter(r => r.layoutX !== null && r.layoutY !== null)
         .forEach(room => {
           const offset = worldOrbitOffsets.get(room.zoneId) || { dx: 0, dy: 0 };
           const x = worldGridToPixels((room.layoutX ?? 0) + offset.dx);
           const y = worldGridToPixelsY((room.layoutY ?? 0) + offset.dy);
+
+          // Skip rooms outside viewport bounds (viewport virtualization)
+          if (x < minX || x > maxX || y < minY || y > maxY) {
+            return;
+          }
           const zoneName =
             worldZoneBounds.find(z => z.id === room.zoneId)?.name ||
             `Zone ${room.zoneId}`;
@@ -1029,6 +1222,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     roomsStructureKey,
+    deferredVisibleRooms, // Deferred viewport virtualization (non-blocking)
     worldZones,
     worldRooms,
     worldZoneBounds,
@@ -1043,18 +1237,38 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   // This only runs when the memoized nodes actually change
   useEffect(() => {
     setNodes(generatedNodes);
+
+    // Enable static preview mode: show nodes immediately but defer full interactivity
+    // This makes initial load feel instant while heavy calculations happen in background
+    // Static preview will hide automatically when isFullyInteractive becomes true
+    setIsFullyInteractive(false);
+
+    // Clear any pending timeout
+    if (renderTimeoutRef.current) {
+      clearTimeout(renderTimeoutRef.current);
+    }
+
+    // Enable full interactivity after nodes are rendered (300ms delay)
+    // This allows visual rendering to complete before enabling expensive features
+    renderTimeoutRef.current = setTimeout(() => {
+      setIsFullyInteractive(true);
+    }, 300);
+
+    return () => {
+      if (renderTimeoutRef.current) {
+        clearTimeout(renderTimeoutRef.current);
+      }
+    };
   }, [generatedNodes, setNodes]);
 
-  // Derive edges from room exits (zone view only) including portal edges
-  useEffect(() => {
-    if (viewMode !== 'zone') return;
-    // Hide edges when zoomed far out to speed up render/interaction
-    if (viewportZoom < 0.4) {
-      setEdges([]);
-      return;
-    }
+  // Generate base edges from room structure (no zoom dependency)
+  // Optimized: Uses deferredVisibleRooms for non-blocking viewport virtualization
+  const baseEdges = useMemo(() => {
+    if (viewMode !== 'zone') return [];
+
     const roomMap = new Map<number, Room>();
-    rooms.forEach(r => roomMap.set(r.id, r));
+    // Use deferredVisibleRooms for non-blocking virtualization
+    deferredVisibleRooms.forEach(r => roomMap.set(r.id, r));
 
     // Map exit directions to source/target handle ids defined in RoomNode
     const sourceHandleMap: Record<string, string> = {
@@ -1093,7 +1307,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       SOUTHWEST: 'top-target',
     };
 
-    const newEdges = rooms.flatMap(room => {
+    // Use deferredVisibleRooms for non-blocking virtualization
+    return deferredVisibleRooms.flatMap(room => {
       const exits = room.exits || [];
       return exits
         .map(e => {
@@ -1144,8 +1359,21 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         targetHandle?: string;
       }>;
     });
-    setEdges(newEdges);
-  }, [rooms, viewMode, setEdges, viewportZoom]);
+  }, [deferredVisibleRooms, viewMode]);
+
+  // Apply zoom-based visibility to edges (separate from generation)
+  // This only updates styles, doesn't regenerate edges
+  useEffect(() => {
+    const shouldHideEdges = viewportZoom < 0.4;
+    const edgesWithVisibility = baseEdges.map(edge => ({
+      ...edge,
+      style: {
+        ...edge.style,
+        display: shouldHideEdges ? 'none' : 'block',
+      },
+    }));
+    setEdges(edgesWithVisibility);
+  }, [baseEdges, viewportZoom, setEdges]);
 
   // World-map edges (lightweight: only connect rooms that exist in payload; allow cross-zone now that IDs are composite)
   useEffect(() => {
@@ -1153,6 +1381,23 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     // Rooms hidden in world view for performance; hide edges too
     setEdges([]);
   }, [viewMode, worldRooms, setEdges]);
+
+  // Update currentZLevel when selected room changes to match its Z-level
+  // Only update if currentZLevel doesn't match the selected room's Z-level
+  // NOTE: currentZLevel NOT in deps - only sync when room selection changes, not when floor buttons are used
+  useEffect(() => {
+    if (viewMode !== 'zone') return;
+    if (selectedRoomId == null) return;
+    const selectedRoom = rooms.find(r => r.id === selectedRoomId);
+    if (
+      selectedRoom &&
+      selectedRoom.layoutZ != null &&
+      selectedRoom.layoutZ !== currentZLevel
+    ) {
+      setCurrentZLevel(selectedRoom.layoutZ);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedRoomId, rooms, viewMode]);
 
   // Floor layering: dim non-selected floors and propagate depth metadata
   // NOTE: This updates node data properties but preserves positions and selection state
@@ -1615,6 +1860,15 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       if (!direction) return;
       if (!selectedRoom) return;
       const exits = selectedRoom.exits || [];
+      console.log(
+        '[Navigation Debug] Selected room exits:',
+        selectedRoom.id,
+        exits.map(e => ({
+          dir: e.direction,
+          toZone: e.toZoneId,
+          toRoom: e.toRoomId,
+        }))
+      );
       const byDirection: Record<string, RoomExit | undefined> = {};
       exits.forEach(ex => {
         byDirection[ex.direction.toUpperCase()] = ex;
@@ -1625,10 +1879,21 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         for (const d of dirs) {
           const ex = byDirection[d];
           if (ex && isValidRoomId(ex.toRoomId)) {
-            return {
+            const result = {
               roomId: ex.toRoomId,
               zoneId: ex.toZoneId ?? selectedRoom.zoneId,
             };
+            console.log(
+              '[Navigation Debug] Pick direction:',
+              d,
+              'exit:',
+              ex,
+              'result:',
+              result,
+              'current zone:',
+              activeZoneId
+            );
+            return result;
           }
         }
         return null;
@@ -1667,13 +1932,42 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           break;
       }
       if (nextDest && nextDest.roomId !== selectedRoomId) {
+        console.log(
+          '[Navigation Debug] Moving to:',
+          nextDest,
+          'from zone:',
+          activeZoneId
+        );
         // Handle cross-zone transition
         if (nextDest.zoneId != null && nextDest.zoneId !== activeZoneId) {
+          console.log(
+            '[Navigation Debug] Zone switch triggered:',
+            activeZoneId,
+            '→',
+            nextDest.zoneId
+          );
+          console.log(
+            '[Navigation Debug] Before setState - activeZoneId:',
+            activeZoneId
+          );
           setActiveZoneId(nextDest.zoneId);
+          console.log('[Navigation Debug] After setActiveZoneId called');
           // Clear rooms to avoid displaying stale room edges until fetch completes
           setRooms([]);
+        } else {
+          console.log('[Navigation Debug] No zone switch:', {
+            destZone: nextDest.zoneId,
+            activeZone: activeZoneId,
+            condition1: nextDest.zoneId != null,
+            condition2: nextDest.zoneId !== activeZoneId,
+          });
         }
+        console.log(
+          '[Navigation Debug] Before setSelectedRoomId:',
+          nextDest.roomId
+        );
         setSelectedRoomId(nextDest.roomId);
+        console.log('[Navigation Debug] After setSelectedRoomId called');
 
         // Update Z-level when navigating to a different room
         const destRoom = rooms.find(r => r.id === nextDest.roomId);
@@ -1708,17 +2002,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   // This updates ONLY the selected property without regenerating positions
   useEffect(() => {
     setNodes(ns => {
-      return ns.map(n => {
-        const nodeIdStr =
-          selectedRoomId != null ? selectedRoomId.toString() : '';
+      const nodeIdStr = selectedRoomId != null ? selectedRoomId.toString() : '';
+      const updated = ns.map(n => {
         const isSelected = selectedRoomId != null && n.id === nodeIdStr;
         return {
           ...n,
           selected: isSelected,
         };
       });
+      return updated;
     });
-  }, [selectedRoomId, nodes.length, setNodes]);
+  }, [selectedRoomId, generatedNodes, setNodes]);
 
   // Follow selected room during navigation (arrow keys, clicks)
   // Skip during initial zone load to avoid conflicting with the initial zoom effect
@@ -2139,6 +2433,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             error={error}
             currentZLevel={currentZLevel}
             onChangeZLevel={delta => setCurrentZLevel(z => z + delta)}
+            minZLevel={floorRange.min}
+            maxZLevel={floorRange.max}
             canUndo={canUndo}
             canRedo={canRedo}
             onUndo={handleUndo}
@@ -2160,15 +2456,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         <ReactFlow
           nodes={nodes}
           edges={edges}
-          nodesDraggable={isEditing}
+          nodesDraggable={isEditing && isFullyInteractive}
           onNodesChange={onNodesChange}
           onEdgesChange={onEdgesChange}
           onNodeDragStop={handleNodeDragStop}
           onNodeDragStart={handleNodeDragStart}
           minZoom={viewMode === 'world-map' ? 0.02 : 0.1}
           maxZoom={viewMode === 'world-map' ? 6 : 2}
-          onMove={(_, vp) => setViewportZoom(vp.zoom)}
-          elementsSelectable={viewMode === 'zone'}
+          onMove={(_, vp) => updateViewportThrottled(vp)}
+          elementsSelectable={viewMode === 'zone' && isFullyInteractive}
+          nodesConnectable={false}
+          nodesFocusable={isFullyInteractive}
           onNodeClick={(_, node) => {
             if (viewMode === 'world-map') {
               const data = node.data as any;
@@ -2214,6 +2512,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               <div className='flex items-center space-x-2 px-3 py-2 rounded-md bg-black/60 text-white text-xs shadow-lg'>
                 <div className='animate-spin h-4 w-4 rounded-full border-2 border-white/60 border-t-transparent' />
                 <span>Rendering world…</span>
+              </div>
+            </div>
+          )}
+          {!isFullyInteractive && !loading && viewMode === 'zone' && (
+            <div className='absolute top-4 right-4 z-20 pointer-events-none'>
+              <div className='flex items-center space-x-2 px-3 py-2 rounded-md bg-blue-500/80 text-white text-xs shadow-lg'>
+                <div className='animate-pulse h-2 w-2 rounded-full bg-white' />
+                <span>Initializing interactive mode…</span>
               </div>
             </div>
           )}
@@ -2352,6 +2658,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               <PropertyPanel
                 room={panelRoom}
                 allRooms={panelAllRooms}
+                zones={worldZones}
                 onRoomChange={() => {}}
                 onSaveRoom={() => {}}
                 onCreateExit={handleCreateExit}

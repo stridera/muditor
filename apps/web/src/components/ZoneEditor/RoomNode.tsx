@@ -45,73 +45,197 @@ interface RoomData {
   onSwitchOverlapRoom?: (direction: 'next' | 'prev') => void;
 }
 
-// Sector type styling and icons - theme-aware
-const getSectorStyles = (
-  isDark: boolean
-): Record<
+// Sector type styling and icons - pre-computed for performance
+// Light theme styles
+const SECTOR_STYLES_LIGHT: Record<
   string,
   { bg: string; border: string; icon: string; text: string }
-> => ({
+> = {
   STRUCTURE: {
-    bg: isDark ? 'bg-slate-800' : 'bg-slate-100',
-    border: isDark ? 'border-slate-500' : 'border-slate-400',
+    bg: 'bg-slate-100',
+    border: 'border-slate-400',
     icon: '🏛️',
-    text: isDark ? 'text-slate-200' : 'text-slate-800',
+    text: 'text-slate-800',
   },
   FIELD: {
-    bg: isDark ? 'bg-green-900' : 'bg-green-100',
-    border: isDark ? 'border-green-500' : 'border-green-400',
+    bg: 'bg-green-100',
+    border: 'border-green-400',
     icon: '🌾',
-    text: isDark ? 'text-green-200' : 'text-green-800',
+    text: 'text-green-800',
   },
   FOREST: {
-    bg: isDark ? 'bg-emerald-900' : 'bg-emerald-100',
-    border: isDark ? 'border-emerald-500' : 'border-emerald-400',
+    bg: 'bg-emerald-100',
+    border: 'border-emerald-400',
     icon: '🌲',
-    text: isDark ? 'text-emerald-200' : 'text-emerald-800',
+    text: 'text-emerald-800',
   },
   HILLS: {
-    bg: isDark ? 'bg-amber-900' : 'bg-amber-100',
-    border: isDark ? 'border-amber-500' : 'border-amber-400',
+    bg: 'bg-amber-100',
+    border: 'border-amber-400',
     icon: '⛰️',
-    text: isDark ? 'text-amber-200' : 'text-amber-800',
+    text: 'text-amber-800',
   },
   MOUNTAIN: {
-    bg: isDark ? 'bg-gray-800' : 'bg-gray-100',
-    border: isDark ? 'border-gray-500' : 'border-gray-400',
+    bg: 'bg-gray-100',
+    border: 'border-gray-400',
     icon: '🏔️',
-    text: isDark ? 'text-gray-200' : 'text-gray-800',
+    text: 'text-gray-800',
   },
   WATER: {
-    bg: isDark ? 'bg-blue-900' : 'bg-blue-100',
-    border: isDark ? 'border-blue-500' : 'border-blue-400',
+    bg: 'bg-blue-100',
+    border: 'border-blue-400',
     icon: '🌊',
-    text: isDark ? 'text-blue-200' : 'text-blue-800',
+    text: 'text-blue-800',
   },
   SWAMP: {
-    bg: isDark ? 'bg-teal-900' : 'bg-teal-100',
-    border: isDark ? 'border-teal-500' : 'border-teal-400',
+    bg: 'bg-teal-100',
+    border: 'border-teal-400',
     icon: '🐊',
-    text: isDark ? 'text-teal-200' : 'text-teal-800',
+    text: 'text-teal-800',
   },
   CITY: {
-    bg: isDark ? 'bg-purple-900' : 'bg-purple-100',
-    border: isDark ? 'border-purple-500' : 'border-purple-400',
+    bg: 'bg-purple-100',
+    border: 'border-purple-400',
     icon: '🏙️',
-    text: isDark ? 'text-purple-200' : 'text-purple-800',
+    text: 'text-purple-800',
   },
   ROAD: {
-    bg: isDark ? 'bg-yellow-900' : 'bg-yellow-100',
-    border: isDark ? 'border-yellow-500' : 'border-yellow-400',
+    bg: 'bg-yellow-100',
+    border: 'border-yellow-400',
     icon: '🛤️',
-    text: isDark ? 'text-yellow-200' : 'text-yellow-800',
+    text: 'text-yellow-800',
   },
-});
+};
 
-export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
+// Dark theme styles
+const SECTOR_STYLES_DARK: Record<
+  string,
+  { bg: string; border: string; icon: string; text: string }
+> = {
+  STRUCTURE: {
+    bg: 'bg-slate-800',
+    border: 'border-slate-500',
+    icon: '🏛️',
+    text: 'text-slate-200',
+  },
+  FIELD: {
+    bg: 'bg-green-900',
+    border: 'border-green-500',
+    icon: '🌾',
+    text: 'text-green-200',
+  },
+  FOREST: {
+    bg: 'bg-emerald-900',
+    border: 'border-emerald-500',
+    icon: '🌲',
+    text: 'text-emerald-200',
+  },
+  HILLS: {
+    bg: 'bg-amber-900',
+    border: 'border-amber-500',
+    icon: '⛰️',
+    text: 'text-amber-200',
+  },
+  MOUNTAIN: {
+    bg: 'bg-gray-800',
+    border: 'border-gray-500',
+    icon: '🏔️',
+    text: 'text-gray-200',
+  },
+  WATER: {
+    bg: 'bg-blue-900',
+    border: 'border-blue-500',
+    icon: '🌊',
+    text: 'text-blue-200',
+  },
+  SWAMP: {
+    bg: 'bg-teal-900',
+    border: 'border-teal-500',
+    icon: '🐊',
+    text: 'text-teal-200',
+  },
+  CITY: {
+    bg: 'bg-purple-900',
+    border: 'border-purple-500',
+    icon: '🏙️',
+    text: 'text-purple-200',
+  },
+  ROAD: {
+    bg: 'bg-yellow-900',
+    border: 'border-yellow-500',
+    icon: '🛤️',
+    text: 'text-yellow-200',
+  },
+};
+
+// Custom comparison function for RoomNode memoization
+// Only re-render if critical props that affect visual output have changed
+const arePropsEqual = (
+  prevProps: NodeProps<RoomData>,
+  nextProps: NodeProps<RoomData>
+): boolean => {
+  const prev = prevProps.data;
+  const next = nextProps.data;
+
+  // Quick checks for primitive values
+  if (
+    prev.roomId !== next.roomId ||
+    prev.zoneId !== next.zoneId ||
+    prev.name !== next.name ||
+    prev.sector !== next.sector ||
+    prev.layoutZ !== next.layoutZ ||
+    prev.currentZLevel !== next.currentZLevel ||
+    prev.isCurrentFloor !== next.isCurrentFloor ||
+    prev.depthOpacity !== next.depthOpacity ||
+    prev.isOverlapping !== next.isOverlapping ||
+    prev.activeOverlapIndex !== next.activeOverlapIndex ||
+    prev.overlapIndex !== next.overlapIndex ||
+    prev.totalOverlaps !== next.totalOverlaps ||
+    prevProps.selected !== nextProps.selected
+  ) {
+    return false;
+  }
+
+  // Check array lengths (counts affect badges)
+  if (
+    (prev.mobs?.length || 0) !== (next.mobs?.length || 0) ||
+    (prev.objects?.length || 0) !== (next.objects?.length || 0) ||
+    (prev.shops?.length || 0) !== (next.shops?.length || 0) ||
+    prev.exits.length !== next.exits.length
+  ) {
+    return false;
+  }
+
+  // Check if exit directions changed (affects UP/DOWN indicators)
+  const prevExitDirs = prev.exits
+    .map(e => e.direction)
+    .sort()
+    .join(',');
+  const nextExitDirs = next.exits
+    .map(e => e.direction)
+    .sort()
+    .join(',');
+  if (prevExitDirs !== nextExitDirs) {
+    return false;
+  }
+
+  // Check overlappedRooms array
+  if (prev.overlappedRooms?.length !== next.overlappedRooms?.length) {
+    return false;
+  }
+
+  // If we got here, all critical props are equal - don't re-render
+  return true;
+};
+
+const RoomNodeComponent: React.FC<NodeProps<RoomData>> = ({
+  data,
+  selected,
+}) => {
   const { theme } = useTheme();
   const isDark = theme === 'dark';
-  const sectorStyles = getSectorStyles(isDark);
+  // Use pre-computed constant styles instead of recalculating
+  const sectorStyles = isDark ? SECTOR_STYLES_DARK : SECTOR_STYLES_LIGHT;
 
   // Rename to sectorStyle to avoid shadowing NodeProps.style and improve clarity.
   // Explicit annotation ensures it is never treated as possibly undefined.
@@ -544,3 +668,6 @@ export const RoomNode: React.FC<NodeProps<RoomData>> = ({ data, selected }) => {
     </>
   );
 };
+
+// Export memoized version with custom comparison
+export const RoomNode = React.memo(RoomNodeComponent, arePropsEqual);

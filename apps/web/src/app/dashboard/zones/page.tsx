@@ -188,7 +188,7 @@ function ZonesContent() {
                   }}
                   className='text-primary hover:text-primary-foreground text-sm'
                 >
-                  Edit
+                  📐 Visual Editor
                 </button>
               </div>
             </div>
