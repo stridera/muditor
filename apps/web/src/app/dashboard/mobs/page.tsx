@@ -24,7 +24,6 @@ import { useEffect, useState } from 'react';
 import EnhancedSearch, {
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
-import ZoneSelector from '../../../components/ZoneSelector';
 import {
   applySearchFilters,
   createMobPresets,
@@ -650,14 +649,6 @@ function MobsContent() {
             Create New Mob
           </button>
         </Link>
-      </div>
-
-      {/* Zone Selector */}
-      <div className='mb-4'>
-        <ZoneSelector
-          selectedZone={selectedZone}
-          onZoneChange={setSelectedZone}
-        />
       </div>
 
       {/* Sort and Items Per Page Controls */}

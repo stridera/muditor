@@ -56,6 +56,7 @@ interface RoomExit {
 interface PropertyPanelProps {
   room: Room;
   allRooms: Room[];
+  zones?: Array<{ id: number; name: string }>; // For cross-zone exit display
   onRoomChange: (field: keyof Room, value: string) => void;
   onSaveRoom: () => void;
   onCreateExit: (exitData: {
@@ -107,6 +108,7 @@ const directionOptions = [
 export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   room,
   allRooms,
+  zones = [],
   onRoomChange,
   onSaveRoom,
   onCreateExit,
@@ -439,6 +441,20 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 ? ` / Zone ${destZoneId}`
                                 : ''}
                               )
+                            </span>
+                          ) : destZoneId !== room.zoneId ? (
+                            // Cross-zone exit - show zone name and portal indicator
+                            <span className='flex items-center gap-1'>
+                              <span className='text-purple-600 dark:text-purple-400'>
+                                🌐 Portal:
+                              </span>
+                              <span className='font-medium'>
+                                {zones.find(z => z.id === destZoneId)?.name ||
+                                  `Zone ${destZoneId}`}
+                              </span>
+                              <span className='text-xs opacity-75'>
+                                (Room {destRoomId})
+                              </span>
                             </span>
                           ) : (
                             <span className='italic'>Unlinked destination</span>
@@ -1217,7 +1233,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         </div>
                         <div className='flex gap-1'>
                           <a
-                            href={`/dashboard/mobs/editor?zoneId=${mob.zoneId}&id=${mob.id}`}
+                            href={`/dashboard/mobs/editor?zone={mob.zoneId}&id=${mob.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
                             className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-blue-400 bg-blue-900/30 hover:bg-blue-900/50' : 'text-blue-600 hover:text-blue-800 bg-blue-100 hover:bg-blue-200'}`}
@@ -1298,7 +1314,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         </div>
                         <div className='flex gap-1'>
                           <a
-                            href={`/dashboard/objects/editor?zoneId=${obj.zoneId}&id=${obj.id}`}
+                            href={`/dashboard/objects/editor?zone={obj.zoneId}&id=${obj.id}`}
                             target='_blank'
                             rel='noopener noreferrer'
                             className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-purple-400 bg-purple-900/30 hover:bg-purple-900/50' : 'text-purple-600 hover:text-purple-800 bg-purple-100 hover:bg-purple-200'}`}
@@ -1384,7 +1400,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           </div>
                           <div className='flex gap-1'>
                             <a
-                              href={`/dashboard/shops/editor?zoneId=${shop.zoneId}&id=${shop.id}`}
+                              href={`/dashboard/shops/editor?zone={shop.zoneId}&id=${shop.id}`}
                               target='_blank'
                               rel='noopener noreferrer'
                               className={`text-xs px-2 py-1 rounded transition-colors ${isDark ? 'text-amber-400 bg-amber-900/30 hover:bg-amber-900/50' : 'text-amber-600 hover:text-amber-800 bg-amber-100 hover:bg-amber-200'}`}

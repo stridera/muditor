@@ -2,9 +2,10 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { ClimateBadge } from '@/components/ui/climate-badge';
+import { EditZoneModal } from '@/components/zones/edit-zone-modal';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 interface ZoneDetail {
   id: number;
@@ -35,15 +36,15 @@ function ZoneDetailContent() {
   const [zone, setZone] = useState<ZoneDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
-  useEffect(() => {
-    const fetchZone = async () => {
-      try {
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `
+  const fetchZone = useCallback(async () => {
+    try {
+      const response = await fetch('http://localhost:4000/graphql', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query: `
               query GetZone($id: Int!) {
                 zone(id: $id) {
                   id
@@ -61,29 +62,30 @@ function ZoneDetailContent() {
                 }
               }
             `,
-            variables: { id: parseInt(zoneId) },
-          }),
-        });
+          variables: { id: parseInt(zoneId) },
+        }),
+      });
 
-        const data = await response.json();
-        if (data.errors) {
-          throw new Error(data.errors[0].message);
-        }
-
-        if (!data.data.zone) {
-          throw new Error('Zone not found');
-        }
-
-        setZone(data.data.zone);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch zone');
-      } finally {
-        setLoading(false);
+      const data = await response.json();
+      if (data.errors) {
+        throw new Error(data.errors[0].message);
       }
-    };
 
-    fetchZone();
+      if (!data.data.zone) {
+        throw new Error('Zone not found');
+      }
+
+      setZone(data.data.zone);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Failed to fetch zone');
+    } finally {
+      setLoading(false);
+    }
   }, [zoneId]);
+
+  useEffect(() => {
+    fetchZone();
+  }, [fetchZone]);
 
   if (loading) {
     return (
@@ -147,7 +149,7 @@ function ZoneDetailContent() {
             <h1 className='text-3xl font-bold text-foreground'>{zone.name}</h1>
             <p className='text-muted-foreground mt-1'>Zone ID: {zone.id}</p>
           </div>
-          <div className='flex items-center gap-2'>
+          <div className='flex items-center gap-3'>
             <span className='inline-flex items-center gap-1 rounded-md border border-border bg-muted text-muted-foreground px-3 py-1 text-sm'>
               <span
                 className={`w-2 h-2 rounded-full ${healthStatus === 'healthy' ? 'bg-primary' : healthStatus === 'moderate' ? 'bg-secondary' : 'bg-destructive'}`}
@@ -158,6 +160,12 @@ function ZoneDetailContent() {
                   ? 'Moderate'
                   : 'Needs Attention'}
             </span>
+            <button
+              onClick={() => setIsEditModalOpen(true)}
+              className='bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-sm'
+            >
+              ✏️ Edit Zone
+            </button>
           </div>
         </div>
       </div>
@@ -261,7 +269,7 @@ function ZoneDetailContent() {
           </h3>
           <div className='space-y-2'>
             <Link
-              href={`/dashboard/zones/editor?zone_id=${zone.id}`}
+              href={`/dashboard/zones/editor?zone=${zone.id}`}
               className='block w-full bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors text-center'
             >
               Visual Editor
@@ -275,6 +283,25 @@ function ZoneDetailContent() {
           </div>
         </div>
       </div>
+
+      {/* Edit Zone Modal */}
+      {zone && (
+        <EditZoneModal
+          zone={{
+            id: zone.id,
+            name: zone.name,
+            lifespan: zone.lifespan,
+            resetMode: zone.resetMode,
+            hemisphere: zone.hemisphere,
+            climate: zone.climate,
+          }}
+          isOpen={isEditModalOpen}
+          onClose={() => setIsEditModalOpen(false)}
+          onSuccess={() => {
+            fetchZone();
+          }}
+        />
+      )}
     </div>
   );
 }

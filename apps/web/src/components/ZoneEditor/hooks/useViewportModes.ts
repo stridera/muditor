@@ -97,7 +97,7 @@ export function useViewportModes(
       if (worldMapMode || currentViewMode === 'world-map') {
         // Simple navigation; detailed centering logic stays here for now
         if (newZoneId !== zoneId) {
-          router.push(`/dashboard/zones/editor?zone_id=${newZoneId}`);
+          router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
         } else {
           setCurrentViewMode('zone-overview');
           if (reactFlowInstance) {
@@ -114,7 +114,7 @@ export function useViewportModes(
         return;
       }
       if (newZoneId !== zoneId) {
-        router.push(`/dashboard/zones/editor?zone_id=${newZoneId}`);
+        router.push(`/dashboard/zones/editor?zone=${newZoneId}`);
       }
     },
     [worldMapMode, currentViewMode, zoneId, router, reactFlowInstance]

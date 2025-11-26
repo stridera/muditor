@@ -21,7 +21,7 @@ export const PortalNode: React.FC<NodeProps<PortalData>> = ({ data }) => {
     // Use shallow routing to update URL without full page re-render
     // This preserves React state while updating the URL for bookmarking/history
     router.push(
-      `/dashboard/zones/editor?zone_id=${data.destZoneId}&room_id=${data.destRoomId}`,
+      `/dashboard/zones/editor?zone=${data.destZoneId}&room=${data.destRoomId}`,
       { scroll: false }
     );
   };

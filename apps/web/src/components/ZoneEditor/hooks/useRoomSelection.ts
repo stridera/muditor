@@ -76,9 +76,7 @@ export function useRoomSelection<
         }
       }
       if (zoneId != null) {
-        router.push(
-          `/dashboard/zones/editor?zone_id=${zoneId}&room_id=${roomId}`
-        );
+        router.push(`/dashboard/zones/editor?zone=${zoneId}&room=${roomId}`);
       }
     },
     [rooms, selectedRoomId, reactFlowInstance, router, zoneId, setCurrentZLevel]

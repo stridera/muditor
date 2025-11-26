@@ -8,15 +8,16 @@ import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState } from 'react';
-import ZoneSelector from '../../../components/ZoneSelector';
 
 interface RoomExit {
   id: string;
   direction: string;
   description?: string;
-  keyword?: string;
+  keywords?: string[];
   key?: string;
-  destination?: number;
+  toZoneId?: number;
+  toRoomId?: number;
+  flags?: string[];
 }
 
 interface RoomExtraDescription {
@@ -65,11 +66,11 @@ function RoomsContent() {
   const [expandedRooms, setExpandedRooms] = useState<Set<number>>(new Set());
   const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
 
-  // Handle initial zone parameter from URL
+  // Sync zone parameter from URL with zone context
   useEffect(() => {
-    if (zoneParam && selectedZone === null) {
+    if (zoneParam) {
       const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId)) {
+      if (!isNaN(zoneId) && zoneId !== selectedZone) {
         setSelectedZone(zoneId);
       }
     }
@@ -159,9 +160,11 @@ function RoomsContent() {
                 id
                 direction
                 description
-                keyword
+                keywords
                 key
-                destination
+                toZoneId
+                toRoomId
+                flags
               }
               extraDescs {
                 id
@@ -282,12 +285,7 @@ function RoomsContent() {
       </div>
 
       <div className='bg-card rounded-lg shadow mb-6 p-4'>
-        <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-          <ZoneSelector
-            selectedZone={selectedZone}
-            onZoneChange={setSelectedZone}
-          />
-
+        <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
           <div>
             <label
               htmlFor='search'
@@ -319,8 +317,8 @@ function RoomsContent() {
               onChange={e => setSelectedSector(e.target.value)}
             >
               <option value='all'>All sectors</option>
-              {sectorOptions.map(sector => (
-                <option key={sector} value={sector}>
+              {sectorOptions.map((sector, index) => (
+                <option key={`sector-${index}`} value={sector}>
                   {sector}
                 </option>
               ))}
@@ -387,7 +385,7 @@ function RoomsContent() {
                       Zone
                     </Link>
                     <Link
-                      href={`/dashboard/zones/editor?zone_id=${room.zoneId}&room_id=${room.id}`}
+                      href={`/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`}
                       className='text-primary hover:text-primary-foreground px-3 py-1 text-sm'
                       onClick={e => e.stopPropagation()}
                     >
@@ -436,9 +434,14 @@ function RoomsContent() {
                                 <div className='font-medium text-foreground'>
                                   {exit.direction.toUpperCase()}
                                 </div>
-                                {exit.destination != null && (
+                                {exit.toRoomId != null && (
                                   <div className='text-primary'>
-                                    → Room {exit.destination}
+                                    →{' '}
+                                    {exit.toZoneId &&
+                                    exit.toZoneId !== room.zoneId
+                                      ? `Zone ${exit.toZoneId}, `
+                                      : ''}
+                                    Room {exit.toRoomId}
                                   </div>
                                 )}
                                 {exit.description && (
@@ -446,9 +449,9 @@ function RoomsContent() {
                                     {exit.description}
                                   </div>
                                 )}
-                                {exit.keyword && (
+                                {exit.keywords && exit.keywords.length > 0 && (
                                   <div className='text-muted-foreground mt-1'>
-                                    Keyword: {exit.keyword}
+                                    Keywords: {exit.keywords.join(', ')}
                                   </div>
                                 )}
                                 {exit.key && (

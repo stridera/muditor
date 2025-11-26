@@ -169,7 +169,7 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
 function ShopEditorContent() {
   const searchParams = useSearchParams();
   const shopId = searchParams.get('id');
-  const zoneId = searchParams.get('zoneId');
+  const zoneId = searchParams.get('zone');
   const isNew = !shopId;
 
   const [activeTab, setActiveTab] = useState('basic');

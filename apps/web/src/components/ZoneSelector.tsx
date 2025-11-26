@@ -1,12 +1,6 @@
 'use client';
 
-import { gql } from '@apollo/client';
-import { useQuery } from '@apollo/client/react';
-
-interface Zone {
-  id: number;
-  name: string;
-}
+import { useZonesForSelector } from '@/hooks/use-zones-for-selector';
 
 interface ZoneSelectorProps {
   selectedZone?: number | null;
@@ -14,27 +8,12 @@ interface ZoneSelectorProps {
   className?: string;
 }
 
-interface ZonesQueryData {
-  zones: Zone[];
-}
-
-const GET_ZONES = gql`
-  query GetZonesForSelector {
-    zones {
-      id
-      name
-    }
-  }
-`;
-
 export default function ZoneSelector({
   selectedZone,
   onZoneChange,
   className = '',
 }: ZoneSelectorProps) {
-  const { data, loading, error } = useQuery<ZonesQueryData>(GET_ZONES);
-
-  const zones = data?.zones || [];
+  const { zones, loading, error } = useZonesForSelector();
 
   const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
@@ -82,7 +61,7 @@ export default function ZoneSelector({
         onChange={handleChange}
       >
         <option value='all'>All zones</option>
-        {zones.map((zone: Zone) => (
+        {zones.map(zone => (
           <option key={zone.id} value={zone.id}>
             Zone {zone.id}: {zone.name}
           </option>
