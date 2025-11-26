@@ -327,19 +327,19 @@ export function useHelpModal(context: HelpContext = 'global') {
 
           switch (e.key.toLowerCase()) {
             case 'r':
-              targetPath = '/rooms';
+              targetPath = '/dashboard/rooms';
               break;
             case 'm':
-              targetPath = '/mobs';
+              targetPath = '/dashboard/mobs';
               break;
             case 'o':
-              targetPath = '/objects';
+              targetPath = '/dashboard/objects';
               break;
             case 's':
-              targetPath = '/shops';
+              targetPath = '/dashboard/shops';
               break;
             case 'z':
-              targetPath = '/zones';
+              targetPath = '/dashboard/zones';
               break;
           }
 
