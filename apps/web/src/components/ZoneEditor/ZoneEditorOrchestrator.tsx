@@ -42,7 +42,7 @@ import { RoomNode } from './RoomNode';
 import { usePermissions } from '@/hooks/use-permissions';
 import { EntityPanel, type Mob, type GameObject } from './EntityPanel';
 import type { EntityDetail } from './EntityDetailPanel';
-import { HelpModal, useHelpModal } from '@/components/HelpModal';
+import { GoToHint, HelpModal, useHelpModal } from '@/components/HelpModal';
 
 // Portal positioning using center-to-center distances
 // This ensures uniform spacing in all directions
@@ -372,7 +372,11 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   >({});
   const [editorMode, setEditorMode] = useState<EditorMode>('view');
   const { canEditZone } = usePermissions();
-  const { open: helpOpen, setOpen: setHelpOpen } = useHelpModal('zone-editor');
+  const {
+    open: helpOpen,
+    setOpen: setHelpOpen,
+    showGoToHint,
+  } = useHelpModal('zone-editor');
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
   const reactFlowRef = useRef<HTMLDivElement | null>(null);
@@ -2711,6 +2715,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         onOpenChange={setHelpOpen}
         context='zone-editor'
       />
+
+      {/* Go-to hint popup */}
+      <GoToHint show={showGoToHint} />
     </div>
   );
 };

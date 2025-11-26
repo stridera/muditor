@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -44,11 +44,11 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       title: 'Navigation',
       shortcuts: [
         { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
-        { keys: 'gr', description: 'Go to room', implemented: false },
-        { keys: 'gz', description: 'Go to zone', implemented: false },
-        { keys: 'gm', description: 'Go to mob', implemented: false },
-        { keys: 'go', description: 'Go to object', implemented: false },
-        { keys: 'gs', description: 'Go to shop', implemented: false },
+        { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
+        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
+        { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
+        { keys: 'Ctrl+G → O', description: 'Go to objects list' },
+        { keys: 'Ctrl+G → S', description: 'Go to shops list' },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
@@ -61,56 +61,31 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       ],
     },
     {
-      title: 'Room Creation',
+      title: 'Entity Creation (Chords)',
       shortcuts: [
         {
-          keys: 'Ctrl+N North',
-          description: 'Create room to the north',
+          keys: 'Ctrl+N → R',
+          description: 'Create new room (in direction)',
           implemented: false,
         },
         {
-          keys: 'Ctrl+N South',
-          description: 'Create room to the south',
+          keys: 'Ctrl+N → M',
+          description: 'Create new mob in current room',
           implemented: false,
         },
         {
-          keys: 'Ctrl+N East',
-          description: 'Create room to the east',
+          keys: 'Ctrl+N → O',
+          description: 'Create new object in current room',
           implemented: false,
         },
         {
-          keys: 'Ctrl+N West',
-          description: 'Create room to the west',
+          keys: 'Ctrl+N → S',
+          description: 'Create new shop in current room',
           implemented: false,
         },
         {
-          keys: 'Ctrl+N Up',
-          description: 'Create room above',
-          implemented: false,
-        },
-        {
-          keys: 'Ctrl+N Down',
-          description: 'Create room below',
-          implemented: false,
-        },
-      ],
-    },
-    {
-      title: 'Entity Creation',
-      shortcuts: [
-        {
-          keys: 'Ctrl+M',
-          description: 'Add mob to current room',
-          implemented: false,
-        },
-        {
-          keys: 'Ctrl+O',
-          description: 'Add object to current room',
-          implemented: false,
-        },
-        {
-          keys: 'Ctrl+Shift+S',
-          description: 'Add shop to current room',
+          keys: 'Ctrl+N → T',
+          description: 'Create new trigger/script',
           implemented: false,
         },
       ],
@@ -129,13 +104,18 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       shortcuts: [
         { keys: 'Ctrl+S', description: 'Save room changes' },
         {
-          keys: 'Ctrl+M',
+          keys: 'Ctrl+N → M',
           description: 'Add mob to this room',
           implemented: false,
         },
         {
-          keys: 'Ctrl+O',
+          keys: 'Ctrl+N → O',
           description: 'Add object to this room',
+          implemented: false,
+        },
+        {
+          keys: 'Ctrl+N → S',
+          description: 'Add shop to this room',
           implemented: false,
         },
       ],
@@ -186,6 +166,44 @@ interface HelpModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   context?: HelpContext;
+}
+
+export interface GoToHintProps {
+  show: boolean;
+}
+
+export function GoToHint({ show }: GoToHintProps) {
+  if (!show) return null;
+
+  return (
+    <div className='fixed inset-0 z-50 flex items-center justify-center pointer-events-none'>
+      <div className='bg-popover border border-border rounded-lg shadow-lg p-4 pointer-events-auto animate-in fade-in zoom-in-95 duration-200'>
+        <div className='text-sm font-semibold mb-3 text-foreground'>Go to:</div>
+        <div className='space-y-2 text-sm'>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>R</kbd>
+            <span className='text-muted-foreground'>Rooms</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>M</kbd>
+            <span className='text-muted-foreground'>Mobs</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>O</kbd>
+            <span className='text-muted-foreground'>Objects</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>S</kbd>
+            <span className='text-muted-foreground'>Shops</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>Z</kbd>
+            <span className='text-muted-foreground'>Zones</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 }
 
 export function HelpModal({
@@ -258,33 +276,96 @@ export function HelpModal({
 
 /**
  * Hook to manage help modal state and keyboard shortcuts
+ * Also handles global navigation shortcuts (Ctrl+G → R/M/O/S/Z)
  */
 export function useHelpModal(context: HelpContext = 'global') {
   const [open, setOpen] = useState(false);
+  const [showGoToHint, setShowGoToHint] = useState(false);
+  const lastKeyRef = useRef<string | null>(null);
+  const lastKeyTimeRef = useRef<number>(0);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      const target = e.target as HTMLElement;
+      const isInput =
+        target.tagName === 'INPUT' ||
+        target.tagName === 'TEXTAREA' ||
+        target.isContentEditable;
+
       // ? key opens help (but not in input fields)
       // Note: ? requires shift key, so we check for '?' character directly
       if (e.key === '?') {
-        const target = e.target as HTMLElement;
-        const isInput =
-          target.tagName === 'INPUT' ||
-          target.tagName === 'TEXTAREA' ||
-          target.isContentEditable;
-
         if (!isInput) {
           e.preventDefault();
           setOpen(true);
         }
+        return;
       }
 
-      // Esc closes help
+      // Esc closes help or hint
       if (e.key === 'Escape') {
         if (open) {
           e.preventDefault();
           setOpen(false);
+        } else if (showGoToHint) {
+          e.preventDefault();
+          setShowGoToHint(false);
+          lastKeyRef.current = null;
         }
+        return;
+      }
+
+      // Handle 'Ctrl+G' navigation shortcuts (Ctrl+G → R/M/O/S/Z)
+      // Only in non-input contexts
+      if (!isInput) {
+        const now = Date.now();
+        const timeSinceLastKey = now - lastKeyTimeRef.current;
+
+        // If 'Ctrl+G' was pressed within the last 1000ms, check for second key
+        if (lastKeyRef.current === 'ctrl+g' && timeSinceLastKey < 1000) {
+          let targetPath: string | null = null;
+
+          switch (e.key.toLowerCase()) {
+            case 'r':
+              targetPath = '/rooms';
+              break;
+            case 'm':
+              targetPath = '/mobs';
+              break;
+            case 'o':
+              targetPath = '/objects';
+              break;
+            case 's':
+              targetPath = '/shops';
+              break;
+            case 'z':
+              targetPath = '/zones';
+              break;
+          }
+
+          if (targetPath) {
+            e.preventDefault();
+            setShowGoToHint(false);
+            window.location.href = targetPath;
+            lastKeyRef.current = null;
+            return;
+          }
+        }
+
+        // Record 'Ctrl+G' key press
+        if (e.ctrlKey && e.key.toLowerCase() === 'g') {
+          e.preventDefault();
+          lastKeyRef.current = 'ctrl+g';
+          lastKeyTimeRef.current = now;
+          setShowGoToHint(true);
+          return;
+        }
+
+        // Reset if any other key is pressed
+        if (lastKeyRef.current === 'ctrl+g') {
+          setShowGoToHint(false);
+        }
+        lastKeyRef.current = null;
       }
     };
 
@@ -292,7 +373,18 @@ export function useHelpModal(context: HelpContext = 'global') {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [context, open]);
+  }, [context, open, showGoToHint]);
 
-  return { open, setOpen };
+  // Auto-hide hint after timeout
+  useEffect(() => {
+    if (showGoToHint) {
+      const timeout = setTimeout(() => {
+        setShowGoToHint(false);
+        lastKeyRef.current = null;
+      }, 1000);
+      return () => clearTimeout(timeout);
+    }
+  }, [showGoToHint]);
+
+  return { open, setOpen, showGoToHint };
 }
