@@ -34,11 +34,17 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       title: 'Navigation',
       shortcuts: [
         { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        { keys: 'Ctrl+G → V', description: 'Go to visual editor (zones)' },
         { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
-        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
         { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
         { keys: 'Ctrl+G → O', description: 'Go to objects list' },
         { keys: 'Ctrl+G → S', description: 'Go to shops list' },
+        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
+        { keys: 'Ctrl+G → C', description: 'Go to characters' },
+        { keys: 'Ctrl+G → U', description: 'Go to users' },
+        { keys: 'Ctrl+G → A', description: 'Go to abilities' },
+        { keys: 'Ctrl+G → T', description: 'Go to scripts' },
+        { keys: 'Ctrl+G → E', description: 'Go to effects' },
         { keys: '?', description: 'Show this help dialog' },
         { keys: 'Esc', description: 'Close dialogs and modals' },
       ],
@@ -49,11 +55,17 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       title: 'Navigation',
       shortcuts: [
         { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        { keys: 'Ctrl+G → V', description: 'Go to visual editor (zones)' },
         { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
-        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
         { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
         { keys: 'Ctrl+G → O', description: 'Go to objects list' },
         { keys: 'Ctrl+G → S', description: 'Go to shops list' },
+        { keys: 'Ctrl+G → Z', description: 'Go to zones list' },
+        { keys: 'Ctrl+G → C', description: 'Go to characters' },
+        { keys: 'Ctrl+G → U', description: 'Go to users' },
+        { keys: 'Ctrl+G → A', description: 'Go to abilities' },
+        { keys: 'Ctrl+G → T', description: 'Go to scripts' },
+        { keys: 'Ctrl+G → E', description: 'Go to effects' },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
@@ -184,22 +196,46 @@ export function GoToHint({ show }: GoToHintProps) {
     <div className='fixed inset-0 z-50 flex items-center justify-center pointer-events-none'>
       <div className='bg-popover border border-border rounded-lg shadow-lg p-4 pointer-events-auto animate-in fade-in zoom-in-95 duration-200'>
         <div className='text-sm font-semibold mb-3 text-foreground'>Go to:</div>
-        <div className='space-y-2 text-sm'>
+        <div className='grid grid-cols-2 gap-x-6 gap-y-2 text-sm'>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>V</kbd>
+            <span className='text-muted-foreground'>Visual Editor</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>C</kbd>
+            <span className='text-muted-foreground'>Characters</span>
+          </div>
           <div className='flex items-center gap-3'>
             <kbd className='kbd min-w-[1.5rem]'>R</kbd>
             <span className='text-muted-foreground'>Rooms</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>U</kbd>
+            <span className='text-muted-foreground'>Users</span>
           </div>
           <div className='flex items-center gap-3'>
             <kbd className='kbd min-w-[1.5rem]'>M</kbd>
             <span className='text-muted-foreground'>Mobs</span>
           </div>
           <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>A</kbd>
+            <span className='text-muted-foreground'>Abilities</span>
+          </div>
+          <div className='flex items-center gap-3'>
             <kbd className='kbd min-w-[1.5rem]'>O</kbd>
             <span className='text-muted-foreground'>Objects</span>
           </div>
           <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>T</kbd>
+            <span className='text-muted-foreground'>Scripts</span>
+          </div>
+          <div className='flex items-center gap-3'>
             <kbd className='kbd min-w-[1.5rem]'>S</kbd>
             <span className='text-muted-foreground'>Shops</span>
+          </div>
+          <div className='flex items-center gap-3'>
+            <kbd className='kbd min-w-[1.5rem]'>E</kbd>
+            <span className='text-muted-foreground'>Effects</span>
           </div>
           <div className='flex items-center gap-3'>
             <kbd className='kbd min-w-[1.5rem]'>Z</kbd>
@@ -331,6 +367,9 @@ export function useHelpModal(context: HelpContext = 'global') {
           let targetPath: string | null = null;
 
           switch (e.key.toLowerCase()) {
+            case 'v':
+              targetPath = '/dashboard/zones';
+              break;
             case 'r':
               targetPath = '/dashboard/rooms';
               break;
@@ -345,6 +384,21 @@ export function useHelpModal(context: HelpContext = 'global') {
               break;
             case 'z':
               targetPath = '/dashboard/zones';
+              break;
+            case 'c':
+              targetPath = '/dashboard/characters';
+              break;
+            case 'u':
+              targetPath = '/dashboard/users';
+              break;
+            case 'a':
+              targetPath = '/dashboard/abilities';
+              break;
+            case 't':
+              targetPath = '/dashboard/scripts';
+              break;
+            case 'e':
+              targetPath = '/dashboard/effects';
               break;
           }
 
