@@ -1,6 +1,7 @@
 'use client';
 
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import { useSearchParams } from 'next/navigation';
 
 export interface ZoneContextType {
   selectedZone: number | null;
@@ -23,9 +24,22 @@ interface ZoneProviderProps {
 
 export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
   const [selectedZone, setSelectedZoneState] = useState<number | null>(null);
+  const searchParams = useSearchParams();
 
   useEffect(() => {
-    // Load selected zone from localStorage on component mount
+    // Priority 1: Check URL parameters first
+    const urlZone = searchParams.get('zone');
+    if (urlZone) {
+      const zoneId = parseInt(urlZone);
+      if (!isNaN(zoneId)) {
+        setSelectedZoneState(zoneId);
+        // Update localStorage to match URL
+        localStorage.setItem('muditor-selected-zone', zoneId.toString());
+        return;
+      }
+    }
+
+    // Priority 2: Load from localStorage if no URL parameter
     const stored = localStorage.getItem('muditor-selected-zone');
     if (stored && stored !== 'null') {
       const zoneId = parseInt(stored);
@@ -33,7 +47,7 @@ export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
         setSelectedZoneState(zoneId);
       }
     }
-  }, []);
+  }, [searchParams]);
 
   const setSelectedZone = (zone: number | null) => {
     setSelectedZoneState(zone);

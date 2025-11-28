@@ -349,20 +349,23 @@ function MobEditorContent() {
   };
 
   // Show loading state while query is running
-  if (loading) return <div className='p-4'>Loading mob data...</div>;
+  if (loading)
+    return <div className='p-4 text-foreground'>Loading mob data...</div>;
 
   // Show error if query failed
   if (error) {
     console.error('GraphQL Error:', error);
     return (
-      <div className='p-4 text-red-600'>Error loading mob: {error.message}</div>
+      <div className='p-4 text-destructive'>
+        Error loading mob: {error.message}
+      </div>
     );
   }
 
   // If we have params but no data, the mob might not exist
   if (!isNew && !loading && !data?.mob) {
     return (
-      <div className='p-4 text-red-600'>
+      <div className='p-4 text-destructive'>
         Mob not found (Zone: {zoneId}, ID: {mobId}). It may not exist in the
         database.
       </div>
@@ -382,14 +385,14 @@ function MobEditorContent() {
       {/* Header */}
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900'>
+          <h1 className='text-3xl font-bold text-foreground'>
             {isNew
               ? 'Create New Mob'
               : formData.name
                 ? `Edit Mob: ${formData.name}`
                 : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
           </h1>
-          <p className='text-gray-600 mt-1'>
+          <p className='text-muted-foreground mt-1'>
             {isNew
               ? 'Create a new mob with custom stats, appearance, and behavior'
               : data?.mob?.name || 'Loading mob details...'}
@@ -397,7 +400,7 @@ function MobEditorContent() {
         </div>
         <div className='flex gap-2'>
           <Link href='/dashboard/mobs'>
-            <button className='inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'>
+            <button className='inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Mobs
             </button>
@@ -405,7 +408,7 @@ function MobEditorContent() {
           <button
             onClick={handleSave}
             disabled={updateLoading || createLoading}
-            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
+            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
           >
             <Save className='w-4 h-4 mr-2' />
             {isNew ? 'Create Mob' : 'Save Changes'}
@@ -414,7 +417,7 @@ function MobEditorContent() {
       </div>
 
       {generalError && (
-        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4'>
+        <div className='bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-4'>
           {generalError}
         </div>
       )}
@@ -428,8 +431,8 @@ function MobEditorContent() {
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-foreground hover:border-border'
               }`}
             >
               {tab.label}
@@ -442,8 +445,8 @@ function MobEditorContent() {
       <div className='space-y-6'>
         {/* Basic Information Tab */}
         {activeTab === 'basic' && (
-          <div className='bg-white shadow rounded-lg p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          <div className='bg-card shadow rounded-lg p-6'>
+            <h3 className='text-lg font-medium text-card-foreground mb-4'>
               Basic Information
             </h3>
             <div className='space-y-4'>
@@ -451,7 +454,7 @@ function MobEditorContent() {
                 <div>
                   <label
                     htmlFor='keywords'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Keywords *
                   </label>
@@ -463,12 +466,12 @@ function MobEditorContent() {
                       handleInputChange('keywords', e.target.value)
                     }
                     placeholder='e.g., orc warrior guard'
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.keywords ? 'border-red-300' : 'border-gray-300'
+                    className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                      errors.keywords ? 'border-destructive' : 'border-input'
                     }`}
                   />
                   {errors.keywords && (
-                    <p className='text-red-500 text-xs mt-1'>
+                    <p className='text-destructive text-xs mt-1'>
                       {errors.keywords}
                     </p>
                   )}
@@ -477,7 +480,7 @@ function MobEditorContent() {
                 <div>
                   <label
                     htmlFor='mobClass'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Class
                   </label>
@@ -487,7 +490,7 @@ function MobEditorContent() {
                     onChange={e =>
                       handleInputChange('mobClass', e.target.value)
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   >
                     <option value='warrior'>Warrior</option>
                     <option value='wizard'>Wizard</option>
@@ -501,7 +504,7 @@ function MobEditorContent() {
               <div>
                 <label
                   htmlFor='name'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-card-foreground mb-1'
                 >
                   Name *
                 </label>
@@ -511,19 +514,19 @@ function MobEditorContent() {
                   value={formData.name}
                   onChange={e => handleInputChange('name', e.target.value)}
                   placeholder='e.g., a burly orc warrior'
-                  className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
+                  className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                    errors.name ? 'border-destructive' : 'border-input'
                   }`}
                 />
                 {errors.name && (
-                  <p className='text-red-500 text-xs mt-1'>{errors.name}</p>
+                  <p className='text-destructive text-xs mt-1'>{errors.name}</p>
                 )}
               </div>
 
               <div>
                 <label
                   htmlFor='roomDescription'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-card-foreground mb-1'
                 >
                   Room Description
                 </label>
@@ -535,14 +538,14 @@ function MobEditorContent() {
                     handleInputChange('roomDescription', e.target.value)
                   }
                   placeholder='How the mob appears in the room'
-                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                  className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                 />
               </div>
 
               <div>
                 <label
                   htmlFor='examineDescription'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-card-foreground mb-1'
                 >
                   Examine Description
                 </label>
@@ -554,7 +557,7 @@ function MobEditorContent() {
                     handleInputChange('examineDescription', e.target.value)
                   }
                   placeholder='Detailed appearance when examined'
-                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                  className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                 />
               </div>
             </div>
@@ -564,8 +567,8 @@ function MobEditorContent() {
         {/* Combat Stats Tab */}
         {activeTab === 'stats' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Combat Statistics
               </h3>
               <div className='space-y-4'>
@@ -573,7 +576,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='level'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Level *
                     </label>
@@ -589,12 +592,12 @@ function MobEditorContent() {
                       }
                       min='1'
                       max='100'
-                      className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                        errors.level ? 'border-red-300' : 'border-gray-300'
+                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                        errors.level ? 'border-destructive' : 'border-input'
                       }`}
                     />
                     {errors.level && (
-                      <p className='text-red-500 text-xs mt-1'>
+                      <p className='text-destructive text-xs mt-1'>
                         {errors.level}
                       </p>
                     )}
@@ -603,7 +606,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='armorClass'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Armor Class
                     </label>
@@ -617,7 +620,7 @@ function MobEditorContent() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
                 </div>
@@ -626,7 +629,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='hitRoll'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Hit Roll
                     </label>
@@ -640,14 +643,14 @@ function MobEditorContent() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor='move'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Movement
                     </label>
@@ -658,20 +661,20 @@ function MobEditorContent() {
                       onChange={e =>
                         handleInputChange('move', parseInt(e.target.value) || 0)
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
                 </div>
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Hit Points & Damage
               </h3>
               <div className='space-y-4'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <label className='block text-sm font-medium text-card-foreground mb-2'>
                     Hit Points Dice
                   </label>
                   <div className='grid grid-cols-3 gap-2'>
@@ -686,8 +689,8 @@ function MobEditorContent() {
                         )
                       }
                       min='1'
-                      className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                        errors.hpDiceNum ? 'border-red-300' : 'border-gray-300'
+                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                        errors.hpDiceNum ? 'border-destructive' : 'border-input'
                       }`}
                     />
                     <input
@@ -701,8 +704,10 @@ function MobEditorContent() {
                         )
                       }
                       min='1'
-                      className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                        errors.hpDiceSize ? 'border-red-300' : 'border-gray-300'
+                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                        errors.hpDiceSize
+                          ? 'border-destructive'
+                          : 'border-input'
                       }`}
                     />
                     <input
@@ -715,17 +720,17 @@ function MobEditorContent() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
-                  <p className='text-sm text-gray-500 mt-1'>
+                  <p className='text-sm text-muted-foreground mt-1'>
                     {formData.hpDiceNum}d{formData.hpDiceSize}+
                     {formData.hpDiceBonus} (avg: ~{calculateHP()})
                   </p>
                 </div>
 
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-2'>
+                  <label className='block text-sm font-medium text-card-foreground mb-2'>
                     Damage Dice
                   </label>
                   <div className='grid grid-cols-3 gap-2'>
@@ -740,7 +745,7 @@ function MobEditorContent() {
                         )
                       }
                       min='1'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                     <input
                       type='number'
@@ -753,7 +758,7 @@ function MobEditorContent() {
                         )
                       }
                       min='1'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                     <input
                       type='number'
@@ -765,10 +770,10 @@ function MobEditorContent() {
                           parseInt(e.target.value) || 0
                         )
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
-                  <p className='text-sm text-gray-500 mt-1'>
+                  <p className='text-sm text-muted-foreground mt-1'>
                     {formData.damageDiceNum}d{formData.damageDiceSize}+
                     {formData.damageDiceBonus} (avg: ~{calculateDamage()})
                   </p>
@@ -781,8 +786,8 @@ function MobEditorContent() {
         {/* Attributes Tab */}
         {activeTab === 'attributes' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Primary Attributes
               </h3>
               <div className='grid grid-cols-2 gap-4'>
@@ -797,7 +802,7 @@ function MobEditorContent() {
                   <div key={attr}>
                     <label
                       htmlFor={attr}
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       {attr.charAt(0).toUpperCase() + attr.slice(1)}
                     </label>
@@ -813,22 +818,22 @@ function MobEditorContent() {
                       }
                       min='3'
                       max='25'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
                 ))}
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Special Attributes
               </h3>
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <label
                     htmlFor='perception'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Perception
                   </label>
@@ -842,14 +847,14 @@ function MobEditorContent() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='concealment'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Concealment
                   </label>
@@ -863,14 +868,14 @@ function MobEditorContent() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='alignment'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Alignment
                   </label>
@@ -886,14 +891,14 @@ function MobEditorContent() {
                     }
                     min='-1000'
                     max='1000'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='zoneId'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-card-foreground mb-1'
                   >
                     Zone ID
                   </label>
@@ -907,7 +912,7 @@ function MobEditorContent() {
                         parseInt(e.target.value) || 511
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
               </div>
@@ -917,7 +922,7 @@ function MobEditorContent() {
 
         {/* Equipment Tab */}
         {activeTab === 'equipment' && !isNew && (
-          <div className='bg-white shadow rounded-lg p-6'>
+          <div className='bg-card shadow rounded-lg p-6'>
             <MobEquipmentManager
               mobId={parseInt(mobId!)}
               zoneId={formData.zoneId}
@@ -927,11 +932,11 @@ function MobEditorContent() {
 
         {/* Equipment Tab - New Mob Warning */}
         {activeTab === 'equipment' && isNew && (
-          <div className='bg-white shadow rounded-lg p-6'>
+          <div className='bg-card shadow rounded-lg p-6'>
             <div className='text-center py-8'>
-              <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100'>
+              <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-accent'>
                 <svg
-                  className='h-6 w-6 text-yellow-600'
+                  className='h-6 w-6 text-accent-foreground'
                   fill='none'
                   viewBox='0 0 24 24'
                   stroke='currentColor'
@@ -944,10 +949,10 @@ function MobEditorContent() {
                   />
                 </svg>
               </div>
-              <h3 className='mt-2 text-sm font-medium text-gray-900'>
+              <h3 className='mt-2 text-sm font-medium text-card-foreground'>
                 Save mob first
               </h3>
-              <p className='mt-1 text-sm text-gray-500'>
+              <p className='mt-1 text-sm text-muted-foreground'>
                 You need to save this mob before you can configure its equipment
                 and spawn locations.
               </p>
@@ -955,7 +960,7 @@ function MobEditorContent() {
                 <button
                   onClick={handleSave}
                   disabled={updateLoading || createLoading}
-                  className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
+                  className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
                 >
                   <Save className='w-4 h-4 mr-2' />
                   Save Mob First
@@ -968,8 +973,8 @@ function MobEditorContent() {
         {/* Advanced Tab */}
         {activeTab === 'advanced' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Physical Properties
               </h3>
               <div className='space-y-4'>
@@ -977,7 +982,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='race'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Race
                     </label>
@@ -985,7 +990,7 @@ function MobEditorContent() {
                       id='race'
                       value={formData.race}
                       onChange={e => handleInputChange('race', e.target.value)}
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
                       <option value='HUMAN'>Human</option>
                       <option value='ELF'>Elf</option>
@@ -999,7 +1004,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='gender'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Gender
                     </label>
@@ -1009,7 +1014,7 @@ function MobEditorContent() {
                       onChange={e =>
                         handleInputChange('gender', e.target.value)
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
                       <option value='NEUTRAL'>Neutral</option>
                       <option value='MALE'>Male</option>
@@ -1022,7 +1027,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='size'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Size
                     </label>
@@ -1030,7 +1035,7 @@ function MobEditorContent() {
                       id='size'
                       value={formData.size}
                       onChange={e => handleInputChange('size', e.target.value)}
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
                       <option value='TINY'>Tiny</option>
                       <option value='SMALL'>Small</option>
@@ -1044,7 +1049,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='composition'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Composition
                     </label>
@@ -1054,7 +1059,7 @@ function MobEditorContent() {
                       onChange={e =>
                         handleInputChange('composition', e.target.value)
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
                       <option value='FLESH'>Flesh</option>
                       <option value='BONE'>Bone</option>
@@ -1071,8 +1076,8 @@ function MobEditorContent() {
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Treasure
               </h3>
               <div className='space-y-4'>
@@ -1080,7 +1085,7 @@ function MobEditorContent() {
                   <div>
                     <label
                       htmlFor='copper'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Copper
                     </label>
@@ -1095,14 +1100,14 @@ function MobEditorContent() {
                         )
                       }
                       min='0'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor='silver'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Silver
                     </label>
@@ -1117,14 +1122,14 @@ function MobEditorContent() {
                         )
                       }
                       min='0'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor='gold'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Gold
                     </label>
@@ -1136,14 +1141,14 @@ function MobEditorContent() {
                         handleInputChange('gold', parseInt(e.target.value) || 0)
                       }
                       min='0'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
 
                   <div>
                     <label
                       htmlFor='platinum'
-                      className='block text-sm font-medium text-gray-700 mb-1'
+                      className='block text-sm font-medium text-card-foreground mb-1'
                     >
                       Platinum
                     </label>
@@ -1158,16 +1163,16 @@ function MobEditorContent() {
                         )
                       }
                       min='0'
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
                 </div>
 
-                <div className='mt-4 p-4 bg-gray-50 rounded-lg'>
-                  <p className='text-sm font-medium text-gray-700'>
+                <div className='mt-4 p-4 bg-muted rounded-lg'>
+                  <p className='text-sm font-medium text-card-foreground'>
                     Total Treasure Value:
                   </p>
-                  <p className='text-lg font-bold text-green-600'>
+                  <p className='text-lg font-bold text-primary'>
                     {formData.platinum}pp {formData.gold}gp {formData.silver}sp{' '}
                     {formData.copper}cp
                   </p>
