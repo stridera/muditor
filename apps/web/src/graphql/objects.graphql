@@ -46,6 +46,16 @@ query GetObject($id: Int!, $zoneId: Int!) {
   }
 }
 
+query SearchObjects($search: String!, $limit: Int, $zoneId: Int) {
+  searchObjects(search: $search, limit: $limit, zoneId: $zoneId) {
+    id
+    zoneId
+    name
+    type
+    level
+  }
+}
+
 mutation CreateObject($data: CreateObjectInput!) {
   createObject(data: $data) {
     ...ObjectSummary

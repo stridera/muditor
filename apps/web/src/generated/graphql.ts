@@ -1784,6 +1784,8 @@ export type Query = {
   rooms: Array<RoomDto>;
   roomsByZone: Array<RoomDto>;
   roomsCount: Scalars['Int']['output'];
+  searchMobs: Array<MobDto>;
+  searchObjects: Array<ObjectDto>;
   shop: ShopDto;
   shopByKeeper: ShopDto;
   shops: Array<ShopDto>;
@@ -1997,6 +1999,18 @@ export type QueryRoomsByZoneArgs = {
 };
 
 export type QueryRoomsCountArgs = {
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QuerySearchMobsArgs = {
+  limit?: Scalars['Int']['input'];
+  search: Scalars['String']['input'];
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QuerySearchObjectsArgs = {
+  limit?: Scalars['Int']['input'];
+  search: Scalars['String']['input'];
   zoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -3479,13 +3493,6 @@ export type DetachTriggerInlineMutation = {
   detachTrigger: { __typename?: 'TriggerDto'; id: string; name: string };
 };
 
-export type GetZonesForSelectorQueryVariables = Exact<{ [key: string]: never }>;
-
-export type GetZonesForSelectorQuery = {
-  __typename?: 'Query';
-  zones: Array<{ __typename?: 'ZoneDto'; id: number; name: string }>;
-};
-
 export type GetAllCharactersInlineQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -4036,24 +4043,6 @@ export type UpdateThemePreferenceMutation = {
       __typename?: 'UserPreferences';
       theme?: string | null;
     } | null;
-  };
-};
-
-export type UpdateZoneMutationVariables = Exact<{
-  id: Scalars['Int']['input'];
-  data: UpdateZoneInput;
-}>;
-
-export type UpdateZoneMutation = {
-  __typename?: 'Mutation';
-  updateZone: {
-    __typename?: 'ZoneDto';
-    id: number;
-    name: string;
-    lifespan: number;
-    resetMode: ResetMode;
-    hemisphere: Hemisphere;
-    climate: Climate;
   };
 };
 
@@ -4971,6 +4960,24 @@ export type GetObjectQuery = {
   };
 };
 
+export type SearchObjectsQueryVariables = Exact<{
+  search: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type SearchObjectsQuery = {
+  __typename?: 'Query';
+  searchObjects: Array<{
+    __typename?: 'ObjectDto';
+    id: number;
+    zoneId: number;
+    name: string;
+    type: ObjectType;
+    level: number;
+  }>;
+};
+
 export type CreateObjectMutationVariables = Exact<{
   data: CreateObjectInput;
 }>;
@@ -5143,6 +5150,25 @@ export type GetMobsByZoneQuery = {
     mobFlags: Array<MobFlag>;
     effectFlags: Array<EffectFlag>;
     lifeForce: LifeForce;
+  }>;
+};
+
+export type SearchMobsQueryVariables = Exact<{
+  search: Scalars['String']['input'];
+  limit?: InputMaybe<Scalars['Int']['input']>;
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type SearchMobsQuery = {
+  __typename?: 'Query';
+  searchMobs: Array<{
+    __typename?: 'MobDto';
+    id: number;
+    zoneId: number;
+    name: string;
+    roomDescription: string;
+    level: number;
+    race: Race;
   }>;
 };
 
@@ -5602,6 +5628,13 @@ export type GetZonesQuery = {
     lifespan: number;
     resetMode: ResetMode;
   }>;
+};
+
+export type GetZonesForSelectorQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetZonesForSelectorQuery = {
+  __typename?: 'Query';
+  zones: Array<{ __typename?: 'ZoneDto'; id: number; name: string }>;
 };
 
 export type OnlineCharactersQueryVariables = Exact<{
@@ -7668,35 +7701,6 @@ export const DetachTriggerInlineDocument = {
   DetachTriggerInlineMutation,
   DetachTriggerInlineMutationVariables
 >;
-export const GetZonesForSelectorDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetZonesForSelector' },
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'zones' },
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  GetZonesForSelectorQuery,
-  GetZonesForSelectorQueryVariables
->;
 export const GetAllCharactersInlineDocument = {
   kind: 'Document',
   definitions: [
@@ -9719,75 +9723,6 @@ export const UpdateThemePreferenceDocument = {
   UpdateThemePreferenceMutation,
   UpdateThemePreferenceMutationVariables
 >;
-export const UpdateZoneDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'mutation',
-      name: { kind: 'Name', value: 'UpdateZone' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'UpdateZoneInput' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'updateZone' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'id' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'id' },
-                },
-              },
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'data' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'data' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'lifespan' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'resetMode' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'hemisphere' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'climate' } },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<UpdateZoneMutation, UpdateZoneMutationVariables>;
 export const LoginDocument = {
   kind: 'Document',
   definitions: [
@@ -12822,6 +12757,93 @@ export const GetObjectDocument = {
     },
   ],
 } as unknown as DocumentNode<GetObjectQuery, GetObjectQueryVariables>;
+export const SearchObjectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SearchObjects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'search' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'limit' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'searchObjects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'search' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'search' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'limit' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'limit' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SearchObjectsQuery, SearchObjectsQueryVariables>;
 export const CreateObjectDocument = {
   kind: 'Document',
   definitions: [
@@ -13406,6 +13428,97 @@ export const GetMobsByZoneDocument = {
     },
   ],
 } as unknown as DocumentNode<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
+export const SearchMobsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SearchMobs' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'search' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'limit' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'searchMobs' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'search' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'search' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'limit' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'limit' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'roomDescription' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'race' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SearchMobsQuery, SearchMobsQueryVariables>;
 export const GetRacesDocument = {
   kind: 'Document',
   definitions: [
@@ -15305,6 +15418,35 @@ export const GetZonesDocument = {
     },
   ],
 } as unknown as DocumentNode<GetZonesQuery, GetZonesQueryVariables>;
+export const GetZonesForSelectorDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetZonesForSelector' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'zones' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetZonesForSelectorQuery,
+  GetZonesForSelectorQueryVariables
+>;
 export const OnlineCharactersDocument = {
   kind: 'Document',
   definitions: [

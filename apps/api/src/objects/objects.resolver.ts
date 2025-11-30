@@ -55,6 +55,16 @@ export class ObjectsResolver {
     return this.objectsService.count();
   }
 
+  @Query(() => [ObjectDto], { name: 'searchObjects' })
+  async searchObjects(
+    @Args('search', { type: () => String }) search: string,
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+  ): Promise<ObjectDto[]> {
+    const objects = await this.objectsService.search(search, limit, zoneId);
+    return objects.map(o => mapObject(o));
+  }
+
   @Mutation(() => ObjectDto)
   @UseGuards(JwtAuthGuard)
   async createObject(

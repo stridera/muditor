@@ -17,6 +17,7 @@ import {
   Plus,
   Square,
   Trash2,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -633,15 +634,30 @@ function MobsContent() {
   const adminView = (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
-        <div>
-          <h1 className='text-2xl font-bold text-foreground'>
-            {selectedZone ? `Zone ${selectedZone} Mobs` : 'Mobs'}
-          </h1>
-          <p className='text-sm text-muted-foreground mt-1'>
-            Showing {startItem}-{endItem} of {mobsCount} mobs
-            {selectedZone && ' in this zone'} (Page {currentPage} of{' '}
-            {totalPages})
-          </p>
+        <div className='flex items-center gap-3'>
+          <div>
+            <h1 className='text-2xl font-bold text-foreground'>
+              {selectedZone ? `Zone ${selectedZone} Mobs` : 'All Mobs'}
+            </h1>
+            <p className='text-sm text-muted-foreground mt-1'>
+              Showing {startItem}-{endItem} of {mobsCount} mobs
+              {selectedZone && ' in this zone'} (Page {currentPage} of{' '}
+              {totalPages})
+            </p>
+          </div>
+          {selectedZone && (
+            <button
+              onClick={() => {
+                setSelectedZone(null);
+                setCurrentPage(1);
+              }}
+              className='inline-flex items-center px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-muted'
+              title='Clear zone filter and show all mobs'
+            >
+              <X className='w-3 h-3 mr-1' />
+              Clear Filter
+            </button>
+          )}
         </div>
         <Link href='/dashboard/mobs/editor'>
           <button className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/80'>

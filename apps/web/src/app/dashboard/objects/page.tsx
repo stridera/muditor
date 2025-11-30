@@ -41,6 +41,7 @@ import {
   Plus,
   Square,
   Trash2,
+  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -425,15 +426,30 @@ function ObjectsContent() {
   return (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
-        <div>
-          <h1 className='text-2xl font-bold text-foreground'>
-            {selectedZone ? `Zone ${selectedZone} Objects` : 'Objects'}
-          </h1>
-          <p className='text-sm text-muted-foreground mt-1'>
-            Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
-            objects (Page {currentPage} of {totalPages})
-            {selectedZone && ' in this zone'}
-          </p>
+        <div className='flex items-center gap-3'>
+          <div>
+            <h1 className='text-2xl font-bold text-foreground'>
+              {selectedZone ? `Zone ${selectedZone} Objects` : 'All Objects'}
+            </h1>
+            <p className='text-sm text-muted-foreground mt-1'>
+              Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
+              objects (Page {currentPage} of {totalPages})
+              {selectedZone && ' in this zone'}
+            </p>
+          </div>
+          {selectedZone && (
+            <button
+              onClick={() => {
+                setSelectedZone(null);
+                setCurrentPage(1);
+              }}
+              className='inline-flex items-center px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-muted'
+              title='Clear zone filter and show all objects'
+            >
+              <X className='w-3 h-3 mr-1' />
+              Clear Filter
+            </button>
+          )}
         </div>
         <Link
           href='/dashboard/objects/editor'

@@ -46,7 +46,7 @@ export class MobDto {
   keywords: string[];
 
   @Field()
-  mobClass: string;
+  role: string;
 
   @Field()
   shortDesc: string;
@@ -187,7 +187,7 @@ export class CreateMobInput {
 
   @Field()
   @IsString()
-  mobClass: string;
+  role: string;
 
   @Field()
   @IsString()
@@ -398,7 +398,7 @@ export class UpdateMobInput {
   @Field({ nullable: true })
   @IsOptional()
   @IsString()
-  mobClass?: string;
+  role?: string;
 
   @Field({ nullable: true })
   @IsOptional()

@@ -480,14 +480,41 @@ model MobResets {
 model Mobs {
   id                 Int
   keywords           String[]
-  mobClass           String          @map("mob_class")
   name               String          @map("name")
   roomDescription    String          @map("room_description")
   examineDescription String          @map("examine_description")
   alignment          Int             @default(0)
   level              Int             @default(1)
-  armorClass         Int             @default(0) @map("armor_class")
-  hitRoll            Int             @default(0) @map("hit_roll")
+
+  // MOB ROLE CLASSIFICATION
+  role                      MobRole         @default(TRASH)
+
+  // LEGACY COMBAT STATS (to be removed after migration)
+  armorClass                Int             @default(0) @map("armor_class")
+  hitRoll                   Int             @default(0) @map("hit_roll")
+
+  // NEW OFFENSIVE STATS
+  accuracy                  Int             @default(0)
+  attackPower               Int             @default(0) @map("attack_power")
+  spellPower                Int             @default(0) @map("spell_power")
+  penetrationFlat           Int             @default(0) @map("penetration_flat")
+  penetrationPercent        Int             @default(0) @map("penetration_percent")
+
+  // NEW DEFENSIVE STATS
+  evasion                   Int             @default(0)
+  armorRating               Int             @default(0) @map("armor_rating")
+  damageReductionPercent    Int             @default(0) @map("damage_reduction_percent")
+  soak                      Int             @default(0)
+  hardness                  Int             @default(0)
+  wardPercent               Int             @default(0) @map("ward_percent")
+
+  // ELEMENTAL RESISTANCES
+  resistanceFire            Int             @default(0) @map("resistance_fire")
+  resistanceCold            Int             @default(0) @map("resistance_cold")
+  resistanceLightning       Int             @default(0) @map("resistance_lightning")
+  resistanceAcid            Int             @default(0) @map("resistance_acid")
+  resistancePoison          Int             @default(0) @map("resistance_poison")
+
   move               Int             @default(0)
   hpDiceNum          Int             @default(0) @map("hp_dice_num")
   hpDiceSize         Int             @default(0) @map("hp_dice_size")
@@ -537,6 +564,8 @@ model Mobs {
   triggers           Triggers[]
 
   @@id([zoneId, id])
+  @@index([name])
+  @@index([zoneId, name])
 }
 
 model ObjectAffects {
@@ -614,6 +643,8 @@ model Objects {
   objectAbilities         ObjectAbilities[]
 
   @@id([zoneId, id])
+  @@index([name])
+  @@index([zoneId, name])
 }
 
 model Races {
@@ -1063,6 +1094,15 @@ enum Gender {
   MALE
   FEMALE
   NON_BINARY
+}
+
+enum MobRole {
+  TRASH
+  NORMAL
+  ELITE
+  MINIBOSS
+  BOSS
+  RAID_BOSS
 }
 
 enum Hemisphere {

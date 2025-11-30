@@ -12,6 +12,7 @@ import {
   Gender,
   LifeForce,
   MobFlag,
+  MobRole,
   Position,
   Race,
   Size,
@@ -36,6 +37,7 @@ registerEnumType(LifeForce, { name: 'LifeForce' });
 registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(Stance, { name: 'Stance' });
 registerEnumType(Size, { name: 'Size' });
+registerEnumType(MobRole, { name: 'MobRole' });
 
 // This DTO matches the actual Prisma Mob model
 @ObjectType()
@@ -52,9 +54,6 @@ export class MobDto {
   @Field()
   name: string;
 
-  @Field({ description: 'Mob class identifier (e.g., NORMAL)' })
-  mobClass: string;
-
   @Field()
   roomDescription: string;
 
@@ -64,6 +63,9 @@ export class MobDto {
   @Field(() => Int)
   level: number;
 
+  @Field(() => MobRole)
+  role: MobRole;
+
   @Field(() => Int)
   alignment: number;
 
@@ -72,6 +74,54 @@ export class MobDto {
 
   @Field(() => Int)
   armorClass: number;
+
+  @Field(() => Int)
+  accuracy: number;
+
+  @Field(() => Int)
+  attackPower: number;
+
+  @Field(() => Int)
+  spellPower: number;
+
+  @Field(() => Int)
+  penetrationFlat: number;
+
+  @Field(() => Int)
+  penetrationPercent: number;
+
+  @Field(() => Int)
+  evasion: number;
+
+  @Field(() => Int)
+  armorRating: number;
+
+  @Field(() => Int)
+  damageReductionPercent: number;
+
+  @Field(() => Int)
+  soak: number;
+
+  @Field(() => Int)
+  hardness: number;
+
+  @Field(() => Int)
+  wardPercent: number;
+
+  @Field(() => Int)
+  resistanceFire: number;
+
+  @Field(() => Int)
+  resistanceCold: number;
+
+  @Field(() => Int)
+  resistanceLightning: number;
+
+  @Field(() => Int)
+  resistanceAcid: number;
+
+  @Field(() => Int)
+  resistancePoison: number;
 
   @Field()
   hpDice: string;
@@ -177,6 +227,11 @@ export class CreateMobInput {
   @IsNumber()
   level?: number;
 
+  @Field(() => MobRole, { defaultValue: MobRole.NORMAL })
+  @IsOptional()
+  @IsEnum(MobRole)
+  role?: MobRole;
+
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
   @IsNumber()
@@ -191,6 +246,86 @@ export class CreateMobInput {
   @IsOptional()
   @IsNumber()
   armorClass?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  accuracy?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  attackPower?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  spellPower?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  penetrationFlat?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  penetrationPercent?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  evasion?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  armorRating?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  damageReductionPercent?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  soak?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  hardness?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  wardPercent?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  resistanceFire?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  resistanceCold?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  resistanceLightning?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  resistanceAcid?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsNumber()
+  resistancePoison?: number;
 
   @Field({ defaultValue: '1d8+0' })
   @IsOptional()
@@ -332,6 +467,11 @@ export class UpdateMobInput {
   @IsNumber()
   level?: number;
 
+  @Field(() => MobRole, { nullable: true })
+  @IsOptional()
+  @IsEnum(MobRole)
+  role?: MobRole;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
@@ -346,6 +486,86 @@ export class UpdateMobInput {
   @IsOptional()
   @IsNumber()
   armorClass?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  accuracy?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  attackPower?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  spellPower?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  penetrationFlat?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  penetrationPercent?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  evasion?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  armorRating?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  damageReductionPercent?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  soak?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  hardness?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  wardPercent?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  resistanceFire?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  resistanceCold?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  resistanceLightning?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  resistanceAcid?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  resistancePoison?: number;
 
   @Field({ nullable: true })
   @IsOptional()

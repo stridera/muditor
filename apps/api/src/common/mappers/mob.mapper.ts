@@ -12,7 +12,7 @@ export function mapMob(db: MobMapperSource): MobDto {
     zoneId: db.zoneId,
     keywords: db.keywords,
     name: db.name,
-    mobClass: db.mobClass,
+    role: db.role,
     roomDescription: db.roomDescription,
     examineDescription: db.examineDescription,
     level: db.level,

@@ -65,6 +65,16 @@ export class MobsResolver {
     return this.mobsService.count();
   }
 
+  @Query(() => [MobDto], { name: 'searchMobs' })
+  async searchMobs(
+    @Args('search', { type: () => String }) search: string,
+    @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+  ): Promise<MobDto[]> {
+    const mobs = await this.mobsService.search(search, limit, zoneId);
+    return mobs.map(m => mapMob(m));
+  }
+
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
@@ -90,7 +100,7 @@ export class MobsResolver {
 
     const createData: Prisma.MobsCreateInput = {
       ...rest,
-      mobClass: 'NORMAL', // Default mob class
+      role: 'NORMAL', // Default mob role
       hpDiceNum: hp.num,
       hpDiceSize: hp.size,
       hpDiceBonus: hp.bonus,
