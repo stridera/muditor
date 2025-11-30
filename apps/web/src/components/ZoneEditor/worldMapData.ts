@@ -49,7 +49,7 @@ export async function fetchAllZonesExternal(
     deps;
   try {
     const zonesResponse = await authenticatedFetch(
-      'http://localhost:4000/graphql',
+      process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
       {
         method: 'POST',
         body: JSON.stringify({
@@ -65,7 +65,7 @@ export async function fetchAllZonesExternal(
     const zones = zonesData.data.zones || [];
 
     const roomsResponse = await authenticatedFetch(
-      'http://localhost:4000/graphql',
+      process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
       {
         method: 'POST',
         body: JSON.stringify({

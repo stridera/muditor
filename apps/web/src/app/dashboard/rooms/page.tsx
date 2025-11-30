@@ -110,11 +110,15 @@ function RoomsContent() {
           ? { zoneId: selectedZone }
           : { take: 100 };
 
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, variables }),
-        });
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+            'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables }),
+          }
+        );
 
         const data = await response.json();
         if (data.errors) {
@@ -182,14 +186,18 @@ function RoomsContent() {
           }
         `;
 
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: getRoomQuery,
-            variables: { id: roomId },
-          }),
-        });
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+            'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              query: getRoomQuery,
+              variables: { id: roomId },
+            }),
+          }
+        );
 
         const result = await response.json();
         if (result.errors) {

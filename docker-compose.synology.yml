@@ -51,6 +51,7 @@ services:
       JWT_SECRET: ${JWT_SECRET}
       JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
       PORT: 4000
+      API_HOST: 0.0.0.0
     volumes:
       - ./muditor:/app
       - /app/node_modules
@@ -82,7 +83,7 @@ services:
     working_dir: /app
     environment:
       NODE_ENV: production
-      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:4000/graphql}
+      NEXT_PUBLIC_GRAPHQL_URL: ${NEXT_PUBLIC_GRAPHQL_URL:-http://localhost:4000/graphql}
       PORT: 3000
     volumes:
       - ./muditor:/app

@@ -193,11 +193,15 @@ function MobsContent() {
               search: searchTerm,
             };
 
-        const response = await fetch('http://localhost:4000/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, variables }),
-        });
+        const response = await fetch(
+          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+            'http://localhost:4000/graphql',
+          {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ query, variables }),
+          }
+        );
 
         const result = await response.json();
         if (result.errors) {
@@ -207,7 +211,8 @@ function MobsContent() {
             : `query { mobs { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
 
           const fallbackResponse = await fetch(
-            'http://localhost:4000/graphql',
+            process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+              'http://localhost:4000/graphql',
             {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
@@ -342,14 +347,17 @@ function MobsContent() {
         }
       `;
 
-      const response = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: mutation,
-          variables: { ids: Array.from(selectedMobs) },
-        }),
-      });
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: mutation,
+            variables: { ids: Array.from(selectedMobs) },
+          }),
+        }
+      );
 
       const result = await response.json();
       if (result.errors) {
@@ -409,14 +417,17 @@ function MobsContent() {
         }
       `;
 
-      const mobResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: getMobQuery,
-          variables: { id: mobId },
-        }),
-      });
+      const mobResponse = await fetch(
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: getMobQuery,
+            variables: { id: mobId },
+          }),
+        }
+      );
 
       const mobResult = await mobResponse.json();
       if (mobResult.errors) {
@@ -477,14 +488,17 @@ function MobsContent() {
         }
       `;
 
-      const createResponse = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: createMutation,
-          variables: { data: cloneData },
-        }),
-      });
+      const createResponse = await fetch(
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: createMutation,
+            variables: { data: cloneData },
+          }),
+        }
+      );
 
       const createResult = await createResponse.json();
       if (createResult.errors) {
@@ -589,14 +603,18 @@ function MobsContent() {
             }
           `;
 
-          const response = await fetch('http://localhost:4000/graphql', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: getMobQuery,
-              variables: { id: mobId },
-            }),
-          });
+          const response = await fetch(
+            process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+              'http://localhost:4000/graphql',
+            {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                query: getMobQuery,
+                variables: { id: mobId },
+              }),
+            }
+          );
 
           const result = await response.json();
           if (result.errors) {

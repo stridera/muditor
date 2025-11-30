@@ -40,11 +40,13 @@ function ZoneDetailContent() {
 
   const fetchZone = useCallback(async () => {
     try {
-      const response = await fetch('http://localhost:4000/graphql', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          query: `
+      const response = await fetch(
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            query: `
               query GetZone($id: Int!) {
                 zone(id: $id) {
                   id
@@ -62,9 +64,10 @@ function ZoneDetailContent() {
                 }
               }
             `,
-          variables: { id: parseInt(zoneId) },
-        }),
-      });
+            variables: { id: parseInt(zoneId) },
+          }),
+        }
+      );
 
       const data = await response.json();
       if (data.errors) {

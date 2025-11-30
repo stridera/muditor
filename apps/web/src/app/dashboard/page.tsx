@@ -282,7 +282,10 @@ export default function DashboardPage() {
                 </h4>
                 <div className='space-y-1'>
                   <a
-                    href='http://localhost:4000/graphql'
+                    href={
+                      process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+                      'http://localhost:4000/graphql'
+                    }
                     target='_blank'
                     rel='noopener noreferrer'
                     className='block text-sm text-green-600 hover:text-green-800 hover:underline'

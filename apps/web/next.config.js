@@ -14,6 +14,15 @@ const nextConfig = {
   experimental: {
     // Enable experimental features if needed
   },
+  // Proxy GraphQL requests to API server
+  async rewrites() {
+    return [
+      {
+        source: '/graphql',
+        destination: 'http://api:4000/graphql', // Uses Docker network service name
+      },
+    ];
+  },
   // Other Next.js config options can be added here
 };
 
