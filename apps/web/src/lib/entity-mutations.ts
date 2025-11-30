@@ -40,13 +40,16 @@ export async function updateMob(input: UpdateMobInput) {
     gqlInput.roomDescription = data.description;
   }
 
-  const res = await authenticatedFetch('http://localhost:4000/graphql', {
-    method: 'POST',
-    body: JSON.stringify({
-      query: `mutation UpdateMob($id: Int!, $zoneId: Int!, $data: UpdateMobInput!) {\n  updateMob(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
-      variables: { id, zoneId, data: gqlInput },
-    }),
-  });
+  const res = await authenticatedFetch(
+    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        query: `mutation UpdateMob($id: Int!, $zoneId: Int!, $data: UpdateMobInput!) {\n  updateMob(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
+        variables: { id, zoneId, data: gqlInput },
+      }),
+    }
+  );
 
   const json = await res.json();
   if (!res.ok || json.errors) {
@@ -65,13 +68,16 @@ export async function updateObject(input: UpdateObjectInput) {
   if (data.roomDescription !== undefined)
     gqlInput.roomDescription = data.roomDescription;
 
-  const res = await authenticatedFetch('http://localhost:4000/graphql', {
-    method: 'POST',
-    body: JSON.stringify({
-      query: `mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {\n  updateObject(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
-      variables: { id, zoneId, data: gqlInput },
-    }),
-  });
+  const res = await authenticatedFetch(
+    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+    {
+      method: 'POST',
+      body: JSON.stringify({
+        query: `mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {\n  updateObject(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
+        variables: { id, zoneId, data: gqlInput },
+      }),
+    }
+  );
 
   const json = await res.json();
   if (!res.ok || json.errors) {

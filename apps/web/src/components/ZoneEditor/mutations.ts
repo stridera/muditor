@@ -6,7 +6,8 @@ export type AuthenticatedFetch = (
   init?: RequestInit
 ) => Promise<Response>;
 
-const GRAPHQL_ENDPOINT = 'http://localhost:4000/graphql';
+const GRAPHQL_ENDPOINT =
+  process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql';
 
 interface UpdateRoomPositionArgs {
   id: number;

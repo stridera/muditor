@@ -65,7 +65,10 @@ export default function HomePage() {
         </div>
         <div className='mt-4'>
           <a
-            href='http://localhost:4000/graphql'
+            href={
+              process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+              'http://localhost:4000/graphql'
+            }
             target='_blank'
             rel='noopener noreferrer'
             className='text-primary hover:text-primary-foreground text-sm'

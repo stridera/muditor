@@ -87,7 +87,7 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         const currentRoom = rooms.find(r => r.id === roomId);
         const currentZ = currentRoom?.layoutZ ?? 0;
         const response = await authenticatedFetch(
-          'http://localhost:4000/graphql',
+          process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
           {
             method: 'POST',
             body: JSON.stringify({
@@ -161,7 +161,8 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
           }
         );
         const response = await authenticatedFetch(
-          'http://localhost:4000/graphql',
+          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+            'http://localhost:4000/graphql',
           {
             method: 'POST',
             body: JSON.stringify({
@@ -248,7 +249,7 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         const currentRoom = rooms.find(r => r.id === roomId);
         const currentZ = currentRoom?.layoutZ ?? 0;
         const response = await authenticatedFetch(
-          'http://localhost:4000/graphql',
+          process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
           {
             method: 'POST',
             body: JSON.stringify({
@@ -319,7 +320,8 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
           }
         );
         const response = await authenticatedFetch(
-          'http://localhost:4000/graphql',
+          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
+            'http://localhost:4000/graphql',
           {
             method: 'POST',
             body: JSON.stringify({
