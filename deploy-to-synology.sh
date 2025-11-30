@@ -1,12 +1,28 @@
 #!/bin/bash
 
 # Muditor Synology NAS Deployment Script
-# Usage: ./deploy-to-synology.sh [SSH_HOST]
+# Usage: ./deploy-to-synology.sh [SSH_HOST] [--skip-prompts|--update]
 
 set -e
 
+# Parse arguments
+SSH_HOST="galactica"
+SKIP_PROMPTS=false
+
+for arg in "$@"; do
+  case $arg in
+    --skip-prompts|--update)
+      SKIP_PROMPTS=true
+      shift
+      ;;
+    *)
+      SSH_HOST="$arg"
+      shift
+      ;;
+  esac
+done
+
 # Configuration
-SSH_HOST="${1:-galactica}"
 NAS_DIR="/volume1/docker/muditor"
 LOCAL_DIR="$(pwd)"
 
@@ -65,16 +81,27 @@ if ssh "$SSH_HOST" "[ ! -f $NAS_DIR/.env ]"; then
     echo "   - REDIS_PASSWORD"
     echo "   - JWT_SECRET (generate with: openssl rand -base64 32)"
     echo "   - JWT_REFRESH_SECRET (generate with: openssl rand -base64 32)"
-    echo "   - NEXT_PUBLIC_API_URL (use your NAS IP)"
+    echo "   - NEXT_PUBLIC_GRAPHQL_URL"
+    echo "   - NEXT_PUBLIC_API_URL"
     echo ""
-    read -p "Press Enter after updating .env file..."
+    if [ "$SKIP_PROMPTS" = false ]; then
+        read -p "Press Enter after updating .env file..."
+    else
+        echo "⚠️  Skipping prompt (--skip-prompts flag set)"
+    fi
 else
     echo "✅ .env file already exists, skipping..."
 fi
 
 # Import legacy data using FieryLib
-echo "📚 Do you want to import legacy MUD data? (y/N)"
-read -r IMPORT_DATA
+IMPORT_DATA="N"
+if [ "$SKIP_PROMPTS" = false ]; then
+    echo "📚 Do you want to import legacy MUD data? (y/N)"
+    read -r IMPORT_DATA
+else
+    echo "📚 Skipping data import (--skip-prompts flag set)"
+fi
+
 if [[ "$IMPORT_DATA" =~ ^[Yy]$ ]]; then
     echo "📥 Copying FieryLib import tool..."
     tar czf - \
@@ -87,17 +114,22 @@ if [[ "$IMPORT_DATA" =~ ^[Yy]$ ]]; then
     tar czf - -C "$LOCAL_DIR/../fierymud/legacy/lib" . | ssh "$SSH_HOST" "mkdir -p $NAS_DIR/legacy-lib && cd $NAS_DIR/legacy-lib && tar xzf -"
 fi
 
-# Start services
-echo "🚀 Starting Docker services on NAS..."
-ssh "$SSH_HOST" "cd $NAS_DIR && docker compose up -d"
+# Start or restart services
+if [ "$SKIP_PROMPTS" = true ]; then
+    echo "🔄 Restarting Docker services on NAS..."
+    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose restart"
+    echo "⏳ Waiting for services to restart..."
+    sleep 15
+else
+    echo "🚀 Starting Docker services on NAS..."
+    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose up -d"
+    echo "⏳ Waiting for services to start..."
+    sleep 10
 
-# Wait for services to be healthy
-echo "⏳ Waiting for services to start..."
-sleep 10
-
-# Run database migrations
-echo "🗄️  Running database migrations..."
-ssh "$SSH_HOST" "cd $NAS_DIR && docker compose exec -T api sh -c 'pnpm db:migrate deploy'"
+    # Run database migrations (only on fresh install)
+    echo "🗄️  Running database migrations..."
+    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose exec -T api sh -c 'pnpm db:migrate deploy'"
+fi
 
 # Import data if requested
 if [[ "$IMPORT_DATA" =~ ^[Yy]$ ]]; then
@@ -124,5 +156,6 @@ echo "📝 Useful commands:"
 echo "   View logs: ssh $SSH_HOST 'cd $NAS_DIR && docker compose logs -f'"
 echo "   Restart: ssh $SSH_HOST 'cd $NAS_DIR && docker compose restart'"
 echo "   Stop: ssh $SSH_HOST 'cd $NAS_DIR && docker compose down'"
-echo "   Update: ./deploy-to-synology.sh"
+echo "   Update code: ./deploy-to-synology.sh --update"
+echo "   Fresh install: ./deploy-to-synology.sh"
 echo ""
