@@ -17,7 +17,7 @@ function base(): MobMapperSource {
     zoneId: 5,
     keywords: ['orc'],
     name: 'Orc',
-    mobClass: 'NORMAL',
+    role: 'NORMAL',
     roomDescription: 'A fearsome orc',
     examineDescription: 'It looks angry',
     level: 3,

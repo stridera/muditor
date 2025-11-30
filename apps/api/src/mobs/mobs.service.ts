@@ -88,6 +88,39 @@ export class MobsService {
     return this.database.mobs.count(countArgs);
   }
 
+  async search(
+    search: string,
+    limit: number = 10,
+    zoneId?: number
+  ): Promise<Mobs[]> {
+    const searchTerm = search.trim();
+    const searchNum = parseInt(searchTerm, 10);
+    const isNumeric = !isNaN(searchNum);
+
+    const where: Prisma.MobsWhereInput = {
+      OR: [
+        { name: { contains: searchTerm, mode: 'insensitive' } },
+        { keywords: { hasSome: [searchTerm.toLowerCase()] } },
+        ...(isNumeric ? [{ id: searchNum }] : []),
+      ],
+      ...(zoneId && { zoneId }),
+    };
+
+    return this.database.mobs.findMany({
+      where,
+      take: limit,
+      orderBy: [{ zoneId: 'asc' }, { id: 'asc' }],
+      include: {
+        zones: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+    });
+  }
+
   async create(data: Prisma.MobsCreateInput): Promise<Mobs> {
     const mob = await this.database.mobs.create({
       data,

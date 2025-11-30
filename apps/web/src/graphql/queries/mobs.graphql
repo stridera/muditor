@@ -91,3 +91,14 @@ query GetMobsByZone($zoneId: Int!) {
     lifeForce
   }
 }
+
+query SearchMobs($search: String!, $limit: Int, $zoneId: Int) {
+  searchMobs(search: $search, limit: $limit, zoneId: $zoneId) {
+    id
+    zoneId
+    name
+    roomDescription
+    level
+    race
+  }
+}

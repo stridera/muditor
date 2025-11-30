@@ -46,7 +46,7 @@ describe('MobsResolver', () => {
         name: 'A test mob',
         roomDescription: 'A longer description',
         examineDescription: 'Detailed description',
-        mobClass: 'NORMAL',
+        role: 'NORMAL',
         mobFlags: [],
         effectFlags: [],
         alignment: 0,
@@ -134,7 +134,7 @@ describe('MobsResolver', () => {
         roomDescription: 'Long desc',
         examineDescription: 'Description',
         race: null,
-        mobClass: 'NORMAL',
+        role: 'NORMAL',
         hitRoll: 0,
         armorClass: 0,
         hpDiceNum: 1,
@@ -262,7 +262,7 @@ describe('MobsResolver', () => {
         damageDiceNum: 2,
         damageDiceSize: 6,
         damageDiceBonus: 3,
-        mobClass: 'NORMAL',
+        role: 'NORMAL',
         damageType: DamageType.SLASH,
       };
       jest.spyOn(service, 'create').mockResolvedValue(

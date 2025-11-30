@@ -12,6 +12,7 @@ import {
   type Gender,
   type GetMobQuery,
   type LifeForce,
+  type MobRole,
   type Position,
   type Race,
   type Size,
@@ -37,8 +38,25 @@ interface MobFormData {
   examineDescription: string;
   alignment: number;
   level: number;
+  role: string;
   armorClass: number;
   hitRoll: number;
+  accuracy: number;
+  attackPower: number;
+  spellPower: number;
+  penetrationFlat: number;
+  penetrationPercent: number;
+  evasion: number;
+  armorRating: number;
+  damageReductionPercent: number;
+  soak: number;
+  hardness: number;
+  wardPercent: number;
+  resistanceFire: number;
+  resistanceCold: number;
+  resistanceLightning: number;
+  resistanceAcid: number;
+  resistancePoison: number;
   move: number;
   hpDiceNum: number;
   hpDiceSize: number;
@@ -128,8 +146,25 @@ function MobEditorContent() {
     examineDescription: '',
     alignment: 0,
     level: 1,
+    role: 'NORMAL',
     armorClass: 0,
     hitRoll: 0,
+    accuracy: 0,
+    attackPower: 0,
+    spellPower: 0,
+    penetrationFlat: 0,
+    penetrationPercent: 0,
+    evasion: 0,
+    armorRating: 0,
+    damageReductionPercent: 0,
+    soak: 0,
+    hardness: 0,
+    wardPercent: 0,
+    resistanceFire: 0,
+    resistanceCold: 0,
+    resistanceLightning: 0,
+    resistanceAcid: 0,
+    resistancePoison: 0,
     move: 0,
     hpDiceNum: 1,
     hpDiceSize: 8,
@@ -214,8 +249,25 @@ function MobEditorContent() {
         examineDescription: mob.examineDescription,
         alignment: mob.alignment,
         level: mob.level,
+        role: mob.role || 'NORMAL',
         armorClass: mob.armorClass,
         hitRoll: mob.hitRoll,
+        accuracy: mob.accuracy || 0,
+        attackPower: mob.attackPower || 0,
+        spellPower: mob.spellPower || 0,
+        penetrationFlat: mob.penetrationFlat || 0,
+        penetrationPercent: mob.penetrationPercent || 0,
+        evasion: mob.evasion || 0,
+        armorRating: mob.armorRating || 0,
+        damageReductionPercent: mob.damageReductionPercent || 0,
+        soak: mob.soak || 0,
+        hardness: mob.hardness || 0,
+        wardPercent: mob.wardPercent || 0,
+        resistanceFire: mob.resistanceFire || 0,
+        resistanceCold: mob.resistanceCold || 0,
+        resistanceLightning: mob.resistanceLightning || 0,
+        resistanceAcid: mob.resistanceAcid || 0,
+        resistancePoison: mob.resistancePoison || 0,
         move: 0, // Not in schema
         hpDiceNum: hpDice.num,
         hpDiceSize: hpDice.size,
@@ -285,9 +337,26 @@ function MobEditorContent() {
         roomDescription: formData.roomDescription,
         examineDescription: formData.examineDescription,
         level: formData.level,
+        role: formData.role as MobRole,
         alignment: formData.alignment,
         hitRoll: formData.hitRoll,
         armorClass: formData.armorClass,
+        accuracy: formData.accuracy,
+        attackPower: formData.attackPower,
+        spellPower: formData.spellPower,
+        penetrationFlat: formData.penetrationFlat,
+        penetrationPercent: formData.penetrationPercent,
+        evasion: formData.evasion,
+        armorRating: formData.armorRating,
+        damageReductionPercent: formData.damageReductionPercent,
+        soak: formData.soak,
+        hardness: formData.hardness,
+        wardPercent: formData.wardPercent,
+        resistanceFire: formData.resistanceFire,
+        resistanceCold: formData.resistanceCold,
+        resistanceLightning: formData.resistanceLightning,
+        resistanceAcid: formData.resistanceAcid,
+        resistancePoison: formData.resistancePoison,
         hpDice: `${formData.hpDiceNum}d${formData.hpDiceSize}${formData.hpDiceBonus >= 0 ? '+' : ''}${formData.hpDiceBonus}`,
         damageDice: `${formData.damageDiceNum}d${formData.damageDiceSize}${formData.damageDiceBonus >= 0 ? '+' : ''}${formData.damageDiceBonus}`,
         damageType: formData.damageType as DamageType,
@@ -605,10 +674,34 @@ function MobEditorContent() {
 
                   <div>
                     <label
+                      htmlFor='role'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Role
+                    </label>
+                    <select
+                      id='role'
+                      value={formData.role}
+                      onChange={e => handleInputChange('role', e.target.value)}
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    >
+                      <option value='TRASH'>Trash</option>
+                      <option value='NORMAL'>Normal</option>
+                      <option value='ELITE'>Elite</option>
+                      <option value='MINIBOSS'>Miniboss</option>
+                      <option value='BOSS'>Boss</option>
+                      <option value='RAID_BOSS'>Raid Boss</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <label
                       htmlFor='armorClass'
                       className='block text-sm font-medium text-card-foreground mb-1'
                     >
-                      Armor Class
+                      Armor Class (Legacy)
                     </label>
                     <input
                       type='number'
@@ -631,7 +724,7 @@ function MobEditorContent() {
                       htmlFor='hitRoll'
                       className='block text-sm font-medium text-card-foreground mb-1'
                     >
-                      Hit Roll
+                      Hit Roll (Legacy)
                     </label>
                     <input
                       type='number'
@@ -661,6 +754,370 @@ function MobEditorContent() {
                       onChange={e =>
                         handleInputChange('move', parseInt(e.target.value) || 0)
                       }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+                </div>
+
+                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
+                  Modern Offensive Stats
+                </h4>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <label
+                      htmlFor='accuracy'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Accuracy
+                    </label>
+                    <input
+                      type='number'
+                      id='accuracy'
+                      value={formData.accuracy}
+                      onChange={e =>
+                        handleInputChange(
+                          'accuracy',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='attackPower'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Attack Power
+                    </label>
+                    <input
+                      type='number'
+                      id='attackPower'
+                      value={formData.attackPower}
+                      onChange={e =>
+                        handleInputChange(
+                          'attackPower',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='spellPower'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Spell Power
+                    </label>
+                    <input
+                      type='number'
+                      id='spellPower'
+                      value={formData.spellPower}
+                      onChange={e =>
+                        handleInputChange(
+                          'spellPower',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='penetrationFlat'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Penetration (Flat)
+                    </label>
+                    <input
+                      type='number'
+                      id='penetrationFlat'
+                      value={formData.penetrationFlat}
+                      onChange={e =>
+                        handleInputChange(
+                          'penetrationFlat',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='penetrationPercent'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Penetration (%)
+                    </label>
+                    <input
+                      type='number'
+                      id='penetrationPercent'
+                      value={formData.penetrationPercent}
+                      onChange={e =>
+                        handleInputChange(
+                          'penetrationPercent',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+                </div>
+
+                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
+                  Modern Defensive Stats
+                </h4>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <label
+                      htmlFor='evasion'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Evasion
+                    </label>
+                    <input
+                      type='number'
+                      id='evasion'
+                      value={formData.evasion}
+                      onChange={e =>
+                        handleInputChange(
+                          'evasion',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='armorRating'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Armor Rating
+                    </label>
+                    <input
+                      type='number'
+                      id='armorRating'
+                      value={formData.armorRating}
+                      onChange={e =>
+                        handleInputChange(
+                          'armorRating',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='damageReductionPercent'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Damage Reduction (%)
+                    </label>
+                    <input
+                      type='number'
+                      id='damageReductionPercent'
+                      value={formData.damageReductionPercent}
+                      onChange={e =>
+                        handleInputChange(
+                          'damageReductionPercent',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='soak'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Soak
+                    </label>
+                    <input
+                      type='number'
+                      id='soak'
+                      value={formData.soak}
+                      onChange={e =>
+                        handleInputChange('soak', parseInt(e.target.value) || 0)
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='hardness'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Hardness
+                    </label>
+                    <input
+                      type='number'
+                      id='hardness'
+                      value={formData.hardness}
+                      onChange={e =>
+                        handleInputChange(
+                          'hardness',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='wardPercent'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Ward (%)
+                    </label>
+                    <input
+                      type='number'
+                      id='wardPercent'
+                      value={formData.wardPercent}
+                      onChange={e =>
+                        handleInputChange(
+                          'wardPercent',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+                </div>
+
+                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
+                  Elemental Resistances
+                </h4>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <label
+                      htmlFor='resistanceFire'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Fire Resistance
+                    </label>
+                    <input
+                      type='number'
+                      id='resistanceFire'
+                      value={formData.resistanceFire}
+                      onChange={e =>
+                        handleInputChange(
+                          'resistanceFire',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='resistanceCold'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Cold Resistance
+                    </label>
+                    <input
+                      type='number'
+                      id='resistanceCold'
+                      value={formData.resistanceCold}
+                      onChange={e =>
+                        handleInputChange(
+                          'resistanceCold',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='resistanceLightning'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Lightning Resistance
+                    </label>
+                    <input
+                      type='number'
+                      id='resistanceLightning'
+                      value={formData.resistanceLightning}
+                      onChange={e =>
+                        handleInputChange(
+                          'resistanceLightning',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='resistanceAcid'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Acid Resistance
+                    </label>
+                    <input
+                      type='number'
+                      id='resistanceAcid'
+                      value={formData.resistanceAcid}
+                      onChange={e =>
+                        handleInputChange(
+                          'resistanceAcid',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor='resistancePoison'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Poison Resistance
+                    </label>
+                    <input
+                      type='number'
+                      id='resistancePoison'
+                      value={formData.resistancePoison}
+                      onChange={e =>
+                        handleInputChange(
+                          'resistancePoison',
+                          parseInt(e.target.value) || 0
+                        )
+                      }
+                      min='0'
+                      max='100'
                       className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>

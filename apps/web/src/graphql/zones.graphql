@@ -9,3 +9,10 @@ query GetZones {
     resetMode
   }
 }
+
+query GetZonesForSelector {
+  zones {
+    id
+    name
+  }
+}

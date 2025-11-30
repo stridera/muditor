@@ -33,7 +33,13 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
+        { keys: 'Ctrl+K → m <name>', description: 'Search mobs globally' },
+        { keys: 'Ctrl+K → o <name>', description: 'Search objects globally' },
+        { keys: 'Ctrl+K → <name>', description: 'Search zones (default)' },
         { keys: 'Ctrl+G → V', description: 'Go to visual editor (zones)' },
         { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
         { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
@@ -54,7 +60,10 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
         { keys: 'Ctrl+G → V', description: 'Go to visual editor (zones)' },
         { keys: 'Ctrl+G → R', description: 'Go to rooms list' },
         { keys: 'Ctrl+G → M', description: 'Go to mobs list' },
@@ -112,7 +121,10 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
@@ -142,7 +154,10 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
@@ -155,7 +170,10 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
@@ -168,7 +186,10 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
     {
       title: 'Navigation',
       shortcuts: [
-        { keys: 'Ctrl+K', description: 'Quick zone/room navigation' },
+        {
+          keys: 'Ctrl+K',
+          description: 'Command palette (zones, mobs, objects)',
+        },
         { keys: '?', description: 'Show help dialog' },
       ],
     },
