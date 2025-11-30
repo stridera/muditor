@@ -942,9 +942,6 @@ type MobDto {
   keywords: [String!]!
   level: Int!
   lifeForce: LifeForce!
-
-  """Mob class identifier (e.g., NORMAL)"""
-  role: String!
   mobFlags: [MobFlag!]!
   name: String!
   penetrationFlat: Int!
