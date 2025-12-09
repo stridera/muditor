@@ -45,7 +45,7 @@ services:
     restart: unless-stopped
     working_dir: /app
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       DATABASE_URL: postgresql://${DATABASE_USER:-muditor}:${DATABASE_PASSWORD}@postgres:5432/${DATABASE_NAME:-muditor}
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       JWT_SECRET: ${JWT_SECRET}
@@ -70,8 +70,8 @@ services:
         npm install -g pnpm &&
         pnpm install --frozen-lockfile &&
         pnpm db:generate &&
-        pnpm --filter @muditor/api build &&
-        pnpm --filter @muditor/api start:prod
+        pnpm --filter @muditor/db build &&
+        pnpm --filter @muditor/api dev
       "
     networks:
       - muditor-network
@@ -82,8 +82,9 @@ services:
     restart: unless-stopped
     working_dir: /app
     environment:
-      NODE_ENV: production
+      NODE_ENV: development
       NEXT_PUBLIC_GRAPHQL_URL: ${NEXT_PUBLIC_GRAPHQL_URL:-http://localhost:4000/graphql}
+      NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-https://api.muditor.utaboshi.com}
       PORT: 3000
     volumes:
       - ./muditor:/app
@@ -99,8 +100,7 @@ services:
         apk add --no-cache python3 make g++ &&
         npm install -g pnpm &&
         pnpm install --frozen-lockfile &&
-        pnpm --filter @muditor/web build &&
-        pnpm --filter @muditor/web start
+        pnpm --filter @muditor/web dev
       "
     networks:
       - muditor-network

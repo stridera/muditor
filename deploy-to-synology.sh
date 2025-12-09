@@ -117,18 +117,18 @@ fi
 # Start or restart services
 if [ "$SKIP_PROMPTS" = true ]; then
     echo "🔄 Restarting Docker services on NAS..."
-    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose restart"
+    ssh "$SSH_HOST" "cd $NAS_DIR && /usr/local/bin/docker compose restart"
     echo "⏳ Waiting for services to restart..."
     sleep 15
 else
     echo "🚀 Starting Docker services on NAS..."
-    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose up -d"
+    ssh "$SSH_HOST" "cd $NAS_DIR && /usr/local/bin/docker compose up -d"
     echo "⏳ Waiting for services to start..."
     sleep 10
 
     # Run database migrations (only on fresh install)
     echo "🗄️  Running database migrations..."
-    ssh "$SSH_HOST" "cd $NAS_DIR && docker compose exec -T api sh -c 'pnpm db:migrate deploy'"
+    ssh "$SSH_HOST" "cd $NAS_DIR && /usr/local/bin/docker compose exec -T api sh -c 'pnpm db:migrate deploy'"
 fi
 
 # Import data if requested
@@ -142,7 +142,7 @@ echo ""
 echo "✅ Deployment complete!"
 echo ""
 echo "📊 Service Status:"
-ssh "$SSH_HOST" "cd $NAS_DIR && docker compose ps"
+ssh "$SSH_HOST" "cd $NAS_DIR && /usr/local/bin/docker compose ps"
 echo ""
 
 # Get NAS hostname/IP for access URLs

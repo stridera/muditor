@@ -21,6 +21,10 @@ Muditor transforms legacy MUD world building from text-based file editing to a v
 ### 🤖 Entity Management
 
 - **Mob Editor**: Complete NPC creation with stats, equipment, AI behaviors, and spawn rules
+  - Modern combat system with 15+ stat fields (accuracy, evasion, armor rating, resistances)
+  - Intelligent stat generation based on level and role (TRASH → BOSS)
+  - Dice notation inputs with real-time average calculations
+  - Organized stat grouping: Health/Damage, Offensive, Defensive, Elemental Resistances
 - **Object Editor**: Item creation with type-specific properties, magical effects, and interactions
 - **Shop Editor**: Merchant configuration with inventory, pricing, and trading rules
 

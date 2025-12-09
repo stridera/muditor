@@ -544,19 +544,25 @@ export type CreateMobEquipmentSetInput = {
 };
 
 export type CreateMobInput = {
+  accuracy?: Scalars['Int']['input'];
   alignment?: Scalars['Int']['input'];
   armorClass?: Scalars['Int']['input'];
+  armorRating?: Scalars['Int']['input'];
+  attackPower?: Scalars['Int']['input'];
   charisma?: Scalars['Int']['input'];
   classId?: InputMaybe<Scalars['Int']['input']>;
   composition?: Composition;
   concealment?: Scalars['Int']['input'];
   constitution?: Scalars['Int']['input'];
   damageDice?: Scalars['String']['input'];
+  damageReductionPercent?: Scalars['Int']['input'];
   damageType?: DamageType;
   dexterity?: Scalars['Int']['input'];
   effectFlags?: Array<EffectFlag>;
+  evasion?: Scalars['Int']['input'];
   examineDescription: Scalars['String']['input'];
   gender?: Gender;
+  hardness?: Scalars['Int']['input'];
   hitRoll?: Scalars['Int']['input'];
   hpDice?: Scalars['String']['input'];
   id: Scalars['Int']['input'];
@@ -566,13 +572,24 @@ export type CreateMobInput = {
   lifeForce?: LifeForce;
   mobFlags?: Array<MobFlag>;
   name: Scalars['String']['input'];
+  penetrationFlat?: Scalars['Int']['input'];
+  penetrationPercent?: Scalars['Int']['input'];
   perception?: Scalars['Int']['input'];
   position?: Position;
   race?: Race;
+  resistanceAcid?: Scalars['Int']['input'];
+  resistanceCold?: Scalars['Int']['input'];
+  resistanceFire?: Scalars['Int']['input'];
+  resistanceLightning?: Scalars['Int']['input'];
+  resistancePoison?: Scalars['Int']['input'];
+  role?: MobRole;
   roomDescription: Scalars['String']['input'];
   size?: Size;
+  soak?: Scalars['Int']['input'];
+  spellPower?: Scalars['Int']['input'];
   stance?: Stance;
   strength?: Scalars['Int']['input'];
+  wardPercent?: Scalars['Int']['input'];
   wealth?: Scalars['Int']['input'];
   wisdom?: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -900,8 +917,11 @@ export type LoginInput = {
 
 export type MobDto = {
   __typename?: 'MobDto';
+  accuracy: Scalars['Int']['output'];
   alignment: Scalars['Int']['output'];
   armorClass: Scalars['Int']['output'];
+  armorRating: Scalars['Int']['output'];
+  attackPower: Scalars['Int']['output'];
   charisma: Scalars['Int']['output'];
   classId?: Maybe<Scalars['Int']['output']>;
   composition: Composition;
@@ -909,11 +929,14 @@ export type MobDto = {
   constitution: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   damageDice: Scalars['String']['output'];
+  damageReductionPercent: Scalars['Int']['output'];
   damageType: DamageType;
   dexterity: Scalars['Int']['output'];
   effectFlags: Array<EffectFlag>;
+  evasion: Scalars['Int']['output'];
   examineDescription: Scalars['String']['output'];
   gender: Gender;
+  hardness: Scalars['Int']['output'];
   hitRoll: Scalars['Int']['output'];
   hpDice: Scalars['String']['output'];
   id: Scalars['Int']['output'];
@@ -921,18 +944,27 @@ export type MobDto = {
   keywords: Array<Scalars['String']['output']>;
   level: Scalars['Int']['output'];
   lifeForce: LifeForce;
-  /** Mob class identifier (e.g., NORMAL) */
-  mobClass: Scalars['String']['output'];
   mobFlags: Array<MobFlag>;
   name: Scalars['String']['output'];
+  penetrationFlat: Scalars['Int']['output'];
+  penetrationPercent: Scalars['Int']['output'];
   perception: Scalars['Int']['output'];
   position: Position;
   race: Race;
+  resistanceAcid: Scalars['Int']['output'];
+  resistanceCold: Scalars['Int']['output'];
+  resistanceFire: Scalars['Int']['output'];
+  resistanceLightning: Scalars['Int']['output'];
+  resistancePoison: Scalars['Int']['output'];
+  role: MobRole;
   roomDescription: Scalars['String']['output'];
   size: Size;
+  soak: Scalars['Int']['output'];
+  spellPower: Scalars['Int']['output'];
   stance: Stance;
   strength: Scalars['Int']['output'];
   updatedAt: Scalars['DateTime']['output'];
+  wardPercent: Scalars['Int']['output'];
   wealth?: Maybe<Scalars['Int']['output']>;
   wisdom: Scalars['Int']['output'];
   zoneId: Scalars['Int']['output'];
@@ -1033,6 +1065,14 @@ export type MobResetEquipmentDto = {
   probability: Scalars['Float']['output'];
   wearLocation?: Maybe<WearFlag>;
 };
+
+export type MobRole =
+  | 'BOSS'
+  | 'ELITE'
+  | 'MINIBOSS'
+  | 'NORMAL'
+  | 'RAID_BOSS'
+  | 'TRASH';
 
 export type MobSummaryDto = {
   __typename?: 'MobSummaryDto';
@@ -2580,19 +2620,25 @@ export type UpdateGrantInput = {
 };
 
 export type UpdateMobInput = {
+  accuracy?: InputMaybe<Scalars['Int']['input']>;
   alignment?: InputMaybe<Scalars['Int']['input']>;
   armorClass?: InputMaybe<Scalars['Int']['input']>;
+  armorRating?: InputMaybe<Scalars['Int']['input']>;
+  attackPower?: InputMaybe<Scalars['Int']['input']>;
   charisma?: InputMaybe<Scalars['Int']['input']>;
   classId?: InputMaybe<Scalars['Int']['input']>;
   composition?: InputMaybe<Composition>;
   concealment?: InputMaybe<Scalars['Int']['input']>;
   constitution?: InputMaybe<Scalars['Int']['input']>;
   damageDice?: InputMaybe<Scalars['String']['input']>;
+  damageReductionPercent?: InputMaybe<Scalars['Int']['input']>;
   damageType?: InputMaybe<DamageType>;
   dexterity?: InputMaybe<Scalars['Int']['input']>;
   effectFlags?: InputMaybe<Array<EffectFlag>>;
+  evasion?: InputMaybe<Scalars['Int']['input']>;
   examineDescription?: InputMaybe<Scalars['String']['input']>;
   gender?: InputMaybe<Gender>;
+  hardness?: InputMaybe<Scalars['Int']['input']>;
   hitRoll?: InputMaybe<Scalars['Int']['input']>;
   hpDice?: InputMaybe<Scalars['String']['input']>;
   intelligence?: InputMaybe<Scalars['Int']['input']>;
@@ -2601,13 +2647,24 @@ export type UpdateMobInput = {
   lifeForce?: InputMaybe<LifeForce>;
   mobFlags?: InputMaybe<Array<MobFlag>>;
   name?: InputMaybe<Scalars['String']['input']>;
+  penetrationFlat?: InputMaybe<Scalars['Int']['input']>;
+  penetrationPercent?: InputMaybe<Scalars['Int']['input']>;
   perception?: InputMaybe<Scalars['Int']['input']>;
   position?: InputMaybe<Position>;
   race?: InputMaybe<Race>;
+  resistanceAcid?: InputMaybe<Scalars['Int']['input']>;
+  resistanceCold?: InputMaybe<Scalars['Int']['input']>;
+  resistanceFire?: InputMaybe<Scalars['Int']['input']>;
+  resistanceLightning?: InputMaybe<Scalars['Int']['input']>;
+  resistancePoison?: InputMaybe<Scalars['Int']['input']>;
+  role?: InputMaybe<MobRole>;
   roomDescription?: InputMaybe<Scalars['String']['input']>;
   size?: InputMaybe<Size>;
+  soak?: InputMaybe<Scalars['Int']['input']>;
+  spellPower?: InputMaybe<Scalars['Int']['input']>;
   stance?: InputMaybe<Stance>;
   strength?: InputMaybe<Scalars['Int']['input']>;
+  wardPercent?: InputMaybe<Scalars['Int']['input']>;
   wealth?: InputMaybe<Scalars['Int']['input']>;
   wisdom?: InputMaybe<Scalars['Int']['input']>;
 };
@@ -5055,9 +5112,26 @@ export type GetMobQuery = {
     roomDescription: string;
     examineDescription: string;
     level: number;
+    role: MobRole;
     alignment: number;
     hitRoll: number;
     armorClass: number;
+    accuracy: number;
+    attackPower: number;
+    spellPower: number;
+    penetrationFlat: number;
+    penetrationPercent: number;
+    evasion: number;
+    armorRating: number;
+    damageReductionPercent: number;
+    soak: number;
+    hardness: number;
+    wardPercent: number;
+    resistanceFire: number;
+    resistanceCold: number;
+    resistanceLightning: number;
+    resistanceAcid: number;
+    resistancePoison: number;
     hpDice: string;
     damageDice: string;
     damageType: DamageType;
@@ -13217,9 +13291,50 @@ export const GetMobDocument = {
                   name: { kind: 'Name', value: 'examineDescription' },
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'alignment' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'hitRoll' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'armorClass' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'accuracy' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attackPower' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'spellPower' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'penetrationFlat' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'penetrationPercent' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'evasion' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'armorRating' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'damageReductionPercent' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'soak' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hardness' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'wardPercent' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'resistanceFire' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'resistanceCold' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'resistanceLightning' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'resistanceAcid' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'resistancePoison' },
+                },
                 { kind: 'Field', name: { kind: 'Name', value: 'hpDice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'damageDice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'damageType' } },
