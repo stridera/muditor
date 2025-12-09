@@ -7,9 +7,26 @@ query GetMob($id: Int!, $zoneId: Int!) {
     roomDescription
     examineDescription
     level
+    role
     alignment
     hitRoll
     armorClass
+    accuracy
+    attackPower
+    spellPower
+    penetrationFlat
+    penetrationPercent
+    evasion
+    armorRating
+    damageReductionPercent
+    soak
+    hardness
+    wardPercent
+    resistanceFire
+    resistanceCold
+    resistanceLightning
+    resistanceAcid
+    resistancePoison
     hpDice
     damageDice
     damageType

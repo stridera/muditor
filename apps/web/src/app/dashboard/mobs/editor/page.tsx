@@ -19,7 +19,7 @@ import {
   type Stance,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
-import { ArrowLeft, Save } from 'lucide-react';
+import { ArrowLeft, Save, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -29,6 +29,10 @@ import {
   useRealTimeValidation,
   ValidationHelpers,
 } from '../../../../hooks/useRealTimeValidation';
+import { DiceInput } from '../../../../components/dice-input';
+import { NumberSpinner } from '../../../../components/number-spinner';
+import { generateMobStats } from '../../../../utils/mob-stat-generator';
+import { MobCombatStatsTab } from '../../../../components/mob-combat-stats-tab';
 
 interface MobFormData {
   keywords: string;
@@ -417,6 +421,47 @@ function MobEditorContent() {
     );
   };
 
+  const handleGenerateStats = () => {
+    // Generate stats based on current level and role
+    const generatedStats = generateMobStats(
+      formData.level,
+      formData.role as any, // Type assertion for role
+      formData.mobClass.toUpperCase() as any, // Type assertion for class
+      formData.race,
+      formData.lifeForce as any, // Type assertion for lifeforce
+      formData.composition as any, // Type assertion for composition
+      formData.hitRoll,
+      formData.armorClass
+    );
+
+    // Update form data with generated stats
+    setFormData({
+      ...formData,
+      accuracy: generatedStats.accuracy,
+      attackPower: generatedStats.attackPower,
+      spellPower: generatedStats.spellPower,
+      penetrationFlat: generatedStats.penetrationFlat,
+      penetrationPercent: generatedStats.penetrationPercent,
+      evasion: generatedStats.evasion,
+      armorRating: generatedStats.armorRating,
+      damageReductionPercent: generatedStats.damageReductionPercent,
+      soak: generatedStats.soak,
+      hardness: generatedStats.hardness,
+      wardPercent: generatedStats.wardPercent,
+      resistanceFire: generatedStats.resistanceFire,
+      resistanceCold: generatedStats.resistanceCold,
+      resistanceLightning: generatedStats.resistanceLightning,
+      resistanceAcid: generatedStats.resistanceAcid,
+      resistancePoison: generatedStats.resistancePoison,
+      hpDiceNum: generatedStats.hpDiceNum,
+      hpDiceSize: generatedStats.hpDiceSize,
+      hpDiceBonus: generatedStats.hpDiceBonus,
+      damageDiceNum: generatedStats.damageDiceNum,
+      damageDiceSize: generatedStats.damageDiceSize,
+      damageDiceBonus: generatedStats.damageDiceBonus,
+    });
+  };
+
   // Show loading state while query is running
   if (loading)
     return <div className='p-4 text-foreground'>Loading mob data...</div>;
@@ -635,609 +680,12 @@ function MobEditorContent() {
 
         {/* Combat Stats Tab */}
         {activeTab === 'stats' && (
-          <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-card shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-card-foreground mb-4'>
-                Combat Statistics
-              </h3>
-              <div className='space-y-4'>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='level'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Level *
-                    </label>
-                    <input
-                      type='number'
-                      id='level'
-                      value={formData.level}
-                      onChange={e =>
-                        handleInputChange(
-                          'level',
-                          parseInt(e.target.value) || 1
-                        )
-                      }
-                      min='1'
-                      max='100'
-                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
-                        errors.level ? 'border-destructive' : 'border-input'
-                      }`}
-                    />
-                    {errors.level && (
-                      <p className='text-destructive text-xs mt-1'>
-                        {errors.level}
-                      </p>
-                    )}
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='role'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Role
-                    </label>
-                    <select
-                      id='role'
-                      value={formData.role}
-                      onChange={e => handleInputChange('role', e.target.value)}
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    >
-                      <option value='TRASH'>Trash</option>
-                      <option value='NORMAL'>Normal</option>
-                      <option value='ELITE'>Elite</option>
-                      <option value='MINIBOSS'>Miniboss</option>
-                      <option value='BOSS'>Boss</option>
-                      <option value='RAID_BOSS'>Raid Boss</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='armorClass'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Armor Class (Legacy)
-                    </label>
-                    <input
-                      type='number'
-                      id='armorClass'
-                      value={formData.armorClass}
-                      onChange={e =>
-                        handleInputChange(
-                          'armorClass',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                </div>
-
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='hitRoll'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Hit Roll (Legacy)
-                    </label>
-                    <input
-                      type='number'
-                      id='hitRoll'
-                      value={formData.hitRoll}
-                      onChange={e =>
-                        handleInputChange(
-                          'hitRoll',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='move'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Movement
-                    </label>
-                    <input
-                      type='number'
-                      id='move'
-                      value={formData.move}
-                      onChange={e =>
-                        handleInputChange('move', parseInt(e.target.value) || 0)
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                </div>
-
-                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
-                  Modern Offensive Stats
-                </h4>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='accuracy'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Accuracy
-                    </label>
-                    <input
-                      type='number'
-                      id='accuracy'
-                      value={formData.accuracy}
-                      onChange={e =>
-                        handleInputChange(
-                          'accuracy',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='attackPower'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Attack Power
-                    </label>
-                    <input
-                      type='number'
-                      id='attackPower'
-                      value={formData.attackPower}
-                      onChange={e =>
-                        handleInputChange(
-                          'attackPower',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='spellPower'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Spell Power
-                    </label>
-                    <input
-                      type='number'
-                      id='spellPower'
-                      value={formData.spellPower}
-                      onChange={e =>
-                        handleInputChange(
-                          'spellPower',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='penetrationFlat'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Penetration (Flat)
-                    </label>
-                    <input
-                      type='number'
-                      id='penetrationFlat'
-                      value={formData.penetrationFlat}
-                      onChange={e =>
-                        handleInputChange(
-                          'penetrationFlat',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='penetrationPercent'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Penetration (%)
-                    </label>
-                    <input
-                      type='number'
-                      id='penetrationPercent'
-                      value={formData.penetrationPercent}
-                      onChange={e =>
-                        handleInputChange(
-                          'penetrationPercent',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                </div>
-
-                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
-                  Modern Defensive Stats
-                </h4>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='evasion'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Evasion
-                    </label>
-                    <input
-                      type='number'
-                      id='evasion'
-                      value={formData.evasion}
-                      onChange={e =>
-                        handleInputChange(
-                          'evasion',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='armorRating'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Armor Rating
-                    </label>
-                    <input
-                      type='number'
-                      id='armorRating'
-                      value={formData.armorRating}
-                      onChange={e =>
-                        handleInputChange(
-                          'armorRating',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='damageReductionPercent'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Damage Reduction (%)
-                    </label>
-                    <input
-                      type='number'
-                      id='damageReductionPercent'
-                      value={formData.damageReductionPercent}
-                      onChange={e =>
-                        handleInputChange(
-                          'damageReductionPercent',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='soak'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Soak
-                    </label>
-                    <input
-                      type='number'
-                      id='soak'
-                      value={formData.soak}
-                      onChange={e =>
-                        handleInputChange('soak', parseInt(e.target.value) || 0)
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='hardness'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Hardness
-                    </label>
-                    <input
-                      type='number'
-                      id='hardness'
-                      value={formData.hardness}
-                      onChange={e =>
-                        handleInputChange(
-                          'hardness',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='wardPercent'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Ward (%)
-                    </label>
-                    <input
-                      type='number'
-                      id='wardPercent'
-                      value={formData.wardPercent}
-                      onChange={e =>
-                        handleInputChange(
-                          'wardPercent',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                </div>
-
-                <h4 className='text-md font-medium text-card-foreground mt-6 mb-3'>
-                  Elemental Resistances
-                </h4>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='resistanceFire'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Fire Resistance
-                    </label>
-                    <input
-                      type='number'
-                      id='resistanceFire'
-                      value={formData.resistanceFire}
-                      onChange={e =>
-                        handleInputChange(
-                          'resistanceFire',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='resistanceCold'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Cold Resistance
-                    </label>
-                    <input
-                      type='number'
-                      id='resistanceCold'
-                      value={formData.resistanceCold}
-                      onChange={e =>
-                        handleInputChange(
-                          'resistanceCold',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='resistanceLightning'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Lightning Resistance
-                    </label>
-                    <input
-                      type='number'
-                      id='resistanceLightning'
-                      value={formData.resistanceLightning}
-                      onChange={e =>
-                        handleInputChange(
-                          'resistanceLightning',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='resistanceAcid'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Acid Resistance
-                    </label>
-                    <input
-                      type='number'
-                      id='resistanceAcid'
-                      value={formData.resistanceAcid}
-                      onChange={e =>
-                        handleInputChange(
-                          'resistanceAcid',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='resistancePoison'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Poison Resistance
-                    </label>
-                    <input
-                      type='number'
-                      id='resistancePoison'
-                      value={formData.resistancePoison}
-                      onChange={e =>
-                        handleInputChange(
-                          'resistancePoison',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      min='0'
-                      max='100'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className='bg-card shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-card-foreground mb-4'>
-                Hit Points & Damage
-              </h3>
-              <div className='space-y-4'>
-                <div>
-                  <label className='block text-sm font-medium text-card-foreground mb-2'>
-                    Hit Points Dice
-                  </label>
-                  <div className='grid grid-cols-3 gap-2'>
-                    <input
-                      type='number'
-                      placeholder='Num'
-                      value={formData.hpDiceNum}
-                      onChange={e =>
-                        handleInputChange(
-                          'hpDiceNum',
-                          parseInt(e.target.value) || 1
-                        )
-                      }
-                      min='1'
-                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
-                        errors.hpDiceNum ? 'border-destructive' : 'border-input'
-                      }`}
-                    />
-                    <input
-                      type='number'
-                      placeholder='Size'
-                      value={formData.hpDiceSize}
-                      onChange={e =>
-                        handleInputChange(
-                          'hpDiceSize',
-                          parseInt(e.target.value) || 8
-                        )
-                      }
-                      min='1'
-                      className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
-                        errors.hpDiceSize
-                          ? 'border-destructive'
-                          : 'border-input'
-                      }`}
-                    />
-                    <input
-                      type='number'
-                      placeholder='Bonus'
-                      value={formData.hpDiceBonus}
-                      onChange={e =>
-                        handleInputChange(
-                          'hpDiceBonus',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    {formData.hpDiceNum}d{formData.hpDiceSize}+
-                    {formData.hpDiceBonus} (avg: ~{calculateHP()})
-                  </p>
-                </div>
-
-                <div>
-                  <label className='block text-sm font-medium text-card-foreground mb-2'>
-                    Damage Dice
-                  </label>
-                  <div className='grid grid-cols-3 gap-2'>
-                    <input
-                      type='number'
-                      placeholder='Num'
-                      value={formData.damageDiceNum}
-                      onChange={e =>
-                        handleInputChange(
-                          'damageDiceNum',
-                          parseInt(e.target.value) || 1
-                        )
-                      }
-                      min='1'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                    <input
-                      type='number'
-                      placeholder='Size'
-                      value={formData.damageDiceSize}
-                      onChange={e =>
-                        handleInputChange(
-                          'damageDiceSize',
-                          parseInt(e.target.value) || 4
-                        )
-                      }
-                      min='1'
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                    <input
-                      type='number'
-                      placeholder='Bonus'
-                      value={formData.damageDiceBonus}
-                      onChange={e =>
-                        handleInputChange(
-                          'damageDiceBonus',
-                          parseInt(e.target.value) || 0
-                        )
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    />
-                  </div>
-                  <p className='text-sm text-muted-foreground mt-1'>
-                    {formData.damageDiceNum}d{formData.damageDiceSize}+
-                    {formData.damageDiceBonus} (avg: ~{calculateDamage()})
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
+          <MobCombatStatsTab
+            formData={formData}
+            onFieldChange={handleInputChange}
+            onGenerateStats={handleGenerateStats}
+            errors={errors}
+          />
         )}
 
         {/* Attributes Tab */}
