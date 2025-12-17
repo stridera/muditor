@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { NodeProps } from 'reactflow';
+import { ColoredTextInline } from '../ColoredTextViewer';
 
 interface ObjectData {
   id: number;
@@ -135,7 +136,9 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                   )}
                 </div>
                 <h3 className='font-semibold text-sm leading-tight truncate'>
-                  {data.name || `Object ${data.id}`}
+                  <ColoredTextInline
+                    markup={data.name || `Object ${data.id}`}
+                  />
                 </h3>
               </div>
             </div>
@@ -195,7 +198,7 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                 )}
               </div>
               <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-                {data.name}
+                <ColoredTextInline markup={data.name || `Object ${data.id}`} />
               </h3>
             </div>
             <div className='px-3 py-2'>
@@ -272,7 +275,7 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
             }}
           >
             <div className='font-semibold mb-2'>
-              {data.name || `Object ${data.id}`}
+              <ColoredTextInline markup={data.name || `Object ${data.id}`} />
             </div>
             <div
               className={`grid grid-cols-2 gap-2 mb-2 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}

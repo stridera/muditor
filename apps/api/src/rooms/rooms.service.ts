@@ -49,7 +49,7 @@ type RoomServiceResult = RoomServiceResultBase;
 
 @Injectable()
 export class RoomsService {
-  constructor(private readonly db: DatabaseService) { }
+  constructor(private readonly db: DatabaseService) {}
 
   private readonly includeFull = {
     exits: true,
@@ -202,7 +202,7 @@ export class RoomsService {
         });
       }
 
-      return rows.map(r => {
+      return rows.map((r: (typeof rows)[0]) => {
         const roomKey = `${r.zoneId}-${r.id}`;
         const roomExits = exitsByRoom.get(roomKey) || [];
         return this.mapRoom({
@@ -302,9 +302,7 @@ export class RoomsService {
     return this.mapRoom(room);
   }
 
-  async createExit(
-    data: CreateRoomExitInput
-  ): Promise<RoomExitResult> {
+  async createExit(data: CreateRoomExitInput): Promise<RoomExitResult> {
     const keywords = (data.keywords || []).filter(
       k => !!k && k.trim().length > 0
     );

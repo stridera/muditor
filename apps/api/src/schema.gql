@@ -5,23 +5,29 @@
 type Ability {
   abilityType: String!
   castTimeRounds: Int!
+  combatOk: Boolean!
   cooldownMs: Int!
   createdAt: DateTime!
+  damageType: ElementType
   description: String
   effects: [AbilityEffect!]
-  gameId: String
+  humanoidOnly: Boolean!
   id: ID!
   inCombatOnly: Boolean!
   isArea: Boolean!
   luaScript: String
+  memorizationTime: Int!
   messages: AbilityMessages
   minPosition: Position!
   name: String!
   notes: String
+  pages: Int
+  questOnly: Boolean!
   restrictions: AbilityRestrictions
   savingThrows: [AbilitySavingThrow!]
   school: AbilitySchool
   schoolId: Int
+  sphere: SpellSphere
   tags: [String!]!
   targeting: AbilityTargeting
   updatedAt: DateTime!
@@ -34,6 +40,15 @@ type AbilityEffect {
   condition: String
   effect: Effect!
   effectId: ID!
+  order: Int!
+  overrideParams: JSON
+  trigger: String
+}
+
+input AbilityEffectItemInput {
+  chancePct: Int! = 100
+  condition: String
+  effectId: Int!
   order: Int!
   overrideParams: JSON
   trigger: String
@@ -168,6 +183,8 @@ type CharacterDto {
   bankSilver: Int!
   baseSize: Int!
   birthTime: DateTime!
+  characterEffects: [CharacterEffectDto!]
+  characterItems: [CharacterItemDto!]
   charisma: Int!
   classId: Int
   constitution: Int!
@@ -179,7 +196,6 @@ type CharacterDto {
   description: String
   dexterity: Int!
   effectFlags: [String!]!
-  effects: [CharacterEffectDto!]
   experience: Int!
   gender: String!
   gold: Int!
@@ -193,7 +209,6 @@ type CharacterDto {
   intelligence: Int!
   invisLevel: Int!
   isOnline: Boolean!
-  items: [CharacterItemDto!]
   lastLogin: DateTime
   level: Int!
   luck: Int!
@@ -245,8 +260,8 @@ input CharacterFilterInput {
 }
 
 type CharacterItemDto {
-  character: CharacterDto!
   characterId: String!
+  characters: CharacterDto!
   charges: Int!
   condition: Int!
   containedItems: [CharacterItemDto!]!
@@ -259,8 +274,8 @@ type CharacterItemDto {
   equippedLocation: String
   id: ID!
   instanceFlags: [String!]!
-  objectPrototype: ObjectSummaryDto!
   objectPrototypeId: Int!
+  objects: ObjectSummaryDto!
   updatedAt: DateTime!
 }
 
@@ -313,6 +328,7 @@ type ClassDto {
   hitDice: String!
   id: ID!
   name: String!
+  plainName: String!
   primaryStat: String
   updatedAt: DateTime!
 }
@@ -364,16 +380,22 @@ enum Composition {
 input CreateAbilityInput {
   abilityType: String! = "SPELL"
   castTimeRounds: Int! = 1
+  combatOk: Boolean! = true
   cooldownMs: Int! = 0
+  damageType: ElementType
   description: String
-  gameId: String
+  humanoidOnly: Boolean! = false
   inCombatOnly: Boolean! = false
   isArea: Boolean! = false
   luaScript: String
+  memorizationTime: Int! = 0
   minPosition: Position! = STANDING
   name: String!
   notes: String
+  pages: Int
+  questOnly: Boolean! = false
   schoolId: Int
+  sphere: SpellSphere
   tags: [String!]! = []
   violent: Boolean! = false
 }
@@ -464,6 +486,15 @@ input CreateClassInput {
   primaryStat: String
 }
 
+input CreateEffectInput {
+  defaultParams: JSON
+  description: String
+  effectType: String!
+  name: String!
+  paramSchema: JSON
+  tags: [String!]
+}
+
 input CreateEquipmentSetInput {
   description: String
   items: [CreateEquipmentSetItemInput!]
@@ -492,6 +523,36 @@ input CreateGrantInput {
   resourceId: String!
   resourceType: GrantResourceType!
   userId: String!
+}
+
+"""Input for creating a new help entry"""
+input CreateHelpEntryInput {
+  """Category (e.g., spell, skill, command)"""
+  category: String
+
+  """Class/circle requirements"""
+  classes: JSON
+
+  """Full help text content"""
+  content: String!
+
+  """Duration description"""
+  duration: String
+
+  """Keywords for looking up this help entry"""
+  keywords: [String!]!
+
+  """Minimum player level to view"""
+  minLevel: Int! = 0
+
+  """Spell sphere"""
+  sphere: String
+
+  """Primary display title"""
+  title: String!
+
+  """Usage syntax"""
+  usage: String
 }
 
 input CreateMobEquipmentSetInput {
@@ -659,6 +720,42 @@ input CreateShopInput {
   zoneId: Int!
 }
 
+"""Input for creating a new social command"""
+input CreateSocialInput {
+  """Message to actor when targeting self"""
+  charAuto: String
+
+  """Message to actor when target found"""
+  charFound: String
+
+  """Message to actor when no target"""
+  charNoArg: String
+
+  """Hide who initiated the action"""
+  hide: Boolean! = false
+
+  """Minimum position for the target"""
+  minVictimPosition: Position! = STANDING
+
+  """Unique command name (e.g., smile, bow, hug)"""
+  name: String!
+
+  """Message when target not found"""
+  notFound: String
+
+  """Message to room when actor targets self"""
+  othersAuto: String
+
+  """Message to room (excluding target) when target found"""
+  othersFound: String
+
+  """Message to room when no target"""
+  othersNoArg: String
+
+  """Message to target"""
+  victFound: String
+}
+
 input CreateTriggerInput {
   argList: [String!]! = []
   attachType: ScriptType!
@@ -728,6 +825,8 @@ type Effect {
   effectType: String!
   id: ID!
   name: String!
+  paramSchema: JSON
+  tags: [String!]!
 }
 
 enum EffectFlag {
@@ -819,6 +918,29 @@ enum EffectFlag {
   WRATH
 }
 
+enum ElementType {
+  ACID
+  AIR
+  BLEED
+  COLD
+  EARTH
+  FIRE
+  FORCE
+  HEAL
+  HOLY
+  MENTAL
+  NATURE
+  NECROTIC
+  PHYSICAL
+  POISON
+  RADIANT
+  SHADOW
+  SHOCK
+  SONIC
+  UNHOLY
+  WATER
+}
+
 type EquipmentSetDto {
   createdAt: DateTime!
   description: String
@@ -874,6 +996,54 @@ input GrantZoneAccessInput {
   permissions: [GrantPermission!]!
   userId: String!
   zoneId: Float!
+}
+
+"""Help entry for in-game documentation"""
+type HelpEntryDto {
+  """Category (e.g., spell, skill, command, class, area)"""
+  category: String
+
+  """Class/circle requirements (e.g., {"Pyromancer": 7})"""
+  classes: JSON
+
+  """Full help text content"""
+  content: String!
+  createdAt: DateTime!
+
+  """Duration description"""
+  duration: String
+  id: ID!
+
+  """Keywords for looking up this help entry"""
+  keywords: [String!]!
+
+  """Minimum player level to view (0 = all, 100+ = immortal only)"""
+  minLevel: Int!
+
+  """Original help file this came from"""
+  sourceFile: String
+
+  """Spell sphere (fire, water, healing, etc.)"""
+  sphere: String
+
+  """Primary display title"""
+  title: String!
+  updatedAt: DateTime!
+
+  """Usage syntax"""
+  usage: String
+}
+
+"""Filter options for help entries"""
+input HelpEntryFilterInput {
+  """Filter by category"""
+  category: String
+
+  """Maximum minLevel to include"""
+  maxMinLevel: Int
+
+  """Filter by sphere"""
+  sphere: String
 }
 
 enum Hemisphere {
@@ -947,6 +1117,9 @@ type MobDto {
   penetrationFlat: Int!
   penetrationPercent: Int!
   perception: Int!
+  plainExamineDescription: String!
+  plainName: String!
+  plainRoomDescription: String!
   position: Position!
   race: Race!
   resistanceAcid: Int!
@@ -1099,9 +1272,13 @@ type Mutation {
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createClass(data: CreateClassInput!): ClassDto!
   createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
+  createEffect(data: CreateEffectInput!): Effect!
   createEquipmentSet(data: CreateEquipmentSetInput!): EquipmentSetDto!
   createEquipmentSetItem(data: CreateEquipmentSetItemStandaloneInput!): EquipmentSetItemDto!
   createGrant(data: CreateGrantInput!): UserGrantDto!
+
+  """Create a new help entry"""
+  createHelpEntry(data: CreateHelpEntryInput!): HelpEntryDto!
   createMob(data: CreateMobInput!): MobDto!
   createMobEquipmentSet(data: CreateMobEquipmentSetInput!): MobEquipmentSetDto!
   createMobReset(data: CreateMobResetInput!): MobResetDto!
@@ -1110,6 +1287,9 @@ type Mutation {
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
   createShop(data: CreateShopInput!): ShopDto!
+
+  """Create a new social command"""
+  createSocial(data: CreateSocialInput!): SocialDto!
   createTrigger(input: CreateTriggerInput!): TriggerDto!
   createZone(data: CreateZoneInput!): ZoneDto!
   deleteAbility(id: ID!): Boolean!
@@ -1120,9 +1300,13 @@ type Mutation {
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
   deleteClass(id: ID!): Boolean!
+  deleteEffect(id: ID!): Boolean!
   deleteEquipmentSet(id: ID!): Boolean!
   deleteEquipmentSetItem(id: ID!): Boolean!
   deleteGrant(id: ID!): Boolean!
+
+  """Delete a help entry"""
+  deleteHelpEntry(id: ID!): Boolean!
   deleteMob(id: Int!, zoneId: Int!): MobDto!
   deleteMobEquipmentSet(id: ID!): Boolean!
   deleteMobReset(id: ID!): Boolean!
@@ -1134,6 +1318,9 @@ type Mutation {
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
+
+  """Delete a social command"""
+  deleteSocial(id: ID!): Boolean!
   deleteTrigger(id: Float!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
   detachTrigger(triggerId: Float!): TriggerDto!
@@ -1164,6 +1351,7 @@ type Mutation {
   """Unlink a character from your user account"""
   unlinkCharacter(data: UnlinkCharacterInput!): Boolean!
   updateAbility(data: UpdateAbilityInput!, id: ID!): Ability!
+  updateAbilityEffects(abilityId: Int!, data: UpdateAbilityEffectsInput!): Ability!
   updateAbilityMessages(abilityId: Int!, data: UpdateAbilityMessagesInput!): AbilityMessages!
   updateAbilityTargeting(abilityId: Int!, data: UpdateAbilityTargetingInput!): AbilityTargeting!
   updateCharacter(data: UpdateCharacterInput!, id: ID!): CharacterDto!
@@ -1173,8 +1361,12 @@ type Mutation {
   updateClass(data: UpdateClassInput!, id: ID!): ClassDto!
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
+  updateEffect(data: UpdateEffectInput!, id: ID!): Effect!
   updateEquipmentSet(data: UpdateEquipmentSetInput!, id: ID!): EquipmentSetDto!
   updateGrant(data: UpdateGrantInput!, id: ID!): UserGrantDto!
+
+  """Update an existing help entry"""
+  updateHelpEntry(data: UpdateHelpEntryInput!, id: ID!): HelpEntryDto!
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
@@ -1187,10 +1379,18 @@ type Mutation {
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopHours(data: UpdateShopHoursInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
+
+  """Update an existing social command"""
+  updateSocial(data: UpdateSocialInput!, id: ID!): SocialDto!
   updateTrigger(id: Float!, input: UpdateTriggerInput!): TriggerDto!
   updateUser(input: UpdateUserInput!): User!
   updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
+}
+
+type ObjectAffectDto {
+  location: String!
+  modifier: Int!
 }
 
 type ObjectDto {
@@ -1206,6 +1406,10 @@ type ObjectDto {
   keywords: [String!]!
   level: Int!
   name: String!
+  plainActionDescription: String
+  plainExamineDescription: String!
+  plainName: String!
+  plainRoomDescription: String!
   roomDescription: String!
   timer: Int!
   type: ObjectType!
@@ -1274,9 +1478,17 @@ enum ObjectFlag {
 
 type ObjectSummaryDto {
   cost: Int
+  effectFlags: [String!]
+  examineDescription: String
+  flags: [String!]
   id: Int!
+  level: Int
   name: String!
+  objectAffects: [ObjectAffectDto!]
   type: String!
+  values: JSON
+  wearFlags: [String!]
+  weight: Float
   zoneId: Int!
 }
 
@@ -1342,7 +1554,6 @@ type Query {
   abilities(abilityType: String, search: String, skip: Int, take: Int): [Ability!]!
   abilitiesCount(abilityType: String, search: String): Int!
   ability(id: ID!): Ability!
-  abilityByGameId(gameId: String!): Ability
   abilitySchool(id: ID!): AbilitySchool!
   abilitySchools: [AbilitySchool!]!
   activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
@@ -1376,6 +1587,21 @@ type Query {
   getValidationSummary: ValidationSummaryType!
   grant(id: ID!): UserGrantDto!
   grants(resourceType: GrantResourceType, userId: String): [UserGrantDto!]!
+
+  """Get a help entry by keyword"""
+  helpByKeyword(keyword: String!): HelpEntryDto!
+
+  """Get all distinct help entry categories"""
+  helpCategories: [String!]!
+
+  """Get all help entries with optional filtering"""
+  helpEntries(filter: HelpEntryFilterInput): [HelpEntryDto!]!
+
+  """Get total count of help entries"""
+  helpEntriesCount(filter: HelpEntryFilterInput): Int!
+
+  """Get a single help entry by ID"""
+  helpEntry(id: ID!): HelpEntryDto!
   me: User!
   mob(id: Int!, zoneId: Int!): MobDto!
   mobReset(id: ID!): MobResetDto
@@ -1403,13 +1629,31 @@ type Query {
   rooms(lightweight: Boolean = false, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
   roomsCount(zoneId: Int): Int!
+
+  """Search help entries by keyword, title, or content"""
+  searchHelp(filter: HelpEntryFilterInput, query: String!): [HelpEntryDto!]!
   searchMobs(limit: Int! = 10, search: String!, zoneId: Int): [MobDto!]!
   searchObjects(limit: Int! = 10, search: String!, zoneId: Int): [ObjectDto!]!
+
+  """Search socials by name pattern"""
+  searchSocials(query: String!): [SocialDto!]!
   shop(id: Int!, zoneId: Int!): ShopDto!
   shopByKeeper(id: Int!, zoneId: Int!): ShopDto!
   shops(skip: Int, take: Int): [ShopDto!]!
   shopsByZone(zoneId: Int!): [ShopDto!]!
   shopsCount: Int!
+
+  """Get a single social by ID"""
+  social(id: ID!): SocialDto!
+
+  """Get a social by its command name"""
+  socialByName(name: String!): SocialDto!
+
+  """Get all social commands"""
+  socials: [SocialDto!]!
+
+  """Get total count of socials"""
+  socialsCount: Int!
   trigger(id: Float!): TriggerDto!
   triggers: [TriggerDto!]!
   triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
@@ -1482,10 +1726,8 @@ type RaceDto {
   defaultComposition: Composition!
   defaultLifeforce: LifeForce!
   defaultSize: Size!
-  displayName: String!
   expFactor: Int!
   focusBonus: Int!
-  fullName: String!
   hpFactor: Int!
   humanoid: Boolean!
   keywords: String!
@@ -1773,6 +2015,59 @@ enum SkillCategory {
   SECONDARY
 }
 
+"""Social command (emote/action)"""
+type SocialDto {
+  """Message to actor when targeting self"""
+  charAuto: String
+
+  """Message to actor when target found"""
+  charFound: String
+
+  """Message to actor when no target"""
+  charNoArg: String
+  createdAt: DateTime!
+
+  """Hide who initiated the action"""
+  hide: Boolean!
+  id: ID!
+
+  """Minimum position for the target"""
+  minVictimPosition: Position!
+
+  """Command name (e.g., smile, bow, hug)"""
+  name: String!
+
+  """Message when target not found"""
+  notFound: String
+
+  """Message to room when actor targets self"""
+  othersAuto: String
+
+  """Message to room (excluding target) when target found"""
+  othersFound: String
+
+  """Message to room when no target"""
+  othersNoArg: String
+  updatedAt: DateTime!
+
+  """Message to target"""
+  victFound: String
+}
+
+enum SpellSphere {
+  AIR
+  DEATH
+  DIVINATION
+  EARTH
+  ENCHANTMENT
+  FIRE
+  GENERIC
+  HEALING
+  PROTECTION
+  SUMMONING
+  WATER
+}
+
 enum Stance {
   ALERT
   DEAD
@@ -1832,19 +2127,29 @@ input UnlinkCharacterInput {
   characterId: ID!
 }
 
+input UpdateAbilityEffectsInput {
+  effects: [AbilityEffectItemInput!]!
+}
+
 input UpdateAbilityInput {
   abilityType: String
   castTimeRounds: Int
+  combatOk: Boolean
   cooldownMs: Int
+  damageType: ElementType
   description: String
-  gameId: String
+  humanoidOnly: Boolean
   inCombatOnly: Boolean
   isArea: Boolean
   luaScript: String
+  memorizationTime: Int
   minPosition: Position
   name: String
   notes: String
+  pages: Int
+  questOnly: Boolean
   schoolId: Int
+  sphere: SpellSphere
   tags: [String!]
   violent: Boolean
 }
@@ -1936,6 +2241,15 @@ input UpdateClassSkillInput {
   minLevel: Int
 }
 
+input UpdateEffectInput {
+  defaultParams: JSON
+  description: String
+  effectType: String
+  name: String
+  paramSchema: JSON
+  tags: [String!]
+}
+
 input UpdateEquipmentSetInput {
   description: String
   name: String
@@ -1945,6 +2259,36 @@ input UpdateGrantInput {
   expiresAt: DateTime
   notes: String
   permissions: [GrantPermission!]
+}
+
+"""Input for updating a help entry"""
+input UpdateHelpEntryInput {
+  """Category (e.g., spell, skill, command)"""
+  category: String
+
+  """Class/circle requirements"""
+  classes: JSON
+
+  """Full help text content"""
+  content: String
+
+  """Duration description"""
+  duration: String
+
+  """Keywords for looking up this help entry"""
+  keywords: [String!]
+
+  """Minimum player level to view"""
+  minLevel: Int
+
+  """Spell sphere"""
+  sphere: String
+
+  """Primary display title"""
+  title: String
+
+  """Usage syntax"""
+  usage: String
 }
 
 input UpdateMobInput {
@@ -2127,6 +2471,39 @@ input UpdateShopInput {
 
 input UpdateShopInventoryInput {
   items: [ShopItemInput!]!
+}
+
+"""Input for updating a social command"""
+input UpdateSocialInput {
+  """Message to actor when targeting self"""
+  charAuto: String
+
+  """Message to actor when target found"""
+  charFound: String
+
+  """Message to actor when no target"""
+  charNoArg: String
+
+  """Hide who initiated the action"""
+  hide: Boolean
+
+  """Minimum position for the target"""
+  minVictimPosition: Position
+
+  """Message when target not found"""
+  notFound: String
+
+  """Message to room when actor targets self"""
+  othersAuto: String
+
+  """Message to room (excluding target) when target found"""
+  othersFound: String
+
+  """Message to room when no target"""
+  othersNoArg: String
+
+  """Message to target"""
+  victFound: String
 }
 
 input UpdateTriggerInput {

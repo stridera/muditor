@@ -91,9 +91,9 @@ export function TagInput({
     <div
       onClick={handleContainerClick}
       className={cn(
-        'flex flex-wrap gap-2 p-2 rounded-md border bg-white min-h-[42px] cursor-text transition-colors',
-        error ? 'border-red-300' : 'border-gray-300',
-        'focus-within:ring-2 focus-within:ring-blue-500 focus-within:border-blue-500',
+        'flex flex-wrap gap-2 p-2 rounded-md border bg-background min-h-[42px] cursor-text transition-colors',
+        error ? 'border-destructive' : 'border-input',
+        'focus-within:ring-2 focus-within:ring-ring focus-within:border-ring',
         className
       )}
     >
@@ -110,7 +110,7 @@ export function TagInput({
               e.stopPropagation();
               removeTag(index);
             }}
-            className='ml-1 rounded-full hover:bg-gray-400/20 p-0.5 transition-colors'
+            className='ml-1 rounded-full hover:bg-accent/20 p-0.5 transition-colors'
           >
             <X className='h-3 w-3' />
           </button>

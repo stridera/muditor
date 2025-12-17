@@ -36,6 +36,7 @@ interface GenerateParams {
   rooms: FactoryRoom[];
   overlaps: OverlapInfo[];
   currentZLevel: number;
+  hideOtherFloors: boolean;
   selectedRoomId: number | null;
   nodePositionsRef: React.MutableRefObject<
     Record<string, { x: number; y: number }>
@@ -73,6 +74,7 @@ export function generateNodesAndEdges({
   rooms,
   overlaps,
   currentZLevel,
+  hideOtherFloors,
   selectedRoomId,
   nodePositionsRef,
   gridToPixels,
@@ -111,8 +113,13 @@ export function generateNodesAndEdges({
     return position;
   };
 
+  // Filter rooms based on hideOtherFloors setting
+  const visibleRooms = hideOtherFloors
+    ? rooms.filter(room => (room.layoutZ ?? 0) === currentZLevel)
+    : rooms;
+
   // Nodes
-  const nodes: Node[] = rooms.map((room, index): Node => {
+  const nodes: Node[] = visibleRooms.map((room, index): Node => {
     const overlappingWith = overlaps.find(o => o.roomIds.includes(room.id));
     const roomZ = room.layoutZ ?? 0;
     const floorDiff = roomZ - currentZLevel;
@@ -213,9 +220,9 @@ export function generateNodesAndEdges({
   }));
   const oneWayExits = detectOneWayExits(layoutRooms) as OneWayExitDescriptor[];
 
-  // Edges
+  // Edges - only show edges between visible rooms
   const edges: Edge[] = [];
-  rooms.forEach(room => {
+  visibleRooms.forEach(room => {
     const roomZLevel = room.layoutZ ?? 0;
     const floorDiff = Math.abs(currentZLevel - roomZLevel);
     const edgeZIndex = 100 - floorDiff;
@@ -223,7 +230,7 @@ export function generateNodesAndEdges({
     room.exits.forEach(exit => {
       if (exit.direction === 'UP' || exit.direction === 'DOWN') return;
       const targetZoneId = exit.toZoneId ?? room.zoneId;
-      const targetRoom = rooms.find(
+      const targetRoom = visibleRooms.find(
         r => r.zoneId === targetZoneId && r.id === exit.toRoomId
       );
       if (exit.toRoomId != null && targetRoom) {

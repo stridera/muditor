@@ -5,6 +5,7 @@ import { useTheme } from 'next-themes';
 import React, { useState } from 'react';
 import { createPortal } from 'react-dom';
 import type { NodeProps } from 'reactflow';
+import { ColoredTextInline } from '../ColoredTextViewer';
 
 interface MobData {
   id: number;
@@ -122,7 +123,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
                   )}
                 </div>
                 <h3 className='font-semibold text-sm leading-tight truncate'>
-                  {data.name || `Mob ${data.id}`}
+                  <ColoredTextInline markup={data.name || `Mob ${data.id}`} />
                 </h3>
               </div>
             </div>
@@ -170,7 +171,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
                 )}
               </div>
               <h3 className='font-semibold text-sm mt-1 leading-tight line-clamp-2'>
-                {data.name || `Mob ${data.id}`}
+                <ColoredTextInline markup={data.name || `Mob ${data.id}`} />
               </h3>
             </div>
             <div className='px-3 py-2'>
@@ -222,7 +223,8 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
             }}
           >
             <div className='font-semibold mb-2'>
-              {data.name || `Mob ${data.id}`} • Lvl {data.level}
+              <ColoredTextInline markup={data.name || `Mob ${data.id}`} /> • Lvl{' '}
+              {data.level}
             </div>
 
             <div

@@ -10,6 +10,32 @@
  * - Composition (FLESH, STONE, METAL, etc.)
  *
  * All formulas match the Python implementation in fierylib/src/fierylib/combat_formulas.py
+ *
+ * IMPORTANT - How FieryMUD Should Use These Stats:
+ * ================================================
+ *
+ * These generated stats are FINAL VALUES that should be used directly in combat.
+ * DO NOT apply additional class/race/composition modifiers at runtime.
+ *
+ * Why? Because the generator already applies these modifiers:
+ * - Class affects: attackPower, spellPower, penetration, ward
+ * - Race affects: elemental resistances (e.g., Fire Dragon = +75% fire)
+ * - Composition affects: soak, hardness, resistances
+ * - Lifeforce affects: ward multiplier, poison/cold resistance
+ *
+ * Runtime Behavior:
+ * - Use mob.accuracy directly (don't add class bonuses)
+ * - Use mob.resistanceFire directly (don't add race bonuses)
+ * - Use mob.attackPower directly (don't add class bonuses)
+ * - HP/Damage dice should be rolled at spawn time, not modified
+ *
+ * Exception - Dynamic Buffs/Debuffs:
+ * - Temporary spell effects (haste, bless, etc.) CAN modify stats
+ * - Equipment bonuses (if mobs have gear) CAN modify stats
+ * - Environmental effects (terrain, weather) CAN modify stats
+ *
+ * This approach prevents double-dipping on bonuses and ensures
+ * balanced, predictable combat that matches the generator's intent.
  */
 
 export interface MobStats {

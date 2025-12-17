@@ -10,14 +10,14 @@ export function ZoneEntityTabs() {
   const { zoneId, entityType } = useZoneContext();
   const pathname = usePathname();
 
-  // Visual Editor tab - always show (world view when no zone selected)
+  // Visual Editor tab - always show (canvas world map when no zone selected)
   const visualEditorTab = {
     id: 'visual-editor',
     label: 'Visual Editor',
     icon: <Map className='h-4 w-4' />,
     href: zoneId
       ? `/dashboard/zones/editor?zone=${zoneId}`
-      : '/dashboard/zones/editor',
+      : '/dashboard/zones/editor', // Shows canvas-based world map when no zone
   };
 
   // Other tabs - only show when zone is selected

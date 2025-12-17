@@ -1,4 +1,5 @@
 import type { SearchFilters } from '../components/EnhancedSearch';
+import { stripMarkup } from '../utils/xmlLiteParser';
 
 /**
  * Advanced search utility functions for filtering entities
@@ -35,9 +36,9 @@ export function applySearchFilters<T extends Searchable>(
 
       const searchFields = [
         item.keywords,
-        item.name,
-        item.roomDescription,
-        item.examineDescription,
+        item.name ? stripMarkup(item.name) : null,
+        item.roomDescription ? stripMarkup(item.roomDescription) : null,
+        item.examineDescription ? stripMarkup(item.examineDescription) : null,
         item.id?.toString(),
         item.type,
       ]

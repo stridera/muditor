@@ -51,6 +51,7 @@ query SearchObjects($search: String!, $limit: Int, $zoneId: Int) {
     id
     zoneId
     name
+    plainName
     type
     level
   }

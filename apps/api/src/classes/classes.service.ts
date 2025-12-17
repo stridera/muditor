@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import type { Prisma } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
+import { stripMarkup } from '../common/text-utils';
 import {
   AssignSkillToClassInput,
   CreateClassCircleInput,
@@ -48,11 +49,11 @@ export class ClassesService {
   }
 
   /**
-   * Find a class by name
+   * Find a class by plain name (without color codes)
    */
-  async findByName(name: string) {
+  async findByName(plainName: string) {
     return this.db.characterClass.findUnique({
-      where: { name },
+      where: { plainName },
     });
   }
 
@@ -68,15 +69,21 @@ export class ClassesService {
    * Requires CODER role (enforced by resolver guard)
    */
   async create(data: CreateClassInput) {
+    // Generate plain name by stripping markup
+    const plainName = stripMarkup(data.name);
+
     // Check if class name already exists
-    const existing = await this.findByName(data.name);
+    const existing = await this.findByName(plainName);
     if (existing) {
       throw new BadRequestException(
-        `Class with name '${data.name}' already exists`
+        `Class with name '${plainName}' already exists`
       );
     }
 
-    const createData: Prisma.CharacterClassCreateInput = { name: data.name };
+    const createData: Prisma.CharacterClassCreateInput = {
+      name: data.name,
+      plainName: plainName,
+    };
     if (data.description !== undefined)
       (createData as any).description = data.description;
     return this.db.characterClass.create({ data: createData });
@@ -91,16 +98,21 @@ export class ClassesService {
 
     // If name is being changed, check for duplicates
     if (data.name) {
-      const existing = await this.findByName(data.name);
+      const plainName = stripMarkup(data.name);
+      const existing = await this.findByName(plainName);
       if (existing && existing.id !== id) {
         throw new BadRequestException(
-          `Class with name '${data.name}' already exists`
+          `Class with name '${plainName}' already exists`
         );
       }
     }
 
     const updateData: Prisma.CharacterClassUpdateInput = {};
-    if (data.name !== undefined) (updateData as any).name = data.name;
+    if (data.name !== undefined) {
+      (updateData as any).name = data.name;
+      // Middleware will auto-generate plainName, but we can set it explicitly
+      (updateData as any).plainName = stripMarkup(data.name);
+    }
     if (data.description !== undefined)
       (updateData as any).description = data.description;
     return this.db.characterClass.update({ where: { id }, data: updateData });

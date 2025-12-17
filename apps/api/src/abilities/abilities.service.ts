@@ -8,13 +8,20 @@ import {
   CreateAbilitySavingThrowInput,
   CreateAbilityMessagesInput,
   UpdateAbilityMessagesInput,
+  CreateEffectInput,
+  UpdateEffectInput,
 } from './abilities.input';
 
 @Injectable()
 export class AbilitiesService {
   constructor(private prisma: DatabaseService) {}
 
-  async findAll(skip?: number, take?: number, abilityType?: string, search?: string) {
+  async findAll(
+    skip?: number,
+    take?: number,
+    abilityType?: string,
+    search?: string
+  ) {
     const where: any = {};
 
     if (abilityType) {
@@ -87,44 +94,35 @@ export class AbilitiesService {
     });
   }
 
-  async findByGameId(gameId: string) {
-    return this.prisma.ability.findUnique({
-      where: { gameId },
-      include: {
-        school: true,
-        effects: {
-          include: {
-            effect: true,
-          },
-          orderBy: {
-            order: 'asc',
-          },
-        },
-        targeting: true,
-        restrictions: true,
-        savingThrows: true,
-        messages: true,
-      },
-    });
-  }
-
   async create(data: CreateAbilityInput) {
     const createData: any = {
       name: data.name,
+      plainName: data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim(),
       abilityType: data.abilityType,
       minPosition: data.minPosition,
       violent: data.violent,
+      combatOk: data.combatOk,
       castTimeRounds: data.castTimeRounds,
       cooldownMs: data.cooldownMs,
       inCombatOnly: data.inCombatOnly,
       isArea: data.isArea,
+      memorizationTime: data.memorizationTime,
+      questOnly: data.questOnly,
+      humanoidOnly: data.humanoidOnly,
     };
-    if (data.description !== undefined) createData.description = data.description;
-    if (data.gameId !== undefined) createData.gameId = data.gameId;
+    if (data.description !== undefined)
+      createData.description = data.description;
     if (data.schoolId !== undefined) createData.schoolId = data.schoolId;
     if (data.notes !== undefined) createData.notes = data.notes;
     if (data.tags !== undefined) createData.tags = data.tags;
     if (data.luaScript !== undefined) createData.luaScript = data.luaScript;
+    if (data.sphere !== undefined) createData.sphere = data.sphere;
+    if (data.damageType !== undefined) createData.damageType = data.damageType;
+    if (data.pages !== undefined) createData.pages = data.pages;
 
     return this.prisma.ability.create({
       data: createData,
@@ -141,20 +139,40 @@ export class AbilitiesService {
 
   async update(id: number, data: UpdateAbilityInput) {
     const updateData: any = {};
-    if (data.name !== undefined) updateData.name = data.name;
-    if (data.description !== undefined) updateData.description = data.description;
-    if (data.gameId !== undefined) updateData.gameId = data.gameId;
-    if (data.abilityType !== undefined) updateData.abilityType = data.abilityType;
+    if (data.name !== undefined) {
+      updateData.name = data.name;
+      updateData.plainName = data.name
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '')
+        .replace(/\s+/g, ' ')
+        .trim();
+    }
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.abilityType !== undefined)
+      updateData.abilityType = data.abilityType;
     if (data.schoolId !== undefined) updateData.schoolId = data.schoolId;
-    if (data.minPosition !== undefined) updateData.minPosition = data.minPosition;
+    if (data.minPosition !== undefined)
+      updateData.minPosition = data.minPosition;
     if (data.violent !== undefined) updateData.violent = data.violent;
-    if (data.castTimeRounds !== undefined) updateData.castTimeRounds = data.castTimeRounds;
+    if (data.combatOk !== undefined) updateData.combatOk = data.combatOk;
+    if (data.castTimeRounds !== undefined)
+      updateData.castTimeRounds = data.castTimeRounds;
     if (data.cooldownMs !== undefined) updateData.cooldownMs = data.cooldownMs;
-    if (data.inCombatOnly !== undefined) updateData.inCombatOnly = data.inCombatOnly;
+    if (data.inCombatOnly !== undefined)
+      updateData.inCombatOnly = data.inCombatOnly;
     if (data.isArea !== undefined) updateData.isArea = data.isArea;
     if (data.notes !== undefined) updateData.notes = data.notes;
     if (data.tags !== undefined) updateData.tags = data.tags;
     if (data.luaScript !== undefined) updateData.luaScript = data.luaScript;
+    if (data.sphere !== undefined) updateData.sphere = data.sphere;
+    if (data.damageType !== undefined) updateData.damageType = data.damageType;
+    if (data.pages !== undefined) updateData.pages = data.pages;
+    if (data.memorizationTime !== undefined)
+      updateData.memorizationTime = data.memorizationTime;
+    if (data.questOnly !== undefined) updateData.questOnly = data.questOnly;
+    if (data.humanoidOnly !== undefined)
+      updateData.humanoidOnly = data.humanoidOnly;
 
     return this.prisma.ability.update({
       where: { id },
@@ -175,6 +193,55 @@ export class AbilitiesService {
       where: { id },
     });
     return true;
+  }
+
+  // Effect methods
+  async updateAbilityEffects(
+    abilityId: number,
+    effects: Array<{
+      effectId: number;
+      overrideParams?: any;
+      order: number;
+      trigger?: string;
+      chancePct: number;
+      condition?: string;
+    }>
+  ) {
+    // Use a transaction to replace all effects atomically
+    await this.prisma.$transaction(async tx => {
+      // Delete all existing effects for this ability
+      await tx.abilityEffect.deleteMany({
+        where: { abilityId },
+      });
+
+      // Create new effects
+      if (effects.length > 0) {
+        await tx.abilityEffect.createMany({
+          data: effects.map(effect => ({
+            abilityId,
+            effectId: effect.effectId,
+            overrideParams: effect.overrideParams || {},
+            order: effect.order,
+            trigger: effect.trigger ?? null,
+            chancePct: effect.chancePct,
+            condition: effect.condition ?? null,
+          })),
+        });
+      }
+    });
+
+    // Return the updated ability with effects
+    return this.prisma.ability.findUnique({
+      where: { id: abilityId },
+      include: {
+        school: true,
+        effects: { include: { effect: true }, orderBy: { order: 'asc' } },
+        targeting: true,
+        restrictions: true,
+        savingThrows: true,
+        messages: true,
+      },
+    });
   }
 
   // Targeting methods
@@ -287,5 +354,43 @@ export class AbilitiesService {
     return this.prisma.effect.findUnique({
       where: { id },
     });
+  }
+
+  async createEffect(data: CreateEffectInput) {
+    return this.prisma.effect.create({
+      data: {
+        name: data.name,
+        description: data.description ?? null,
+        effectType: data.effectType,
+        tags: data.tags ?? [],
+        defaultParams: data.defaultParams ?? {},
+        paramSchema: data.paramSchema ?? null,
+      },
+    });
+  }
+
+  async updateEffect(id: number, data: UpdateEffectInput) {
+    const updateData: any = {};
+    if (data.name !== undefined) updateData.name = data.name;
+    if (data.description !== undefined)
+      updateData.description = data.description;
+    if (data.effectType !== undefined) updateData.effectType = data.effectType;
+    if (data.tags !== undefined) updateData.tags = data.tags;
+    if (data.defaultParams !== undefined)
+      updateData.defaultParams = data.defaultParams;
+    if (data.paramSchema !== undefined)
+      updateData.paramSchema = data.paramSchema;
+
+    return this.prisma.effect.update({
+      where: { id },
+      data: updateData,
+    });
+  }
+
+  async deleteEffect(id: number) {
+    await this.prisma.effect.delete({
+      where: { id },
+    });
+    return true;
   }
 }

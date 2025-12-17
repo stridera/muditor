@@ -34,6 +34,8 @@ import { useState } from 'react';
 import { CharacterDeleteDialog } from './character-delete-dialog';
 import { CharacterEditForm } from './character-edit-form';
 import { OnlineStatus } from './online-status';
+import { ColoredText } from '@/lib/color-codes';
+import { CharacterSessionInfo } from './character-session-info';
 
 const GET_CHARACTER_DETAILS = gql`
   query GetCharacterDetailsInline($id: ID!) {
@@ -83,18 +85,31 @@ const GET_CHARACTER_DETAILS = gql`
       privilegeFlags
       invisLevel
       birthTime
-      items {
+      characterItems {
         id
         equippedLocation
         condition
         charges
-        objectPrototype {
+        objects {
           id
+          zoneId
           name
           type
+          examineDescription
+          weight
+          cost
+          level
+          values
+          flags
+          effectFlags
+          wearFlags
+          objectAffects {
+            location
+            modifier
+          }
         }
       }
-      effects {
+      characterEffects {
         id
         effectName
         effectType
@@ -103,19 +118,6 @@ const GET_CHARACTER_DETAILS = gql`
         appliedAt
         expiresAt
       }
-    }
-  }
-`;
-
-const GET_CHARACTER_SESSION_INFO = gql`
-  query GetCharacterSessionInfoInline($characterId: ID!) {
-    characterSessionInfo(characterId: $characterId) {
-      id
-      name
-      isOnline
-      lastLogin
-      totalTimePlayed
-      currentSessionTime
     }
   }
 `;
@@ -129,33 +131,19 @@ interface CharacterDetailsQueryResult {
   character: any;
 }
 
-interface CharacterSessionInfoQueryResult {
-  characterSessionInfo: any;
-}
-
 export function CharacterDetails({
   characterId,
   onBack,
 }: CharacterDetailsProps) {
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [activeTab, setActiveTab] = useState('overview');
+  const [selectedItem, setSelectedItem] = useState<any>(null);
 
-  const { data, loading, error, refetch } = useQuery<CharacterDetailsQueryResult>(
-    GET_CHARACTER_DETAILS,
-    {
+  const { data, loading, error, refetch } =
+    useQuery<CharacterDetailsQueryResult>(GET_CHARACTER_DETAILS, {
       variables: { id: characterId },
-      pollInterval: 30000,
-    }
-  );
-
-  const { data: sessionData } = useQuery<CharacterSessionInfoQueryResult>(
-    GET_CHARACTER_SESSION_INFO,
-    {
-      variables: { characterId },
-      pollInterval: 5000,
-      skip: !data?.character?.isOnline,
-    }
-  );
+    });
 
   const handleCharacterUpdated = () => {
     setEditDialogOpen(false);
@@ -192,21 +180,6 @@ export function CharacterDetails({
   }
 
   const character = data.character;
-  const sessionInfo = sessionData?.characterSessionInfo;
-
-  const formatPlayTime = (seconds: number) => {
-    const hours = Math.floor(seconds / 3600);
-    const days = Math.floor(hours / 24);
-    const remainingHours = hours % 24;
-
-    if (days > 0) {
-      return `${days} days, ${remainingHours} hours`;
-    } else if (hours > 0) {
-      return `${hours} hours, ${Math.floor((seconds % 3600) / 60)} minutes`;
-    } else {
-      return `${Math.floor(seconds / 60)} minutes`;
-    }
-  };
 
   const formatCurrency = (
     copper: number,
@@ -240,13 +213,37 @@ export function CharacterDetails({
     return 'text-red-600';
   };
 
-  const equippedItems = (character.items || []).filter(
+  const equippedItems = (character.characterItems || []).filter(
     (item: any) => item.equippedLocation
   );
-  const inventoryItems = (character.items || []).filter(
+
+  // Group inventory items by object ID and name
+  const inventoryItems = (character.characterItems || []).filter(
     (item: any) => !item.equippedLocation
   );
-  const activeEffects = (character.effects || []).filter(
+
+  const groupedInventory = inventoryItems.reduce((acc: any[], item: any) => {
+    const key = `${item.objects.zoneId}-${item.objects.id}`;
+    const existing = acc.find(g => g.key === key);
+
+    if (existing) {
+      existing.quantity += 1;
+      existing.items.push(item);
+    } else {
+      acc.push({
+        key,
+        quantity: 1,
+        items: [item],
+        objects: item.objects,
+        // Use best condition from the stack
+        condition: item.condition,
+        charges: item.charges,
+      });
+    }
+
+    return acc;
+  }, []);
+  const activeEffects = (character.characterEffects || []).filter(
     (effect: any) =>
       !effect.expiresAt || new Date(effect.expiresAt) > new Date()
   );
@@ -273,7 +270,8 @@ export function CharacterDetails({
             <p className='text-muted-foreground flex items-center gap-2'>
               Level {character.level}
               {character.raceType && ` ${formatRace(character.raceType)}`}
-              {character.playerClass && ` ${formatClass(character.playerClass)}`}
+              {character.playerClass &&
+                ` ${formatClass(character.playerClass)}`}
               {character.title && (
                 <>
                   <span className='ml-2'>•</span>
@@ -313,7 +311,11 @@ export function CharacterDetails({
         </div>
       )}
 
-      <Tabs defaultValue='overview' className='space-y-6'>
+      <Tabs
+        value={activeTab}
+        onValueChange={setActiveTab}
+        className='space-y-6'
+      >
         <TabsList>
           <TabsTrigger value='overview'>Overview</TabsTrigger>
           <TabsTrigger value='stats'>Stats & Skills</TabsTrigger>
@@ -392,46 +394,10 @@ export function CharacterDetails({
             </Card>
 
             {/* Session Info */}
-            <Card>
-              <CardHeader>
-                <CardTitle className='flex items-center gap-2'>
-                  <Clock className='h-5 w-5' />
-                  Session Info
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                <div className='flex items-center justify-between'>
-                  <span>Total Played</span>
-                  <span>{formatPlayTime(character.timePlayed)}</span>
-                </div>
-                {sessionInfo && character.isOnline && (
-                  <div className='flex items-center justify-between'>
-                    <span>Current Session</span>
-                    <span>
-                      {formatPlayTime(sessionInfo.currentSessionTime)}
-                    </span>
-                  </div>
-                )}
-                {character.lastLogin && (
-                  <div className='flex items-center justify-between'>
-                    <span>Last Login</span>
-                    <span>
-                      {formatDistanceToNow(new Date(character.lastLogin), {
-                        addSuffix: true,
-                      })}
-                    </span>
-                  </div>
-                )}
-                <div className='flex items-center justify-between'>
-                  <span>Created</span>
-                  <span>
-                    {formatDistanceToNow(new Date(character.birthTime), {
-                      addSuffix: true,
-                    })}
-                  </span>
-                </div>
-              </CardContent>
-            </Card>
+            <CharacterSessionInfo
+              characterId={character.id}
+              isOnline={character.isOnline}
+            />
           </div>
 
           {/* Character Description */}
@@ -558,11 +524,12 @@ export function CharacterDetails({
                     {equippedItems.map((item: any) => (
                       <div
                         key={item.id}
-                        className='flex items-center justify-between p-2 border rounded'
+                        className='flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-accent transition-colors'
+                        onClick={() => setSelectedItem(item)}
                       >
                         <div className='flex-1'>
                           <div className='font-medium'>
-                            {item.objectPrototype.name}
+                            <ColoredText text={item.objects.name} />
                           </div>
                           <div className='text-sm text-muted-foreground'>
                             {item.equippedLocation} • Condition:{' '}
@@ -590,28 +557,35 @@ export function CharacterDetails({
               <CardHeader>
                 <CardTitle className='flex items-center gap-2'>
                   <Backpack className='h-5 w-5' />
-                  Inventory ({inventoryItems.length})
+                  Inventory ({inventoryItems.length} items,{' '}
+                  {groupedInventory.length} unique)
                 </CardTitle>
               </CardHeader>
               <CardContent>
-                {inventoryItems.length > 0 ? (
+                {groupedInventory.length > 0 ? (
                   <div className='space-y-3'>
-                    {inventoryItems.map((item: any) => (
+                    {groupedInventory.map((group: any) => (
                       <div
-                        key={item.id}
-                        className='flex items-center justify-between p-2 border rounded'
+                        key={group.key}
+                        className='flex items-center justify-between p-2 border rounded cursor-pointer hover:bg-accent transition-colors'
+                        onClick={() => setSelectedItem(group.items[0])}
                       >
                         <div className='flex-1'>
                           <div className='font-medium'>
-                            {item.objectPrototype.name}
+                            <ColoredText text={group.objects.name} />
+                            {group.quantity > 1 && (
+                              <span className='ml-2 text-sm text-muted-foreground'>
+                                × {group.quantity}
+                              </span>
+                            )}
                           </div>
                           <div className='text-sm text-muted-foreground'>
-                            Condition: {item.condition}%
+                            Condition: {group.condition}%
                           </div>
                         </div>
-                        {item.charges > 0 && (
+                        {group.charges > 0 && (
                           <Badge variant='secondary'>
-                            {item.charges} charges
+                            {group.charges} charges
                           </Badge>
                         )}
                       </div>
@@ -812,6 +786,184 @@ export function CharacterDetails({
         onOpenChange={setDeleteDialogOpen}
         onCharacterDeleted={handleCharacterDeleted}
       />
+
+      {/* Item Detail Dialog */}
+      {selectedItem && (
+        <Dialog
+          open={!!selectedItem}
+          onOpenChange={() => setSelectedItem(null)}
+        >
+          <DialogContent className='max-w-2xl'>
+            <DialogHeader>
+              <DialogTitle>
+                <ColoredText text={selectedItem.objects.name} />
+              </DialogTitle>
+              <DialogDescription>
+                {selectedItem.objects.type}
+                {selectedItem.objects.level
+                  ? ` • Level ${selectedItem.objects.level}`
+                  : ''}
+              </DialogDescription>
+            </DialogHeader>
+
+            <div className='space-y-4'>
+              {/* Description */}
+              {selectedItem.objects.examineDescription && (
+                <div>
+                  <h4 className='font-semibold mb-2'>Description</h4>
+                  <p className='text-sm text-muted-foreground'>
+                    <ColoredText
+                      text={selectedItem.objects.examineDescription}
+                    />
+                  </p>
+                </div>
+              )}
+
+              {/* Basic Stats */}
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <h4 className='font-semibold mb-2'>Basic Information</h4>
+                  <div className='space-y-1 text-sm'>
+                    {selectedItem.objects.weight != null && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>Weight:</span>
+                        <span>{selectedItem.objects.weight} lbs</span>
+                      </div>
+                    )}
+                    {selectedItem.objects.cost != null && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>Cost:</span>
+                        <span>{selectedItem.objects.cost} coins</span>
+                      </div>
+                    )}
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>Zone/ID:</span>
+                      <span>
+                        {selectedItem.objects.zoneId}:{selectedItem.objects.id}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className='font-semibold mb-2'>Item Condition</h4>
+                  <div className='space-y-1 text-sm'>
+                    <div className='flex justify-between'>
+                      <span className='text-muted-foreground'>Condition:</span>
+                      <span>{selectedItem.condition}%</span>
+                    </div>
+                    {selectedItem.charges > 0 && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>Charges:</span>
+                        <span>{selectedItem.charges}</span>
+                      </div>
+                    )}
+                    {selectedItem.equippedLocation && (
+                      <div className='flex justify-between'>
+                        <span className='text-muted-foreground'>Slot:</span>
+                        <span>{selectedItem.equippedLocation}</span>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Stat Modifiers */}
+              {selectedItem.objects.objectAffects &&
+                selectedItem.objects.objectAffects.length > 0 && (
+                  <div>
+                    <h4 className='font-semibold mb-2'>Stat Bonuses</h4>
+                    <div className='grid grid-cols-2 gap-2'>
+                      {selectedItem.objects.objectAffects.map(
+                        (affect: any, index: number) => (
+                          <div
+                            key={index}
+                            className='flex justify-between text-sm p-2 bg-muted rounded'
+                          >
+                            <span>{affect.location}:</span>
+                            <span
+                              className={
+                                affect.modifier > 0
+                                  ? 'text-green-600'
+                                  : 'text-red-600'
+                              }
+                            >
+                              {affect.modifier > 0 ? '+' : ''}
+                              {affect.modifier}
+                            </span>
+                          </div>
+                        )
+                      )}
+                    </div>
+                  </div>
+                )}
+
+              {/* Flags */}
+              {((selectedItem.objects.flags &&
+                selectedItem.objects.flags.length > 0) ||
+                (selectedItem.objects.wearFlags &&
+                  selectedItem.objects.wearFlags.length > 0)) && (
+                <div className='grid grid-cols-2 gap-4'>
+                  {selectedItem.objects.flags &&
+                    selectedItem.objects.flags.length > 0 && (
+                      <div>
+                        <h4 className='font-semibold mb-2'>Object Flags</h4>
+                        <div className='flex flex-wrap gap-1'>
+                          {selectedItem.objects.flags.map((flag: string) => (
+                            <Badge
+                              key={flag}
+                              variant='outline'
+                              className='text-xs'
+                            >
+                              {flag}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                  {selectedItem.objects.wearFlags &&
+                    selectedItem.objects.wearFlags.length > 0 && (
+                      <div>
+                        <h4 className='font-semibold mb-2'>Wear Slots</h4>
+                        <div className='flex flex-wrap gap-1'>
+                          {selectedItem.objects.wearFlags.map(
+                            (flag: string) => (
+                              <Badge
+                                key={flag}
+                                variant='secondary'
+                                className='text-xs'
+                              >
+                                {flag}
+                              </Badge>
+                            )
+                          )}
+                        </div>
+                      </div>
+                    )}
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className='flex justify-end gap-2 pt-4'>
+                <Button variant='outline' onClick={() => setSelectedItem(null)}>
+                  Close
+                </Button>
+                <Button
+                  onClick={() => {
+                    window.open(
+                      `/dashboard/objects/view?zone=${selectedItem.objects.zoneId}&id=${selectedItem.objects.id}`,
+                      '_blank'
+                    );
+                  }}
+                >
+                  View Details
+                </Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
     </div>
   );
 }

@@ -19,9 +19,31 @@ const authLink = setContext((_, { headers }) => {
   };
 });
 
+// Configure cache with composite keys for entities that use (zoneId, id)
+const cache = new InMemoryCache({
+  typePolicies: {
+    // Entities with composite primary keys (zoneId + id)
+    MobDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+    ObjectDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+    RoomDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+    TriggerDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+    ShopDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+  },
+});
+
 export const apolloClient = new ApolloClient({
   link: authLink.concat(httpLink),
-  cache: new InMemoryCache(),
+  cache,
   defaultOptions: {
     watchQuery: {
       errorPolicy: 'ignore',

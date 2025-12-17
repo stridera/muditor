@@ -6,11 +6,11 @@
   "types": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate --generator client",
-    "push": "prisma db push --skip-generate && pnpm generate",
+    "push": "prisma db push && pnpm generate",
     "studio": "prisma studio",
-    "migrate:dev": "prisma migrate dev --skip-generate && pnpm generate",
-    "migrate:reset": "prisma migrate reset --skip-generate && pnpm generate",
-    "migrate:deploy": "prisma migrate deploy --skip-generate && pnpm generate",
+    "migrate:dev": "prisma migrate dev && pnpm generate",
+    "migrate:reset": "prisma migrate reset && pnpm generate",
+    "migrate:deploy": "prisma migrate deploy && pnpm generate",
     "seed": "tsx src/seed/index.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf node_modules/.prisma"

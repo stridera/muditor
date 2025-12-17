@@ -1,0 +1,79 @@
+# Social commands (emotes/actions) operations
+
+query GetSocials {
+  socials {
+    id
+    name
+    hide
+    minVictimPosition
+    charNoArg
+    othersNoArg
+    charFound
+    othersFound
+    victFound
+    notFound
+    charAuto
+    othersAuto
+  }
+  socialsCount
+}
+
+query GetSocial($id: ID!) {
+  social(id: $id) {
+    id
+    name
+    hide
+    minVictimPosition
+    charNoArg
+    othersNoArg
+    charFound
+    othersFound
+    victFound
+    notFound
+    charAuto
+    othersAuto
+    createdAt
+    updatedAt
+  }
+}
+
+query SearchSocials($query: String!) {
+  searchSocials(query: $query) {
+    id
+    name
+    hide
+    minVictimPosition
+    charNoArg
+    othersNoArg
+  }
+}
+
+mutation CreateSocial($data: CreateSocialInput!) {
+  createSocial(data: $data) {
+    id
+    name
+    hide
+    minVictimPosition
+  }
+}
+
+mutation UpdateSocial($id: ID!, $data: UpdateSocialInput!) {
+  updateSocial(id: $id, data: $data) {
+    id
+    name
+    hide
+    minVictimPosition
+    charNoArg
+    othersNoArg
+    charFound
+    othersFound
+    victFound
+    notFound
+    charAuto
+    othersAuto
+  }
+}
+
+mutation DeleteSocial($id: ID!) {
+  deleteSocial(id: $id)
+}

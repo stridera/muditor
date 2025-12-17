@@ -1,10 +1,4 @@
-import {
-  Field,
-  ObjectType,
-  ID,
-  Int,
-  registerEnumType,
-} from '@nestjs/graphql';
+import { Field, ObjectType, ID, Int, registerEnumType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import {
   Position,
@@ -12,6 +6,8 @@ import {
   TargetType,
   TargetScope,
   SkillCategory,
+  SpellSphere,
+  ElementType,
 } from '@prisma/client';
 
 // Register enums with GraphQL (Position already registered in mob.dto.ts)
@@ -19,6 +15,8 @@ registerEnumType(SaveType, { name: 'SaveType' });
 registerEnumType(TargetType, { name: 'TargetType' });
 registerEnumType(TargetScope, { name: 'TargetScope' });
 registerEnumType(SkillCategory, { name: 'SkillCategory' });
+registerEnumType(SpellSphere, { name: 'SpellSphere' });
+registerEnumType(ElementType, { name: 'ElementType' });
 
 @ObjectType()
 export class AbilitySchool {
@@ -46,8 +44,14 @@ export class Effect {
   @Field()
   effectType: string;
 
+  @Field(() => [String])
+  tags: string[];
+
   @Field(() => GraphQLJSON)
   defaultParams: any;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  paramSchema?: any;
 }
 
 @ObjectType()
@@ -169,9 +173,6 @@ export class Ability {
   @Field({ nullable: true })
   description?: string;
 
-  @Field({ nullable: true })
-  gameId?: string;
-
   @Field()
   abilityType: string;
 
@@ -186,6 +187,9 @@ export class Ability {
 
   @Field()
   violent: boolean;
+
+  @Field()
+  combatOk: boolean;
 
   @Field(() => Int)
   castTimeRounds: number;
@@ -207,6 +211,25 @@ export class Ability {
 
   @Field({ nullable: true })
   luaScript?: string;
+
+  // Spell metadata
+  @Field(() => SpellSphere, { nullable: true })
+  sphere?: SpellSphere;
+
+  @Field(() => ElementType, { nullable: true })
+  damageType?: ElementType;
+
+  @Field(() => Int, { nullable: true })
+  pages?: number;
+
+  @Field(() => Int)
+  memorizationTime: number;
+
+  @Field()
+  questOnly: boolean;
+
+  @Field()
+  humanoidOnly: boolean;
 
   // Relations
   @Field(() => [AbilityEffect], { nullable: true })

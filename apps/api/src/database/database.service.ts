@@ -5,61 +5,396 @@ import {
   OnModuleInit,
 } from '@nestjs/common';
 import { Prisma, PrismaClient } from '@prisma/client';
+import { stripMarkup } from '../common/text-utils';
+
+// Create extended Prisma client with plaintext field middleware
+function createExtendedPrismaClient() {
+  const prisma = new PrismaClient({
+    log: [
+      {
+        emit: 'event',
+        level: 'query',
+      },
+      {
+        emit: 'event',
+        level: 'error',
+      },
+      {
+        emit: 'event',
+        level: 'info',
+      },
+      {
+        emit: 'event',
+        level: 'warn',
+      },
+    ],
+  });
+
+  return prisma.$extends({
+    query: {
+      mobs: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription
+            );
+          }
+          if (args.data.examineDescription) {
+            args.data.plainExamineDescription = stripMarkup(
+              args.data.examineDescription
+            );
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription as string
+            );
+          }
+          if (args.data.examineDescription) {
+            args.data.plainExamineDescription = stripMarkup(
+              args.data.examineDescription as string
+            );
+          }
+          return query(args);
+        },
+      },
+      objects: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription
+            );
+          }
+          if (args.data.examineDescription) {
+            args.data.plainExamineDescription = stripMarkup(
+              args.data.examineDescription
+            );
+          }
+          if (args.data.actionDescription) {
+            args.data.plainActionDescription = stripMarkup(
+              args.data.actionDescription
+            );
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription as string
+            );
+          }
+          if (args.data.examineDescription) {
+            args.data.plainExamineDescription = stripMarkup(
+              args.data.examineDescription as string
+            );
+          }
+          if (args.data.actionDescription) {
+            args.data.plainActionDescription = stripMarkup(
+              args.data.actionDescription as string
+            );
+          }
+          return query(args);
+        },
+      },
+      room: {
+        async create({ args, query }: any) {
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription
+            );
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.roomDescription) {
+            args.data.plainRoomDescription = stripMarkup(
+              args.data.roomDescription as string
+            );
+          }
+          return query(args);
+        },
+      },
+      characterClass: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          return query(args);
+        },
+      },
+      ability: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          return query(args);
+        },
+      },
+      races: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          return query(args);
+        },
+      },
+    },
+  });
+}
+
+type ExtendedPrismaClient = ReturnType<typeof createExtendedPrismaClient>;
 
 @Injectable()
-export class DatabaseService
-  extends PrismaClient
-  implements OnModuleInit, OnModuleDestroy
-{
+export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DatabaseService.name);
+  private client: ExtendedPrismaClient;
 
   constructor() {
-    super({
-      log: [
-        {
-          emit: 'event',
-          level: 'query',
-        },
-        {
-          emit: 'event',
-          level: 'error',
-        },
-        {
-          emit: 'event',
-          level: 'info',
-        },
-        {
-          emit: 'event',
-          level: 'warn',
-        },
-      ],
-    });
+    // Create extended client directly
+    this.client = createExtendedPrismaClient();
+  }
+
+  // Expose all Prisma model delegates through the client
+  get users() {
+    return this.client.users;
+  }
+
+  get characters() {
+    return this.client.characters;
+  }
+
+  get zones() {
+    return this.client.zones;
+  }
+
+  get room() {
+    return this.client.room;
+  }
+
+  get mobs() {
+    return this.client.mobs;
+  }
+
+  get objects() {
+    return this.client.objects;
+  }
+
+  get shops() {
+    return this.client.shops;
+  }
+
+  get roomExit() {
+    return this.client.roomExit;
+  }
+
+  get roomExtraDescriptions() {
+    return this.client.roomExtraDescriptions;
+  }
+
+  get mobCarrying() {
+    return this.client.mobCarrying;
+  }
+
+  get mobResets() {
+    return this.client.mobResets;
+  }
+
+  get objectResets() {
+    return this.client.objectResets;
+  }
+
+  get triggers() {
+    return this.client.triggers;
+  }
+
+  get races() {
+    return this.client.races;
+  }
+
+  get userGrants() {
+    return this.client.userGrants;
+  }
+
+  get equipmentSets() {
+    return this.client.equipmentSets;
+  }
+
+  get equipmentSetItems() {
+    return this.client.equipmentSetItems;
+  }
+
+  get characterItems() {
+    return this.client.characterItems;
+  }
+
+  get auditLogs() {
+    return this.client.auditLogs;
+  }
+
+  get banRecords() {
+    return this.client.banRecords;
+  }
+
+  get ability() {
+    return this.client.ability;
+  }
+
+  get abilityMessages() {
+    return this.client.abilityMessages;
+  }
+
+  get abilitySavingThrow() {
+    return this.client.abilitySavingThrow;
+  }
+
+  get abilitySchool() {
+    return this.client.abilitySchool;
+  }
+
+  get abilityTargeting() {
+    return this.client.abilityTargeting;
+  }
+
+  get characterClass() {
+    return this.client.characterClass;
+  }
+
+  get characterEffects() {
+    return this.client.characterEffects;
+  }
+
+  get classAbilities() {
+    return this.client.classAbilities;
+  }
+
+  get classAbilityCircles() {
+    return this.client.classAbilityCircles;
+  }
+
+  get classSkills() {
+    return this.client.classSkills;
+  }
+
+  get effect() {
+    return this.client.effect;
+  }
+
+  get mobResetEquipment() {
+    return this.client.mobResetEquipment;
+  }
+
+  get raceAbilities() {
+    return this.client.raceAbilities;
+  }
+
+  get shopHours() {
+    return this.client.shopHours;
+  }
+
+  get shopItems() {
+    return this.client.shopItems;
+  }
+
+  get social() {
+    return this.client.social;
+  }
+
+  get helpEntry() {
+    return this.client.helpEntry;
+  }
+
+  // Pass-through Prisma client methods
+  async $connect() {
+    return this.client.$connect();
+  }
+
+  async $disconnect() {
+    return this.client.$disconnect();
+  }
+
+  $queryRaw<T = unknown>(
+    query: TemplateStringsArray | Prisma.Sql,
+    ...values: any[]
+  ): Promise<T> {
+    return this.client.$queryRaw(query, ...values) as Promise<T>;
+  }
+
+  $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Promise<T> {
+    return this.client.$queryRawUnsafe(query, ...values) as Promise<T>;
+  }
+
+  $executeRaw(query: TemplateStringsArray | Prisma.Sql, ...values: any[]) {
+    return this.client.$executeRaw(query, ...values);
+  }
+
+  $transaction<R>(
+    fn: (
+      prisma: Omit<
+        PrismaClient,
+        | '$connect'
+        | '$disconnect'
+        | '$on'
+        | '$transaction'
+        | '$use'
+        | '$extends'
+      >
+    ) => Promise<R>
+  ): Promise<R>;
+  $transaction<R>(arg: any): Promise<R> {
+    return this.client.$transaction(arg) as Promise<R>;
   }
 
   async onModuleInit() {
     // Log Prisma events in development
     if (process.env.NODE_ENV === 'development') {
-      // TODO(prisma-wrapper): Replace direct $on listeners with a lightweight wrapper service
-      // that normalizes event payloads and enforces typed query logging.
-      // Issue: Subclassing PrismaClient with custom log config + strict optional types forces
-      // us to use @ts-expect-error here. Wrapper will expose onQuery/onError hooks instead.
-      // Restore listeners with explicit ts-expect-error due to subclass narrowing bug under strict optional types
-      // @ts-expect-error Prisma typing issue when subclassing with custom log configuration
-      this.$on('query', (e: Prisma.QueryEvent) => {
+      // @ts-expect-error Prisma extension typing doesn't expose $on properly
+      this.client.$on('query', (e: Prisma.QueryEvent) => {
         this.logger.debug(
           `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration}ms`
         );
       });
       // @ts-expect-error see note above
-      this.$on('error', (e: Prisma.LogEvent) => {
+      this.client.$on('error', (e: Prisma.LogEvent) => {
         this.logger.error('Database error:', e);
       });
       // @ts-expect-error see note above
-      this.$on('warn', (e: Prisma.LogEvent) => {
+      this.client.$on('warn', (e: Prisma.LogEvent) => {
         this.logger.warn('Database warning:', e);
       });
       // @ts-expect-error see note above
-      this.$on('info', (e: Prisma.LogEvent) => {
+      this.client.$on('info', (e: Prisma.LogEvent) => {
         this.logger.log('Database info:', e);
       });
     }

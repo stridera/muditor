@@ -1,0 +1,38 @@
+# Effect Editor dropdown options - minimal data for block dropdowns
+
+query GetEffectEditorOptions {
+  # Zones for filtering
+  zones {
+    id
+    name
+  }
+
+  # Effects for the status blocks
+  effects(take: 1000) {
+    id
+    name
+    effectType
+    paramSchema
+  }
+
+  # Mobs for summon blocks
+  mobs(take: 1000) {
+    id
+    zoneId
+    plainName
+  }
+
+  # Objects for create object blocks
+  objects(take: 1000) {
+    id
+    zoneId
+    plainName
+  }
+
+  # Triggers/scripts for script blocks
+  triggers {
+    id
+    name
+    zoneId
+  }
+}

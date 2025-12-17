@@ -17,6 +17,7 @@ type SearchMode = 'zones' | 'mobs' | 'objects';
 interface ParsedInput {
   mode: SearchMode;
   query: string;
+  zoneId?: number;
 }
 
 interface SearchResult {
@@ -31,7 +32,16 @@ interface SearchResult {
 function parseSearchInput(input: string): ParsedInput {
   const trimmed = input.trim();
 
-  // Entity prefixes (case-insensitive)
+  // Pattern: "30 o sword" or "30 m orc" (zone-scoped search)
+  const zoneScopedMatch = trimmed.match(/^(\d+)\s+([mo])\s+(.+)$/i);
+  if (zoneScopedMatch) {
+    const [, zoneIdStr, modeChar, query] = zoneScopedMatch;
+    const zoneId = parseInt(zoneIdStr, 10);
+    const mode = modeChar.toLowerCase() === 'm' ? 'mobs' : 'objects';
+    return { mode, query, zoneId };
+  }
+
+  // Pattern: "m orc" or "o sword" (global search)
   if (trimmed.toLowerCase().startsWith('m ')) {
     return { mode: 'mobs', query: trimmed.slice(2).trim() };
   }
@@ -141,23 +151,25 @@ export function EnhancedCommandPalette() {
       setResults(zoneResults);
       setSelectedIndex(0);
     } else if (mode === 'mobs') {
-      // Clear old results immediately, then search mobs globally
+      // Clear old results immediately, then search mobs (globally or zone-scoped)
       setResults([]);
       setSelectedIndex(0);
       searchMobsQuery({
         variables: {
           search: query,
           limit: 10,
+          ...(parsedInput.zoneId != null && { zoneId: parsedInput.zoneId }),
         },
       });
     } else if (mode === 'objects') {
-      // Clear old results immediately, then search objects globally
+      // Clear old results immediately, then search objects (globally or zone-scoped)
       setResults([]);
       setSelectedIndex(0);
       searchObjectsQuery({
         variables: {
           search: query,
           limit: 10,
+          ...(parsedInput.zoneId != null && { zoneId: parsedInput.zoneId }),
         },
       });
     }
@@ -171,7 +183,7 @@ export function EnhancedCommandPalette() {
         id: mob.id,
         zoneId: mob.zoneId,
         name: mob.name,
-        displayName: mob.name,
+        displayName: mob.plainName,
         description: `Zone ${mob.zoneId}${
           zoneNameMap.has(mob.zoneId) ? `: ${zoneNameMap.get(mob.zoneId)}` : ''
         } • Mob ${mob.zoneId}:${mob.id} • Level ${mob.level}`,
@@ -189,7 +201,7 @@ export function EnhancedCommandPalette() {
           id: obj.id,
           zoneId: obj.zoneId,
           name: obj.name,
-          displayName: obj.name,
+          displayName: obj.plainName,
           description: `Zone ${obj.zoneId}${
             zoneNameMap.has(obj.zoneId)
               ? `: ${zoneNameMap.get(obj.zoneId)}`
@@ -269,10 +281,10 @@ export function EnhancedCommandPalette() {
         }
       } else if (result.type === 'mob') {
         setSelectedZone(result.zoneId);
-        targetPath = `/dashboard/mobs/editor?zone=${result.zoneId}&id=${result.id}`;
+        targetPath = `/dashboard/mobs/view?zone=${result.zoneId}&id=${result.id}`;
       } else if (result.type === 'object') {
         setSelectedZone(result.zoneId);
-        targetPath = `/dashboard/objects/editor?zone=${result.zoneId}&id=${result.id}`;
+        targetPath = `/dashboard/objects/view?zone=${result.zoneId}&id=${result.id}`;
       }
 
       router.push(targetPath);
@@ -294,8 +306,13 @@ export function EnhancedCommandPalette() {
         ? 'Objects'
         : 'Zones';
 
-  const contextInfo = selectedZone
-    ? `Searching in Zone ${selectedZone}`
+  // Context info shows zone-scoped or global search
+  const contextInfo = parsedInput.zoneId
+    ? `Searching in Zone ${parsedInput.zoneId}${
+        zoneNameMap.has(parsedInput.zoneId)
+          ? `: ${zoneNameMap.get(parsedInput.zoneId)}`
+          : ''
+      }`
     : 'Searching all zones';
 
   return (
@@ -316,17 +333,15 @@ export function EnhancedCommandPalette() {
                 {parsedInput.mode === 'mobs' ? '🧙 ' : '📦 '}
                 {modeLabel}
               </span>
-              {selectedZone && (
-                <span className='ml-2 text-xs text-gray-500 dark:text-gray-400'>
-                  {contextInfo}
-                </span>
-              )}
+              <span className='ml-2 text-xs text-gray-500 dark:text-gray-400'>
+                {contextInfo}
+              </span>
             </div>
           )}
 
           <input
             type='text'
-            placeholder="Type 'm orc' for mobs, 'o sword' for objects, or zone name..."
+            placeholder="'m orc' (global), '30 m orc' (zone 30), 'o sword', or zone name..."
             value={searchQuery}
             onChange={e => setSearchQuery(e.target.value)}
             className='w-full px-4 py-2 text-lg bg-transparent border-none outline-none'

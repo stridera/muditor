@@ -67,6 +67,8 @@ import {
   XCircle,
 } from 'lucide-react';
 import { Fragment, useCallback, useEffect, useMemo, useState } from 'react';
+import { ColoredText } from '@/components/ColoredText';
+import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 
 // Helper function to ensure numeric IDs
 const toNumericId = (id: number | string): number => {
@@ -427,7 +429,7 @@ export default function ClassesPage() {
   const filteredClasses = useMemo(
     () =>
       classesData?.classes?.filter(cls =>
-        (cls.name ?? '').toLowerCase().includes(searchQuery.toLowerCase())
+        (cls.plainName ?? '').toLowerCase().includes(searchQuery.toLowerCase())
       ) ?? [],
     [classesData, searchQuery]
   );
@@ -437,7 +439,7 @@ export default function ClassesPage() {
   if (classesLoading) {
     return (
       <div className='flex items-center justify-center h-screen'>
-        <Loader2 className='h-8 w-8 animate-spin text-gray-500' />
+        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
       </div>
     );
   }
@@ -445,11 +447,11 @@ export default function ClassesPage() {
   return (
     <div className='flex h-[calc(100vh-4rem)]'>
       {/* Sidebar - Class List */}
-      <div className='w-80 border-r bg-gray-50 flex flex-col'>
-        <div className='p-4 border-b bg-white'>
+      <div className='w-80 border-r bg-muted flex flex-col'>
+        <div className='p-4 border-b bg-card'>
           <h2 className='text-lg font-semibold mb-2'>Classes</h2>
           <div className='relative'>
-            <Search className='absolute left-2 top-2.5 h-4 w-4 text-gray-400' />
+            <Search className='absolute left-2 top-2.5 h-4 w-4 text-muted-foreground' />
             <Input
               placeholder='Search classes...'
               value={searchQuery}
@@ -464,14 +466,16 @@ export default function ClassesPage() {
             <button
               key={cls.id}
               onClick={() => handleClassSelect(cls)}
-              className={`w-full text-left px-4 py-3 border-b hover:bg-gray-100 transition-colors ${
+              className={`w-full text-left px-4 py-3 border-b hover:bg-accent transition-colors ${
                 selectedClass?.id === cls.id
-                  ? 'bg-blue-50 border-l-4 border-l-blue-500'
+                  ? 'bg-accent border-l-4 border-l-primary'
                   : ''
               }`}
             >
-              <div className='font-medium text-gray-900'>{cls.name}</div>
-              <div className='text-sm text-gray-500'>{cls.hitDice}</div>
+              <div className='font-medium text-card-foreground'>
+                {cls.plainName}
+              </div>
+              <div className='text-sm text-muted-foreground'>{cls.hitDice}</div>
             </button>
           ))}
         </div>
@@ -517,7 +521,9 @@ export default function ClassesPage() {
                   <CardHeader>
                     <div className='flex justify-between items-center'>
                       <div>
-                        <CardTitle>{selectedClass.name}</CardTitle>
+                        <CardTitle>
+                          <ColoredText text={selectedClass.name} />
+                        </CardTitle>
                         <CardDescription>
                           Class details and attributes
                         </CardDescription>
@@ -564,15 +570,22 @@ export default function ClassesPage() {
                   </CardHeader>
                   <CardContent className='space-y-4'>
                     <div className='grid gap-2'>
-                      <Label htmlFor='name'>Name</Label>
-                      <Input
-                        id='name'
-                        value={formData.name}
-                        onChange={e =>
-                          setFormData({ ...formData, name: e.target.value })
-                        }
-                        disabled={!isEditing}
-                      />
+                      <Label htmlFor='name'>Name (with color codes)</Label>
+                      {isEditing ? (
+                        <ColoredTextEditor
+                          value={formData.name}
+                          onChange={markup =>
+                            setFormData({ ...formData, name: markup })
+                          }
+                          placeholder='e.g. <b:magenta>Sorcerer</>'
+                          maxLength={100}
+                          showPreview={true}
+                        />
+                      ) : (
+                        <div className='p-3 border rounded-md bg-muted/30 min-h-[50px]'>
+                          <ColoredText text={formData.name} />
+                        </div>
+                      )}
                     </div>
 
                     <div className='grid gap-2'>
@@ -630,7 +643,8 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Class Skills</CardTitle>
                         <CardDescription>
-                          Skills available to the {selectedClass.name} class
+                          Skills available to the {selectedClass.plainName}{' '}
+                          class
                         </CardDescription>
                       </div>
                       {canEdit && !addingSkill && (
@@ -643,7 +657,7 @@ export default function ClassesPage() {
                   </CardHeader>
                   <CardContent>
                     {addingSkill && (
-                      <div className='border rounded-lg p-4 mb-4 bg-gray-50 space-y-3'>
+                      <div className='border rounded-lg p-4 mb-4 bg-muted space-y-3'>
                         <div className='grid grid-cols-2 gap-3'>
                           <div className='grid gap-2'>
                             <Label>Skill</Label>
@@ -803,7 +817,7 @@ export default function ClassesPage() {
                             <TableRow>
                               <TableCell
                                 colSpan={canEdit ? 5 : 4}
-                                className='text-center text-gray-500 py-8'
+                                className='text-center text-muted-foreground py-8'
                               >
                                 No skills assigned to this class
                               </TableCell>
@@ -823,7 +837,8 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Spell Circles</CardTitle>
                         <CardDescription>
-                          Spell progression for the {selectedClass.name} class
+                          Spell progression for the {selectedClass.plainName}{' '}
+                          class
                         </CardDescription>
                       </div>
                       {canEdit && !addingCircle && (
@@ -836,7 +851,7 @@ export default function ClassesPage() {
                   </CardHeader>
                   <CardContent>
                     {addingCircle && (
-                      <div className='border rounded-lg p-4 mb-4 bg-gray-50 space-y-3'>
+                      <div className='border rounded-lg p-4 mb-4 bg-muted space-y-3'>
                         <div className='grid grid-cols-2 gap-3'>
                           <div className='grid gap-2'>
                             <Label>Circle Number</Label>
@@ -905,7 +920,7 @@ export default function ClassesPage() {
                               const isExpanded = expandedCircles.has(circle.id);
                               return (
                                 <Fragment key={circle.id}>
-                                  <TableRow className='hover:bg-gray-50'>
+                                  <TableRow className='hover:bg-muted'>
                                     <TableCell>
                                       <Button
                                         variant='ghost'
@@ -927,7 +942,7 @@ export default function ClassesPage() {
                                     </TableCell>
                                     <TableCell>{circle.minLevel}</TableCell>
                                     <TableCell>
-                                      <span className='text-sm text-gray-600'>
+                                      <span className='text-sm text-muted-foreground'>
                                         {circle.spells?.length || 0} spells
                                       </span>
                                     </TableCell>
@@ -951,11 +966,11 @@ export default function ClassesPage() {
                                     <TableRow key={`${circle.id}-spells`}>
                                       <TableCell
                                         colSpan={canEdit ? 5 : 4}
-                                        className='bg-gray-50 p-0'
+                                        className='bg-muted p-0'
                                       >
                                         <div className='px-4 py-3'>
                                           <div className='flex justify-between items-center mb-2'>
-                                            <div className='text-sm font-medium text-gray-700'>
+                                            <div className='text-sm font-medium text-foreground'>
                                               Spells in Circle {circle.circle}
                                             </div>
                                             {canEdit &&
@@ -1097,7 +1112,7 @@ export default function ClassesPage() {
                                                         {spell.spellName}
                                                       </span>
                                                       {spell.minLevel && (
-                                                        <span className='text-xs text-gray-500 ml-2'>
+                                                        <span className='text-xs text-muted-foreground ml-2'>
                                                           Lv {spell.minLevel}
                                                         </span>
                                                       )}
@@ -1126,7 +1141,7 @@ export default function ClassesPage() {
                                             </div>
                                           ) : (
                                             !addingSpellToCircle && (
-                                              <div className='text-sm text-gray-500 text-center py-2'>
+                                              <div className='text-sm text-muted-foreground text-center py-2'>
                                                 No spells configured for this
                                                 circle
                                               </div>
@@ -1143,7 +1158,7 @@ export default function ClassesPage() {
                             <TableRow>
                               <TableCell
                                 colSpan={canEdit ? 5 : 4}
-                                className='text-center text-gray-500 py-8'
+                                className='text-center text-muted-foreground py-8'
                               >
                                 No spell circles configured for this class
                               </TableCell>
@@ -1158,7 +1173,7 @@ export default function ClassesPage() {
             </Tabs>
           </div>
         ) : (
-          <div className='flex-1 flex items-center justify-center text-gray-500'>
+          <div className='flex-1 flex items-center justify-center text-muted-foreground'>
             <div className='text-center'>
               <div className='text-lg font-medium'>No class selected</div>
               <div className='text-sm'>

@@ -114,6 +114,7 @@ query SearchMobs($search: String!, $limit: Int, $zoneId: Int) {
     id
     zoneId
     name
+    plainName
     roomDescription
     level
     race

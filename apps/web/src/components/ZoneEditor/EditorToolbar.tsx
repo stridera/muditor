@@ -1,4 +1,5 @@
 import React from 'react';
+import Link from 'next/link';
 
 export type EditorMode = 'view' | 'edit';
 
@@ -11,6 +12,8 @@ interface ZoneEditorToolbarProps {
   onChangeZLevel: (delta: number) => void;
   minZLevel: number;
   maxZLevel: number;
+  hideOtherFloors: boolean;
+  onToggleHideOtherFloors: () => void;
   canUndo: boolean;
   canRedo: boolean;
   onUndo: () => void;
@@ -32,6 +35,8 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
   onChangeZLevel,
   minZLevel,
   maxZLevel,
+  hideOtherFloors,
+  onToggleHideOtherFloors,
   canUndo,
   canRedo,
   onUndo,
@@ -73,13 +78,23 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
           Edit
         </button>
       </div>
-      <button
-        className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-        onClick={onToggleViewMode}
-        title='Toggle world map view'
-      >
-        {viewMode === 'zone' ? 'World Map' : 'Zone View'}
-      </button>
+      {viewMode === 'zone' ? (
+        <Link
+          href='/dashboard/zones/editor'
+          className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+          title='View canvas-based world map'
+        >
+          World Map
+        </Link>
+      ) : (
+        <button
+          className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+          onClick={onToggleViewMode}
+          title='Back to zone view'
+        >
+          Zone View
+        </button>
+      )}
       {loading && (
         <span className='px-2 py-1 text-xs text-gray-700 dark:text-gray-300'>
           Loading…
@@ -120,21 +135,40 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
         </button>
       </div>
       <button
-        className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-        disabled={!canUndo}
-        onClick={onUndo}
-        title='Undo (Ctrl+Z)'
+        className={`px-2 py-1 text-xs rounded ${
+          hideOtherFloors
+            ? 'bg-blue-500 text-white hover:bg-blue-600 dark:bg-blue-600 dark:hover:bg-blue-700'
+            : 'bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+        }`}
+        onClick={onToggleHideOtherFloors}
+        title={
+          hideOtherFloors
+            ? 'Show rooms on other floors (with reduced opacity)'
+            : 'Hide rooms not on current floor'
+        }
       >
-        Undo
+        {hideOtherFloors ? '👁️ Show Other Floors' : '👁️‍🗨️ Hide Other Floors'}
       </button>
-      <button
-        className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
-        disabled={!canRedo}
-        onClick={onRedo}
-        title='Redo (Ctrl+Shift+Z / Ctrl+Y)'
-      >
-        Redo
-      </button>
+      {editorMode === 'edit' && (
+        <>
+          <button
+            className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            disabled={!canUndo}
+            onClick={onUndo}
+            title='Undo (Ctrl+Z)'
+          >
+            Undo
+          </button>
+          <button
+            className='px-2 py-1 text-xs rounded bg-gray-200 hover:bg-gray-300 dark:bg-gray-700 dark:hover:bg-gray-600'
+            disabled={!canRedo}
+            onClick={onRedo}
+            title='Redo (Ctrl+Shift+Z / Ctrl+Y)'
+          >
+            Redo
+          </button>
+        </>
+      )}
       {showOverlapButton && overlapCount > 0 && (
         <button
           className='px-2 py-1 text-xs rounded bg-yellow-500 hover:bg-yellow-600 text-white dark:bg-yellow-600 dark:hover:bg-yellow-700'

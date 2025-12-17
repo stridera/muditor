@@ -3,19 +3,28 @@
 export const dynamic = 'force-dynamic';
 
 import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrchestrator';
+import { WorldMapCanvas } from '@/components/WorldMap/WorldMapCanvas';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useMemo, useState } from 'react';
 import { isValidZoneId } from '@/lib/room-utils';
 
 function ZoneEditorContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
-  const zoneIdParam = searchParams.get('zone_id');
-  const roomIdParam = searchParams.get('room_id');
+  const zoneIdParam = searchParams.get('zone');
+  const roomIdParam = searchParams.get('room');
   const { zoneId: contextZoneId } = useZoneContext();
   const [localStorageZone, setLocalStorageZone] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [mapOptions, setMapOptions] = useState({
+    zoneGlow: true,
+    zoneOutline: true,
+    zoneLabels: true,
+    roomGlow: false,
+  });
 
   // Load zone from localStorage on client side
   useEffect(() => {
@@ -53,6 +62,13 @@ function ZoneEditorContent() {
   const worldMapMode = useMemo(() => {
     return !isValidZoneId(zoneId);
   }, [zoneId]);
+
+  const handleZoneClick = (clickedZoneId: number) => {
+    console.log('handleZoneClick called with zoneId:', clickedZoneId);
+    const url = `/dashboard/zones/editor?zone=${clickedZoneId}`;
+    console.log('Navigating to:', url);
+    router.push(url);
+  };
 
   return (
     <div className='fixed inset-0 z-40 bg-gray-50 dark:bg-gray-900'>
@@ -97,13 +113,59 @@ function ZoneEditorContent() {
         </div>
       </div>
 
-      {/* Full-screen Zone Editor */}
+      {/* Full-screen Zone Editor or World Map */}
       <div className='h-[calc(100vh-73px)]'>
-        <ZoneEditorOrchestrator
-          zoneId={zoneId ?? undefined}
-          initialRoomId={initialRoomId}
-          worldMapMode={worldMapMode}
-        />
+        {worldMapMode ? (
+          <>
+            {loading && (
+              <div className='absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 z-10'>
+                <div className='text-lg'>Loading world map...</div>
+              </div>
+            )}
+            <div className='absolute top-2 right-2 z-20 bg-white/90 dark:bg-gray-800/90 border border-gray-200 dark:border-gray-700 rounded-lg shadow-md px-3 py-2 space-y-1 text-sm text-gray-800 dark:text-gray-100'>
+              <div className='font-semibold text-xs uppercase tracking-wide text-gray-500 dark:text-gray-400'>
+                Display
+              </div>
+              {(
+                [
+                  { key: 'zoneGlow', label: 'Zone glow' },
+                  { key: 'zoneOutline', label: 'Zone borders' },
+                  { key: 'zoneLabels', label: 'Zone labels' },
+                  { key: 'roomGlow', label: 'Room glow' },
+                ] as const
+              ).map(option => (
+                <label
+                  key={option.key}
+                  className='flex items-center gap-2 cursor-pointer select-none'
+                >
+                  <input
+                    type='checkbox'
+                    className='rounded border-gray-300 text-indigo-600 focus:ring-indigo-500'
+                    checked={mapOptions[option.key]}
+                    onChange={e =>
+                      setMapOptions(prev => ({
+                        ...prev,
+                        [option.key]: e.target.checked,
+                      }))
+                    }
+                  />
+                  <span>{option.label}</span>
+                </label>
+              ))}
+            </div>
+            <WorldMapCanvas
+              onZoneClick={handleZoneClick}
+              onLoadingChange={setLoading}
+              options={mapOptions}
+            />
+          </>
+        ) : (
+          <ZoneEditorOrchestrator
+            zoneId={zoneId ?? undefined}
+            initialRoomId={initialRoomId}
+            worldMapMode={false}
+          />
+        )}
       </div>
     </div>
   );

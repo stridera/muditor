@@ -1,7 +1,7 @@
 'use client';
 
 import { ChevronDown, ChevronUp } from 'lucide-react';
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface NumberSpinnerProps {
   label?: string;
@@ -24,7 +24,7 @@ interface NumberSpinnerProps {
  * - Keyboard support (up/down arrows)
  * - Min/max validation
  * - Step increment control
- * - Prevents value loss on backspace (maintains min value)
+ * - Allows full editing including clearing the field
  * - Proper focus management
  */
 export function NumberSpinner({
@@ -40,7 +40,15 @@ export function NumberSpinner({
   placeholder,
 }: NumberSpinnerProps) {
   const inputRef = useRef<HTMLInputElement>(null);
+  const [inputValue, setInputValue] = useState(String(value));
   const [isFocused, setIsFocused] = useState(false);
+
+  // Sync input value when prop value changes externally
+  useEffect(() => {
+    if (!isFocused) {
+      setInputValue(String(value));
+    }
+  }, [value, isFocused]);
 
   const clamp = (val: number): number => {
     return Math.max(min, Math.min(max, val));
@@ -49,21 +57,23 @@ export function NumberSpinner({
   const handleIncrement = () => {
     const newValue = clamp(value + step);
     onChange(newValue);
+    setInputValue(String(newValue));
     inputRef.current?.focus();
   };
 
   const handleDecrement = () => {
     const newValue = clamp(value - step);
     onChange(newValue);
+    setInputValue(String(newValue));
     inputRef.current?.focus();
   };
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const rawValue = e.target.value;
+    setInputValue(rawValue);
 
-    // Allow empty input while typing
+    // Allow empty input or just a minus sign while typing
     if (rawValue === '' || rawValue === '-') {
-      // Don't call onChange yet - wait for blur
       return;
     }
 
@@ -73,18 +83,26 @@ export function NumberSpinner({
     }
   };
 
+  const handleFocus = () => {
+    setIsFocused(true);
+    // Select all text on focus for easier editing
+    inputRef.current?.select();
+  };
+
   const handleBlur = () => {
     setIsFocused(false);
 
     // If input is empty or invalid on blur, restore to min value
-    const currentValue = inputRef.current?.value;
     if (
-      !currentValue ||
-      currentValue === '' ||
-      currentValue === '-' ||
-      isNaN(parseInt(currentValue, 10))
+      inputValue === '' ||
+      inputValue === '-' ||
+      isNaN(parseInt(inputValue, 10))
     ) {
       onChange(min);
+      setInputValue(String(min));
+    } else {
+      // Ensure the displayed value matches the clamped value
+      setInputValue(String(value));
     }
   };
 
@@ -109,15 +127,13 @@ export function NumberSpinner({
       <div className='relative'>
         <input
           ref={inputRef}
-          type='number'
-          value={value}
+          type='text'
+          inputMode='numeric'
+          value={inputValue}
           onChange={handleInputChange}
-          onFocus={() => setIsFocused(true)}
+          onFocus={handleFocus}
           onBlur={handleBlur}
           onKeyDown={handleKeyDown}
-          min={min}
-          max={max}
-          step={step}
           placeholder={placeholder}
           className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring pr-8 sm:text-sm ${
             error ? 'border-destructive' : 'border-input'

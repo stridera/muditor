@@ -42,13 +42,25 @@ export class ObjectDto {
   name: string;
 
   @Field()
+  plainName: string;
+
+  @Field()
   roomDescription: string;
+
+  @Field()
+  plainRoomDescription: string;
 
   @Field()
   examineDescription: string;
 
+  @Field()
+  plainExamineDescription: string;
+
   @Field({ nullable: true })
   actionDescription?: string;
+
+  @Field({ nullable: true })
+  plainActionDescription?: string;
 
   @Field(() => [ObjectFlag])
   flags: ObjectFlag[];

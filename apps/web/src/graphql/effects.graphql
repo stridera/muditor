@@ -6,7 +6,9 @@ query GetEffects($skip: Int, $take: Int, $search: String) {
     name
     effectType
     description
+    tags
     defaultParams
+    paramSchema
   }
 }
 
@@ -20,6 +22,36 @@ query GetEffect($id: ID!) {
     name
     effectType
     description
+    tags
     defaultParams
+    paramSchema
   }
+}
+
+mutation CreateEffect($data: CreateEffectInput!) {
+  createEffect(data: $data) {
+    id
+    name
+    effectType
+    description
+    tags
+    defaultParams
+    paramSchema
+  }
+}
+
+mutation UpdateEffect($id: ID!, $data: UpdateEffectInput!) {
+  updateEffect(id: $id, data: $data) {
+    id
+    name
+    effectType
+    description
+    tags
+    defaultParams
+    paramSchema
+  }
+}
+
+mutation DeleteEffect($id: ID!) {
+  deleteEffect(id: $id)
 }

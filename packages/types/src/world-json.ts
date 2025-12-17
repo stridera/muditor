@@ -504,6 +504,48 @@ export enum DamageType {
   ALIGN = 'ALIGN',
 }
 
+// ElementType: Used for damage calculations, resistances, and ability components
+// See fierymud/docs/game-systems/ELEMENT_TYPES.md for full documentation
+export enum ElementType {
+  // Physical damage types
+  PHYSICAL = 'PHYSICAL', // Weapon damage (slash, pierce, bludgeon)
+  FORCE = 'FORCE', // Magical kinetic energy, hits ethereal
+  SONIC = 'SONIC', // Sound/thunder, ignores physical armor
+  BLEED = 'BLEED', // Physical DoT, bypasses some armor
+
+  // Classical elements
+  FIRE = 'FIRE', // Heat, burning (opposes COLD)
+  COLD = 'COLD', // Freezing, slowing (opposes FIRE)
+  WATER = 'WATER', // Drowning, pressure, conducts SHOCK
+  EARTH = 'EARTH', // Crushing, grounding (opposes AIR)
+  AIR = 'AIR', // Suffocation, cutting winds (opposes EARTH)
+  SHOCK = 'SHOCK', // Electricity, chains in water
+  ACID = 'ACID', // Corrosion, DoT
+  POISON = 'POISON', // Toxins, CON-based resist
+
+  // Light/Dark
+  RADIANT = 'RADIANT', // Pure light energy (opposes SHADOW)
+  SHADOW = 'SHADOW', // Darkness/void (opposes RADIANT)
+
+  // Divine
+  HOLY = 'HOLY', // Divine positive (opposes UNHOLY)
+  UNHOLY = 'UNHOLY', // Divine negative (opposes HOLY)
+
+  // Life/Death
+  HEAL = 'HEAL', // Restoration, inverts on undead (opposes NECROTIC)
+  NECROTIC = 'NECROTIC', // Life drain, withering (opposes HEAL)
+
+  // Other
+  MENTAL = 'MENTAL', // Psychic/psionic, ignores armor
+  NATURE = 'NATURE', // Druidic/primal energy
+}
+
+// Resistance value type: -100 (2x damage) to 100 (immune), >100 for absorption
+export type ResistanceValue = number;
+
+// Resistances map: ElementType -> percentage (-100 to 200)
+export type Resistances = Partial<Record<ElementType, ResistanceValue>>;
+
 export enum ObjectType {
   NOTHING = 'NOTHING',
   LIGHT = 'LIGHT',

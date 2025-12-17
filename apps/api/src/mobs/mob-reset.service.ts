@@ -178,6 +178,7 @@ export class MobResetService {
     });
 
     // Execute all operations in transaction
+    // @ts-expect-error - Extended Prisma client type incompatibility with transaction array syntax
     await this.prisma.$transaction([
       ...equipmentOperations,
       this.prisma.mobResets.update({

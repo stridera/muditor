@@ -22,15 +22,20 @@ import { useMutation } from '@apollo/client/react';
 import {
   Box,
   FileCode,
+  HelpCircle,
   Home,
   LogOut,
   Map,
+  MessageCircle,
   Settings,
   Shield,
   ShoppingBag,
+  Sparkles,
+  Swords,
   User,
   Users,
   Users2,
+  Zap,
 } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -62,6 +67,38 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
     name: 'Scripts',
     icon: <FileCode className='h-5 w-5' />,
   },
+  '/dashboard/classes': {
+    name: 'Classes',
+    icon: <Swords className='h-5 w-5' />,
+  },
+  '/dashboard/races': {
+    name: 'Races',
+    icon: <Users className='h-5 w-5' />,
+  },
+  '/dashboard/effects': {
+    name: 'Effects',
+    icon: <Zap className='h-5 w-5' />,
+  },
+  '/dashboard/abilities': {
+    name: 'Abilities',
+    icon: <Sparkles className='h-5 w-5' />,
+  },
+  '/dashboard/socials': {
+    name: 'Socials',
+    icon: <MessageCircle className='h-5 w-5' />,
+  },
+  '/dashboard/help': {
+    name: 'Help',
+    icon: <HelpCircle className='h-5 w-5' />,
+  },
+  '/dashboard/player/characters': {
+    name: 'My Characters',
+    icon: <Users className='h-5 w-5' />,
+  },
+  '/dashboard/admin/characters': {
+    name: 'All Characters',
+    icon: <Users className='h-5 w-5' />,
+  },
   '/dashboard/characters': {
     name: 'Characters',
     icon: <Users className='h-5 w-5' />,
@@ -72,7 +109,7 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { isPlayer, isImmortal } = usePermissions();
+  const { isImmortal, isCoder, isGod } = usePermissions();
   const { isInZoneContext } = useZoneContext();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
@@ -134,8 +171,13 @@ export function Navigation() {
   const playerQuickLinks = [
     {
       name: 'My Characters',
-      href: '/dashboard/characters',
+      href: '/dashboard/player/characters',
       icon: <Users className='h-4 w-4' />,
+    },
+    {
+      name: 'Help',
+      href: '/dashboard/help',
+      icon: <HelpCircle className='h-4 w-4' />,
     },
     {
       name: 'Settings',
@@ -173,47 +215,49 @@ export function Navigation() {
   ];
 
   const quickLinks = showPlayerView ? playerQuickLinks : adminQuickLinks;
+  const canAccessGameSystems = isCoder || isGod;
 
   return (
     <nav className='bg-background/95 backdrop-blur-md border-b border-border shadow-sm sticky top-0 z-50'>
       <div className='container mx-auto px-4'>
-        <div className='flex items-center justify-between h-16'>
+        <div className='flex items-center h-16'>
           {/* Left: Breadcrumbs and Zone Tabs */}
-          <div className='flex items-center gap-4'>
+          <div className='flex items-center gap-4 flex-1'>
             <Breadcrumb />
             <ZoneEntityTabs />
           </div>
 
           {/* Center: Quick Links (only show when NOT in zone context) */}
-          <div
-            className={`hidden md:flex items-center gap-2 ${isInZoneContext ? 'md:hidden' : ''}`}
-          >
-            {quickLinks.map(link => {
-              const isActive =
-                pathname === link.href ||
-                (link.href !== '/dashboard' && pathname.startsWith(link.href));
+          {!isInZoneContext && (
+            <div className='hidden md:flex items-center gap-2 flex-1 justify-center'>
+              {quickLinks.map(link => {
+                const isActive =
+                  pathname === link.href ||
+                  (link.href !== '/dashboard' &&
+                    pathname.startsWith(link.href));
 
-              return (
-                <Link key={link.href} href={link.href}>
-                  <Button
-                    variant={isActive ? 'default' : 'ghost'}
-                    size='sm'
-                    className={`flex items-center gap-2 transition-all duration-200 ${
-                      isActive
-                        ? 'bg-primary text-primary-foreground hover:bg-primary/80'
-                        : 'hover:bg-muted'
-                    }`}
-                  >
-                    {link.icon}
-                    <span className='hidden lg:inline'>{link.name}</span>
-                  </Button>
-                </Link>
-              );
-            })}
-          </div>
+                return (
+                  <Link key={link.href} href={link.href}>
+                    <Button
+                      variant={isActive ? 'default' : 'ghost'}
+                      size='sm'
+                      className={`flex items-center gap-2 transition-all duration-200 ${
+                        isActive
+                          ? 'bg-primary text-primary-foreground hover:bg-primary/80'
+                          : 'hover:bg-muted'
+                      }`}
+                    >
+                      {link.icon}
+                      <span className='hidden lg:inline'>{link.name}</span>
+                    </Button>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
 
-          {/* Right: View Toggle, Theme, Environment, User */}
-          <div className='flex items-center gap-3'>
+          {/* Right: View Toggle, Theme, Environment, User - Always positioned at the right */}
+          <div className='flex items-center gap-3 flex-1 justify-end'>
             {/* View Mode Toggle (only for Immortal+) */}
             {canSwitchViews && (
               <div className='hidden md:flex items-center bg-muted rounded-lg p-1'>
@@ -284,6 +328,52 @@ export function Navigation() {
                     <Settings className='mr-2 h-4 w-4' />
                     Settings
                   </DropdownMenuItem>
+                  {canAccessGameSystems && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuLabel className='text-xs text-muted-foreground'>
+                        Game Systems
+                      </DropdownMenuLabel>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/classes'>
+                          <Swords className='mr-2 h-4 w-4' />
+                          Classes
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/races'>
+                          <Users className='mr-2 h-4 w-4' />
+                          Races
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/effects'>
+                          <Zap className='mr-2 h-4 w-4' />
+                          Effects
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/abilities'>
+                          <Sparkles className='mr-2 h-4 w-4' />
+                          Abilities
+                        </Link>
+                      </DropdownMenuItem>
+                      {isGod && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/socials'>
+                            <MessageCircle className='mr-2 h-4 w-4' />
+                            Socials
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/help'>
+                          <HelpCircle className='mr-2 h-4 w-4' />
+                          Help Entries
+                        </Link>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuSeparator />
                   <DropdownMenuItem onClick={logout}>
                     <LogOut className='mr-2 h-4 w-4' />

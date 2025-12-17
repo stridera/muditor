@@ -5,6 +5,8 @@ import {
   hasValidDestination,
   isValidRoomId,
 } from '@/lib/room-utils';
+import { ColoredTextEditor } from '@/components/ColoredTextEditor';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
 
@@ -224,7 +226,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
         <h3
           className={`text-lg font-semibold ${isDark ? 'text-gray-100' : 'text-gray-900'} mb-2`}
         >
-          Room {room.id}: {room.name}
+          Room {room.id}: <ColoredTextInline markup={room.name} />
         </h3>
 
         {/* Condensed Meta Strip (no duplicate exits/entities) */}
@@ -654,12 +656,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               >
                 Room Name
               </label>
-              <input
-                type='text'
+              <ColoredTextEditor
                 value={room.name}
-                onChange={e => onRoomChange('name', e.target.value)}
-                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                onChange={value => onRoomChange('name', value)}
                 placeholder='Enter room name'
+                maxLength={80}
+                showPreview={true}
               />
             </div>
 
@@ -670,12 +672,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               >
                 Description
               </label>
-              <textarea
+              <ColoredTextEditor
                 value={room.roomDescription}
-                onChange={e => onRoomChange('roomDescription', e.target.value)}
-                rows={5}
-                className='w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                onChange={value => onRoomChange('roomDescription', value)}
                 placeholder='Describe what players see in this room'
+                maxLength={1000}
+                showPreview={true}
               />
               <div className='text-xs text-gray-500 mt-1'>
                 {room.roomDescription?.length || 0}/1000 characters
@@ -1061,9 +1063,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           const zoneId = e.target.value;
                           const roomId = newExitDestination.split(':')[1] || '';
                           setNewExitDestination(
-                            zoneId && roomId
+                            zoneId !== '' && roomId !== ''
                               ? `${zoneId}:${roomId}`
-                              : zoneId || roomId
+                              : zoneId !== ''
+                                ? zoneId
+                                : roomId
                           );
                         }}
                         className='w-24 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'

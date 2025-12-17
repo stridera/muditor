@@ -108,6 +108,8 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
   const zoneBoundsRef = useRef<
     Map<number, { minX: number; maxX: number; minY: number; maxY: number }>
   >(new Map());
+  const mouseDownPosRef = useRef<{ x: number; y: number } | null>(null);
+  const dragThreshold = 5; // pixels - clicks with less movement are considered clicks
 
   // Room dimensions
   const ROOM_WIDTH = 180;
@@ -560,9 +562,10 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
       }
     }
 
-    console.log(
-      `Drew ${uniqueRooms.length} unique rooms (${visibleRooms.length - uniqueRooms.length} overlaps skipped) out of ${rooms.length} total`
-    );
+    // Debug logging removed - was causing console spam during mouse movements
+    // console.log(
+    //   `Drew ${uniqueRooms.length} unique rooms (${visibleRooms.length - uniqueRooms.length} overlaps skipped) out of ${rooms.length} total`
+    // );
   }, [rooms, viewport, isInteracting, hoveredZoneId, zones]);
 
   // Redraw on viewport or rooms change
@@ -580,7 +583,7 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
   }, [drawRooms]);
 
   // Handle mouse wheel for zoom (throttled with RAF)
-  const handleWheel = useCallback((e: React.WheelEvent) => {
+  const handleWheel = useCallback((e: WheelEvent) => {
     e.preventDefault();
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -629,11 +632,25 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
     });
   }, []);
 
+  // Attach wheel event listener with { passive: false } to prevent scroll
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+
+    canvas.addEventListener('wheel', handleWheel, { passive: false });
+
+    return () => {
+      canvas.removeEventListener('wheel', handleWheel);
+    };
+  }, [handleWheel]);
+
   // Handle mouse down for panning
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
       setIsPanning(true);
       setPanStart({ x: e.clientX - viewport.x, y: e.clientY - viewport.y });
+      // Store initial mouse position to detect drag vs click
+      mouseDownPosRef.current = { x: e.clientX, y: e.clientY };
     },
     [viewport]
   );
@@ -714,10 +731,37 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
   // Handle click to navigate to zone
   const handleClick = useCallback(
     (e: React.MouseEvent) => {
-      if (isPanning) return; // Don't navigate if we were panning
+      console.log('Click event fired');
+
+      // Check if this was a drag or a click by measuring mouse movement
+      if (mouseDownPosRef.current) {
+        const dx = Math.abs(e.clientX - mouseDownPosRef.current.x);
+        const dy = Math.abs(e.clientY - mouseDownPosRef.current.y);
+        const distance = Math.sqrt(dx * dx + dy * dy);
+
+        console.log(
+          'Mouse movement distance:',
+          distance,
+          'threshold:',
+          dragThreshold
+        );
+
+        // If mouse moved more than threshold, this was a drag, not a click
+        if (distance > dragThreshold) {
+          console.log('Drag detected, ignoring click');
+          mouseDownPosRef.current = null;
+          return;
+        }
+      } else {
+        console.log('No mouseDownPos recorded');
+      }
+      mouseDownPosRef.current = null;
 
       const canvas = canvasRef.current;
-      if (!canvas) return;
+      if (!canvas) {
+        console.log('No canvas ref');
+        return;
+      }
 
       const rect = canvas.getBoundingClientRect();
       const mouseX = e.clientX - rect.left;
@@ -727,32 +771,39 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
       const worldX = (mouseX - viewport.x) / viewport.zoom;
       const worldY = (mouseY - viewport.y) / viewport.zoom;
 
-      // Find clicked room
-      for (const room of rooms) {
-        if (room.layoutX === null || room.layoutY === null) continue;
+      console.log('World coordinates:', worldX, worldY);
 
-        const x = gridToPixels(room.layoutX);
-        const y = gridToPixelsY(room.layoutY);
-
+      // Find clicked zone using bounding boxes (same as hover detection)
+      let foundZone = false;
+      for (const [zoneId, bounds] of zoneBoundsRef.current.entries()) {
         if (
-          worldX >= x &&
-          worldX <= x + ROOM_WIDTH &&
-          worldY >= y &&
-          worldY <= y + ROOM_HEIGHT
+          worldX >= bounds.minX &&
+          worldX <= bounds.maxX &&
+          worldY >= bounds.minY &&
+          worldY <= bounds.maxY
         ) {
-          onZoneClick(room.zoneId);
+          console.log('Found zone:', zoneId, 'Calling onZoneClick...');
+          onZoneClick(zoneId);
+          foundZone = true;
           break;
         }
       }
+
+      if (!foundZone) {
+        console.log('No zone found at click position');
+        console.log(
+          'Available zones:',
+          Array.from(zoneBoundsRef.current.keys())
+        );
+      }
     },
-    [rooms, viewport, isPanning, onZoneClick]
+    [rooms, viewport, onZoneClick]
   );
 
   return (
     <div ref={containerRef} className='w-full h-full'>
       <canvas
         ref={canvasRef}
-        onWheel={handleWheel}
         onMouseDown={handleMouseDown}
         onMouseMove={handleMouseMove}
         onMouseUp={handleMouseUp}
