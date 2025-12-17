@@ -65,6 +65,37 @@ const GATE_BLOCK_TO_TYPE: Record<string, AbilityEffectOutput['gateType']> = {
 };
 
 /**
+ * Extract damage components from nested component blocks
+ */
+function extractDamageComponents(
+  damageBlock: Blockly.Block
+): Array<{ type: string; percent: number }> | null {
+  const componentsInput = damageBlock.getInputTargetBlock('components');
+  if (!componentsInput) {
+    return null;
+  }
+
+  const components: Array<{ type: string; percent: number }> = [];
+  let currentBlock: Blockly.Block | null = componentsInput;
+
+  while (currentBlock) {
+    if (currentBlock.type === 'damage_component') {
+      const type = currentBlock.getFieldValue('type');
+      const percent = currentBlock.getFieldValue('percent');
+      if (type && percent !== null) {
+        components.push({
+          type: String(type),
+          percent: Number(percent),
+        });
+      }
+    }
+    currentBlock = currentBlock.getNextBlock();
+  }
+
+  return components.length > 0 ? components : null;
+}
+
+/**
  * Extract parameters from a block based on its type
  */
 function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
@@ -113,6 +144,19 @@ function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
     }
   }
 
+  // Special handling for damage blocks - extract components
+  if (blockType === 'effect_damage') {
+    const components = extractDamageComponents(block);
+    if (components) {
+      // Use components array instead of single type
+      params['components'] = components;
+      delete params['type']; // Remove single type when using components
+    } else if (params['type'] === '') {
+      // No components and no single type selected - default to physical
+      params['type'] = 'physical';
+    }
+  }
+
   return params;
 }
 
@@ -123,7 +167,7 @@ function isOptionalField(blockType: string, fieldName: string): boolean {
   const optionalFields: Record<string, string[]> = {
     effect_status: ['type', 'contestedBy', 'source'],
     effect_enchant: ['flag'],
-    effect_damage: ['interval', 'duration', 'maxJumps', 'attenuation'],
+    effect_damage: ['type', 'interval', 'duration', 'maxJumps', 'attenuation'],
   };
   return optionalFields[blockType]?.includes(fieldName) ?? false;
 }
@@ -292,8 +336,10 @@ export function generateJson(
 export function validateEffects(effects: AbilityEffectOutput[]): {
   valid: boolean;
   errors: string[];
+  warnings: string[];
 } {
   const errors: string[] = [];
+  const warnings: string[] = [];
 
   // Get valid effect IDs from the database
   const validEffectIds = hasEffectsLoaded()
@@ -312,6 +358,58 @@ export function validateEffects(effects: AbilityEffectOutput[]): {
         errors.push(`${path}: Invalid effectId ${item.effectId}`);
       } else if (validEffectIds && !validEffectIds.has(item.effectId)) {
         errors.push(`${path}: Unknown effectId ${item.effectId}`);
+      }
+
+      // Validate damage components if present
+      const components = item.overrideParams['components'] as
+        | Array<{ type: string; percent: number }>
+        | undefined;
+      if (components && Array.isArray(components)) {
+        const totalPercent = components.reduce(
+          (sum, c) => sum + (c.percent || 0),
+          0
+        );
+        if (totalPercent !== 100) {
+          warnings.push(
+            `${path}: Damage components sum to ${totalPercent}%, should be 100%`
+          );
+        }
+        // Check for valid damage types
+        const validTypes = [
+          'physical',
+          'fire',
+          'cold',
+          'shock',
+          'acid',
+          'poison',
+          'holy',
+          'unholy',
+          'force',
+          'sonic',
+          'bleed',
+          'water',
+          'earth',
+          'air',
+          'radiant',
+          'shadow',
+          'necrotic',
+          'mental',
+          'nature',
+          'magic',
+          'lifesteal',
+        ];
+        for (const comp of components) {
+          if (!validTypes.includes(comp.type)) {
+            errors.push(
+              `${path}: Invalid damage component type "${comp.type}"`
+            );
+          }
+          if (comp.percent < 1 || comp.percent > 100) {
+            errors.push(
+              `${path}: Damage component percent must be between 1 and 100`
+            );
+          }
+        }
       }
     }
 
@@ -362,6 +460,7 @@ export function validateEffects(effects: AbilityEffectOutput[]): {
   return {
     valid: errors.length === 0,
     errors,
+    warnings,
   };
 }
 

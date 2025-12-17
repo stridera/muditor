@@ -228,13 +228,43 @@ const ROOM_EFFECT_TYPES: MenuOption[] = [
  */
 export function registerEffectBlocks(): void {
   // ============================================
+  // DAMAGE COMPONENT BLOCK (for multi-element damage)
+  // ============================================
+  Blockly.Blocks['damage_component'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput()
+        .appendField(new Blockly.FieldDropdown(DAMAGE_TYPES), 'type')
+        .appendField('at')
+        .appendField(new Blockly.FieldNumber(100, 1, 100), 'percent')
+        .appendField('%');
+      this.setPreviousStatement(true, 'damage_component');
+      this.setNextStatement(true, 'damage_component');
+      this.setColour('#c62828');
+      this.setTooltip(
+        'A damage component with type and percentage. All components should sum to 100%.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
   // 1. DAMAGE BLOCK (consolidated: instant + DoT + chain + resource drain)
   // ============================================
   Blockly.Blocks['effect_damage'] = {
     init: function (this: Blockly.Block) {
       this.appendDummyInput()
         .appendField('Damage')
-        .appendField(new Blockly.FieldDropdown(DAMAGE_TYPES), 'type');
+        .appendField(
+          new Blockly.FieldDropdown([
+            ['(use components)', ''],
+            ...DAMAGE_TYPES,
+          ] as MenuOption[]),
+          'type'
+        );
+      // Multi-element damage components (optional - use instead of single type)
+      this.appendStatementInput('components')
+        .setCheck('damage_component')
+        .appendField('Components');
       this.appendDummyInput()
         .appendField('Amount')
         .appendField(new Blockly.FieldTextInput('1d6'), 'amount')
@@ -271,7 +301,7 @@ export function registerEffectBlocks(): void {
       this.setNextStatement(true, 'effect');
       this.setColour('#e53935');
       this.setTooltip(
-        'Deal damage. Set interval/duration for DoT. Set maxJumps for chain lightning.'
+        'Deal damage. Use single type OR add component blocks for multi-element. Set interval/duration for DoT. Set maxJumps for chain lightning.'
       );
       this.setHelpUrl('');
     },
