@@ -37,23 +37,29 @@ export type Ability = {
   __typename?: 'Ability';
   abilityType: Scalars['String']['output'];
   castTimeRounds: Scalars['Int']['output'];
+  combatOk: Scalars['Boolean']['output'];
   cooldownMs: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
+  damageType?: Maybe<ElementType>;
   description?: Maybe<Scalars['String']['output']>;
   effects?: Maybe<Array<AbilityEffect>>;
-  gameId?: Maybe<Scalars['String']['output']>;
+  humanoidOnly: Scalars['Boolean']['output'];
   id: Scalars['ID']['output'];
   inCombatOnly: Scalars['Boolean']['output'];
   isArea: Scalars['Boolean']['output'];
   luaScript?: Maybe<Scalars['String']['output']>;
+  memorizationTime: Scalars['Int']['output'];
   messages?: Maybe<AbilityMessages>;
   minPosition: Position;
   name: Scalars['String']['output'];
   notes?: Maybe<Scalars['String']['output']>;
+  pages?: Maybe<Scalars['Int']['output']>;
+  questOnly: Scalars['Boolean']['output'];
   restrictions?: Maybe<AbilityRestrictions>;
   savingThrows?: Maybe<Array<AbilitySavingThrow>>;
   school?: Maybe<AbilitySchool>;
   schoolId?: Maybe<Scalars['Int']['output']>;
+  sphere?: Maybe<SpellSphere>;
   tags: Array<Scalars['String']['output']>;
   targeting?: Maybe<AbilityTargeting>;
   updatedAt: Scalars['DateTime']['output'];
@@ -70,6 +76,15 @@ export type AbilityEffect = {
   order: Scalars['Int']['output'];
   overrideParams?: Maybe<Scalars['JSON']['output']>;
   trigger?: Maybe<Scalars['String']['output']>;
+};
+
+export type AbilityEffectItemInput = {
+  chancePct?: Scalars['Int']['input'];
+  condition?: InputMaybe<Scalars['String']['input']>;
+  effectId: Scalars['Int']['input'];
+  order: Scalars['Int']['input'];
+  overrideParams?: InputMaybe<Scalars['JSON']['input']>;
+  trigger?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type AbilityMessages = {
@@ -209,6 +224,8 @@ export type CharacterDto = {
   bankSilver: Scalars['Int']['output'];
   baseSize: Scalars['Int']['output'];
   birthTime: Scalars['DateTime']['output'];
+  characterEffects?: Maybe<Array<CharacterEffectDto>>;
+  characterItems?: Maybe<Array<CharacterItemDto>>;
   charisma: Scalars['Int']['output'];
   classId?: Maybe<Scalars['Int']['output']>;
   constitution: Scalars['Int']['output'];
@@ -220,7 +237,6 @@ export type CharacterDto = {
   description?: Maybe<Scalars['String']['output']>;
   dexterity: Scalars['Int']['output'];
   effectFlags: Array<Scalars['String']['output']>;
-  effects?: Maybe<Array<CharacterEffectDto>>;
   experience: Scalars['Int']['output'];
   gender: Scalars['String']['output'];
   gold: Scalars['Int']['output'];
@@ -234,7 +250,6 @@ export type CharacterDto = {
   intelligence: Scalars['Int']['output'];
   invisLevel: Scalars['Int']['output'];
   isOnline: Scalars['Boolean']['output'];
-  items?: Maybe<Array<CharacterItemDto>>;
   lastLogin?: Maybe<Scalars['DateTime']['output']>;
   level: Scalars['Int']['output'];
   luck: Scalars['Int']['output'];
@@ -288,8 +303,8 @@ export type CharacterFilterInput = {
 
 export type CharacterItemDto = {
   __typename?: 'CharacterItemDto';
-  character: CharacterDto;
   characterId: Scalars['String']['output'];
+  characters: CharacterDto;
   charges: Scalars['Int']['output'];
   condition: Scalars['Int']['output'];
   containedItems: Array<CharacterItemDto>;
@@ -302,8 +317,8 @@ export type CharacterItemDto = {
   equippedLocation?: Maybe<Scalars['String']['output']>;
   id: Scalars['ID']['output'];
   instanceFlags: Array<Scalars['String']['output']>;
-  objectPrototype: ObjectSummaryDto;
   objectPrototypeId: Scalars['Int']['output'];
+  objects: ObjectSummaryDto;
   updatedAt: Scalars['DateTime']['output'];
 };
 
@@ -359,6 +374,7 @@ export type ClassDto = {
   hitDice: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  plainName: Scalars['String']['output'];
   primaryStat?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
 };
@@ -407,16 +423,22 @@ export type Composition =
 export type CreateAbilityInput = {
   abilityType?: Scalars['String']['input'];
   castTimeRounds?: Scalars['Int']['input'];
+  combatOk?: Scalars['Boolean']['input'];
   cooldownMs?: Scalars['Int']['input'];
+  damageType?: InputMaybe<ElementType>;
   description?: InputMaybe<Scalars['String']['input']>;
-  gameId?: InputMaybe<Scalars['String']['input']>;
+  humanoidOnly?: Scalars['Boolean']['input'];
   inCombatOnly?: Scalars['Boolean']['input'];
   isArea?: Scalars['Boolean']['input'];
   luaScript?: InputMaybe<Scalars['String']['input']>;
+  memorizationTime?: Scalars['Int']['input'];
   minPosition?: Position;
   name: Scalars['String']['input'];
   notes?: InputMaybe<Scalars['String']['input']>;
+  pages?: InputMaybe<Scalars['Int']['input']>;
+  questOnly?: Scalars['Boolean']['input'];
   schoolId?: InputMaybe<Scalars['Int']['input']>;
+  sphere?: InputMaybe<SpellSphere>;
   tags?: Array<Scalars['String']['input']>;
   violent?: Scalars['Boolean']['input'];
 };
@@ -507,6 +529,15 @@ export type CreateClassInput = {
   primaryStat?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateEffectInput = {
+  defaultParams?: InputMaybe<Scalars['JSON']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  effectType: Scalars['String']['input'];
+  name: Scalars['String']['input'];
+  paramSchema?: InputMaybe<Scalars['JSON']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type CreateEquipmentSetInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   items?: InputMaybe<Array<CreateEquipmentSetItemInput>>;
@@ -535,6 +566,28 @@ export type CreateGrantInput = {
   resourceId: Scalars['String']['input'];
   resourceType: GrantResourceType;
   userId: Scalars['String']['input'];
+};
+
+/** Input for creating a new help entry */
+export type CreateHelpEntryInput = {
+  /** Category (e.g., spell, skill, command) */
+  category?: InputMaybe<Scalars['String']['input']>;
+  /** Class/circle requirements */
+  classes?: InputMaybe<Scalars['JSON']['input']>;
+  /** Full help text content */
+  content: Scalars['String']['input'];
+  /** Duration description */
+  duration?: InputMaybe<Scalars['String']['input']>;
+  /** Keywords for looking up this help entry */
+  keywords: Array<Scalars['String']['input']>;
+  /** Minimum player level to view */
+  minLevel?: Scalars['Int']['input'];
+  /** Spell sphere */
+  sphere?: InputMaybe<Scalars['String']['input']>;
+  /** Primary display title */
+  title: Scalars['String']['input'];
+  /** Usage syntax */
+  usage?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type CreateMobEquipmentSetInput = {
@@ -702,6 +755,32 @@ export type CreateShopInput = {
   zoneId: Scalars['Int']['input'];
 };
 
+/** Input for creating a new social command */
+export type CreateSocialInput = {
+  /** Message to actor when targeting self */
+  charAuto?: InputMaybe<Scalars['String']['input']>;
+  /** Message to actor when target found */
+  charFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to actor when no target */
+  charNoArg?: InputMaybe<Scalars['String']['input']>;
+  /** Hide who initiated the action */
+  hide?: Scalars['Boolean']['input'];
+  /** Minimum position for the target */
+  minVictimPosition?: Position;
+  /** Unique command name (e.g., smile, bow, hug) */
+  name: Scalars['String']['input'];
+  /** Message when target not found */
+  notFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room when actor targets self */
+  othersAuto?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room (excluding target) when target found */
+  othersFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room when no target */
+  othersNoArg?: InputMaybe<Scalars['String']['input']>;
+  /** Message to target */
+  victFound?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateTriggerInput = {
   argList?: Array<Scalars['String']['input']>;
   attachType: ScriptType;
@@ -759,6 +838,8 @@ export type Effect = {
   effectType: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
+  paramSchema?: Maybe<Scalars['JSON']['output']>;
+  tags: Array<Scalars['String']['output']>;
 };
 
 export type EffectFlag =
@@ -849,6 +930,28 @@ export type EffectFlag =
   | 'WATERWALK'
   | 'WRATH';
 
+export type ElementType =
+  | 'ACID'
+  | 'AIR'
+  | 'BLEED'
+  | 'COLD'
+  | 'EARTH'
+  | 'FIRE'
+  | 'FORCE'
+  | 'HEAL'
+  | 'HOLY'
+  | 'MENTAL'
+  | 'NATURE'
+  | 'NECROTIC'
+  | 'PHYSICAL'
+  | 'POISON'
+  | 'RADIANT'
+  | 'SHADOW'
+  | 'SHOCK'
+  | 'SONIC'
+  | 'UNHOLY'
+  | 'WATER';
+
 export type EquipmentSetDto = {
   __typename?: 'EquipmentSetDto';
   createdAt: Scalars['DateTime']['output'];
@@ -885,6 +988,44 @@ export type GrantZoneAccessInput = {
   permissions: Array<GrantPermission>;
   userId: Scalars['String']['input'];
   zoneId: Scalars['Float']['input'];
+};
+
+/** Help entry for in-game documentation */
+export type HelpEntryDto = {
+  __typename?: 'HelpEntryDto';
+  /** Category (e.g., spell, skill, command, class, area) */
+  category?: Maybe<Scalars['String']['output']>;
+  /** Class/circle requirements (e.g., {"Pyromancer": 7}) */
+  classes?: Maybe<Scalars['JSON']['output']>;
+  /** Full help text content */
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  /** Duration description */
+  duration?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Keywords for looking up this help entry */
+  keywords: Array<Scalars['String']['output']>;
+  /** Minimum player level to view (0 = all, 100+ = immortal only) */
+  minLevel: Scalars['Int']['output'];
+  /** Original help file this came from */
+  sourceFile?: Maybe<Scalars['String']['output']>;
+  /** Spell sphere (fire, water, healing, etc.) */
+  sphere?: Maybe<Scalars['String']['output']>;
+  /** Primary display title */
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  /** Usage syntax */
+  usage?: Maybe<Scalars['String']['output']>;
+};
+
+/** Filter options for help entries */
+export type HelpEntryFilterInput = {
+  /** Filter by category */
+  category?: InputMaybe<Scalars['String']['input']>;
+  /** Maximum minLevel to include */
+  maxMinLevel?: InputMaybe<Scalars['Int']['input']>;
+  /** Filter by sphere */
+  sphere?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type Hemisphere = 'NORTHEAST' | 'NORTHWEST' | 'SOUTHEAST' | 'SOUTHWEST';
@@ -949,6 +1090,9 @@ export type MobDto = {
   penetrationFlat: Scalars['Int']['output'];
   penetrationPercent: Scalars['Int']['output'];
   perception: Scalars['Int']['output'];
+  plainExamineDescription: Scalars['String']['output'];
+  plainName: Scalars['String']['output'];
+  plainRoomDescription: Scalars['String']['output'];
   position: Position;
   race: Race;
   resistanceAcid: Scalars['Int']['output'];
@@ -1101,9 +1245,12 @@ export type Mutation = {
   createCharacterItem: CharacterItemDto;
   createClass: ClassDto;
   createClassCircle: ClassCircleDto;
+  createEffect: Effect;
   createEquipmentSet: EquipmentSetDto;
   createEquipmentSetItem: EquipmentSetItemDto;
   createGrant: UserGrantDto;
+  /** Create a new help entry */
+  createHelpEntry: HelpEntryDto;
   createMob: MobDto;
   createMobEquipmentSet: MobEquipmentSetDto;
   createMobReset: MobResetDto;
@@ -1112,6 +1259,8 @@ export type Mutation = {
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
   createShop: ShopDto;
+  /** Create a new social command */
+  createSocial: SocialDto;
   createTrigger: TriggerDto;
   createZone: ZoneDto;
   deleteAbility: Scalars['Boolean']['output'];
@@ -1122,9 +1271,12 @@ export type Mutation = {
   deleteCharacterEffect: Scalars['Boolean']['output'];
   deleteCharacterItem: Scalars['Boolean']['output'];
   deleteClass: Scalars['Boolean']['output'];
+  deleteEffect: Scalars['Boolean']['output'];
   deleteEquipmentSet: Scalars['Boolean']['output'];
   deleteEquipmentSetItem: Scalars['Boolean']['output'];
   deleteGrant: Scalars['Boolean']['output'];
+  /** Delete a help entry */
+  deleteHelpEntry: Scalars['Boolean']['output'];
   deleteMob: MobDto;
   deleteMobEquipmentSet: Scalars['Boolean']['output'];
   deleteMobReset: Scalars['Boolean']['output'];
@@ -1136,6 +1288,8 @@ export type Mutation = {
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
   deleteShop: ShopDto;
+  /** Delete a social command */
+  deleteSocial: Scalars['Boolean']['output'];
   deleteTrigger: TriggerDto;
   deleteZone: ZoneDto;
   detachTrigger: TriggerDto;
@@ -1161,6 +1315,7 @@ export type Mutation = {
   /** Unlink a character from your user account */
   unlinkCharacter: Scalars['Boolean']['output'];
   updateAbility: Ability;
+  updateAbilityEffects: Ability;
   updateAbilityMessages: AbilityMessages;
   updateAbilityTargeting: AbilityTargeting;
   updateCharacter: CharacterDto;
@@ -1170,8 +1325,11 @@ export type Mutation = {
   updateClass: ClassDto;
   updateClassCircle: ClassCircleDto;
   updateClassSkill: ClassSkillDto;
+  updateEffect: Effect;
   updateEquipmentSet: EquipmentSetDto;
   updateGrant: UserGrantDto;
+  /** Update an existing help entry */
+  updateHelpEntry: HelpEntryDto;
   updateMob: MobDto;
   updateMobReset: MobResetDto;
   updateMobResetEquipment: Scalars['Boolean']['output'];
@@ -1184,6 +1342,8 @@ export type Mutation = {
   updateShop: ShopDto;
   updateShopHours: ShopDto;
   updateShopInventory: ShopDto;
+  /** Update an existing social command */
+  updateSocial: SocialDto;
   updateTrigger: TriggerDto;
   updateUser: User;
   updateUserPreferences: User;
@@ -1259,6 +1419,10 @@ export type MutationCreateClassCircleArgs = {
   data: CreateClassCircleInput;
 };
 
+export type MutationCreateEffectArgs = {
+  data: CreateEffectInput;
+};
+
 export type MutationCreateEquipmentSetArgs = {
   data: CreateEquipmentSetInput;
 };
@@ -1269,6 +1433,10 @@ export type MutationCreateEquipmentSetItemArgs = {
 
 export type MutationCreateGrantArgs = {
   data: CreateGrantInput;
+};
+
+export type MutationCreateHelpEntryArgs = {
+  data: CreateHelpEntryInput;
 };
 
 export type MutationCreateMobArgs = {
@@ -1301,6 +1469,10 @@ export type MutationCreateRoomExitArgs = {
 
 export type MutationCreateShopArgs = {
   data: CreateShopInput;
+};
+
+export type MutationCreateSocialArgs = {
+  data: CreateSocialInput;
 };
 
 export type MutationCreateTriggerArgs = {
@@ -1343,6 +1515,10 @@ export type MutationDeleteClassArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationDeleteEffectArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationDeleteEquipmentSetArgs = {
   id: Scalars['ID']['input'];
 };
@@ -1352,6 +1528,10 @@ export type MutationDeleteEquipmentSetItemArgs = {
 };
 
 export type MutationDeleteGrantArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type MutationDeleteHelpEntryArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -1401,6 +1581,10 @@ export type MutationDeleteRoomExitArgs = {
 export type MutationDeleteShopArgs = {
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
+};
+
+export type MutationDeleteSocialArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type MutationDeleteTriggerArgs = {
@@ -1481,6 +1665,11 @@ export type MutationUpdateAbilityArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationUpdateAbilityEffectsArgs = {
+  abilityId: Scalars['Int']['input'];
+  data: UpdateAbilityEffectsInput;
+};
+
 export type MutationUpdateAbilityMessagesArgs = {
   abilityId: Scalars['Int']['input'];
   data: UpdateAbilityMessagesInput;
@@ -1525,6 +1714,11 @@ export type MutationUpdateClassSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationUpdateEffectArgs = {
+  data: UpdateEffectInput;
+  id: Scalars['ID']['input'];
+};
+
 export type MutationUpdateEquipmentSetArgs = {
   data: UpdateEquipmentSetInput;
   id: Scalars['ID']['input'];
@@ -1532,6 +1726,11 @@ export type MutationUpdateEquipmentSetArgs = {
 
 export type MutationUpdateGrantArgs = {
   data: UpdateGrantInput;
+  id: Scalars['ID']['input'];
+};
+
+export type MutationUpdateHelpEntryArgs = {
+  data: UpdateHelpEntryInput;
   id: Scalars['ID']['input'];
 };
 
@@ -1603,6 +1802,11 @@ export type MutationUpdateShopInventoryArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type MutationUpdateSocialArgs = {
+  data: UpdateSocialInput;
+  id: Scalars['ID']['input'];
+};
+
 export type MutationUpdateTriggerArgs = {
   id: Scalars['Float']['input'];
   input: UpdateTriggerInput;
@@ -1621,6 +1825,12 @@ export type MutationUpdateZoneArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type ObjectAffectDto = {
+  __typename?: 'ObjectAffectDto';
+  location: Scalars['String']['output'];
+  modifier: Scalars['Int']['output'];
+};
+
 export type ObjectDto = {
   __typename?: 'ObjectDto';
   actionDescription?: Maybe<Scalars['String']['output']>;
@@ -1635,6 +1845,10 @@ export type ObjectDto = {
   keywords: Array<Scalars['String']['output']>;
   level: Scalars['Int']['output'];
   name: Scalars['String']['output'];
+  plainActionDescription?: Maybe<Scalars['String']['output']>;
+  plainExamineDescription: Scalars['String']['output'];
+  plainName: Scalars['String']['output'];
+  plainRoomDescription: Scalars['String']['output'];
   roomDescription: Scalars['String']['output'];
   timer: Scalars['Int']['output'];
   type: ObjectType;
@@ -1703,9 +1917,17 @@ export type ObjectFlag =
 export type ObjectSummaryDto = {
   __typename?: 'ObjectSummaryDto';
   cost?: Maybe<Scalars['Int']['output']>;
+  effectFlags?: Maybe<Array<Scalars['String']['output']>>;
+  examineDescription?: Maybe<Scalars['String']['output']>;
+  flags?: Maybe<Array<Scalars['String']['output']>>;
   id: Scalars['Int']['output'];
+  level?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
+  objectAffects?: Maybe<Array<ObjectAffectDto>>;
   type: Scalars['String']['output'];
+  values?: Maybe<Scalars['JSON']['output']>;
+  wearFlags?: Maybe<Array<Scalars['String']['output']>>;
+  weight?: Maybe<Scalars['Float']['output']>;
   zoneId: Scalars['Int']['output'];
 };
 
@@ -1767,7 +1989,6 @@ export type Query = {
   abilities: Array<Ability>;
   abilitiesCount: Scalars['Int']['output'];
   ability: Ability;
-  abilityByGameId?: Maybe<Ability>;
   abilitySchool: AbilitySchool;
   abilitySchools: Array<AbilitySchool>;
   activeCharacterEffects: Array<CharacterEffectDto>;
@@ -1798,6 +2019,16 @@ export type Query = {
   getValidationSummary: ValidationSummaryType;
   grant: UserGrantDto;
   grants: Array<UserGrantDto>;
+  /** Get a help entry by keyword */
+  helpByKeyword: HelpEntryDto;
+  /** Get all distinct help entry categories */
+  helpCategories: Array<Scalars['String']['output']>;
+  /** Get all help entries with optional filtering */
+  helpEntries: Array<HelpEntryDto>;
+  /** Get total count of help entries */
+  helpEntriesCount: Scalars['Int']['output'];
+  /** Get a single help entry by ID */
+  helpEntry: HelpEntryDto;
   me: User;
   mob: MobDto;
   mobReset?: Maybe<MobResetDto>;
@@ -1824,13 +2055,25 @@ export type Query = {
   rooms: Array<RoomDto>;
   roomsByZone: Array<RoomDto>;
   roomsCount: Scalars['Int']['output'];
+  /** Search help entries by keyword, title, or content */
+  searchHelp: Array<HelpEntryDto>;
   searchMobs: Array<MobDto>;
   searchObjects: Array<ObjectDto>;
+  /** Search socials by name pattern */
+  searchSocials: Array<SocialDto>;
   shop: ShopDto;
   shopByKeeper: ShopDto;
   shops: Array<ShopDto>;
   shopsByZone: Array<ShopDto>;
   shopsCount: Scalars['Int']['output'];
+  /** Get a single social by ID */
+  social: SocialDto;
+  /** Get a social by its command name */
+  socialByName: SocialDto;
+  /** Get all social commands */
+  socials: Array<SocialDto>;
+  /** Get total count of socials */
+  socialsCount: Scalars['Int']['output'];
   trigger: TriggerDto;
   triggers: Array<TriggerDto>;
   triggersByAttachment: Array<TriggerDto>;
@@ -1862,10 +2105,6 @@ export type QueryAbilitiesCountArgs = {
 
 export type QueryAbilityArgs = {
   id: Scalars['ID']['input'];
-};
-
-export type QueryAbilityByGameIdArgs = {
-  gameId: Scalars['String']['input'];
 };
 
 export type QueryAbilitySchoolArgs = {
@@ -1966,6 +2205,22 @@ export type QueryGrantsArgs = {
   userId?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type QueryHelpByKeywordArgs = {
+  keyword: Scalars['String']['input'];
+};
+
+export type QueryHelpEntriesArgs = {
+  filter?: InputMaybe<HelpEntryFilterInput>;
+};
+
+export type QueryHelpEntriesCountArgs = {
+  filter?: InputMaybe<HelpEntryFilterInput>;
+};
+
+export type QueryHelpEntryArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type QueryMobArgs = {
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -2042,6 +2297,11 @@ export type QueryRoomsCountArgs = {
   zoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type QuerySearchHelpArgs = {
+  filter?: InputMaybe<HelpEntryFilterInput>;
+  query: Scalars['String']['input'];
+};
+
 export type QuerySearchMobsArgs = {
   limit?: Scalars['Int']['input'];
   search: Scalars['String']['input'];
@@ -2052,6 +2312,10 @@ export type QuerySearchObjectsArgs = {
   limit?: Scalars['Int']['input'];
   search: Scalars['String']['input'];
   zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QuerySearchSocialsArgs = {
+  query: Scalars['String']['input'];
 };
 
 export type QueryShopArgs = {
@@ -2071,6 +2335,14 @@ export type QueryShopsArgs = {
 
 export type QueryShopsByZoneArgs = {
   zoneId: Scalars['Int']['input'];
+};
+
+export type QuerySocialArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QuerySocialByNameArgs = {
+  name: Scalars['String']['input'];
 };
 
 export type QueryTriggerArgs = {
@@ -2161,10 +2433,8 @@ export type RaceDto = {
   defaultComposition: Composition;
   defaultLifeforce: LifeForce;
   defaultSize: Size;
-  displayName: Scalars['String']['output'];
   expFactor: Scalars['Int']['output'];
   focusBonus: Scalars['Int']['output'];
-  fullName: Scalars['String']['output'];
   hpFactor: Scalars['Int']['output'];
   humanoid: Scalars['Boolean']['output'];
   keywords: Scalars['String']['output'];
@@ -2447,6 +2717,49 @@ export type SkillCategory =
   | 'RESTRICTED'
   | 'SECONDARY';
 
+/** Social command (emote/action) */
+export type SocialDto = {
+  __typename?: 'SocialDto';
+  /** Message to actor when targeting self */
+  charAuto?: Maybe<Scalars['String']['output']>;
+  /** Message to actor when target found */
+  charFound?: Maybe<Scalars['String']['output']>;
+  /** Message to actor when no target */
+  charNoArg?: Maybe<Scalars['String']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  /** Hide who initiated the action */
+  hide: Scalars['Boolean']['output'];
+  id: Scalars['ID']['output'];
+  /** Minimum position for the target */
+  minVictimPosition: Position;
+  /** Command name (e.g., smile, bow, hug) */
+  name: Scalars['String']['output'];
+  /** Message when target not found */
+  notFound?: Maybe<Scalars['String']['output']>;
+  /** Message to room when actor targets self */
+  othersAuto?: Maybe<Scalars['String']['output']>;
+  /** Message to room (excluding target) when target found */
+  othersFound?: Maybe<Scalars['String']['output']>;
+  /** Message to room when no target */
+  othersNoArg?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  /** Message to target */
+  victFound?: Maybe<Scalars['String']['output']>;
+};
+
+export type SpellSphere =
+  | 'AIR'
+  | 'DEATH'
+  | 'DIVINATION'
+  | 'EARTH'
+  | 'ENCHANTMENT'
+  | 'FIRE'
+  | 'GENERIC'
+  | 'HEALING'
+  | 'PROTECTION'
+  | 'SUMMONING'
+  | 'WATER';
+
 export type Stance =
   | 'ALERT'
   | 'DEAD'
@@ -2504,19 +2817,29 @@ export type UnlinkCharacterInput = {
   characterId: Scalars['ID']['input'];
 };
 
+export type UpdateAbilityEffectsInput = {
+  effects: Array<AbilityEffectItemInput>;
+};
+
 export type UpdateAbilityInput = {
   abilityType?: InputMaybe<Scalars['String']['input']>;
   castTimeRounds?: InputMaybe<Scalars['Int']['input']>;
+  combatOk?: InputMaybe<Scalars['Boolean']['input']>;
   cooldownMs?: InputMaybe<Scalars['Int']['input']>;
+  damageType?: InputMaybe<ElementType>;
   description?: InputMaybe<Scalars['String']['input']>;
-  gameId?: InputMaybe<Scalars['String']['input']>;
+  humanoidOnly?: InputMaybe<Scalars['Boolean']['input']>;
   inCombatOnly?: InputMaybe<Scalars['Boolean']['input']>;
   isArea?: InputMaybe<Scalars['Boolean']['input']>;
   luaScript?: InputMaybe<Scalars['String']['input']>;
+  memorizationTime?: InputMaybe<Scalars['Int']['input']>;
   minPosition?: InputMaybe<Position>;
   name?: InputMaybe<Scalars['String']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
+  pages?: InputMaybe<Scalars['Int']['input']>;
+  questOnly?: InputMaybe<Scalars['Boolean']['input']>;
   schoolId?: InputMaybe<Scalars['Int']['input']>;
+  sphere?: InputMaybe<SpellSphere>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   violent?: InputMaybe<Scalars['Boolean']['input']>;
 };
@@ -2608,6 +2931,15 @@ export type UpdateClassSkillInput = {
   minLevel?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateEffectInput = {
+  defaultParams?: InputMaybe<Scalars['JSON']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  effectType?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  paramSchema?: InputMaybe<Scalars['JSON']['input']>;
+  tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
 export type UpdateEquipmentSetInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
@@ -2617,6 +2949,28 @@ export type UpdateGrantInput = {
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
   permissions?: InputMaybe<Array<GrantPermission>>;
+};
+
+/** Input for updating a help entry */
+export type UpdateHelpEntryInput = {
+  /** Category (e.g., spell, skill, command) */
+  category?: InputMaybe<Scalars['String']['input']>;
+  /** Class/circle requirements */
+  classes?: InputMaybe<Scalars['JSON']['input']>;
+  /** Full help text content */
+  content?: InputMaybe<Scalars['String']['input']>;
+  /** Duration description */
+  duration?: InputMaybe<Scalars['String']['input']>;
+  /** Keywords for looking up this help entry */
+  keywords?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Minimum player level to view */
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  /** Spell sphere */
+  sphere?: InputMaybe<Scalars['String']['input']>;
+  /** Primary display title */
+  title?: InputMaybe<Scalars['String']['input']>;
+  /** Usage syntax */
+  usage?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateMobInput = {
@@ -2795,6 +3149,30 @@ export type UpdateShopInput = {
 
 export type UpdateShopInventoryInput = {
   items: Array<ShopItemInput>;
+};
+
+/** Input for updating a social command */
+export type UpdateSocialInput = {
+  /** Message to actor when targeting self */
+  charAuto?: InputMaybe<Scalars['String']['input']>;
+  /** Message to actor when target found */
+  charFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to actor when no target */
+  charNoArg?: InputMaybe<Scalars['String']['input']>;
+  /** Hide who initiated the action */
+  hide?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Minimum position for the target */
+  minVictimPosition?: InputMaybe<Position>;
+  /** Message when target not found */
+  notFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room when actor targets self */
+  othersAuto?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room (excluding target) when target found */
+  othersFound?: InputMaybe<Scalars['String']['input']>;
+  /** Message to room when no target */
+  othersNoArg?: InputMaybe<Scalars['String']['input']>;
+  /** Message to target */
+  victFound?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateTriggerInput = {
@@ -3028,6 +3406,124 @@ export type UpdateViewModeMutation = {
   };
 };
 
+export type GetHelpEntriesPageQueryVariables = Exact<{
+  filter?: InputMaybe<HelpEntryFilterInput>;
+}>;
+
+export type GetHelpEntriesPageQuery = {
+  __typename?: 'Query';
+  helpEntriesCount: number;
+  helpCategories: Array<string>;
+  helpEntries: Array<{
+    __typename?: 'HelpEntryDto';
+    id: string;
+    keywords: Array<string>;
+    title: string;
+    content: string;
+    minLevel: number;
+    category?: string | null;
+    usage?: string | null;
+    duration?: string | null;
+    sphere?: string | null;
+    classes?: any | null;
+    sourceFile?: string | null;
+    createdAt: any;
+    updatedAt: any;
+  }>;
+};
+
+export type SearchHelpPageQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+  filter?: InputMaybe<HelpEntryFilterInput>;
+}>;
+
+export type SearchHelpPageQuery = {
+  __typename?: 'Query';
+  searchHelp: Array<{
+    __typename?: 'HelpEntryDto';
+    id: string;
+    keywords: Array<string>;
+    title: string;
+    content: string;
+    minLevel: number;
+    category?: string | null;
+    usage?: string | null;
+    duration?: string | null;
+    sphere?: string | null;
+    classes?: any | null;
+    sourceFile?: string | null;
+  }>;
+};
+
+export type GetHelpByKeywordQueryVariables = Exact<{
+  keyword: Scalars['String']['input'];
+}>;
+
+export type GetHelpByKeywordQuery = {
+  __typename?: 'Query';
+  helpByKeyword: {
+    __typename?: 'HelpEntryDto';
+    id: string;
+    keywords: Array<string>;
+    title: string;
+    content: string;
+    minLevel: number;
+    category?: string | null;
+    usage?: string | null;
+    duration?: string | null;
+    sphere?: string | null;
+    classes?: any | null;
+    sourceFile?: string | null;
+  };
+};
+
+export type CreateHelpEntryPageMutationVariables = Exact<{
+  data: CreateHelpEntryInput;
+}>;
+
+export type CreateHelpEntryPageMutation = {
+  __typename?: 'Mutation';
+  createHelpEntry: {
+    __typename?: 'HelpEntryDto';
+    id: string;
+    keywords: Array<string>;
+    title: string;
+    content: string;
+    category?: string | null;
+  };
+};
+
+export type UpdateHelpEntryPageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateHelpEntryInput;
+}>;
+
+export type UpdateHelpEntryPageMutation = {
+  __typename?: 'Mutation';
+  updateHelpEntry: {
+    __typename?: 'HelpEntryDto';
+    id: string;
+    keywords: Array<string>;
+    title: string;
+    content: string;
+    minLevel: number;
+    category?: string | null;
+    usage?: string | null;
+    duration?: string | null;
+    sphere?: string | null;
+    classes?: any | null;
+  };
+};
+
+export type DeleteHelpEntryPageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type DeleteHelpEntryPageMutation = {
+  __typename?: 'Mutation';
+  deleteHelpEntry: boolean;
+};
+
 export type GetObjectInlineQueryVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -3110,7 +3606,7 @@ export type GetRacesInlineQuery = {
     __typename?: 'RaceDto';
     race: Race;
     name: string;
-    displayName: string;
+    plainName: string;
     playable: boolean;
     humanoid: boolean;
     magical: boolean;
@@ -3282,6 +3778,76 @@ export type DeleteShopInlineMutationVariables = Exact<{
 export type DeleteShopInlineMutation = {
   __typename?: 'Mutation';
   deleteShop: { __typename?: 'ShopDto'; id: number };
+};
+
+export type GetSocialsPageQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetSocialsPageQuery = {
+  __typename?: 'Query';
+  socialsCount: number;
+  socials: Array<{
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+    charFound?: string | null;
+    othersFound?: string | null;
+    victFound?: string | null;
+    notFound?: string | null;
+    charAuto?: string | null;
+    othersAuto?: string | null;
+  }>;
+};
+
+export type CreateSocialPageMutationVariables = Exact<{
+  data: CreateSocialInput;
+}>;
+
+export type CreateSocialPageMutation = {
+  __typename?: 'Mutation';
+  createSocial: {
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+  };
+};
+
+export type UpdateSocialPageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateSocialInput;
+}>;
+
+export type UpdateSocialPageMutation = {
+  __typename?: 'Mutation';
+  updateSocial: {
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+    charFound?: string | null;
+    othersFound?: string | null;
+    victFound?: string | null;
+    notFound?: string | null;
+    charAuto?: string | null;
+    othersAuto?: string | null;
+  };
+};
+
+export type DeleteSocialPageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type DeleteSocialPageMutation = {
+  __typename?: 'Mutation';
+  deleteSocial: boolean;
 };
 
 export type UsersInlineQueryVariables = Exact<{ [key: string]: never }>;
@@ -3685,20 +4251,34 @@ export type GetCharacterDetailsInlineQuery = {
     privilegeFlags: Array<string>;
     invisLevel: number;
     birthTime: any;
-    items?: Array<{
+    characterItems?: Array<{
       __typename?: 'CharacterItemDto';
       id: string;
       equippedLocation?: string | null;
       condition: number;
       charges: number;
-      objectPrototype: {
+      objects: {
         __typename?: 'ObjectSummaryDto';
         id: number;
+        zoneId: number;
         name: string;
         type: string;
+        examineDescription?: string | null;
+        weight?: number | null;
+        cost?: number | null;
+        level?: number | null;
+        values?: any | null;
+        flags?: Array<string> | null;
+        effectFlags?: Array<string> | null;
+        wearFlags?: Array<string> | null;
+        objectAffects?: Array<{
+          __typename?: 'ObjectAffectDto';
+          location: string;
+          modifier: number;
+        }> | null;
       };
     }> | null;
-    effects?: Array<{
+    characterEffects?: Array<{
       __typename?: 'CharacterEffectDto';
       id: string;
       effectName: string;
@@ -3708,23 +4288,6 @@ export type GetCharacterDetailsInlineQuery = {
       appliedAt: any;
       expiresAt?: any | null;
     }> | null;
-  };
-};
-
-export type GetCharacterSessionInfoInlineQueryVariables = Exact<{
-  characterId: Scalars['ID']['input'];
-}>;
-
-export type GetCharacterSessionInfoInlineQuery = {
-  __typename?: 'Query';
-  characterSessionInfo: {
-    __typename?: 'CharacterSessionInfoDto';
-    id: string;
-    name: string;
-    isOnline: boolean;
-    lastLogin?: any | null;
-    totalTimePlayed: number;
-    currentSessionTime: number;
   };
 };
 
@@ -3804,6 +4367,23 @@ export type ValidateCharacterPasswordInlineQueryVariables = Exact<{
 export type ValidateCharacterPasswordInlineQuery = {
   __typename?: 'Query';
   validateCharacterPassword: boolean;
+};
+
+export type GetCharacterSessionInfoPollingQueryVariables = Exact<{
+  characterId: Scalars['ID']['input'];
+}>;
+
+export type GetCharacterSessionInfoPollingQuery = {
+  __typename?: 'Query';
+  characterSessionInfo: {
+    __typename?: 'CharacterSessionInfoDto';
+    id: string;
+    name: string;
+    isOnline: boolean;
+    lastLogin?: any | null;
+    totalTimePlayed: number;
+    currentSessionTime: number;
+  };
 };
 
 export type GetEquipmentSetsQueryVariables = Exact<{ [key: string]: never }>;
@@ -4087,6 +4667,15 @@ export type UpdateMobResetEquipmentMutation = {
   updateMobResetEquipment: boolean;
 };
 
+export type GetCharacterNameForBreadcrumbQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type GetCharacterNameForBreadcrumbQuery = {
+  __typename?: 'Query';
+  character: { __typename?: 'CharacterDto'; id: string; name: string };
+};
+
 export type UpdateThemePreferenceMutationVariables = Exact<{
   input: UpdatePreferencesInput;
 }>;
@@ -4202,9 +4791,9 @@ export type GetAbilityDetailsQuery = {
     name: string;
     abilityType: string;
     description?: string | null;
-    gameId?: string | null;
     minPosition: Position;
     violent: boolean;
+    combatOk: boolean;
     castTimeRounds: number;
     cooldownMs: number;
     inCombatOnly: boolean;
@@ -4212,6 +4801,12 @@ export type GetAbilityDetailsQuery = {
     notes?: string | null;
     tags: Array<string>;
     luaScript?: string | null;
+    sphere?: SpellSphere | null;
+    damageType?: ElementType | null;
+    pages?: number | null;
+    memorizationTime: number;
+    questOnly: boolean;
+    humanoidOnly: boolean;
     school?: {
       __typename?: 'AbilitySchool';
       id: string;
@@ -4320,6 +4915,36 @@ export type DeleteAbilityMutationVariables = Exact<{
 export type DeleteAbilityMutation = {
   __typename?: 'Mutation';
   deleteAbility: boolean;
+};
+
+export type UpdateAbilityEffectsMutationVariables = Exact<{
+  abilityId: Scalars['Int']['input'];
+  data: UpdateAbilityEffectsInput;
+}>;
+
+export type UpdateAbilityEffectsMutation = {
+  __typename?: 'Mutation';
+  updateAbilityEffects: {
+    __typename?: 'Ability';
+    id: string;
+    name: string;
+    effects?: Array<{
+      __typename?: 'AbilityEffect';
+      effectId: string;
+      order: number;
+      chancePct: number;
+      trigger?: string | null;
+      condition?: string | null;
+      overrideParams?: any | null;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+        description?: string | null;
+      };
+    }> | null;
+  };
 };
 
 export type RequestPasswordResetMutationVariables = Exact<{
@@ -4647,6 +5272,7 @@ export type GetClassesQuery = {
     __typename?: 'ClassDto';
     id: string;
     name: string;
+    plainName: string;
     description?: string | null;
     hitDice: string;
     primaryStat?: string | null;
@@ -4714,6 +5340,7 @@ export type UpdateClassMutation = {
     __typename?: 'ClassDto';
     id: string;
     name: string;
+    plainName: string;
     description?: string | null;
     hitDice: string;
     primaryStat?: string | null;
@@ -4769,6 +5396,40 @@ export type RemoveClassCircleMutation = {
   removeClassCircle: boolean;
 };
 
+export type GetEffectEditorOptionsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetEffectEditorOptionsQuery = {
+  __typename?: 'Query';
+  zones: Array<{ __typename?: 'ZoneDto'; id: number; name: string }>;
+  effects: Array<{
+    __typename?: 'Effect';
+    id: string;
+    name: string;
+    effectType: string;
+    paramSchema?: any | null;
+  }>;
+  mobs: Array<{
+    __typename?: 'MobDto';
+    id: number;
+    zoneId: number;
+    plainName: string;
+  }>;
+  objects: Array<{
+    __typename?: 'ObjectDto';
+    id: number;
+    zoneId: number;
+    plainName: string;
+  }>;
+  triggers: Array<{
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    zoneId?: number | null;
+  }>;
+};
+
 export type GetEffectsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
@@ -4783,7 +5444,9 @@ export type GetEffectsQuery = {
     name: string;
     effectType: string;
     description?: string | null;
+    tags: Array<string>;
     defaultParams: any;
+    paramSchema?: any | null;
   }>;
 };
 
@@ -4808,8 +5471,56 @@ export type GetEffectQuery = {
     name: string;
     effectType: string;
     description?: string | null;
+    tags: Array<string>;
     defaultParams: any;
+    paramSchema?: any | null;
   };
+};
+
+export type CreateEffectMutationVariables = Exact<{
+  data: CreateEffectInput;
+}>;
+
+export type CreateEffectMutation = {
+  __typename?: 'Mutation';
+  createEffect: {
+    __typename?: 'Effect';
+    id: string;
+    name: string;
+    effectType: string;
+    description?: string | null;
+    tags: Array<string>;
+    defaultParams: any;
+    paramSchema?: any | null;
+  };
+};
+
+export type UpdateEffectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateEffectInput;
+}>;
+
+export type UpdateEffectMutation = {
+  __typename?: 'Mutation';
+  updateEffect: {
+    __typename?: 'Effect';
+    id: string;
+    name: string;
+    effectType: string;
+    description?: string | null;
+    tags: Array<string>;
+    defaultParams: any;
+    paramSchema?: any | null;
+  };
+};
+
+export type DeleteEffectMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type DeleteEffectMutation = {
+  __typename?: 'Mutation';
+  deleteEffect: boolean;
 };
 
 export type UpdateMobMutationVariables = Exact<{
@@ -5030,6 +5741,7 @@ export type SearchObjectsQuery = {
     id: number;
     zoneId: number;
     name: string;
+    plainName: string;
     type: ObjectType;
     level: number;
   }>;
@@ -5240,6 +5952,7 @@ export type SearchMobsQuery = {
     id: number;
     zoneId: number;
     name: string;
+    plainName: string;
     roomDescription: string;
     level: number;
     race: Race;
@@ -5254,7 +5967,7 @@ export type GetRacesQuery = {
     __typename?: 'RaceDto';
     race: Race;
     name: string;
-    displayName: string;
+    plainName: string;
     playable: boolean;
     humanoid: boolean;
     magical: boolean;
@@ -5272,7 +5985,7 @@ export type UpdateRaceMutation = {
     __typename?: 'RaceDto';
     race: Race;
     name: string;
-    displayName: string;
+    plainName: string;
     playable: boolean;
     humanoid: boolean;
     magical: boolean;
@@ -5533,6 +6246,118 @@ export type DeleteShopMutationVariables = Exact<{
 export type DeleteShopMutation = {
   __typename?: 'Mutation';
   deleteShop: { __typename?: 'ShopDto'; id: number };
+};
+
+export type GetSocialsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetSocialsQuery = {
+  __typename?: 'Query';
+  socialsCount: number;
+  socials: Array<{
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+    charFound?: string | null;
+    othersFound?: string | null;
+    victFound?: string | null;
+    notFound?: string | null;
+    charAuto?: string | null;
+    othersAuto?: string | null;
+  }>;
+};
+
+export type GetSocialQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type GetSocialQuery = {
+  __typename?: 'Query';
+  social: {
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+    charFound?: string | null;
+    othersFound?: string | null;
+    victFound?: string | null;
+    notFound?: string | null;
+    charAuto?: string | null;
+    othersAuto?: string | null;
+    createdAt: any;
+    updatedAt: any;
+  };
+};
+
+export type SearchSocialsQueryVariables = Exact<{
+  query: Scalars['String']['input'];
+}>;
+
+export type SearchSocialsQuery = {
+  __typename?: 'Query';
+  searchSocials: Array<{
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+  }>;
+};
+
+export type CreateSocialMutationVariables = Exact<{
+  data: CreateSocialInput;
+}>;
+
+export type CreateSocialMutation = {
+  __typename?: 'Mutation';
+  createSocial: {
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+  };
+};
+
+export type UpdateSocialMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateSocialInput;
+}>;
+
+export type UpdateSocialMutation = {
+  __typename?: 'Mutation';
+  updateSocial: {
+    __typename?: 'SocialDto';
+    id: string;
+    name: string;
+    hide: boolean;
+    minVictimPosition: Position;
+    charNoArg?: string | null;
+    othersNoArg?: string | null;
+    charFound?: string | null;
+    othersFound?: string | null;
+    victFound?: string | null;
+    notFound?: string | null;
+    charAuto?: string | null;
+    othersAuto?: string | null;
+  };
+};
+
+export type DeleteSocialMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type DeleteSocialMutation = {
+  __typename?: 'Mutation';
+  deleteSocial: boolean;
 };
 
 export type GetTriggersQueryVariables = Exact<{ [key: string]: never }>;
@@ -6018,6 +6843,401 @@ export const UpdateViewModeDocument = {
   UpdateViewModeMutation,
   UpdateViewModeMutationVariables
 >;
+export const GetHelpEntriesPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetHelpEntriesPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'HelpEntryFilterInput' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'helpEntries' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'usage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'classes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sourceFile' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'helpEntriesCount' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+            ],
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'helpCategories' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetHelpEntriesPageQuery,
+  GetHelpEntriesPageQueryVariables
+>;
+export const SearchHelpPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SearchHelpPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'query' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'HelpEntryFilterInput' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'searchHelp' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'query' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'query' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'usage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'classes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sourceFile' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SearchHelpPageQuery, SearchHelpPageQueryVariables>;
+export const GetHelpByKeywordDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetHelpByKeyword' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'keyword' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'helpByKeyword' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'keyword' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'keyword' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'usage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'classes' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sourceFile' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetHelpByKeywordQuery,
+  GetHelpByKeywordQueryVariables
+>;
+export const CreateHelpEntryPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateHelpEntryPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateHelpEntryInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createHelpEntry' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateHelpEntryPageMutation,
+  CreateHelpEntryPageMutationVariables
+>;
+export const UpdateHelpEntryPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateHelpEntryPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateHelpEntryInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateHelpEntry' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'usage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'classes' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateHelpEntryPageMutation,
+  UpdateHelpEntryPageMutationVariables
+>;
+export const DeleteHelpEntryPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteHelpEntryPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteHelpEntry' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteHelpEntryPageMutation,
+  DeleteHelpEntryPageMutationVariables
+>;
 export const GetObjectInlineDocument = {
   kind: 'Document',
   definitions: [
@@ -6298,7 +7518,7 @@ export const GetRacesInlineDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'race' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'playable' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'humanoid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'magical' } },
@@ -6837,6 +8057,226 @@ export const DeleteShopInlineDocument = {
 } as unknown as DocumentNode<
   DeleteShopInlineMutation,
   DeleteShopInlineMutationVariables
+>;
+export const GetSocialsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetSocialsPage' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'socials' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'victFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersAuto' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'socialsCount' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetSocialsPageQuery, GetSocialsPageQueryVariables>;
+export const CreateSocialPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateSocialPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateSocialInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateSocialPageMutation,
+  CreateSocialPageMutationVariables
+>;
+export const UpdateSocialPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSocialPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateSocialInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'victFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersAuto' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSocialPageMutation,
+  UpdateSocialPageMutationVariables
+>;
+export const DeleteSocialPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteSocialPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteSocialPageMutation,
+  DeleteSocialPageMutationVariables
 >;
 export const UsersInlineDocument = {
   kind: 'Document',
@@ -8148,7 +9588,7 @@ export const GetCharacterDetailsInlineDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'birthTime' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'items' },
+                  name: { kind: 'Name', value: 'characterItems' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
@@ -8167,7 +9607,7 @@ export const GetCharacterDetailsInlineDocument = {
                       },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'objectPrototype' },
+                        name: { kind: 'Name', value: 'objects' },
                         selectionSet: {
                           kind: 'SelectionSet',
                           selections: [
@@ -8177,11 +9617,67 @@ export const GetCharacterDetailsInlineDocument = {
                             },
                             {
                               kind: 'Field',
+                              name: { kind: 'Name', value: 'zoneId' },
+                            },
+                            {
+                              kind: 'Field',
                               name: { kind: 'Name', value: 'name' },
                             },
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'type' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'examineDescription',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'weight' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'cost' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'level' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'values' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'flags' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectFlags' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'wearFlags' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectAffects' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'location' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'modifier' },
+                                  },
+                                ],
+                              },
                             },
                           ],
                         },
@@ -8191,7 +9687,7 @@ export const GetCharacterDetailsInlineDocument = {
                 },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'effects' },
+                  name: { kind: 'Name', value: 'characterEffects' },
                   selectionSet: {
                     kind: 'SelectionSet',
                     selections: [
@@ -8233,68 +9729,6 @@ export const GetCharacterDetailsInlineDocument = {
 } as unknown as DocumentNode<
   GetCharacterDetailsInlineQuery,
   GetCharacterDetailsInlineQueryVariables
->;
-export const GetCharacterSessionInfoInlineDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'GetCharacterSessionInfoInline' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'characterId' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'characterSessionInfo' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'characterId' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'characterId' },
-                },
-              },
-            ],
-            selectionSet: {
-              kind: 'SelectionSet',
-              selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'isOnline' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'lastLogin' } },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'totalTimePlayed' },
-                },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'currentSessionTime' },
-                },
-              ],
-            },
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  GetCharacterSessionInfoInlineQuery,
-  GetCharacterSessionInfoInlineQueryVariables
 >;
 export const UpdateCharacterInlineDocument = {
   kind: 'Document',
@@ -8577,6 +10011,68 @@ export const ValidateCharacterPasswordInlineDocument = {
 } as unknown as DocumentNode<
   ValidateCharacterPasswordInlineQuery,
   ValidateCharacterPasswordInlineQueryVariables
+>;
+export const GetCharacterSessionInfoPollingDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetCharacterSessionInfoPolling' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'characterSessionInfo' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isOnline' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'lastLogin' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'totalTimePlayed' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'currentSessionTime' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetCharacterSessionInfoPollingQuery,
+  GetCharacterSessionInfoPollingQueryVariables
 >;
 export const GetEquipmentSetsDocument = {
   kind: 'Document',
@@ -9733,6 +11229,55 @@ export const UpdateMobResetEquipmentDocument = {
   UpdateMobResetEquipmentMutation,
   UpdateMobResetEquipmentMutationVariables
 >;
+export const GetCharacterNameForBreadcrumbDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetCharacterNameForBreadcrumb' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'character' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetCharacterNameForBreadcrumbQuery,
+  GetCharacterNameForBreadcrumbQueryVariables
+>;
 export const UpdateThemePreferenceDocument = {
   kind: 'Document',
   definitions: [
@@ -10175,9 +11720,9 @@ export const GetAbilityDetailsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'abilityType' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'gameId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'minPosition' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'violent' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'combatOk' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'castTimeRounds' },
@@ -10191,6 +11736,18 @@ export const GetAbilityDetailsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'notes' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'tags' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'luaScript' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'damageType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'pages' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'memorizationTime' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'questOnly' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'humanoidOnly' },
+                },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'school' },
@@ -10584,6 +12141,132 @@ export const DeleteAbilityDocument = {
 } as unknown as DocumentNode<
   DeleteAbilityMutation,
   DeleteAbilityMutationVariables
+>;
+export const UpdateAbilityEffectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateAbilityEffects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'abilityId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateAbilityEffectsInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateAbilityEffects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'abilityId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'abilityId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'effects' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectId' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'chancePct' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'trigger' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'condition' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'overrideParams' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effect' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'description' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateAbilityEffectsMutation,
+  UpdateAbilityEffectsMutationVariables
 >;
 export const RequestPasswordResetDocument = {
   kind: 'Document',
@@ -11649,6 +13332,7 @@ export const GetClassesDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'hitDice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'primaryStat' } },
@@ -11900,6 +13584,7 @@ export const UpdateClassDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'hitDice' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'primaryStat' } },
@@ -12104,6 +13789,105 @@ export const RemoveClassCircleDocument = {
   RemoveClassCircleMutation,
   RemoveClassCircleMutationVariables
 >;
+export const GetEffectEditorOptionsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetEffectEditorOptions' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'zones' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'effects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: { kind: 'IntValue', value: '1000' },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'paramSchema' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'mobs' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: { kind: 'IntValue', value: '1000' },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: { kind: 'IntValue', value: '1000' },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'triggers' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetEffectEditorOptionsQuery,
+  GetEffectEditorOptionsQueryVariables
+>;
 export const GetEffectsDocument = {
   kind: 'Document',
   definitions: [
@@ -12170,10 +13954,12 @@ export const GetEffectsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'effectType' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'tags' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'defaultParams' },
                 },
+                { kind: 'Field', name: { kind: 'Name', value: 'paramSchema' } },
               ],
             },
           },
@@ -12264,10 +14050,12 @@ export const GetEffectDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'effectType' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'tags' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'defaultParams' },
                 },
+                { kind: 'Field', name: { kind: 'Name', value: 'paramSchema' } },
               ],
             },
           },
@@ -12276,6 +14064,184 @@ export const GetEffectDocument = {
     },
   ],
 } as unknown as DocumentNode<GetEffectQuery, GetEffectQueryVariables>;
+export const CreateEffectDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateEffect' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateEffectInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createEffect' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'tags' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'defaultParams' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'paramSchema' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateEffectMutation,
+  CreateEffectMutationVariables
+>;
+export const UpdateEffectDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateEffect' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateEffectInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateEffect' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'tags' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'defaultParams' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'paramSchema' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateEffectMutation,
+  UpdateEffectMutationVariables
+>;
+export const DeleteEffectDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteEffect' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteEffect' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteEffectMutation,
+  DeleteEffectMutationVariables
+>;
 export const UpdateMobDocument = {
   kind: 'Document',
   definitions: [
@@ -12908,6 +14874,7 @@ export const SearchObjectsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'level' } },
               ],
@@ -13620,6 +15587,7 @@ export const SearchMobsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'roomDescription' },
@@ -13652,7 +15620,7 @@ export const GetRacesDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'race' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'playable' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'humanoid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'magical' } },
@@ -13721,7 +15689,7 @@ export const UpdateRaceDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'race' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'plainName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'playable' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'humanoid' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'magical' } },
@@ -14841,6 +16809,346 @@ export const DeleteShopDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteShopMutation, DeleteShopMutationVariables>;
+export const GetSocialsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetSocials' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'socials' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'victFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersAuto' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'socialsCount' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetSocialsQuery, GetSocialsQueryVariables>;
+export const GetSocialDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetSocial' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'social' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'victFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetSocialQuery, GetSocialQueryVariables>;
+export const SearchSocialsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'SearchSocials' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'query' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'searchSocials' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'query' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'query' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<SearchSocialsQuery, SearchSocialsQueryVariables>;
+export const CreateSocialDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateSocial' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateSocialInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateSocialMutation,
+  CreateSocialMutationVariables
+>;
+export const UpdateSocialDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSocial' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateSocialInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hide' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'minVictimPosition' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'charNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersNoArg' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'victFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'notFound' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'charAuto' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'othersAuto' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSocialMutation,
+  UpdateSocialMutationVariables
+>;
+export const DeleteSocialDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteSocial' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteSocial' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteSocialMutation,
+  DeleteSocialMutationVariables
+>;
 export const GetTriggersDocument = {
   kind: 'Document',
   definitions: [

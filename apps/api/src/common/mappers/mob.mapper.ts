@@ -6,15 +6,28 @@ function buildDice(num: number, size: number, bonus: number): string {
   return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
 }
 
+// Extract resistance value from JSON resistances object
+function getResistance(resistances: unknown, key: string): number {
+  if (!resistances || typeof resistances !== 'object') return 0;
+  const value = (resistances as Record<string, unknown>)[key];
+  return typeof value === 'number' ? value : 0;
+}
+
 export function mapMob(db: MobMapperSource): MobDto {
+  // Parse resistances JSON field
+  const resistances = db.resistances ?? {};
+
   const dto: MobDto = {
     id: db.id,
     zoneId: db.zoneId,
     keywords: db.keywords,
     name: db.name,
+    plainName: db.plainName,
     role: db.role,
     roomDescription: db.roomDescription,
+    plainRoomDescription: db.plainRoomDescription,
     examineDescription: db.examineDescription,
+    plainExamineDescription: db.plainExamineDescription,
     level: db.level,
     alignment: db.alignment,
     hitRoll: db.hitRoll,
@@ -30,11 +43,11 @@ export function mapMob(db: MobMapperSource): MobDto {
     soak: db.soak,
     hardness: db.hardness,
     wardPercent: db.wardPercent,
-    resistanceFire: db.resistanceFire,
-    resistanceCold: db.resistanceCold,
-    resistanceLightning: db.resistanceLightning,
-    resistanceAcid: db.resistanceAcid,
-    resistancePoison: db.resistancePoison,
+    resistanceFire: getResistance(resistances, 'FIRE'),
+    resistanceCold: getResistance(resistances, 'COLD'),
+    resistanceLightning: getResistance(resistances, 'LIGHTNING'),
+    resistanceAcid: getResistance(resistances, 'ACID'),
+    resistancePoison: getResistance(resistances, 'POISON'),
     hpDice: buildDice(db.hpDiceNum, db.hpDiceSize, db.hpDiceBonus),
     damageDice: buildDice(
       db.damageDiceNum,

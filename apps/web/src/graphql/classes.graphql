@@ -4,6 +4,7 @@ query GetClasses {
   classes {
     id
     name
+    plainName
     description
     hitDice
     primaryStat
@@ -49,6 +50,7 @@ mutation UpdateClass($id: ID!, $data: UpdateClassInput!) {
   updateClass(id: $id, data: $data) {
     id
     name
+    plainName
     description
     hitDice
     primaryStat

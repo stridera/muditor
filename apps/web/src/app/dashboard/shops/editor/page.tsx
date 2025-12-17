@@ -68,7 +68,7 @@ function MessageList({
   };
   return (
     <div>
-      <h4 className='text-sm font-medium text-gray-900 mb-2'>{title}</h4>
+      <h4 className='text-sm font-medium text-foreground mb-2'>{title}</h4>
       <div className='space-y-2'>
         {values.map((val, idx) => (
           <div key={idx} className='flex gap-2 items-start'>
@@ -77,12 +77,12 @@ function MessageList({
               value={val}
               onChange={e => updateValue(idx, e.target.value)}
               placeholder={placeholder}
-              className='flex-1 rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm'
+              className='flex-1 rounded-md border-input shadow-sm focus:ring-ring focus:border-ring text-sm'
             />
             <button
               type='button'
               onClick={() => removeRow(idx)}
-              className='text-red-600 hover:text-red-800 p-1'
+              className='text-destructive hover:text-destructive/90 p-1'
               aria-label={`Remove ${title} row ${idx + 1}`}
             >
               <Trash2 className='w-4 h-4' />
@@ -92,7 +92,7 @@ function MessageList({
         <button
           type='button'
           onClick={addRow}
-          className='inline-flex items-center text-sm text-blue-600 hover:text-blue-800'
+          className='inline-flex items-center text-sm text-primary hover:text-primary/90'
         >
           <Plus className='w-3 h-3 mr-1' /> Add{' '}
           {title.replace(/ Messages?$/, '')} Message
@@ -512,7 +512,7 @@ function ShopEditorContent() {
       );
 
       if (isNew) {
-        if (!formData.id || formData.id <= 0) {
+        if (formData.id == null) {
           setGeneralError('Shop ID is required for creation');
           return;
         }
@@ -644,7 +644,7 @@ function ShopEditorContent() {
   if (loading) return <div className='p-4'>Loading shop data...</div>;
   if (error) {
     const msg = (error as { message?: string })?.message || 'Unknown error';
-    return <div className='p-4 text-red-600'>Error: {msg}</div>;
+    return <div className='p-4 text-destructive'>Error: {msg}</div>;
   }
 
   const tabs = [
@@ -659,7 +659,7 @@ function ShopEditorContent() {
       {/* Header */}
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-gray-900'>
+          <h1 className='text-3xl font-bold text-foreground'>
             {isNew
               ? 'Create New Shop'
               : data?.shop?.keeper?.name
@@ -668,13 +668,13 @@ function ShopEditorContent() {
                   ? `Shop: Zone ${formData.zoneId}, ID ${shopId}`
                   : `Shop ${shopId}`}
           </h1>
-          <p className='text-gray-600 mt-1'>
+          <p className='text-muted-foreground mt-1'>
             Configure shop inventory, pricing, and trading policies
           </p>
         </div>
         <div className='flex gap-2'>
           <Link href='/dashboard/shops'>
-            <button className='inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50'>
+            <button className='inline-flex items-center px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-card hover:bg-accent'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Shops
             </button>
@@ -682,7 +682,7 @@ function ShopEditorContent() {
           <button
             onClick={handleSave}
             disabled={updateLoading || createLoading}
-            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50'
+            className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 disabled:opacity-50'
           >
             <Save className='w-4 h-4 mr-2' />
             {isNew ? 'Create Shop' : 'Save Changes'}
@@ -691,7 +691,7 @@ function ShopEditorContent() {
       </div>
 
       {generalError && (
-        <div className='bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded mb-4'>
+        <div className='bg-destructive/10 border border-destructive text-destructive px-4 py-3 rounded mb-4'>
           {generalError}
         </div>
       )}
@@ -705,8 +705,8 @@ function ShopEditorContent() {
               onClick={() => setActiveTab(tab.id)}
               className={`py-2 px-1 border-b-2 font-medium text-sm ${
                 activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  ? 'border-primary text-primary'
+                  : 'border-transparent text-muted-foreground hover:text-muted-foreground hover:border-input'
               }`}
             >
               {tab.label}
@@ -720,15 +720,15 @@ function ShopEditorContent() {
         {/* Basic Information Tab */}
         {activeTab === 'basic' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Pricing & Profits
               </h3>
               <div className='space-y-4'>
                 <div>
                   <label
                     htmlFor='buyProfit'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Buy Profit Margin *
                   </label>
@@ -744,16 +744,16 @@ function ShopEditorContent() {
                         parseFloat(e.target.value) || 1.0
                       )
                     }
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.buyProfit ? 'border-red-300' : 'border-gray-300'
+                    className={`block w-full rounded-md shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                      errors.buyProfit ? 'border-destructive' : 'border-input'
                     }`}
                   />
                   {errors.buyProfit && (
-                    <p className='text-red-500 text-xs mt-1'>
+                    <p className='text-destructive text-xs mt-1'>
                       {errors.buyProfit}
                     </p>
                   )}
-                  <p className='text-xs text-gray-500 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Multiplier for buying from players (1.0 = 100%)
                   </p>
                 </div>
@@ -761,7 +761,7 @@ function ShopEditorContent() {
                 <div>
                   <label
                     htmlFor='sellProfit'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Sell Profit Margin *
                   </label>
@@ -777,16 +777,16 @@ function ShopEditorContent() {
                         parseFloat(e.target.value) || 1.0
                       )
                     }
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.sellProfit ? 'border-red-300' : 'border-gray-300'
+                    className={`block w-full rounded-md shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
+                      errors.sellProfit ? 'border-destructive' : 'border-input'
                     }`}
                   />
                   {errors.sellProfit && (
-                    <p className='text-red-500 text-xs mt-1'>
+                    <p className='text-destructive text-xs mt-1'>
                       {errors.sellProfit}
                     </p>
                   )}
-                  <p className='text-xs text-gray-500 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Multiplier for selling to players (1.0 = 100%)
                   </p>
                 </div>
@@ -794,7 +794,7 @@ function ShopEditorContent() {
                 <div>
                   <label
                     htmlFor='temper'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Shopkeeper Temper
                   </label>
@@ -807,24 +807,24 @@ function ShopEditorContent() {
                     onChange={e =>
                       handleInputChange('temper', parseInt(e.target.value) || 0)
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
-                  <p className='text-xs text-gray-500 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     0 = calm, 100 = very aggressive
                   </p>
                 </div>
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Shop Details
               </h3>
               <div className='space-y-4'>
                 <div>
                   <label
                     htmlFor='id'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Shop ID *
                   </label>
@@ -836,16 +836,16 @@ function ShopEditorContent() {
                       handleInputChange('id', parseInt(e.target.value) || 0)
                     }
                     disabled={!isNew}
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${errors.id ? 'border-red-300' : 'border-gray-300'}`}
+                    className={`block w-full rounded-md shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${errors.id ? 'border-destructive' : 'border-input'}`}
                   />
                   {errors.id && (
-                    <p className='text-red-500 text-xs mt-1'>{errors.id}</p>
+                    <p className='text-destructive text-xs mt-1'>{errors.id}</p>
                   )}
                 </div>
                 <div>
                   <label
                     htmlFor='keeperId'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Shopkeeper
                   </label>
@@ -858,7 +858,7 @@ function ShopEditorContent() {
                         parseInt(e.target.value) || 0
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   >
                     <option value=''>No shopkeeper</option>
                     {mobsData?.mobsByZone?.map(
@@ -877,7 +877,7 @@ function ShopEditorContent() {
                 <div>
                   <label
                     htmlFor='zoneId'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Zone ID
                   </label>
@@ -891,13 +891,13 @@ function ShopEditorContent() {
                         parseInt(e.target.value) || 511
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
               </div>
 
               <div className='mt-6'>
-                <h4 className='text-sm font-medium text-gray-900 mb-3'>
+                <h4 className='text-sm font-medium text-foreground mb-3'>
                   Operating Hours
                 </h4>
                 <div className='space-y-2'>
@@ -912,7 +912,7 @@ function ShopEditorContent() {
                             parseInt(e.target.value)
                           )
                         }
-                        className='rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm'
+                        className='rounded-md border-input shadow-sm focus:ring-ring focus:border-ring text-sm'
                       >
                         {Array.from({ length: 24 }, (_, i) => (
                           <option key={i} value={i}>
@@ -920,7 +920,7 @@ function ShopEditorContent() {
                           </option>
                         ))}
                       </select>
-                      <span className='text-sm text-gray-500'>to</span>
+                      <span className='text-sm text-muted-foreground'>to</span>
                       <select
                         value={hour.closeHour}
                         onChange={e =>
@@ -930,7 +930,7 @@ function ShopEditorContent() {
                             parseInt(e.target.value)
                           )
                         }
-                        className='rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 text-sm'
+                        className='rounded-md border-input shadow-sm focus:ring-ring focus:border-ring text-sm'
                       >
                         {Array.from({ length: 24 }, (_, i) => (
                           <option key={i} value={i}>
@@ -940,7 +940,7 @@ function ShopEditorContent() {
                       </select>
                       <button
                         onClick={() => removeShopHour(index)}
-                        className='text-red-600 hover:text-red-800 p-1'
+                        className='text-destructive hover:text-destructive/90 p-1'
                       >
                         <Trash2 className='w-3 h-3' />
                       </button>
@@ -948,7 +948,7 @@ function ShopEditorContent() {
                   ))}
                   <button
                     onClick={addShopHour}
-                    className='text-sm text-blue-600 hover:text-blue-800 inline-flex items-center'
+                    className='text-sm text-primary hover:text-primary/90 inline-flex items-center'
                   >
                     <Plus className='w-3 h-3 mr-1' />
                     Add Hours
@@ -962,14 +962,14 @@ function ShopEditorContent() {
         {/* Inventory Tab */}
         {activeTab === 'inventory' && (
           <div className='space-y-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
+            <div className='bg-card shadow rounded-lg p-6'>
               <div className='flex items-center justify-between mb-4'>
-                <h3 className='text-lg font-medium text-gray-900'>
+                <h3 className='text-lg font-medium text-foreground'>
                   Shop Inventory
                 </h3>
                 <button
                   onClick={openAddItemModal}
-                  className='inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700'
+                  className='inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary/90'
                 >
                   <Plus className='w-4 h-4 mr-1' />
                   Add Item
@@ -983,7 +983,7 @@ function ShopEditorContent() {
                     className='flex items-center gap-4 p-3 border rounded-lg'
                   >
                     <div className='flex-1'>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Object
                       </label>
                       <select
@@ -1002,7 +1002,7 @@ function ShopEditorContent() {
                           };
                           setShopItems(newItems);
                         }}
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                       >
                         <option value='0:0'>Select object</option>
                         {objectsData?.objectsByZone?.map(
@@ -1019,7 +1019,7 @@ function ShopEditorContent() {
                     </div>
 
                     <div className='w-24'>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Stock
                       </label>
                       <input
@@ -1033,13 +1033,13 @@ function ShopEditorContent() {
                             parseInt(e.target.value) || 0
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                       />
                     </div>
 
                     <button
                       onClick={() => removeShopItem(index)}
-                      className='text-red-600 hover:text-red-800 p-2'
+                      className='text-destructive hover:text-destructive/90 p-2'
                     >
                       <Trash2 className='w-4 h-4' />
                     </button>
@@ -1047,18 +1047,18 @@ function ShopEditorContent() {
                 ))}
 
                 {shopItems.length === 0 && (
-                  <div className='text-center py-8 text-gray-500'>
+                  <div className='text-center py-8 text-muted-foreground'>
                     No items in inventory. Click "Add Item" to start.
                   </div>
                 )}
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Accepted Item Types
               </h3>
-              <p className='text-sm text-gray-600 mb-4'>
+              <p className='text-sm text-muted-foreground mb-4'>
                 Select which types of objects this shop will buy from players.
               </p>
               <div className='grid grid-cols-3 gap-2'>
@@ -1068,9 +1068,9 @@ function ShopEditorContent() {
                       type='checkbox'
                       checked={acceptedTypes.includes(type)}
                       onChange={() => handleAcceptedTypeToggle(type)}
-                      className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                      className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring/20 focus:ring-opacity-50'
                     />
-                    <span className='ml-2 text-sm text-gray-700'>
+                    <span className='ml-2 text-sm text-muted-foreground'>
                       {type.replace('_', ' ').toLowerCase()}
                     </span>
                   </label>
@@ -1083,8 +1083,8 @@ function ShopEditorContent() {
         {/* Settings Tab */}
         {activeTab === 'settings' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Shop Flags
               </h3>
               <div className='space-y-2'>
@@ -1094,9 +1094,9 @@ function ShopEditorContent() {
                       type='checkbox'
                       checked={selectedFlags.includes(flag)}
                       onChange={() => handleFlagToggle(flag, 'shop')}
-                      className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                      className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring/20 focus:ring-opacity-50'
                     />
-                    <span className='ml-2 text-sm text-gray-700'>
+                    <span className='ml-2 text-sm text-muted-foreground'>
                       {flag.replace('_', ' ').toLowerCase()}
                     </span>
                   </label>
@@ -1104,8 +1104,8 @@ function ShopEditorContent() {
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Trading Policies
               </h3>
               <div className='space-y-2'>
@@ -1124,9 +1124,9 @@ function ShopEditorContent() {
                       type='checkbox'
                       checked={selectedTradesWithFlags.includes(flag)}
                       onChange={() => handleFlagToggle(flag, 'tradesWith')}
-                      className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                      className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring/20 focus:ring-opacity-50'
                     />
-                    <span className='ml-2 text-sm text-gray-700'>
+                    <span className='ml-2 text-sm text-muted-foreground'>
                       Trades with {flag.toLowerCase()}s
                     </span>
                   </label>
@@ -1138,11 +1138,11 @@ function ShopEditorContent() {
 
         {/* Messages Tab */}
         {activeTab === 'messages' && (
-          <div className='bg-white shadow rounded-lg p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          <div className='bg-card shadow rounded-lg p-6'>
+            <h3 className='text-lg font-medium text-foreground mb-4'>
               Shop Messages
             </h3>
-            <p className='text-sm text-gray-600 mb-4'>
+            <p className='text-sm text-muted-foreground mb-4'>
               Add, edit, or remove messages. Empty lines will be ignored when
               saving.
             </p>
@@ -1189,14 +1189,14 @@ function ShopEditorContent() {
       {/* Add Item Modal */}
       {showAddItemModal && (
         <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
-          <div className='bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'>
+          <div className='bg-card rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'>
             <div className='flex items-center justify-between mb-4'>
-              <h2 className='text-xl font-semibold text-gray-900'>
+              <h2 className='text-xl font-semibold text-foreground'>
                 Add Item to Inventory
               </h2>
               <button
                 onClick={closeAddItemModal}
-                className='text-gray-400 hover:text-gray-600'
+                className='text-muted-foreground hover:text-muted-foreground'
               >
                 <X className='w-6 h-6' />
               </button>
@@ -1204,7 +1204,7 @@ function ShopEditorContent() {
 
             <div className='space-y-4'>
               <div>
-                <label className='block text-sm font-medium text-gray-700 mb-2'>
+                <label className='block text-sm font-medium text-muted-foreground mb-2'>
                   Select Zone
                 </label>
                 <select
@@ -1212,7 +1212,7 @@ function ShopEditorContent() {
                   onChange={e =>
                     setModalSelectedZoneId(parseInt(e.target.value))
                   }
-                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                  className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                 >
                   <option value={0}>Select a zone</option>
                   {zonesData?.zones?.map(
@@ -1228,7 +1228,7 @@ function ShopEditorContent() {
               {modalSelectedZoneId > 0 && (
                 <>
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <label className='block text-sm font-medium text-muted-foreground mb-2'>
                       Select Object
                     </label>
                     <select
@@ -1236,7 +1236,7 @@ function ShopEditorContent() {
                       onChange={e =>
                         setModalSelectedObjectId(parseInt(e.target.value))
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     >
                       <option value={0}>Select an object</option>
                       {modalObjectsData?.objectsByZone?.map(
@@ -1255,7 +1255,7 @@ function ShopEditorContent() {
                   </div>
 
                   <div>
-                    <label className='block text-sm font-medium text-gray-700 mb-2'>
+                    <label className='block text-sm font-medium text-muted-foreground mb-2'>
                       Initial Stock Amount
                     </label>
                     <input
@@ -1265,7 +1265,7 @@ function ShopEditorContent() {
                       onChange={e =>
                         setModalAmount(parseInt(e.target.value) || 0)
                       }
-                      className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                      className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                     />
                   </div>
                 </>
@@ -1275,14 +1275,14 @@ function ShopEditorContent() {
             <div className='flex justify-end gap-3 mt-6'>
               <button
                 onClick={closeAddItemModal}
-                className='px-4 py-2 border border-gray-300 rounded-md text-sm font-medium text-gray-700 hover:bg-gray-50'
+                className='px-4 py-2 border border-input rounded-md text-sm font-medium text-muted-foreground hover:bg-accent'
               >
                 Cancel
               </button>
               <button
                 onClick={confirmAddItem}
                 disabled={!modalSelectedObjectId || !modalSelectedZoneId}
-                className='px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed'
+                className='px-4 py-2 border border-transparent rounded-md text-sm font-medium text-white bg-primary hover:bg-primary/90 disabled:bg-muted disabled:cursor-not-allowed'
               >
                 Add Item
               </button>

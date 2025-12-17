@@ -49,12 +49,17 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { TypeBadge } from '@/components/ui/type-badge';
 import {
+  EffectEditor,
+  type AbilityEffectOutput,
+} from '@/components/EffectEditor';
+import {
   CreateAbilityDocument,
   DeleteAbilityDocument,
   GetAbilitiesDocument,
   GetAbilityDetailsDocument,
   GetAbilitySchoolsDocument,
   UpdateAbilityDocument,
+  UpdateAbilityEffectsDocument,
   type Ability,
   type AbilitySchool,
   type CreateAbilityInput,
@@ -62,6 +67,7 @@ import {
   type CreateAbilityMutationVariables,
   type DeleteAbilityMutation,
   type DeleteAbilityMutationVariables,
+  type ElementType,
   type GetAbilitiesQuery,
   type GetAbilitiesQueryVariables,
   type GetAbilityDetailsQuery,
@@ -69,8 +75,11 @@ import {
   type GetAbilitySchoolsQuery,
   type GetAbilitySchoolsQueryVariables,
   type Position,
+  type SpellSphere,
   type UpdateAbilityMutation,
   type UpdateAbilityMutationVariables,
+  type UpdateAbilityEffectsMutation,
+  type UpdateAbilityEffectsMutationVariables,
 } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -126,17 +135,53 @@ interface AbilityFormData {
   schoolId: number | undefined; // explicit undefined instead of optional property
   minPosition: Position;
   violent: boolean;
+  combatOk: boolean;
   castTimeRounds: number;
   cooldownMs: number;
   inCombatOnly: boolean;
   isArea: boolean;
   notes: string;
   tags: string[];
+  // Spell metadata
+  sphere: string | undefined;
+  damageType: string | undefined;
+  pages: number | undefined;
+  memorizationTime: number;
+  questOnly: boolean;
+  humanoidOnly: boolean;
 }
 
 const ABILITY_TYPES = ['SPELL', 'SKILL', 'SONG', 'CHANT'];
 
 const POSITIONS = ['PRONE', 'SITTING', 'KNEELING', 'STANDING', 'FLYING'];
+
+const SPELL_SPHERES = [
+  'GENERIC',
+  'FIRE',
+  'WATER',
+  'EARTH',
+  'AIR',
+  'HEALING',
+  'PROTECTION',
+  'ENCHANTMENT',
+  'SUMMONING',
+  'DEATH',
+  'DIVINATION',
+];
+
+const ELEMENT_TYPES = [
+  'PHYSICAL',
+  'FIRE',
+  'COLD',
+  'ACID',
+  'SHOCK',
+  'POISON',
+  'MAGIC',
+  'HOLY',
+  'UNHOLY',
+  'MENTAL',
+  'HEAL',
+];
 
 // Icon mapping removed; TypeBadge handles visual differentiation.
 
@@ -166,6 +211,8 @@ export default function AbilitiesPage() {
   const [deleteAbility, setDeleteAbility] = useState<AbilitySummary | null>(
     null
   );
+  const [editingEffects, setEditingEffects] = useState(false);
+  const [editedEffects, setEditedEffects] = useState<AbilityEffectOutput[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -185,6 +232,7 @@ export default function AbilitiesPage() {
       abilityType: abilityTypeFilter === 'ALL' ? undefined : abilityTypeFilter,
       search: debouncedSearchTerm || undefined,
     },
+    fetchPolicy: 'network-only', // Always fetch fresh data to pick up effect changes
   });
 
   const { data: schoolsData } = useQuery<
@@ -198,6 +246,7 @@ export default function AbilitiesPage() {
   >(GetAbilityDetailsDocument, {
     variables: { id: viewingAbilityId! },
     skip: !viewingAbilityId,
+    fetchPolicy: 'network-only', // Always fetch fresh data to pick up effect changes
   });
 
   const [createAbilityMutation, { loading: creating }] = useMutation<
@@ -252,6 +301,24 @@ export default function AbilitiesPage() {
     },
   });
 
+  const [updateAbilityEffectsMutation, { loading: savingEffects }] =
+    useMutation<
+      UpdateAbilityEffectsMutation,
+      UpdateAbilityEffectsMutationVariables
+    >(UpdateAbilityEffectsDocument, {
+      onCompleted: () => {
+        setSuccessMessage('Effects updated successfully');
+        setErrorMessage('');
+        setEditingEffects(false);
+        refetch();
+        setTimeout(() => setSuccessMessage(''), 5000);
+      },
+      onError: error => {
+        setErrorMessage(error.message);
+        setSuccessMessage('');
+      },
+    });
+
   const abilities = data?.abilities || [];
   const totalCount = data?.abilitiesCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -290,6 +357,55 @@ export default function AbilitiesPage() {
     setDeleteAbility(ability);
   };
 
+  const handleEditEffects = () => {
+    if (abilityDetailsData?.ability?.effects) {
+      setEditedEffects(
+        abilityDetailsData.ability.effects
+          .sort((a, b) => a.order - b.order)
+          .map(effect => ({
+            effectId:
+              typeof effect.effectId === 'string'
+                ? parseInt(effect.effectId, 10)
+                : effect.effectId,
+            overrideParams:
+              (effect.overrideParams as Record<string, unknown>) || {},
+            order: effect.order,
+            trigger: effect.trigger || undefined,
+            chancePct: effect.chancePct,
+            condition: effect.condition || undefined,
+          }))
+      );
+    } else {
+      setEditedEffects([]);
+    }
+    setEditingEffects(true);
+  };
+
+  const handleCancelEditEffects = () => {
+    setEditingEffects(false);
+    setEditedEffects([]);
+  };
+
+  const handleSaveEffects = () => {
+    if (viewingAbilityId) {
+      updateAbilityEffectsMutation({
+        variables: {
+          abilityId: parseInt(viewingAbilityId, 10),
+          data: {
+            effects: editedEffects.map(effect => ({
+              effectId: effect.effectId,
+              overrideParams: effect.overrideParams,
+              order: effect.order,
+              trigger: effect.trigger,
+              chancePct: effect.chancePct,
+              condition: effect.condition,
+            })),
+          },
+        },
+      });
+    }
+  };
+
   const confirmDelete = () => {
     if (deleteAbility) {
       deleteAbilityMutation({ variables: { id: deleteAbility.id } });
@@ -304,12 +420,20 @@ export default function AbilitiesPage() {
       schoolId: formData.schoolId || undefined,
       minPosition: formData.minPosition,
       violent: formData.violent,
+      combatOk: formData.combatOk,
       castTimeRounds: formData.castTimeRounds,
       cooldownMs: formData.cooldownMs,
       inCombatOnly: formData.inCombatOnly,
       isArea: formData.isArea,
       notes: formData.notes || undefined,
       tags: formData.tags,
+      // Spell metadata
+      sphere: (formData.sphere || undefined) as SpellSphere | undefined,
+      damageType: (formData.damageType || undefined) as ElementType | undefined,
+      pages: formData.pages || undefined,
+      memorizationTime: formData.memorizationTime,
+      questOnly: formData.questOnly,
+      humanoidOnly: formData.humanoidOnly,
     };
 
     if (editingAbility) {
@@ -745,15 +869,26 @@ export default function AbilitiesPage() {
       {/* Ability Details View Dialog */}
       <Dialog
         open={!!viewingAbilityId}
-        onOpenChange={open => !open && setViewingAbilityId(null)}
+        onOpenChange={open => {
+          if (!open) {
+            setViewingAbilityId(null);
+            setEditingEffects(false);
+            setEditedEffects([]);
+          }
+        }}
       >
         <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
           {loadingDetails ? (
-            <div className='flex items-center justify-center p-8'>
-              <div className='text-muted-foreground'>
-                Loading ability details...
+            <>
+              <DialogHeader>
+                <DialogTitle>Loading...</DialogTitle>
+              </DialogHeader>
+              <div className='flex items-center justify-center p-8'>
+                <div className='text-muted-foreground'>
+                  Loading ability details...
+                </div>
               </div>
-            </div>
+            </>
           ) : abilityDetailsData?.ability ? (
             <>
               <DialogHeader>
@@ -763,11 +898,6 @@ export default function AbilitiesPage() {
                     {abilityDetailsData.ability.abilityType}
                   </Badge>
                 </DialogTitle>
-                {abilityDetailsData.ability.gameId && (
-                  <div className='text-sm text-muted-foreground'>
-                    Game ID: {abilityDetailsData.ability.gameId}
-                  </div>
-                )}
               </DialogHeader>
 
               <div className='space-y-6'>
@@ -832,6 +962,12 @@ export default function AbilitiesPage() {
                       </p>
                     </div>
                     <div>
+                      <Label>Combat OK</Label>
+                      <p className='text-sm mt-1'>
+                        {abilityDetailsData.ability.combatOk ? 'Yes' : 'No'}
+                      </p>
+                    </div>
+                    <div>
                       <Label>Area Effect</Label>
                       <p className='text-sm mt-1'>
                         {abilityDetailsData.ability.isArea ? 'Yes' : 'No'}
@@ -846,81 +982,143 @@ export default function AbilitiesPage() {
                   </div>
                 </div>
 
-                {/* Effects */}
-                {abilityDetailsData.ability.effects &&
-                  abilityDetailsData.ability.effects.length > 0 && (
-                    <div>
-                      <h3 className='text-lg font-semibold mb-2'>Effects</h3>
-                      <div className='space-y-3'>
-                        {abilityDetailsData.ability.effects
-                          .sort((a, b) => a.order - b.order)
-                          .map(effect => (
-                            <div
-                              key={effect.effectId}
-                              className='border rounded-lg p-3'
-                            >
-                              <div className='flex items-center justify-between mb-2'>
-                                <div className='font-medium'>
-                                  {effect.effect.name}
-                                </div>
-                                <Badge variant='secondary'>
-                                  Order: {effect.order}
-                                </Badge>
-                              </div>
-                              {effect.effect.description && (
-                                <p className='text-sm text-muted-foreground mb-2'>
-                                  {effect.effect.description}
-                                </p>
-                              )}
-                              <div className='grid grid-cols-3 gap-2 text-sm'>
-                                <div>
-                                  <span className='text-muted-foreground'>
-                                    Type:
-                                  </span>{' '}
-                                  {effect.effect.effectType}
-                                </div>
-                                {effect.trigger && (
-                                  <div>
-                                    <span className='text-muted-foreground'>
-                                      Trigger:
-                                    </span>{' '}
-                                    {effect.trigger}
-                                  </div>
-                                )}
-                                <div>
-                                  <span className='text-muted-foreground'>
-                                    Chance:
-                                  </span>{' '}
-                                  {effect.chancePct}%
-                                </div>
-                                {effect.condition && (
-                                  <div className='col-span-3'>
-                                    <span className='text-muted-foreground'>
-                                      Condition:
-                                    </span>{' '}
-                                    {effect.condition}
-                                  </div>
-                                )}
-                                {effect.overrideParams && (
-                                  <div className='col-span-3'>
-                                    <span className='text-muted-foreground'>
-                                      Parameters:
-                                    </span>
-                                    <pre className='text-xs mt-1'>
-                                      {JSON.stringify(
-                                        effect.overrideParams,
-                                        null,
-                                        2
-                                      )}
-                                    </pre>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          ))}
-                      </div>
+                {/* Spell Metadata */}
+                {(abilityDetailsData.ability.sphere ||
+                  abilityDetailsData.ability.damageType ||
+                  abilityDetailsData.ability.pages ||
+                  abilityDetailsData.ability.memorizationTime ||
+                  abilityDetailsData.ability.questOnly ||
+                  abilityDetailsData.ability.humanoidOnly) && (
+                  <div>
+                    <h3 className='text-lg font-semibold mb-2'>
+                      Spell Metadata
+                    </h3>
+                    <div className='grid grid-cols-2 gap-4'>
+                      {abilityDetailsData.ability.sphere && (
+                        <div>
+                          <Label>Sphere</Label>
+                          <p className='text-sm mt-1'>
+                            {abilityDetailsData.ability.sphere}
+                          </p>
+                        </div>
+                      )}
+                      {abilityDetailsData.ability.damageType && (
+                        <div>
+                          <Label>Damage Type</Label>
+                          <p className='text-sm mt-1'>
+                            {abilityDetailsData.ability.damageType}
+                          </p>
+                        </div>
+                      )}
+                      {abilityDetailsData.ability.pages && (
+                        <div>
+                          <Label>Spellbook Pages</Label>
+                          <p className='text-sm mt-1'>
+                            {abilityDetailsData.ability.pages}
+                          </p>
+                        </div>
+                      )}
+                      {abilityDetailsData.ability.memorizationTime > 0 && (
+                        <div>
+                          <Label>Memorization Time</Label>
+                          <p className='text-sm mt-1'>
+                            +{abilityDetailsData.ability.memorizationTime}{' '}
+                            rounds
+                          </p>
+                        </div>
+                      )}
+                      {abilityDetailsData.ability.questOnly && (
+                        <div>
+                          <Label>Quest Only</Label>
+                          <p className='text-sm mt-1'>Yes</p>
+                        </div>
+                      )}
+                      {abilityDetailsData.ability.humanoidOnly && (
+                        <div>
+                          <Label>Humanoid Only</Label>
+                          <p className='text-sm mt-1'>Yes</p>
+                        </div>
+                      )}
                     </div>
+                  </div>
+                )}
+
+                {/* Effects - Visual Block Editor */}
+                <div>
+                  <div className='flex items-center justify-between mb-2'>
+                    <h3 className='text-lg font-semibold'>Effect Pipeline</h3>
+                    {canEdit && !editingEffects && (
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={handleEditEffects}
+                      >
+                        <Pencil className='h-4 w-4 mr-2' />
+                        Edit Effects
+                      </Button>
+                    )}
+                    {editingEffects && (
+                      <div className='flex gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          onClick={handleCancelEditEffects}
+                          disabled={savingEffects}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size='sm'
+                          onClick={handleSaveEffects}
+                          disabled={savingEffects}
+                        >
+                          {savingEffects ? (
+                            <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                          ) : (
+                            <CheckCircle className='h-4 w-4 mr-2' />
+                          )}
+                          Save Effects
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                  {editingEffects ? (
+                    <EffectEditor
+                      initialEffects={editedEffects}
+                      onChange={setEditedEffects}
+                      readOnly={false}
+                      height='500px'
+                    />
+                  ) : abilityDetailsData.ability.effects &&
+                    abilityDetailsData.ability.effects.length > 0 ? (
+                    <EffectEditor
+                      initialEffects={abilityDetailsData.ability.effects
+                        .sort((a, b) => a.order - b.order)
+                        .map(effect => ({
+                          effectId:
+                            typeof effect.effectId === 'string'
+                              ? parseInt(effect.effectId, 10)
+                              : effect.effectId,
+                          overrideParams:
+                            (effect.overrideParams as Record<
+                              string,
+                              unknown
+                            >) || {},
+                          order: effect.order,
+                          trigger: effect.trigger || undefined,
+                          chancePct: effect.chancePct,
+                          condition: effect.condition || undefined,
+                        }))}
+                      readOnly={true}
+                      height='400px'
+                    />
+                  ) : (
+                    <p className='text-muted-foreground text-sm'>
+                      No effects configured. Click "Edit Effects" to add effects
+                      to this ability.
+                    </p>
                   )}
+                </div>
 
                 {/* Targeting */}
                 {abilityDetailsData.ability.targeting && (
@@ -1156,9 +1354,14 @@ export default function AbilitiesPage() {
               </DialogFooter>
             </>
           ) : (
-            <div className='flex items-center justify-center p-8'>
-              <div className='text-muted-foreground'>Ability not found</div>
-            </div>
+            <>
+              <DialogHeader>
+                <DialogTitle>Not Found</DialogTitle>
+              </DialogHeader>
+              <div className='flex items-center justify-center p-8'>
+                <div className='text-muted-foreground'>Ability not found</div>
+              </div>
+            </>
           )}
         </DialogContent>
       </Dialog>
@@ -1189,6 +1392,7 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
     description: '',
     minPosition: 'STANDING',
     violent: false,
+    combatOk: true,
     castTimeRounds: 1,
     cooldownMs: 0,
     inCombatOnly: false,
@@ -1196,6 +1400,12 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
     notes: '',
     tags: [],
     schoolId: undefined,
+    sphere: undefined,
+    damageType: undefined,
+    pages: undefined,
+    memorizationTime: 0,
+    questOnly: false,
+    humanoidOnly: false,
   });
 
   // Update form when ability changes
@@ -1209,12 +1419,19 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         schoolId: ability.school ? parseInt(ability.school.id) : undefined,
         minPosition: ability.minPosition,
         violent: ability.violent,
+        combatOk: (ability as any).combatOk ?? true,
         castTimeRounds: ability.castTimeRounds,
         cooldownMs: ability.cooldownMs,
         inCombatOnly: ability.inCombatOnly,
         isArea: ability.isArea,
         notes: ability.notes || '',
         tags: (ability.tags as string[]) || [],
+        sphere: (ability as any).sphere || undefined,
+        damageType: (ability as any).damageType || undefined,
+        pages: (ability as any).pages || undefined,
+        memorizationTime: (ability as any).memorizationTime || 0,
+        questOnly: (ability as any).questOnly || false,
+        humanoidOnly: (ability as any).humanoidOnly || false,
       }));
     } else {
       setFormData(prev => ({
@@ -1225,12 +1442,19 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         schoolId: undefined,
         minPosition: 'STANDING',
         violent: false,
+        combatOk: true,
         castTimeRounds: 1,
         cooldownMs: 0,
         inCombatOnly: false,
         isArea: false,
         notes: '',
         tags: [],
+        sphere: undefined,
+        damageType: undefined,
+        pages: undefined,
+        memorizationTime: 0,
+        questOnly: false,
+        humanoidOnly: false,
       }));
     }
   }, [ability]);
@@ -1408,6 +1632,19 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
 
               <div className='flex items-center space-x-2'>
                 <Checkbox
+                  id='combatOk'
+                  checked={formData.combatOk}
+                  onCheckedChange={(checked: boolean) =>
+                    setFormData({ ...formData, combatOk: checked })
+                  }
+                />
+                <Label htmlFor='combatOk' className='cursor-pointer'>
+                  Combat OK (can be used during combat)
+                </Label>
+              </div>
+
+              <div className='flex items-center space-x-2'>
+                <Checkbox
                   id='isArea'
                   checked={formData.isArea}
                   onCheckedChange={(checked: boolean) =>
@@ -1434,7 +1671,131 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
                   Combat Only (can only be used in combat)
                 </Label>
               </div>
+
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='questOnly'
+                  checked={formData.questOnly}
+                  onCheckedChange={(checked: boolean) =>
+                    setFormData({ ...formData, questOnly: checked })
+                  }
+                />
+                <Label htmlFor='questOnly' className='cursor-pointer'>
+                  Quest Only (restricted to quests)
+                </Label>
+              </div>
+
+              <div className='flex items-center space-x-2'>
+                <Checkbox
+                  id='humanoidOnly'
+                  checked={formData.humanoidOnly}
+                  onCheckedChange={(checked: boolean) =>
+                    setFormData({ ...formData, humanoidOnly: checked })
+                  }
+                />
+                <Label htmlFor='humanoidOnly' className='cursor-pointer'>
+                  Humanoid Only (only available to humanoid races)
+                </Label>
+              </div>
             </div>
+
+            {/* Spell Metadata - only show for spells */}
+            {(formData.abilityType === 'SPELL' ||
+              formData.abilityType === 'CHANT') && (
+              <>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='sphere'>Sphere</Label>
+                    <Select
+                      value={formData.sphere || 'NONE'}
+                      onValueChange={value =>
+                        setFormData({
+                          ...formData,
+                          sphere: value === 'NONE' ? undefined : value,
+                        })
+                      }
+                    >
+                      <SelectTrigger id='sphere'>
+                        <SelectValue placeholder='Select a sphere' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='NONE'>None</SelectItem>
+                        {SPELL_SPHERES.map(sphere => (
+                          <SelectItem key={sphere} value={sphere}>
+                            {sphere}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+
+                  <div className='grid gap-2'>
+                    <Label htmlFor='damageType'>Damage Type</Label>
+                    <Select
+                      value={formData.damageType || 'NONE'}
+                      onValueChange={value =>
+                        setFormData({
+                          ...formData,
+                          damageType: value === 'NONE' ? undefined : value,
+                        })
+                      }
+                    >
+                      <SelectTrigger id='damageType'>
+                        <SelectValue placeholder='Select damage type' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value='NONE'>None</SelectItem>
+                        {ELEMENT_TYPES.map(type => (
+                          <SelectItem key={type} value={type}>
+                            {type}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+
+                <div className='grid grid-cols-2 gap-4'>
+                  <div className='grid gap-2'>
+                    <Label htmlFor='pages'>Spellbook Pages</Label>
+                    <Input
+                      id='pages'
+                      type='number'
+                      value={formData.pages || ''}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          pages: e.target.value
+                            ? parseInt(e.target.value)
+                            : undefined,
+                        })
+                      }
+                      min={0}
+                      placeholder='Pages required to scribe'
+                    />
+                  </div>
+
+                  <div className='grid gap-2'>
+                    <Label htmlFor='memorizationTime'>
+                      Extra Memorization Time
+                    </Label>
+                    <Input
+                      id='memorizationTime'
+                      type='number'
+                      value={formData.memorizationTime}
+                      onChange={e =>
+                        setFormData({
+                          ...formData,
+                          memorizationTime: parseInt(e.target.value) || 0,
+                        })
+                      }
+                      min={0}
+                      placeholder='Additional rounds'
+                    />
+                  </div>
+                </div>
+              </>
+            )}
 
             <div className='grid gap-2'>
               <Label htmlFor='notes'>Notes</Label>

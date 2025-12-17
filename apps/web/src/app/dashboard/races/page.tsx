@@ -33,7 +33,7 @@ const GET_RACES = gql`
     races {
       race
       name
-      displayName
+      plainName
       playable
       humanoid
       magical
@@ -206,7 +206,7 @@ export default function RacesPage() {
   const canEdit = isBuilder || isCoder || isGod;
 
   const filteredRaces = (data as any)?.races?.filter((race: any) =>
-    race.name.toLowerCase().includes(searchQuery.toLowerCase())
+    race.plainName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
   if (loading) {
@@ -285,7 +285,7 @@ export default function RacesPage() {
                   onClick={() => handleRaceClick(race)}
                 >
                   <TableCell className='font-medium'>
-                    {race.displayName}
+                    {race.plainName}
                   </TableCell>
                   <TableCell>
                     <span className='text-sm'>{race.defaultSize}</span>
@@ -332,7 +332,7 @@ export default function RacesPage() {
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={(e) => handleEditClick(race, e)}
+                        onClick={e => handleEditClick(race, e)}
                       >
                         <Pencil className='h-4 w-4' />
                       </Button>
@@ -359,7 +359,7 @@ export default function RacesPage() {
         <DialogContent className='sm:max-w-[600px] max-h-[90vh] overflow-y-auto'>
           <form onSubmit={handleSubmit}>
             <DialogHeader>
-              <DialogTitle>Edit Race: {editingRace?.displayName}</DialogTitle>
+              <DialogTitle>Edit Race: {editingRace?.plainName}</DialogTitle>
               <DialogDescription>
                 Update race attributes and statistics
               </DialogDescription>
@@ -605,7 +605,7 @@ export default function RacesPage() {
                       'FEATHER_FALL',
                       'SOULSHIELD',
                       'HARNESS',
-                    ].map((effect) => (
+                    ].map(effect => (
                       <div key={effect} className='flex items-center space-x-2'>
                         <Checkbox
                           id={`effect-${effect}`}
@@ -624,7 +624,7 @@ export default function RacesPage() {
                                 ...formData,
                                 permanentEffects:
                                   formData.permanentEffects.filter(
-                                    (e) => e !== effect
+                                    e => e !== effect
                                   ),
                               });
                             }
@@ -664,10 +664,8 @@ export default function RacesPage() {
       <Dialog open={isDetailsOpen} onOpenChange={setIsDetailsOpen}>
         <DialogContent className='sm:max-w-[700px] max-h-[90vh] overflow-y-auto'>
           <DialogHeader>
-            <DialogTitle>{selectedRace?.displayName}</DialogTitle>
-            <DialogDescription>
-              {selectedRace?.fullName || selectedRace?.name}
-            </DialogDescription>
+            <DialogTitle>{selectedRace?.plainName}</DialogTitle>
+            <DialogDescription>{selectedRace?.name}</DialogDescription>
           </DialogHeader>
 
           <Tabs defaultValue='info' className='mt-4'>

@@ -22,24 +22,28 @@ export async function seedGameSystem(prisma: PrismaClient) {
     // Base Classes
     {
       name: 'Sorcerer',
+      plainName: 'Sorcerer',
       hitDice: '1d4',
       primaryStat: 'intelligence',
       description: 'Magical base class that memorizes arcane spells.',
     },
     {
       name: 'Cleric',
+      plainName: 'Cleric',
       hitDice: '1d8',
       primaryStat: 'wisdom',
       description: 'Divine base class that prays for holy spells.',
     },
     {
       name: 'Warrior',
+      plainName: 'Warrior',
       hitDice: '1d12',
       primaryStat: 'strength',
       description: 'Combat base class focused on martial prowess.',
     },
     {
       name: 'Rogue',
+      plainName: 'Rogue',
       hitDice: '1d6',
       primaryStat: 'dexterity',
       description: 'Stealth base class focused on skills and subterfuge.',
@@ -48,7 +52,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
 
   for (const classData of classes) {
     await prisma.characterClass.upsert({
-      where: { name: classData.name },
+      where: { plainName: classData.plainName },
       update: classData,
       create: classData,
     });
@@ -107,29 +111,29 @@ export async function seedGameSystem(prisma: PrismaClient) {
   }
 
   // ===========================================================================
-  // EFFECTS
+  // EFFECTS (sample data - full effects seeded from FieryLib's effects.json)
   // ===========================================================================
-  console.log('💥 Seeding effects...');
+  console.log('💥 Seeding sample effects...');
   const effects = [
     {
       name: 'Damage',
       effectType: 'damage',
-      defaultParams: { damage_type: 'FIRE', dice: '1d1' },
+      defaultParams: { type: 'fire', amount: '1d6' },
     },
     {
       name: 'Heal',
       effectType: 'heal',
-      defaultParams: { dice: '1d4' },
+      defaultParams: { resource: 'hp', amount: '1d8' },
     },
     {
-      name: 'Apply Aura',
-      effectType: 'apply_aura',
-      defaultParams: { aura: 'DETECT_INVISIBILITY' },
+      name: 'Status',
+      effectType: 'status',
+      defaultParams: { flag: 'detect_invisible' },
     },
     {
       name: 'Teleport',
       effectType: 'teleport',
-      defaultParams: { location: 'home' },
+      defaultParams: { destination: 'home', scope: 'self' },
     },
   ];
 
@@ -211,10 +215,11 @@ export async function seedGameSystem(prisma: PrismaClient) {
     } & { schoolId?: number } = {
       ...abilityBase,
     };
-    const abilityCreateBuilder: { name: string } & {
+    const abilityCreateBuilder: { name: string; plainName: string } & {
       [K in keyof typeof abilityBase]: (typeof abilityBase)[K];
     } & { schoolId?: number } = {
       name: abilityData.name,
+      plainName: abilityData.name,
       ...abilityBase,
     };
     if (typeof school?.id === 'number') {
@@ -223,7 +228,7 @@ export async function seedGameSystem(prisma: PrismaClient) {
     }
 
     const ability = await prisma.ability.upsert({
-      where: { name: abilityData.name },
+      where: { plainName: abilityData.name },
       update: abilityUpdateBuilder,
       create: abilityCreateBuilder,
     });
@@ -257,15 +262,17 @@ export async function seedGameSystem(prisma: PrismaClient) {
       if (damageEffect) {
         await prisma.abilityEffect.upsert({
           where: {
-            abilityId_effectId: {
+            abilityId_effectId_order: {
               abilityId: ability.id,
               effectId: damageEffect.id,
+              order: 0,
             },
           },
           update: {},
           create: {
             abilityId: ability.id,
             effectId: damageEffect.id,
+            order: 0,
             overrideParams: {
               damage_type: 'FIRE',
               dice: '6d6',
@@ -352,13 +359,14 @@ export async function seedGameSystem(prisma: PrismaClient) {
 
   for (const skillData of skills) {
     await prisma.ability.upsert({
-      where: { name: skillData.name },
+      where: { plainName: skillData.name },
       update: {
         description: skillData.description,
         tags: skillData.tags,
       },
       create: {
         name: skillData.name,
+        plainName: skillData.name,
         description: skillData.description,
         abilityType: 'SKILL',
         tags: skillData.tags,

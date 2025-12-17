@@ -35,9 +35,9 @@ query GetAbilityDetails($id: ID!) {
     name
     abilityType
     description
-    gameId
     minPosition
     violent
+    combatOk
     castTimeRounds
     cooldownMs
     inCombatOnly
@@ -45,6 +45,13 @@ query GetAbilityDetails($id: ID!) {
     notes
     tags
     luaScript
+    # Spell metadata
+    sphere
+    damageType
+    pages
+    memorizationTime
+    questOnly
+    humanoidOnly
     school {
       id
       name
@@ -124,4 +131,25 @@ mutation UpdateAbility($id: ID!, $data: UpdateAbilityInput!) {
 
 mutation DeleteAbility($id: ID!) {
   deleteAbility(id: $id)
+}
+
+mutation UpdateAbilityEffects($abilityId: Int!, $data: UpdateAbilityEffectsInput!) {
+  updateAbilityEffects(abilityId: $abilityId, data: $data) {
+    id
+    name
+    effects {
+      effectId
+      order
+      chancePct
+      trigger
+      condition
+      overrideParams
+      effect {
+        id
+        name
+        effectType
+        description
+      }
+    }
+  }
 }

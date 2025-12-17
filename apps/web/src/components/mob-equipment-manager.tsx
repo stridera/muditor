@@ -3,7 +3,8 @@
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Layers, Package, Plus, Settings, Shield, Trash2 } from 'lucide-react';
-import { useState } from 'react';
+import React, { useState } from 'react';
+import { ColoredTextInline } from './ColoredTextViewer';
 
 const GET_MOB_RESETS = gql`
   query GetMobResetsForMob($mobId: Int!, $mobZoneId: Int!) {
@@ -280,7 +281,7 @@ export default function MobEquipmentManager({
     refetch: refetchResets,
   } = useQuery(GET_MOB_RESETS, {
     variables: { mobId, mobZoneId: zoneId },
-    skip: !mobId || !zoneId,
+    skip: mobId == null || zoneId == null,
   });
 
   const {
@@ -450,24 +451,24 @@ export default function MobEquipmentManager({
   };
 
   if (resetsLoading)
-    return <div className='p-4'>Loading equipment data...</div>;
+    return <div className='p-4 text-foreground'>Loading equipment data...</div>;
 
   return (
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h3 className='text-lg font-medium text-gray-900'>
+          <h3 className='text-lg font-medium text-foreground'>
             Equipment Sets & Spawn Configuration
           </h3>
-          <p className='text-sm text-gray-500'>
+          <p className='text-sm text-muted-foreground'>
             Manage equipment sets and spawn conditions for this mob
           </p>
         </div>
         <div className='flex gap-2'>
           <button
             onClick={() => setShowEquipmentSets(!showEquipmentSets)}
-            className='inline-flex items-center px-3 py-2 border border-gray-300 text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50'
+            className='inline-flex items-center px-3 py-2 border border-border text-sm leading-4 font-medium rounded-md text-foreground bg-background hover:bg-muted'
           >
             <Layers className='w-4 h-4 mr-2' />
             Manage Sets
@@ -477,14 +478,14 @@ export default function MobEquipmentManager({
 
       {/* Equipment Sets Management */}
       {showEquipmentSets && (
-        <div className='bg-blue-50 border border-blue-200 rounded-lg p-4'>
+        <div className='bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg p-4'>
           <div className='flex items-center justify-between mb-4'>
-            <h4 className='text-md font-medium text-blue-900'>
+            <h4 className='text-md font-medium text-blue-900 dark:text-blue-100'>
               Equipment Sets Library
             </h4>
             <button
               onClick={() => setShowCreateSet(!showCreateSet)}
-              className='inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 bg-blue-100 rounded-md hover:bg-blue-200'
+              className='inline-flex items-center px-3 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 rounded-md hover:bg-blue-200 dark:hover:bg-blue-800/50'
             >
               <Plus className='w-4 h-4 mr-2' />
               Create New Set
@@ -493,13 +494,13 @@ export default function MobEquipmentManager({
 
           {/* Create New Set Form */}
           {showCreateSet && (
-            <div className='bg-white rounded-lg p-4 mb-4 border border-blue-200'>
-              <h5 className='text-sm font-medium text-gray-900 mb-3'>
+            <div className='bg-background rounded-lg p-4 mb-4 border border-blue-200 dark:border-blue-800'>
+              <h5 className='text-sm font-medium text-foreground mb-3'>
                 Create Equipment Set
               </h5>
               <div className='space-y-3'>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  <label className='block text-sm font-medium text-foreground mb-1'>
                     Set Name
                   </label>
                   <input
@@ -507,11 +508,11 @@ export default function MobEquipmentManager({
                     value={newSetName}
                     onChange={e => setNewSetName(e.target.value)}
                     placeholder='e.g., Guard Captain Set, Mage Robes'
-                    className='block w-full px-3 py-2 border border-gray-300 rounded-md text-sm'
+                    className='block w-full px-3 py-2 border border-border rounded-md text-sm bg-background text-foreground'
                   />
                 </div>
                 <div>
-                  <label className='block text-sm font-medium text-gray-700 mb-1'>
+                  <label className='block text-sm font-medium text-foreground mb-1'>
                     Description (optional)
                   </label>
                   <input
@@ -519,7 +520,7 @@ export default function MobEquipmentManager({
                     value={newSetDescription}
                     onChange={e => setNewSetDescription(e.target.value)}
                     placeholder='Brief description of the equipment set'
-                    className='block w-full px-3 py-2 border border-gray-300 rounded-md text-sm'
+                    className='block w-full px-3 py-2 border border-border rounded-md text-sm bg-background text-foreground'
                   />
                 </div>
                 <div className='flex gap-2'>
@@ -532,7 +533,7 @@ export default function MobEquipmentManager({
                   </button>
                   <button
                     onClick={() => setShowCreateSet(false)}
-                    className='px-3 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200'
+                    className='px-3 py-2 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80'
                   >
                     Cancel
                   </button>
@@ -546,23 +547,35 @@ export default function MobEquipmentManager({
             {equipmentSets.map(set => (
               <div
                 key={set.id}
-                className='bg-white rounded-lg p-3 border border-gray-200'
+                className='bg-background rounded-lg p-3 border border-border'
               >
                 <div className='flex items-center justify-between mb-2'>
-                  <h5 className='text-sm font-medium text-gray-900'>
+                  <h5 className='text-sm font-medium text-foreground'>
                     {set.name}
                   </h5>
-                  <span className='text-xs text-gray-500'>
+                  <span className='text-xs text-muted-foreground'>
                     {set.items.length} items
                   </span>
                 </div>
                 {set.description && (
-                  <p className='text-xs text-gray-600 mb-2'>
+                  <p className='text-xs text-muted-foreground mb-2'>
                     {set.description}
                   </p>
                 )}
-                <div className='text-xs text-gray-500'>
-                  Items: {set.items.map(item => item.object.name).join(', ')}
+                <div className='text-xs text-muted-foreground'>
+                  Items:{' '}
+                  {set.items
+                    .map(item => (
+                      <ColoredTextInline
+                        key={item.id}
+                        markup={item.object.name}
+                      />
+                    ))
+                    .reduce(
+                      (prev, curr, i) =>
+                        i === 0 ? [curr] : [...prev, ', ', curr],
+                      [] as React.ReactNode[]
+                    )}
                 </div>
               </div>
             ))}
@@ -573,26 +586,30 @@ export default function MobEquipmentManager({
       {/* Resets List */}
       {resets.length === 0 ? (
         <div className='text-center py-8'>
-          <Package className='mx-auto h-12 w-12 text-gray-400' />
-          <h3 className='mt-2 text-sm font-medium text-gray-900'>
+          <Package className='mx-auto h-12 w-12 text-muted-foreground' />
+          <h3 className='mt-2 text-sm font-medium text-foreground'>
             No spawn locations
           </h3>
-          <p className='mt-1 text-sm text-gray-500'>
+          <p className='mt-1 text-sm text-muted-foreground'>
             This mob has no configured spawn locations.
           </p>
         </div>
       ) : (
         <div className='space-y-4'>
           {resets.map(reset => (
-            <div key={reset.id} className='bg-white shadow rounded-lg border'>
+            <div
+              key={reset.id}
+              className='bg-card shadow rounded-lg border border-border'
+            >
               {/* Reset Header */}
-              <div className='px-4 py-3 border-b border-gray-200 bg-gray-50'>
+              <div className='px-4 py-3 border-b border-border bg-muted'>
                 <div className='flex items-center justify-between'>
                   <div>
-                    <h4 className='text-sm font-medium text-gray-900'>
-                      {reset.mob.name} Spawn #{reset.id.slice(-8)}
+                    <h4 className='text-sm font-medium text-foreground'>
+                      <ColoredTextInline markup={reset.mob.name} /> Spawn #
+                      {reset.id.slice(-8)}
                     </h4>
-                    <p className='text-sm text-gray-500'>
+                    <p className='text-sm text-muted-foreground'>
                       Room {reset.roomId} • Max spawns: {reset.maxInstances} •
                       Probability: {(reset.probability * 100).toFixed(0)}%
                     </p>
@@ -601,7 +618,7 @@ export default function MobEquipmentManager({
                     onClick={() =>
                       setActiveReset(activeReset === reset.id ? null : reset.id)
                     }
-                    className='text-sm text-blue-600 hover:text-blue-800'
+                    className='text-sm text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300'
                   >
                     {activeReset === reset.id ? 'Collapse' : 'Manage Equipment'}
                   </button>
@@ -614,8 +631,8 @@ export default function MobEquipmentManager({
                   {/* Direct Equipment */}
                   <div>
                     <div className='flex items-center justify-between mb-3'>
-                      <h5 className='text-sm font-medium text-gray-900 flex items-center'>
-                        <Package className='w-4 h-4 mr-2 text-gray-400' />
+                      <h5 className='text-sm font-medium text-foreground flex items-center'>
+                        <Package className='w-4 h-4 mr-2 text-muted-foreground' />
                         Direct Equipment ({reset.equipment.length})
                       </h5>
                       <button
@@ -625,7 +642,7 @@ export default function MobEquipmentManager({
                             [reset.id]: !showAddEquipment[reset.id],
                           })
                         }
-                        className='inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 bg-blue-100 rounded hover:bg-blue-200'
+                        className='inline-flex items-center px-2 py-1 text-xs font-medium text-blue-700 dark:text-blue-300 bg-blue-100 dark:bg-blue-900/50 rounded hover:bg-blue-200 dark:hover:bg-blue-800/50'
                       >
                         <Plus className='w-3 h-3 mr-1' />
                         Add Item
@@ -634,13 +651,13 @@ export default function MobEquipmentManager({
 
                     {/* Add Equipment Form */}
                     {showAddEquipment[reset.id] && (
-                      <div className='mb-4 p-3 bg-blue-50 border border-blue-200 rounded-lg'>
-                        <h6 className='text-sm font-medium text-gray-900 mb-3'>
+                      <div className='mb-4 p-3 bg-blue-50 dark:bg-blue-950/30 border border-blue-200 dark:border-blue-800 rounded-lg'>
+                        <h6 className='text-sm font-medium text-foreground mb-3'>
                           Add Equipment Item
                         </h6>
                         <div className='space-y-3'>
                           <div>
-                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                            <label className='block text-xs font-medium text-foreground mb-1'>
                               Object (Zone:ID)
                             </label>
                             <input
@@ -648,11 +665,11 @@ export default function MobEquipmentManager({
                               value={selectedObject}
                               onChange={e => setSelectedObject(e.target.value)}
                               placeholder='e.g., 30:22'
-                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                              className='block w-full px-2 py-1 text-sm border border-border rounded bg-background text-foreground'
                             />
                           </div>
                           <div>
-                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                            <label className='block text-xs font-medium text-foreground mb-1'>
                               Wear Location (optional)
                             </label>
                             <select
@@ -660,7 +677,7 @@ export default function MobEquipmentManager({
                               onChange={e =>
                                 setSelectedWearLocation(e.target.value)
                               }
-                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                              className='block w-full px-2 py-1 text-sm border border-border rounded bg-background text-foreground'
                             >
                               <option value=''>None (carried)</option>
                               {EQUIPMENT_SLOTS.map(slot => (
@@ -671,7 +688,7 @@ export default function MobEquipmentManager({
                             </select>
                           </div>
                           <div>
-                            <label className='block text-xs font-medium text-gray-700 mb-1'>
+                            <label className='block text-xs font-medium text-foreground mb-1'>
                               Probability
                             </label>
                             <input
@@ -685,7 +702,7 @@ export default function MobEquipmentManager({
                                   parseFloat(e.target.value) || 1.0
                                 )
                               }
-                              className='block w-full px-2 py-1 text-sm border border-gray-300 rounded'
+                              className='block w-full px-2 py-1 text-sm border border-border rounded bg-background text-foreground'
                             />
                           </div>
                           <div className='flex gap-2'>
@@ -703,7 +720,7 @@ export default function MobEquipmentManager({
                                   [reset.id]: false,
                                 })
                               }
-                              className='px-3 py-1 text-sm font-medium text-gray-700 bg-gray-100 rounded hover:bg-gray-200'
+                              className='px-3 py-1 text-sm font-medium text-foreground bg-muted rounded hover:bg-muted/80'
                             >
                               Cancel
                             </button>
@@ -713,7 +730,7 @@ export default function MobEquipmentManager({
                     )}
 
                     {reset.equipment.length === 0 ? (
-                      <p className='text-sm text-gray-500 italic'>
+                      <p className='text-sm text-muted-foreground italic'>
                         No direct equipment assigned
                       </p>
                     ) : (
@@ -721,20 +738,22 @@ export default function MobEquipmentManager({
                         {reset.equipment.map(item => (
                           <div
                             key={item.id}
-                            className='border border-gray-200 rounded-lg p-3 bg-gray-50'
+                            className='border border-border rounded-lg p-3 bg-muted'
                           >
                             {editingEquipment === item.id ? (
                               /* Edit Mode */
                               <div className='space-y-2'>
-                                <div className='font-medium text-sm text-gray-900 mb-1'>
-                                  {item.object.name}
-                                  <span className='text-xs text-gray-500 ml-2'>
+                                <div className='font-medium text-sm text-foreground mb-1'>
+                                  <ColoredTextInline
+                                    markup={item.object.name}
+                                  />
+                                  <span className='text-xs text-muted-foreground ml-2'>
                                     {(item.object as any).zoneId}:
                                     {item.object.id}
                                   </span>
                                 </div>
                                 <div>
-                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                  <label className='block text-xs font-medium text-foreground mb-1'>
                                     Wear Location
                                   </label>
                                   <select
@@ -745,7 +764,7 @@ export default function MobEquipmentManager({
                                         wearLocation: e.target.value,
                                       })
                                     }
-                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                    className='block w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground'
                                   >
                                     <option value=''>None (carried)</option>
                                     {EQUIPMENT_SLOTS.map(slot => (
@@ -756,7 +775,7 @@ export default function MobEquipmentManager({
                                   </select>
                                 </div>
                                 <div>
-                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                  <label className='block text-xs font-medium text-foreground mb-1'>
                                     Max Instances
                                   </label>
                                   <input
@@ -770,11 +789,11 @@ export default function MobEquipmentManager({
                                           parseInt(e.target.value) || 1,
                                       })
                                     }
-                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                    className='block w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground'
                                   />
                                 </div>
                                 <div>
-                                  <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                  <label className='block text-xs font-medium text-foreground mb-1'>
                                     Probability
                                   </label>
                                   <input
@@ -790,7 +809,7 @@ export default function MobEquipmentManager({
                                           parseFloat(e.target.value) || 1.0,
                                       })
                                     }
-                                    className='block w-full px-2 py-1 text-xs border border-gray-300 rounded'
+                                    className='block w-full px-2 py-1 text-xs border border-border rounded bg-background text-foreground'
                                   />
                                 </div>
                                 <div className='flex gap-2 pt-2'>
@@ -802,7 +821,7 @@ export default function MobEquipmentManager({
                                   </button>
                                   <button
                                     onClick={handleCancelEdit}
-                                    className='px-2 py-1 text-xs font-medium text-gray-700 bg-gray-200 rounded hover:bg-gray-300'
+                                    className='px-2 py-1 text-xs font-medium text-foreground bg-background rounded hover:bg-muted/80 border border-border'
                                   >
                                     Cancel
                                   </button>
@@ -813,10 +832,12 @@ export default function MobEquipmentManager({
                               <>
                                 <div className='flex items-center justify-between mb-2'>
                                   <div className='flex-1'>
-                                    <div className='font-medium text-sm text-gray-900'>
-                                      {item.object.name}
+                                    <div className='font-medium text-sm text-foreground'>
+                                      <ColoredTextInline
+                                        markup={item.object.name}
+                                      />
                                     </div>
-                                    <div className='text-xs text-gray-500'>
+                                    <div className='text-xs text-muted-foreground'>
                                       {(item.object as any).zoneId}:
                                       {item.object.id} • {item.object.type}
                                     </div>
@@ -824,7 +845,7 @@ export default function MobEquipmentManager({
                                   <div className='flex gap-1'>
                                     <button
                                       onClick={() => handleStartEdit(item)}
-                                      className='text-blue-600 hover:text-blue-800'
+                                      className='text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300'
                                       title='Edit equipment'
                                     >
                                       <Settings className='w-4 h-4' />
@@ -833,16 +854,16 @@ export default function MobEquipmentManager({
                                       onClick={() =>
                                         handleDeleteEquipment(item.id)
                                       }
-                                      className='text-red-600 hover:text-red-800'
+                                      className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300'
                                       title='Remove equipment'
                                     >
                                       <Trash2 className='w-4 h-4' />
                                     </button>
                                   </div>
                                 </div>
-                                <div className='flex items-center gap-3 text-xs text-gray-600'>
+                                <div className='flex items-center gap-3 text-xs text-muted-foreground'>
                                   {item.wearLocation && (
-                                    <span className='px-2 py-1 bg-blue-100 text-blue-700 rounded'>
+                                    <span className='px-2 py-1 bg-blue-100 dark:bg-blue-900/50 text-blue-700 dark:text-blue-300 rounded'>
                                       {item.wearLocation}
                                     </span>
                                   )}
@@ -863,14 +884,14 @@ export default function MobEquipmentManager({
                   {/* Equipment Sets */}
                   <div>
                     <div className='flex items-center justify-between mb-3'>
-                      <h5 className='text-sm font-medium text-gray-900 flex items-center'>
-                        <Shield className='w-4 h-4 mr-2 text-gray-400' />
+                      <h5 className='text-sm font-medium text-foreground flex items-center'>
+                        <Shield className='w-4 h-4 mr-2 text-muted-foreground' />
                         Equipment Sets ({(reset.equipmentSets || []).length})
                       </h5>
                     </div>
 
                     {(reset.equipmentSets || []).length === 0 ? (
-                      <p className='text-sm text-gray-500 italic'>
+                      <p className='text-sm text-muted-foreground italic'>
                         No equipment sets assigned
                       </p>
                     ) : (
@@ -878,14 +899,14 @@ export default function MobEquipmentManager({
                         {(reset.equipmentSets || []).map(mobEquipmentSet => (
                           <div
                             key={mobEquipmentSet.id}
-                            className='border border-gray-200 rounded-lg p-3'
+                            className='border border-border rounded-lg p-3'
                           >
                             <div className='flex items-center justify-between mb-2'>
-                              <h6 className='text-sm font-medium text-gray-900'>
+                              <h6 className='text-sm font-medium text-foreground'>
                                 {mobEquipmentSet.equipmentSet.name}
                               </h6>
                               <div className='flex items-center gap-2'>
-                                <span className='text-xs text-gray-500'>
+                                <span className='text-xs text-muted-foreground'>
                                   {(mobEquipmentSet.probability * 100).toFixed(
                                     0
                                   )}
@@ -895,14 +916,14 @@ export default function MobEquipmentManager({
                                   onClick={() =>
                                     handleRemoveEquipmentSet(mobEquipmentSet.id)
                                   }
-                                  className='text-red-600 hover:text-red-800'
+                                  className='text-red-600 dark:text-red-400 hover:text-red-800 dark:hover:text-red-300'
                                 >
                                   <Trash2 className='w-4 h-4' />
                                 </button>
                               </div>
                             </div>
                             {mobEquipmentSet.equipmentSet.description && (
-                              <p className='text-xs text-gray-600 mb-2'>
+                              <p className='text-xs text-muted-foreground mb-2'>
                                 {mobEquipmentSet.equipmentSet.description}
                               </p>
                             )}
@@ -910,12 +931,14 @@ export default function MobEquipmentManager({
                               {mobEquipmentSet.equipmentSet.items.map(item => (
                                 <div
                                   key={item.id}
-                                  className='text-xs p-2 bg-gray-50 rounded'
+                                  className='text-xs p-2 bg-muted rounded'
                                 >
-                                  <div className='font-medium'>
-                                    {item.object.name}
+                                  <div className='font-medium text-foreground'>
+                                    <ColoredTextInline
+                                      markup={item.object.name}
+                                    />
                                   </div>
-                                  <div className='text-gray-500'>
+                                  <div className='text-muted-foreground'>
                                     {item.slot} •{' '}
                                     {(item.probability * 100).toFixed(0)}%
                                   </div>
@@ -937,7 +960,7 @@ export default function MobEquipmentManager({
                               e.target.value = '';
                             }
                           }}
-                          className='text-sm px-3 py-2 border border-gray-300 rounded-md'
+                          className='text-sm px-3 py-2 border border-border rounded-md bg-background text-foreground'
                         >
                           <option value=''>Add Equipment Set...</option>
                           {getAvailableEquipmentSets(reset).map(set => (

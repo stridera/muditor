@@ -27,16 +27,10 @@ export class RaceDto {
   name: string;
 
   @Field()
-  keywords: string;
-
-  @Field()
-  displayName: string;
-
-  @Field()
-  fullName: string;
-
-  @Field()
   plainName: string;
+
+  @Field()
+  keywords: string;
 
   @Field()
   playable: boolean;

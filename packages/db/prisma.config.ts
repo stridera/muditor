@@ -8,10 +8,11 @@ const schema = path.resolve(__dirname, 'prisma', 'schema.prisma');
 
 // Load only the repository root .env file explicitly because Prisma skips auto-loading when using prisma.config.ts.
 // packages/db -> repo root (two levels up)
+// Note: Don't override existing env vars - docker-compose sets DATABASE_URL correctly for containers
 const repoRoot = path.resolve(__dirname, '../..');
 const rootEnv = path.join(repoRoot, '.env');
 if (fs.existsSync(rootEnv)) {
-  dotenv.config({ path: rootEnv, override: true });
+  dotenv.config({ path: rootEnv, override: false });
 }
 
 if (!process.env.DATABASE_URL) {

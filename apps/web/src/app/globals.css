@@ -114,3 +114,178 @@
   @apply bg-muted text-muted-foreground border border-border rounded shadow-sm;
   @apply min-w-[2rem] gap-1;
 }
+
+/* ============================================
+   Blockly Effect Editor Theme Styles
+   ============================================ */
+
+/* Light theme (default) */
+.blocklySvg {
+  background-color: #f8fafc !important;
+}
+.blocklyMainBackground {
+  fill: #f8fafc !important;
+}
+.blocklyToolboxDiv {
+  background-color: #f1f5f9 !important;
+  color: #1e293b !important;
+}
+.blocklyTreeLabel {
+  color: #1e293b !important;
+}
+.blocklyFlyout {
+  background-color: #f1f5f9 !important;
+}
+.blocklyFlyoutBackground {
+  fill: #f1f5f9 !important;
+  fill-opacity: 0.95 !important;
+}
+.blocklyScrollbarHandle {
+  fill: #94a3b8 !important;
+  fill-opacity: 0.6 !important;
+}
+.blocklyScrollbarBackground {
+  fill: transparent !important;
+}
+.blocklyTreeRow:hover {
+  background-color: #e2e8f0 !important;
+}
+.blocklyTreeSelected {
+  background-color: #cbd5e1 !important;
+}
+.blocklyTreeIcon {
+  fill: #1e293b !important;
+}
+
+/* Dark theme - targets .dark class on html element */
+.dark .blocklySvg {
+  background-color: #1e1e2e !important;
+}
+.dark .blocklyMainBackground {
+  fill: #1e1e2e !important;
+}
+.dark .blocklyToolboxDiv {
+  background-color: #11111b !important;
+  color: #cdd6f4 !important;
+}
+.dark .blocklyToolboxContents {
+  background-color: #11111b !important;
+}
+.dark .blocklyToolboxCategory {
+  background-color: #11111b !important;
+}
+.dark .blocklyTreeRoot {
+  background-color: #11111b !important;
+}
+.dark .blocklyTreeRow {
+  background-color: #11111b !important;
+}
+.dark .blocklyTreeLabel {
+  color: #cdd6f4 !important;
+}
+.dark .blocklyTreeRowContentContainer {
+  background-color: #11111b !important;
+}
+.dark .blocklyFlyout {
+  background-color: #181825 !important;
+}
+.dark .blocklyFlyoutBackground {
+  fill: #181825 !important;
+  fill-opacity: 0.95 !important;
+}
+.dark .blocklyScrollbarHandle {
+  fill: #585b70 !important;
+  fill-opacity: 0.7 !important;
+}
+.dark .blocklyTreeRow:hover {
+  background-color: #313244 !important;
+}
+.dark .blocklyTreeSelected {
+  background-color: #45475a !important;
+}
+.dark .blocklyTreeIcon {
+  fill: #cdd6f4 !important;
+}
+/* Category color icons in dark mode */
+.dark .blocklyTreeRowContentContainer .blocklyTreeIcon {
+  background-color: inherit !important;
+}
+
+/* Fallback for system dark mode preference (before .dark class is applied) */
+@media (prefers-color-scheme: dark) {
+  html:not(.light) .blocklySvg {
+    background-color: #1e1e2e !important;
+  }
+  html:not(.light) .blocklyMainBackground {
+    fill: #1e1e2e !important;
+  }
+  html:not(.light) .blocklyToolboxDiv {
+    background-color: #11111b !important;
+    color: #cdd6f4 !important;
+  }
+  html:not(.light) .blocklyToolboxContents {
+    background-color: #11111b !important;
+  }
+  html:not(.light) .blocklyToolboxCategory {
+    background-color: #11111b !important;
+  }
+  html:not(.light) .blocklyTreeRoot {
+    background-color: #11111b !important;
+  }
+  html:not(.light) .blocklyTreeRow {
+    background-color: #11111b !important;
+  }
+  html:not(.light) .blocklyTreeLabel {
+    color: #cdd6f4 !important;
+  }
+  html:not(.light) .blocklyTreeRowContentContainer {
+    background-color: #11111b !important;
+  }
+  html:not(.light) .blocklyFlyout {
+    background-color: #181825 !important;
+  }
+  html:not(.light) .blocklyFlyoutBackground {
+    fill: #181825 !important;
+    fill-opacity: 0.95 !important;
+  }
+  html:not(.light) .blocklyScrollbarHandle {
+    fill: #585b70 !important;
+    fill-opacity: 0.7 !important;
+  }
+  html:not(.light) .blocklyTreeRow:hover {
+    background-color: #313244 !important;
+  }
+  html:not(.light) .blocklyTreeSelected {
+    background-color: #45475a !important;
+  }
+  html:not(.light) .blocklyTreeIcon {
+    fill: #cdd6f4 !important;
+  }
+  html:not(.light) .blocklyTreeRowContentContainer .blocklyTreeIcon {
+    background-color: inherit !important;
+  }
+}
+
+/* Fix: Blockly scrollbar styling - hide all scrollbars */
+/* The scrollbar handle has inline styles, so we need !important on everything */
+.blocklyScrollbarHandle,
+rect.blocklyScrollbarHandle {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+.blocklyScrollbarBackground,
+rect.blocklyScrollbarBackground {
+  fill: transparent !important;
+  fill-opacity: 0 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+}
+
+/* Hide the entire scrollbar groups */
+g.blocklyScrollbarVertical,
+g.blocklyScrollbarHorizontal {
+  display: none !important;
+}

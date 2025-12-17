@@ -4,6 +4,8 @@ export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { TagInput } from '@/components/ui/tag-input';
+import { ColoredTextEditor } from '@/components/ColoredTextEditor';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -282,7 +284,7 @@ function ObjectEditorContent() {
         level: object.level || 1,
         concealment: object.concealment || 0,
         values: object.values || {},
-        zoneId: object.zoneId || 511,
+        zoneId: object.zoneId ?? 511,
       });
       setSelectedFlags(object.flags || []);
       setSelectedWearFlags(object.wearFlags || []);
@@ -375,7 +377,7 @@ function ObjectEditorContent() {
 
   if (loading) return <div className='p-4'>Loading object data...</div>;
   if (error)
-    return <div className='p-4 text-red-600'>Error: {error.message}</div>;
+    return <div className='p-4 text-destructive'>Error: {error.message}</div>;
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
@@ -390,11 +392,15 @@ function ObjectEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-foreground'>
-            {isNew
-              ? 'Create New Object'
-              : formData.name
-                ? `Edit Object: ${formData.name}`
-                : `Edit Object ${objectId}`}
+            {isNew ? (
+              'Create New Object'
+            ) : formData.name ? (
+              <>
+                Edit Object: <ColoredTextInline markup={formData.name} />
+              </>
+            ) : (
+              `Edit Object ${objectId}`
+            )}
           </h1>
           <p className='text-muted-foreground mt-1'>
             Configure object properties, flags, and type-specific values
@@ -484,7 +490,7 @@ function ObjectEditorContent() {
                     id='type'
                     value={formData.type}
                     onChange={e => handleInputChange('type', e.target.value)}
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   >
                     {OBJECT_TYPES.map(type => (
                       <option key={type} value={type}>
@@ -499,60 +505,55 @@ function ObjectEditorContent() {
               <div>
                 <label
                   htmlFor='name'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-muted-foreground mb-1'
                 >
                   Name *
                 </label>
-                <input
-                  type='text'
-                  id='name'
+                <ColoredTextEditor
                   value={formData.name}
-                  onChange={e => handleInputChange('name', e.target.value)}
+                  onChange={value => handleInputChange('name', value)}
                   placeholder='e.g., a long iron sword'
-                  className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                    errors.name ? 'border-red-300' : 'border-gray-300'
-                  }`}
+                  maxLength={80}
+                  showPreview={true}
+                  className={errors.name ? 'border-destructive' : ''}
                 />
                 {errors.name && (
-                  <p className='text-red-500 text-xs mt-1'>{errors.name}</p>
+                  <p className='text-destructive text-xs mt-1'>{errors.name}</p>
                 )}
               </div>
 
               <div>
                 <label
                   htmlFor='examineDescription'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-muted-foreground mb-1'
                 >
                   Examine Description
                 </label>
-                <textarea
-                  id='examineDescription'
-                  rows={4}
+                <ColoredTextEditor
                   value={formData.examineDescription}
-                  onChange={e =>
-                    handleInputChange('examineDescription', e.target.value)
+                  onChange={value =>
+                    handleInputChange('examineDescription', value)
                   }
                   placeholder='Detailed description when examined'
-                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                  showPreview={true}
                 />
               </div>
 
               <div>
                 <label
                   htmlFor='actionDescription'
-                  className='block text-sm font-medium text-gray-700 mb-1'
+                  className='block text-sm font-medium text-muted-foreground mb-1'
                 >
                   Action Description
                 </label>
-                <input
-                  type='text'
-                  id='actionDescription'
+                <ColoredTextEditor
                   value={formData.actionDescription}
-                  onChange={e =>
-                    handleInputChange('actionDescription', e.target.value)
+                  onChange={value =>
+                    handleInputChange('actionDescription', value)
                   }
                   placeholder='Description when used/activated'
-                  className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                  maxLength={200}
+                  showPreview={true}
                 />
               </div>
             </div>
@@ -562,15 +563,15 @@ function ObjectEditorContent() {
         {/* Properties Tab */}
         {activeTab === 'properties' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Physical Properties
               </h3>
               <div className='space-y-4'>
                 <div>
                   <label
                     htmlFor='weight'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Weight (lbs)
                   </label>
@@ -586,19 +587,21 @@ function ObjectEditorContent() {
                       )
                     }
                     min='0'
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.weight ? 'border-red-300' : 'border-gray-300'
+                    className={`block w-full rounded-md shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground ${
+                      errors.weight ? 'border-destructive' : 'border-input'
                     }`}
                   />
                   {errors.weight && (
-                    <p className='text-red-500 text-xs mt-1'>{errors.weight}</p>
+                    <p className='text-destructive text-xs mt-1'>
+                      {errors.weight}
+                    </p>
                   )}
                 </div>
 
                 <div>
                   <label
                     htmlFor='cost'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Cost (copper pieces)
                   </label>
@@ -610,19 +613,21 @@ function ObjectEditorContent() {
                       handleInputChange('cost', parseInt(e.target.value) || 0)
                     }
                     min='0'
-                    className={`block w-full rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm ${
-                      errors.cost ? 'border-red-300' : 'border-gray-300'
+                    className={`block w-full rounded-md shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground ${
+                      errors.cost ? 'border-destructive' : 'border-input'
                     }`}
                   />
                   {errors.cost && (
-                    <p className='text-red-500 text-xs mt-1'>{errors.cost}</p>
+                    <p className='text-destructive text-xs mt-1'>
+                      {errors.cost}
+                    </p>
                   )}
                 </div>
 
                 <div>
                   <label
                     htmlFor='level'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Level
                   </label>
@@ -635,21 +640,21 @@ function ObjectEditorContent() {
                     }
                     min='1'
                     max='100'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Special Properties
               </h3>
               <div className='space-y-4'>
                 <div>
                   <label
                     htmlFor='timer'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Timer (minutes)
                   </label>
@@ -661,14 +666,14 @@ function ObjectEditorContent() {
                       handleInputChange('timer', parseInt(e.target.value) || 0)
                     }
                     min='0'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='decomposeTimer'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Decompose Timer
                   </label>
@@ -683,14 +688,14 @@ function ObjectEditorContent() {
                       )
                     }
                     min='0'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='concealment'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Concealment
                   </label>
@@ -705,14 +710,14 @@ function ObjectEditorContent() {
                       )
                     }
                     min='0'
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
 
                 <div>
                   <label
                     htmlFor='zoneId'
-                    className='block text-sm font-medium text-gray-700 mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Zone ID
                   </label>
@@ -726,7 +731,7 @@ function ObjectEditorContent() {
                         parseInt(e.target.value) || 511
                       )
                     }
-                    className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
               </div>
@@ -737,8 +742,8 @@ function ObjectEditorContent() {
         {/* Flags Tab */}
         {activeTab === 'flags' && (
           <div className='grid grid-cols-2 gap-6'>
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Object Flags
               </h3>
               <div className='grid grid-cols-2 gap-2'>
@@ -748,9 +753,9 @@ function ObjectEditorContent() {
                       type='checkbox'
                       checked={selectedFlags.includes(flag)}
                       onChange={() => handleFlagToggle(flag, 'object')}
-                      className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                      className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50'
                     />
-                    <span className='ml-2 text-sm text-gray-700'>
+                    <span className='ml-2 text-sm text-foreground'>
                       {flag.replace('_', ' ').toLowerCase()}
                     </span>
                   </label>
@@ -758,8 +763,8 @@ function ObjectEditorContent() {
               </div>
             </div>
 
-            <div className='bg-white shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-gray-900 mb-4'>
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
                 Wear Locations
               </h3>
               <div className='grid grid-cols-2 gap-2'>
@@ -769,9 +774,9 @@ function ObjectEditorContent() {
                       type='checkbox'
                       checked={selectedWearFlags.includes(flag)}
                       onChange={() => handleFlagToggle(flag, 'wear')}
-                      className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                      className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50'
                     />
-                    <span className='ml-2 text-sm text-gray-700'>
+                    <span className='ml-2 text-sm text-foreground'>
                       {flag.toLowerCase()}
                     </span>
                   </label>
@@ -783,12 +788,12 @@ function ObjectEditorContent() {
 
         {/* Type Values Tab */}
         {activeTab === 'values' && (
-          <div className='bg-white shadow rounded-lg p-6'>
-            <h3 className='text-lg font-medium text-gray-900 mb-4'>
+          <div className='bg-card shadow rounded-lg p-6 border border-border'>
+            <h3 className='text-lg font-medium text-foreground mb-4'>
               Type-Specific Values for {formData.type}
             </h3>
-            <div className='bg-gray-50 p-4 rounded-lg'>
-              <p className='text-sm text-gray-600 mb-4'>
+            <div className='bg-muted p-4 rounded-lg'>
+              <p className='text-sm text-muted-foreground mb-4'>
                 Configure type-specific properties based on the object type
                 selected. Different object types have different value
                 requirements.
@@ -799,7 +804,7 @@ function ObjectEditorContent() {
                 {formData.type === 'WEAPON' && (
                   <div className='grid grid-cols-3 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Damage Dice Number
                       </label>
                       <input
@@ -816,12 +821,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 1
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Number of dice'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Damage Dice Size
                       </label>
                       <input
@@ -838,12 +843,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 6
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Dice size (e.g., 6 for d6)'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Damage Bonus
                       </label>
                       <input
@@ -855,12 +860,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 0
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Damage bonus'
                       />
                     </div>
                     <div className='col-span-3 mt-2'>
-                      <p className='text-sm text-gray-500'>
+                      <p className='text-sm text-muted-foreground'>
                         Average damage: ~
                         {Math.floor(
                           (getValueSafe(formData.values, 'damageDiceNum', 1) *
@@ -881,7 +886,7 @@ function ObjectEditorContent() {
                 {formData.type === 'ARMOR' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Armor Class Bonus
                       </label>
                       <input
@@ -893,12 +898,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 0
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='AC bonus (positive values)'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Max Dex Bonus
                       </label>
                       <input
@@ -912,7 +917,7 @@ function ObjectEditorContent() {
                         }
                         min='0'
                         max='10'
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Max dexterity bonus'
                       />
                     </div>
@@ -922,7 +927,7 @@ function ObjectEditorContent() {
                 {formData.type === 'CONTAINER' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Max Weight Capacity
                       </label>
                       <input
@@ -936,12 +941,12 @@ function ObjectEditorContent() {
                           )
                         }
                         step='0.1'
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Weight capacity in lbs'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Container Key ID (Optional)
                       </label>
                       <input
@@ -954,12 +959,12 @@ function ObjectEditorContent() {
                           )
                         }
                         min='0'
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Object ID of key (if locked)'
                       />
                     </div>
                     <div className='col-span-2'>
-                      <label className='block text-sm font-medium text-gray-700 mb-2'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-2'>
                         Container Flags
                       </label>
                       <div className='grid grid-cols-2 gap-2'>
@@ -991,9 +996,9 @@ function ObjectEditorContent() {
                                     );
                                   }
                                 }}
-                                className='rounded border-gray-300 text-blue-600 shadow-sm focus:border-blue-300 focus:ring focus:ring-blue-200 focus:ring-opacity-50'
+                                className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50'
                               />
-                              <span className='ml-2 text-sm text-gray-700'>
+                              <span className='ml-2 text-sm text-foreground'>
                                 {flag}
                               </span>
                             </label>
@@ -1007,7 +1012,7 @@ function ObjectEditorContent() {
                 {formData.type === 'LIGHT' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Light Hours Remaining
                       </label>
                       <input
@@ -1020,12 +1025,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 0
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Hours of light (-1 for infinite)'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Light Brightness
                       </label>
                       <select
@@ -1037,7 +1042,7 @@ function ObjectEditorContent() {
                         onChange={e =>
                           handleTypeValueChange('brightness', e.target.value)
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                       >
                         <option value='dim'>Dim</option>
                         <option value='normal'>Normal</option>
@@ -1051,7 +1056,7 @@ function ObjectEditorContent() {
                 {formData.type === 'FOOD' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Hours of Nourishment
                       </label>
                       <input
@@ -1064,12 +1069,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 4
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Hours of hunger satisfied'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Poisoned?
                       </label>
                       <select
@@ -1084,7 +1089,7 @@ function ObjectEditorContent() {
                             e.target.value === 'true'
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                       >
                         <option value='false'>Safe</option>
                         <option value='true'>Poisoned</option>
@@ -1096,7 +1101,7 @@ function ObjectEditorContent() {
                 {formData.type === 'LIQUID_CONTAINER' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Liquid Capacity
                       </label>
                       <input
@@ -1113,12 +1118,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 10
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Maximum liquid units'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Current Liquid
                       </label>
                       <select
@@ -1130,7 +1135,7 @@ function ObjectEditorContent() {
                         onChange={e =>
                           handleTypeValueChange('liquidType', e.target.value)
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                       >
                         <option value='water'>Water</option>
                         <option value='beer'>Beer</option>
@@ -1150,7 +1155,7 @@ function ObjectEditorContent() {
                 {formData.type === 'POTION' && (
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Spell Level
                       </label>
                       <input
@@ -1164,12 +1169,12 @@ function ObjectEditorContent() {
                             parseInt(e.target.value) || 1
                           )
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Spell level (1-9)'
                       />
                     </div>
                     <div>
-                      <label className='block text-sm font-medium text-gray-700 mb-1'>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Spell Name
                       </label>
                       <input
@@ -1178,15 +1183,15 @@ function ObjectEditorContent() {
                         onChange={e =>
                           handleTypeValueChange('spellName', e.target.value)
                         }
-                        className='block w-full rounded-md border-gray-300 shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm'
+                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                         placeholder='Name of spell effect'
                       />
                     </div>
                   </div>
                 )}
 
-                <div className='mt-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg'>
-                  <p className='text-sm text-yellow-800'>
+                <div className='mt-6 p-4 bg-muted border border-border rounded-lg'>
+                  <p className='text-sm text-muted-foreground'>
                     <strong>Note:</strong> Type-specific values are stored as
                     JSON and interpreted by the MUD server. Consult your MUD's
                     documentation for specific value requirements for each

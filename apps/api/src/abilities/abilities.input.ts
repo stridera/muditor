@@ -1,6 +1,13 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
-import { Position, TargetType, TargetScope, SaveType } from '@prisma/client';
+import {
+  Position,
+  TargetType,
+  TargetScope,
+  SaveType,
+  SpellSphere,
+  ElementType,
+} from '@prisma/client';
 
 @InputType()
 export class CreateAbilityInput {
@@ -9,9 +16,6 @@ export class CreateAbilityInput {
 
   @Field({ nullable: true })
   description?: string;
-
-  @Field({ nullable: true })
-  gameId?: string;
 
   @Field({ defaultValue: 'SPELL' })
   abilityType: string;
@@ -24,6 +28,9 @@ export class CreateAbilityInput {
 
   @Field({ defaultValue: false })
   violent: boolean;
+
+  @Field({ defaultValue: true })
+  combatOk: boolean;
 
   @Field(() => Int, { defaultValue: 1 })
   castTimeRounds: number;
@@ -45,6 +52,25 @@ export class CreateAbilityInput {
 
   @Field({ nullable: true })
   luaScript?: string;
+
+  // Spell metadata
+  @Field(() => SpellSphere, { nullable: true })
+  sphere?: SpellSphere;
+
+  @Field(() => ElementType, { nullable: true })
+  damageType?: ElementType;
+
+  @Field(() => Int, { nullable: true })
+  pages?: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  memorizationTime: number;
+
+  @Field({ defaultValue: false })
+  questOnly: boolean;
+
+  @Field({ defaultValue: false })
+  humanoidOnly: boolean;
 }
 
 @InputType()
@@ -54,9 +80,6 @@ export class UpdateAbilityInput {
 
   @Field({ nullable: true })
   description?: string;
-
-  @Field({ nullable: true })
-  gameId?: string;
 
   @Field({ nullable: true })
   abilityType?: string;
@@ -69,6 +92,9 @@ export class UpdateAbilityInput {
 
   @Field({ nullable: true })
   violent?: boolean;
+
+  @Field({ nullable: true })
+  combatOk?: boolean;
 
   @Field(() => Int, { nullable: true })
   castTimeRounds?: number;
@@ -90,6 +116,25 @@ export class UpdateAbilityInput {
 
   @Field({ nullable: true })
   luaScript?: string;
+
+  // Spell metadata
+  @Field(() => SpellSphere, { nullable: true })
+  sphere?: SpellSphere;
+
+  @Field(() => ElementType, { nullable: true })
+  damageType?: ElementType;
+
+  @Field(() => Int, { nullable: true })
+  pages?: number;
+
+  @Field(() => Int, { nullable: true })
+  memorizationTime?: number;
+
+  @Field({ nullable: true })
+  questOnly?: boolean;
+
+  @Field({ nullable: true })
+  humanoidOnly?: boolean;
 }
 
 @InputType()
@@ -114,6 +159,33 @@ export class CreateAbilityEffectInput {
 
   @Field({ nullable: true })
   condition?: string;
+}
+
+@InputType()
+export class AbilityEffectItemInput {
+  @Field(() => Int)
+  effectId: number;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  overrideParams?: any;
+
+  @Field(() => Int)
+  order: number;
+
+  @Field({ nullable: true })
+  trigger?: string;
+
+  @Field(() => Int, { defaultValue: 100 })
+  chancePct: number;
+
+  @Field({ nullable: true })
+  condition?: string;
+}
+
+@InputType()
+export class UpdateAbilityEffectsInput {
+  @Field(() => [AbilityEffectItemInput])
+  effects: AbilityEffectItemInput[];
 }
 
 @InputType()
@@ -249,4 +321,47 @@ export class UpdateAbilityMessagesInput {
 
   @Field({ nullable: true })
   wearoffToRoom?: string;
+}
+
+// Effect inputs
+@InputType()
+export class CreateEffectInput {
+  @Field()
+  name: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field()
+  effectType: string;
+
+  @Field(() => [String], { nullable: true })
+  tags?: string[];
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  defaultParams?: any;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  paramSchema?: any;
+}
+
+@InputType()
+export class UpdateEffectInput {
+  @Field({ nullable: true })
+  name?: string;
+
+  @Field({ nullable: true })
+  description?: string;
+
+  @Field({ nullable: true })
+  effectType?: string;
+
+  @Field(() => [String], { nullable: true })
+  tags?: string[];
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  defaultParams?: any;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  paramSchema?: any;
 }

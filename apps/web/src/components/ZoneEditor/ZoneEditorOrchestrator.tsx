@@ -366,6 +366,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   );
   // Current Z-level being viewed (floor 0 is ground level)
   const [currentZLevel, setCurrentZLevel] = useState<number>(0);
+  // Hide rooms not on current floor (false = show with reduced opacity, true = completely hide)
+  const [hideOtherFloors, setHideOtherFloors] = useState<boolean>(false);
   // Track which room is active in each overlap group (keyed by position)
   const [activeOverlapRooms, setActiveOverlapRooms] = useState<
     Record<string, number>
@@ -929,10 +931,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     return rooms.map(r => `${r.id}:${r.exits?.length ?? 0}`).join('|');
   }, [rooms]);
 
-  // Render all rooms (viewport virtualization removed - not needed for individual zones)
+  // Filter rooms based on hideOtherFloors setting
   const visibleRooms = useMemo(() => {
+    if (hideOtherFloors) {
+      return rooms.filter(room => (room.layoutZ ?? 0) === currentZLevel);
+    }
     return rooms;
-  }, [rooms]);
+  }, [rooms, hideOtherFloors, currentZLevel]);
 
   // Viewport virtualization removed - not needed for individual zones
   // Rooms now render synchronously to ensure proper initial zoom timing
@@ -2460,6 +2465,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             onChangeZLevel={delta => setCurrentZLevel(z => z + delta)}
             minZLevel={floorRange.min}
             maxZLevel={floorRange.max}
+            hideOtherFloors={hideOtherFloors}
+            onToggleHideOtherFloors={() => setHideOtherFloors(h => !h)}
             canUndo={canUndo}
             canRedo={canRedo}
             onUndo={handleUndo}
@@ -2495,7 +2502,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           onNodeClick={(_, node) => {
             if (viewMode === 'world-map') {
               const data = node.data as any;
-              if (data?.zoneId && data?.isZoneBoundary) {
+              if (data?.zoneId != null && data?.isZoneBoundary) {
                 setActiveZoneId(data.zoneId);
                 setViewMode('zone');
                 setSelectedRoomId(null);
@@ -2503,7 +2510,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 hasInitialZoomedRef.current = false;
                 return;
               }
-              if (data?.roomId && data?.zoneId) {
+              if (data?.roomId != null && data?.zoneId != null) {
                 setActiveZoneId(data.zoneId);
                 setSelectedRoomId(data.roomId);
                 setViewMode('zone');

@@ -192,10 +192,10 @@ export class CharacterDto {
 
   // Relations
   @Field(() => [CharacterItemDto], { nullable: true })
-  items?: CharacterItemDto[];
+  characterItems?: CharacterItemDto[];
 
   @Field(() => [CharacterEffectDto], { nullable: true })
-  effects?: CharacterEffectDto[];
+  characterEffects?: CharacterEffectDto[];
 }
 
 @ObjectType()
@@ -241,10 +241,10 @@ export class CharacterItemDto {
 
   // Relations
   @Field(() => CharacterDto)
-  character: CharacterDto;
+  characters: CharacterDto;
 
   @Field(() => ObjectSummaryDto)
-  objectPrototype: ObjectSummaryDto;
+  objects: ObjectSummaryDto;
 
   @Field(() => CharacterItemDto, { nullable: true })
   container?: CharacterItemDto;

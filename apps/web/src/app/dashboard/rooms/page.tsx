@@ -4,6 +4,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { SectorBadge } from '@/components/ui/sector-badge';
 import { useZone } from '@/contexts/zone-context';
+import { stripMarkup } from '@/utils/xmlLiteParser';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -224,9 +225,13 @@ function RoomsContent() {
   const filteredRooms = useMemo(() => {
     return rooms.filter(room => {
       const matchesSearch =
-        room.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        stripMarkup(room.name)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase()) ||
         room.id.toString().includes(searchTerm) ||
-        room.roomDescription.toLowerCase().includes(searchTerm.toLowerCase());
+        stripMarkup(room.roomDescription)
+          .toLowerCase()
+          .includes(searchTerm.toLowerCase());
       const matchesSector =
         selectedSector === 'all' || room.sector === selectedSector;
 
@@ -537,7 +542,7 @@ function RoomsContent() {
                             <span className='text-muted-foreground'>
                               Zone ID:
                             </span>
-                            <span>{room.zoneId || 'N/A'}</span>
+                            <span>{room.zoneId ?? 'N/A'}</span>
                           </div>
                           <div className='flex justify-between'>
                             <span className='text-muted-foreground'>

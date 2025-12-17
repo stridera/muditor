@@ -3,6 +3,9 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { TagInput } from '@/components/ui/tag-input';
+import { ColoredTextEditor } from '@/components/ColoredTextEditor';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import {
   CreateMobDocument,
   GetMobDocument,
@@ -29,6 +32,7 @@ import {
   useRealTimeValidation,
   ValidationHelpers,
 } from '../../../../hooks/useRealTimeValidation';
+import { useClasses } from '@/hooks/use-classes';
 import { DiceInput } from '../../../../components/dice-input';
 import { NumberSpinner } from '../../../../components/number-spinner';
 import { generateMobStats } from '../../../../utils/mob-stat-generator';
@@ -141,10 +145,13 @@ function MobEditorContent() {
   const zoneId = searchParams.get('zone');
   const isNew = !mobId || !zoneId;
 
+  // Fetch classes dynamically
+  const { classes, loading: classesLoading } = useClasses();
+
   const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState<MobFormData>({
     keywords: '',
-    mobClass: 'warrior',
+    mobClass: '',
     name: '',
     roomDescription: '',
     examineDescription: '',
@@ -189,7 +196,7 @@ function MobEditorContent() {
     perception: 0,
     concealment: 0,
     zoneId: 511,
-    race: 'HUMAN',
+    race: 'HUMANOID',
     position: 'STANDING',
     defaultPosition: 'STANDING',
     gender: 'NEUTRAL',
@@ -201,7 +208,7 @@ function MobEditorContent() {
   });
 
   // Initialize real-time validation
-  const { errors, validateField, validateAllFields } =
+  const { errors, validateField, validateAllFields, clearError } =
     useRealTimeValidation<MobFormData>(mobValidationRules);
 
   // Separate state for general/save errors
@@ -246,8 +253,8 @@ function MobEditorContent() {
       const damageDice = parseDice(mob.damageDice ?? '1d4+0');
 
       setFormData({
-        keywords: mob.keywords.join(' '),
-        mobClass: 'warrior', // Not in schema
+        keywords: mob.keywords.join(', '),
+        mobClass: '', // Not in schema - will be removed later
         name: mob.name,
         roomDescription: mob.roomDescription,
         examineDescription: mob.examineDescription,
@@ -325,6 +332,12 @@ function MobEditorContent() {
     validateField(field, value, updatedFormData);
   };
 
+  const handleClearErrors = (fields: string[]) => {
+    fields.forEach(field => {
+      clearError(field);
+    });
+  };
+
   const validateForm = (): boolean => {
     // Use the real-time validation for final form validation
     return validateAllFields(formData);
@@ -336,7 +349,10 @@ function MobEditorContent() {
     try {
       // Convert form data to backend format
       const saveData = {
-        keywords: formData.keywords.split(/\s+/).filter(k => k.length > 0),
+        keywords: formData.keywords
+          .split(',')
+          .map(k => k.trim())
+          .filter(k => k.length > 0),
         name: formData.name,
         roomDescription: formData.roomDescription,
         examineDescription: formData.examineDescription,
@@ -434,32 +450,7 @@ function MobEditorContent() {
       formData.armorClass
     );
 
-    // Update form data with generated stats
-    setFormData({
-      ...formData,
-      accuracy: generatedStats.accuracy,
-      attackPower: generatedStats.attackPower,
-      spellPower: generatedStats.spellPower,
-      penetrationFlat: generatedStats.penetrationFlat,
-      penetrationPercent: generatedStats.penetrationPercent,
-      evasion: generatedStats.evasion,
-      armorRating: generatedStats.armorRating,
-      damageReductionPercent: generatedStats.damageReductionPercent,
-      soak: generatedStats.soak,
-      hardness: generatedStats.hardness,
-      wardPercent: generatedStats.wardPercent,
-      resistanceFire: generatedStats.resistanceFire,
-      resistanceCold: generatedStats.resistanceCold,
-      resistanceLightning: generatedStats.resistanceLightning,
-      resistanceAcid: generatedStats.resistanceAcid,
-      resistancePoison: generatedStats.resistancePoison,
-      hpDiceNum: generatedStats.hpDiceNum,
-      hpDiceSize: generatedStats.hpDiceSize,
-      hpDiceBonus: generatedStats.hpDiceBonus,
-      damageDiceNum: generatedStats.damageDiceNum,
-      damageDiceSize: generatedStats.damageDiceSize,
-      damageDiceBonus: generatedStats.damageDiceBonus,
-    });
+    return generatedStats;
   };
 
   // Show loading state while query is running
@@ -491,7 +482,6 @@ function MobEditorContent() {
     { id: 'stats', label: 'Combat Stats' },
     { id: 'attributes', label: 'Attributes' },
     { id: 'equipment', label: 'Equipment & Resets' },
-    { id: 'advanced', label: 'Advanced' },
   ];
 
   return (
@@ -500,16 +490,24 @@ function MobEditorContent() {
       <div className='flex items-center justify-between mb-6'>
         <div>
           <h1 className='text-3xl font-bold text-foreground'>
-            {isNew
-              ? 'Create New Mob'
-              : formData.name
-                ? `Edit Mob: ${formData.name}`
-                : `Edit Mob - Zone ${zoneId}, ID ${mobId}`}
+            {isNew ? (
+              'Create New Mob'
+            ) : formData.name ? (
+              <>
+                Edit Mob: <ColoredTextInline markup={formData.name} />
+              </>
+            ) : (
+              `Edit Mob - Zone ${zoneId}, ID ${mobId}`
+            )}
           </h1>
           <p className='text-muted-foreground mt-1'>
-            {isNew
-              ? 'Create a new mob with custom stats, appearance, and behavior'
-              : data?.mob?.name || 'Loading mob details...'}
+            {isNew ? (
+              'Create a new mob with custom stats, appearance, and behavior'
+            ) : data?.mob?.name ? (
+              <ColoredTextInline markup={data.mob.name} />
+            ) : (
+              'Loading mob details...'
+            )}
           </p>
         </div>
         <div className='flex gap-2'>
@@ -568,21 +566,15 @@ function MobEditorContent() {
                 <div>
                   <label
                     htmlFor='keywords'
-                    className='block text-sm font-medium text-card-foreground mb-1'
+                    className='block text-sm font-medium text-muted-foreground mb-1'
                   >
                     Keywords *
                   </label>
-                  <input
-                    type='text'
-                    id='keywords'
+                  <TagInput
                     value={formData.keywords}
-                    onChange={e =>
-                      handleInputChange('keywords', e.target.value)
-                    }
-                    placeholder='e.g., orc warrior guard'
-                    className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
-                      errors.keywords ? 'border-destructive' : 'border-input'
-                    }`}
+                    onChange={value => handleInputChange('keywords', value)}
+                    placeholder='e.g., orc, warrior, guard'
+                    error={!!errors.keywords}
                   />
                   {errors.keywords && (
                     <p className='text-destructive text-xs mt-1'>
@@ -605,12 +597,14 @@ function MobEditorContent() {
                       handleInputChange('mobClass', e.target.value)
                     }
                     className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    disabled={classesLoading}
                   >
-                    <option value='warrior'>Warrior</option>
-                    <option value='wizard'>Wizard</option>
-                    <option value='cleric'>Cleric</option>
-                    <option value='rogue'>Rogue</option>
-                    <option value='ranger'>Ranger</option>
+                    <option value=''>N/A (No Class)</option>
+                    {classes.map(cls => (
+                      <option key={cls.id} value={cls.name}>
+                        {cls.name.charAt(0).toUpperCase() + cls.name.slice(1)}
+                      </option>
+                    ))}
                   </select>
                 </div>
               </div>
@@ -622,15 +616,13 @@ function MobEditorContent() {
                 >
                   Name *
                 </label>
-                <input
-                  type='text'
-                  id='name'
+                <ColoredTextEditor
                   value={formData.name}
-                  onChange={e => handleInputChange('name', e.target.value)}
+                  onChange={value => handleInputChange('name', value)}
                   placeholder='e.g., a burly orc warrior'
-                  className={`block w-full rounded-md border bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm ${
-                    errors.name ? 'border-destructive' : 'border-input'
-                  }`}
+                  maxLength={80}
+                  showPreview={true}
+                  className={errors.name ? 'border-destructive' : ''}
                 />
                 {errors.name && (
                   <p className='text-destructive text-xs mt-1'>{errors.name}</p>
@@ -644,15 +636,13 @@ function MobEditorContent() {
                 >
                   Room Description
                 </label>
-                <textarea
-                  id='roomDescription'
-                  rows={4}
+                <ColoredTextEditor
                   value={formData.roomDescription}
-                  onChange={e =>
-                    handleInputChange('roomDescription', e.target.value)
+                  onChange={value =>
+                    handleInputChange('roomDescription', value)
                   }
                   placeholder='How the mob appears in the room'
-                  className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  showPreview={true}
                 />
               </div>
 
@@ -663,16 +653,57 @@ function MobEditorContent() {
                 >
                   Examine Description
                 </label>
-                <textarea
-                  id='examineDescription'
-                  rows={4}
+                <ColoredTextEditor
                   value={formData.examineDescription}
-                  onChange={e =>
-                    handleInputChange('examineDescription', e.target.value)
+                  onChange={value =>
+                    handleInputChange('examineDescription', value)
                   }
                   placeholder='Detailed appearance when examined'
-                  className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  showPreview={true}
                 />
+              </div>
+
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <label
+                    htmlFor='gender'
+                    className='block text-sm font-medium text-card-foreground mb-1'
+                  >
+                    Gender
+                  </label>
+                  <select
+                    id='gender'
+                    value={formData.gender}
+                    onChange={e => handleInputChange('gender', e.target.value)}
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    <option value='NEUTRAL'>Neutral</option>
+                    <option value='MALE'>Male</option>
+                    <option value='FEMALE'>Female</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor='size'
+                    className='block text-sm font-medium text-card-foreground mb-1'
+                  >
+                    Size
+                  </label>
+                  <select
+                    id='size'
+                    value={formData.size}
+                    onChange={e => handleInputChange('size', e.target.value)}
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    <option value='TINY'>Tiny</option>
+                    <option value='SMALL'>Small</option>
+                    <option value='MEDIUM'>Medium</option>
+                    <option value='LARGE'>Large</option>
+                    <option value='HUGE'>Huge</option>
+                    <option value='GIGANTIC'>Gigantic</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -685,6 +716,7 @@ function MobEditorContent() {
             onFieldChange={handleInputChange}
             onGenerateStats={handleGenerateStats}
             errors={errors}
+            onClearErrors={handleClearErrors}
           />
         )}
 
@@ -827,158 +859,12 @@ function MobEditorContent() {
 
         {/* Equipment Tab */}
         {activeTab === 'equipment' && !isNew && (
-          <div className='bg-card shadow rounded-lg p-6'>
-            <MobEquipmentManager
-              mobId={parseInt(mobId!)}
-              zoneId={formData.zoneId}
-            />
-          </div>
-        )}
-
-        {/* Equipment Tab - New Mob Warning */}
-        {activeTab === 'equipment' && isNew && (
-          <div className='bg-card shadow rounded-lg p-6'>
-            <div className='text-center py-8'>
-              <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-accent'>
-                <svg
-                  className='h-6 w-6 text-accent-foreground'
-                  fill='none'
-                  viewBox='0 0 24 24'
-                  stroke='currentColor'
-                >
-                  <path
-                    strokeLinecap='round'
-                    strokeLinejoin='round'
-                    strokeWidth={2}
-                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z'
-                  />
-                </svg>
-              </div>
-              <h3 className='mt-2 text-sm font-medium text-card-foreground'>
-                Save mob first
-              </h3>
-              <p className='mt-1 text-sm text-muted-foreground'>
-                You need to save this mob before you can configure its equipment
-                and spawn locations.
-              </p>
-              <div className='mt-6'>
-                <button
-                  onClick={handleSave}
-                  disabled={updateLoading || createLoading}
-                  className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
-                >
-                  <Save className='w-4 h-4 mr-2' />
-                  Save Mob First
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Advanced Tab */}
-        {activeTab === 'advanced' && (
-          <div className='grid grid-cols-2 gap-6'>
+          <div className='space-y-6'>
             <div className='bg-card shadow rounded-lg p-6'>
-              <h3 className='text-lg font-medium text-card-foreground mb-4'>
-                Physical Properties
-              </h3>
-              <div className='space-y-4'>
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='race'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Race
-                    </label>
-                    <select
-                      id='race'
-                      value={formData.race}
-                      onChange={e => handleInputChange('race', e.target.value)}
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    >
-                      <option value='HUMAN'>Human</option>
-                      <option value='ELF'>Elf</option>
-                      <option value='DWARF'>Dwarf</option>
-                      <option value='HALFLING'>Halfling</option>
-                      <option value='ORC'>Orc</option>
-                      <option value='GOBLIN'>Goblin</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='gender'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Gender
-                    </label>
-                    <select
-                      id='gender'
-                      value={formData.gender}
-                      onChange={e =>
-                        handleInputChange('gender', e.target.value)
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    >
-                      <option value='NEUTRAL'>Neutral</option>
-                      <option value='MALE'>Male</option>
-                      <option value='FEMALE'>Female</option>
-                    </select>
-                  </div>
-                </div>
-
-                <div className='grid grid-cols-2 gap-4'>
-                  <div>
-                    <label
-                      htmlFor='size'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Size
-                    </label>
-                    <select
-                      id='size'
-                      value={formData.size}
-                      onChange={e => handleInputChange('size', e.target.value)}
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    >
-                      <option value='TINY'>Tiny</option>
-                      <option value='SMALL'>Small</option>
-                      <option value='MEDIUM'>Medium</option>
-                      <option value='LARGE'>Large</option>
-                      <option value='HUGE'>Huge</option>
-                      <option value='GIGANTIC'>Gigantic</option>
-                    </select>
-                  </div>
-
-                  <div>
-                    <label
-                      htmlFor='composition'
-                      className='block text-sm font-medium text-card-foreground mb-1'
-                    >
-                      Composition
-                    </label>
-                    <select
-                      id='composition'
-                      value={formData.composition}
-                      onChange={e =>
-                        handleInputChange('composition', e.target.value)
-                      }
-                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
-                    >
-                      <option value='FLESH'>Flesh</option>
-                      <option value='BONE'>Bone</option>
-                      <option value='STONE'>Stone</option>
-                      <option value='METAL'>Metal</option>
-                      <option value='PLANT'>Plant</option>
-                      <option value='WATER'>Water</option>
-                      <option value='FIRE'>Fire</option>
-                      <option value='AIR'>Air</option>
-                      <option value='EARTH'>Earth</option>
-                    </select>
-                  </div>
-                </div>
-              </div>
+              <MobEquipmentManager
+                mobId={parseInt(mobId!)}
+                zoneId={formData.zoneId}
+              />
             </div>
 
             <div className='bg-card shadow rounded-lg p-6'>
@@ -1082,6 +968,46 @@ function MobEditorContent() {
                     {formData.copper}cp
                   </p>
                 </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Equipment Tab - New Mob Warning */}
+        {activeTab === 'equipment' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6'>
+            <div className='text-center py-8'>
+              <div className='mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-accent'>
+                <svg
+                  className='h-6 w-6 text-accent-foreground'
+                  fill='none'
+                  viewBox='0 0 24 24'
+                  stroke='currentColor'
+                >
+                  <path
+                    strokeLinecap='round'
+                    strokeLinejoin='round'
+                    strokeWidth={2}
+                    d='M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.732-.833-2.5 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z'
+                  />
+                </svg>
+              </div>
+              <h3 className='mt-2 text-sm font-medium text-card-foreground'>
+                Save mob first
+              </h3>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                You need to save this mob before you can configure its equipment
+                and spawn locations.
+              </p>
+              <div className='mt-6'>
+                <button
+                  onClick={handleSave}
+                  disabled={updateLoading || createLoading}
+                  className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
+                >
+                  <Save className='w-4 h-4 mr-2' />
+                  Save Mob First
+                </button>
               </div>
             </div>
           </div>

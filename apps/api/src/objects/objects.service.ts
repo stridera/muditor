@@ -117,17 +117,40 @@ export class ObjectsService {
     limit: number = 10,
     zoneId?: number
   ): Promise<Objects[]> {
-    const searchTerm = search.trim();
+    const searchTerm = search.trim().toLowerCase();
     const searchNum = parseInt(searchTerm, 10);
     const isNumeric = !isNaN(searchNum);
 
+    // Split search into words for multi-word AND logic
+    const searchWords = searchTerm.split(/\s+/).filter(w => w.length > 0);
+
+    // Build WHERE clause using plaintext fields
     const where: Prisma.ObjectsWhereInput = {
-      OR: [
-        { name: { contains: searchTerm, mode: 'insensitive' } },
-        { keywords: { hasSome: [searchTerm.toLowerCase()] } },
-        ...(isNumeric ? [{ id: searchNum }] : []),
-      ],
       ...(zoneId && { zoneId }),
+      OR: [
+        // Check ID if numeric
+        ...(isNumeric ? [{ id: searchNum }] : []),
+        // Check keywords
+        { keywords: { hasSome: searchWords } },
+        // Search plaintext fields (all words must match - AND logic)
+        {
+          AND: searchWords.map(word => ({
+            OR: [
+              { plainName: { contains: word, mode: 'insensitive' } },
+              { plainRoomDescription: { contains: word, mode: 'insensitive' } },
+              {
+                plainExamineDescription: {
+                  contains: word,
+                  mode: 'insensitive',
+                },
+              },
+              {
+                plainActionDescription: { contains: word, mode: 'insensitive' },
+              },
+            ],
+          })),
+        },
+      ],
     };
 
     return this.database.objects.findMany({

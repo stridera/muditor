@@ -4,6 +4,7 @@ import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Edit, Package, Plus, Search, Settings, Trash2 } from 'lucide-react';
 import { useState } from 'react';
+import { ColoredTextInline } from './ColoredTextViewer';
 
 const GET_EQUIPMENT_SETS = gql`
   query GetEquipmentSets {
@@ -300,17 +301,17 @@ export default function EquipmentSetManager({
   };
 
   if (equipmentSetsLoading)
-    return <div className='p-4'>Loading equipment sets...</div>;
+    return <div className='p-4 text-foreground'>Loading equipment sets...</div>;
 
   return (
     <div className='space-y-6'>
       {/* Header */}
       <div className='flex items-center justify-between'>
         <div>
-          <h2 className='text-xl font-semibold text-gray-900'>
+          <h2 className='text-xl font-semibold text-foreground'>
             Equipment Set Manager
           </h2>
-          <p className='text-sm text-gray-600'>
+          <p className='text-sm text-muted-foreground'>
             Create and manage reusable equipment sets for consistent mob
             outfitting
           </p>
@@ -326,13 +327,13 @@ export default function EquipmentSetManager({
 
       {/* Create Form */}
       {showCreate && (
-        <div className='bg-white border border-gray-200 rounded-lg p-6'>
-          <h3 className='text-lg font-medium text-gray-900 mb-4'>
+        <div className='bg-card border border-border rounded-lg p-6'>
+          <h3 className='text-lg font-medium text-foreground mb-4'>
             Create Equipment Set
           </h3>
           <div className='space-y-4'>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
+              <label className='block text-sm font-medium text-foreground mb-2'>
                 Set Name *
               </label>
               <input
@@ -340,11 +341,11 @@ export default function EquipmentSetManager({
                 value={newSetName}
                 onChange={e => setNewSetName(e.target.value)}
                 placeholder='e.g., City Guard Set, Royal Mage Robes'
-                className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
+                className='block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-background text-foreground'
               />
             </div>
             <div>
-              <label className='block text-sm font-medium text-gray-700 mb-2'>
+              <label className='block text-sm font-medium text-foreground mb-2'>
                 Description (optional)
               </label>
               <textarea
@@ -352,7 +353,7 @@ export default function EquipmentSetManager({
                 onChange={e => setNewSetDescription(e.target.value)}
                 placeholder='Brief description of the equipment set and its intended use'
                 rows={3}
-                className='block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500'
+                className='block w-full px-3 py-2 border border-border rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 bg-background text-foreground'
               />
             </div>
             <div className='flex gap-3'>
@@ -365,7 +366,7 @@ export default function EquipmentSetManager({
               </button>
               <button
                 onClick={() => setShowCreate(false)}
-                className='px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 rounded-md hover:bg-gray-200'
+                className='px-4 py-2 text-sm font-medium text-foreground bg-muted rounded-md hover:bg-muted/80'
               >
                 Cancel
               </button>
@@ -377,11 +378,11 @@ export default function EquipmentSetManager({
       {/* Equipment Sets Grid */}
       {equipmentSets.length === 0 ? (
         <div className='text-center py-12'>
-          <Package className='mx-auto h-12 w-12 text-gray-400' />
-          <h3 className='mt-2 text-sm font-medium text-gray-900'>
+          <Package className='mx-auto h-12 w-12 text-muted-foreground' />
+          <h3 className='mt-2 text-sm font-medium text-foreground'>
             No equipment sets
           </h3>
-          <p className='mt-1 text-sm text-gray-500'>
+          <p className='mt-1 text-sm text-muted-foreground'>
             Get started by creating your first equipment set.
           </p>
         </div>
@@ -390,25 +391,25 @@ export default function EquipmentSetManager({
           {equipmentSets.map(set => (
             <div
               key={set.id}
-              className={`bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow ${
+              className={`bg-card border rounded-lg shadow-sm hover:shadow-md transition-shadow ${
                 selectedSetId === set.id
-                  ? 'ring-2 ring-blue-500 border-blue-200'
-                  : 'border-gray-200'
+                  ? 'ring-2 ring-blue-500 border-blue-200 dark:border-blue-800'
+                  : 'border-border'
               }`}
             >
               {/* Set Header */}
-              <div className='p-4 border-b border-gray-200'>
+              <div className='p-4 border-b border-border'>
                 <div className='flex items-center justify-between'>
                   <div className='flex-1'>
-                    <h3 className='text-lg font-medium text-gray-900'>
+                    <h3 className='text-lg font-medium text-foreground'>
                       {set.name}
                     </h3>
                     {set.description && (
-                      <p className='text-sm text-gray-600 mt-1'>
+                      <p className='text-sm text-muted-foreground mt-1'>
                         {set.description}
                       </p>
                     )}
-                    <p className='text-xs text-gray-500 mt-2'>
+                    <p className='text-xs text-muted-foreground mt-2'>
                       {set.items.length} items • Created{' '}
                       {new Date(set.createdAt).toLocaleDateString()}
                     </p>
@@ -417,7 +418,7 @@ export default function EquipmentSetManager({
                     {onSetSelect && (
                       <button
                         onClick={() => onSetSelect(set.id)}
-                        className='p-2 text-gray-400 hover:text-blue-600'
+                        className='p-2 text-muted-foreground hover:text-blue-600 dark:hover:text-blue-400'
                         title='Select this set'
                       >
                         <Settings className='w-4 h-4' />
@@ -427,14 +428,14 @@ export default function EquipmentSetManager({
                       onClick={() =>
                         setEditingSet(editingSet === set.id ? null : set.id)
                       }
-                      className='p-2 text-gray-400 hover:text-gray-600'
+                      className='p-2 text-muted-foreground hover:text-foreground'
                       title='Edit set'
                     >
                       <Edit className='w-4 h-4' />
                     </button>
                     <button
                       onClick={() => handleDeleteSet(set.id)}
-                      className='p-2 text-gray-400 hover:text-red-600'
+                      className='p-2 text-muted-foreground hover:text-red-600 dark:hover:text-red-400'
                       title='Delete set'
                     >
                       <Trash2 className='w-4 h-4' />
@@ -446,7 +447,7 @@ export default function EquipmentSetManager({
               {/* Set Items */}
               <div className='p-4'>
                 {set.items.length === 0 ? (
-                  <p className='text-sm text-gray-500 italic text-center py-4'>
+                  <p className='text-sm text-muted-foreground italic text-center py-4'>
                     No items in this set yet
                   </p>
                 ) : (
@@ -454,20 +455,20 @@ export default function EquipmentSetManager({
                     {set.items.map(item => (
                       <div
                         key={item.id}
-                        className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                        className='flex items-center justify-between p-2 bg-muted rounded'
                       >
                         <div className='flex-1'>
-                          <div className='text-sm font-medium text-gray-900'>
-                            {item.object.name}
+                          <div className='text-sm font-medium text-foreground'>
+                            <ColoredTextInline markup={item.object.name} />
                           </div>
-                          <div className='text-xs text-gray-500'>
+                          <div className='text-xs text-muted-foreground'>
                             {item.slot} • {item.object.type} •{' '}
                             {(item.probability * 100).toFixed(0)}% chance
                           </div>
                         </div>
                         <button
                           onClick={() => handleRemoveItem(item.id)}
-                          className='ml-2 p-1 text-gray-400 hover:text-red-600'
+                          className='ml-2 p-1 text-muted-foreground hover:text-red-600 dark:hover:text-red-400'
                           title='Remove item'
                         >
                           <Trash2 className='w-3 h-3' />
@@ -479,14 +480,14 @@ export default function EquipmentSetManager({
 
                 {/* Add Item */}
                 {getAvailableSlots(set).length > 0 && (
-                  <div className='mt-4 pt-4 border-t border-gray-200'>
+                  <div className='mt-4 pt-4 border-t border-border'>
                     <button
                       onClick={() =>
                         setShowObjectSearch(
                           showObjectSearch === set.id ? null : set.id
                         )
                       }
-                      className='w-full px-3 py-2 text-sm font-medium text-blue-600 border border-blue-300 rounded-md hover:bg-blue-50'
+                      className='w-full px-3 py-2 text-sm font-medium text-blue-600 dark:text-blue-400 border border-blue-300 dark:border-blue-700 rounded-md hover:bg-blue-50 dark:hover:bg-blue-950/30'
                     >
                       <Plus className='w-4 h-4 inline mr-1' />
                       Add Item to Set
@@ -496,13 +497,13 @@ export default function EquipmentSetManager({
                     {showObjectSearch === set.id && (
                       <div className='mt-3 space-y-3'>
                         <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-1'>
+                          <label className='block text-sm font-medium text-foreground mb-1'>
                             Equipment Slot
                           </label>
                           <select
                             value={selectedSlot}
                             onChange={e => setSelectedSlot(e.target.value)}
-                            className='block w-full px-3 py-2 border border-gray-300 rounded-md text-sm'
+                            className='block w-full px-3 py-2 border border-border rounded-md text-sm bg-background text-foreground'
                           >
                             <option value=''>Select a slot...</option>
                             {getAvailableSlots(set).map(slot => (
@@ -514,35 +515,35 @@ export default function EquipmentSetManager({
                         </div>
 
                         <div>
-                          <label className='block text-sm font-medium text-gray-700 mb-1'>
+                          <label className='block text-sm font-medium text-foreground mb-1'>
                             Search Objects
                           </label>
                           <div className='relative'>
-                            <Search className='absolute left-3 top-2.5 h-4 w-4 text-gray-400' />
+                            <Search className='absolute left-3 top-2.5 h-4 w-4 text-muted-foreground' />
                             <input
                               type='text'
                               value={searchTerm}
                               onChange={e => setSearchTerm(e.target.value)}
                               placeholder='Search by name or keywords...'
-                              className='block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md text-sm'
+                              className='block w-full pl-10 pr-3 py-2 border border-border rounded-md text-sm bg-background text-foreground'
                             />
                           </div>
                         </div>
 
                         {selectedSlot && (
-                          <div className='max-h-32 overflow-y-auto border border-gray-200 rounded'>
+                          <div className='max-h-32 overflow-y-auto border border-border rounded'>
                             {filteredObjects.slice(0, 10).map(obj => (
                               <button
                                 key={obj.id}
                                 onClick={() =>
                                   handleAddItem(set.id, obj.id, selectedSlot)
                                 }
-                                className='w-full p-2 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0'
+                                className='w-full p-2 text-left hover:bg-muted border-b border-border last:border-b-0'
                               >
-                                <div className='text-sm font-medium'>
-                                  {obj.name}
+                                <div className='text-sm font-medium text-foreground'>
+                                  <ColoredTextInline markup={obj.name} />
                                 </div>
-                                <div className='text-xs text-gray-500'>
+                                <div className='text-xs text-muted-foreground'>
                                   {obj.type} • {obj.keywords}
                                 </div>
                               </button>

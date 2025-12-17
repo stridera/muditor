@@ -648,27 +648,27 @@ Script attachment targets.
 
 Spell targeting scope patterns.
 
-| Value    | Description                    |
-| -------- | ------------------------------ |
-| `SINGLE` | Single target                  |
-| `ROOM`   | All targets in room            |
-| `GROUP`  | All group members              |
-| `AREA`   | Area effect                    |
-| `CHAIN`  | Chain lightning style          |
-| `CONE`   | Cone-shaped area               |
-| `LINE`   | Line-shaped area               |
+| Value    | Description           |
+| -------- | --------------------- |
+| `SINGLE` | Single target         |
+| `ROOM`   | All targets in room   |
+| `GROUP`  | All group members     |
+| `AREA`   | Area effect           |
+| `CHAIN`  | Chain lightning style |
+| `CONE`   | Cone-shaped area      |
+| `LINE`   | Line-shaped area      |
 
 ### SpellRange
 
 Spell casting range.
 
-| Value           | Description           |
-| --------------- | --------------------- |
-| `SELF`          | Caster only           |
-| `TOUCH`         | Touch range           |
-| `ROOM`          | Same room             |
-| `ADJACENT_ROOM` | Adjacent rooms        |
-| `WORLD`         | Anywhere in world     |
+| Value           | Description       |
+| --------------- | ----------------- |
+| `SELF`          | Caster only       |
+| `TOUCH`         | Touch range       |
+| `ROOM`          | Same room         |
+| `ADJACENT_ROOM` | Adjacent rooms    |
+| `WORLD`         | Anywhere in world |
 
 ### SaveType
 
@@ -696,47 +696,51 @@ Saving throw results.
 
 ### EffectType
 
-Spell effect types.
+Consolidated spell effect types (18 effects). Params vary by type.
 
-| Value          | Description                    |
-| -------------- | ------------------------------ |
-| `DAMAGE`       | Causes damage                  |
-| `HEAL`         | Restores hit points            |
-| `STAT_MOD`     | Modifies attributes            |
-| `AFFECT_FLAG`  | Applies status effects         |
-| `DISPEL`       | Removes magical effects        |
-| `TELEPORT`     | Teleportation                  |
-| `SUMMON`       | Summons creatures              |
-| `CREATE_OBJECT`| Creates items                  |
-| `RESOURCE`     | Modifies resources             |
-| `OBJ_AFFECT`   | Affects objects                |
-| `ROOM_AFFECT`  | Affects rooms                  |
-| `CLEANSE`      | Removes negative effects       |
-| `REMOVE_CURSE` | Removes curses                 |
-| `SCRIPT`       | Executes script                |
+| Value       | Description                                              |
+| ----------- | -------------------------------------------------------- |
+| `damage`    | Causes damage (instant, DoT, chain, or lifesteal)        |
+| `heal`      | Restores resources (hp, mana, move)                      |
+| `modify`    | Modifies any numeric value (stats, saves, size, etc.)    |
+| `status`    | Applies status flags (simple, CC, stealth, detect, etc.) |
+| `cleanse`   | Removes conditions (poison, curse, etc.)                 |
+| `dispel`    | Removes magical effects                                  |
+| `reveal`    | One-time show hidden targets                             |
+| `teleport`  | Move characters (self, target, group)                    |
+| `extract`   | Remove mob/object from game (banishment)                 |
+| `move`      | Forced movement (knockback, pull, swap)                  |
+| `interrupt` | Stop casting/channeling                                  |
+| `transform` | Shapechange (references form templates)                  |
+| `resurrect` | Bring back dead players                                  |
+| `create`    | Create objects (food, water, items)                      |
+| `summon`    | Summon creatures                                         |
+| `enchant`   | Apply effects to objects (duration/charges)              |
+| `globe`     | Spell immunity by circle                                 |
+| `room`      | Room-wide effects and barriers                           |
 
 ### EffectTrigger
 
 When spell effects trigger.
 
-| Value     | Description               |
-| --------- | ------------------------- |
-| `ON_CAST` | When spell is cast        |
-| `ON_HIT`  | When attack hits          |
-| `ON_KILL` | When target dies          |
-| `ON_SAVE` | When saving throw succeeds|
-| `ON_FAIL` | When saving throw fails   |
+| Value     | Description                |
+| --------- | -------------------------- |
+| `ON_CAST` | When spell is cast         |
+| `ON_HIT`  | When attack hits           |
+| `ON_KILL` | When target dies           |
+| `ON_SAVE` | When saving throw succeeds |
+| `ON_FAIL` | When saving throw fails    |
 
 ### StackingRule
 
 How multiple spell effects stack.
 
-| Value      | Description                  |
-| ---------- | ---------------------------- |
-| `REFRESH`  | Refresh duration             |
-| `STACK`    | Stack effects                |
-| `IGNORE`   | Ignore new applications      |
-| `MAX_ONLY` | Use strongest effect only    |
+| Value      | Description               |
+| ---------- | ------------------------- |
+| `REFRESH`  | Refresh duration          |
+| `STACK`    | Stack effects             |
+| `IGNORE`   | Ignore new applications   |
+| `MAX_ONLY` | Use strongest effect only |
 
 ---
 
@@ -746,28 +750,28 @@ How multiple spell effects stack.
 
 Skill classification types.
 
-| Value       | Description           |
-| ----------- | --------------------- |
-| `WEAPON`    | Weapon skills         |
-| `COMBAT`    | Combat abilities      |
-| `MAGIC`     | Magical abilities     |
-| `STEALTH`   | Stealth and subterfuge|
-| `SOCIAL`    | Social interactions   |
-| `CRAFTING`  | Item creation         |
-| `SURVIVAL`  | Survival skills       |
-| `KNOWLEDGE` | Lore and information  |
-| `UTILITY`   | General utilities     |
+| Value       | Description            |
+| ----------- | ---------------------- |
+| `WEAPON`    | Weapon skills          |
+| `COMBAT`    | Combat abilities       |
+| `MAGIC`     | Magical abilities      |
+| `STEALTH`   | Stealth and subterfuge |
+| `SOCIAL`    | Social interactions    |
+| `CRAFTING`  | Item creation          |
+| `SURVIVAL`  | Survival skills        |
+| `KNOWLEDGE` | Lore and information   |
+| `UTILITY`   | General utilities      |
 
 ### SkillCategory
 
 Skill availability categories.
 
-| Value        | Description                    |
-| ------------ | ------------------------------ |
-| `PRIMARY`    | Primary class skills           |
-| `SECONDARY`  | Secondary skills               |
-| `RESTRICTED` | Restricted access skills       |
-| `FORBIDDEN`  | Forbidden to class/race        |
+| Value        | Description              |
+| ------------ | ------------------------ |
+| `PRIMARY`    | Primary class skills     |
+| `SECONDARY`  | Secondary skills         |
+| `RESTRICTED` | Restricted access skills |
+| `FORBIDDEN`  | Forbidden to class/race  |
 
 ---
 
@@ -788,13 +792,13 @@ Character gender options.
 
 Character positioning states.
 
-| Value      | Description         |
-| ---------- | ------------------- |
-| `PRONE`    | Lying down          |
-| `SITTING`  | Sitting position    |
-| `KNEELING` | Kneeling position   |
-| `STANDING` | Standing upright    |
-| `FLYING`   | Flying/hovering     |
+| Value      | Description       |
+| ---------- | ----------------- |
+| `PRONE`    | Lying down        |
+| `SITTING`  | Sitting position  |
+| `KNEELING` | Kneeling position |
+| `STANDING` | Standing upright  |
+| `FLYING`   | Flying/hovering   |
 
 ### LifeForce
 
@@ -833,44 +837,44 @@ Physical makeup of creatures.
 
 Combat readiness and state.
 
-| Value           | Description            |
-| --------------- | ---------------------- |
-| `DEAD`          | Dead                   |
-| `MORT`          | Mortally wounded       |
-| `INCAPACITATED` | Unconscious            |
-| `STUNNED`       | Stunned/dazed          |
-| `SLEEPING`      | Sleeping               |
-| `RESTING`       | Resting                |
-| `ALERT`         | Alert and ready        |
-| `FIGHTING`      | Actively fighting      |
+| Value           | Description       |
+| --------------- | ----------------- |
+| `DEAD`          | Dead              |
+| `MORT`          | Mortally wounded  |
+| `INCAPACITATED` | Unconscious       |
+| `STUNNED`       | Stunned/dazed     |
+| `SLEEPING`      | Sleeping          |
+| `RESTING`       | Resting           |
+| `ALERT`         | Alert and ready   |
+| `FIGHTING`      | Actively fighting |
 
 ### DamageType
 
 Types of damage attacks can inflict.
 
-| Value      | Description         |
-| ---------- | ------------------- |
-| `HIT`      | Physical hit        |
-| `STING`    | Stinging attack     |
-| `WHIP`     | Whipping attack     |
-| `SLASH`    | Slashing damage     |
-| `BITE`     | Bite attack         |
-| `BLUDGEON` | Bludgeoning damage  |
-| `CRUSH`    | Crushing attack     |
-| `POUND`    | Pounding attack     |
-| `CLAW`     | Claw attack         |
-| `MAUL`     | Mauling attack      |
-| `THRASH`   | Thrashing attack    |
-| `PIERCE`   | Piercing damage     |
-| `BLAST`    | Blast/explosion     |
-| `PUNCH`    | Punching attack     |
-| `STAB`     | Stabbing attack     |
-| `FIRE`     | Fire damage         |
-| `COLD`     | Cold damage         |
-| `ACID`     | Acid damage         |
-| `SHOCK`    | Lightning damage    |
-| `POISON`   | Poison damage       |
-| `ALIGN`    | Alignment damage    |
+| Value      | Description        |
+| ---------- | ------------------ |
+| `HIT`      | Physical hit       |
+| `STING`    | Stinging attack    |
+| `WHIP`     | Whipping attack    |
+| `SLASH`    | Slashing damage    |
+| `BITE`     | Bite attack        |
+| `BLUDGEON` | Bludgeoning damage |
+| `CRUSH`    | Crushing attack    |
+| `POUND`    | Pounding attack    |
+| `CLAW`     | Claw attack        |
+| `MAUL`     | Mauling attack     |
+| `THRASH`   | Thrashing attack   |
+| `PIERCE`   | Piercing damage    |
+| `BLAST`    | Blast/explosion    |
+| `PUNCH`    | Punching attack    |
+| `STAB`     | Stabbing attack    |
+| `FIRE`     | Fire damage        |
+| `COLD`     | Cold damage        |
+| `ACID`     | Acid damage        |
+| `SHOCK`    | Lightning damage   |
+| `POISON`   | Poison damage      |
+| `ALIGN`    | Alignment damage   |
 
 ### Size
 

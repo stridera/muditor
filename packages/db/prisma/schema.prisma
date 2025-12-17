@@ -19,9 +19,9 @@ datasource db {
 
 model Ability {
   id             Int      @id @default(autoincrement())
-  name           String   @unique
+  name           String   // Display name with color codes (XML-Lite format)
+  plainName      String   @unique @map("plain_name") // Plain text name - unique identifier
   description    String?
-  gameId         String?  @unique @map("game_id") // e.g., "ability.fireball", "skill.backstab"
   abilityType    String   @default("SPELL") // Type: SPELL, SKILL, SONG, CHANT
   schoolId       Int?     @map("school_id")
   minPosition    Position @default(STANDING)
@@ -29,10 +29,19 @@ model Ability {
   castTimeRounds Int      @default(1) @map("cast_time_rounds")
   cooldownMs     Int      @default(0) @map("cooldown_ms")
   inCombatOnly   Boolean  @default(false) @map("in_combat_only")
+  combatOk       Boolean  @default(true) @map("combat_ok") // Can be used during combat
   isArea         Boolean  @default(false) @map("is_area")
   notes          String?
   tags           String[] @default([])
   luaScript      String?  @map("lua_script") @db.Text
+
+  // --- Spell metadata ---
+  sphere          SpellSphere? // Spell sphere: fire, water, healing, etc.
+  damageType      ElementType? @map("damage_type") // Primary damage type for display
+  pages           Int?         // Spellbook pages required to scribe
+  memorizationTime Int         @default(0) @map("memorization_time") // Additional memorization rounds
+  questOnly       Boolean      @default(false) @map("quest_only") // Quest-restricted ability
+  humanoidOnly    Boolean      @default(false) @map("humanoid_only") // Only available to humanoids
 
   // --- Relationships ---
   effects            AbilityEffect[]
@@ -42,6 +51,7 @@ model Ability {
   classAbilities     ClassAbilities[]
   classSkills        ClassSkills[]
   components         AbilityComponent[]
+  damageComponents   AbilityDamageComponent[]  // Multi-element damage (e.g., Fireball = FIRE + FORCE)
   messages           AbilityMessages?
   restrictions       AbilityRestrictions?
   savingThrows       AbilitySavingThrow[]
@@ -51,17 +61,32 @@ model Ability {
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
+}
 
-  @@index([gameId])
+model ToolboxCategory {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique // Display name: "Damage & Healing"
+  colour       String   // Hex color: "#e53935"
+  displayOrder Int      @map("display_order")
+  effects      Effect[]
+
+  @@map("ToolboxCategory")
 }
 
 model Effect {
-  id            Int             @id @default(autoincrement())
-  name          String          @unique
+  id            Int              @id @default(autoincrement())
+  name          String           @unique
   description   String?
-  effectType    String // e.g., "damage", "heal", "apply_aura", "teleport"
-  defaultParams Json            @default("{}") @map("default_params")
+  effectType    String           // e.g., "damage", "heal", "status", "crowd_control"
+  tags          String[]         // e.g., ["damage", "elemental", "fire"] for filtering
+  defaultParams Json             @default("{}") @map("default_params")
+  paramSchema   Json?            @map("param_schema") // JSON Schema for validation
+  categoryId    Int?             @map("category_id")
+  category      ToolboxCategory? @relation(fields: [categoryId], references: [id])
   abilities     AbilityEffect[]
+
+  @@index([effectType])
+  @@index([categoryId])
 }
 
 model AbilityEffect {
@@ -75,7 +100,7 @@ model AbilityEffect {
   chancePct      Int     @default(100) @map("chance_pct")
   condition      String? // Lua expression: "target.isUndead"
 
-  @@id([abilityId, effectId])
+  @@id([abilityId, effectId, order])
 }
 
 model AbilitySchool {
@@ -139,6 +164,20 @@ model AbilityComponent {
   consumed  Boolean @default(false)
   required  Boolean @default(true)
   ability   Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+}
+
+// Multi-component damage for abilities (e.g., Fireball = 70% FIRE + 30% FORCE)
+model AbilityDamageComponent {
+  id            Int         @id @default(autoincrement())
+  abilityId     Int         @map("ability_id")
+  element       ElementType
+  damageFormula String      @map("damage_formula") // e.g., "8d6", "2d6+level"
+  percentage    Int         @default(100)          // % of total damage (should sum to 100)
+  sequence      Int         @default(0)            // order of application
+
+  ability       Ability     @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+
+  @@index([abilityId])
 }
 
 model ObjectAbilities {
@@ -218,10 +257,16 @@ model MobAbilities {
 
 model CharacterClass {
   id                  Int                   @id @default(autoincrement())
-  name                String                @unique
+  name                String                // Display name with color codes (XML-Lite format)
+  plainName           String                @unique @map("plain_name") // Plain text name - unique identifier
   description         String?
   hitDice             String                @default("1d8") @map("hit_dice")
   primaryStat         String?               @map("primary_stat")
+
+  // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
+  // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
+  resistances         Json?                 @default("{}")
+
   createdAt           DateTime              @default(now()) @map("created_at")
   updatedAt           DateTime              @updatedAt @map("updated_at")
   characters          Characters[]
@@ -231,6 +276,33 @@ model CharacterClass {
   mobs                Mobs[]
 
   @@map("Class")
+}
+
+// ============================================================================
+// HELP SYSTEM
+// ============================================================================
+
+model HelpEntry {
+  id          Int      @id @default(autoincrement())
+  keywords    String[] // Multiple keywords for lookup (e.g., ["FIREBALL", "FIRE BALL"])
+  title       String   // Primary display title
+  content     String   @db.Text // Full help text content
+  minLevel    Int      @default(0) @map("min_level") // 0 = all players, 100+ = immortal only
+  category    String?  // Optional category for organization (e.g., "spell", "skill", "command")
+
+  // Parsed metadata (for spell/skill entries)
+  usage       String?  // Usage syntax
+  duration    String?  // Duration description
+  sphere      String?  // Spell sphere (fire, water, healing, etc.)
+  classes     Json?    // Class/circle requirements as JSON (e.g., {"Pyromancer": 7, "Sorcerer": 3})
+
+  // Tracking
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+  sourceFile  String?  @map("source_file") // Original help file this came from
+
+  @@index([keywords], type: Gin)
+  @@map("HelpEntry")
 }
 
 model AuditLogs {
@@ -387,6 +459,7 @@ model Characters {
   characterEffects   CharacterEffects[]
   characterItems     CharacterItems[]
   characterAbilities CharacterAbilities[]
+  characterPets      CharacterPets[]
   characterClass     CharacterClass?      @relation(fields: [classId], references: [id])
   users              Users?               @relation(fields: [userId], references: [id], onDelete: SetNull)
 }
@@ -399,6 +472,23 @@ model CharacterAliases {
   characters  Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, alias])
+}
+
+model CharacterPets {
+  id                   String     @id @default(uuid())
+  characterId          String     @map("character_id")
+  mobPrototypeZoneId   Int        @map("mob_prototype_zone_id")
+  mobPrototypeVnum     Int        @map("mob_prototype_vnum")
+  name                 String     // Pet's current name (can be customized)
+  customDescription    String?    @map("custom_description") @db.Text
+  createdAt            DateTime   @default(now()) @map("created_at")
+
+  // Relationships
+  character            Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  mobPrototype         Mobs       @relation(fields: [mobPrototypeZoneId, mobPrototypeVnum], references: [zoneId, id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([mobPrototypeZoneId, mobPrototypeVnum])
 }
 
 model EquipmentSetItems {
@@ -481,8 +571,11 @@ model Mobs {
   id                 Int
   keywords           String[]
   name               String          @map("name")
+  plainName          String          @default("") @map("plain_name")
   roomDescription    String          @map("room_description")
+  plainRoomDescription String        @default("") @map("plain_room_description")
   examineDescription String          @map("examine_description")
+  plainExamineDescription String     @default("") @map("plain_examine_description")
   alignment          Int             @default(0)
   level              Int             @default(1)
 
@@ -509,11 +602,9 @@ model Mobs {
   wardPercent               Int             @default(0) @map("ward_percent")
 
   // ELEMENTAL RESISTANCES
-  resistanceFire            Int             @default(0) @map("resistance_fire")
-  resistanceCold            Int             @default(0) @map("resistance_cold")
-  resistanceLightning       Int             @default(0) @map("resistance_lightning")
-  resistanceAcid            Int             @default(0) @map("resistance_acid")
-  resistancePoison          Int             @default(0) @map("resistance_poison")
+  // JSON object { "FIRE": 25, "COLD": -50, "HOLY": 100 }
+  // Values: -100 (2x damage) to 100 (immune), >100 for absorption (explicit only)
+  resistances               Json            @default("{}")
 
   move               Int             @default(0)
   hpDiceNum          Int             @default(0) @map("hp_dice_num")
@@ -558,6 +649,7 @@ model Mobs {
   damageType         DamageType      @default(HIT)
   mobResets          MobResets[]
   mobAbilities       MobAbilities[]
+  characterPets      CharacterPets[]
   characterClass     CharacterClass? @relation(fields: [classId], references: [id])
   zones              Zones           @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shops              Shops[]
@@ -566,6 +658,9 @@ model Mobs {
   @@id([zoneId, id])
   @@index([name])
   @@index([zoneId, name])
+  @@index([plainName])
+  @@index([plainRoomDescription])
+  @@index([plainExamineDescription])
 }
 
 model ObjectAffects {
@@ -584,6 +679,20 @@ model ObjectExtraDescriptions {
   objectZoneId Int      @map("object_zone_id")
   objectId     Int      @map("object_id")
   objects      Objects  @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+}
+
+// Resistance bonuses granted by equipment (e.g., Ring of Fire Resistance)
+model ObjectResistance {
+  id              Int         @id @default(autoincrement())
+  objectZoneId    Int         @map("object_zone_id")
+  objectId        Int         @map("object_id")
+  element         ElementType
+  value           Int         // -100 to 100 normally, >100 for absorption items
+  allowAbsorption Boolean     @default(false) @map("allow_absorption") // Can exceed 100%?
+
+  object          Objects     @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+
+  @@unique([objectZoneId, objectId, element])
 }
 
 model ObjectResets {
@@ -611,9 +720,13 @@ model Objects {
   type                    ObjectType                @default(NOTHING)
   keywords                String[]
   name                    String                    @map("name")
+  plainName               String                    @default("") @map("plain_name")
   roomDescription         String                    @map("room_description")
+  plainRoomDescription    String                    @default("") @map("plain_room_description")
   examineDescription      String?                   @map("examine_description")
+  plainExamineDescription String?                   @default("") @map("plain_examine_description")
   actionDescription       String?                   @map("action_desc")
+  plainActionDescription  String?                   @default("") @map("plain_action_desc")
   weight                  Float                     @default(0.0)
   cost                    Int                       @default(0)
   timer                   Int                       @default(0)
@@ -637,6 +750,7 @@ model Objects {
   objectAffects           ObjectAffects[]
   objectExtraDescriptions ObjectExtraDescriptions[]
   objectResets            ObjectResets[]
+  objectResistances       ObjectResistance[]        // Resistance bonuses granted by this item
   zones                   Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shopItems               ShopItems[]
   triggers                Triggers[]
@@ -645,15 +759,16 @@ model Objects {
   @@id([zoneId, id])
   @@index([name])
   @@index([zoneId, name])
+  @@index([plainName])
+  @@index([plainRoomDescription])
+  @@index([plainExamineDescription])
 }
 
 model Races {
   race               Race            @id
-  name               String
+  name               String          // Display name with color codes (XML-Lite format)
+  plainName          String          @unique @map("plain_name") // Plain text name - unique identifier
   keywords           String
-  displayName        String          @map("display_name")
-  fullName           String          @map("full_name")
-  plainName          String          @map("plain_name")
   playable           Boolean         @default(false)
   humanoid           Boolean         @default(false)
   magical            Boolean         @default(false)
@@ -688,6 +803,11 @@ model Races {
   enterVerb          String?         @map("enter_verb")
   leaveVerb          String?         @map("leave_verb")
   permanentEffects   EffectFlag[]    @map("permanent_effects")
+
+  // Elemental resistances: JSON object { "FIRE": 25, "COLD": -25, "HOLY": 100 }
+  // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively.
+  resistances        Json?           @default("{}")
+
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
   raceAbilities      RaceAbilities[]
@@ -735,6 +855,7 @@ model Room {
   id                    Int
   name                  String
   roomDescription       String                  @map("room_description")
+  plainRoomDescription  String                  @default("") @map("plain_room_description")
   sector                Sector                  @default(STRUCTURE)
   zoneId                Int                     @map("zone_id")
   createdAt             DateTime                @default(now()) @map("created_at")
@@ -754,6 +875,7 @@ model Room {
   zones                 Zones                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@id([zoneId, id])
+  @@index([plainRoomDescription])
 }
 
 model ShopAccepts {
@@ -920,6 +1042,38 @@ model Zones {
   rooms        Room[]
   shops        Shops[]
   triggers     Triggers[]
+}
+
+// ============================================================================
+// SOCIALS (Emotes/Actions)
+// ============================================================================
+
+model Social {
+  id                 Int      @id @default(autoincrement())
+  name               String   @unique // Command name (e.g., "smile", "bow", "hug")
+  hide               Boolean  @default(false) // Hide who initiated the action
+  minVictimPosition  Position @default(STANDING) @map("min_victim_position") // Victim must be at least this position
+
+  // No argument provided - actor alone
+  charNoArg          String?  @map("char_no_arg") // Message to actor
+  othersNoArg        String?  @map("others_no_arg") // Message to room
+
+  // Argument provided, target found
+  charFound          String?  @map("char_found") // Message to actor (null = no target allowed)
+  othersFound        String?  @map("others_found") // Message to room (excluding target)
+  victFound          String?  @map("vict_found") // Message to target
+
+  // Argument provided, target not found
+  notFound           String?  @map("not_found") // "Can't find that person"
+
+  // Self-targeting (actor targets themselves)
+  charAuto           String?  @map("char_auto") // Message to actor
+  othersAuto         String?  @map("others_auto") // Message to room
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  @@index([name])
 }
 
 // ============================================================================
@@ -1542,6 +1696,54 @@ enum TargetType {
   OBJECT_INV
   OBJECT_WORLD
   CORPSE
+}
+
+enum SpellSphere {
+  GENERIC
+  FIRE
+  WATER
+  EARTH
+  AIR
+  HEALING
+  PROTECTION
+  ENCHANTMENT
+  SUMMONING
+  DEATH
+  DIVINATION
+}
+
+enum ElementType {
+  // Physical damage types
+  PHYSICAL    // Weapon damage (slash, pierce, bludgeon)
+  FORCE       // Magical kinetic energy, hits ethereal
+  SONIC       // Sound/thunder, ignores physical armor
+  BLEED       // Physical DoT, bypasses some armor
+
+  // Classical elements
+  FIRE        // Heat, burning (opposes COLD)
+  COLD        // Freezing, slowing (opposes FIRE)
+  WATER       // Drowning, pressure, conducts SHOCK
+  EARTH       // Crushing, grounding (opposes AIR)
+  AIR         // Suffocation, cutting winds (opposes EARTH)
+  SHOCK       // Electricity, chains in water
+  ACID        // Corrosion, DoT
+  POISON      // Toxins, CON-based resist
+
+  // Light/Dark
+  RADIANT     // Pure light energy (opposes SHADOW)
+  SHADOW      // Darkness/void (opposes RADIANT)
+
+  // Divine
+  HOLY        // Divine positive (opposes UNHOLY)
+  UNHOLY      // Divine negative (opposes HOLY)
+
+  // Life/Death
+  HEAL        // Restoration, inverts on undead (opposes NECROTIC)
+  NECROTIC    // Life drain, withering (opposes HEAL)
+
+  // Other
+  MENTAL      // Psychic/psionic, ignores armor
+  NATURE      // Druidic/primal energy
 }
 
 enum TriggerFlag {

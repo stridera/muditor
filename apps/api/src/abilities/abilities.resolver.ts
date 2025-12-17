@@ -17,8 +17,11 @@ import {
   CreateAbilitySavingThrowInput,
   CreateAbilityTargetingInput,
   UpdateAbilityInput,
+  UpdateAbilityEffectsInput,
   UpdateAbilityMessagesInput,
   UpdateAbilityTargetingInput,
+  CreateEffectInput,
+  UpdateEffectInput,
 } from './abilities.input';
 import { AbilitiesService } from './abilities.service';
 
@@ -65,11 +68,6 @@ export class AbilitiesResolver {
     return this.abilitiesService.findOne(this.coerceNumericId(id));
   }
 
-  @Query(() => Ability, { name: 'abilityByGameId', nullable: true })
-  async getAbilityByGameId(@Args('gameId') gameId: string) {
-    return this.abilitiesService.findByGameId(gameId);
-  }
-
   @Mutation(() => Ability)
   @UseGuards(MinimumRoleGuard)
   @MinimumRole('CODER')
@@ -92,6 +90,17 @@ export class AbilitiesResolver {
   @MinimumRole('BUILDER')
   async deleteAbility(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.delete(this.coerceNumericId(id));
+  }
+
+  // Effects mutations
+  @Mutation(() => Ability)
+  @UseGuards(MinimumRoleGuard)
+  @MinimumRole('BUILDER')
+  async updateAbilityEffects(
+    @Args('abilityId', { type: () => Int }) abilityId: number,
+    @Args('data') data: UpdateAbilityEffectsInput
+  ) {
+    return this.abilitiesService.updateAbilityEffects(abilityId, data.effects);
   }
 
   // Targeting mutations
@@ -200,5 +209,30 @@ export class AbilitiesResolver {
   @Query(() => Effect, { name: 'effect' })
   async getEffect(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.findEffect(this.coerceNumericId(id));
+  }
+
+  // Effect mutations
+  @Mutation(() => Effect)
+  @UseGuards(MinimumRoleGuard)
+  @MinimumRole('CODER')
+  async createEffect(@Args('data') data: CreateEffectInput) {
+    return this.abilitiesService.createEffect(data);
+  }
+
+  @Mutation(() => Effect)
+  @UseGuards(MinimumRoleGuard)
+  @MinimumRole('CODER')
+  async updateEffect(
+    @Args('id', { type: () => ID }) id: string | number,
+    @Args('data') data: UpdateEffectInput
+  ) {
+    return this.abilitiesService.updateEffect(this.coerceNumericId(id), data);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(MinimumRoleGuard)
+  @MinimumRole('CODER')
+  async deleteEffect(@Args('id', { type: () => ID }) id: string | number) {
+    return this.abilitiesService.deleteEffect(this.coerceNumericId(id));
   }
 }

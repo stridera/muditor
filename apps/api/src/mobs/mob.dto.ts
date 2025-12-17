@@ -55,10 +55,19 @@ export class MobDto {
   name: string;
 
   @Field()
+  plainName: string;
+
+  @Field()
   roomDescription: string;
 
   @Field()
+  plainRoomDescription: string;
+
+  @Field()
   examineDescription: string;
+
+  @Field()
+  plainExamineDescription: string;
 
   @Field(() => Int)
   level: number;

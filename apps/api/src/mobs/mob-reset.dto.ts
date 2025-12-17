@@ -8,11 +8,21 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { WearFlag } from '@prisma/client';
+import GraphQLJSON from 'graphql-type-json';
 
 // Register WearFlag enum for GraphQL
 registerEnumType(WearFlag, {
   name: 'WearFlag',
 });
+
+@ObjectType()
+export class ObjectAffectDto {
+  @Field()
+  location: string;
+
+  @Field(() => Int)
+  modifier: number;
+}
 
 @ObjectType()
 export class ObjectSummaryDto {
@@ -30,6 +40,30 @@ export class ObjectSummaryDto {
 
   @Field(() => Int, { nullable: true })
   cost?: number;
+
+  @Field({ nullable: true })
+  examineDescription?: string;
+
+  @Field(() => Number, { nullable: true })
+  weight?: number;
+
+  @Field(() => Int, { nullable: true })
+  level?: number;
+
+  @Field(() => GraphQLJSON, { nullable: true })
+  values?: any;
+
+  @Field(() => [String], { nullable: true })
+  flags?: string[];
+
+  @Field(() => [String], { nullable: true })
+  effectFlags?: string[];
+
+  @Field(() => [String], { nullable: true })
+  wearFlags?: string[];
+
+  @Field(() => [ObjectAffectDto], { nullable: true })
+  objectAffects?: ObjectAffectDto[];
 }
 
 @ObjectType()

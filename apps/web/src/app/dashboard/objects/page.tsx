@@ -3,6 +3,7 @@
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { TypeBadge } from '@/components/ui/type-badge';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useZone } from '@/contexts/zone-context';
 import {
   CreateObjectDocument,
@@ -41,12 +42,12 @@ import {
   Plus,
   Square,
   Trash2,
-  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import EnhancedSearch, {
+  type EnhancedSearchRef,
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import {
@@ -97,11 +98,14 @@ function ObjectsContent() {
   const [sortBy, setSortBy] = useState('level');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
+  // Ref for search box focus
+  const searchRef = useRef<EnhancedSearchRef>(null);
+
+  // Fetch objects using conditional query based on selectedZone
   const { loading, error, data, refetch } = useQuery<
-    GetObjectsQuery | GetObjectsByZoneQuery,
-    GetObjectsQueryVariables | GetObjectsByZoneQueryVariables
+    GetObjectsByZoneQuery | GetObjectsQuery
   >(selectedZone ? GetObjectsByZoneDocument : GetObjectsDocument, {
-    variables: selectedZone ? { zoneId: selectedZone } : { take: 100 },
+    variables: selectedZone ? { zoneId: selectedZone } : { take: 1000 },
   });
 
   const [deleteObject] = useMutation<
@@ -113,26 +117,65 @@ function ObjectsContent() {
     DeleteObjectsMutationVariables
   >(DeleteObjectsDocument);
 
-  // Redirect to object editor if id parameter is provided
+  // Auto-expand object if id parameter is provided (for display, not editing)
   useEffect(() => {
-    if (idParam && zoneParam) {
+    if (idParam) {
       const objectId = parseInt(idParam);
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(objectId) && !isNaN(zoneId)) {
-        router.push(`/dashboard/objects/editor?zone=${zoneId}&id=${objectId}`);
+      if (!isNaN(objectId)) {
+        setExpandedObjects(prev => new Set(prev).add(objectId));
+        // Scroll to the object after a short delay to allow rendering
+        setTimeout(() => {
+          const element = document.getElementById(`object-${objectId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
       }
     }
-  }, [idParam, zoneParam, router]);
+  }, [idParam]);
 
-  // Handle initial zone parameter from URL
+  // Sync zone parameter from URL with context
   useEffect(() => {
-    if (zoneParam && selectedZone === null) {
+    if (zoneParam) {
       const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId)) {
+      if (!isNaN(zoneId) && selectedZone !== zoneId) {
         setSelectedZone(zoneId);
       }
+    } else if (!zoneParam && selectedZone !== null) {
+      // Clear zone when parameter is removed from URL
+      setSelectedZone(null);
     }
   }, [zoneParam, selectedZone, setSelectedZone]);
+
+  // Keyboard shortcut: '/' focuses search box
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
+        !(e.target as HTMLElement)?.isContentEditable
+      ) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Extract objects from the query result
+  const rawObjects: ObjectSummaryFragment[] =
+    data && 'objectsByZone' in data
+      ? (data.objectsByZone as ObjectSummaryFragment[])
+      : data && 'objects' in data
+        ? ((data as GetObjectsQuery).objects as ObjectSummaryFragment[])
+        : [];
+
+  // Deduplicate objects based on composite key (zoneId, id)
+  const objects: ObjectSummaryFragment[] = Array.from(
+    new Map(rawObjects.map(obj => [`${obj.zoneId}-${obj.id}`, obj])).values()
+  );
 
   // Type guard to differentiate summary vs detailed object
   const isDetailed = (
@@ -207,14 +250,6 @@ function ObjectsContent() {
       setDeletingId(null);
     }
   };
-
-  // Get objects from whichever query is active
-  const objects: ObjectSummaryFragment[] =
-    (data && 'objects' in data && (data as GetObjectsQuery).objects) ||
-    (data &&
-      'objectsByZone' in data &&
-      (data as GetObjectsByZoneQuery).objectsByZone) ||
-    [];
 
   // Get available types for filtering
   const availableTypes = getUniqueValues(objects, 'type');
@@ -376,6 +411,8 @@ function ObjectsContent() {
     }
     return base;
   });
+
+  // Apply search filters (zone filtering is done server-side)
   const filteredObjects = applySearchFilters(searchableObjects, searchFilters, {
     // Custom field mappings for object-specific filters
     isValuable: obj => (obj.cost ?? 0) >= 1000,
@@ -406,18 +443,18 @@ function ObjectsContent() {
     return sortOrder === 'asc' ? comparison : -comparison;
   });
 
-  // Calculate pagination
-  const totalPages = Math.ceil(sortedDisplayObjects.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
+  // Calculate pagination with page clamping
+  const totalCount = sortedDisplayObjects.length;
+  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
+  // Clamp currentPage to valid range to handle search filter changes
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
   const paginatedObjects = sortedDisplayObjects.slice(
     startIndex,
     startIndex + itemsPerPage
   );
-  const startItem = startIndex + 1;
-  const endItem = Math.min(
-    startIndex + itemsPerPage,
-    sortedDisplayObjects.length
-  );
+  const startItem = totalCount > 0 ? startIndex + 1 : 0;
+  const endItem = Math.min(startIndex + itemsPerPage, totalCount);
 
   if (loading) return <div className='p-4'>Loading objects...</div>;
   if (error)
@@ -426,30 +463,14 @@ function ObjectsContent() {
   return (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
-        <div className='flex items-center gap-3'>
-          <div>
-            <h1 className='text-2xl font-bold text-foreground'>
-              {selectedZone ? `Zone ${selectedZone} Objects` : 'All Objects'}
-            </h1>
-            <p className='text-sm text-muted-foreground mt-1'>
-              Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
-              objects (Page {currentPage} of {totalPages})
-              {selectedZone && ' in this zone'}
-            </p>
-          </div>
-          {selectedZone && (
-            <button
-              onClick={() => {
-                setSelectedZone(null);
-                setCurrentPage(1);
-              }}
-              className='inline-flex items-center px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-muted'
-              title='Clear zone filter and show all objects'
-            >
-              <X className='w-3 h-3 mr-1' />
-              Clear Filter
-            </button>
-          )}
+        <div>
+          <h1 className='text-2xl font-bold text-foreground'>
+            {selectedZone ? `Zone ${selectedZone} Objects` : 'All Objects'}
+          </h1>
+          <p className='text-sm text-muted-foreground mt-1'>
+            Showing {startItem}-{endItem} of {totalCount} objects (Page{' '}
+            {currentPage} of {totalPages})
+          </p>
         </div>
         <Link
           href='/dashboard/objects/editor'
@@ -519,6 +540,7 @@ function ObjectsContent() {
 
       {/* Enhanced Search */}
       <EnhancedSearch
+        ref={searchRef}
         onFiltersChange={setSearchFilters}
         placeholder='Search objects by name, keywords, type, or ID...'
         showLevelFilter={true}
@@ -608,7 +630,8 @@ function ObjectsContent() {
               objectDetails[object.id] || object;
             return (
               <div
-                key={fullObject.id}
+                id={`object-${fullObject.id}`}
+                key={`${fullObject.zoneId}-${fullObject.id}`}
                 className='bg-card border rounded-lg hover:shadow-md transition-shadow'
               >
                 <div
@@ -634,7 +657,8 @@ function ObjectsContent() {
                       <div className='flex-1'>
                         <div className='flex items-center gap-2 mb-1'>
                           <h3 className='font-semibold text-lg text-foreground'>
-                            #{fullObject.id} - {fullObject.name}
+                            #{fullObject.id} -{' '}
+                            <ColoredTextInline markup={fullObject.name ?? ''} />
                           </h3>
                           <TypeBadge type={fullObject.type ?? ''} />
                           <ChevronDown
@@ -645,12 +669,21 @@ function ObjectsContent() {
                             }`}
                           />
                         </div>
-                        <p className='text-sm text-muted-foreground mb-2'>
-                          Keywords:{' '}
-                          {Array.isArray(fullObject.keywords)
-                            ? fullObject.keywords.join(', ')
-                            : fullObject.keywords}
-                        </p>
+                        <div className='flex flex-wrap gap-1 mb-2'>
+                          {(Array.isArray(fullObject.keywords)
+                            ? fullObject.keywords
+                            : fullObject.keywords.split(/\s+/)
+                          )
+                            .filter(k => k)
+                            .map((keyword, idx) => (
+                              <span
+                                key={idx}
+                                className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground'
+                              >
+                                {keyword}
+                              </span>
+                            ))}
+                        </div>
                         <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                           <span>Level {fullObject.level}</span>
                           <span>{fullObject.weight} lbs</span>
@@ -660,6 +693,13 @@ function ObjectsContent() {
                       </div>
                     </div>
                     <div className='flex items-center gap-2 ml-4'>
+                      <Link
+                        href={`/dashboard/objects/view?zone=${fullObject.zoneId}&id=${fullObject.id}`}
+                        className='inline-flex items-center text-muted-foreground hover:text-foreground px-3 py-1 text-sm'
+                        onClick={e => e.stopPropagation()}
+                      >
+                        View
+                      </Link>
                       <Link
                         href={`/dashboard/objects/editor?zone=${fullObject.zoneId}&id=${fullObject.id}`}
                         className='inline-flex items-center text-primary hover:text-primary/80 px-3 py-1 text-sm'
@@ -1107,41 +1147,6 @@ function ObjectsContent() {
                           </div>
                         </div>
 
-                        {/* Timestamps */}
-                        {isDetailed(fullObject) &&
-                          (fullObject.createdAt || fullObject.updatedAt) && (
-                            <div>
-                              <h4 className='font-medium text-foreground mb-2'>
-                                Timestamps
-                              </h4>
-                              <div className='bg-card p-3 rounded border text-sm space-y-1'>
-                                {fullObject.createdAt && (
-                                  <div className='flex justify-between'>
-                                    <span className='text-muted-foreground'>
-                                      Created:
-                                    </span>
-                                    <span>
-                                      {new Date(
-                                        fullObject.createdAt
-                                      ).toLocaleString()}
-                                    </span>
-                                  </div>
-                                )}
-                                {fullObject.updatedAt && (
-                                  <div className='flex justify-between'>
-                                    <span className='text-muted-foreground'>
-                                      Updated:
-                                    </span>
-                                    <span>
-                                      {new Date(
-                                        fullObject.updatedAt
-                                      ).toLocaleString()}
-                                    </span>
-                                  </div>
-                                )}
-                              </div>
-                            </div>
-                          )}
                         {!isDetailed(fullObject) && (
                           <div className='text-xs text-muted-foreground italic'>
                             Detailed data not loaded yet.
@@ -1161,8 +1166,7 @@ function ObjectsContent() {
       {totalPages > 1 && (
         <div className='flex items-center justify-between mt-6 px-4 py-3 bg-muted rounded-lg'>
           <div className='text-sm text-muted-foreground'>
-            Showing {startItem}-{endItem} of {sortedDisplayObjects.length}{' '}
-            results
+            Showing {startItem}-{endItem} of {totalCount} results
           </div>
           <div className='flex items-center gap-2'>
             <button

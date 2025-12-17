@@ -11,11 +11,13 @@ import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
 import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
 import { GrantsModule } from './grants/grants.module';
+import { HelpModule } from './help/help.module';
 import { MobsModule } from './mobs/mobs.module';
 import { ObjectsModule } from './objects/objects.module';
 import { RacesModule } from './races/races.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ShopsModule } from './shops/shops.module';
+import { SocialsModule } from './socials/socials.module';
 import { TriggersModule } from './triggers/triggers.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
@@ -66,6 +68,8 @@ import { ZonesModule } from './zones/zones.module';
     AbilitiesModule,
     RacesModule,
     ClassesModule,
+    SocialsModule,
+    HelpModule,
   ],
 })
 export class AppModule {}

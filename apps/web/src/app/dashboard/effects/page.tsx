@@ -13,6 +13,7 @@ import {
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogTitle,
@@ -34,6 +35,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Textarea } from '@/components/ui/textarea';
 import type {
   Effect,
   GetEffectQuery,
@@ -44,29 +46,58 @@ import type {
   GetEffectsQueryVariables,
 } from '@/generated/graphql';
 import {
+  CreateEffectDocument,
+  DeleteEffectDocument,
   GetEffectDocument,
   GetEffectsCountDocument,
   GetEffectsDocument,
+  UpdateEffectDocument,
 } from '@/generated/graphql';
-import { useQuery } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import {
   AlertCircle,
   ChevronLeft,
   ChevronRight,
   ChevronsLeft,
   ChevronsRight,
-  Info,
+  Edit,
   Loader2,
+  Plus,
   Search,
   Sparkles,
+  Trash2,
   Zap,
 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 
 type EffectSummary = Pick<
   Effect,
-  'id' | 'name' | 'effectType' | 'description' | 'defaultParams'
+  | 'id'
+  | 'name'
+  | 'effectType'
+  | 'description'
+  | 'tags'
+  | 'defaultParams'
+  | 'paramSchema'
 >;
+
+interface EffectFormData {
+  name: string;
+  effectType: string;
+  description: string;
+  tags: string;
+  defaultParams: string;
+  paramSchema: string;
+}
+
+const emptyFormData: EffectFormData = {
+  name: '',
+  effectType: '',
+  description: '',
+  tags: '',
+  defaultParams: '{}',
+  paramSchema: '',
+};
 
 export default function EffectsPage() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -74,6 +105,15 @@ export default function EffectsPage() {
   const [page, setPage] = useState(0);
   const [pageSize, setPageSize] = useState(50);
   const [viewingEffectId, setViewingEffectId] = useState<string | null>(null);
+  const [editingEffect, setEditingEffect] = useState<EffectSummary | null>(
+    null
+  );
+  const [isCreating, setIsCreating] = useState(false);
+  const [deletingEffect, setDeletingEffect] = useState<EffectSummary | null>(
+    null
+  );
+  const [formData, setFormData] = useState<EffectFormData>(emptyFormData);
+  const [formError, setFormError] = useState<string | null>(null);
 
   // Debounce search term
   useEffect(() => {
@@ -84,7 +124,7 @@ export default function EffectsPage() {
     return () => clearTimeout(timer);
   }, [searchTerm]);
 
-  const { data, loading, error } = useQuery<
+  const { data, loading, error, refetch } = useQuery<
     GetEffectsQuery,
     GetEffectsQueryVariables
   >(GetEffectsDocument, {
@@ -95,7 +135,7 @@ export default function EffectsPage() {
     },
   });
 
-  const { data: countData } = useQuery<
+  const { data: countData, refetch: refetchCount } = useQuery<
     GetEffectsCountQuery,
     GetEffectsCountQueryVariables
   >(GetEffectsCountDocument, {
@@ -112,6 +152,51 @@ export default function EffectsPage() {
     skip: !viewingEffectId,
   });
 
+  const [createEffect, { loading: creating }] = useMutation(
+    CreateEffectDocument,
+    {
+      onCompleted: () => {
+        setIsCreating(false);
+        setFormData(emptyFormData);
+        setFormError(null);
+        refetch();
+        refetchCount();
+      },
+      onError: err => {
+        setFormError(err.message);
+      },
+    }
+  );
+
+  const [updateEffect, { loading: updating }] = useMutation(
+    UpdateEffectDocument,
+    {
+      onCompleted: () => {
+        setEditingEffect(null);
+        setFormData(emptyFormData);
+        setFormError(null);
+        refetch();
+      },
+      onError: err => {
+        setFormError(err.message);
+      },
+    }
+  );
+
+  const [deleteEffect, { loading: deleting }] = useMutation(
+    DeleteEffectDocument,
+    {
+      onCompleted: () => {
+        setDeletingEffect(null);
+        refetch();
+        refetchCount();
+      },
+      onError: err => {
+        setFormError(err.message);
+      },
+    }
+  );
+
   const effects = (data?.effects || []) as EffectSummary[];
   const totalCount = countData?.effectsCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -119,7 +204,7 @@ export default function EffectsPage() {
   const getEffectTypeCategory = (effectType: string) => {
     if (effectType.startsWith('apply_status_eff_')) {
       return 'Status Effect';
-    } else if (effectType.startsWith('apply_modifier_')) {
+    } else if (effectType.includes('_mod')) {
       return 'Stat Modifier';
     } else if (effectType.includes('damage')) {
       return 'Damage';
@@ -146,10 +231,8 @@ export default function EffectsPage() {
   };
 
   const formatEffectType = (effectType: string) => {
-    // Clean up the effect type for display
     return effectType
       .replace('apply_status_eff_', '')
-      .replace('apply_modifier_', 'Mod: ')
       .replace(/_/g, ' ')
       .split(' ')
       .map(word => word.charAt(0).toUpperCase() + word.slice(1))
@@ -179,18 +262,127 @@ export default function EffectsPage() {
     );
   };
 
+  const openCreateDialog = () => {
+    setFormData(emptyFormData);
+    setFormError(null);
+    setIsCreating(true);
+  };
+
+  const openEditDialog = (effect: EffectSummary, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setFormData({
+      name: effect.name || '',
+      effectType: effect.effectType || '',
+      description: effect.description || '',
+      tags: (effect.tags || []).join(', '),
+      defaultParams: JSON.stringify(effect.defaultParams || {}, null, 2),
+      paramSchema: effect.paramSchema
+        ? JSON.stringify(effect.paramSchema, null, 2)
+        : '',
+    });
+    setFormError(null);
+    setEditingEffect(effect);
+  };
+
+  const openDeleteDialog = (effect: EffectSummary, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setDeletingEffect(effect);
+  };
+
+  const handleSubmit = () => {
+    setFormError(null);
+
+    if (!formData.name.trim()) {
+      setFormError('Name is required');
+      return;
+    }
+    if (!formData.effectType.trim()) {
+      setFormError('Effect type is required');
+      return;
+    }
+
+    let parsedDefaultParams: any = {};
+    let parsedParamSchema: any = null;
+
+    try {
+      if (formData.defaultParams.trim()) {
+        parsedDefaultParams = JSON.parse(formData.defaultParams);
+      }
+    } catch (e) {
+      setFormError('Default parameters must be valid JSON');
+      return;
+    }
+
+    try {
+      if (formData.paramSchema.trim()) {
+        parsedParamSchema = JSON.parse(formData.paramSchema);
+      }
+    } catch (e) {
+      setFormError('Parameter schema must be valid JSON');
+      return;
+    }
+
+    const tags = formData.tags
+      .split(',')
+      .map(t => t.trim())
+      .filter(t => t.length > 0);
+
+    if (editingEffect) {
+      updateEffect({
+        variables: {
+          id: editingEffect.id,
+          data: {
+            name: formData.name.trim(),
+            effectType: formData.effectType.trim(),
+            description: formData.description.trim() || null,
+            tags,
+            defaultParams: parsedDefaultParams,
+            paramSchema: parsedParamSchema,
+          },
+        },
+      });
+    } else {
+      createEffect({
+        variables: {
+          data: {
+            name: formData.name.trim(),
+            effectType: formData.effectType.trim(),
+            description: formData.description.trim() || undefined,
+            tags,
+            defaultParams: parsedDefaultParams,
+            paramSchema: parsedParamSchema,
+          },
+        },
+      });
+    }
+  };
+
+  const handleDelete = () => {
+    if (deletingEffect) {
+      deleteEffect({ variables: { id: deletingEffect.id } });
+    }
+  };
+
+  const isFormOpen = isCreating || editingEffect !== null;
+
   return (
     <div className='space-y-6'>
       <div className='flex items-center justify-between'>
         <div>
           <h1 className='text-3xl font-bold'>Effects</h1>
           <p className='text-muted-foreground'>
-            Browse all available effects and their parameters
+            Manage all available effects and their parameters
           </p>
         </div>
-        <Badge variant='secondary' className='text-lg px-4 py-2'>
-          {totalCount} effects
-        </Badge>
+        <div className='flex items-center gap-4'>
+          <Badge variant='secondary' className='text-lg px-4 py-2'>
+            {totalCount} effects
+          </Badge>
+          <Button onClick={openCreateDialog}>
+            <Plus className='h-4 w-4 mr-2' />
+            New Effect
+          </Button>
+        </div>
       </div>
 
       <Card>
@@ -200,7 +392,7 @@ export default function EffectsPage() {
             Effects Database
           </CardTitle>
           <CardDescription>
-            View all effects available in the game and their configurations
+            View and manage all effects available in the game
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -248,10 +440,12 @@ export default function EffectsPage() {
                 <Table>
                   <TableHeader>
                     <TableRow>
+                      <TableHead>Name</TableHead>
                       <TableHead>Effect Type</TableHead>
                       <TableHead>Category</TableHead>
-                      <TableHead>Description</TableHead>
+                      <TableHead>Tags</TableHead>
                       <TableHead>Parameters</TableHead>
+                      <TableHead className='w-24'>Actions</TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
@@ -261,7 +455,10 @@ export default function EffectsPage() {
                         className='cursor-pointer hover:bg-muted/50'
                         onClick={() => setViewingEffectId(effect.id)}
                       >
-                        <TableCell className='font-medium font-mono text-sm'>
+                        <TableCell className='font-medium'>
+                          {effect.name}
+                        </TableCell>
+                        <TableCell className='font-mono text-sm'>
                           {formatEffectType(effect.effectType)}
                         </TableCell>
                         <TableCell>
@@ -273,9 +470,26 @@ export default function EffectsPage() {
                           </Badge>
                         </TableCell>
                         <TableCell>
-                          {effect.description || (
-                            <span className='text-muted-foreground italic'>
-                              No description
+                          {effect.tags && effect.tags.length > 0 ? (
+                            <div className='flex gap-1 flex-wrap'>
+                              {effect.tags.slice(0, 3).map(tag => (
+                                <Badge
+                                  key={tag}
+                                  variant='outline'
+                                  className='text-xs'
+                                >
+                                  {tag}
+                                </Badge>
+                              ))}
+                              {effect.tags.length > 3 && (
+                                <Badge variant='outline' className='text-xs'>
+                                  +{effect.tags.length - 3}
+                                </Badge>
+                              )}
+                            </div>
+                          ) : (
+                            <span className='text-muted-foreground italic text-sm'>
+                              None
                             </span>
                           )}
                         </TableCell>
@@ -285,6 +499,27 @@ export default function EffectsPage() {
                               None
                             </span>
                           )}
+                        </TableCell>
+                        <TableCell>
+                          <div className='flex gap-1'>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              onClick={e => openEditDialog(effect, e)}
+                              title='Edit effect'
+                            >
+                              <Edit className='h-4 w-4' />
+                            </Button>
+                            <Button
+                              variant='ghost'
+                              size='icon'
+                              onClick={e => openDeleteDialog(effect, e)}
+                              title='Delete effect'
+                              className='text-destructive hover:text-destructive'
+                            >
+                              <Trash2 className='h-4 w-4' />
+                            </Button>
+                          </div>
                         </TableCell>
                       </TableRow>
                     ))}
@@ -406,7 +641,7 @@ export default function EffectsPage() {
               <DialogHeader>
                 <DialogTitle className='flex items-center gap-2'>
                   <Zap className='h-5 w-5' />
-                  {formatEffectType(effectDetailsData.effect.effectType)}
+                  {effectDetailsData.effect.name}
                 </DialogTitle>
                 <Badge
                   variant='secondary'
@@ -437,25 +672,26 @@ export default function EffectsPage() {
                   </p>
                 </div>
 
+                {/* Tags */}
+                {effectDetailsData.effect.tags &&
+                  effectDetailsData.effect.tags.length > 0 && (
+                    <div>
+                      <Label className='text-sm font-semibold'>Tags</Label>
+                      <div className='flex gap-2 flex-wrap mt-2'>
+                        {effectDetailsData.effect.tags.map(tag => (
+                          <Badge key={tag} variant='outline'>
+                            {tag}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
                 {/* Parameters */}
                 <div>
                   <Label className='text-sm font-semibold'>
                     Default Parameters
                   </Label>
-                  {formatParams(effectDetailsData.effect.defaultParams) ? (
-                    <div className='mt-2 p-3 bg-muted rounded-lg'>
-                      {formatParams(effectDetailsData.effect.defaultParams)}
-                    </div>
-                  ) : (
-                    <p className='text-sm text-muted-foreground italic mt-1'>
-                      No default parameters
-                    </p>
-                  )}
-                </div>
-
-                {/* JSON View */}
-                <div>
-                  <Label className='text-sm font-semibold'>Raw JSON</Label>
                   <pre className='mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto'>
                     {JSON.stringify(
                       effectDetailsData.effect.defaultParams,
@@ -465,15 +701,21 @@ export default function EffectsPage() {
                   </pre>
                 </div>
 
-                {/* Info Box */}
-                <Alert>
-                  <Info className='h-4 w-4' />
-                  <AlertDescription className='text-sm'>
-                    Effects can be attached to abilities with custom parameters.
-                    The parameters shown here are the default values that will
-                    be used if no override is specified.
-                  </AlertDescription>
-                </Alert>
+                {/* Parameter Schema */}
+                {effectDetailsData.effect.paramSchema && (
+                  <div>
+                    <Label className='text-sm font-semibold'>
+                      Parameter Schema
+                    </Label>
+                    <pre className='mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto'>
+                      {JSON.stringify(
+                        effectDetailsData.effect.paramSchema,
+                        null,
+                        2
+                      )}
+                    </pre>
+                  </div>
+                )}
               </div>
 
               <DialogFooter>
@@ -490,6 +732,180 @@ export default function EffectsPage() {
               Effect not found
             </div>
           )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Create/Edit Effect Dialog */}
+      <Dialog
+        open={isFormOpen}
+        onOpenChange={open => {
+          if (!open) {
+            setIsCreating(false);
+            setEditingEffect(null);
+            setFormError(null);
+          }
+        }}
+      >
+        <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
+          <DialogHeader>
+            <DialogTitle>
+              {editingEffect ? 'Edit Effect' : 'Create New Effect'}
+            </DialogTitle>
+            <DialogDescription>
+              {editingEffect
+                ? 'Update the effect properties below.'
+                : 'Fill in the details for the new effect.'}
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className='space-y-4'>
+            {formError && (
+              <Alert variant='destructive'>
+                <AlertCircle className='h-4 w-4' />
+                <AlertDescription>{formError}</AlertDescription>
+              </Alert>
+            )}
+
+            <div className='grid grid-cols-2 gap-4'>
+              <div className='space-y-2'>
+                <Label htmlFor='name'>Name *</Label>
+                <Input
+                  id='name'
+                  placeholder='e.g., ward_mod'
+                  value={formData.name}
+                  onChange={e =>
+                    setFormData(prev => ({ ...prev, name: e.target.value }))
+                  }
+                />
+              </div>
+              <div className='space-y-2'>
+                <Label htmlFor='effectType'>Effect Type *</Label>
+                <Input
+                  id='effectType'
+                  placeholder='e.g., ward_mod'
+                  value={formData.effectType}
+                  onChange={e =>
+                    setFormData(prev => ({
+                      ...prev,
+                      effectType: e.target.value,
+                    }))
+                  }
+                />
+              </div>
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='description'>Description</Label>
+              <Textarea
+                id='description'
+                placeholder='Describe what this effect does...'
+                value={formData.description}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    description: e.target.value,
+                  }))
+                }
+                rows={2}
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='tags'>Tags (comma-separated)</Label>
+              <Input
+                id='tags'
+                placeholder='e.g., buff, defensive, magic'
+                value={formData.tags}
+                onChange={e =>
+                  setFormData(prev => ({ ...prev, tags: e.target.value }))
+                }
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='defaultParams'>Default Parameters (JSON)</Label>
+              <Textarea
+                id='defaultParams'
+                placeholder='{"amount": 10, "duration": 60}'
+                value={formData.defaultParams}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    defaultParams: e.target.value,
+                  }))
+                }
+                rows={4}
+                className='font-mono text-sm'
+              />
+            </div>
+
+            <div className='space-y-2'>
+              <Label htmlFor='paramSchema'>
+                Parameter Schema (JSON, optional)
+              </Label>
+              <Textarea
+                id='paramSchema'
+                placeholder='{"type": "object", "properties": {...}}'
+                value={formData.paramSchema}
+                onChange={e =>
+                  setFormData(prev => ({
+                    ...prev,
+                    paramSchema: e.target.value,
+                  }))
+                }
+                rows={4}
+                className='font-mono text-sm'
+              />
+            </div>
+          </div>
+
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => {
+                setIsCreating(false);
+                setEditingEffect(null);
+                setFormError(null);
+              }}
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSubmit} disabled={creating || updating}>
+              {(creating || updating) && (
+                <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+              )}
+              {editingEffect ? 'Save Changes' : 'Create Effect'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog
+        open={!!deletingEffect}
+        onOpenChange={open => !open && setDeletingEffect(null)}
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Effect</DialogTitle>
+            <DialogDescription>
+              Are you sure you want to delete the effect &quot;
+              {deletingEffect?.name}&quot;? This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant='outline' onClick={() => setDeletingEffect(null)}>
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleDelete}
+              disabled={deleting}
+            >
+              {deleting && <Loader2 className='h-4 w-4 mr-2 animate-spin' />}
+              Delete
+            </Button>
+          </DialogFooter>
         </DialogContent>
       </Dialog>
     </div>

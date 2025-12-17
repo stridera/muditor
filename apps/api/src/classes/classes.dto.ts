@@ -9,6 +9,9 @@ export class ClassDto {
   @Field()
   name: string;
 
+  @Field()
+  plainName: string;
+
   @Field({ nullable: true })
   description?: string;
 

@@ -2,7 +2,16 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
+import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useZone } from '@/contexts/zone-context';
+import {
+  GetMobsDocument,
+  GetMobsByZoneDocument,
+  type GetMobsQuery,
+  type GetMobsByZoneQuery,
+  type GetMobsByZoneQueryVariables,
+} from '@/generated/graphql';
+import { useQuery } from '@apollo/client/react';
 import {
   ArrowDown,
   ArrowUp,
@@ -17,12 +26,12 @@ import {
   Plus,
   Square,
   Trash2,
-  X,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import EnhancedSearch, {
+  type EnhancedSearchRef,
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import {
@@ -72,11 +81,8 @@ function MobsContent() {
   const zoneParam = searchParams.get('zone');
   const idParam = searchParams.get('id');
   const { selectedZone, setSelectedZone } = useZone();
+  const searchRef = useRef<EnhancedSearchRef>(null);
 
-  const [mobs, setMobs] = useState<Mob[]>([]);
-  const [mobsCount, setMobsCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchTerm: '',
   });
@@ -92,222 +98,115 @@ function MobsContent() {
   const [sortBy, setSortBy] = useState('level');
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
 
-  // Redirect to mob editor if id parameter is provided
+  // Auto-expand mob if id parameter is provided (for display, not editing)
   useEffect(() => {
-    if (idParam && zoneParam) {
+    if (idParam) {
       const mobId = parseInt(idParam);
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(mobId) && !isNaN(zoneId)) {
-        router.push(`/dashboard/mobs/editor?zone=${zoneId}&id=${mobId}`);
+      if (!isNaN(mobId)) {
+        setExpandedMobs(prev => new Set(prev).add(mobId));
+        // Scroll to the mob after a short delay to allow rendering
+        setTimeout(() => {
+          const element = document.getElementById(`mob-${mobId}`);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+        }, 100);
       }
     }
-  }, [idParam, zoneParam, router]);
+  }, [idParam]);
 
-  // Handle initial zone parameter from URL
+  // Sync zone parameter from URL with context
   useEffect(() => {
-    if (zoneParam && selectedZone === null) {
+    if (zoneParam) {
       const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId)) {
+      if (!isNaN(zoneId) && selectedZone !== zoneId) {
         setSelectedZone(zoneId);
       }
+    } else if (!zoneParam && selectedZone !== null) {
+      // Clear zone when parameter is removed from URL
+      setSelectedZone(null);
     }
   }, [zoneParam, selectedZone, setSelectedZone]);
 
-  useEffect(() => {
-    const fetchMobs = async () => {
-      try {
-        const query = selectedZone
-          ? `
-              query GetMobsByZone($zoneId: Int!, $search: String) {
-                mobsByZone(zoneId: $zoneId, search: $search) {
-                  id
-                  keywords
-                  name
-                  roomDescription
-                  examineDescription
-                  hpDice
-                  damageDice
-                  level
-                  race
-                  hitRoll
-                  armorClass
-                  alignment
-                  lifeForce
-                  damageType
-                  strength
-                  intelligence
-                  wisdom
-                  dexterity
-                  constitution
-                  charisma
-                  wealth
-                  mobFlags
-                  effectFlags
-                  zoneId
-                }
-                mobsCount
-              }
-            `
-          : `
-              query GetMobs($skip: Int, $take: Int, $search: String) {
-                mobs(skip: $skip, take: $take, search: $search) {
-                  id
-                  keywords
-                  name
-                  roomDescription
-                  examineDescription
-                  hpDice
-                  damageDice
-                  level
-                  race
-                  hitRoll
-                  armorClass
-                  alignment
-                  lifeForce
-                  damageType
-                  strength
-                  intelligence
-                  wisdom
-                  dexterity
-                  constitution
-                  charisma
-                  wealth
-                  mobFlags
-                  effectFlags
-                  zoneId
-                }
-                mobsCount
-              }
-            `;
+  // Fetch mobs using Apollo Client with conditional query
+  const {
+    loading,
+    error: queryError,
+    data,
+    refetch,
+  } = useQuery<GetMobsByZoneQuery | GetMobsQuery>(
+    selectedZone ? GetMobsByZoneDocument : GetMobsDocument,
+    {
+      variables: selectedZone ? { zoneId: selectedZone } : {},
+      skip: false, // Always run the query
+    }
+  );
 
-        const skip = (currentPage - 1) * itemsPerPage;
-        const searchTerm = searchFilters.searchTerm?.trim() || undefined;
-        const variables = selectedZone
-          ? {
-              zoneId: selectedZone,
-              search: searchTerm,
-            }
-          : {
-              skip,
-              take: itemsPerPage,
-              search: searchTerm,
-            };
+  // Extract mobs from the query result
+  const rawMobs: Mob[] =
+    data && 'mobsByZone' in data
+      ? (data.mobsByZone as Mob[])
+      : data && 'mobs' in data
+        ? (data.mobs as Mob[])
+        : [];
 
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:4000/graphql',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, variables }),
-          }
-        );
-
-        const result = await response.json();
-        if (result.errors) {
-          // If pagination fails, fall back to basic query (TODO: integrate LoggingService.warn)
-          const fallbackQuery = selectedZone
-            ? `query { mobsByZone(zoneId: ${selectedZone}) { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`
-            : `query { mobs { id keywords name roomDescription examineDescription level race hitRoll armorClass alignment lifeForce damageType strength intelligence wisdom dexterity constitution charisma wealth hpDice damageDice mobFlags effectFlags zoneId } mobsCount }`;
-
-          const fallbackResponse = await fetch(
-            process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-              'http://localhost:4000/graphql',
-            {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ query: fallbackQuery }),
-            }
-          );
-
-          const fallbackResult = await fallbackResponse.json();
-          if (fallbackResult.errors) {
-            throw new Error(fallbackResult.errors[0].message);
-          }
-
-          const allMobs =
-            fallbackResult.data.mobs || fallbackResult.data.mobsByZone || [];
-          // Sort client-side as fallback
-          allMobs.sort((a: Mob, b: Mob) => {
-            const aVal = a[sortBy as keyof Mob] || 0;
-            const bVal = b[sortBy as keyof Mob] || 0;
-            return sortOrder === 'asc'
-              ? aVal < bVal
-                ? -1
-                : 1
-              : aVal > bVal
-                ? -1
-                : 1;
-          });
-
-          const offset = (currentPage - 1) * itemsPerPage;
-          setMobs(allMobs.slice(offset, offset + itemsPerPage));
-          setMobsCount(fallbackResult.data.mobsCount || allMobs.length);
-          return;
-        }
-
-        if (selectedZone && result.data.mobsByZone) {
-          // For zone-specific queries, apply client-side pagination and sorting
-          const allMobs = result.data.mobsByZone;
-
-          // Apply sorting
-          allMobs.sort((a: Mob, b: Mob) => {
-            const aVal = a[sortBy as keyof Mob] || 0;
-            const bVal = b[sortBy as keyof Mob] || 0;
-            return sortOrder === 'asc'
-              ? aVal < bVal
-                ? -1
-                : 1
-              : aVal > bVal
-                ? -1
-                : 1;
-          });
-
-          // Apply pagination
-          const skip = (currentPage - 1) * itemsPerPage;
-          const paginatedMobs = allMobs.slice(skip, skip + itemsPerPage);
-
-          setMobs(paginatedMobs);
-          setMobsCount(allMobs.length); // Use actual filtered count
-        } else {
-          // For general queries, use server response directly
-          setMobs(result.data.mobs || []);
-          setMobsCount(result.data.mobsCount || 0);
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch mobs');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchMobs();
-  }, [
-    selectedZone,
-    currentPage,
-    itemsPerPage,
-    sortBy,
-    sortOrder,
-    searchFilters.searchTerm,
-  ]);
+  // Deduplicate mobs based on composite key (zoneId, id)
+  const mobs: Mob[] = Array.from(
+    new Map(rawMobs.map(mob => [`${mob.zoneId}-${mob.id}`, mob])).values()
+  );
 
   // Reset to page 1 when search term changes
   useEffect(() => {
     setCurrentPage(1);
   }, [searchFilters.searchTerm]);
 
-  // Apply advanced search filters
-  const filteredMobs = applySearchFilters(mobs, searchFilters, {
+  // Keyboard shortcut: '/' to focus search
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Only focus if '/' is pressed and we're not already in an input/textarea
+      if (
+        e.key === '/' &&
+        !['INPUT', 'TEXTAREA'].includes((e.target as HTMLElement)?.tagName) &&
+        !(e.target as HTMLElement)?.isContentEditable
+      ) {
+        e.preventDefault();
+        searchRef.current?.focus();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
+  }, []);
+
+  // Apply advanced search filters (zone filtering is done server-side)
+  const searchedMobs = applySearchFilters(mobs, searchFilters, {
     // Custom field mappings for mob-specific filters
     healthPoints: mob => (mob.level || 0) * 10, // Use level-based HP since dice are all 0
     isHighLevel: mob => (mob.level || 0) >= 50,
     isNewbie: mob => (mob.level || 0) <= 10,
   });
 
-  // Calculate pagination
-  const totalPages = Math.ceil(mobsCount / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
-  const endItem = Math.min(currentPage * itemsPerPage, mobsCount);
+  // Apply client-side sorting
+  const sortedMobs = [...searchedMobs].sort((a, b) => {
+    const aVal = a[sortBy as keyof Mob] || 0;
+    const bVal = b[sortBy as keyof Mob] || 0;
+    if (sortOrder === 'asc') {
+      return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
+    } else {
+      return aVal > bVal ? -1 : aVal < bVal ? 1 : 0;
+    }
+  });
+
+  // Apply client-side pagination with page clamping
+  const totalCount = sortedMobs.length;
+  const totalPages = Math.ceil(totalCount / itemsPerPage) || 1;
+  // Clamp currentPage to valid range to handle search filter changes
+  const validCurrentPage = Math.min(Math.max(1, currentPage), totalPages);
+  const startIndex = (validCurrentPage - 1) * itemsPerPage;
+  const filteredMobs = sortedMobs.slice(startIndex, startIndex + itemsPerPage);
+  const filteredCount = totalCount;
+  const startItem = totalCount > 0 ? startIndex + 1 : 0;
+  const endItem = Math.min(startIndex + itemsPerPage, totalCount);
 
   // Bulk operations
   const toggleMobSelection = (mobId: number) => {
@@ -364,9 +263,8 @@ function MobsContent() {
         throw new Error(result.errors[0].message);
       }
 
-      // Remove deleted mobs from the list
-      setMobs(mobs.filter(mob => !selectedMobs.has(mob.id)));
-      setMobsCount(mobsCount - selectedMobs.size);
+      // Refetch mobs to update the list
+      await refetch();
       clearSelection();
     } catch (err) {
       alert(
@@ -507,9 +405,8 @@ function MobsContent() {
 
       const newMob = createResult.data.createMob;
 
-      // Add the new mob to the local state
-      setMobs(prevMobs => [newMob, ...prevMobs]);
-      setMobsCount(prevCount => prevCount + 1);
+      // Refetch mobs to update the list
+      await refetch();
 
       // Show success message (could be replaced with a toast notification)
       alert(`Mob cloned successfully! New mob ID: ${newMob.id}`);
@@ -642,40 +539,24 @@ function MobsContent() {
   };
 
   if (loading) return <div className='p-4'>Loading mobs...</div>;
-  if (error)
+  if (queryError)
     return (
       <div className='p-4 text-red-600' data-testid='error-message'>
-        Error: {error}
+        Error: {queryError.message}
       </div>
     );
 
   const adminView = (
     <div className='p-6'>
       <div className='flex items-center justify-between mb-6'>
-        <div className='flex items-center gap-3'>
-          <div>
-            <h1 className='text-2xl font-bold text-foreground'>
-              {selectedZone ? `Zone ${selectedZone} Mobs` : 'All Mobs'}
-            </h1>
-            <p className='text-sm text-muted-foreground mt-1'>
-              Showing {startItem}-{endItem} of {mobsCount} mobs
-              {selectedZone && ' in this zone'} (Page {currentPage} of{' '}
-              {totalPages})
-            </p>
-          </div>
-          {selectedZone && (
-            <button
-              onClick={() => {
-                setSelectedZone(null);
-                setCurrentPage(1);
-              }}
-              className='inline-flex items-center px-3 py-1.5 text-xs font-medium text-muted-foreground hover:text-foreground border border-border rounded-md hover:bg-muted'
-              title='Clear zone filter and show all mobs'
-            >
-              <X className='w-3 h-3 mr-1' />
-              Clear Filter
-            </button>
-          )}
+        <div>
+          <h1 className='text-2xl font-bold text-foreground'>
+            {selectedZone ? `Zone ${selectedZone} Mobs` : 'All Mobs'}
+          </h1>
+          <p className='text-sm text-muted-foreground mt-1'>
+            Showing {startItem}-{endItem} of {filteredCount} mobs (Page{' '}
+            {currentPage} of {totalPages})
+          </p>
         </div>
         <Link href='/dashboard/mobs/editor'>
           <button className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/80'>
@@ -741,6 +622,7 @@ function MobsContent() {
 
       {/* Enhanced Search */}
       <EnhancedSearch
+        ref={searchRef}
         onFiltersChange={setSearchFilters}
         placeholder='Search mobs by name, keywords, description, or ID...'
         showLevelFilter={true}
@@ -819,7 +701,8 @@ function MobsContent() {
         <div className='grid gap-4'>
           {filteredMobs.map(mob => (
             <div
-              key={mob.id}
+              id={`mob-${mob.id}`}
+              key={`${mob.zoneId}-${mob.id}`}
               className='bg-card border border-border rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer'
               onClick={() => toggleMobExpanded(mob.id)}
             >
@@ -842,7 +725,7 @@ function MobsContent() {
                   <div className='flex-1'>
                     <div className='flex items-center gap-2 mb-1'>
                       <h3 className='font-semibold text-lg text-foreground'>
-                        #{mob.id} - {mob.name}
+                        #{mob.id} - <ColoredTextInline markup={mob.name} />
                       </h3>
                       {/* Visual indicator for expand state */}
                       <div className='text-muted-foreground'>
@@ -855,9 +738,21 @@ function MobsContent() {
                         )}
                       </div>
                     </div>
-                    <p className='text-sm text-muted-foreground mb-2'>
-                      Keywords: {mob.keywords}
-                    </p>
+                    <div className='flex flex-wrap gap-1 mb-2'>
+                      {(Array.isArray(mob.keywords)
+                        ? mob.keywords
+                        : mob.keywords.split(/\s+/)
+                      )
+                        .filter(k => k)
+                        .map((keyword, idx) => (
+                          <span
+                            key={`${mob.zoneId}-${mob.id}-kw-${idx}`}
+                            className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground'
+                          >
+                            {keyword}
+                          </span>
+                        ))}
+                    </div>
                     <p className='text-muted-foreground mb-2 line-clamp-2'>
                       {mob.roomDescription}
                     </p>
@@ -893,7 +788,7 @@ function MobsContent() {
                                 <span className='text-muted-foreground'>
                                   Race:
                                 </span>{' '}
-                                {mob.race || 'N/A'}
+                                {mob.race ? mob.race.replace(/_/g, ' ') : 'N/A'}
                               </div>
                               <div>
                                 <span className='text-muted-foreground'>
@@ -1011,7 +906,7 @@ function MobsContent() {
                                       {mob.mobFlags.map(
                                         (flag: string, index: number) => (
                                           <span
-                                            key={index}
+                                            key={`${mob.zoneId}-${mob.id}-mf-${index}`}
                                             className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                           >
                                             {flag}
@@ -1031,7 +926,7 @@ function MobsContent() {
                                         {mob.effectFlags.map(
                                           (flag: string, index: number) => (
                                             <span
-                                              key={index}
+                                              key={`${mob.zoneId}-${mob.id}-ef-${index}`}
                                               className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                             >
                                               {flag}
@@ -1062,6 +957,16 @@ function MobsContent() {
                   </div>
                 </div>
                 <div className='flex items-center gap-2 ml-4'>
+                  <Link
+                    href={`/dashboard/mobs/view?zone=${mob.zoneId}&id=${mob.id}`}
+                  >
+                    <button
+                      onClick={e => e.stopPropagation()}
+                      className='inline-flex items-center text-muted-foreground hover:text-foreground px-3 py-1 text-sm'
+                    >
+                      View
+                    </button>
+                  </Link>
                   <Link
                     href={`/dashboard/mobs/editor?zone=${mob.zoneId}&id=${mob.id}`}
                   >
@@ -1102,7 +1007,7 @@ function MobsContent() {
       {totalPages > 1 && (
         <div className='flex items-center justify-between mt-6 px-4 py-3 bg-muted rounded-lg'>
           <div className='text-sm text-muted-foreground'>
-            Showing {startItem}-{endItem} of {mobsCount} results
+            Showing {startItem}-{endItem} of {filteredCount} results
           </div>
           <div className='flex items-center gap-2'>
             <button
