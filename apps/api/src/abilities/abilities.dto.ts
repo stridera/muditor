@@ -147,6 +147,12 @@ export class AbilityMessages {
   successToRoom?: string;
 
   @Field({ nullable: true })
+  successToSelf?: string;
+
+  @Field({ nullable: true })
+  successSelfRoom?: string;
+
+  @Field({ nullable: true })
   failToCaster?: string;
 
   @Field({ nullable: true })
@@ -160,6 +166,9 @@ export class AbilityMessages {
 
   @Field({ nullable: true })
   wearoffToRoom?: string;
+
+  @Field({ nullable: true })
+  lookMessage?: string;
 }
 
 @ObjectType()

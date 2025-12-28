@@ -28,7 +28,7 @@ async function bootstrap() {
     })
   );
 
-  const port = process.env.API_PORT || 4000;
+  const port = process.env.API_PORT || 3001; // API uses 3001 to avoid conflict with game server
   const host = process.env.API_HOST || 'localhost';
 
   // Set up graceful shutdown

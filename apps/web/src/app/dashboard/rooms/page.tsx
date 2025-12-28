@@ -113,7 +113,7 @@ function RoomsContent() {
 
         const response = await fetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:4000/graphql',
+            'http://localhost:3001/graphql',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -189,7 +189,7 @@ function RoomsContent() {
 
         const response = await fetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:4000/graphql',
+            'http://localhost:3001/graphql',
           {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },

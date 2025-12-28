@@ -17,11 +17,17 @@ import { ObjectsModule } from './objects/objects.module';
 import { RacesModule } from './races/races.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ShopsModule } from './shops/shops.module';
+import { SettingsModule } from './settings/settings.module';
 import { SocialsModule } from './socials/socials.module';
 import { TriggersModule } from './triggers/triggers.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
 import { ZonesModule } from './zones/zones.module';
+import { PlayerMailModule } from './player-mail/player-mail.module';
+import { AccountStorageModule } from './account-storage/account-storage.module';
+import { BoardsModule } from './boards/boards.module';
+import { BridgeModule } from './bridge/bridge.module';
+import { DiscordModule } from './discord/discord.module';
 
 @Module({
   imports: [
@@ -70,6 +76,12 @@ import { ZonesModule } from './zones/zones.module';
     ClassesModule,
     SocialsModule,
     HelpModule,
+    SettingsModule,
+    PlayerMailModule,
+    AccountStorageModule,
+    BoardsModule,
+    BridgeModule,
+    DiscordModule,
   ],
 })
 export class AppModule {}

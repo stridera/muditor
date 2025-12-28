@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_URL = 'http://localhost:4000/graphql';
+const API_URL = 'http://localhost:3001/graphql';
 
 /**
  * Integration test for character linking and role recalculation
@@ -67,7 +67,9 @@ test.describe('Character Linking and Role Recalculation', () => {
     expect(data.data.me.role).toBe('PLAYER');
   });
 
-  test('should update role to GOD after linking level 105 character', async ({ request }) => {
+  test('should update role to GOD after linking level 105 character', async ({
+    request,
+  }) => {
     // Note: This test requires a character named 'TestGodChar' with level 105
     // and password 'admin123' to exist in the database
 
@@ -93,7 +95,9 @@ test.describe('Character Linking and Role Recalculation', () => {
 
     // Should fail if character doesn't exist or is already linked
     if (linkData.errors) {
-      console.log('Note: Character linking failed (expected if TestGodChar does not exist or is already linked)');
+      console.log(
+        'Note: Character linking failed (expected if TestGodChar does not exist or is already linked)'
+      );
       console.log('Error:', linkData.errors[0].message);
       test.skip();
       return;
@@ -115,7 +119,9 @@ test.describe('Character Linking and Role Recalculation', () => {
     expect(meData.data.me.role).toBe('GOD');
   });
 
-  test('should update role back when unlinking character', async ({ request }) => {
+  test('should update role back when unlinking character', async ({
+    request,
+  }) => {
     if (!testCharacterId) {
       console.log('Skipping: No character was linked');
       test.skip();
@@ -152,7 +158,9 @@ test.describe('Character Linking and Role Recalculation', () => {
 });
 
 test.describe('Role Hierarchy Tests', () => {
-  test('GOD role should have access to all game systems', async ({ request }) => {
+  test('GOD role should have access to all game systems', async ({
+    request,
+  }) => {
     // Login as GOD user
     const loginResponse = await request.post(API_URL, {
       data: {
@@ -192,7 +200,9 @@ test.describe('Role Hierarchy Tests', () => {
     expect(data.data.classesCount).toBeGreaterThan(0);
   });
 
-  test('BUILDER role should have access to view queries', async ({ request }) => {
+  test('BUILDER role should have access to view queries', async ({
+    request,
+  }) => {
     // Login as BUILDER user
     const loginResponse = await request.post(API_URL, {
       data: {
@@ -222,7 +232,9 @@ test.describe('Role Hierarchy Tests', () => {
     expect(data.data.skillsCount).toBeGreaterThan(0);
   });
 
-  test('PLAYER role should be denied access to game system queries', async ({ request }) => {
+  test('PLAYER role should be denied access to game system queries', async ({
+    request,
+  }) => {
     // Login as PLAYER user
     const loginResponse = await request.post(API_URL, {
       data: {

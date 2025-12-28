@@ -109,11 +109,19 @@ function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
     const value = block.getFieldValue(fieldName);
     if (value !== null && value !== undefined) {
       // Handle combined "zoneId:id" ref fields - split them into separate fields
+      // Skip empty refs (e.g., "(No specific mob)" which has value '')
       if (fieldName === 'mobRef' && typeof value === 'string') {
-        const { zoneId, id } = parseZoneId(value);
-        params['mobZoneId'] = zoneId;
-        params['mobId'] = id;
-      } else if (fieldName === 'objectRef' && typeof value === 'string') {
+        if (value && value !== '') {
+          const { zoneId, id } = parseZoneId(value);
+          params['mobZoneId'] = zoneId;
+          params['mobId'] = id;
+        }
+        // Don't add anything if mobRef is empty - mob is optional
+      } else if (
+        fieldName === 'objectRef' &&
+        typeof value === 'string' &&
+        value !== ''
+      ) {
         const { zoneId, id } = parseZoneId(value);
         params['objectZoneId'] = zoneId;
         params['objectId'] = id;
@@ -168,6 +176,8 @@ function isOptionalField(blockType: string, fieldName: string): boolean {
     effect_status: ['type', 'contestedBy', 'source'],
     effect_enchant: ['flag'],
     effect_damage: ['type', 'interval', 'duration', 'maxJumps', 'attenuation'],
+    effect_summon: ['mobRef', 'mobZoneFilter'], // mob template is optional - some summons just use mobType
+    effect_create: ['objectRef', 'objectZoneFilter'], // object template can be optional
   };
   return optionalFields[blockType]?.includes(fieldName) ?? false;
 }
@@ -182,6 +192,7 @@ const UI_EXTRA_FIELDS: Record<string, string[]> = {
   effect_create: ['objectRef'], // UI uses combined ref, transforms to objectZoneId + objectId
   effect_summon: ['mobRef'], // UI uses combined ref, transforms to mobZoneId + mobId
   effect_script: ['scriptId', 'args'], // Script effect has special fields
+  effect_portal: ['objectRef', 'decay'], // Portal uses objectRef for template, decay for duration
 };
 
 /**

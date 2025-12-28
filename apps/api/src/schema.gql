@@ -58,11 +58,14 @@ type AbilityMessages {
   failToCaster: String
   failToRoom: String
   failToVictim: String
+  lookMessage: String
   startToCaster: String
   startToRoom: String
   startToVictim: String
+  successSelfRoom: String
   successToCaster: String
   successToRoom: String
+  successToSelf: String
   successToVictim: String
   wearoffToRoom: String
   wearoffToTarget: String
@@ -93,6 +96,67 @@ type AbilityTargeting {
   scope: TargetScope!
   scopePattern: String
   validTargets: [TargetType!]!
+}
+
+type AccountItemCharacterDto {
+  id: String!
+  name: String!
+}
+
+type AccountItemDto {
+  customData: String
+  id: Int!
+  object: AccountItemObjectDto!
+  objectId: Int!
+  objectZoneId: Int!
+  quantity: Int!
+  slot: Int!
+  storedAt: DateTime!
+  storedByCharacter: AccountItemCharacterDto
+  storedByCharacterId: String
+}
+
+type AccountItemObjectDto {
+  id: Int!
+  name: String!
+  type: String
+  zoneId: Int!
+}
+
+type AccountMailDto {
+  body: String!
+  createdAt: DateTime!
+  id: Int!
+  isBroadcast: Boolean!
+  isDeleted: Boolean!
+  readAt: DateTime
+  recipient: AccountMailUserDto
+  recipientUserId: String
+  sender: AccountMailUserDto
+  senderName: String!
+  senderUserId: String!
+  sentAt: DateTime!
+  subject: String!
+}
+
+input AccountMailFilterInput {
+  includeBroadcasts: Boolean
+  includeDeleted: Boolean
+  recipientUserId: String
+  searchBody: String
+  searchSubject: String
+  senderUserId: String
+}
+
+type AccountMailUserDto {
+  email: String!
+  id: String!
+  username: String!
+}
+
+type AccountStorageDto {
+  accountWealth: BigInt!
+  items: [AccountItemDto!]!
 }
 
 type AdminUser {
@@ -167,6 +231,58 @@ type BatchUpdateResult {
 
 input BatchUpdateRoomPositionsInput {
   updates: [BatchRoomPositionUpdateInput!]!
+}
+
+"""
+The `BigInt` scalar type represents non-fractional signed whole numeric values.
+"""
+scalar BigInt
+
+type BoardDto {
+  alias: String!
+  createdAt: DateTime!
+  id: Int!
+  locked: Boolean!
+  messageCount: Int
+  messages: [BoardMessageDto!]
+  privileges: JSON!
+  title: String!
+  updatedAt: DateTime!
+}
+
+type BoardMessageDto {
+  board: BoardDto
+  boardId: Int!
+  content: String!
+  createdAt: DateTime!
+  edits: [BoardMessageEditDto!]
+  id: Int!
+  postedAt: DateTime!
+  poster: String!
+  posterLevel: Int!
+  sticky: Boolean!
+  subject: String!
+  updatedAt: DateTime!
+}
+
+type BoardMessageEditDto {
+  editedAt: DateTime!
+  editor: String!
+  id: Int!
+  messageId: Int!
+}
+
+"""Bridge connection status"""
+type BridgeStatus {
+  connected: Boolean!
+  subscribedChannels: Int!
+}
+
+"""Result of broadcasting a message"""
+type BroadcastResultType {
+  message: String!
+  recipientCount: Int!
+  success: Boolean!
 }
 
 input ChangePasswordInput {
@@ -361,6 +477,56 @@ enum Climate {
   TROPICAL
 }
 
+"""Category of MUD commands"""
+enum CommandCategory {
+  ADMIN
+  BUILDING
+  CLAN
+  COMBAT
+  COMMUNICATION
+  INFORMATION
+  MAGIC
+  MOVEMENT
+  OBJECT
+  SKILLS
+  SOCIAL
+  SYSTEM
+}
+
+"""MUD command definition with permission requirements"""
+type CommandDto {
+  """Alternative names/aliases for the command"""
+  aliases: [String!]!
+
+  """Command category for organization"""
+  category: CommandCategory!
+  createdAt: DateTime!
+
+  """Brief description of what the command does"""
+  description: String
+
+  """Whether this command requires an immortal level"""
+  immortalOnly: Boolean!
+
+  """Primary command name"""
+  name: String!
+
+  """Permission flags required to use this command"""
+  permissions: [String!]!
+  updatedAt: DateTime!
+
+  """Usage syntax example"""
+  usage: String
+}
+
+"""Result of executing a game command"""
+type CommandResultType {
+  executor: String
+  message: String!
+  note: String
+  success: Boolean!
+}
+
 enum Composition {
   AIR
   BONE
@@ -375,6 +541,15 @@ enum Composition {
   PLANT
   STONE
   WATER
+}
+
+"""Type of configuration value"""
+enum ConfigValueType {
+  BOOL
+  FLOAT
+  INT
+  JSON
+  STRING
 }
 
 input CreateAbilityInput {
@@ -405,11 +580,14 @@ input CreateAbilityMessagesInput {
   failToCaster: String
   failToRoom: String
   failToVictim: String
+  lookMessage: String
   startToCaster: String
   startToRoom: String
   startToVictim: String
+  successSelfRoom: String
   successToCaster: String
   successToRoom: String
+  successToSelf: String
   successToVictim: String
   wearoffToRoom: String
   wearoffToTarget: String
@@ -430,6 +608,22 @@ input CreateAbilityTargetingInput {
   scope: TargetScope! = SINGLE
   scopePattern: String
   validTargets: [TargetType!]! = [SELF]
+}
+
+input CreateBoardInput {
+  alias: String!
+  locked: Boolean! = false
+  privileges: JSON
+  title: String!
+}
+
+input CreateBoardMessageInput {
+  boardId: Int!
+  content: String!
+  poster: String!
+  posterLevel: Int!
+  sticky: Boolean! = false
+  subject: String!
 }
 
 input CreateCharacterEffectInput {
@@ -555,6 +749,21 @@ input CreateHelpEntryInput {
   usage: String
 }
 
+"""Input for creating a login message"""
+input CreateLoginMessageInput {
+  """Whether this message is active"""
+  isActive: Boolean! = true
+
+  """Message content"""
+  message: String!
+
+  """Login flow stage"""
+  stage: LoginStage!
+
+  """Message variant"""
+  variant: String! = "default"
+}
+
 input CreateMobEquipmentSetInput {
   equipmentSetId: String!
   mobResetId: String!
@@ -572,7 +781,7 @@ input CreateMobInput {
   composition: Composition! = FLESH
   concealment: Int! = 0
   constitution: Int! = 13
-  damageDice: String! = "1d4+0"
+  damageDice: String!
   damageReductionPercent: Int! = 0
   damageType: DamageType! = HIT
   dexterity: Int! = 13
@@ -582,7 +791,7 @@ input CreateMobInput {
   gender: Gender! = NEUTRAL
   hardness: Int! = 0
   hitRoll: Int! = 0
-  hpDice: String! = "1d8+0"
+  hpDice: String!
   id: Int!
   intelligence: Int! = 13
   keywords: [String!]!
@@ -651,6 +860,15 @@ input CreateObjectInput {
   values: JSON
   wearFlags: [WearFlag!]! = []
   weight: Float! = 0
+  zoneId: Int!
+}
+
+input CreateObjectResetInput {
+  max: Int! = 1
+  name: String
+  objectId: Int!
+  probability: Float! = 1
+  roomId: Int!
   zoneId: Int!
 }
 
@@ -756,6 +974,27 @@ input CreateSocialInput {
   victFound: String
 }
 
+"""Input for creating system text"""
+input CreateSystemTextInput {
+  """Text category"""
+  category: SystemTextCategory!
+
+  """Text content"""
+  content: String!
+
+  """Whether this text is active"""
+  isActive: Boolean! = true
+
+  """Unique key identifier"""
+  key: String!
+
+  """Minimum level to view"""
+  minLevel: Int! = 0
+
+  """Display title"""
+  title: String
+}
+
 input CreateTriggerInput {
   argList: [String!]! = []
   attachType: ScriptType!
@@ -813,8 +1052,16 @@ scalar DateTime
 enum Direction {
   DOWN
   EAST
+  IN
+  NONE
   NORTH
+  NORTHEAST
+  NORTHWEST
+  OUT
+  PORTAL
   SOUTH
+  SOUTHEAST
+  SOUTHWEST
   UP
   WEST
 }
@@ -923,6 +1170,7 @@ enum ElementType {
   AIR
   BLEED
   COLD
+  CRUSH
   EARTH
   FIRE
   FORCE
@@ -932,10 +1180,12 @@ enum ElementType {
   NATURE
   NECROTIC
   PHYSICAL
+  PIERCE
   POISON
   RADIANT
   SHADOW
   SHOCK
+  SLASH
   SONIC
   UNHOLY
   WATER
@@ -965,6 +1215,87 @@ enum ExitFlag {
   IS_DOOR
   LOCKED
   PICKPROOF
+}
+
+"""Game configuration entry"""
+type GameConfigDto {
+  """Configuration category (e.g., server, combat, progression)"""
+  category: String!
+  createdAt: DateTime!
+
+  """Human-readable description"""
+  description: String
+  id: ID!
+
+  """Whether this config contains sensitive data"""
+  isSecret: Boolean!
+
+  """Configuration key within category"""
+  key: String!
+
+  """Maximum valid value"""
+  maxValue: String
+
+  """Minimum valid value"""
+  minValue: String
+
+  """Whether changing this requires server restart"""
+  restartReq: Boolean!
+  updatedAt: DateTime!
+
+  """Configuration value as string"""
+  value: String!
+
+  """Type of the value"""
+  valueType: ConfigValueType!
+}
+
+"""A game event from FieryMUD"""
+type GameEvent {
+  message: String!
+  metadata: JSON
+  playerName: String
+  roomVnum: Int
+  targetPlayer: String
+  timestamp: DateTime!
+  type: GameEventType!
+  zoneId: Int
+}
+
+"""Categories of game events for subscription filtering"""
+enum GameEventCategory {
+  ADMIN
+  CHAT
+  PLAYER
+  WORLD
+}
+
+"""Types of events published by the FieryMUD game server"""
+enum GameEventType {
+  ADMIN_BROADCAST
+  ADMIN_CRASH
+  ADMIN_SHUTDOWN
+  ADMIN_WARNING
+  ADMIN_ZONE_RESET
+  BOSS_SPAWN
+  CHAT_CLAN
+  CHAT_EMOTE
+  CHAT_GOSSIP
+  CHAT_GROUP
+  CHAT_OOC
+  CHAT_SAY
+  CHAT_SHOUT
+  CHAT_TELL
+  MOB_KILLED
+  PLAYER_DEATH
+  PLAYER_LEVEL_UP
+  PLAYER_LOGIN
+  PLAYER_LOGOUT
+  PLAYER_QUIT
+  PLAYER_ZONE_ENTER
+  QUEST_COMPLETE
+  ZONE_LOADED
+  ZONE_RESET
 }
 
 enum Gender {
@@ -1065,6 +1396,40 @@ type KeeperDto {
   zoneId: Int!
 }
 
+"""Result of kicking a player"""
+type KickResultType {
+  message: String!
+  reason: String!
+  success: Boolean!
+}
+
+"""Level definition with experience and permissions"""
+type LevelDefinitionDto {
+  createdAt: DateTime!
+
+  """Experience required to reach this level"""
+  expRequired: Int!
+
+  """HP gained at this level"""
+  hpGain: Int!
+
+  """Whether this is an immortal level (100+)"""
+  isImmortal: Boolean!
+
+  """Level number (1-105)"""
+  level: Int!
+
+  """Display name for immortal levels"""
+  name: String
+
+  """Permissions granted at this level"""
+  permissions: [String!]!
+
+  """Stamina gained at this level"""
+  staminaGain: Int!
+  updatedAt: DateTime!
+}
+
 enum LifeForce {
   CELESTIAL
   DEMONIC
@@ -1082,6 +1447,42 @@ input LinkCharacterInput {
 input LoginInput {
   identifier: String!
   password: String!
+}
+
+"""Login flow message"""
+type LoginMessageDto {
+  createdAt: DateTime!
+  id: ID!
+
+  """Whether this message is active"""
+  isActive: Boolean!
+
+  """Message content"""
+  message: String!
+
+  """Login flow stage"""
+  stage: LoginStage!
+  updatedAt: DateTime!
+
+  """Message variant (default, or for A/B testing)"""
+  variant: String!
+}
+
+"""Stage in the login/character creation flow"""
+enum LoginStage {
+  CHARACTER_SELECT
+  CONFIRM_PASSWORD
+  CREATE_NAME_PROMPT
+  CREATE_PASSWORD
+  CREATION_COMPLETE
+  INVALID_LOGIN
+  PASSWORD_PROMPT
+  RECONNECT_MESSAGE
+  SELECT_CLASS
+  SELECT_RACE
+  TOO_MANY_ATTEMPTS
+  USERNAME_PROMPT
+  WELCOME_BANNER
 }
 
 type MobDto {
@@ -1158,6 +1559,7 @@ enum MobFlag {
   AQUATIC
   ASSASSIN
   AWARE
+  BANKER
   BERSERKER
   BLUR
   CLERIC
@@ -1191,8 +1593,10 @@ enum MobFlag {
   PEACEFUL
   PEACEKEEPER
   POISON_BITE
+  POSTMASTER
   PROTECTOR
   RANGER
+  RECEPTIONIST
   SCAVENGER
   SENTINEL
   SHAMAN
@@ -1262,11 +1666,16 @@ type Mutation {
   attachTrigger(input: AttachTriggerInput!): TriggerDto!
   banUser(input: BanUserInput!): BanRecord!
   batchUpdateRoomPositions(input: BatchUpdateRoomPositionsInput!): BatchUpdateResult!
+
+  """Broadcast a message to all online players"""
+  broadcastMessage(message: String!, sender: String): BroadcastResultType!
   changePassword(input: ChangePasswordInput!): PasswordResetResponse!
   createAbility(data: CreateAbilityInput!): Ability!
   createAbilityMessages(data: CreateAbilityMessagesInput!): AbilityMessages!
   createAbilitySavingThrow(data: CreateAbilitySavingThrowInput!): AbilitySavingThrow!
   createAbilityTargeting(data: CreateAbilityTargetingInput!): AbilityTargeting!
+  createBoard(data: CreateBoardInput!): BoardDto!
+  createBoardMessage(data: CreateBoardMessageInput!): BoardMessageDto!
   createCharacter(data: CreateCharacterInput!): CharacterDto!
   createCharacterEffect(data: CreateCharacterEffectInput!): CharacterEffectDto!
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
@@ -1279,10 +1688,14 @@ type Mutation {
 
   """Create a new help entry"""
   createHelpEntry(data: CreateHelpEntryInput!): HelpEntryDto!
+
+  """Create a new login message"""
+  createLoginMessage(data: CreateLoginMessageInput!): LoginMessageDto!
   createMob(data: CreateMobInput!): MobDto!
   createMobEquipmentSet(data: CreateMobEquipmentSetInput!): MobEquipmentSetDto!
   createMobReset(data: CreateMobResetInput!): MobResetDto!
   createObject(data: CreateObjectInput!): ObjectDto!
+  createObjectReset(data: CreateObjectResetInput!): ObjectResetDto!
   createRace(data: CreateRaceInput!): RaceDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
@@ -1290,12 +1703,18 @@ type Mutation {
 
   """Create a new social command"""
   createSocial(data: CreateSocialInput!): SocialDto!
+
+  """Create a new system text entry"""
+  createSystemText(data: CreateSystemTextInput!): SystemTextDto!
   createTrigger(input: CreateTriggerInput!): TriggerDto!
   createZone(data: CreateZoneInput!): ZoneDto!
   deleteAbility(id: ID!): Boolean!
   deleteAbilityMessages(abilityId: Int!): Boolean!
   deleteAbilitySavingThrow(id: ID!): Boolean!
   deleteAbilityTargeting(abilityId: Int!): Boolean!
+  deleteAccountMail(id: Int!): AccountMailDto!
+  deleteBoard(id: Int!): BoardDto!
+  deleteBoardMessage(id: Int!): BoardMessageDto!
   deleteCharacter(id: ID!): CharacterDto!
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
@@ -1307,13 +1726,18 @@ type Mutation {
 
   """Delete a help entry"""
   deleteHelpEntry(id: ID!): Boolean!
+
+  """Delete a login message"""
+  deleteLoginMessage(id: ID!): Boolean!
   deleteMob(id: Int!, zoneId: Int!): MobDto!
   deleteMobEquipmentSet(id: ID!): Boolean!
   deleteMobReset(id: ID!): Boolean!
   deleteMobResetEquipment(id: ID!): Boolean!
   deleteMobs(ids: [Int!]!): Int!
   deleteObject(id: Int!, zoneId: Int!): ObjectDto!
+  deleteObjectReset(id: ID!): Boolean!
   deleteObjects(ids: [Int!]!): Int!
+  deletePlayerMail(id: Int!): PlayerMailDto!
   deleteRace(race: Race!): Boolean!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
@@ -1321,16 +1745,32 @@ type Mutation {
 
   """Delete a social command"""
   deleteSocial(id: ID!): Boolean!
+
+  """Delete a system text entry"""
+  deleteSystemText(id: ID!): Boolean!
   deleteTrigger(id: Float!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
+  depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
+  depositWealth(amount: BigInt!, characterId: String!): BigInt!
   detachTrigger(triggerId: Float!): TriggerDto!
+
+  """Execute a god command on FieryMUD"""
+  executeGameCommand(command: String!, executor: String): CommandResultType!
 
   """Grant zone access to a user"""
   grantZoneAccess(data: GrantZoneAccessInput!): UserGrantDto!
 
+  """Disconnect a player from FieryMUD"""
+  kickPlayer(playerName: String!, reason: String): KickResultType!
+
   """Link an existing game character to your user account"""
   linkCharacter(data: LinkCharacterInput!): CharacterDto!
   login(input: LoginInput!): AuthPayload!
+  markAccountMailRead(id: Int!): AccountMailDto!
+  markMailRead(id: Int!): PlayerMailDto!
+  markObjectRetrieved(characterId: String!, id: Int!, movedToAccountStorage: Boolean! = false): PlayerMailDto!
+  markTriggerReviewed(triggerId: Int!): TriggerDto!
+  markWealthRetrieved(characterId: String!, id: Int!): PlayerMailDto!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
   removeClassCircle(id: ID!): Boolean!
@@ -1344,6 +1784,9 @@ type Mutation {
 
   """Revoke zone access from a user"""
   revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
+  sendAccountMail(data: SendAccountMailInput!): AccountMailDto!
+  sendBroadcast(data: SendBroadcastInput!): Int!
+  sendMail(data: SendPlayerMailInput!): PlayerMailDto!
   setCharacterOffline(characterId: ID!): Boolean!
   setCharacterOnline(characterId: ID!): Boolean!
   unbanUser(input: UnbanUserInput!): BanRecord!
@@ -1354,6 +1797,8 @@ type Mutation {
   updateAbilityEffects(abilityId: Int!, data: UpdateAbilityEffectsInput!): Ability!
   updateAbilityMessages(abilityId: Int!, data: UpdateAbilityMessagesInput!): AbilityMessages!
   updateAbilityTargeting(abilityId: Int!, data: UpdateAbilityTargetingInput!): AbilityTargeting!
+  updateBoard(data: UpdateBoardInput!, id: Int!): BoardDto!
+  updateBoardMessage(data: UpdateBoardMessageInput!, editor: String, id: Int!): BoardMessageDto!
   updateCharacter(data: UpdateCharacterInput!, id: ID!): CharacterDto!
   updateCharacterActivity(characterId: ID!): Boolean!
   updateCharacterEffect(data: UpdateCharacterEffectInput!, id: ID!): CharacterEffectDto!
@@ -1363,14 +1808,24 @@ type Mutation {
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
   updateEffect(data: UpdateEffectInput!, id: ID!): Effect!
   updateEquipmentSet(data: UpdateEquipmentSetInput!, id: ID!): EquipmentSetDto!
+
+  """Update a game configuration value"""
+  updateGameConfig(category: String!, data: UpdateGameConfigInput!, key: String!): GameConfigDto!
   updateGrant(data: UpdateGrantInput!, id: ID!): UserGrantDto!
 
   """Update an existing help entry"""
   updateHelpEntry(data: UpdateHelpEntryInput!, id: ID!): HelpEntryDto!
+
+  """Update a level definition"""
+  updateLevelDefinition(data: UpdateLevelDefinitionInput!, level: Int!): LevelDefinitionDto!
+
+  """Update a login message"""
+  updateLoginMessage(data: UpdateLoginMessageInput!, id: ID!): LoginMessageDto!
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
+  updateObjectReset(data: UpdateObjectResetInput!, id: ID!): ObjectResetDto!
   updateProfile(input: UpdateProfileInput!): User!
   updateRace(data: UpdateRaceInput!, race: Race!): RaceDto!
   updateRaceSkill(data: UpdateRaceSkillInput!, id: ID!): RaceSkillDto!
@@ -1382,10 +1837,15 @@ type Mutation {
 
   """Update an existing social command"""
   updateSocial(data: UpdateSocialInput!, id: ID!): SocialDto!
+
+  """Update a system text entry"""
+  updateSystemText(data: UpdateSystemTextInput!, id: ID!): SystemTextDto!
   updateTrigger(id: Float!, input: UpdateTriggerInput!): TriggerDto!
   updateUser(input: UpdateUserInput!): User!
   updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
+  withdrawItem(accountItemId: Int!, characterId: String!): Boolean!
+  withdrawWealth(amount: BigInt!, characterId: String!): BigInt!
 }
 
 type ObjectAffectDto {
@@ -1476,6 +1936,18 @@ enum ObjectFlag {
   WAS_DISARMED
 }
 
+type ObjectResetDto {
+  conditions: [SpawnConditionDto!]!
+  id: String!
+  max: Int!
+  name: String
+  object: ObjectDto!
+  objectId: Int!
+  probability: Float!
+  roomId: Int!
+  zoneId: Int!
+}
+
 type ObjectSummaryDto {
   cost: Int
   effectFlags: [String!]
@@ -1537,17 +2009,86 @@ type OnlineCharacterDto {
   user: UserSummaryDto!
 }
 
+"""Information about an online player in FieryMUD"""
+type OnlinePlayerType {
+  class: String!
+  godLevel: Int!
+  isLinkdead: Boolean!
+  level: Int!
+  name: String!
+  race: String!
+  roomId: Int!
+}
+
 type PasswordResetResponse {
   message: String!
   success: Boolean!
 }
 
+type PlayerMailCharacterDto {
+  id: String!
+  name: String!
+}
+
+type PlayerMailDto {
+  attachedCopper: Int!
+  attachedGold: Int!
+  attachedObject: PlayerMailObjectDto
+  attachedObjectId: Int
+  attachedObjectZoneId: Int
+  attachedPlatinum: Int!
+  attachedSilver: Int!
+  body: String!
+  createdAt: DateTime!
+  id: Int!
+  isDeleted: Boolean!
+  legacyRecipientId: Int
+  legacySenderId: Int
+  objectMovedToAccountStorage: Boolean!
+  objectRetrievalInfo: String
+  objectRetrievedAt: DateTime
+  objectRetrievedByCharacterId: String
+  readAt: DateTime
+  recipient: PlayerMailCharacterDto
+  recipientCharacterId: String
+  sender: PlayerMailCharacterDto
+  senderCharacterId: String
+  senderName: String!
+  sentAt: DateTime!
+  wealthRetrievalInfo: String
+  wealthRetrievedAt: DateTime
+  wealthRetrievedByCharacterId: String
+}
+
+input PlayerMailFilterInput {
+  fromDate: DateTime
+  includeDeleted: Boolean
+  recipientCharacterId: String
+  searchBody: String
+  senderCharacterId: String
+  toDate: DateTime
+}
+
+type PlayerMailObjectDto {
+  id: Int!
+  name: String!
+  zoneId: Int!
+}
+
 enum Position {
+  DEAD
+  FIGHTING
   FLYING
+  GHOST
+  INCAPACITATED
   KNEELING
+  MORTALLY_WOUNDED
   PRONE
+  RESTING
   SITTING
+  SLEEPING
   STANDING
+  STUNNED
 }
 
 type Query {
@@ -1557,7 +2098,20 @@ type Query {
   abilitySchool(id: ID!): AbilitySchool!
   abilitySchools: [AbilitySchool!]!
   activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
+  allAccountMail(filter: AccountMailFilterInput, skip: Int, take: Int): [AccountMailDto!]!
+
+  """Get all unique permission flags used across commands"""
+  availablePermissions: [String!]!
   banHistory(userId: ID!): [BanRecord!]!
+  board(alias: String, id: Int): BoardDto
+  boardMessage(id: Int!): BoardMessageDto
+  boardMessages(boardId: Int!, skip: Int, take: Int): [BoardMessageDto!]!
+  boardMessagesCount(boardId: Int): Int!
+  boards(search: String, skip: Int, take: Int): [BoardDto!]!
+  boardsCount: Int!
+
+  """Get the FieryMUD bridge connection status"""
+  bridgeStatus: BridgeStatus!
   character(id: ID!): CharacterDto!
   characterEffect(id: ID!): CharacterEffectDto!
   characterEffects(characterId: ID!): [CharacterEffectDto!]!
@@ -1577,11 +2131,38 @@ type Query {
   classSkills(classId: Int!): [ClassSkillDto!]!
   classes(skip: Int, take: Int): [ClassDto!]!
   classesCount: Int!
+
+  """Get a single command by name"""
+  command(name: String!): CommandDto!
+
+  """Get all command categories"""
+  commandCategories: [CommandCategory!]!
+
+  """Get all command definitions"""
+  commands: [CommandDto!]!
+
+  """Get commands by category"""
+  commandsByCategory(category: CommandCategory!): [CommandDto!]!
   effect(id: ID!): Effect!
   effects(search: String, skip: Int, take: Int): [Effect!]!
   effectsCount(search: String): Int!
   equipmentSet(id: ID!): EquipmentSetDto!
   equipmentSets: [EquipmentSetDto!]!
+
+  """Get a single configuration entry"""
+  gameConfig(category: String!, key: String!): GameConfigDto!
+
+  """Get all distinct configuration categories"""
+  gameConfigCategories: [String!]!
+
+  """Get all game configuration entries"""
+  gameConfigs: [GameConfigDto!]!
+
+  """Get configuration entries by category"""
+  gameConfigsByCategory(category: String!): [GameConfigDto!]!
+
+  """Check if FieryMUD admin API is connected"""
+  gameServerConnected: Boolean!
 
   """Get validation summary statistics"""
   getValidationSummary: ValidationSummaryType!
@@ -1602,6 +2183,27 @@ type Query {
 
   """Get a single help entry by ID"""
   helpEntry(id: ID!): HelpEntryDto!
+
+  """Get all immortal-only commands"""
+  immortalCommands: [CommandDto!]!
+
+  """Get immortal level definitions (100+)"""
+  immortalLevels: [LevelDefinitionDto!]!
+
+  """Get a single level definition"""
+  levelDefinition(level: Int!): LevelDefinitionDto!
+
+  """Get all level definitions"""
+  levelDefinitions: [LevelDefinitionDto!]!
+
+  """Get a single login message"""
+  loginMessage(id: ID!): LoginMessageDto!
+
+  """Get all login messages"""
+  loginMessages: [LoginMessageDto!]!
+
+  """Get login messages by stage"""
+  loginMessagesByStage(stage: LoginStage!): [LoginMessageDto!]!
   me: User!
   mob(id: Int!, zoneId: Int!): MobDto!
   mobReset(id: ID!): MobResetDto
@@ -1609,16 +2211,34 @@ type Query {
   mobs(search: String, skip: Int, take: Int): [MobDto!]!
   mobsByZone(search: String, zoneId: Int!): [MobDto!]!
   mobsCount: Int!
+
+  """Get mortal level definitions (1-99)"""
+  mortalLevels: [LevelDefinitionDto!]!
+  myAccountMail(skip: Int, take: Int): [AccountMailDto!]!
+  myAccountMailCount: Int!
+  myAccountStorage: AccountStorageDto!
+  myAccountWealthDisplay: WealthDisplayDto!
   myCharacters: [CharacterDto!]!
+  myMail(characterId: String!, skip: Int, take: Int): [PlayerMailDto!]!
+  myMailCount(characterId: String!): Int!
   myOnlineCharacters: [OnlineCharacterDto!]!
   myPermissions: UserPermissions!
   myZoneGrants: [ZoneGrantDto!]!
   object(id: Int!, zoneId: Int!): ObjectDto!
+  objectReset(id: ID!): ObjectResetDto
+  objectResetsByRoom(roomId: Int!, roomZoneId: Int!): [ObjectResetDto!]!
+  objectResetsByZone(zoneId: Int!): [ObjectResetDto!]!
   objects(skip: Int, take: Int): [ObjectDto!]!
   objectsByType(type: ObjectType!): [ObjectDto!]!
   objectsByZone(zoneId: Int!): [ObjectDto!]!
   objectsCount: Int!
   onlineCharacters(userId: ID): [OnlineCharacterDto!]!
+
+  """Get list of online players in FieryMUD"""
+  onlinePlayers: [OnlinePlayerType!]!
+  playerMail(id: Int!): PlayerMailDto
+  playerMailCount(filter: PlayerMailFilterInput): Int!
+  playerMails(filter: PlayerMailFilterInput, skip: Int, take: Int): [PlayerMailDto!]!
   race(race: Race!): RaceDto!
 
   """Get all skills for a race"""
@@ -1637,6 +2257,9 @@ type Query {
 
   """Search socials by name pattern"""
   searchSocials(query: String!): [SocialDto!]!
+
+  """Get server statistics and info from FieryMUD"""
+  serverStatus: ServerStatusType!
   shop(id: Int!, zoneId: Int!): ShopDto!
   shopByKeeper(id: Int!, zoneId: Int!): ShopDto!
   shops(skip: Int, take: Int): [ShopDto!]!
@@ -1654,9 +2277,23 @@ type Query {
 
   """Get total count of socials"""
   socialsCount: Int!
+
+  """Get a single system text entry by ID"""
+  systemText(id: ID!): SystemTextDto!
+
+  """Get system text by key"""
+  systemTextByKey(key: String!): SystemTextDto!
+
+  """Get all system text entries"""
+  systemTexts: [SystemTextDto!]!
+
+  """Get system text entries by category"""
+  systemTextsByCategory(category: String!): [SystemTextDto!]!
   trigger(id: Float!): TriggerDto!
   triggers: [TriggerDto!]!
   triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
+  triggersNeedingReview: [TriggerDto!]!
+  triggersNeedingReviewCount: Int!
   user(id: ID!): User!
   userPermissions(userId: ID!): UserPermissions!
   userZoneGrants(userId: String!): [ZoneGrantDto!]!
@@ -1830,6 +2467,7 @@ enum RoomFlag {
   ARENA
   ATRIUM
   BFS_MARK
+  CAMPSITE
   DARK
   DEATH
   EFFECTS_NEXT
@@ -1839,6 +2477,7 @@ enum RoomFlag {
   HOUSE
   HOUSECRASH
   INDOORS
+  INN
   ISOLATED
   LARGE
   MEDIUM
@@ -1859,6 +2498,7 @@ enum RoomFlag {
   PRIVATE
   SMALL
   SOUNDPROOF
+  TEMPLE
   TUNNEL
   UNDERDARK
   VERY_SMALL
@@ -1921,6 +2561,57 @@ enum Sector {
   UNDERDARK
   UNDERWATER
   WATER
+}
+
+input SendAccountMailInput {
+  body: String!
+  recipientUserId: String!
+  subject: String!
+}
+
+input SendBroadcastInput {
+  body: String!
+  subject: String!
+}
+
+input SendPlayerMailInput {
+  attachedCopper: Int! = 0
+  attachedGold: Int! = 0
+  attachedObjectId: Int
+  attachedObjectZoneId: Int
+  attachedPlatinum: Int! = 0
+  attachedSilver: Int! = 0
+  body: String!
+  recipientCharacterId: String!
+  senderCharacterId: String!
+}
+
+"""Server information from FieryMUD"""
+type ServerInfoType {
+  maintenanceMode: Boolean!
+  name: String!
+  port: Int!
+  running: Boolean!
+  tlsPort: Int!
+}
+
+"""Server statistics from FieryMUD"""
+type ServerStatsType {
+  commandsPerSecond: Float!
+  currentConnections: Int!
+  failedCommands: Int!
+  failedLogins: Int!
+  peakConnections: Int!
+  totalCommands: Int!
+  totalConnections: Int!
+  totalLogins: Int!
+  uptimeSeconds: Int!
+}
+
+"""Full server status from FieryMUD"""
+type ServerStatusType {
+  server: ServerInfoType!
+  stats: ServerStatsType!
 }
 
 type ShopAcceptDto {
@@ -2054,6 +2745,12 @@ type SocialDto {
   victFound: String
 }
 
+type SpawnConditionDto {
+  id: String!
+  parameters: String!
+  type: String!
+}
+
 enum SpellSphere {
   AIR
   DEATH
@@ -2077,6 +2774,67 @@ enum Stance {
   RESTING
   SLEEPING
   STUNNED
+}
+
+type Subscription {
+  """Subscribe to admin alerts and system events"""
+  adminAlerts: GameEvent!
+
+  """Subscribe to all chat messages (gossip, shout, say, etc.)"""
+  chatMessages: GameEvent!
+
+  """Subscribe to all game events from FieryMUD"""
+  gameEvents: GameEvent!
+
+  """Subscribe to game events by category (player, chat, admin, world)"""
+  gameEventsByCategory(category: GameEventCategory!): GameEvent!
+
+  """Subscribe to specific types of game events"""
+  gameEventsByTypes(types: [GameEventType!]!): GameEvent!
+
+  """Subscribe to player activity events (login, logout, death, level up)"""
+  playerActivity: GameEvent!
+
+  """Subscribe to events involving a specific player"""
+  playerEvents(playerName: String!): GameEvent!
+
+  """Subscribe to world events (zone loads, resets, boss spawns)"""
+  worldEvents: GameEvent!
+
+  """Subscribe to events in a specific zone"""
+  zoneEvents(zoneId: Int!): GameEvent!
+}
+
+"""Category of system text"""
+enum SystemTextCategory {
+  COMBAT
+  IMMORTAL
+  LOGIN
+  SYSTEM
+}
+
+"""System text content (MOTD, news, credits, etc.)"""
+type SystemTextDto {
+  """Text category"""
+  category: SystemTextCategory!
+
+  """Text content"""
+  content: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """Whether this text is active"""
+  isActive: Boolean!
+
+  """Unique key identifier"""
+  key: String!
+
+  """Minimum level to view this text"""
+  minLevel: Int!
+
+  """Display title"""
+  title: String
+  updatedAt: DateTime!
 }
 
 enum TargetScope {
@@ -2108,11 +2866,16 @@ type TriggerDto {
   commands: String!
   createdAt: DateTime!
   createdBy: String
+  flags: [String!]!
   id: String!
+  legacyScript: String
+  legacyVnum: Int
   mobId: Int
   name: String!
+  needsReview: Boolean!
   numArgs: Int!
   objectId: Int
+  syntaxError: String
   updatedAt: DateTime!
   updatedBy: String
   variables: String!
@@ -2158,11 +2921,14 @@ input UpdateAbilityMessagesInput {
   failToCaster: String
   failToRoom: String
   failToVictim: String
+  lookMessage: String
   startToCaster: String
   startToRoom: String
   startToVictim: String
+  successSelfRoom: String
   successToCaster: String
   successToRoom: String
+  successToSelf: String
   successToVictim: String
   wearoffToRoom: String
   wearoffToTarget: String
@@ -2175,6 +2941,18 @@ input UpdateAbilityTargetingInput {
   scope: TargetScope
   scopePattern: String
   validTargets: [TargetType!]
+}
+
+input UpdateBoardInput {
+  locked: Boolean
+  privileges: JSON
+  title: String
+}
+
+input UpdateBoardMessageInput {
+  content: String
+  sticky: Boolean
+  subject: String
 }
 
 input UpdateCharacterEffectInput {
@@ -2255,6 +3033,15 @@ input UpdateEquipmentSetInput {
   name: String
 }
 
+"""Input for updating a game configuration value"""
+input UpdateGameConfigInput {
+  """Updated description"""
+  description: String
+
+  """New value for this configuration"""
+  value: String!
+}
+
 input UpdateGrantInput {
   expiresAt: DateTime
   notes: String
@@ -2289,6 +3076,33 @@ input UpdateHelpEntryInput {
 
   """Usage syntax"""
   usage: String
+}
+
+"""Input for updating a level definition"""
+input UpdateLevelDefinitionInput {
+  """Experience required"""
+  expRequired: Int
+
+  """HP gained at this level"""
+  hpGain: Int
+
+  """Display name for this level"""
+  name: String
+
+  """Permissions for this level"""
+  permissions: [String!]
+
+  """Stamina gained at this level"""
+  staminaGain: Int
+}
+
+"""Input for updating a login message"""
+input UpdateLoginMessageInput {
+  """Whether this message is active"""
+  isActive: Boolean
+
+  """Message content"""
+  message: String
 }
 
 input UpdateMobInput {
@@ -2377,6 +3191,12 @@ input UpdateObjectInput {
   wearFlags: [WearFlag!]
   weight: Float
   zoneId: Int
+}
+
+input UpdateObjectResetInput {
+  max: Int
+  name: String
+  probability: Float
 }
 
 input UpdatePreferencesInput {
@@ -2504,6 +3324,24 @@ input UpdateSocialInput {
 
   """Message to target"""
   victFound: String
+}
+
+"""Input for updating system text"""
+input UpdateSystemTextInput {
+  """Text category"""
+  category: SystemTextCategory
+
+  """Text content"""
+  content: String
+
+  """Whether this text is active"""
+  isActive: Boolean
+
+  """Minimum level to view"""
+  minLevel: Int
+
+  """Display title"""
+  title: String
 }
 
 input UpdateTriggerInput {
@@ -2676,6 +3514,14 @@ type ValidationSummaryType {
   totalZones: Int!
   warningCount: Int!
   zonesWithIssues: Int!
+}
+
+type WealthDisplayDto {
+  copper: Int!
+  gold: Int!
+  platinum: Int!
+  silver: Int!
+  totalCopper: BigInt!
 }
 
 enum WearFlag {

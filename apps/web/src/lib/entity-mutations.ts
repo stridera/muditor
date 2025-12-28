@@ -41,7 +41,7 @@ export async function updateMob(input: UpdateMobInput) {
   }
 
   const res = await authenticatedFetch(
-    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
     {
       method: 'POST',
       body: JSON.stringify({
@@ -69,7 +69,7 @@ export async function updateObject(input: UpdateObjectInput) {
     gqlInput.roomDescription = data.roomDescription;
 
   const res = await authenticatedFetch(
-    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+    process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
     {
       method: 'POST',
       body: JSON.stringify({

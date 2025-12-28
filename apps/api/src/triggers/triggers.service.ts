@@ -41,6 +41,56 @@ export class TriggersService {
     });
   }
 
+  async findNeedingReview() {
+    return this.prisma.triggers.findMany({
+      where: {
+        needsReview: true,
+      },
+      include: {
+        mobs: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
+          },
+        },
+        objects: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
+          },
+        },
+        zones: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+      },
+      orderBy: [{ legacyVnum: 'asc' }, { createdAt: 'desc' }],
+    });
+  }
+
+  async countNeedingReview() {
+    return this.prisma.triggers.count({
+      where: {
+        needsReview: true,
+      },
+    });
+  }
+
+  async clearNeedsReview(id: number, userId?: string) {
+    return this.prisma.triggers.update({
+      where: { id },
+      data: {
+        needsReview: false,
+        syntaxError: null,
+        updatedBy: userId ?? null,
+      },
+    });
+  }
+
   async findOne(id: number) {
     const trigger = await this.prisma.triggers.findUnique({
       where: { id },

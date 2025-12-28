@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_URL = 'http://localhost:4000/graphql';
+const API_URL = 'http://localhost:3001/graphql';
 
 test.describe('Authentication and Role System', () => {
   let adminToken: string;
@@ -88,7 +88,9 @@ test.describe('Authentication and Role System', () => {
     expect(data.data.classes).toHaveLength(3);
   });
 
-  test('BUILDER role should be allowed (level 102 ≥ IMMORTAL 100)', async ({ request }) => {
+  test('BUILDER role should be allowed (level 102 ≥ IMMORTAL 100)', async ({
+    request,
+  }) => {
     // BUILDER (level 101-102) is above IMMORTAL (level 100) in the hierarchy
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${builderToken}` },

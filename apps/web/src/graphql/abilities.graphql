@@ -96,11 +96,14 @@ query GetAbilityDetails($id: ID!) {
       successToCaster
       successToRoom
       successToVictim
+      successToSelf
+      successSelfRoom
       failToCaster
       failToRoom
       failToVictim
       wearoffToRoom
       wearoffToTarget
+      lookMessage
     }
   }
 }
@@ -151,5 +154,24 @@ mutation UpdateAbilityEffects($abilityId: Int!, $data: UpdateAbilityEffectsInput
         description
       }
     }
+  }
+}
+
+mutation UpdateAbilityMessages($abilityId: Int!, $data: UpdateAbilityMessagesInput!) {
+  updateAbilityMessages(abilityId: $abilityId, data: $data) {
+    startToCaster
+    startToRoom
+    startToVictim
+    successToCaster
+    successToRoom
+    successToVictim
+    successToSelf
+    successSelfRoom
+    failToCaster
+    failToRoom
+    failToVictim
+    wearoffToRoom
+    wearoffToTarget
+    lookMessage
   }
 }

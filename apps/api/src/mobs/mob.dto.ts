@@ -336,15 +336,13 @@ export class CreateMobInput {
   @IsNumber()
   resistancePoison?: number;
 
-  @Field({ defaultValue: '1d8+0' })
-  @IsOptional()
+  @Field()
   @IsString()
-  hpDice?: string;
+  hpDice: string;
 
-  @Field({ defaultValue: '1d4+0' })
-  @IsOptional()
+  @Field()
   @IsString()
-  damageDice?: string;
+  damageDice: string;
 
   @Field(() => DamageType, { defaultValue: DamageType.HIT })
   @IsOptional()

@@ -999,6 +999,40 @@ export function registerEffectBlocks(): void {
   };
 
   // ============================================
+  // 20. PORTAL BLOCK (bidirectional portal creation)
+  // ============================================
+  Blockly.Blocks['effect_portal'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Create Portal');
+      this.appendDummyInput()
+        .appendField('Portal Type')
+        .appendField(
+          new Blockly.FieldDropdown([
+            ["Heaven's Gate (0:72)", '0:72'],
+            ["Hell's Gate (0:74)", '0:74'],
+            ['Moonwell (0:33)', '0:33'],
+          ] as MenuOption[]),
+          'objectRef'
+        );
+      this.appendDummyInput()
+        .appendField('Decay (ticks)')
+        .appendField(new Blockly.FieldNumber(2, 1, 100), 'decay');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#7b1fa2'); // Purple for portal magic
+      this.setTooltip(
+        'Create bidirectional portal between caster and target locations'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
   // GATE BLOCKS (Conditional Execution)
   // ============================================
 

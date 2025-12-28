@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
+import { useTheme } from 'next-themes';
 
 export interface Script {
   id: string;
@@ -521,6 +522,13 @@ export default function ScriptEditor({
   const [isValidating, setIsValidating] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const { resolvedTheme } = useTheme();
+  const [mounted, setMounted] = useState(false);
+
+  // Ensure we're mounted before accessing theme
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   useEffect(() => {
     if (script?.commands !== code) {
@@ -528,45 +536,78 @@ export default function ScriptEditor({
     }
   }, [script]);
 
+  // Define themes before editor mounts
+  const handleEditorWillMount = (monaco: typeof import('monaco-editor')) => {
+    // Register Lua language if not already registered
+    if (!monaco.languages.getLanguages().find(lang => lang.id === 'lua')) {
+      monaco.languages.register({ id: 'lua' });
+      monaco.languages.setMonarchTokensProvider('lua', luaLanguageConfig);
+    }
+
+    // Define dark theme
+    monaco.editor.defineTheme('muditor-dark', {
+      base: 'vs-dark',
+      inherit: true,
+      rules: [
+        {
+          token: 'support.function',
+          foreground: '4FC1FF',
+          fontStyle: 'bold',
+        },
+        { token: 'keyword', foreground: 'FF6B6B', fontStyle: 'bold' },
+        { token: 'string', foreground: '4ECDC4' },
+        { token: 'number', foreground: 'FFE66D' },
+        { token: 'comment', foreground: '95A5A6', fontStyle: 'italic' },
+      ],
+      colors: {
+        'editor.background': '#1e1e1e',
+        'editor.foreground': '#d4d4d4',
+      },
+    });
+
+    // Define light theme
+    monaco.editor.defineTheme('muditor-light', {
+      base: 'vs',
+      inherit: true,
+      rules: [
+        {
+          token: 'support.function',
+          foreground: '0066CC',
+          fontStyle: 'bold',
+        },
+        { token: 'keyword', foreground: 'AF00DB', fontStyle: 'bold' },
+        { token: 'string', foreground: '098658' },
+        { token: 'number', foreground: 'B5740D' },
+        { token: 'comment', foreground: '6A737D', fontStyle: 'italic' },
+      ],
+      colors: {
+        'editor.background': '#ffffff',
+        'editor.foreground': '#24292e',
+      },
+    });
+  };
+
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
     editorRef.current = editor;
 
-    // Configure Monaco for Lua
+    // Set language to Lua
     if (typeof window !== 'undefined') {
       import('monaco-editor').then(monaco => {
-        // Register Lua language if not already registered
-        if (!monaco.languages.getLanguages().find(lang => lang.id === 'lua')) {
-          monaco.languages.register({ id: 'lua' });
-          monaco.languages.setMonarchTokensProvider('lua', luaLanguageConfig);
-
-          // Set theme
-          monaco.editor.defineTheme('muditor-dark', {
-            base: 'vs-dark',
-            inherit: true,
-            rules: [
-              {
-                token: 'support.function',
-                foreground: '4FC1FF',
-                fontStyle: 'bold',
-              },
-              { token: 'keyword', foreground: 'FF6B6B', fontStyle: 'bold' },
-              { token: 'string', foreground: '4ECDC4' },
-              { token: 'number', foreground: 'FFE66D' },
-              { token: 'comment', foreground: '95A5A6', fontStyle: 'italic' },
-            ],
-            colors: {
-              'editor.background': '#1e1e1e',
-              'editor.foreground': '#d4d4d4',
-            },
-          });
-        }
-
-        // Apply Lua language and theme
         monaco.editor.setModelLanguage(editor.getModel()!, 'lua');
-        monaco.editor.setTheme('muditor-dark');
       });
     }
   };
+
+  // Update Monaco theme when system theme changes
+  useEffect(() => {
+    if (mounted && editorRef.current && typeof window !== 'undefined') {
+      import('monaco-editor').then(monaco => {
+        const themeName =
+          resolvedTheme === 'dark' ? 'muditor-dark' : 'muditor-light';
+        monaco.editor.setTheme(themeName);
+      });
+    }
+  }, [resolvedTheme, mounted]);
 
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || '';
@@ -690,12 +731,12 @@ export default function ScriptEditor({
   };
 
   return (
-    <div className='script-editor border border-gray-300 rounded-lg overflow-hidden'>
+    <div className='script-editor border border-border rounded-lg overflow-hidden bg-card'>
       {/* Toolbar */}
-      <div className='bg-gray-100 border-b px-4 py-2 space-y-2'>
+      <div className='bg-muted border-b border-border px-4 py-2 space-y-2'>
         <div className='flex items-center gap-4'>
           <div className='flex items-center gap-2'>
-            <label className='text-sm font-medium text-gray-700'>
+            <label className='text-sm font-medium text-foreground'>
               Category:
             </label>
             <select
@@ -704,7 +745,7 @@ export default function ScriptEditor({
                 setSelectedCategory(e.target.value);
                 setSelectedTemplate('');
               }}
-              className='text-sm border border-gray-300 rounded px-2 py-1 min-w-[140px]'
+              className='text-sm border border-border rounded px-2 py-1 min-w-[140px] bg-background text-foreground'
             >
               <option value=''>All Categories</option>
               {categories.map(category => (
@@ -716,13 +757,13 @@ export default function ScriptEditor({
           </div>
 
           <div className='flex items-center gap-2'>
-            <label className='text-sm font-medium text-gray-700'>
+            <label className='text-sm font-medium text-foreground'>
               Template:
             </label>
             <select
               value={selectedTemplate}
               onChange={e => setSelectedTemplate(e.target.value)}
-              className='text-sm border border-gray-300 rounded px-2 py-1 min-w-[200px]'
+              className='text-sm border border-border rounded px-2 py-1 min-w-[200px] bg-background text-foreground'
             >
               <option value=''>Select template...</option>
               {filteredTemplates.map(([key, template]) => {
@@ -742,7 +783,7 @@ export default function ScriptEditor({
           <button
             onClick={insertTemplate}
             disabled={!selectedTemplate}
-            className='text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed'
+            className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed'
           >
             Insert Template
           </button>
@@ -754,7 +795,7 @@ export default function ScriptEditor({
             const template =
               scriptTemplates[selectedTemplate as keyof typeof scriptTemplates];
             return typeof template === 'object' && 'triggers' in template ? (
-              <div className='text-xs text-gray-600 bg-blue-50 px-2 py-1 rounded'>
+              <div className='text-xs text-muted-foreground bg-accent px-2 py-1 rounded'>
                 <span className='font-medium'>Triggers:</span>{' '}
                 {template.triggers?.join(', ')}
                 <span className='ml-4 font-medium'>Description:</span>{' '}
@@ -774,7 +815,7 @@ export default function ScriptEditor({
           </button>
           <button
             onClick={formatCode}
-            className='text-sm bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700'
+            className='text-sm bg-secondary text-secondary-foreground px-3 py-1 rounded hover:bg-secondary/80'
           >
             Format
           </button>
@@ -789,7 +830,7 @@ export default function ScriptEditor({
           {onSave && (
             <button
               onClick={handleSave}
-              className='text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700'
+              className='text-sm bg-primary text-primary-foreground px-3 py-1 rounded hover:bg-primary/90'
             >
               Save
             </button>
@@ -801,8 +842,16 @@ export default function ScriptEditor({
       <Editor
         height={height}
         defaultLanguage='lua'
+        theme={
+          mounted
+            ? resolvedTheme === 'dark'
+              ? 'muditor-dark'
+              : 'muditor-light'
+            : 'vs'
+        }
         value={code}
         onChange={handleCodeChange}
+        beforeMount={handleEditorWillMount}
         onMount={handleEditorDidMount}
         options={{
           readOnly,
@@ -832,14 +881,14 @@ export default function ScriptEditor({
 
       {/* Validation Results */}
       {validationErrors.length > 0 && (
-        <div className='bg-red-50 border-t border-red-200 p-3'>
-          <h4 className='text-sm font-medium text-red-800 mb-2'>
+        <div className='bg-destructive/10 border-t border-destructive/20 p-3'>
+          <h4 className='text-sm font-medium text-destructive mb-2'>
             Validation Errors:
           </h4>
-          <ul className='text-sm text-red-700 space-y-1'>
+          <ul className='text-sm text-destructive/90 space-y-1'>
             {validationErrors.map((error, index) => (
               <li key={index} className='flex items-start gap-2'>
-                <span className='text-red-500'>•</span>
+                <span className='text-destructive'>•</span>
                 <span>{error}</span>
               </li>
             ))}
@@ -848,39 +897,104 @@ export default function ScriptEditor({
       )}
 
       {/* Help Section */}
-      <details className='bg-gray-50 border-t'>
-        <summary className='px-4 py-2 cursor-pointer text-sm font-medium text-gray-700 hover:bg-gray-100'>
+      <details className='bg-muted border-t border-border'>
+        <summary className='px-4 py-2 cursor-pointer text-sm font-medium text-foreground hover:bg-accent'>
           📚 Lua Scripting Reference
         </summary>
-        <div className='px-4 py-3 space-y-3'>
+        <div className='px-4 py-3 space-y-3 text-sm'>
           <div>
-            <h5 className='font-medium text-gray-800'>Common MUD Functions:</h5>
-            <p className='text-sm text-gray-600 mt-1'>
-              <code>get_character()</code>, <code>get_mobile()</code>,{' '}
-              <code>get_object()</code>, <code>get_room()</code>
+            <h5 className='font-medium text-foreground'>Context Variables:</h5>
+            <p className='text-muted-foreground mt-1'>
+              <code className='bg-accent px-1 rounded'>self</code> - The
+              mob/object running the script
               <br />
-              <code>send_to_char(char, message)</code>,{' '}
-              <code>send_to_room(room, message, exclude)</code>
+              <code className='bg-accent px-1 rounded'>actor</code> - The
+              player/mob that triggered the script
               <br />
-              <code>is_pc(char)</code>, <code>is_npc(char)</code>,{' '}
-              <code>get_level(char)</code>
+              <code className='bg-accent px-1 rounded'>room</code> - The current
+              room
             </p>
           </div>
           <div>
-            <h5 className='font-medium text-gray-800'>Variable Storage:</h5>
-            <p className='text-sm text-gray-600 mt-1'>
-              <code>set_char_var(char, "key", value)</code>,{' '}
-              <code>get_char_var(char, "key")</code>
+            <h5 className='font-medium text-foreground'>Actor Properties:</h5>
+            <p className='text-muted-foreground mt-1'>
+              <code className='bg-accent px-1 rounded'>actor.name</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.level</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.hp</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.max_hp</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.mana</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.alignment</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.gold</code>
               <br />
-              <code>set_mob_var(mob, "key", value)</code>,{' '}
-              <code>get_mob_var(mob, "key")</code>
+              <code className='bg-accent px-1 rounded'>actor.is_npc</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.is_fighting</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.is_alive</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor.room</code>
             </p>
           </div>
           <div>
-            <h5 className='font-medium text-gray-800'>Utility Functions:</h5>
-            <p className='text-sm text-gray-600 mt-1'>
-              <code>random(min, max)</code>, <code>dice(num, size)</code>,{' '}
-              <code>mudlog(message)</code>
+            <h5 className='font-medium text-foreground'>Actor Methods:</h5>
+            <p className='text-muted-foreground mt-1'>
+              <code className='bg-accent px-1 rounded'>actor:send(msg)</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor:say(msg)</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor:emote(msg)</code>
+              <br />
+              <code className='bg-accent px-1 rounded'>
+                actor:damage(n)
+              </code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor:heal(n)</code>,{' '}
+              <code className='bg-accent px-1 rounded'>actor:has_item(kw)</code>
+              <br />
+              <code className='bg-accent px-1 rounded'>actor:give_gold(n)</code>
+              ,{' '}
+              <code className='bg-accent px-1 rounded'>actor:take_gold(n)</code>
+              ,{' '}
+              <code className='bg-accent px-1 rounded'>
+                actor:teleport(room)
+              </code>
+            </p>
+          </div>
+          <div>
+            <h5 className='font-medium text-foreground'>
+              Room Properties & Methods:
+            </h5>
+            <p className='text-muted-foreground mt-1'>
+              <code className='bg-accent px-1 rounded'>room.name</code>,{' '}
+              <code className='bg-accent px-1 rounded'>room.actors</code>,{' '}
+              <code className='bg-accent px-1 rounded'>room.objects</code>,{' '}
+              <code className='bg-accent px-1 rounded'>room.exits</code>
+              <br />
+              <code className='bg-accent px-1 rounded'>
+                room:send(msg)
+              </code>,{' '}
+              <code className='bg-accent px-1 rounded'>
+                room:send_except(actor, msg)
+              </code>
+              ,{' '}
+              <code className='bg-accent px-1 rounded'>
+                room:find_actor(kw)
+              </code>
+            </p>
+          </div>
+          <div>
+            <h5 className='font-medium text-foreground'>Utility Functions:</h5>
+            <p className='text-muted-foreground mt-1'>
+              <code className='bg-accent px-1 rounded'>dice(count, sides)</code>{' '}
+              - Roll dice (e.g., dice(2,6) for 2d6)
+              <br />
+              <code className='bg-accent px-1 rounded'>random(min, max)</code> -
+              Random integer in range
+              <br />
+              <code className='bg-accent px-1 rounded'>
+                percent_chance(n)
+              </code>{' '}
+              - Returns true n% of the time
+              <br />
+              <code className='bg-accent px-1 rounded'>wait(seconds)</code> -
+              Pause script execution (0.1-300s)
+              <br />
+              <code className='bg-accent px-1 rounded'>echo(msg)</code> - Debug
+              output to server log
             </p>
           </div>
         </div>

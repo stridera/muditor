@@ -162,7 +162,7 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         );
         const response = await authenticatedFetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:4000/graphql',
+            'http://localhost:3001/graphql',
           {
             method: 'POST',
             body: JSON.stringify({
@@ -321,7 +321,7 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         );
         const response = await authenticatedFetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:4000/graphql',
+            'http://localhost:3001/graphql',
           {
             method: 'POST',
             body: JSON.stringify({

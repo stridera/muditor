@@ -60,6 +60,7 @@ import {
   GetAbilitySchoolsDocument,
   UpdateAbilityDocument,
   UpdateAbilityEffectsDocument,
+  UpdateAbilityMessagesDocument,
   type Ability,
   type AbilitySchool,
   type CreateAbilityInput,
@@ -80,6 +81,8 @@ import {
   type UpdateAbilityMutationVariables,
   type UpdateAbilityEffectsMutation,
   type UpdateAbilityEffectsMutationVariables,
+  type UpdateAbilityMessagesMutation,
+  type UpdateAbilityMessagesMutationVariables,
 } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -213,6 +216,23 @@ export default function AbilitiesPage() {
   );
   const [editingEffects, setEditingEffects] = useState(false);
   const [editedEffects, setEditedEffects] = useState<AbilityEffectOutput[]>([]);
+  const [editingMessages, setEditingMessages] = useState(false);
+  const [editedMessages, setEditedMessages] = useState<{
+    startToCaster?: string;
+    startToVictim?: string;
+    startToRoom?: string;
+    successToCaster?: string;
+    successToVictim?: string;
+    successToRoom?: string;
+    successToSelf?: string;
+    successSelfRoom?: string;
+    failToCaster?: string;
+    failToVictim?: string;
+    failToRoom?: string;
+    wearoffToTarget?: string;
+    wearoffToRoom?: string;
+    lookMessage?: string;
+  }>({});
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
@@ -319,6 +339,24 @@ export default function AbilitiesPage() {
       },
     });
 
+  const [updateAbilityMessagesMutation, { loading: savingMessages }] =
+    useMutation<
+      UpdateAbilityMessagesMutation,
+      UpdateAbilityMessagesMutationVariables
+    >(UpdateAbilityMessagesDocument, {
+      onCompleted: () => {
+        setSuccessMessage('Messages updated successfully');
+        setErrorMessage('');
+        setEditingMessages(false);
+        refetch();
+        setTimeout(() => setSuccessMessage(''), 5000);
+      },
+      onError: error => {
+        setErrorMessage(error.message);
+        setSuccessMessage('');
+      },
+    });
+
   const abilities = data?.abilities || [];
   const totalCount = data?.abilitiesCount || 0;
   const totalPages = Math.ceil(totalCount / pageSize);
@@ -400,6 +438,78 @@ export default function AbilitiesPage() {
               chancePct: effect.chancePct,
               condition: effect.condition,
             })),
+          },
+        },
+      });
+    }
+  };
+
+  const handleEditMessages = () => {
+    if (abilityDetailsData?.ability?.messages) {
+      const msgs = abilityDetailsData.ability.messages;
+      const newMessages: typeof editedMessages = {};
+      if (msgs.startToCaster) newMessages.startToCaster = msgs.startToCaster;
+      if (msgs.startToVictim) newMessages.startToVictim = msgs.startToVictim;
+      if (msgs.startToRoom) newMessages.startToRoom = msgs.startToRoom;
+      if (msgs.successToCaster)
+        newMessages.successToCaster = msgs.successToCaster;
+      if (msgs.successToVictim)
+        newMessages.successToVictim = msgs.successToVictim;
+      if (msgs.successToRoom) newMessages.successToRoom = msgs.successToRoom;
+      if (msgs.successToSelf) newMessages.successToSelf = msgs.successToSelf;
+      if (msgs.successSelfRoom)
+        newMessages.successSelfRoom = msgs.successSelfRoom;
+      if (msgs.failToCaster) newMessages.failToCaster = msgs.failToCaster;
+      if (msgs.failToVictim) newMessages.failToVictim = msgs.failToVictim;
+      if (msgs.failToRoom) newMessages.failToRoom = msgs.failToRoom;
+      if (msgs.wearoffToTarget)
+        newMessages.wearoffToTarget = msgs.wearoffToTarget;
+      if (msgs.wearoffToRoom) newMessages.wearoffToRoom = msgs.wearoffToRoom;
+      if (msgs.lookMessage) newMessages.lookMessage = msgs.lookMessage;
+      setEditedMessages(newMessages);
+    } else {
+      setEditedMessages({});
+    }
+    setEditingMessages(true);
+  };
+
+  const handleCancelEditMessages = () => {
+    setEditingMessages(false);
+    setEditedMessages({});
+  };
+
+  const updateMessage = (field: keyof typeof editedMessages, value: string) => {
+    setEditedMessages(prev => {
+      const newMessages = { ...prev };
+      if (value) {
+        newMessages[field] = value;
+      } else {
+        delete newMessages[field];
+      }
+      return newMessages;
+    });
+  };
+
+  const handleSaveMessages = () => {
+    if (viewingAbilityId) {
+      updateAbilityMessagesMutation({
+        variables: {
+          abilityId: parseInt(viewingAbilityId, 10),
+          data: {
+            startToCaster: editedMessages.startToCaster || null,
+            startToVictim: editedMessages.startToVictim || null,
+            startToRoom: editedMessages.startToRoom || null,
+            successToCaster: editedMessages.successToCaster || null,
+            successToVictim: editedMessages.successToVictim || null,
+            successToRoom: editedMessages.successToRoom || null,
+            successToSelf: editedMessages.successToSelf || null,
+            successSelfRoom: editedMessages.successSelfRoom || null,
+            failToCaster: editedMessages.failToCaster || null,
+            failToVictim: editedMessages.failToVictim || null,
+            failToRoom: editedMessages.failToRoom || null,
+            wearoffToTarget: editedMessages.wearoffToTarget || null,
+            wearoffToRoom: editedMessages.wearoffToRoom || null,
+            lookMessage: editedMessages.lookMessage || null,
           },
         },
       });
@@ -628,9 +738,9 @@ export default function AbilitiesPage() {
                               <div className='flex flex-wrap gap-1'>
                                 {ability.effects
                                   .slice(0, 2)
-                                  .map(abilityEffect => (
+                                  .map((abilityEffect, index) => (
                                     <Badge
-                                      key={abilityEffect.effectId}
+                                      key={`${abilityEffect.effectId}-${index}`}
                                       variant='outline'
                                       className='text-xs'
                                     >
@@ -874,6 +984,8 @@ export default function AbilitiesPage() {
             setViewingAbilityId(null);
             setEditingEffects(false);
             setEditedEffects([]);
+            setEditingMessages(false);
+            setEditedMessages({});
           }
         }}
       >
@@ -1257,48 +1369,553 @@ export default function AbilitiesPage() {
                   )}
 
                 {/* Messages */}
-                {abilityDetailsData.ability.messages && (
-                  <div>
-                    <h3 className='text-lg font-semibold mb-2'>Messages</h3>
-                    <div className='space-y-2 text-sm'>
-                      {abilityDetailsData.ability.messages.startToCaster && (
-                        <div>
-                          <Label className='text-xs'>Cast (Self)</Label>
-                          <p className='text-muted-foreground'>
-                            {abilityDetailsData.ability.messages.startToCaster}
-                          </p>
-                        </div>
-                      )}
-                      {abilityDetailsData.ability.messages.startToVictim && (
-                        <div>
-                          <Label className='text-xs'>Cast (Target)</Label>
-                          <p className='text-muted-foreground'>
-                            {abilityDetailsData.ability.messages.startToVictim}
-                          </p>
-                        </div>
-                      )}
-                      {abilityDetailsData.ability.messages.startToRoom && (
-                        <div>
-                          <Label className='text-xs'>Cast (Room)</Label>
-                          <p className='text-muted-foreground'>
-                            {abilityDetailsData.ability.messages.startToRoom}
-                          </p>
-                        </div>
-                      )}
-                      {abilityDetailsData.ability.messages.wearoffToTarget && (
-                        <div>
-                          <Label className='text-xs'>Wear Off</Label>
-                          <p className='text-muted-foreground'>
-                            {
-                              abilityDetailsData.ability.messages
-                                .wearoffToTarget
-                            }
-                          </p>
-                        </div>
-                      )}
-                    </div>
+                <div>
+                  <div className='flex items-center justify-between mb-2'>
+                    <h3 className='text-lg font-semibold'>Messages</h3>
+                    {canEdit && !editingMessages && (
+                      <Button
+                        variant='outline'
+                        size='sm'
+                        onClick={handleEditMessages}
+                      >
+                        <Pencil className='h-4 w-4 mr-2' />
+                        Edit Messages
+                      </Button>
+                    )}
+                    {editingMessages && (
+                      <div className='flex gap-2'>
+                        <Button
+                          variant='outline'
+                          size='sm'
+                          onClick={handleCancelEditMessages}
+                          disabled={savingMessages}
+                        >
+                          Cancel
+                        </Button>
+                        <Button
+                          size='sm'
+                          onClick={handleSaveMessages}
+                          disabled={savingMessages}
+                        >
+                          {savingMessages ? (
+                            <Loader2 className='h-4 w-4 mr-2 animate-spin' />
+                          ) : (
+                            <CheckCircle className='h-4 w-4 mr-2' />
+                          )}
+                          Save Messages
+                        </Button>
+                      </div>
+                    )}
                   </div>
-                )}
+                  {editingMessages ? (
+                    <div className='space-y-4 border rounded-lg p-4'>
+                      <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                        {/* Start Messages */}
+                        <div className='space-y-3'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Start Messages (when casting begins)
+                          </h4>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='startToCaster' className='text-xs'>
+                              To Caster
+                            </Label>
+                            <Input
+                              id='startToCaster'
+                              value={editedMessages.startToCaster || ''}
+                              onChange={e =>
+                                updateMessage('startToCaster', e.target.value)
+                              }
+                              placeholder='What the caster sees when starting to cast'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='startToVictim' className='text-xs'>
+                              To Target
+                            </Label>
+                            <Input
+                              id='startToVictim'
+                              value={editedMessages.startToVictim || ''}
+                              onChange={e =>
+                                updateMessage('startToVictim', e.target.value)
+                              }
+                              placeholder='What the target sees'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='startToRoom' className='text-xs'>
+                              To Room
+                            </Label>
+                            <Input
+                              id='startToRoom'
+                              value={editedMessages.startToRoom || ''}
+                              onChange={e =>
+                                updateMessage('startToRoom', e.target.value)
+                              }
+                              placeholder='What others in the room see'
+                            />
+                          </div>
+                        </div>
+
+                        {/* Success Messages */}
+                        <div className='space-y-3'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Success Messages (on successful cast)
+                          </h4>
+                          <div className='grid gap-2'>
+                            <Label
+                              htmlFor='successToCaster'
+                              className='text-xs'
+                            >
+                              To Caster
+                            </Label>
+                            <Input
+                              id='successToCaster'
+                              value={editedMessages.successToCaster || ''}
+                              onChange={e =>
+                                updateMessage('successToCaster', e.target.value)
+                              }
+                              placeholder='What the caster sees on success'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label
+                              htmlFor='successToVictim'
+                              className='text-xs'
+                            >
+                              To Target
+                            </Label>
+                            <Input
+                              id='successToVictim'
+                              value={editedMessages.successToVictim || ''}
+                              onChange={e =>
+                                updateMessage('successToVictim', e.target.value)
+                              }
+                              placeholder='What the target sees on success'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='successToRoom' className='text-xs'>
+                              To Room
+                            </Label>
+                            <Input
+                              id='successToRoom'
+                              value={editedMessages.successToRoom || ''}
+                              onChange={e =>
+                                updateMessage('successToRoom', e.target.value)
+                              }
+                              placeholder='What others in the room see'
+                            />
+                          </div>
+                        </div>
+
+                        {/* Self-Cast Messages */}
+                        <div className='space-y-3'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Self-Cast Messages (when casting on yourself)
+                          </h4>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='successToSelf' className='text-xs'>
+                              To Self (Caster)
+                            </Label>
+                            <Input
+                              id='successToSelf'
+                              value={editedMessages.successToSelf || ''}
+                              onChange={e =>
+                                updateMessage('successToSelf', e.target.value)
+                              }
+                              placeholder='What you see when casting on yourself'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label
+                              htmlFor='successSelfRoom'
+                              className='text-xs'
+                            >
+                              To Room (Self-Cast)
+                            </Label>
+                            <Input
+                              id='successSelfRoom'
+                              value={editedMessages.successSelfRoom || ''}
+                              onChange={e =>
+                                updateMessage('successSelfRoom', e.target.value)
+                              }
+                              placeholder='What others see when you cast on yourself'
+                            />
+                          </div>
+                        </div>
+
+                        {/* Fail Messages */}
+                        <div className='space-y-3'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Fail Messages (on failed cast)
+                          </h4>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='failToCaster' className='text-xs'>
+                              To Caster
+                            </Label>
+                            <Input
+                              id='failToCaster'
+                              value={editedMessages.failToCaster || ''}
+                              onChange={e =>
+                                updateMessage('failToCaster', e.target.value)
+                              }
+                              placeholder='What the caster sees on failure'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='failToVictim' className='text-xs'>
+                              To Target
+                            </Label>
+                            <Input
+                              id='failToVictim'
+                              value={editedMessages.failToVictim || ''}
+                              onChange={e =>
+                                updateMessage('failToVictim', e.target.value)
+                              }
+                              placeholder='What the target sees on failure'
+                            />
+                          </div>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='failToRoom' className='text-xs'>
+                              To Room
+                            </Label>
+                            <Input
+                              id='failToRoom'
+                              value={editedMessages.failToRoom || ''}
+                              onChange={e =>
+                                updateMessage('failToRoom', e.target.value)
+                              }
+                              placeholder='What others see on failure'
+                            />
+                          </div>
+                        </div>
+
+                        {/* Wear Off Messages */}
+                        <div className='space-y-3 md:col-span-2'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Wear Off Messages (when effect expires)
+                          </h4>
+                          <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                            <div className='grid gap-2'>
+                              <Label
+                                htmlFor='wearoffToTarget'
+                                className='text-xs'
+                              >
+                                To Target
+                              </Label>
+                              <Input
+                                id='wearoffToTarget'
+                                value={editedMessages.wearoffToTarget || ''}
+                                onChange={e =>
+                                  updateMessage(
+                                    'wearoffToTarget',
+                                    e.target.value
+                                  )
+                                }
+                                placeholder='What the target sees when effect wears off'
+                              />
+                            </div>
+                            <div className='grid gap-2'>
+                              <Label
+                                htmlFor='wearoffToRoom'
+                                className='text-xs'
+                              >
+                                To Room
+                              </Label>
+                              <Input
+                                id='wearoffToRoom'
+                                value={editedMessages.wearoffToRoom || ''}
+                                onChange={e =>
+                                  updateMessage('wearoffToRoom', e.target.value)
+                                }
+                                placeholder='What others see when effect wears off'
+                              />
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Look Message */}
+                        <div className='space-y-3 md:col-span-2'>
+                          <h4 className='font-medium text-sm text-muted-foreground'>
+                            Look Message (when looking at someone with this
+                            effect)
+                          </h4>
+                          <div className='grid gap-2'>
+                            <Label htmlFor='lookMessage' className='text-xs'>
+                              Description
+                            </Label>
+                            <Input
+                              id='lookMessage'
+                              value={editedMessages.lookMessage || ''}
+                              onChange={e =>
+                                updateMessage('lookMessage', e.target.value)
+                              }
+                              placeholder='e.g., "Their skin is made of stone!"'
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : abilityDetailsData.ability.messages ? (
+                    <div className='space-y-4 text-sm'>
+                      {/* Start Messages */}
+                      {(abilityDetailsData.ability.messages.startToCaster ||
+                        abilityDetailsData.ability.messages.startToVictim ||
+                        abilityDetailsData.ability.messages.startToRoom) && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Start
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-muted'>
+                            {abilityDetailsData.ability.messages
+                              .startToCaster && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Caster:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .startToCaster
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .startToVictim && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Target:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .startToVictim
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .startToRoom && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Room:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .startToRoom
+                                }
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Success Messages */}
+                      {(abilityDetailsData.ability.messages.successToCaster ||
+                        abilityDetailsData.ability.messages.successToVictim ||
+                        abilityDetailsData.ability.messages.successToRoom) && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Success
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-green-200'>
+                            {abilityDetailsData.ability.messages
+                              .successToCaster && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Caster:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .successToCaster
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .successToVictim && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Target:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .successToVictim
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .successToRoom && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Room:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .successToRoom
+                                }
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Self-Cast Messages */}
+                      {(abilityDetailsData.ability.messages.successToSelf ||
+                        abilityDetailsData.ability.messages
+                          .successSelfRoom) && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Self-Cast
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-blue-200'>
+                            {abilityDetailsData.ability.messages
+                              .successToSelf && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Self:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .successToSelf
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .successSelfRoom && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Room:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .successSelfRoom
+                                }
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Fail Messages */}
+                      {(abilityDetailsData.ability.messages.failToCaster ||
+                        abilityDetailsData.ability.messages.failToVictim ||
+                        abilityDetailsData.ability.messages.failToRoom) && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Fail
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-red-200'>
+                            {abilityDetailsData.ability.messages
+                              .failToCaster && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Caster:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .failToCaster
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .failToVictim && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Target:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .failToVictim
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages.failToRoom && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Room:
+                                </span>{' '}
+                                {abilityDetailsData.ability.messages.failToRoom}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Wear Off Messages */}
+                      {(abilityDetailsData.ability.messages.wearoffToTarget ||
+                        abilityDetailsData.ability.messages.wearoffToRoom) && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Wear Off
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-yellow-200'>
+                            {abilityDetailsData.ability.messages
+                              .wearoffToTarget && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Target:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .wearoffToTarget
+                                }
+                              </div>
+                            )}
+                            {abilityDetailsData.ability.messages
+                              .wearoffToRoom && (
+                              <div>
+                                <span className='text-xs text-muted-foreground'>
+                                  Room:
+                                </span>{' '}
+                                {
+                                  abilityDetailsData.ability.messages
+                                    .wearoffToRoom
+                                }
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* Look Message */}
+                      {abilityDetailsData.ability.messages.lookMessage && (
+                        <div>
+                          <h4 className='font-medium text-muted-foreground mb-2'>
+                            Look
+                          </h4>
+                          <div className='space-y-1 pl-2 border-l-2 border-purple-200'>
+                            <div>
+                              {abilityDetailsData.ability.messages.lookMessage}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {/* No messages configured */}
+                      {!abilityDetailsData.ability.messages.startToCaster &&
+                        !abilityDetailsData.ability.messages.startToVictim &&
+                        !abilityDetailsData.ability.messages.startToRoom &&
+                        !abilityDetailsData.ability.messages.successToCaster &&
+                        !abilityDetailsData.ability.messages.successToVictim &&
+                        !abilityDetailsData.ability.messages.successToRoom &&
+                        !abilityDetailsData.ability.messages.successToSelf &&
+                        !abilityDetailsData.ability.messages.successSelfRoom &&
+                        !abilityDetailsData.ability.messages.failToCaster &&
+                        !abilityDetailsData.ability.messages.failToVictim &&
+                        !abilityDetailsData.ability.messages.failToRoom &&
+                        !abilityDetailsData.ability.messages.wearoffToTarget &&
+                        !abilityDetailsData.ability.messages.wearoffToRoom &&
+                        !abilityDetailsData.ability.messages.lookMessage && (
+                          <p className='text-muted-foreground'>
+                            No messages configured. Click "Edit Messages" to add
+                            messages.
+                          </p>
+                        )}
+                    </div>
+                  ) : (
+                    <p className='text-muted-foreground text-sm'>
+                      No messages configured. Click "Edit Messages" to add
+                      messages.
+                    </p>
+                  )}
+                </div>
 
                 {/* Lua Script */}
                 {abilityDetailsData.ability.luaScript && (

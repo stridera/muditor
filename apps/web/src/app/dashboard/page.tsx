@@ -284,7 +284,7 @@ export default function DashboardPage() {
                   <a
                     href={
                       process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-                      'http://localhost:4000/graphql'
+                      'http://localhost:3001/graphql'
                     }
                     target='_blank'
                     rel='noopener noreferrer'

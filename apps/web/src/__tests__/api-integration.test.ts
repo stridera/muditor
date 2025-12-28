@@ -9,7 +9,7 @@
  */
 
 describe('API Integration Tests', () => {
-  const API_URL = process.env.TEST_API_URL || 'http://localhost:4000/graphql';
+  const API_URL = process.env.TEST_API_URL || 'http://localhost:3001/graphql';
 
   // Helper function to make GraphQL requests
   const makeGraphQLRequest = async (query: string, variables: any = {}) => {
@@ -276,7 +276,7 @@ describe('API Integration Tests', () => {
 export class ApiSchemaValidator {
   private apiUrl: string;
 
-  constructor(apiUrl = 'http://localhost:4000/graphql') {
+  constructor(apiUrl = 'http://localhost:3001/graphql') {
     this.apiUrl = apiUrl;
   }
 

@@ -21,13 +21,12 @@ export async function seedCharacters(
   });
 
   if (!mageClass) {
-    console.log(
-      '  ⚠️ Skipping character creation - class data not found'
-    );
+    console.log('  ⚠️ Skipping character creation - class data not found');
     return;
   }
 
   // Create god character for admin user
+  // Wealth: 100000 gold + 10000 platinum = 10000000 + 10000000 = 20000000 copper
   const godCharacter = await prisma.characters.upsert({
     where: { name: 'GodAdmin' },
     update: {
@@ -50,11 +49,8 @@ export async function seedCharacters(
       hitPointsMax: 9999,
       movement: 9999,
       movementMax: 9999,
-      // Wealth
-      copper: 0,
-      silver: 0,
-      gold: 100000,
-      platinum: 10000,
+      // Wealth (stored in copper units)
+      wealth: 20000000n,
       // Description
       description:
         'A powerful god character for testing and administration purposes.',
@@ -82,10 +78,7 @@ export async function seedCharacters(
       hitPointsMax: 9999,
       movement: 9999,
       movementMax: 9999,
-      copper: 0,
-      silver: 0,
-      gold: 100000,
-      platinum: 10000,
+      wealth: 20000000n,
       description:
         'A powerful god character for testing and administration purposes.',
       title: 'the Almighty Administrator',
@@ -94,6 +87,7 @@ export async function seedCharacters(
   });
 
   // Create builder character for builder user
+  // Wealth: 10000 gold + 100 platinum = 1000000 + 100000 = 1100000 copper
   const builderCharacter = await prisma.characters.upsert({
     where: { name: 'BuilderChar' },
     update: {
@@ -114,10 +108,7 @@ export async function seedCharacters(
       hitPointsMax: 500,
       movement: 500,
       movementMax: 500,
-      copper: 0,
-      silver: 0,
-      gold: 10000,
-      platinum: 100,
+      wealth: 1100000n,
       description: 'A builder character for zone creation and testing.',
       title: 'the Master Builder',
       passwordHash: await bcrypt.hash('buildpass123', 12),
@@ -142,10 +133,7 @@ export async function seedCharacters(
       hitPointsMax: 500,
       movement: 500,
       movementMax: 500,
-      copper: 0,
-      silver: 0,
-      gold: 10000,
-      platinum: 100,
+      wealth: 1100000n,
       description: 'A builder character for zone creation and testing.',
       title: 'the Master Builder',
       passwordHash: await bcrypt.hash('buildpass123', 12),
@@ -153,6 +141,7 @@ export async function seedCharacters(
   });
 
   // Create test player character for player user
+  // Wealth: 100 copper + 10 silver + 1 gold = 100 + 100 + 100 = 300 copper
   const playerCharacter = await prisma.characters.upsert({
     where: { name: 'TestPlayer' },
     update: {
@@ -173,10 +162,7 @@ export async function seedCharacters(
       hitPointsMax: 20,
       movement: 100,
       movementMax: 100,
-      copper: 100,
-      silver: 10,
-      gold: 1,
-      platinum: 0,
+      wealth: 300n,
       description: 'A new player character for testing basic gameplay.',
       title: 'the Novice',
       passwordHash: await bcrypt.hash('testpass123', 12),
@@ -201,10 +187,7 @@ export async function seedCharacters(
       hitPointsMax: 20,
       movement: 100,
       movementMax: 100,
-      copper: 100,
-      silver: 10,
-      gold: 1,
-      platinum: 0,
+      wealth: 300n,
       description: 'A new player character for testing basic gameplay.',
       title: 'the Novice',
       passwordHash: await bcrypt.hash('testpass123', 12),

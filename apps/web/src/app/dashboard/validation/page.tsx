@@ -123,7 +123,7 @@ function ValidationPageContent() {
     try {
       // Fetch validation summary
       const summaryResponse = await authenticatedFetch(
-        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
         {
           method: 'POST',
           body: JSON.stringify({
@@ -141,7 +141,7 @@ function ValidationPageContent() {
 
       // Fetch detailed zone reports
       const zonesResponse = await authenticatedFetch(
-        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:4000/graphql',
+        process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
         {
           method: 'POST',
           body: JSON.stringify({
