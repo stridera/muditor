@@ -60,6 +60,22 @@ export class TriggerDto {
 
   @Field({ nullable: true })
   updatedBy?: string;
+
+  // Validation and legacy tracking
+  @Field(() => Boolean, { defaultValue: false })
+  needsReview: boolean;
+
+  @Field({ nullable: true })
+  syntaxError?: string;
+
+  @Field(() => Int, { nullable: true })
+  legacyVnum?: number;
+
+  @Field({ nullable: true })
+  legacyScript?: string;
+
+  @Field(() => [String], { defaultValue: [] })
+  flags: string[];
 }
 
 @InputType()

@@ -179,15 +179,22 @@ export function getEffectOptionsByType(effectType: string): MenuOption[] {
 /**
  * Get mobs as menu options for Blockly dropdowns
  * Format: "Name [Zone:ID]"
+ * Includes a "(No specific mob)" option for effects that don't require a specific mob
  */
 export function getMobOptions(): MenuOption[] {
   if (registryData.mobs.length === 0) {
-    return [['(No mobs loaded)', '0:0']];
+    return [
+      ['(No specific mob)', ''],
+      ['(No mobs loaded)', '0:0'],
+    ];
   }
-  return registryData.mobs.map(m => [
-    `${stripAnsiCodes(m.name)} [${m.zoneId}:${m.id}]`,
-    `${m.zoneId}:${m.id}`,
-  ]);
+  return [
+    ['(No specific mob)', ''],
+    ...registryData.mobs.map(m => [
+      `${stripAnsiCodes(m.name)} [${m.zoneId}:${m.id}]`,
+      `${m.zoneId}:${m.id}`,
+    ]),
+  ] as MenuOption[];
 }
 
 /**
@@ -227,13 +234,16 @@ export function getZoneOptions(): MenuOption[] {
   // Sort zones by ID
   const sorted = [...registryData.zones].sort((a, b) => a.id - b.id);
   return [
-    ['All Zones', '-1'],
-    ...sorted.map(z => [`${stripAnsiCodes(z.name)} (${z.id})`, String(z.id)]),
+    ['All Zones', '-1'] as MenuOption,
+    ...sorted.map(
+      z => [`${stripAnsiCodes(z.name)} (${z.id})`, String(z.id)] as MenuOption
+    ),
   ];
 }
 
 /**
  * Get mobs filtered by zone as menu options
+ * Includes a "(No specific mob)" option for effects that don't require a specific mob
  */
 export function getMobOptionsByZone(zoneId: number | null): MenuOption[] {
   let mobs = registryData.mobs;
@@ -244,7 +254,10 @@ export function getMobOptionsByZone(zoneId: number | null): MenuOption[] {
   }
 
   if (mobs.length === 0) {
-    return [['(No mobs in zone)', '0:0']];
+    return [
+      ['(No specific mob)', ''],
+      ['(No mobs in zone)', '0:0'],
+    ];
   }
 
   // Sort by zoneId, then by id within zone
@@ -252,10 +265,13 @@ export function getMobOptionsByZone(zoneId: number | null): MenuOption[] {
     if (a.zoneId !== b.zoneId) return a.zoneId - b.zoneId;
     return a.id - b.id;
   });
-  return sorted.map(m => [
-    `${stripAnsiCodes(m.name)} [${m.zoneId}:${m.id}]`,
-    `${m.zoneId}:${m.id}`,
-  ]);
+  return [
+    ['(No specific mob)', ''],
+    ...sorted.map(m => [
+      `${stripAnsiCodes(m.name)} [${m.zoneId}:${m.id}]`,
+      `${m.zoneId}:${m.id}`,
+    ]),
+  ] as MenuOption[];
 }
 
 /**

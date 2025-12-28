@@ -1,0 +1,117 @@
+# Player Mail (Character-to-Character) operations
+
+# Fragments
+fragment PlayerMailCharacterFields on PlayerMailCharacterDto {
+  id
+  name
+}
+
+fragment PlayerMailObjectFields on PlayerMailObjectDto {
+  zoneId
+  id
+  name
+}
+
+fragment PlayerMailFields on PlayerMailDto {
+  id
+  legacySenderId
+  legacyRecipientId
+  senderCharacterId
+  recipientCharacterId
+  body
+  sentAt
+  readAt
+  attachedCopper
+  attachedSilver
+  attachedGold
+  attachedPlatinum
+  attachedObjectZoneId
+  attachedObjectId
+  wealthRetrievedAt
+  wealthRetrievedByCharacterId
+  objectRetrievedAt
+  objectRetrievedByCharacterId
+  objectMovedToAccountStorage
+  isDeleted
+  createdAt
+  senderName
+  wealthRetrievalInfo
+  objectRetrievalInfo
+  sender {
+    ...PlayerMailCharacterFields
+  }
+  recipient {
+    ...PlayerMailCharacterFields
+  }
+  attachedObject {
+    ...PlayerMailObjectFields
+  }
+}
+
+# Player Queries (for character mailbox)
+query GetMyMail($characterId: String!, $skip: Int, $take: Int) {
+  myMail(characterId: $characterId, skip: $skip, take: $take) {
+    ...PlayerMailFields
+  }
+}
+
+query GetMyMailCount($characterId: String!) {
+  myMailCount(characterId: $characterId)
+}
+
+query GetPlayerMailById($id: Int!) {
+  playerMail(id: $id) {
+    ...PlayerMailFields
+  }
+}
+
+# Admin Queries (for admin mail management)
+query GetAllPlayerMails($filter: PlayerMailFilterInput, $skip: Int, $take: Int) {
+  playerMails(filter: $filter, skip: $skip, take: $take) {
+    ...PlayerMailFields
+  }
+}
+
+query GetPlayerMailCount($filter: PlayerMailFilterInput) {
+  playerMailCount(filter: $filter)
+}
+
+# Mutations
+mutation SendPlayerMail($data: SendPlayerMailInput!) {
+  sendMail(data: $data) {
+    ...PlayerMailFields
+  }
+}
+
+mutation MarkPlayerMailRead($id: Int!) {
+  markMailRead(id: $id) {
+    id
+    readAt
+  }
+}
+
+mutation MarkWealthRetrieved($id: Int!, $characterId: String!) {
+  markWealthRetrieved(id: $id, characterId: $characterId) {
+    id
+    wealthRetrievedAt
+    wealthRetrievedByCharacterId
+    wealthRetrievalInfo
+  }
+}
+
+mutation MarkObjectRetrieved($id: Int!, $characterId: String!, $movedToAccountStorage: Boolean!) {
+  markObjectRetrieved(id: $id, characterId: $characterId, movedToAccountStorage: $movedToAccountStorage) {
+    id
+    objectRetrievedAt
+    objectRetrievedByCharacterId
+    objectMovedToAccountStorage
+    objectRetrievalInfo
+  }
+}
+
+mutation DeletePlayerMail($id: Int!) {
+  deletePlayerMail(id: $id) {
+    id
+    isDeleted
+  }
+}

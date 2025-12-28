@@ -184,6 +184,15 @@ function createBlockFromEffect(
     setBlockField(block, 'objectRef', objectRef);
   }
 
+  // Handle objectRef for portal
+  if (blockType === 'effect_portal' && params['objectZoneId'] !== undefined) {
+    const objectRef = formatZoneId(
+      Number(params['objectZoneId']),
+      Number(params['objectId'] || 0)
+    );
+    setBlockField(block, 'objectRef', objectRef);
+  }
+
   // Set common fields (trigger, chancePct) if the block has them
   if (effect.trigger) {
     const triggerField = block.getField('trigger');

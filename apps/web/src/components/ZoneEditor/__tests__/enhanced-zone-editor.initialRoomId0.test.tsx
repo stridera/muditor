@@ -85,7 +85,7 @@ function buildResponse<T>(data: T): MockResponse<T> {
 jest.mock('@/lib/authenticated-fetch', () => {
   return {
     authenticatedFetch: jest.fn(async (url: string, options?: any) => {
-      if (url === 'http://localhost:4000/graphql') {
+      if (url === 'http://localhost:3001/graphql') {
         const body = JSON.parse(options?.body || '{}');
         const query: string = body.query || '';
         // Zone query

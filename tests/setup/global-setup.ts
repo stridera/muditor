@@ -4,7 +4,7 @@ async function globalSetup(_config: FullConfig) {
   console.log('🔧 Starting global E2E test setup...');
 
   // Ensure database and API are ready
-  await waitForServer('http://localhost:4000/graphql', 30000);
+  await waitForServer('http://localhost:3001/graphql', 30000);
   await waitForServer('http://localhost:3000', 30000);
 
   console.log('✅ E2E test setup complete');

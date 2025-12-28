@@ -1,0 +1,75 @@
+# Account Storage (shared item/wealth storage across account characters) operations
+
+# Fragments
+fragment AccountItemObjectFields on AccountItemObjectDto {
+  zoneId
+  id
+  name
+  type
+}
+
+fragment AccountItemCharacterFields on AccountItemCharacterDto {
+  id
+  name
+}
+
+fragment AccountItemFields on AccountItemDto {
+  id
+  slot
+  objectZoneId
+  objectId
+  quantity
+  customData
+  storedAt
+  storedByCharacterId
+  object {
+    ...AccountItemObjectFields
+  }
+  storedByCharacter {
+    ...AccountItemCharacterFields
+  }
+}
+
+fragment AccountStorageFields on AccountStorageDto {
+  accountWealth
+  items {
+    ...AccountItemFields
+  }
+}
+
+fragment WealthDisplayFields on WealthDisplayDto {
+  totalCopper
+  platinum
+  gold
+  silver
+  copper
+}
+
+# Queries
+query GetMyAccountStorage {
+  myAccountStorage {
+    ...AccountStorageFields
+  }
+}
+
+query GetMyAccountWealthDisplay {
+  myAccountWealthDisplay {
+    ...WealthDisplayFields
+  }
+}
+
+# Mutations
+mutation DepositWealth($characterId: String!, $amount: BigInt!) {
+  depositWealth(characterId: $characterId, amount: $amount)
+}
+
+mutation DepositItem($characterId: String!, $objectZoneId: Int!, $objectId: Int!, $quantity: Int!) {
+  depositItem(
+    characterId: $characterId
+    objectZoneId: $objectZoneId
+    objectId: $objectId
+    quantity: $quantity
+  ) {
+    ...AccountItemFields
+  }
+}

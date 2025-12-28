@@ -21,10 +21,13 @@ import { useZoneContext } from '@/hooks/use-zone-context';
 import { useMutation } from '@apollo/client/react';
 import {
   Box,
+  Clipboard,
   FileCode,
   HelpCircle,
   Home,
+  Inbox,
   LogOut,
+  Mail,
   Map,
   MessageCircle,
   Settings,
@@ -35,6 +38,7 @@ import {
   User,
   Users,
   Users2,
+  Vault,
   Zap,
 } from 'lucide-react';
 import Link from 'next/link';
@@ -104,6 +108,26 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
     icon: <Users className='h-5 w-5' />,
   },
   '/dashboard/users': { name: 'Users', icon: <Users className='h-5 w-5' /> },
+  '/dashboard/admin/game-config': {
+    name: 'Game Config',
+    icon: <Settings className='h-5 w-5' />,
+  },
+  '/dashboard/admin/mail': {
+    name: 'Mail Admin',
+    icon: <Mail className='h-5 w-5' />,
+  },
+  '/dashboard/player/mailbox': {
+    name: 'Mailbox',
+    icon: <Inbox className='h-5 w-5' />,
+  },
+  '/dashboard/player/storage': {
+    name: 'Account Storage',
+    icon: <Vault className='h-5 w-5' />,
+  },
+  '/dashboard/boards': {
+    name: 'Boards',
+    icon: <Clipboard className='h-5 w-5' />,
+  },
 };
 
 export function Navigation() {
@@ -175,14 +199,19 @@ export function Navigation() {
       icon: <Users className='h-4 w-4' />,
     },
     {
+      name: 'Mailbox',
+      href: '/dashboard/player/mailbox',
+      icon: <Inbox className='h-4 w-4' />,
+    },
+    {
+      name: 'Storage',
+      href: '/dashboard/player/storage',
+      icon: <Vault className='h-4 w-4' />,
+    },
+    {
       name: 'Help',
       href: '/dashboard/help',
       icon: <HelpCircle className='h-4 w-4' />,
-    },
-    {
-      name: 'Settings',
-      href: '/profile',
-      icon: <Settings className='h-4 w-4' />,
     },
   ];
 
@@ -210,7 +239,12 @@ export function Navigation() {
     {
       name: 'Shops',
       href: '/dashboard/shops',
-      icon: <Box className='h-4 w-4' />,
+      icon: <ShoppingBag className='h-4 w-4' />,
+    },
+    {
+      name: 'Scripts',
+      href: '/dashboard/scripts',
+      icon: <FileCode className='h-4 w-4' />,
     },
   ];
 
@@ -367,11 +401,33 @@ export function Navigation() {
                         </DropdownMenuItem>
                       )}
                       <DropdownMenuItem asChild>
+                        <Link href='/dashboard/boards'>
+                          <Clipboard className='mr-2 h-4 w-4' />
+                          Boards
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
                         <Link href='/dashboard/help'>
                           <HelpCircle className='mr-2 h-4 w-4' />
                           Help Entries
                         </Link>
                       </DropdownMenuItem>
+                      {isGod && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/admin/game-config'>
+                            <Settings className='mr-2 h-4 w-4' />
+                            Game Config
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {isCoder && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/admin/mail'>
+                            <Mail className='mr-2 h-4 w-4' />
+                            Mail Admin
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                     </>
                   )}
                   <DropdownMenuSeparator />

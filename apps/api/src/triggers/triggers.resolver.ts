@@ -26,6 +26,20 @@ export class TriggersResolver {
     }));
   }
 
+  @Query(() => [TriggerDto], { name: 'triggersNeedingReview' })
+  async findNeedingReview() {
+    const triggers = await this.triggersService.findNeedingReview();
+    return triggers.map(trigger => ({
+      ...trigger,
+      variables: '{}',
+    }));
+  }
+
+  @Query(() => Int, { name: 'triggersNeedingReviewCount' })
+  async countNeedingReview() {
+    return this.triggersService.countNeedingReview();
+  }
+
   @Query(() => TriggerDto, { name: 'trigger' })
   async findOne(@Args('id') id: number) {
     const trigger = await this.triggersService.findOne(id);
@@ -102,6 +116,21 @@ export class TriggersResolver {
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.detachFromEntity(
+      triggerId,
+      user.id
+    );
+    return {
+      ...trigger,
+      variables: '{}',
+    };
+  }
+
+  @Mutation(() => TriggerDto)
+  async markTriggerReviewed(
+    @Args('triggerId', { type: () => Int }) triggerId: number,
+    @CurrentUser() user: Users
+  ) {
+    const trigger = await this.triggersService.clearNeedsReview(
       triggerId,
       user.id
     );

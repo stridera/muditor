@@ -86,6 +86,7 @@ interface Room {
   layoutX: number | null;
   layoutY: number | null;
   layoutZ: number | null;
+  flags?: string[];
   exits?: RoomExit[];
   mobs?: {
     id: number;
@@ -116,6 +117,7 @@ interface PropertyPanelRoom {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
+  flags?: string[];
   exits: PropertyPanelRoomExit[];
   mobs?: {
     id: number;
@@ -373,6 +375,11 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     Record<string, number>
   >({});
   const [editorMode, setEditorMode] = useState<EditorMode>('view');
+  // Pending room edits state
+  const [pendingRoomEdits, setPendingRoomEdits] = useState<
+    Partial<PropertyPanelRoom>
+  >({});
+  const [savingRoom, setSavingRoom] = useState(false);
   const { canEditZone } = usePermissions();
   const {
     open: helpOpen,
@@ -562,7 +569,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     async (url: string, init?: RequestInit): Promise<Response> => {
       // Prefer configurable base URL; fall back to localhost
       const API_BASE =
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
       const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url}`;
       // Attempt CSRF token discovery from cookie (common names)
       let csrfToken: string | undefined;
@@ -623,7 +630,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             query: `query GetRooms($zoneId: Int!, $lightweight: Boolean){
               zones { id name climate }
               roomsByZone(zoneId: $zoneId, lightweight: $lightweight){
-                id zoneId name description roomDescription sector layoutX layoutY layoutZ
+                id zoneId name description roomDescription sector layoutX layoutY layoutZ flags
                 exits{ id direction toZoneId toRoomId description keywords key flags }
                 mobs{ id name level roomDescription }
                 objects{ id name roomDescription }
@@ -672,6 +679,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             layoutX: number | null;
             layoutY: number | null;
             layoutZ: number | null;
+            flags?: string[] | null;
             exits?: RawExit[] | null;
             mobs?: RawMob[] | null;
             objects?: RawObject[] | null;
@@ -691,6 +699,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: r.layoutX,
               layoutY: r.layoutY,
               layoutZ: r.layoutZ,
+              flags: r.flags ?? [],
               exits: (r.exits || []).map((e: RawExit) => ({
                 id: String(e.id ?? `${r.id}-${e.direction}`),
                 direction: e.direction,
@@ -1507,7 +1516,104 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   // Room selection
   const handleSelectRoom = useCallback((roomId: number) => {
     setSelectedRoomId(roomId);
+    // Reset pending edits when switching rooms
+    setPendingRoomEdits({});
   }, []);
+
+  // Room property change handler
+  const handleRoomChange = useCallback(
+    (field: keyof PropertyPanelRoom, value: string | string[]) => {
+      // Update pending edits
+      setPendingRoomEdits(prev => ({ ...prev, [field]: value }));
+      // Optimistically update rooms state
+      setRooms(rs =>
+        rs.map(r =>
+          r.id === selectedRoomId
+            ? {
+                ...r,
+                [field === 'roomDescription' ? 'roomDescription' : field]:
+                  value,
+              }
+            : r
+        )
+      );
+    },
+    [selectedRoomId]
+  );
+
+  // Save room changes via GraphQL
+  const handleSaveRoom = useCallback(async () => {
+    if (!selectedRoomId || !activeZoneId) return;
+    if (Object.keys(pendingRoomEdits).length === 0) return;
+
+    setSavingRoom(true);
+    try {
+      // Build the update input
+      const updateInput: Record<string, unknown> = {};
+      if (pendingRoomEdits.name !== undefined) {
+        updateInput.name = pendingRoomEdits.name;
+      }
+      if (pendingRoomEdits.roomDescription !== undefined) {
+        updateInput.description = pendingRoomEdits.roomDescription;
+      }
+      if (pendingRoomEdits.sector !== undefined) {
+        updateInput.sector = pendingRoomEdits.sector;
+      }
+      if (pendingRoomEdits.flags !== undefined) {
+        updateInput.flags = pendingRoomEdits.flags;
+      }
+
+      const response = await authenticatedFetch('/graphql', {
+        method: 'POST',
+        body: JSON.stringify({
+          query: `
+            mutation UpdateRoom($zoneId: Int!, $id: Int!, $data: UpdateRoomInput!) {
+              updateRoom(zoneId: $zoneId, id: $id, data: $data) {
+                id
+                name
+                description
+                sector
+                flags
+                zoneId
+              }
+            }
+          `,
+          variables: {
+            zoneId: activeZoneId,
+            id: selectedRoomId,
+            data: updateInput,
+          },
+        }),
+      });
+
+      const json = await response.json();
+      if (response.ok && !json.errors) {
+        // Update rooms state with server response
+        const updated = json.data.updateRoom;
+        setRooms(rs =>
+          rs.map(r =>
+            r.id === selectedRoomId
+              ? {
+                  ...r,
+                  name: updated.name,
+                  roomDescription: updated.description,
+                  sector: updated.sector,
+                  flags: updated.flags,
+                }
+              : r
+          )
+        );
+        // Clear pending edits
+        setPendingRoomEdits({});
+      } else {
+        console.error('Failed to save room:', json.errors);
+      }
+    } catch (err) {
+      console.error('Error saving room:', err);
+    } finally {
+      setSavingRoom(false);
+    }
+  }, [selectedRoomId, activeZoneId, pendingRoomEdits, authenticatedFetch]);
 
   // Overlap room switching - cycle through overlapping rooms at the same position
   const handleSwitchOverlapRoom = useCallback(
@@ -2619,6 +2725,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: selectedRoom.layoutX,
               layoutY: selectedRoom.layoutY,
               layoutZ: selectedRoom.layoutZ,
+              flags: selectedRoom.flags || [],
               exits: (selectedRoom.exits || []).map(e => {
                 const base: Omit<PropertyPanelRoomExit, 'key'> & {
                   key?: string;
@@ -2657,6 +2764,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: r.layoutX,
               layoutY: r.layoutY,
               layoutZ: r.layoutZ,
+              flags: r.flags || [],
               exits: (r.exits || []).map(e => {
                 const base: Omit<PropertyPanelRoomExit, 'key'> & {
                   key?: string;
@@ -2691,8 +2799,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 room={panelRoom}
                 allRooms={panelAllRooms}
                 zones={worldZones}
-                onRoomChange={() => {}}
-                onSaveRoom={() => {}}
+                onRoomChange={handleRoomChange}
+                onSaveRoom={handleSaveRoom}
                 onCreateExit={handleCreateExit}
                 onDeleteExit={handleDeleteExit}
                 onUpdateExit={handleUpdateExit}
@@ -2701,7 +2809,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 onUpdateZLevel={() => {}}
                 onRemoveMob={() => {}}
                 onRemoveObject={() => {}}
-                saving={false}
+                saving={savingRoom}
                 managingExits={managingExits}
                 viewMode={editorMode}
                 onEntityClick={() => {}}

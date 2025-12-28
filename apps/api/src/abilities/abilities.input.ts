@@ -272,6 +272,12 @@ export class CreateAbilityMessagesInput {
   successToRoom?: string;
 
   @Field({ nullable: true })
+  successToSelf?: string;
+
+  @Field({ nullable: true })
+  successSelfRoom?: string;
+
+  @Field({ nullable: true })
   failToCaster?: string;
 
   @Field({ nullable: true })
@@ -285,6 +291,9 @@ export class CreateAbilityMessagesInput {
 
   @Field({ nullable: true })
   wearoffToRoom?: string;
+
+  @Field({ nullable: true })
+  lookMessage?: string;
 }
 
 @InputType()
@@ -308,6 +317,12 @@ export class UpdateAbilityMessagesInput {
   successToRoom?: string;
 
   @Field({ nullable: true })
+  successToSelf?: string;
+
+  @Field({ nullable: true })
+  successSelfRoom?: string;
+
+  @Field({ nullable: true })
   failToCaster?: string;
 
   @Field({ nullable: true })
@@ -321,6 +336,9 @@ export class UpdateAbilityMessagesInput {
 
   @Field({ nullable: true })
   wearoffToRoom?: string;
+
+  @Field({ nullable: true })
+  lookMessage?: string;
 }
 
 // Effect inputs

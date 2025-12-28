@@ -140,6 +140,7 @@ const toolboxCategories = {
       colour: '#e53935',
       contents: [
         { kind: 'block', type: 'effect_damage' }, // Includes instant, DoT (interval), chain (maxJumps), lifesteal type
+        { kind: 'block', type: 'damage_component' }, // For multi-element damage (e.g., 50% fire + 50% cold)
         { kind: 'block', type: 'effect_heal' },
       ],
     },
@@ -419,6 +420,29 @@ export function EffectEditor({
       }
     }
   }, [blocksRegistered, initialEffects, initialLoaded, registryReady]);
+
+  // Track previous view mode to detect when switching to blocks view
+  const [prevViewMode, setPrevViewMode] = useState<'blocks' | 'json'>(viewMode);
+
+  // Reload blocks when switching from JSON view to blocks view
+  useEffect(() => {
+    if (
+      prevViewMode === 'json' &&
+      viewMode === 'blocks' &&
+      blocksRegistered &&
+      workspaceRef.current &&
+      registryReady &&
+      hasEffectsLoaded()
+    ) {
+      try {
+        // Reload the workspace with current effects state (which may have been edited in JSON view)
+        loadEffectsIntoWorkspace(workspaceRef.current, effects);
+      } catch (err) {
+        console.error('Failed to reload effects after view switch:', err);
+      }
+    }
+    setPrevViewMode(viewMode);
+  }, [viewMode, blocksRegistered, registryReady, effects, prevViewMode]);
 
   // Update workspace theme when theme changes
   useEffect(() => {

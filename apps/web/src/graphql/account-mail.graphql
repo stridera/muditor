@@ -1,0 +1,71 @@
+# Account Mail (Account-to-Account) operations
+
+# Fragments
+fragment AccountMailUserFields on AccountMailUserDto {
+  id
+  username
+  email
+}
+
+fragment AccountMailFields on AccountMailDto {
+  id
+  senderUserId
+  recipientUserId
+  isBroadcast
+  subject
+  body
+  sentAt
+  readAt
+  isDeleted
+  createdAt
+  senderName
+  sender {
+    ...AccountMailUserFields
+  }
+  recipient {
+    ...AccountMailUserFields
+  }
+}
+
+# Player Queries (for account inbox)
+query GetMyAccountMail($skip: Int, $take: Int) {
+  myAccountMail(skip: $skip, take: $take) {
+    ...AccountMailFields
+  }
+}
+
+query GetMyAccountMailCount {
+  myAccountMailCount
+}
+
+# Admin Queries (for admin mail management)
+query GetAllAccountMail($filter: AccountMailFilterInput, $skip: Int, $take: Int) {
+  allAccountMail(filter: $filter, skip: $skip, take: $take) {
+    ...AccountMailFields
+  }
+}
+
+# Mutations
+mutation SendAccountMail($data: SendAccountMailInput!) {
+  sendAccountMail(data: $data) {
+    ...AccountMailFields
+  }
+}
+
+mutation SendBroadcast($data: SendBroadcastInput!) {
+  sendBroadcast(data: $data)
+}
+
+mutation MarkAccountMailRead($id: Int!) {
+  markAccountMailRead(id: $id) {
+    id
+    readAt
+  }
+}
+
+mutation DeleteAccountMail($id: Int!) {
+  deleteAccountMail(id: $id) {
+    id
+    isDeleted
+  }
+}

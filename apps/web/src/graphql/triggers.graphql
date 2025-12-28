@@ -1,36 +1,64 @@
 # Trigger related operations
 
+fragment TriggerFields on TriggerDto {
+  id
+  name
+  attachType
+  numArgs
+  argList
+  commands
+  zoneId
+  mobId
+  objectId
+  variables
+  flags
+  needsReview
+  syntaxError
+  legacyVnum
+  legacyScript
+  createdAt
+  updatedAt
+  createdBy
+  updatedBy
+}
+
 query GetTriggers {
   triggers {
-    id
-    name
-    attachType
-    zoneId
+    ...TriggerFields
+  }
+}
+
+query GetTriggersNeedingReview {
+  triggersNeedingReview {
+    ...TriggerFields
+  }
+}
+
+query GetTriggersNeedingReviewCount {
+  triggersNeedingReviewCount
+}
+
+query GetTrigger($id: Float!) {
+  trigger(id: $id) {
+    ...TriggerFields
   }
 }
 
 query GetTriggersByAttachment($attachType: ScriptType!, $entityId: Int!) {
   triggersByAttachment(attachType: $attachType, entityId: $entityId) {
-    id
-    name
-    attachType
-    zoneId
+    ...TriggerFields
   }
 }
 
 mutation CreateTrigger($input: CreateTriggerInput!) {
   createTrigger(input: $input) {
-    id
-    name
-    attachType
+    ...TriggerFields
   }
 }
 
 mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
   updateTrigger(id: $id, input: $input) {
-    id
-    name
-    attachType
+    ...TriggerFields
   }
 }
 
@@ -42,13 +70,18 @@ mutation DeleteTrigger($id: Float!) {
 
 mutation AttachTrigger($input: AttachTriggerInput!) {
   attachTrigger(input: $input) {
-    id
-    name
+    ...TriggerFields
   }
 }
 
 mutation DetachTrigger($triggerId: Float!) {
   detachTrigger(triggerId: $triggerId) {
     id
+  }
+}
+
+mutation MarkTriggerReviewed($triggerId: Int!) {
+  markTriggerReviewed(triggerId: $triggerId) {
+    ...TriggerFields
   }
 }

@@ -27,6 +27,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean };
   Int: { input: number; output: number };
   Float: { input: number; output: number };
+  /** The `BigInt` scalar type represents non-fractional signed whole numeric values. */
+  BigInt: { input: any; output: any };
   /** A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format. */
   DateTime: { input: any; output: any };
   /** The `JSON` scalar type represents JSON values as specified by [ECMA-404](http://www.ecma-international.org/publications/files/ECMA-ST/ECMA-404.pdf). */
@@ -92,11 +94,14 @@ export type AbilityMessages = {
   failToCaster?: Maybe<Scalars['String']['output']>;
   failToRoom?: Maybe<Scalars['String']['output']>;
   failToVictim?: Maybe<Scalars['String']['output']>;
+  lookMessage?: Maybe<Scalars['String']['output']>;
   startToCaster?: Maybe<Scalars['String']['output']>;
   startToRoom?: Maybe<Scalars['String']['output']>;
   startToVictim?: Maybe<Scalars['String']['output']>;
+  successSelfRoom?: Maybe<Scalars['String']['output']>;
   successToCaster?: Maybe<Scalars['String']['output']>;
   successToRoom?: Maybe<Scalars['String']['output']>;
+  successToSelf?: Maybe<Scalars['String']['output']>;
   successToVictim?: Maybe<Scalars['String']['output']>;
   wearoffToRoom?: Maybe<Scalars['String']['output']>;
   wearoffToTarget?: Maybe<Scalars['String']['output']>;
@@ -131,6 +136,73 @@ export type AbilityTargeting = {
   scope: TargetScope;
   scopePattern?: Maybe<Scalars['String']['output']>;
   validTargets: Array<TargetType>;
+};
+
+export type AccountItemCharacterDto = {
+  __typename?: 'AccountItemCharacterDto';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type AccountItemDto = {
+  __typename?: 'AccountItemDto';
+  customData?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  object: AccountItemObjectDto;
+  objectId: Scalars['Int']['output'];
+  objectZoneId: Scalars['Int']['output'];
+  quantity: Scalars['Int']['output'];
+  slot: Scalars['Int']['output'];
+  storedAt: Scalars['DateTime']['output'];
+  storedByCharacter?: Maybe<AccountItemCharacterDto>;
+  storedByCharacterId?: Maybe<Scalars['String']['output']>;
+};
+
+export type AccountItemObjectDto = {
+  __typename?: 'AccountItemObjectDto';
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  type?: Maybe<Scalars['String']['output']>;
+  zoneId: Scalars['Int']['output'];
+};
+
+export type AccountMailDto = {
+  __typename?: 'AccountMailDto';
+  body: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  isBroadcast: Scalars['Boolean']['output'];
+  isDeleted: Scalars['Boolean']['output'];
+  readAt?: Maybe<Scalars['DateTime']['output']>;
+  recipient?: Maybe<AccountMailUserDto>;
+  recipientUserId?: Maybe<Scalars['String']['output']>;
+  sender?: Maybe<AccountMailUserDto>;
+  senderName: Scalars['String']['output'];
+  senderUserId: Scalars['String']['output'];
+  sentAt: Scalars['DateTime']['output'];
+  subject: Scalars['String']['output'];
+};
+
+export type AccountMailFilterInput = {
+  includeBroadcasts?: InputMaybe<Scalars['Boolean']['input']>;
+  includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
+  recipientUserId?: InputMaybe<Scalars['String']['input']>;
+  searchBody?: InputMaybe<Scalars['String']['input']>;
+  searchSubject?: InputMaybe<Scalars['String']['input']>;
+  senderUserId?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type AccountMailUserDto = {
+  __typename?: 'AccountMailUserDto';
+  email: Scalars['String']['output'];
+  id: Scalars['String']['output'];
+  username: Scalars['String']['output'];
+};
+
+export type AccountStorageDto = {
+  __typename?: 'AccountStorageDto';
+  accountWealth: Scalars['BigInt']['output'];
+  items: Array<AccountItemDto>;
 };
 
 export type AdminUser = {
@@ -207,6 +279,58 @@ export type BatchUpdateResult = {
 
 export type BatchUpdateRoomPositionsInput = {
   updates: Array<BatchRoomPositionUpdateInput>;
+};
+
+export type BoardDto = {
+  __typename?: 'BoardDto';
+  alias: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  locked: Scalars['Boolean']['output'];
+  messageCount?: Maybe<Scalars['Int']['output']>;
+  messages?: Maybe<Array<BoardMessageDto>>;
+  privileges: Scalars['JSON']['output'];
+  title: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BoardMessageDto = {
+  __typename?: 'BoardMessageDto';
+  board?: Maybe<BoardDto>;
+  boardId: Scalars['Int']['output'];
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  edits?: Maybe<Array<BoardMessageEditDto>>;
+  id: Scalars['Int']['output'];
+  postedAt: Scalars['DateTime']['output'];
+  poster: Scalars['String']['output'];
+  posterLevel: Scalars['Int']['output'];
+  sticky: Scalars['Boolean']['output'];
+  subject: Scalars['String']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
+export type BoardMessageEditDto = {
+  __typename?: 'BoardMessageEditDto';
+  editedAt: Scalars['DateTime']['output'];
+  editor: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  messageId: Scalars['Int']['output'];
+};
+
+/** Bridge connection status */
+export type BridgeStatus = {
+  __typename?: 'BridgeStatus';
+  connected: Scalars['Boolean']['output'];
+  subscribedChannels: Scalars['Int']['output'];
+};
+
+/** Result of broadcasting a message */
+export type BroadcastResultType = {
+  __typename?: 'BroadcastResultType';
+  message: Scalars['String']['output'];
+  recipientCount: Scalars['Int']['output'];
+  success: Scalars['Boolean']['output'];
 };
 
 export type ChangePasswordInput = {
@@ -405,6 +529,51 @@ export type Climate =
   | 'TEMPERATE'
   | 'TROPICAL';
 
+/** Category of MUD commands */
+export type CommandCategory =
+  | 'ADMIN'
+  | 'BUILDING'
+  | 'CLAN'
+  | 'COMBAT'
+  | 'COMMUNICATION'
+  | 'INFORMATION'
+  | 'MAGIC'
+  | 'MOVEMENT'
+  | 'OBJECT'
+  | 'SKILLS'
+  | 'SOCIAL'
+  | 'SYSTEM';
+
+/** MUD command definition with permission requirements */
+export type CommandDto = {
+  __typename?: 'CommandDto';
+  /** Alternative names/aliases for the command */
+  aliases: Array<Scalars['String']['output']>;
+  /** Command category for organization */
+  category: CommandCategory;
+  createdAt: Scalars['DateTime']['output'];
+  /** Brief description of what the command does */
+  description?: Maybe<Scalars['String']['output']>;
+  /** Whether this command requires an immortal level */
+  immortalOnly: Scalars['Boolean']['output'];
+  /** Primary command name */
+  name: Scalars['String']['output'];
+  /** Permission flags required to use this command */
+  permissions: Array<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+  /** Usage syntax example */
+  usage?: Maybe<Scalars['String']['output']>;
+};
+
+/** Result of executing a game command */
+export type CommandResultType = {
+  __typename?: 'CommandResultType';
+  executor?: Maybe<Scalars['String']['output']>;
+  message: Scalars['String']['output'];
+  note?: Maybe<Scalars['String']['output']>;
+  success: Scalars['Boolean']['output'];
+};
+
 export type Composition =
   | 'AIR'
   | 'BONE'
@@ -419,6 +588,9 @@ export type Composition =
   | 'PLANT'
   | 'STONE'
   | 'WATER';
+
+/** Type of configuration value */
+export type ConfigValueType = 'BOOL' | 'FLOAT' | 'INT' | 'JSON' | 'STRING';
 
 export type CreateAbilityInput = {
   abilityType?: Scalars['String']['input'];
@@ -448,11 +620,14 @@ export type CreateAbilityMessagesInput = {
   failToCaster?: InputMaybe<Scalars['String']['input']>;
   failToRoom?: InputMaybe<Scalars['String']['input']>;
   failToVictim?: InputMaybe<Scalars['String']['input']>;
+  lookMessage?: InputMaybe<Scalars['String']['input']>;
   startToCaster?: InputMaybe<Scalars['String']['input']>;
   startToRoom?: InputMaybe<Scalars['String']['input']>;
   startToVictim?: InputMaybe<Scalars['String']['input']>;
+  successSelfRoom?: InputMaybe<Scalars['String']['input']>;
   successToCaster?: InputMaybe<Scalars['String']['input']>;
   successToRoom?: InputMaybe<Scalars['String']['input']>;
+  successToSelf?: InputMaybe<Scalars['String']['input']>;
   successToVictim?: InputMaybe<Scalars['String']['input']>;
   wearoffToRoom?: InputMaybe<Scalars['String']['input']>;
   wearoffToTarget?: InputMaybe<Scalars['String']['input']>;
@@ -473,6 +648,22 @@ export type CreateAbilityTargetingInput = {
   scope?: TargetScope;
   scopePattern?: InputMaybe<Scalars['String']['input']>;
   validTargets?: Array<TargetType>;
+};
+
+export type CreateBoardInput = {
+  alias: Scalars['String']['input'];
+  locked?: Scalars['Boolean']['input'];
+  privileges?: InputMaybe<Scalars['JSON']['input']>;
+  title: Scalars['String']['input'];
+};
+
+export type CreateBoardMessageInput = {
+  boardId: Scalars['Int']['input'];
+  content: Scalars['String']['input'];
+  poster: Scalars['String']['input'];
+  posterLevel: Scalars['Int']['input'];
+  sticky?: Scalars['Boolean']['input'];
+  subject: Scalars['String']['input'];
 };
 
 export type CreateCharacterEffectInput = {
@@ -590,6 +781,18 @@ export type CreateHelpEntryInput = {
   usage?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** Input for creating a login message */
+export type CreateLoginMessageInput = {
+  /** Whether this message is active */
+  isActive?: Scalars['Boolean']['input'];
+  /** Message content */
+  message: Scalars['String']['input'];
+  /** Login flow stage */
+  stage: LoginStage;
+  /** Message variant */
+  variant?: Scalars['String']['input'];
+};
+
 export type CreateMobEquipmentSetInput = {
   equipmentSetId: Scalars['String']['input'];
   mobResetId: Scalars['String']['input'];
@@ -607,7 +810,7 @@ export type CreateMobInput = {
   composition?: Composition;
   concealment?: Scalars['Int']['input'];
   constitution?: Scalars['Int']['input'];
-  damageDice?: Scalars['String']['input'];
+  damageDice: Scalars['String']['input'];
   damageReductionPercent?: Scalars['Int']['input'];
   damageType?: DamageType;
   dexterity?: Scalars['Int']['input'];
@@ -617,7 +820,7 @@ export type CreateMobInput = {
   gender?: Gender;
   hardness?: Scalars['Int']['input'];
   hitRoll?: Scalars['Int']['input'];
-  hpDice?: Scalars['String']['input'];
+  hpDice: Scalars['String']['input'];
   id: Scalars['Int']['input'];
   intelligence?: Scalars['Int']['input'];
   keywords: Array<Scalars['String']['input']>;
@@ -686,6 +889,15 @@ export type CreateObjectInput = {
   values?: InputMaybe<Scalars['JSON']['input']>;
   wearFlags?: Array<WearFlag>;
   weight?: Scalars['Float']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type CreateObjectResetInput = {
+  max?: Scalars['Int']['input'];
+  name?: InputMaybe<Scalars['String']['input']>;
+  objectId: Scalars['Int']['input'];
+  probability?: Scalars['Float']['input'];
+  roomId: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 };
 
@@ -781,6 +993,22 @@ export type CreateSocialInput = {
   victFound?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** Input for creating system text */
+export type CreateSystemTextInput = {
+  /** Text category */
+  category: SystemTextCategory;
+  /** Text content */
+  content: Scalars['String']['input'];
+  /** Whether this text is active */
+  isActive?: Scalars['Boolean']['input'];
+  /** Unique key identifier */
+  key: Scalars['String']['input'];
+  /** Minimum level to view */
+  minLevel?: Scalars['Int']['input'];
+  /** Display title */
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateTriggerInput = {
   argList?: Array<Scalars['String']['input']>;
   attachType: ScriptType;
@@ -829,7 +1057,21 @@ export type DamageType =
   | 'WATER'
   | 'WHIP';
 
-export type Direction = 'DOWN' | 'EAST' | 'NORTH' | 'SOUTH' | 'UP' | 'WEST';
+export type Direction =
+  | 'DOWN'
+  | 'EAST'
+  | 'IN'
+  | 'NONE'
+  | 'NORTH'
+  | 'NORTHEAST'
+  | 'NORTHWEST'
+  | 'OUT'
+  | 'PORTAL'
+  | 'SOUTH'
+  | 'SOUTHEAST'
+  | 'SOUTHWEST'
+  | 'UP'
+  | 'WEST';
 
 export type Effect = {
   __typename?: 'Effect';
@@ -935,6 +1177,7 @@ export type ElementType =
   | 'AIR'
   | 'BLEED'
   | 'COLD'
+  | 'CRUSH'
   | 'EARTH'
   | 'FIRE'
   | 'FORCE'
@@ -944,10 +1187,12 @@ export type ElementType =
   | 'NATURE'
   | 'NECROTIC'
   | 'PHYSICAL'
+  | 'PIERCE'
   | 'POISON'
   | 'RADIANT'
   | 'SHADOW'
   | 'SHOCK'
+  | 'SLASH'
   | 'SONIC'
   | 'UNHOLY'
   | 'WATER';
@@ -973,6 +1218,75 @@ export type EquipmentSetItemDto = {
 };
 
 export type ExitFlag = 'CLOSED' | 'HIDDEN' | 'IS_DOOR' | 'LOCKED' | 'PICKPROOF';
+
+/** Game configuration entry */
+export type GameConfigDto = {
+  __typename?: 'GameConfigDto';
+  /** Configuration category (e.g., server, combat, progression) */
+  category: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  /** Human-readable description */
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Whether this config contains sensitive data */
+  isSecret: Scalars['Boolean']['output'];
+  /** Configuration key within category */
+  key: Scalars['String']['output'];
+  /** Maximum valid value */
+  maxValue?: Maybe<Scalars['String']['output']>;
+  /** Minimum valid value */
+  minValue?: Maybe<Scalars['String']['output']>;
+  /** Whether changing this requires server restart */
+  restartReq: Scalars['Boolean']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+  /** Configuration value as string */
+  value: Scalars['String']['output'];
+  /** Type of the value */
+  valueType: ConfigValueType;
+};
+
+/** A game event from FieryMUD */
+export type GameEvent = {
+  __typename?: 'GameEvent';
+  message: Scalars['String']['output'];
+  metadata?: Maybe<Scalars['JSON']['output']>;
+  playerName?: Maybe<Scalars['String']['output']>;
+  roomVnum?: Maybe<Scalars['Int']['output']>;
+  targetPlayer?: Maybe<Scalars['String']['output']>;
+  timestamp: Scalars['DateTime']['output'];
+  type: GameEventType;
+  zoneId?: Maybe<Scalars['Int']['output']>;
+};
+
+/** Categories of game events for subscription filtering */
+export type GameEventCategory = 'ADMIN' | 'CHAT' | 'PLAYER' | 'WORLD';
+
+/** Types of events published by the FieryMUD game server */
+export type GameEventType =
+  | 'ADMIN_BROADCAST'
+  | 'ADMIN_CRASH'
+  | 'ADMIN_SHUTDOWN'
+  | 'ADMIN_WARNING'
+  | 'ADMIN_ZONE_RESET'
+  | 'BOSS_SPAWN'
+  | 'CHAT_CLAN'
+  | 'CHAT_EMOTE'
+  | 'CHAT_GOSSIP'
+  | 'CHAT_GROUP'
+  | 'CHAT_OOC'
+  | 'CHAT_SAY'
+  | 'CHAT_SHOUT'
+  | 'CHAT_TELL'
+  | 'MOB_KILLED'
+  | 'PLAYER_DEATH'
+  | 'PLAYER_LEVEL_UP'
+  | 'PLAYER_LOGIN'
+  | 'PLAYER_LOGOUT'
+  | 'PLAYER_QUIT'
+  | 'PLAYER_ZONE_ENTER'
+  | 'QUEST_COMPLETE'
+  | 'ZONE_LOADED'
+  | 'ZONE_RESET';
 
 export type Gender = 'FEMALE' | 'MALE' | 'NEUTRAL' | 'NON_BINARY';
 
@@ -1038,6 +1352,35 @@ export type KeeperDto = {
   zoneId: Scalars['Int']['output'];
 };
 
+/** Result of kicking a player */
+export type KickResultType = {
+  __typename?: 'KickResultType';
+  message: Scalars['String']['output'];
+  reason: Scalars['String']['output'];
+  success: Scalars['Boolean']['output'];
+};
+
+/** Level definition with experience and permissions */
+export type LevelDefinitionDto = {
+  __typename?: 'LevelDefinitionDto';
+  createdAt: Scalars['DateTime']['output'];
+  /** Experience required to reach this level */
+  expRequired: Scalars['Int']['output'];
+  /** HP gained at this level */
+  hpGain: Scalars['Int']['output'];
+  /** Whether this is an immortal level (100+) */
+  isImmortal: Scalars['Boolean']['output'];
+  /** Level number (1-105) */
+  level: Scalars['Int']['output'];
+  /** Display name for immortal levels */
+  name?: Maybe<Scalars['String']['output']>;
+  /** Permissions granted at this level */
+  permissions: Array<Scalars['String']['output']>;
+  /** Stamina gained at this level */
+  staminaGain: Scalars['Int']['output'];
+  updatedAt: Scalars['DateTime']['output'];
+};
+
 export type LifeForce =
   | 'CELESTIAL'
   | 'DEMONIC'
@@ -1055,6 +1398,38 @@ export type LoginInput = {
   identifier: Scalars['String']['input'];
   password: Scalars['String']['input'];
 };
+
+/** Login flow message */
+export type LoginMessageDto = {
+  __typename?: 'LoginMessageDto';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  /** Whether this message is active */
+  isActive: Scalars['Boolean']['output'];
+  /** Message content */
+  message: Scalars['String']['output'];
+  /** Login flow stage */
+  stage: LoginStage;
+  updatedAt: Scalars['DateTime']['output'];
+  /** Message variant (default, or for A/B testing) */
+  variant: Scalars['String']['output'];
+};
+
+/** Stage in the login/character creation flow */
+export type LoginStage =
+  | 'CHARACTER_SELECT'
+  | 'CONFIRM_PASSWORD'
+  | 'CREATE_NAME_PROMPT'
+  | 'CREATE_PASSWORD'
+  | 'CREATION_COMPLETE'
+  | 'INVALID_LOGIN'
+  | 'PASSWORD_PROMPT'
+  | 'RECONNECT_MESSAGE'
+  | 'SELECT_CLASS'
+  | 'SELECT_RACE'
+  | 'TOO_MANY_ATTEMPTS'
+  | 'USERNAME_PROMPT'
+  | 'WELCOME_BANNER';
 
 export type MobDto = {
   __typename?: 'MobDto';
@@ -1132,6 +1507,7 @@ export type MobFlag =
   | 'AQUATIC'
   | 'ASSASSIN'
   | 'AWARE'
+  | 'BANKER'
   | 'BERSERKER'
   | 'BLUR'
   | 'CLERIC'
@@ -1165,8 +1541,10 @@ export type MobFlag =
   | 'PEACEFUL'
   | 'PEACEKEEPER'
   | 'POISON_BITE'
+  | 'POSTMASTER'
   | 'PROTECTOR'
   | 'RANGER'
+  | 'RECEPTIONIST'
   | 'SCAVENGER'
   | 'SENTINEL'
   | 'SHAMAN'
@@ -1235,11 +1613,15 @@ export type Mutation = {
   attachTrigger: TriggerDto;
   banUser: BanRecord;
   batchUpdateRoomPositions: BatchUpdateResult;
+  /** Broadcast a message to all online players */
+  broadcastMessage: BroadcastResultType;
   changePassword: PasswordResetResponse;
   createAbility: Ability;
   createAbilityMessages: AbilityMessages;
   createAbilitySavingThrow: AbilitySavingThrow;
   createAbilityTargeting: AbilityTargeting;
+  createBoard: BoardDto;
+  createBoardMessage: BoardMessageDto;
   createCharacter: CharacterDto;
   createCharacterEffect: CharacterEffectDto;
   createCharacterItem: CharacterItemDto;
@@ -1251,22 +1633,30 @@ export type Mutation = {
   createGrant: UserGrantDto;
   /** Create a new help entry */
   createHelpEntry: HelpEntryDto;
+  /** Create a new login message */
+  createLoginMessage: LoginMessageDto;
   createMob: MobDto;
   createMobEquipmentSet: MobEquipmentSetDto;
   createMobReset: MobResetDto;
   createObject: ObjectDto;
+  createObjectReset: ObjectResetDto;
   createRace: RaceDto;
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
   createShop: ShopDto;
   /** Create a new social command */
   createSocial: SocialDto;
+  /** Create a new system text entry */
+  createSystemText: SystemTextDto;
   createTrigger: TriggerDto;
   createZone: ZoneDto;
   deleteAbility: Scalars['Boolean']['output'];
   deleteAbilityMessages: Scalars['Boolean']['output'];
   deleteAbilitySavingThrow: Scalars['Boolean']['output'];
   deleteAbilityTargeting: Scalars['Boolean']['output'];
+  deleteAccountMail: AccountMailDto;
+  deleteBoard: BoardDto;
+  deleteBoardMessage: BoardMessageDto;
   deleteCharacter: CharacterDto;
   deleteCharacterEffect: Scalars['Boolean']['output'];
   deleteCharacterItem: Scalars['Boolean']['output'];
@@ -1277,27 +1667,44 @@ export type Mutation = {
   deleteGrant: Scalars['Boolean']['output'];
   /** Delete a help entry */
   deleteHelpEntry: Scalars['Boolean']['output'];
+  /** Delete a login message */
+  deleteLoginMessage: Scalars['Boolean']['output'];
   deleteMob: MobDto;
   deleteMobEquipmentSet: Scalars['Boolean']['output'];
   deleteMobReset: Scalars['Boolean']['output'];
   deleteMobResetEquipment: Scalars['Boolean']['output'];
   deleteMobs: Scalars['Int']['output'];
   deleteObject: ObjectDto;
+  deleteObjectReset: Scalars['Boolean']['output'];
   deleteObjects: Scalars['Int']['output'];
+  deletePlayerMail: PlayerMailDto;
   deleteRace: Scalars['Boolean']['output'];
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
   deleteShop: ShopDto;
   /** Delete a social command */
   deleteSocial: Scalars['Boolean']['output'];
+  /** Delete a system text entry */
+  deleteSystemText: Scalars['Boolean']['output'];
   deleteTrigger: TriggerDto;
   deleteZone: ZoneDto;
+  depositItem: AccountItemDto;
+  depositWealth: Scalars['BigInt']['output'];
   detachTrigger: TriggerDto;
+  /** Execute a god command on FieryMUD */
+  executeGameCommand: CommandResultType;
   /** Grant zone access to a user */
   grantZoneAccess: UserGrantDto;
+  /** Disconnect a player from FieryMUD */
+  kickPlayer: KickResultType;
   /** Link an existing game character to your user account */
   linkCharacter: CharacterDto;
   login: AuthPayload;
+  markAccountMailRead: AccountMailDto;
+  markMailRead: PlayerMailDto;
+  markObjectRetrieved: PlayerMailDto;
+  markTriggerReviewed: TriggerDto;
+  markWealthRetrieved: PlayerMailDto;
   refreshToken: Scalars['String']['output'];
   register: AuthPayload;
   removeClassCircle: Scalars['Boolean']['output'];
@@ -1309,6 +1716,9 @@ export type Mutation = {
   resetPassword: PasswordResetResponse;
   /** Revoke zone access from a user */
   revokeZoneAccess: Scalars['Boolean']['output'];
+  sendAccountMail: AccountMailDto;
+  sendBroadcast: Scalars['Int']['output'];
+  sendMail: PlayerMailDto;
   setCharacterOffline: Scalars['Boolean']['output'];
   setCharacterOnline: Scalars['Boolean']['output'];
   unbanUser: BanRecord;
@@ -1318,6 +1728,8 @@ export type Mutation = {
   updateAbilityEffects: Ability;
   updateAbilityMessages: AbilityMessages;
   updateAbilityTargeting: AbilityTargeting;
+  updateBoard: BoardDto;
+  updateBoardMessage: BoardMessageDto;
   updateCharacter: CharacterDto;
   updateCharacterActivity: Scalars['Boolean']['output'];
   updateCharacterEffect: CharacterEffectDto;
@@ -1327,13 +1739,20 @@ export type Mutation = {
   updateClassSkill: ClassSkillDto;
   updateEffect: Effect;
   updateEquipmentSet: EquipmentSetDto;
+  /** Update a game configuration value */
+  updateGameConfig: GameConfigDto;
   updateGrant: UserGrantDto;
   /** Update an existing help entry */
   updateHelpEntry: HelpEntryDto;
+  /** Update a level definition */
+  updateLevelDefinition: LevelDefinitionDto;
+  /** Update a login message */
+  updateLoginMessage: LoginMessageDto;
   updateMob: MobDto;
   updateMobReset: MobResetDto;
   updateMobResetEquipment: Scalars['Boolean']['output'];
   updateObject: ObjectDto;
+  updateObjectReset: ObjectResetDto;
   updateProfile: User;
   updateRace: RaceDto;
   updateRaceSkill: RaceSkillDto;
@@ -1344,10 +1763,14 @@ export type Mutation = {
   updateShopInventory: ShopDto;
   /** Update an existing social command */
   updateSocial: SocialDto;
+  /** Update a system text entry */
+  updateSystemText: SystemTextDto;
   updateTrigger: TriggerDto;
   updateUser: User;
   updateUserPreferences: User;
   updateZone: ZoneDto;
+  withdrawItem: Scalars['Boolean']['output'];
+  withdrawWealth: Scalars['BigInt']['output'];
 };
 
 export type MutationAddMobResetEquipmentArgs = {
@@ -1379,6 +1802,11 @@ export type MutationBatchUpdateRoomPositionsArgs = {
   input: BatchUpdateRoomPositionsInput;
 };
 
+export type MutationBroadcastMessageArgs = {
+  message: Scalars['String']['input'];
+  sender?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
 };
@@ -1397,6 +1825,14 @@ export type MutationCreateAbilitySavingThrowArgs = {
 
 export type MutationCreateAbilityTargetingArgs = {
   data: CreateAbilityTargetingInput;
+};
+
+export type MutationCreateBoardArgs = {
+  data: CreateBoardInput;
+};
+
+export type MutationCreateBoardMessageArgs = {
+  data: CreateBoardMessageInput;
 };
 
 export type MutationCreateCharacterArgs = {
@@ -1439,6 +1875,10 @@ export type MutationCreateHelpEntryArgs = {
   data: CreateHelpEntryInput;
 };
 
+export type MutationCreateLoginMessageArgs = {
+  data: CreateLoginMessageInput;
+};
+
 export type MutationCreateMobArgs = {
   data: CreateMobInput;
 };
@@ -1453,6 +1893,10 @@ export type MutationCreateMobResetArgs = {
 
 export type MutationCreateObjectArgs = {
   data: CreateObjectInput;
+};
+
+export type MutationCreateObjectResetArgs = {
+  data: CreateObjectResetInput;
 };
 
 export type MutationCreateRaceArgs = {
@@ -1473,6 +1917,10 @@ export type MutationCreateShopArgs = {
 
 export type MutationCreateSocialArgs = {
   data: CreateSocialInput;
+};
+
+export type MutationCreateSystemTextArgs = {
+  data: CreateSystemTextInput;
 };
 
 export type MutationCreateTriggerArgs = {
@@ -1497,6 +1945,18 @@ export type MutationDeleteAbilitySavingThrowArgs = {
 
 export type MutationDeleteAbilityTargetingArgs = {
   abilityId: Scalars['Int']['input'];
+};
+
+export type MutationDeleteAccountMailArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationDeleteBoardArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationDeleteBoardMessageArgs = {
+  id: Scalars['Int']['input'];
 };
 
 export type MutationDeleteCharacterArgs = {
@@ -1535,6 +1995,10 @@ export type MutationDeleteHelpEntryArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationDeleteLoginMessageArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationDeleteMobArgs = {
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -1561,8 +2025,16 @@ export type MutationDeleteObjectArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type MutationDeleteObjectResetArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationDeleteObjectsArgs = {
   ids: Array<Scalars['Int']['input']>;
+};
+
+export type MutationDeletePlayerMailArgs = {
+  id: Scalars['Int']['input'];
 };
 
 export type MutationDeleteRaceArgs = {
@@ -1587,6 +2059,10 @@ export type MutationDeleteSocialArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationDeleteSystemTextArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationDeleteTriggerArgs = {
   id: Scalars['Float']['input'];
 };
@@ -1595,12 +2071,34 @@ export type MutationDeleteZoneArgs = {
   id: Scalars['Int']['input'];
 };
 
+export type MutationDepositItemArgs = {
+  characterId: Scalars['String']['input'];
+  objectId: Scalars['Int']['input'];
+  objectZoneId: Scalars['Int']['input'];
+  quantity?: Scalars['Int']['input'];
+};
+
+export type MutationDepositWealthArgs = {
+  amount: Scalars['BigInt']['input'];
+  characterId: Scalars['String']['input'];
+};
+
 export type MutationDetachTriggerArgs = {
   triggerId: Scalars['Float']['input'];
 };
 
+export type MutationExecuteGameCommandArgs = {
+  command: Scalars['String']['input'];
+  executor?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type MutationGrantZoneAccessArgs = {
   data: GrantZoneAccessInput;
+};
+
+export type MutationKickPlayerArgs = {
+  playerName: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type MutationLinkCharacterArgs = {
@@ -1609,6 +2107,29 @@ export type MutationLinkCharacterArgs = {
 
 export type MutationLoginArgs = {
   input: LoginInput;
+};
+
+export type MutationMarkAccountMailReadArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationMarkMailReadArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationMarkObjectRetrievedArgs = {
+  characterId: Scalars['String']['input'];
+  id: Scalars['Int']['input'];
+  movedToAccountStorage?: Scalars['Boolean']['input'];
+};
+
+export type MutationMarkTriggerReviewedArgs = {
+  triggerId: Scalars['Int']['input'];
+};
+
+export type MutationMarkWealthRetrievedArgs = {
+  characterId: Scalars['String']['input'];
+  id: Scalars['Int']['input'];
 };
 
 export type MutationRegisterArgs = {
@@ -1642,6 +2163,18 @@ export type MutationResetPasswordArgs = {
 export type MutationRevokeZoneAccessArgs = {
   userId: Scalars['String']['input'];
   zoneId: Scalars['Float']['input'];
+};
+
+export type MutationSendAccountMailArgs = {
+  data: SendAccountMailInput;
+};
+
+export type MutationSendBroadcastArgs = {
+  data: SendBroadcastInput;
+};
+
+export type MutationSendMailArgs = {
+  data: SendPlayerMailInput;
 };
 
 export type MutationSetCharacterOfflineArgs = {
@@ -1678,6 +2211,17 @@ export type MutationUpdateAbilityMessagesArgs = {
 export type MutationUpdateAbilityTargetingArgs = {
   abilityId: Scalars['Int']['input'];
   data: UpdateAbilityTargetingInput;
+};
+
+export type MutationUpdateBoardArgs = {
+  data: UpdateBoardInput;
+  id: Scalars['Int']['input'];
+};
+
+export type MutationUpdateBoardMessageArgs = {
+  data: UpdateBoardMessageInput;
+  editor?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Int']['input'];
 };
 
 export type MutationUpdateCharacterArgs = {
@@ -1724,6 +2268,12 @@ export type MutationUpdateEquipmentSetArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationUpdateGameConfigArgs = {
+  category: Scalars['String']['input'];
+  data: UpdateGameConfigInput;
+  key: Scalars['String']['input'];
+};
+
 export type MutationUpdateGrantArgs = {
   data: UpdateGrantInput;
   id: Scalars['ID']['input'];
@@ -1731,6 +2281,16 @@ export type MutationUpdateGrantArgs = {
 
 export type MutationUpdateHelpEntryArgs = {
   data: UpdateHelpEntryInput;
+  id: Scalars['ID']['input'];
+};
+
+export type MutationUpdateLevelDefinitionArgs = {
+  data: UpdateLevelDefinitionInput;
+  level: Scalars['Int']['input'];
+};
+
+export type MutationUpdateLoginMessageArgs = {
+  data: UpdateLoginMessageInput;
   id: Scalars['ID']['input'];
 };
 
@@ -1756,6 +2316,11 @@ export type MutationUpdateObjectArgs = {
   data: UpdateObjectInput;
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
+};
+
+export type MutationUpdateObjectResetArgs = {
+  data: UpdateObjectResetInput;
+  id: Scalars['ID']['input'];
 };
 
 export type MutationUpdateProfileArgs = {
@@ -1807,6 +2372,11 @@ export type MutationUpdateSocialArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationUpdateSystemTextArgs = {
+  data: UpdateSystemTextInput;
+  id: Scalars['ID']['input'];
+};
+
 export type MutationUpdateTriggerArgs = {
   id: Scalars['Float']['input'];
   input: UpdateTriggerInput;
@@ -1823,6 +2393,16 @@ export type MutationUpdateUserPreferencesArgs = {
 export type MutationUpdateZoneArgs = {
   data: UpdateZoneInput;
   id: Scalars['Int']['input'];
+};
+
+export type MutationWithdrawItemArgs = {
+  accountItemId: Scalars['Int']['input'];
+  characterId: Scalars['String']['input'];
+};
+
+export type MutationWithdrawWealthArgs = {
+  amount: Scalars['BigInt']['input'];
+  characterId: Scalars['String']['input'];
 };
 
 export type ObjectAffectDto = {
@@ -1914,6 +2494,19 @@ export type ObjectFlag =
   | 'PERMANENT'
   | 'WAS_DISARMED';
 
+export type ObjectResetDto = {
+  __typename?: 'ObjectResetDto';
+  conditions: Array<SpawnConditionDto>;
+  id: Scalars['String']['output'];
+  max: Scalars['Int']['output'];
+  name?: Maybe<Scalars['String']['output']>;
+  object: ObjectDto;
+  objectId: Scalars['Int']['output'];
+  probability: Scalars['Float']['output'];
+  roomId: Scalars['Int']['output'];
+  zoneId: Scalars['Int']['output'];
+};
+
 export type ObjectSummaryDto = {
   __typename?: 'ObjectSummaryDto';
   cost?: Maybe<Scalars['Int']['output']>;
@@ -1976,13 +2569,91 @@ export type OnlineCharacterDto = {
   user: UserSummaryDto;
 };
 
+/** Information about an online player in FieryMUD */
+export type OnlinePlayerType = {
+  __typename?: 'OnlinePlayerType';
+  class: Scalars['String']['output'];
+  godLevel: Scalars['Int']['output'];
+  isLinkdead: Scalars['Boolean']['output'];
+  level: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  race: Scalars['String']['output'];
+  roomId: Scalars['Int']['output'];
+};
+
 export type PasswordResetResponse = {
   __typename?: 'PasswordResetResponse';
   message: Scalars['String']['output'];
   success: Scalars['Boolean']['output'];
 };
 
-export type Position = 'FLYING' | 'KNEELING' | 'PRONE' | 'SITTING' | 'STANDING';
+export type PlayerMailCharacterDto = {
+  __typename?: 'PlayerMailCharacterDto';
+  id: Scalars['String']['output'];
+  name: Scalars['String']['output'];
+};
+
+export type PlayerMailDto = {
+  __typename?: 'PlayerMailDto';
+  attachedCopper: Scalars['Int']['output'];
+  attachedGold: Scalars['Int']['output'];
+  attachedObject?: Maybe<PlayerMailObjectDto>;
+  attachedObjectId?: Maybe<Scalars['Int']['output']>;
+  attachedObjectZoneId?: Maybe<Scalars['Int']['output']>;
+  attachedPlatinum: Scalars['Int']['output'];
+  attachedSilver: Scalars['Int']['output'];
+  body: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['Int']['output'];
+  isDeleted: Scalars['Boolean']['output'];
+  legacyRecipientId?: Maybe<Scalars['Int']['output']>;
+  legacySenderId?: Maybe<Scalars['Int']['output']>;
+  objectMovedToAccountStorage: Scalars['Boolean']['output'];
+  objectRetrievalInfo?: Maybe<Scalars['String']['output']>;
+  objectRetrievedAt?: Maybe<Scalars['DateTime']['output']>;
+  objectRetrievedByCharacterId?: Maybe<Scalars['String']['output']>;
+  readAt?: Maybe<Scalars['DateTime']['output']>;
+  recipient?: Maybe<PlayerMailCharacterDto>;
+  recipientCharacterId?: Maybe<Scalars['String']['output']>;
+  sender?: Maybe<PlayerMailCharacterDto>;
+  senderCharacterId?: Maybe<Scalars['String']['output']>;
+  senderName: Scalars['String']['output'];
+  sentAt: Scalars['DateTime']['output'];
+  wealthRetrievalInfo?: Maybe<Scalars['String']['output']>;
+  wealthRetrievedAt?: Maybe<Scalars['DateTime']['output']>;
+  wealthRetrievedByCharacterId?: Maybe<Scalars['String']['output']>;
+};
+
+export type PlayerMailFilterInput = {
+  fromDate?: InputMaybe<Scalars['DateTime']['input']>;
+  includeDeleted?: InputMaybe<Scalars['Boolean']['input']>;
+  recipientCharacterId?: InputMaybe<Scalars['String']['input']>;
+  searchBody?: InputMaybe<Scalars['String']['input']>;
+  senderCharacterId?: InputMaybe<Scalars['String']['input']>;
+  toDate?: InputMaybe<Scalars['DateTime']['input']>;
+};
+
+export type PlayerMailObjectDto = {
+  __typename?: 'PlayerMailObjectDto';
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  zoneId: Scalars['Int']['output'];
+};
+
+export type Position =
+  | 'DEAD'
+  | 'FIGHTING'
+  | 'FLYING'
+  | 'GHOST'
+  | 'INCAPACITATED'
+  | 'KNEELING'
+  | 'MORTALLY_WOUNDED'
+  | 'PRONE'
+  | 'RESTING'
+  | 'SITTING'
+  | 'SLEEPING'
+  | 'STANDING'
+  | 'STUNNED';
 
 export type Query = {
   __typename?: 'Query';
@@ -1992,7 +2663,18 @@ export type Query = {
   abilitySchool: AbilitySchool;
   abilitySchools: Array<AbilitySchool>;
   activeCharacterEffects: Array<CharacterEffectDto>;
+  allAccountMail: Array<AccountMailDto>;
+  /** Get all unique permission flags used across commands */
+  availablePermissions: Array<Scalars['String']['output']>;
   banHistory: Array<BanRecord>;
+  board?: Maybe<BoardDto>;
+  boardMessage?: Maybe<BoardMessageDto>;
+  boardMessages: Array<BoardMessageDto>;
+  boardMessagesCount: Scalars['Int']['output'];
+  boards: Array<BoardDto>;
+  boardsCount: Scalars['Int']['output'];
+  /** Get the FieryMUD bridge connection status */
+  bridgeStatus: BridgeStatus;
   character: CharacterDto;
   characterEffect: CharacterEffectDto;
   characterEffects: Array<CharacterEffectDto>;
@@ -2010,11 +2692,29 @@ export type Query = {
   classSkills: Array<ClassSkillDto>;
   classes: Array<ClassDto>;
   classesCount: Scalars['Int']['output'];
+  /** Get a single command by name */
+  command: CommandDto;
+  /** Get all command categories */
+  commandCategories: Array<CommandCategory>;
+  /** Get all command definitions */
+  commands: Array<CommandDto>;
+  /** Get commands by category */
+  commandsByCategory: Array<CommandDto>;
   effect: Effect;
   effects: Array<Effect>;
   effectsCount: Scalars['Int']['output'];
   equipmentSet: EquipmentSetDto;
   equipmentSets: Array<EquipmentSetDto>;
+  /** Get a single configuration entry */
+  gameConfig: GameConfigDto;
+  /** Get all distinct configuration categories */
+  gameConfigCategories: Array<Scalars['String']['output']>;
+  /** Get all game configuration entries */
+  gameConfigs: Array<GameConfigDto>;
+  /** Get configuration entries by category */
+  gameConfigsByCategory: Array<GameConfigDto>;
+  /** Check if FieryMUD admin API is connected */
+  gameServerConnected: Scalars['Boolean']['output'];
   /** Get validation summary statistics */
   getValidationSummary: ValidationSummaryType;
   grant: UserGrantDto;
@@ -2029,6 +2729,20 @@ export type Query = {
   helpEntriesCount: Scalars['Int']['output'];
   /** Get a single help entry by ID */
   helpEntry: HelpEntryDto;
+  /** Get all immortal-only commands */
+  immortalCommands: Array<CommandDto>;
+  /** Get immortal level definitions (100+) */
+  immortalLevels: Array<LevelDefinitionDto>;
+  /** Get a single level definition */
+  levelDefinition: LevelDefinitionDto;
+  /** Get all level definitions */
+  levelDefinitions: Array<LevelDefinitionDto>;
+  /** Get a single login message */
+  loginMessage: LoginMessageDto;
+  /** Get all login messages */
+  loginMessages: Array<LoginMessageDto>;
+  /** Get login messages by stage */
+  loginMessagesByStage: Array<LoginMessageDto>;
   me: User;
   mob: MobDto;
   mobReset?: Maybe<MobResetDto>;
@@ -2036,16 +2750,32 @@ export type Query = {
   mobs: Array<MobDto>;
   mobsByZone: Array<MobDto>;
   mobsCount: Scalars['Int']['output'];
+  /** Get mortal level definitions (1-99) */
+  mortalLevels: Array<LevelDefinitionDto>;
+  myAccountMail: Array<AccountMailDto>;
+  myAccountMailCount: Scalars['Int']['output'];
+  myAccountStorage: AccountStorageDto;
+  myAccountWealthDisplay: WealthDisplayDto;
   myCharacters: Array<CharacterDto>;
+  myMail: Array<PlayerMailDto>;
+  myMailCount: Scalars['Int']['output'];
   myOnlineCharacters: Array<OnlineCharacterDto>;
   myPermissions: UserPermissions;
   myZoneGrants: Array<ZoneGrantDto>;
   object: ObjectDto;
+  objectReset?: Maybe<ObjectResetDto>;
+  objectResetsByRoom: Array<ObjectResetDto>;
+  objectResetsByZone: Array<ObjectResetDto>;
   objects: Array<ObjectDto>;
   objectsByType: Array<ObjectDto>;
   objectsByZone: Array<ObjectDto>;
   objectsCount: Scalars['Int']['output'];
   onlineCharacters: Array<OnlineCharacterDto>;
+  /** Get list of online players in FieryMUD */
+  onlinePlayers: Array<OnlinePlayerType>;
+  playerMail?: Maybe<PlayerMailDto>;
+  playerMailCount: Scalars['Int']['output'];
+  playerMails: Array<PlayerMailDto>;
   race: RaceDto;
   /** Get all skills for a race */
   raceSkills: Array<RaceSkillDto>;
@@ -2061,6 +2791,8 @@ export type Query = {
   searchObjects: Array<ObjectDto>;
   /** Search socials by name pattern */
   searchSocials: Array<SocialDto>;
+  /** Get server statistics and info from FieryMUD */
+  serverStatus: ServerStatusType;
   shop: ShopDto;
   shopByKeeper: ShopDto;
   shops: Array<ShopDto>;
@@ -2074,9 +2806,19 @@ export type Query = {
   socials: Array<SocialDto>;
   /** Get total count of socials */
   socialsCount: Scalars['Int']['output'];
+  /** Get a single system text entry by ID */
+  systemText: SystemTextDto;
+  /** Get system text by key */
+  systemTextByKey: SystemTextDto;
+  /** Get all system text entries */
+  systemTexts: Array<SystemTextDto>;
+  /** Get system text entries by category */
+  systemTextsByCategory: Array<SystemTextDto>;
   trigger: TriggerDto;
   triggers: Array<TriggerDto>;
   triggersByAttachment: Array<TriggerDto>;
+  triggersNeedingReview: Array<TriggerDto>;
+  triggersNeedingReviewCount: Scalars['Int']['output'];
   user: User;
   userPermissions: UserPermissions;
   userZoneGrants: Array<ZoneGrantDto>;
@@ -2115,8 +2857,39 @@ export type QueryActiveCharacterEffectsArgs = {
   characterId: Scalars['ID']['input'];
 };
 
+export type QueryAllAccountMailArgs = {
+  filter?: InputMaybe<AccountMailFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type QueryBanHistoryArgs = {
   userId: Scalars['ID']['input'];
+};
+
+export type QueryBoardArgs = {
+  alias?: InputMaybe<Scalars['String']['input']>;
+  id?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryBoardMessageArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type QueryBoardMessagesArgs = {
+  boardId: Scalars['Int']['input'];
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryBoardMessagesCountArgs = {
+  boardId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryBoardsArgs = {
+  search?: InputMaybe<Scalars['String']['input']>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type QueryCharacterArgs = {
@@ -2178,6 +2951,14 @@ export type QueryClassesArgs = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type QueryCommandArgs = {
+  name: Scalars['String']['input'];
+};
+
+export type QueryCommandsByCategoryArgs = {
+  category: CommandCategory;
+};
+
 export type QueryEffectArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2194,6 +2975,15 @@ export type QueryEffectsCountArgs = {
 
 export type QueryEquipmentSetArgs = {
   id: Scalars['ID']['input'];
+};
+
+export type QueryGameConfigArgs = {
+  category: Scalars['String']['input'];
+  key: Scalars['String']['input'];
+};
+
+export type QueryGameConfigsByCategoryArgs = {
+  category: Scalars['String']['input'];
 };
 
 export type QueryGrantArgs = {
@@ -2221,6 +3011,18 @@ export type QueryHelpEntryArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type QueryLevelDefinitionArgs = {
+  level: Scalars['Int']['input'];
+};
+
+export type QueryLoginMessageArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryLoginMessagesByStageArgs = {
+  stage: LoginStage;
+};
+
 export type QueryMobArgs = {
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -2246,8 +3048,36 @@ export type QueryMobsByZoneArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type QueryMyAccountMailArgs = {
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryMyMailArgs = {
+  characterId: Scalars['String']['input'];
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryMyMailCountArgs = {
+  characterId: Scalars['String']['input'];
+};
+
 export type QueryObjectArgs = {
   id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type QueryObjectResetArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryObjectResetsByRoomArgs = {
+  roomId: Scalars['Int']['input'];
+  roomZoneId: Scalars['Int']['input'];
+};
+
+export type QueryObjectResetsByZoneArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
@@ -2266,6 +3096,20 @@ export type QueryObjectsByZoneArgs = {
 
 export type QueryOnlineCharactersArgs = {
   userId?: InputMaybe<Scalars['ID']['input']>;
+};
+
+export type QueryPlayerMailArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type QueryPlayerMailCountArgs = {
+  filter?: InputMaybe<PlayerMailFilterInput>;
+};
+
+export type QueryPlayerMailsArgs = {
+  filter?: InputMaybe<PlayerMailFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type QueryRaceArgs = {
@@ -2343,6 +3187,18 @@ export type QuerySocialArgs = {
 
 export type QuerySocialByNameArgs = {
   name: Scalars['String']['input'];
+};
+
+export type QuerySystemTextArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QuerySystemTextByKeyArgs = {
+  key: Scalars['String']['input'];
+};
+
+export type QuerySystemTextsByCategoryArgs = {
+  category: Scalars['String']['input'];
 };
 
 export type QueryTriggerArgs = {
@@ -2537,6 +3393,7 @@ export type RoomFlag =
   | 'ARENA'
   | 'ATRIUM'
   | 'BFS_MARK'
+  | 'CAMPSITE'
   | 'DARK'
   | 'DEATH'
   | 'EFFECTS_NEXT'
@@ -2546,6 +3403,7 @@ export type RoomFlag =
   | 'HOUSE'
   | 'HOUSECRASH'
   | 'INDOORS'
+  | 'INN'
   | 'ISOLATED'
   | 'LARGE'
   | 'MEDIUM'
@@ -2566,6 +3424,7 @@ export type RoomFlag =
   | 'PRIVATE'
   | 'SMALL'
   | 'SOUNDPROOF'
+  | 'TEMPLE'
   | 'TUNNEL'
   | 'UNDERDARK'
   | 'VERY_SMALL'
@@ -2624,6 +3483,60 @@ export type Sector =
   | 'UNDERDARK'
   | 'UNDERWATER'
   | 'WATER';
+
+export type SendAccountMailInput = {
+  body: Scalars['String']['input'];
+  recipientUserId: Scalars['String']['input'];
+  subject: Scalars['String']['input'];
+};
+
+export type SendBroadcastInput = {
+  body: Scalars['String']['input'];
+  subject: Scalars['String']['input'];
+};
+
+export type SendPlayerMailInput = {
+  attachedCopper?: Scalars['Int']['input'];
+  attachedGold?: Scalars['Int']['input'];
+  attachedObjectId?: InputMaybe<Scalars['Int']['input']>;
+  attachedObjectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  attachedPlatinum?: Scalars['Int']['input'];
+  attachedSilver?: Scalars['Int']['input'];
+  body: Scalars['String']['input'];
+  recipientCharacterId: Scalars['String']['input'];
+  senderCharacterId: Scalars['String']['input'];
+};
+
+/** Server information from FieryMUD */
+export type ServerInfoType = {
+  __typename?: 'ServerInfoType';
+  maintenanceMode: Scalars['Boolean']['output'];
+  name: Scalars['String']['output'];
+  port: Scalars['Int']['output'];
+  running: Scalars['Boolean']['output'];
+  tlsPort: Scalars['Int']['output'];
+};
+
+/** Server statistics from FieryMUD */
+export type ServerStatsType = {
+  __typename?: 'ServerStatsType';
+  commandsPerSecond: Scalars['Float']['output'];
+  currentConnections: Scalars['Int']['output'];
+  failedCommands: Scalars['Int']['output'];
+  failedLogins: Scalars['Int']['output'];
+  peakConnections: Scalars['Int']['output'];
+  totalCommands: Scalars['Int']['output'];
+  totalConnections: Scalars['Int']['output'];
+  totalLogins: Scalars['Int']['output'];
+  uptimeSeconds: Scalars['Int']['output'];
+};
+
+/** Full server status from FieryMUD */
+export type ServerStatusType = {
+  __typename?: 'ServerStatusType';
+  server: ServerInfoType;
+  stats: ServerStatsType;
+};
 
 export type ShopAcceptDto = {
   __typename?: 'ShopAcceptDto';
@@ -2747,6 +3660,13 @@ export type SocialDto = {
   victFound?: Maybe<Scalars['String']['output']>;
 };
 
+export type SpawnConditionDto = {
+  __typename?: 'SpawnConditionDto';
+  id: Scalars['String']['output'];
+  parameters: Scalars['String']['output'];
+  type: Scalars['String']['output'];
+};
+
 export type SpellSphere =
   | 'AIR'
   | 'DEATH'
@@ -2769,6 +3689,67 @@ export type Stance =
   | 'RESTING'
   | 'SLEEPING'
   | 'STUNNED';
+
+export type Subscription = {
+  __typename?: 'Subscription';
+  /** Subscribe to admin alerts and system events */
+  adminAlerts: GameEvent;
+  /** Subscribe to all chat messages (gossip, shout, say, etc.) */
+  chatMessages: GameEvent;
+  /** Subscribe to all game events from FieryMUD */
+  gameEvents: GameEvent;
+  /** Subscribe to game events by category (player, chat, admin, world) */
+  gameEventsByCategory: GameEvent;
+  /** Subscribe to specific types of game events */
+  gameEventsByTypes: GameEvent;
+  /** Subscribe to player activity events (login, logout, death, level up) */
+  playerActivity: GameEvent;
+  /** Subscribe to events involving a specific player */
+  playerEvents: GameEvent;
+  /** Subscribe to world events (zone loads, resets, boss spawns) */
+  worldEvents: GameEvent;
+  /** Subscribe to events in a specific zone */
+  zoneEvents: GameEvent;
+};
+
+export type SubscriptionGameEventsByCategoryArgs = {
+  category: GameEventCategory;
+};
+
+export type SubscriptionGameEventsByTypesArgs = {
+  types: Array<GameEventType>;
+};
+
+export type SubscriptionPlayerEventsArgs = {
+  playerName: Scalars['String']['input'];
+};
+
+export type SubscriptionZoneEventsArgs = {
+  zoneId: Scalars['Int']['input'];
+};
+
+/** Category of system text */
+export type SystemTextCategory = 'COMBAT' | 'IMMORTAL' | 'LOGIN' | 'SYSTEM';
+
+/** System text content (MOTD, news, credits, etc.) */
+export type SystemTextDto = {
+  __typename?: 'SystemTextDto';
+  /** Text category */
+  category: SystemTextCategory;
+  /** Text content */
+  content: Scalars['String']['output'];
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  /** Whether this text is active */
+  isActive: Scalars['Boolean']['output'];
+  /** Unique key identifier */
+  key: Scalars['String']['output'];
+  /** Minimum level to view this text */
+  minLevel: Scalars['Int']['output'];
+  /** Display title */
+  title?: Maybe<Scalars['String']['output']>;
+  updatedAt: Scalars['DateTime']['output'];
+};
 
 export type TargetScope =
   | 'AREA'
@@ -2798,11 +3779,16 @@ export type TriggerDto = {
   commands: Scalars['String']['output'];
   createdAt: Scalars['DateTime']['output'];
   createdBy?: Maybe<Scalars['String']['output']>;
+  flags: Array<Scalars['String']['output']>;
   id: Scalars['String']['output'];
+  legacyScript?: Maybe<Scalars['String']['output']>;
+  legacyVnum?: Maybe<Scalars['Int']['output']>;
   mobId?: Maybe<Scalars['Int']['output']>;
   name: Scalars['String']['output'];
+  needsReview: Scalars['Boolean']['output'];
   numArgs: Scalars['Int']['output'];
   objectId?: Maybe<Scalars['Int']['output']>;
+  syntaxError?: Maybe<Scalars['String']['output']>;
   updatedAt: Scalars['DateTime']['output'];
   updatedBy?: Maybe<Scalars['String']['output']>;
   variables: Scalars['String']['output'];
@@ -2848,11 +3834,14 @@ export type UpdateAbilityMessagesInput = {
   failToCaster?: InputMaybe<Scalars['String']['input']>;
   failToRoom?: InputMaybe<Scalars['String']['input']>;
   failToVictim?: InputMaybe<Scalars['String']['input']>;
+  lookMessage?: InputMaybe<Scalars['String']['input']>;
   startToCaster?: InputMaybe<Scalars['String']['input']>;
   startToRoom?: InputMaybe<Scalars['String']['input']>;
   startToVictim?: InputMaybe<Scalars['String']['input']>;
+  successSelfRoom?: InputMaybe<Scalars['String']['input']>;
   successToCaster?: InputMaybe<Scalars['String']['input']>;
   successToRoom?: InputMaybe<Scalars['String']['input']>;
+  successToSelf?: InputMaybe<Scalars['String']['input']>;
   successToVictim?: InputMaybe<Scalars['String']['input']>;
   wearoffToRoom?: InputMaybe<Scalars['String']['input']>;
   wearoffToTarget?: InputMaybe<Scalars['String']['input']>;
@@ -2865,6 +3854,18 @@ export type UpdateAbilityTargetingInput = {
   scope?: InputMaybe<TargetScope>;
   scopePattern?: InputMaybe<Scalars['String']['input']>;
   validTargets?: InputMaybe<Array<TargetType>>;
+};
+
+export type UpdateBoardInput = {
+  locked?: InputMaybe<Scalars['Boolean']['input']>;
+  privileges?: InputMaybe<Scalars['JSON']['input']>;
+  title?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateBoardMessageInput = {
+  content?: InputMaybe<Scalars['String']['input']>;
+  sticky?: InputMaybe<Scalars['Boolean']['input']>;
+  subject?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateCharacterEffectInput = {
@@ -2945,6 +3946,14 @@ export type UpdateEquipmentSetInput = {
   name?: InputMaybe<Scalars['String']['input']>;
 };
 
+/** Input for updating a game configuration value */
+export type UpdateGameConfigInput = {
+  /** Updated description */
+  description?: InputMaybe<Scalars['String']['input']>;
+  /** New value for this configuration */
+  value: Scalars['String']['input'];
+};
+
 export type UpdateGrantInput = {
   expiresAt?: InputMaybe<Scalars['DateTime']['input']>;
   notes?: InputMaybe<Scalars['String']['input']>;
@@ -2971,6 +3980,28 @@ export type UpdateHelpEntryInput = {
   title?: InputMaybe<Scalars['String']['input']>;
   /** Usage syntax */
   usage?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Input for updating a level definition */
+export type UpdateLevelDefinitionInput = {
+  /** Experience required */
+  expRequired?: InputMaybe<Scalars['Int']['input']>;
+  /** HP gained at this level */
+  hpGain?: InputMaybe<Scalars['Int']['input']>;
+  /** Display name for this level */
+  name?: InputMaybe<Scalars['String']['input']>;
+  /** Permissions for this level */
+  permissions?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Stamina gained at this level */
+  staminaGain?: InputMaybe<Scalars['Int']['input']>;
+};
+
+/** Input for updating a login message */
+export type UpdateLoginMessageInput = {
+  /** Whether this message is active */
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Message content */
+  message?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateMobInput = {
@@ -3059,6 +4090,12 @@ export type UpdateObjectInput = {
   wearFlags?: InputMaybe<Array<WearFlag>>;
   weight?: InputMaybe<Scalars['Float']['input']>;
   zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateObjectResetInput = {
+  max?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  probability?: InputMaybe<Scalars['Float']['input']>;
 };
 
 export type UpdatePreferencesInput = {
@@ -3173,6 +4210,20 @@ export type UpdateSocialInput = {
   othersNoArg?: InputMaybe<Scalars['String']['input']>;
   /** Message to target */
   victFound?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Input for updating system text */
+export type UpdateSystemTextInput = {
+  /** Text category */
+  category?: InputMaybe<SystemTextCategory>;
+  /** Text content */
+  content?: InputMaybe<Scalars['String']['input']>;
+  /** Whether this text is active */
+  isActive?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Minimum level to view */
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  /** Display title */
+  title?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateTriggerInput = {
@@ -3327,6 +4378,15 @@ export type ValidationSummaryType = {
   zonesWithIssues: Scalars['Int']['output'];
 };
 
+export type WealthDisplayDto = {
+  __typename?: 'WealthDisplayDto';
+  copper: Scalars['Int']['output'];
+  gold: Scalars['Int']['output'];
+  platinum: Scalars['Int']['output'];
+  silver: Scalars['Int']['output'];
+  totalCopper: Scalars['BigInt']['output'];
+};
+
 export type WearFlag =
   | 'ABOUT'
   | 'ARMS'
@@ -3388,6 +4448,224 @@ export type ZoneRoomDto = {
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   sector: Scalars['String']['output'];
+};
+
+export type GetGameConfigsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetGameConfigsQuery = {
+  __typename?: 'Query';
+  gameConfigCategories: Array<string>;
+  gameConfigs: Array<{
+    __typename?: 'GameConfigDto';
+    id: string;
+    category: string;
+    key: string;
+    value: string;
+    valueType: ConfigValueType;
+    description?: string | null;
+    minValue?: string | null;
+    maxValue?: string | null;
+    isSecret: boolean;
+    restartReq: boolean;
+  }>;
+};
+
+export type UpdateGameConfigMutationVariables = Exact<{
+  category: Scalars['String']['input'];
+  key: Scalars['String']['input'];
+  data: UpdateGameConfigInput;
+}>;
+
+export type UpdateGameConfigMutation = {
+  __typename?: 'Mutation';
+  updateGameConfig: { __typename?: 'GameConfigDto'; id: string; value: string };
+};
+
+export type GetLevelDefinitionsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetLevelDefinitionsQuery = {
+  __typename?: 'Query';
+  availablePermissions: Array<string>;
+  levelDefinitions: Array<{
+    __typename?: 'LevelDefinitionDto';
+    level: number;
+    name?: string | null;
+    expRequired: number;
+    hpGain: number;
+    staminaGain: number;
+    isImmortal: boolean;
+    permissions: Array<string>;
+  }>;
+};
+
+export type UpdateLevelDefinitionMutationVariables = Exact<{
+  level: Scalars['Int']['input'];
+  data: UpdateLevelDefinitionInput;
+}>;
+
+export type UpdateLevelDefinitionMutation = {
+  __typename?: 'Mutation';
+  updateLevelDefinition: {
+    __typename?: 'LevelDefinitionDto';
+    level: number;
+    name?: string | null;
+    expRequired: number;
+    hpGain: number;
+    staminaGain: number;
+    permissions: Array<string>;
+  };
+};
+
+export type GetSystemTextsQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetSystemTextsQuery = {
+  __typename?: 'Query';
+  systemTexts: Array<{
+    __typename?: 'SystemTextDto';
+    id: string;
+    key: string;
+    category: SystemTextCategory;
+    title?: string | null;
+    content: string;
+    minLevel: number;
+    isActive: boolean;
+  }>;
+};
+
+export type UpdateSystemTextMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateSystemTextInput;
+}>;
+
+export type UpdateSystemTextMutation = {
+  __typename?: 'Mutation';
+  updateSystemText: {
+    __typename?: 'SystemTextDto';
+    id: string;
+    content: string;
+    title?: string | null;
+    isActive: boolean;
+  };
+};
+
+export type GetLoginMessagesQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetLoginMessagesQuery = {
+  __typename?: 'Query';
+  loginMessages: Array<{
+    __typename?: 'LoginMessageDto';
+    id: string;
+    stage: LoginStage;
+    variant: string;
+    message: string;
+    isActive: boolean;
+  }>;
+};
+
+export type UpdateLoginMessageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateLoginMessageInput;
+}>;
+
+export type UpdateLoginMessageMutation = {
+  __typename?: 'Mutation';
+  updateLoginMessage: {
+    __typename?: 'LoginMessageDto';
+    id: string;
+    message: string;
+    isActive: boolean;
+  };
+};
+
+export type GetBoardPageQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type GetBoardPageQuery = {
+  __typename?: 'Query';
+  board?: {
+    __typename?: 'BoardDto';
+    id: number;
+    alias: string;
+    title: string;
+    locked: boolean;
+    privileges: any;
+    messageCount?: number | null;
+    messages?: Array<{
+      __typename?: 'BoardMessageDto';
+      id: number;
+      poster: string;
+      posterLevel: number;
+      postedAt: any;
+      subject: string;
+      content: string;
+      sticky: boolean;
+      edits?: Array<{
+        __typename?: 'BoardMessageEditDto';
+        id: number;
+        editor: string;
+        editedAt: any;
+      }> | null;
+    }> | null;
+  } | null;
+};
+
+export type CreateBoardMessagePageMutationVariables = Exact<{
+  data: CreateBoardMessageInput;
+}>;
+
+export type CreateBoardMessagePageMutation = {
+  __typename?: 'Mutation';
+  createBoardMessage: {
+    __typename?: 'BoardMessageDto';
+    id: number;
+    poster: string;
+    subject: string;
+    content: string;
+    postedAt: any;
+  };
+};
+
+export type UpdateBoardMessagePageMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateBoardMessageInput;
+  editor?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type UpdateBoardMessagePageMutation = {
+  __typename?: 'Mutation';
+  updateBoardMessage: {
+    __typename?: 'BoardMessageDto';
+    id: number;
+    subject: string;
+    content: string;
+  };
+};
+
+export type DeleteBoardMessagePageMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteBoardMessagePageMutation = {
+  __typename?: 'Mutation';
+  deleteBoardMessage: { __typename?: 'BoardMessageDto'; id: number };
+};
+
+export type GetBoardsPageQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetBoardsPageQuery = {
+  __typename?: 'Query';
+  boardsCount: number;
+  boards: Array<{
+    __typename?: 'BoardDto';
+    id: number;
+    alias: string;
+    title: string;
+    locked: boolean;
+    messageCount?: number | null;
+    createdAt: any;
+    updatedAt: any;
+  }>;
 };
 
 export type UpdateViewModeMutationVariables = Exact<{
@@ -3663,6 +4941,95 @@ export type UpdateRaceInlineMutation = {
     expFactor: number;
     hpFactor: number;
     permanentEffects: Array<EffectFlag>;
+  };
+};
+
+export type GetTriggersForScriptsPageQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetTriggersForScriptsPageQuery = {
+  __typename?: 'Query';
+  triggers: Array<{
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+  }>;
+};
+
+export type CreateTriggerFromScriptsPageMutationVariables = Exact<{
+  input: CreateTriggerInput;
+}>;
+
+export type CreateTriggerFromScriptsPageMutation = {
+  __typename?: 'Mutation';
+  createTrigger: {
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    needsReview: boolean;
+  };
+};
+
+export type UpdateTriggerFromScriptsPageMutationVariables = Exact<{
+  id: Scalars['Float']['input'];
+  input: UpdateTriggerInput;
+}>;
+
+export type UpdateTriggerFromScriptsPageMutation = {
+  __typename?: 'Mutation';
+  updateTrigger: {
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    needsReview: boolean;
+  };
+};
+
+export type DeleteTriggerFromScriptsPageMutationVariables = Exact<{
+  id: Scalars['Float']['input'];
+}>;
+
+export type DeleteTriggerFromScriptsPageMutation = {
+  __typename?: 'Mutation';
+  deleteTrigger: { __typename?: 'TriggerDto'; id: string };
+};
+
+export type MarkTriggerReviewedFromScriptsPageMutationVariables = Exact<{
+  triggerId: Scalars['Int']['input'];
+}>;
+
+export type MarkTriggerReviewedFromScriptsPageMutation = {
+  __typename?: 'Mutation';
+  markTriggerReviewed: {
+    __typename?: 'TriggerDto';
+    id: string;
+    needsReview: boolean;
   };
 };
 
@@ -4858,11 +6225,14 @@ export type GetAbilityDetailsQuery = {
       successToCaster?: string | null;
       successToRoom?: string | null;
       successToVictim?: string | null;
+      successToSelf?: string | null;
+      successSelfRoom?: string | null;
       failToCaster?: string | null;
       failToRoom?: string | null;
       failToVictim?: string | null;
       wearoffToRoom?: string | null;
       wearoffToTarget?: string | null;
+      lookMessage?: string | null;
     } | null;
   };
 };
@@ -4944,6 +6314,383 @@ export type UpdateAbilityEffectsMutation = {
         description?: string | null;
       };
     }> | null;
+  };
+};
+
+export type UpdateAbilityMessagesMutationVariables = Exact<{
+  abilityId: Scalars['Int']['input'];
+  data: UpdateAbilityMessagesInput;
+}>;
+
+export type UpdateAbilityMessagesMutation = {
+  __typename?: 'Mutation';
+  updateAbilityMessages: {
+    __typename?: 'AbilityMessages';
+    startToCaster?: string | null;
+    startToRoom?: string | null;
+    startToVictim?: string | null;
+    successToCaster?: string | null;
+    successToRoom?: string | null;
+    successToVictim?: string | null;
+    successToSelf?: string | null;
+    successSelfRoom?: string | null;
+    failToCaster?: string | null;
+    failToRoom?: string | null;
+    failToVictim?: string | null;
+    wearoffToRoom?: string | null;
+    wearoffToTarget?: string | null;
+    lookMessage?: string | null;
+  };
+};
+
+export type AccountMailUserFieldsFragment = {
+  __typename?: 'AccountMailUserDto';
+  id: string;
+  username: string;
+  email: string;
+};
+
+export type AccountMailFieldsFragment = {
+  __typename?: 'AccountMailDto';
+  id: number;
+  senderUserId: string;
+  recipientUserId?: string | null;
+  isBroadcast: boolean;
+  subject: string;
+  body: string;
+  sentAt: any;
+  readAt?: any | null;
+  isDeleted: boolean;
+  createdAt: any;
+  senderName: string;
+  sender?: {
+    __typename?: 'AccountMailUserDto';
+    id: string;
+    username: string;
+    email: string;
+  } | null;
+  recipient?: {
+    __typename?: 'AccountMailUserDto';
+    id: string;
+    username: string;
+    email: string;
+  } | null;
+};
+
+export type GetMyAccountMailQueryVariables = Exact<{
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetMyAccountMailQuery = {
+  __typename?: 'Query';
+  myAccountMail: Array<{
+    __typename?: 'AccountMailDto';
+    id: number;
+    senderUserId: string;
+    recipientUserId?: string | null;
+    isBroadcast: boolean;
+    subject: string;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    sender?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+    recipient?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+  }>;
+};
+
+export type GetMyAccountMailCountQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetMyAccountMailCountQuery = {
+  __typename?: 'Query';
+  myAccountMailCount: number;
+};
+
+export type GetAllAccountMailQueryVariables = Exact<{
+  filter?: InputMaybe<AccountMailFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetAllAccountMailQuery = {
+  __typename?: 'Query';
+  allAccountMail: Array<{
+    __typename?: 'AccountMailDto';
+    id: number;
+    senderUserId: string;
+    recipientUserId?: string | null;
+    isBroadcast: boolean;
+    subject: string;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    sender?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+    recipient?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+  }>;
+};
+
+export type SendAccountMailMutationVariables = Exact<{
+  data: SendAccountMailInput;
+}>;
+
+export type SendAccountMailMutation = {
+  __typename?: 'Mutation';
+  sendAccountMail: {
+    __typename?: 'AccountMailDto';
+    id: number;
+    senderUserId: string;
+    recipientUserId?: string | null;
+    isBroadcast: boolean;
+    subject: string;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    sender?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+    recipient?: {
+      __typename?: 'AccountMailUserDto';
+      id: string;
+      username: string;
+      email: string;
+    } | null;
+  };
+};
+
+export type SendBroadcastMutationVariables = Exact<{
+  data: SendBroadcastInput;
+}>;
+
+export type SendBroadcastMutation = {
+  __typename?: 'Mutation';
+  sendBroadcast: number;
+};
+
+export type MarkAccountMailReadMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type MarkAccountMailReadMutation = {
+  __typename?: 'Mutation';
+  markAccountMailRead: {
+    __typename?: 'AccountMailDto';
+    id: number;
+    readAt?: any | null;
+  };
+};
+
+export type DeleteAccountMailMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteAccountMailMutation = {
+  __typename?: 'Mutation';
+  deleteAccountMail: {
+    __typename?: 'AccountMailDto';
+    id: number;
+    isDeleted: boolean;
+  };
+};
+
+export type AccountItemObjectFieldsFragment = {
+  __typename?: 'AccountItemObjectDto';
+  zoneId: number;
+  id: number;
+  name: string;
+  type?: string | null;
+};
+
+export type AccountItemCharacterFieldsFragment = {
+  __typename?: 'AccountItemCharacterDto';
+  id: string;
+  name: string;
+};
+
+export type AccountItemFieldsFragment = {
+  __typename?: 'AccountItemDto';
+  id: number;
+  slot: number;
+  objectZoneId: number;
+  objectId: number;
+  quantity: number;
+  customData?: string | null;
+  storedAt: any;
+  storedByCharacterId?: string | null;
+  object: {
+    __typename?: 'AccountItemObjectDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    type?: string | null;
+  };
+  storedByCharacter?: {
+    __typename?: 'AccountItemCharacterDto';
+    id: string;
+    name: string;
+  } | null;
+};
+
+export type AccountStorageFieldsFragment = {
+  __typename?: 'AccountStorageDto';
+  accountWealth: any;
+  items: Array<{
+    __typename?: 'AccountItemDto';
+    id: number;
+    slot: number;
+    objectZoneId: number;
+    objectId: number;
+    quantity: number;
+    customData?: string | null;
+    storedAt: any;
+    storedByCharacterId?: string | null;
+    object: {
+      __typename?: 'AccountItemObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+      type?: string | null;
+    };
+    storedByCharacter?: {
+      __typename?: 'AccountItemCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+  }>;
+};
+
+export type WealthDisplayFieldsFragment = {
+  __typename?: 'WealthDisplayDto';
+  totalCopper: any;
+  platinum: number;
+  gold: number;
+  silver: number;
+  copper: number;
+};
+
+export type GetMyAccountStorageQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetMyAccountStorageQuery = {
+  __typename?: 'Query';
+  myAccountStorage: {
+    __typename?: 'AccountStorageDto';
+    accountWealth: any;
+    items: Array<{
+      __typename?: 'AccountItemDto';
+      id: number;
+      slot: number;
+      objectZoneId: number;
+      objectId: number;
+      quantity: number;
+      customData?: string | null;
+      storedAt: any;
+      storedByCharacterId?: string | null;
+      object: {
+        __typename?: 'AccountItemObjectDto';
+        zoneId: number;
+        id: number;
+        name: string;
+        type?: string | null;
+      };
+      storedByCharacter?: {
+        __typename?: 'AccountItemCharacterDto';
+        id: string;
+        name: string;
+      } | null;
+    }>;
+  };
+};
+
+export type GetMyAccountWealthDisplayQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetMyAccountWealthDisplayQuery = {
+  __typename?: 'Query';
+  myAccountWealthDisplay: {
+    __typename?: 'WealthDisplayDto';
+    totalCopper: any;
+    platinum: number;
+    gold: number;
+    silver: number;
+    copper: number;
+  };
+};
+
+export type DepositWealthMutationVariables = Exact<{
+  characterId: Scalars['String']['input'];
+  amount: Scalars['BigInt']['input'];
+}>;
+
+export type DepositWealthMutation = {
+  __typename?: 'Mutation';
+  depositWealth: any;
+};
+
+export type DepositItemMutationVariables = Exact<{
+  characterId: Scalars['String']['input'];
+  objectZoneId: Scalars['Int']['input'];
+  objectId: Scalars['Int']['input'];
+  quantity: Scalars['Int']['input'];
+}>;
+
+export type DepositItemMutation = {
+  __typename?: 'Mutation';
+  depositItem: {
+    __typename?: 'AccountItemDto';
+    id: number;
+    slot: number;
+    objectZoneId: number;
+    objectId: number;
+    quantity: number;
+    customData?: string | null;
+    storedAt: any;
+    storedByCharacterId?: string | null;
+    object: {
+      __typename?: 'AccountItemObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+      type?: string | null;
+    };
+    storedByCharacter?: {
+      __typename?: 'AccountItemCharacterDto';
+      id: string;
+      name: string;
+    } | null;
   };
 };
 
@@ -5523,6 +7270,182 @@ export type DeleteEffectMutation = {
   deleteEffect: boolean;
 };
 
+export type GetOnlinePlayersQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetOnlinePlayersQuery = {
+  __typename?: 'Query';
+  onlinePlayers: Array<{
+    __typename?: 'OnlinePlayerType';
+    name: string;
+    level: number;
+    class: string;
+    race: string;
+    roomId: number;
+    godLevel: number;
+    isLinkdead: boolean;
+  }>;
+};
+
+export type GetServerStatusQueryVariables = Exact<{ [key: string]: never }>;
+
+export type GetServerStatusQuery = {
+  __typename?: 'Query';
+  serverStatus: {
+    __typename?: 'ServerStatusType';
+    stats: {
+      __typename?: 'ServerStatsType';
+      uptimeSeconds: number;
+      totalConnections: number;
+      currentConnections: number;
+      peakConnections: number;
+      totalCommands: number;
+      failedCommands: number;
+      totalLogins: number;
+      failedLogins: number;
+      commandsPerSecond: number;
+    };
+    server: {
+      __typename?: 'ServerInfoType';
+      name: string;
+      port: number;
+      tlsPort: number;
+      maintenanceMode: boolean;
+      running: boolean;
+    };
+  };
+};
+
+export type IsGameServerConnectedQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type IsGameServerConnectedQuery = {
+  __typename?: 'Query';
+  gameServerConnected: boolean;
+};
+
+export type ExecuteGameCommandMutationVariables = Exact<{
+  command: Scalars['String']['input'];
+  executor?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type ExecuteGameCommandMutation = {
+  __typename?: 'Mutation';
+  executeGameCommand: {
+    __typename?: 'CommandResultType';
+    success: boolean;
+    message: string;
+    executor?: string | null;
+    note?: string | null;
+  };
+};
+
+export type BroadcastMessageMutationVariables = Exact<{
+  message: Scalars['String']['input'];
+  sender?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type BroadcastMessageMutation = {
+  __typename?: 'Mutation';
+  broadcastMessage: {
+    __typename?: 'BroadcastResultType';
+    success: boolean;
+    message: string;
+    recipientCount: number;
+  };
+};
+
+export type KickPlayerMutationVariables = Exact<{
+  playerName: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
+}>;
+
+export type KickPlayerMutation = {
+  __typename?: 'Mutation';
+  kickPlayer: {
+    __typename?: 'KickResultType';
+    success: boolean;
+    message: string;
+    reason: string;
+  };
+};
+
+export type GameEventsSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type GameEventsSubscription = {
+  __typename?: 'Subscription';
+  gameEvents: {
+    __typename?: 'GameEvent';
+    type: GameEventType;
+    timestamp: any;
+    playerName?: string | null;
+    zoneId?: number | null;
+    roomVnum?: number | null;
+    message: string;
+    targetPlayer?: string | null;
+    metadata?: any | null;
+  };
+};
+
+export type ChatMessagesSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type ChatMessagesSubscription = {
+  __typename?: 'Subscription';
+  chatMessages: {
+    __typename?: 'GameEvent';
+    type: GameEventType;
+    timestamp: any;
+    playerName?: string | null;
+    message: string;
+    metadata?: any | null;
+  };
+};
+
+export type PlayerActivitySubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type PlayerActivitySubscription = {
+  __typename?: 'Subscription';
+  playerActivity: {
+    __typename?: 'GameEvent';
+    type: GameEventType;
+    timestamp: any;
+    playerName?: string | null;
+    zoneId?: number | null;
+    message: string;
+    metadata?: any | null;
+  };
+};
+
+export type AdminAlertsSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type AdminAlertsSubscription = {
+  __typename?: 'Subscription';
+  adminAlerts: {
+    __typename?: 'GameEvent';
+    type: GameEventType;
+    timestamp: any;
+    message: string;
+    metadata?: any | null;
+  };
+};
+
+export type WorldEventsSubscriptionVariables = Exact<{ [key: string]: never }>;
+
+export type WorldEventsSubscription = {
+  __typename?: 'Subscription';
+  worldEvents: {
+    __typename?: 'GameEvent';
+    type: GameEventType;
+    timestamp: any;
+    zoneId?: number | null;
+    roomVnum?: number | null;
+    message: string;
+    metadata?: any | null;
+  };
+};
+
 export type UpdateMobMutationVariables = Exact<{
   zoneId: Scalars['Int']['input'];
   id: Scalars['Int']['input'];
@@ -5806,6 +7729,346 @@ export type DeleteObjectsMutationVariables = Exact<{
 export type DeleteObjectsMutation = {
   __typename?: 'Mutation';
   deleteObjects: number;
+};
+
+export type PlayerMailCharacterFieldsFragment = {
+  __typename?: 'PlayerMailCharacterDto';
+  id: string;
+  name: string;
+};
+
+export type PlayerMailObjectFieldsFragment = {
+  __typename?: 'PlayerMailObjectDto';
+  zoneId: number;
+  id: number;
+  name: string;
+};
+
+export type PlayerMailFieldsFragment = {
+  __typename?: 'PlayerMailDto';
+  id: number;
+  legacySenderId?: number | null;
+  legacyRecipientId?: number | null;
+  senderCharacterId?: string | null;
+  recipientCharacterId?: string | null;
+  body: string;
+  sentAt: any;
+  readAt?: any | null;
+  attachedCopper: number;
+  attachedSilver: number;
+  attachedGold: number;
+  attachedPlatinum: number;
+  attachedObjectZoneId?: number | null;
+  attachedObjectId?: number | null;
+  wealthRetrievedAt?: any | null;
+  wealthRetrievedByCharacterId?: string | null;
+  objectRetrievedAt?: any | null;
+  objectRetrievedByCharacterId?: string | null;
+  objectMovedToAccountStorage: boolean;
+  isDeleted: boolean;
+  createdAt: any;
+  senderName: string;
+  wealthRetrievalInfo?: string | null;
+  objectRetrievalInfo?: string | null;
+  sender?: {
+    __typename?: 'PlayerMailCharacterDto';
+    id: string;
+    name: string;
+  } | null;
+  recipient?: {
+    __typename?: 'PlayerMailCharacterDto';
+    id: string;
+    name: string;
+  } | null;
+  attachedObject?: {
+    __typename?: 'PlayerMailObjectDto';
+    zoneId: number;
+    id: number;
+    name: string;
+  } | null;
+};
+
+export type GetMyMailQueryVariables = Exact<{
+  characterId: Scalars['String']['input'];
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetMyMailQuery = {
+  __typename?: 'Query';
+  myMail: Array<{
+    __typename?: 'PlayerMailDto';
+    id: number;
+    legacySenderId?: number | null;
+    legacyRecipientId?: number | null;
+    senderCharacterId?: string | null;
+    recipientCharacterId?: string | null;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    attachedCopper: number;
+    attachedSilver: number;
+    attachedGold: number;
+    attachedPlatinum: number;
+    attachedObjectZoneId?: number | null;
+    attachedObjectId?: number | null;
+    wealthRetrievedAt?: any | null;
+    wealthRetrievedByCharacterId?: string | null;
+    objectRetrievedAt?: any | null;
+    objectRetrievedByCharacterId?: string | null;
+    objectMovedToAccountStorage: boolean;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    wealthRetrievalInfo?: string | null;
+    objectRetrievalInfo?: string | null;
+    sender?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    recipient?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    attachedObject?: {
+      __typename?: 'PlayerMailObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+    } | null;
+  }>;
+};
+
+export type GetMyMailCountQueryVariables = Exact<{
+  characterId: Scalars['String']['input'];
+}>;
+
+export type GetMyMailCountQuery = { __typename?: 'Query'; myMailCount: number };
+
+export type GetPlayerMailByIdQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type GetPlayerMailByIdQuery = {
+  __typename?: 'Query';
+  playerMail?: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    legacySenderId?: number | null;
+    legacyRecipientId?: number | null;
+    senderCharacterId?: string | null;
+    recipientCharacterId?: string | null;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    attachedCopper: number;
+    attachedSilver: number;
+    attachedGold: number;
+    attachedPlatinum: number;
+    attachedObjectZoneId?: number | null;
+    attachedObjectId?: number | null;
+    wealthRetrievedAt?: any | null;
+    wealthRetrievedByCharacterId?: string | null;
+    objectRetrievedAt?: any | null;
+    objectRetrievedByCharacterId?: string | null;
+    objectMovedToAccountStorage: boolean;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    wealthRetrievalInfo?: string | null;
+    objectRetrievalInfo?: string | null;
+    sender?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    recipient?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    attachedObject?: {
+      __typename?: 'PlayerMailObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+    } | null;
+  } | null;
+};
+
+export type GetAllPlayerMailsQueryVariables = Exact<{
+  filter?: InputMaybe<PlayerMailFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetAllPlayerMailsQuery = {
+  __typename?: 'Query';
+  playerMails: Array<{
+    __typename?: 'PlayerMailDto';
+    id: number;
+    legacySenderId?: number | null;
+    legacyRecipientId?: number | null;
+    senderCharacterId?: string | null;
+    recipientCharacterId?: string | null;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    attachedCopper: number;
+    attachedSilver: number;
+    attachedGold: number;
+    attachedPlatinum: number;
+    attachedObjectZoneId?: number | null;
+    attachedObjectId?: number | null;
+    wealthRetrievedAt?: any | null;
+    wealthRetrievedByCharacterId?: string | null;
+    objectRetrievedAt?: any | null;
+    objectRetrievedByCharacterId?: string | null;
+    objectMovedToAccountStorage: boolean;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    wealthRetrievalInfo?: string | null;
+    objectRetrievalInfo?: string | null;
+    sender?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    recipient?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    attachedObject?: {
+      __typename?: 'PlayerMailObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+    } | null;
+  }>;
+};
+
+export type GetPlayerMailCountQueryVariables = Exact<{
+  filter?: InputMaybe<PlayerMailFilterInput>;
+}>;
+
+export type GetPlayerMailCountQuery = {
+  __typename?: 'Query';
+  playerMailCount: number;
+};
+
+export type SendPlayerMailMutationVariables = Exact<{
+  data: SendPlayerMailInput;
+}>;
+
+export type SendPlayerMailMutation = {
+  __typename?: 'Mutation';
+  sendMail: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    legacySenderId?: number | null;
+    legacyRecipientId?: number | null;
+    senderCharacterId?: string | null;
+    recipientCharacterId?: string | null;
+    body: string;
+    sentAt: any;
+    readAt?: any | null;
+    attachedCopper: number;
+    attachedSilver: number;
+    attachedGold: number;
+    attachedPlatinum: number;
+    attachedObjectZoneId?: number | null;
+    attachedObjectId?: number | null;
+    wealthRetrievedAt?: any | null;
+    wealthRetrievedByCharacterId?: string | null;
+    objectRetrievedAt?: any | null;
+    objectRetrievedByCharacterId?: string | null;
+    objectMovedToAccountStorage: boolean;
+    isDeleted: boolean;
+    createdAt: any;
+    senderName: string;
+    wealthRetrievalInfo?: string | null;
+    objectRetrievalInfo?: string | null;
+    sender?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    recipient?: {
+      __typename?: 'PlayerMailCharacterDto';
+      id: string;
+      name: string;
+    } | null;
+    attachedObject?: {
+      __typename?: 'PlayerMailObjectDto';
+      zoneId: number;
+      id: number;
+      name: string;
+    } | null;
+  };
+};
+
+export type MarkPlayerMailReadMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type MarkPlayerMailReadMutation = {
+  __typename?: 'Mutation';
+  markMailRead: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    readAt?: any | null;
+  };
+};
+
+export type MarkWealthRetrievedMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  characterId: Scalars['String']['input'];
+}>;
+
+export type MarkWealthRetrievedMutation = {
+  __typename?: 'Mutation';
+  markWealthRetrieved: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    wealthRetrievedAt?: any | null;
+    wealthRetrievedByCharacterId?: string | null;
+    wealthRetrievalInfo?: string | null;
+  };
+};
+
+export type MarkObjectRetrievedMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  characterId: Scalars['String']['input'];
+  movedToAccountStorage: Scalars['Boolean']['input'];
+}>;
+
+export type MarkObjectRetrievedMutation = {
+  __typename?: 'Mutation';
+  markObjectRetrieved: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    objectRetrievedAt?: any | null;
+    objectRetrievedByCharacterId?: string | null;
+    objectMovedToAccountStorage: boolean;
+    objectRetrievalInfo?: string | null;
+  };
+};
+
+export type DeletePlayerMailMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeletePlayerMailMutation = {
+  __typename?: 'Mutation';
+  deletePlayerMail: {
+    __typename?: 'PlayerMailDto';
+    id: number;
+    isDeleted: boolean;
+  };
 };
 
 export type GetMobQueryVariables = Exact<{
@@ -6360,6 +8623,29 @@ export type DeleteSocialMutation = {
   deleteSocial: boolean;
 };
 
+export type TriggerFieldsFragment = {
+  __typename?: 'TriggerDto';
+  id: string;
+  name: string;
+  attachType: ScriptType;
+  numArgs: number;
+  argList: Array<string>;
+  commands: string;
+  zoneId?: number | null;
+  mobId?: number | null;
+  objectId?: number | null;
+  variables: string;
+  flags: Array<string>;
+  needsReview: boolean;
+  syntaxError?: string | null;
+  legacyVnum?: number | null;
+  legacyScript?: string | null;
+  createdAt: any;
+  updatedAt: any;
+  createdBy?: string | null;
+  updatedBy?: string | null;
+};
+
 export type GetTriggersQueryVariables = Exact<{ [key: string]: never }>;
 
 export type GetTriggersQuery = {
@@ -6369,8 +8655,92 @@ export type GetTriggersQuery = {
     id: string;
     name: string;
     attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
     zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
   }>;
+};
+
+export type GetTriggersNeedingReviewQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetTriggersNeedingReviewQuery = {
+  __typename?: 'Query';
+  triggersNeedingReview: Array<{
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+  }>;
+};
+
+export type GetTriggersNeedingReviewCountQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type GetTriggersNeedingReviewCountQuery = {
+  __typename?: 'Query';
+  triggersNeedingReviewCount: number;
+};
+
+export type GetTriggerQueryVariables = Exact<{
+  id: Scalars['Float']['input'];
+}>;
+
+export type GetTriggerQuery = {
+  __typename?: 'Query';
+  trigger: {
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+  };
 };
 
 export type GetTriggersByAttachmentQueryVariables = Exact<{
@@ -6385,7 +8755,22 @@ export type GetTriggersByAttachmentQuery = {
     id: string;
     name: string;
     attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
     zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
   }>;
 };
 
@@ -6400,6 +8785,22 @@ export type CreateTriggerMutation = {
     id: string;
     name: string;
     attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
   };
 };
 
@@ -6415,6 +8816,22 @@ export type UpdateTriggerMutation = {
     id: string;
     name: string;
     attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
   };
 };
 
@@ -6433,7 +8850,28 @@ export type AttachTriggerMutationVariables = Exact<{
 
 export type AttachTriggerMutation = {
   __typename?: 'Mutation';
-  attachTrigger: { __typename?: 'TriggerDto'; id: string; name: string };
+  attachTrigger: {
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+  };
 };
 
 export type DetachTriggerMutationVariables = Exact<{
@@ -6443,6 +8881,36 @@ export type DetachTriggerMutationVariables = Exact<{
 export type DetachTriggerMutation = {
   __typename?: 'Mutation';
   detachTrigger: { __typename?: 'TriggerDto'; id: string };
+};
+
+export type MarkTriggerReviewedMutationVariables = Exact<{
+  triggerId: Scalars['Int']['input'];
+}>;
+
+export type MarkTriggerReviewedMutation = {
+  __typename?: 'Mutation';
+  markTriggerReviewed: {
+    __typename?: 'TriggerDto';
+    id: string;
+    name: string;
+    attachType: ScriptType;
+    numArgs: number;
+    argList: Array<string>;
+    commands: string;
+    zoneId?: number | null;
+    mobId?: number | null;
+    objectId?: number | null;
+    variables: string;
+    flags: Array<string>;
+    needsReview: boolean;
+    syntaxError?: string | null;
+    legacyVnum?: number | null;
+    legacyScript?: string | null;
+    createdAt: any;
+    updatedAt: any;
+    createdBy?: string | null;
+    updatedBy?: string | null;
+  };
 };
 
 export type UsersQueryVariables = Exact<{ [key: string]: never }>;
@@ -6645,6 +9113,364 @@ export type MyPermissionsQuery = {
   };
 };
 
+export const AccountMailUserFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailUserFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailUserDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountMailUserFieldsFragment, unknown>;
+export const AccountMailFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'recipientUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isBroadcast' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailUserFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailUserDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountMailFieldsFragment, unknown>;
+export const AccountItemObjectFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountItemObjectFieldsFragment, unknown>;
+export const AccountItemCharacterFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountItemCharacterFieldsFragment, unknown>;
+export const AccountItemFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectZoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'customData' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'storedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'object' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemObjectFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacter' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountItemFieldsFragment, unknown>;
+export const AccountStorageFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountStorageFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountStorageDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'accountWealth' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'items' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectZoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'customData' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'storedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'object' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemObjectFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacter' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<AccountStorageFieldsFragment, unknown>;
+export const WealthDisplayFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'WealthDisplayFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'WealthDisplayDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'totalCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'platinum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'gold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'silver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'copper' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<WealthDisplayFieldsFragment, unknown>;
 export const CharacterCardFieldsFragmentDoc = {
   kind: 'Document',
   definitions: [
@@ -6776,6 +9602,994 @@ export const ObjectDetailsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<ObjectDetailsFragment, unknown>;
+export const PlayerMailCharacterFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PlayerMailCharacterFieldsFragment, unknown>;
+export const PlayerMailObjectFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PlayerMailObjectFieldsFragment, unknown>;
+export const PlayerMailFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacySenderId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyRecipientId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderCharacterId' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipientCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedSilver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedGold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedPlatinum' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObjectZoneId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedObjectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'wealthRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObject' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<PlayerMailFieldsFragment, unknown>;
+export const TriggerFieldsFragmentDoc = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<TriggerFieldsFragment, unknown>;
+export const GetGameConfigsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetGameConfigs' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'gameConfigs' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'valueType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minValue' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxValue' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isSecret' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'restartReq' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'gameConfigCategories' },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetGameConfigsQuery, GetGameConfigsQueryVariables>;
+export const UpdateGameConfigDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateGameConfig' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'category' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'key' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateGameConfigInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateGameConfig' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'category' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'category' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'key' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'key' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateGameConfigMutation,
+  UpdateGameConfigMutationVariables
+>;
+export const GetLevelDefinitionsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetLevelDefinitions' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'levelDefinitions' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'expRequired' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hpGain' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'staminaGain' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isImmortal' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'availablePermissions' },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetLevelDefinitionsQuery,
+  GetLevelDefinitionsQueryVariables
+>;
+export const UpdateLevelDefinitionDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateLevelDefinition' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'level' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateLevelDefinitionInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateLevelDefinition' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'level' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'level' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'expRequired' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hpGain' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'staminaGain' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'permissions' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateLevelDefinitionMutation,
+  UpdateLevelDefinitionMutationVariables
+>;
+export const GetSystemTextsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetSystemTexts' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'systemTexts' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'category' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isActive' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetSystemTextsQuery, GetSystemTextsQueryVariables>;
+export const UpdateSystemTextDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateSystemText' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateSystemTextInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateSystemText' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isActive' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateSystemTextMutation,
+  UpdateSystemTextMutationVariables
+>;
+export const GetLoginMessagesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetLoginMessages' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'loginMessages' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'stage' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'variant' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isActive' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetLoginMessagesQuery,
+  GetLoginMessagesQueryVariables
+>;
+export const UpdateLoginMessageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateLoginMessage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateLoginMessageInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateLoginMessage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isActive' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateLoginMessageMutation,
+  UpdateLoginMessageMutationVariables
+>;
+export const GetBoardPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetBoardPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'board' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'alias' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'locked' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'privileges' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'messageCount' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'messages' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'poster' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'posterLevel' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'postedAt' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'subject' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'content' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'sticky' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'edits' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'editor' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'editedAt' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetBoardPageQuery, GetBoardPageQueryVariables>;
+export const CreateBoardMessagePageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateBoardMessagePage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateBoardMessageInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createBoardMessage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'poster' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'postedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateBoardMessagePageMutation,
+  CreateBoardMessagePageMutationVariables
+>;
+export const UpdateBoardMessagePageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateBoardMessagePage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateBoardMessageInput' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'editor' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateBoardMessage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'editor' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'editor' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'content' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateBoardMessagePageMutation,
+  UpdateBoardMessagePageMutationVariables
+>;
+export const DeleteBoardMessagePageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteBoardMessagePage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteBoardMessage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteBoardMessagePageMutation,
+  DeleteBoardMessagePageMutationVariables
+>;
+export const GetBoardsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetBoardsPage' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'boards' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'alias' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'title' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'locked' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'messageCount' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+              ],
+            },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'boardsCount' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetBoardsPageQuery, GetBoardsPageQueryVariables>;
 export const UpdateViewModeDocument = {
   kind: 'Document',
   definitions: [
@@ -7694,6 +11508,288 @@ export const UpdateRaceInlineDocument = {
 } as unknown as DocumentNode<
   UpdateRaceInlineMutation,
   UpdateRaceInlineMutationVariables
+>;
+export const GetTriggersForScriptsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetTriggersForScriptsPage' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'triggers' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetTriggersForScriptsPageQuery,
+  GetTriggersForScriptsPageQueryVariables
+>;
+export const CreateTriggerFromScriptsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateTriggerFromScriptsPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateTriggerInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createTrigger' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateTriggerFromScriptsPageMutation,
+  CreateTriggerFromScriptsPageMutationVariables
+>;
+export const UpdateTriggerFromScriptsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateTriggerFromScriptsPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateTriggerInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateTrigger' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateTriggerFromScriptsPageMutation,
+  UpdateTriggerFromScriptsPageMutationVariables
+>;
+export const DeleteTriggerFromScriptsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteTriggerFromScriptsPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteTrigger' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteTriggerFromScriptsPageMutation,
+  DeleteTriggerFromScriptsPageMutationVariables
+>;
+export const MarkTriggerReviewedFromScriptsPageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkTriggerReviewedFromScriptsPage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'triggerId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markTriggerReviewed' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'triggerId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'triggerId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkTriggerReviewedFromScriptsPageMutation,
+  MarkTriggerReviewedFromScriptsPageMutationVariables
 >;
 export const GetShopsInlineDocument = {
   kind: 'Document',
@@ -11916,6 +16012,14 @@ export const GetAbilityDetailsDocument = {
                       },
                       {
                         kind: 'Field',
+                        name: { kind: 'Name', value: 'successToSelf' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'successSelfRoom' },
+                      },
+                      {
+                        kind: 'Field',
                         name: { kind: 'Name', value: 'failToCaster' },
                       },
                       {
@@ -11933,6 +16037,10 @@ export const GetAbilityDetailsDocument = {
                       {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'wearoffToTarget' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'lookMessage' },
                       },
                     ],
                   },
@@ -12268,6 +16376,1132 @@ export const UpdateAbilityEffectsDocument = {
   UpdateAbilityEffectsMutation,
   UpdateAbilityEffectsMutationVariables
 >;
+export const UpdateAbilityMessagesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateAbilityMessages' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'abilityId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateAbilityMessagesInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateAbilityMessages' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'abilityId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'abilityId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'startToCaster' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'startToRoom' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'startToVictim' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successToCaster' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successToRoom' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successToVictim' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successToSelf' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'successSelfRoom' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'failToCaster' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'failToRoom' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'failToVictim' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wearoffToRoom' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wearoffToTarget' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'lookMessage' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateAbilityMessagesMutation,
+  UpdateAbilityMessagesMutationVariables
+>;
+export const GetMyAccountMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyAccountMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myAccountMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailUserFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailUserDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'recipientUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isBroadcast' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetMyAccountMailQuery,
+  GetMyAccountMailQueryVariables
+>;
+export const GetMyAccountMailCountDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyAccountMailCount' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myAccountMailCount' },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetMyAccountMailCountQuery,
+  GetMyAccountMailCountQueryVariables
+>;
+export const GetAllAccountMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetAllAccountMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'AccountMailFilterInput' },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'allAccountMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailUserFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailUserDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'recipientUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isBroadcast' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetAllAccountMailQuery,
+  GetAllAccountMailQueryVariables
+>;
+export const SendAccountMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'SendAccountMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SendAccountMailInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sendAccountMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailUserFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailUserDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'recipientUserId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isBroadcast' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'subject' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountMailUserFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SendAccountMailMutation,
+  SendAccountMailMutationVariables
+>;
+export const SendBroadcastDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'SendBroadcast' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SendBroadcastInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sendBroadcast' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SendBroadcastMutation,
+  SendBroadcastMutationVariables
+>;
+export const MarkAccountMailReadDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkAccountMailRead' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markAccountMailRead' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkAccountMailReadMutation,
+  MarkAccountMailReadMutationVariables
+>;
+export const DeleteAccountMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteAccountMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteAccountMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteAccountMailMutation,
+  DeleteAccountMailMutationVariables
+>;
+export const GetMyAccountStorageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyAccountStorage' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myAccountStorage' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountStorageFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectZoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'customData' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'storedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'object' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemObjectFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacter' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountStorageFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountStorageDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'accountWealth' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'items' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetMyAccountStorageQuery,
+  GetMyAccountStorageQueryVariables
+>;
+export const GetMyAccountWealthDisplayDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyAccountWealthDisplay' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myAccountWealthDisplay' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'WealthDisplayFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'WealthDisplayFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'WealthDisplayDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'totalCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'platinum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'gold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'silver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'copper' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetMyAccountWealthDisplayQuery,
+  GetMyAccountWealthDisplayQueryVariables
+>;
+export const DepositWealthDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DepositWealth' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'amount' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'BigInt' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'depositWealth' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'amount' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'amount' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DepositWealthMutation,
+  DepositWealthMutationVariables
+>;
+export const DepositItemDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DepositItem' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'objectZoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'objectId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'quantity' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'depositItem' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'objectZoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'objectZoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'objectId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'objectId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'quantity' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'quantity' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'AccountItemFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'AccountItemDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectZoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'quantity' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'customData' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'storedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'object' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemObjectFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'storedByCharacter' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'AccountItemCharacterFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DepositItemMutation, DepositItemMutationVariables>;
 export const RequestPasswordResetDocument = {
   kind: 'Document',
   definitions: [
@@ -14242,6 +19476,541 @@ export const DeleteEffectDocument = {
   DeleteEffectMutation,
   DeleteEffectMutationVariables
 >;
+export const GetOnlinePlayersDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetOnlinePlayers' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'onlinePlayers' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'class' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'race' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'roomId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'godLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isLinkdead' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetOnlinePlayersQuery,
+  GetOnlinePlayersQueryVariables
+>;
+export const GetServerStatusDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetServerStatus' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'serverStatus' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'stats' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'uptimeSeconds' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'totalConnections' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'currentConnections' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'peakConnections' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'totalCommands' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'failedCommands' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'totalLogins' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'failedLogins' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'commandsPerSecond' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'server' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'port' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'tlsPort' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'maintenanceMode' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'running' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetServerStatusQuery,
+  GetServerStatusQueryVariables
+>;
+export const IsGameServerConnectedDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'IsGameServerConnected' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'gameServerConnected' },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  IsGameServerConnectedQuery,
+  IsGameServerConnectedQueryVariables
+>;
+export const ExecuteGameCommandDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ExecuteGameCommand' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'command' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'executor' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'executeGameCommand' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'command' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'command' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'executor' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'executor' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'executor' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'note' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ExecuteGameCommandMutation,
+  ExecuteGameCommandMutationVariables
+>;
+export const BroadcastMessageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'BroadcastMessage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'message' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'sender' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'broadcastMessage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'message' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'message' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'sender' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'sender' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'recipientCount' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  BroadcastMessageMutation,
+  BroadcastMessageMutationVariables
+>;
+export const KickPlayerDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'KickPlayer' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'playerName' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'reason' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'String' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'kickPlayer' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'playerName' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'playerName' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'reason' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'reason' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'reason' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<KickPlayerMutation, KickPlayerMutationVariables>;
+export const GameEventsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'GameEvents' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'gameEvents' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'playerName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'roomVnum' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'targetPlayer' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GameEventsSubscription,
+  GameEventsSubscriptionVariables
+>;
+export const ChatMessagesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'ChatMessages' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'chatMessages' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'playerName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ChatMessagesSubscription,
+  ChatMessagesSubscriptionVariables
+>;
+export const PlayerActivityDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'PlayerActivity' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'playerActivity' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'playerName' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PlayerActivitySubscription,
+  PlayerActivitySubscriptionVariables
+>;
+export const AdminAlertsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'AdminAlerts' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'adminAlerts' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  AdminAlertsSubscription,
+  AdminAlertsSubscriptionVariables
+>;
+export const WorldEventsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'WorldEvents' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'worldEvents' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'roomVnum' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  WorldEventsSubscription,
+  WorldEventsSubscriptionVariables
+>;
 export const UpdateMobDocument = {
   kind: 'Document',
   definitions: [
@@ -15189,6 +20958,1161 @@ export const DeleteObjectsDocument = {
 } as unknown as DocumentNode<
   DeleteObjectsMutation,
   DeleteObjectsMutationVariables
+>;
+export const GetMyMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacySenderId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyRecipientId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderCharacterId' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipientCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedSilver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedGold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedPlatinum' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObjectZoneId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedObjectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'wealthRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObject' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetMyMailQuery, GetMyMailQueryVariables>;
+export const GetMyMailCountDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetMyMailCount' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'myMailCount' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetMyMailCountQuery, GetMyMailCountQueryVariables>;
+export const GetPlayerMailByIdDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetPlayerMailById' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'playerMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacySenderId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyRecipientId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderCharacterId' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipientCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedSilver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedGold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedPlatinum' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObjectZoneId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedObjectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'wealthRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObject' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetPlayerMailByIdQuery,
+  GetPlayerMailByIdQueryVariables
+>;
+export const GetAllPlayerMailsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetAllPlayerMails' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'PlayerMailFilterInput' },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'playerMails' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacySenderId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyRecipientId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderCharacterId' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipientCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedSilver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedGold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedPlatinum' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObjectZoneId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedObjectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'wealthRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObject' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetAllPlayerMailsQuery,
+  GetAllPlayerMailsQueryVariables
+>;
+export const GetPlayerMailCountDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetPlayerMailCount' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'PlayerMailFilterInput' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'playerMailCount' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetPlayerMailCountQuery,
+  GetPlayerMailCountQueryVariables
+>;
+export const SendPlayerMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'SendPlayerMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'SendPlayerMailInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sendMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailCharacterDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'PlayerMailFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'PlayerMailDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacySenderId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyRecipientId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderCharacterId' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipientCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'body' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'sentAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedCopper' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedSilver' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedGold' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedPlatinum' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObjectZoneId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachedObjectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'wealthRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectRetrievedAt' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+          },
+          { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'senderName' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectRetrievalInfo' },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sender' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'recipient' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailCharacterFields' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'attachedObject' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'PlayerMailObjectFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SendPlayerMailMutation,
+  SendPlayerMailMutationVariables
+>;
+export const MarkPlayerMailReadDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkPlayerMailRead' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markMailRead' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'readAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkPlayerMailReadMutation,
+  MarkPlayerMailReadMutationVariables
+>;
+export const MarkWealthRetrievedDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkWealthRetrieved' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markWealthRetrieved' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wealthRetrievedAt' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wealthRetrievedByCharacterId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wealthRetrievalInfo' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkWealthRetrievedMutation,
+  MarkWealthRetrievedMutationVariables
+>;
+export const MarkObjectRetrievedDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkObjectRetrieved' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'movedToAccountStorage' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'Boolean' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markObjectRetrieved' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'movedToAccountStorage' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'movedToAccountStorage' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectRetrievedAt' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectRetrievedByCharacterId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectMovedToAccountStorage' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectRetrievalInfo' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkObjectRetrievedMutation,
+  MarkObjectRetrievedMutationVariables
+>;
+export const DeletePlayerMailDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeletePlayerMail' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deletePlayerMail' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'isDeleted' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeletePlayerMailMutation,
+  DeletePlayerMailMutationVariables
 >;
 export const GetMobDocument = {
   kind: 'Document',
@@ -17165,18 +24089,215 @@ export const GetTriggersDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
               ],
             },
           },
         ],
       },
     },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+        ],
+      },
+    },
   ],
 } as unknown as DocumentNode<GetTriggersQuery, GetTriggersQueryVariables>;
+export const GetTriggersNeedingReviewDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetTriggersNeedingReview' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'triggersNeedingReview' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetTriggersNeedingReviewQuery,
+  GetTriggersNeedingReviewQueryVariables
+>;
+export const GetTriggersNeedingReviewCountDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetTriggersNeedingReviewCount' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'triggersNeedingReviewCount' },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetTriggersNeedingReviewCountQuery,
+  GetTriggersNeedingReviewCountQueryVariables
+>;
+export const GetTriggerDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetTrigger' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Float' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'trigger' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetTriggerQuery, GetTriggerQueryVariables>;
 export const GetTriggersByAttachmentDocument = {
   kind: 'Document',
   definitions: [
@@ -17238,13 +24359,45 @@ export const GetTriggersByAttachmentDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
         ],
       },
     },
@@ -17295,12 +24448,45 @@ export const CreateTriggerDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
         ],
       },
     },
@@ -17367,12 +24553,45 @@ export const UpdateTriggerDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
         ],
       },
     },
@@ -17471,11 +24690,45 @@ export const AttachTriggerDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
               ],
             },
           },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
         ],
       },
     },
@@ -17534,6 +24787,92 @@ export const DetachTriggerDocument = {
 } as unknown as DocumentNode<
   DetachTriggerMutation,
   DetachTriggerMutationVariables
+>;
+export const MarkTriggerReviewedDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkTriggerReviewed' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'triggerId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markTriggerReviewed' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'triggerId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'triggerId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'TriggerFields' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'TriggerFields' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'TriggerDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'attachType' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'numArgs' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'argList' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'commands' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'mobId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'variables' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'needsReview' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'syntaxError' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyVnum' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'legacyScript' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'updatedBy' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkTriggerReviewedMutation,
+  MarkTriggerReviewedMutationVariables
 >;
 export const UsersDocument = {
   kind: 'Document',

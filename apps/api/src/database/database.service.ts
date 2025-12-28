@@ -335,6 +335,58 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.helpEntry;
   }
 
+  get gameConfig() {
+    return this.client.gameConfig;
+  }
+
+  get levelDefinition() {
+    return this.client.levelDefinition;
+  }
+
+  get systemText() {
+    return this.client.systemText;
+  }
+
+  get loginMessage() {
+    return this.client.loginMessage;
+  }
+
+  get command() {
+    return this.client.command;
+  }
+
+  get playerMail() {
+    return this.client.playerMail;
+  }
+
+  get accountMail() {
+    return this.client.accountMail;
+  }
+
+  get accountItems() {
+    return this.client.accountItems;
+  }
+
+  get board() {
+    return this.client.board;
+  }
+
+  get boardMessage() {
+    return this.client.boardMessage;
+  }
+
+  get boardMessageEdit() {
+    return this.client.boardMessageEdit;
+  }
+
+  get discordLink() {
+    return this.client.discordLink;
+  }
+
+  get discordConfig() {
+    return this.client.discordConfig;
+  }
+
   // Pass-through Prisma client methods
   async $connect() {
     return this.client.$connect();
@@ -377,27 +429,9 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    // Log Prisma events in development
-    if (process.env.NODE_ENV === 'development') {
-      // @ts-expect-error Prisma extension typing doesn't expose $on properly
-      this.client.$on('query', (e: Prisma.QueryEvent) => {
-        this.logger.debug(
-          `Query: ${e.query} - Params: ${e.params} - Duration: ${e.duration}ms`
-        );
-      });
-      // @ts-expect-error see note above
-      this.client.$on('error', (e: Prisma.LogEvent) => {
-        this.logger.error('Database error:', e);
-      });
-      // @ts-expect-error see note above
-      this.client.$on('warn', (e: Prisma.LogEvent) => {
-        this.logger.warn('Database warning:', e);
-      });
-      // @ts-expect-error see note above
-      this.client.$on('info', (e: Prisma.LogEvent) => {
-        this.logger.log('Database info:', e);
-      });
-    }
+    // Note: Prisma extended clients ($extends) don't have $on method in Prisma 5+
+    // Event logging is configured in the base PrismaClient constructor instead
+    // The logs will still be emitted, but we can't attach handlers to the extended client
 
     try {
       await this.$connect();

@@ -19,6 +19,7 @@ interface Room {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
+  flags?: string[];
   exits: RoomExit[];
   mobs?: Array<{
     id: number;
@@ -59,7 +60,7 @@ interface PropertyPanelProps {
   room: Room;
   allRooms: Room[];
   zones?: Array<{ id: number; name: string }>; // For cross-zone exit display
-  onRoomChange: (field: keyof Room, value: string) => void;
+  onRoomChange: (field: keyof Room, value: string | string[]) => void;
   onSaveRoom: () => void;
   onCreateExit: (exitData: {
     direction: string;
@@ -1425,13 +1426,435 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
         {viewMode === 'edit' && activeTab === 'advanced' && (
           <div className='space-y-4'>
-            <div className='text-center py-8 text-gray-500'>
-              <div className='text-2xl mb-2'>🔧</div>
-              <p className='text-sm'>Advanced settings</p>
-              <p className='text-xs text-gray-400 mt-1'>
-                Room flags, special scripts, and triggers will go here
-              </p>
+            <h4
+              className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+            >
+              Room Flags
+            </h4>
+
+            {/* Environment & Lighting */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Environment & Lighting
+              </h5>
+              <div className='grid grid-cols-2 gap-2'>
+                {[
+                  {
+                    flag: 'DARK',
+                    label: '🌑 Dark',
+                    desc: 'Room is dark without light',
+                  },
+                  {
+                    flag: 'ALWAYS_LIT',
+                    label: '☀️ Always Lit',
+                    desc: 'Never dark',
+                  },
+                  {
+                    flag: 'INDOORS',
+                    label: '🏠 Indoors',
+                    desc: 'Inside a building',
+                  },
+                  {
+                    flag: 'UNDERDARK',
+                    label: '🕳️ Underdark',
+                    desc: 'Underground area',
+                  },
+                ].map(({ flag, label, desc }) => (
+                  <label
+                    key={flag}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                      (room.flags || []).includes(flag)
+                        ? isDark
+                          ? 'bg-blue-900/40 border border-blue-700'
+                          : 'bg-blue-50 border border-blue-200'
+                        : isDark
+                          ? 'hover:bg-gray-600'
+                          : 'hover:bg-gray-100'
+                    }`}
+                    title={desc}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={(room.flags || []).includes(flag)}
+                      onChange={e => {
+                        const currentFlags = room.flags || [];
+                        const newFlags = e.target.checked
+                          ? [...currentFlags, flag]
+                          : currentFlags.filter(f => f !== flag);
+                        onRoomChange('flags', newFlags);
+                      }}
+                      className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                    />
+                    <span className='text-xs'>{label}</span>
+                  </label>
+                ))}
+              </div>
             </div>
+
+            {/* Room Size */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Room Size (Combat)
+              </h5>
+              <div className='grid grid-cols-2 gap-2'>
+                {[
+                  {
+                    flag: 'LARGE',
+                    label: '📐 Large',
+                    desc: 'Large combat area',
+                  },
+                  {
+                    flag: 'MEDIUM_LARGE',
+                    label: '📏 Medium-Large',
+                    desc: 'Medium-large area',
+                  },
+                  {
+                    flag: 'MEDIUM',
+                    label: '📍 Medium',
+                    desc: 'Standard room size',
+                  },
+                  {
+                    flag: 'MEDIUM_SMALL',
+                    label: '📌 Medium-Small',
+                    desc: 'Medium-small area',
+                  },
+                  {
+                    flag: 'SMALL',
+                    label: '🔹 Small',
+                    desc: 'Small combat area',
+                  },
+                  {
+                    flag: 'VERY_SMALL',
+                    label: '🔸 Very Small',
+                    desc: 'Very cramped',
+                  },
+                  {
+                    flag: 'ONE_PERSON',
+                    label: '👤 One Person',
+                    desc: 'Single occupant only',
+                  },
+                  {
+                    flag: 'TUNNEL',
+                    label: '🚇 Tunnel',
+                    desc: 'Narrow passage',
+                  },
+                ].map(({ flag, label, desc }) => (
+                  <label
+                    key={flag}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                      (room.flags || []).includes(flag)
+                        ? isDark
+                          ? 'bg-purple-900/40 border border-purple-700'
+                          : 'bg-purple-50 border border-purple-200'
+                        : isDark
+                          ? 'hover:bg-gray-600'
+                          : 'hover:bg-gray-100'
+                    }`}
+                    title={desc}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={(room.flags || []).includes(flag)}
+                      onChange={e => {
+                        const currentFlags = room.flags || [];
+                        const newFlags = e.target.checked
+                          ? [...currentFlags, flag]
+                          : currentFlags.filter(f => f !== flag);
+                        onRoomChange('flags', newFlags);
+                      }}
+                      className='rounded border-gray-300 text-purple-600 focus:ring-purple-500'
+                    />
+                    <span className='text-xs'>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Restrictions */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Restrictions
+              </h5>
+              <div className='grid grid-cols-2 gap-2'>
+                {[
+                  {
+                    flag: 'NO_MOB',
+                    label: '🚫 No Mobs',
+                    desc: 'Mobs cannot enter',
+                  },
+                  {
+                    flag: 'NO_MAGIC',
+                    label: '✨ No Magic',
+                    desc: 'Magic is blocked',
+                  },
+                  {
+                    flag: 'NO_TRACK',
+                    label: '👣 No Track',
+                    desc: 'Cannot be tracked',
+                  },
+                  {
+                    flag: 'NO_SUMMON',
+                    label: '🔮 No Summon',
+                    desc: 'Cannot summon here',
+                  },
+                  { flag: 'NO_SCAN', label: '👁️ No Scan', desc: 'Cannot scan' },
+                  {
+                    flag: 'NO_WELL',
+                    label: '💧 No Well',
+                    desc: 'Cannot create wells',
+                  },
+                  {
+                    flag: 'NO_SHIFT',
+                    label: '🌀 No Shift',
+                    desc: 'Cannot plane shift',
+                  },
+                  {
+                    flag: 'NO_RECALL',
+                    label: '🏠 No Recall',
+                    desc: 'Cannot recall out',
+                  },
+                ].map(({ flag, label, desc }) => (
+                  <label
+                    key={flag}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                      (room.flags || []).includes(flag)
+                        ? isDark
+                          ? 'bg-red-900/40 border border-red-700'
+                          : 'bg-red-50 border border-red-200'
+                        : isDark
+                          ? 'hover:bg-gray-600'
+                          : 'hover:bg-gray-100'
+                    }`}
+                    title={desc}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={(room.flags || []).includes(flag)}
+                      onChange={e => {
+                        const currentFlags = room.flags || [];
+                        const newFlags = e.target.checked
+                          ? [...currentFlags, flag]
+                          : currentFlags.filter(f => f !== flag);
+                        onRoomChange('flags', newFlags);
+                      }}
+                      className='rounded border-gray-300 text-red-600 focus:ring-red-500'
+                    />
+                    <span className='text-xs'>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Special Areas */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Special Areas
+              </h5>
+              <div className='grid grid-cols-2 gap-2'>
+                {[
+                  {
+                    flag: 'PEACEFUL',
+                    label: '🕊️ Peaceful',
+                    desc: 'No combat allowed',
+                  },
+                  {
+                    flag: 'SOUNDPROOF',
+                    label: '🔇 Soundproof',
+                    desc: 'Sound blocked',
+                  },
+                  {
+                    flag: 'PRIVATE',
+                    label: '🔒 Private',
+                    desc: 'Limited access',
+                  },
+                  { flag: 'ARENA', label: '⚔️ Arena', desc: 'PvP combat area' },
+                  {
+                    flag: 'DEATH',
+                    label: '💀 Death',
+                    desc: 'Instant death room',
+                  },
+                  {
+                    flag: 'GODROOM',
+                    label: '👑 Godroom',
+                    desc: 'Immortal-only area',
+                  },
+                  { flag: 'HOUSE', label: '🏡 House', desc: 'Player housing' },
+                  {
+                    flag: 'GUILDHALL',
+                    label: '🏛️ Guildhall',
+                    desc: 'Guild headquarters',
+                  },
+                  {
+                    flag: 'ATRIUM',
+                    label: '🚪 Atrium',
+                    desc: 'House entrance',
+                  },
+                  {
+                    flag: 'HOUSECRASH',
+                    label: '💥 Housecrash',
+                    desc: 'Crash-save room',
+                  },
+                ].map(({ flag, label, desc }) => (
+                  <label
+                    key={flag}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                      (room.flags || []).includes(flag)
+                        ? isDark
+                          ? 'bg-amber-900/40 border border-amber-700'
+                          : 'bg-amber-50 border border-amber-200'
+                        : isDark
+                          ? 'hover:bg-gray-600'
+                          : 'hover:bg-gray-100'
+                    }`}
+                    title={desc}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={(room.flags || []).includes(flag)}
+                      onChange={e => {
+                        const currentFlags = room.flags || [];
+                        const newFlags = e.target.checked
+                          ? [...currentFlags, flag]
+                          : currentFlags.filter(f => f !== flag);
+                        onRoomChange('flags', newFlags);
+                      }}
+                      className='rounded border-gray-300 text-amber-600 focus:ring-amber-500'
+                    />
+                    <span className='text-xs'>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Technical/System Flags */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Technical / System
+              </h5>
+              <div className='grid grid-cols-2 gap-2'>
+                {[
+                  {
+                    flag: 'WORLDMAP',
+                    label: '🗺️ Worldmap',
+                    desc: 'World map location',
+                  },
+                  {
+                    flag: 'FERRY_DEST',
+                    label: '⛴️ Ferry Dest',
+                    desc: 'Ferry destination',
+                  },
+                  {
+                    flag: 'ISOLATED',
+                    label: '🏝️ Isolated',
+                    desc: 'Isolated area',
+                  },
+                  {
+                    flag: 'ALT_EXIT',
+                    label: '🚪 Alt Exit',
+                    desc: 'Alternative exits',
+                  },
+                  {
+                    flag: 'OBSERVATORY',
+                    label: '🔭 Observatory',
+                    desc: 'View distant areas',
+                  },
+                  {
+                    flag: 'EFFECTS_NEXT',
+                    label: '✨ Effects Next',
+                    desc: 'Effects continue',
+                  },
+                  { flag: 'OLC', label: '🔧 OLC', desc: 'Being edited' },
+                  {
+                    flag: 'BFS_MARK',
+                    label: '📍 BFS Mark',
+                    desc: 'Pathfinding marker',
+                  },
+                ].map(({ flag, label, desc }) => (
+                  <label
+                    key={flag}
+                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                      (room.flags || []).includes(flag)
+                        ? isDark
+                          ? 'bg-green-900/40 border border-green-700'
+                          : 'bg-green-50 border border-green-200'
+                        : isDark
+                          ? 'hover:bg-gray-600'
+                          : 'hover:bg-gray-100'
+                    }`}
+                    title={desc}
+                  >
+                    <input
+                      type='checkbox'
+                      checked={(room.flags || []).includes(flag)}
+                      onChange={e => {
+                        const currentFlags = room.flags || [];
+                        const newFlags = e.target.checked
+                          ? [...currentFlags, flag]
+                          : currentFlags.filter(f => f !== flag);
+                        onRoomChange('flags', newFlags);
+                      }}
+                      className='rounded border-gray-300 text-green-600 focus:ring-green-500'
+                    />
+                    <span className='text-xs'>{label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Active Flags Summary */}
+            {(room.flags || []).length > 0 && (
+              <div
+                className={`p-3 rounded-lg border ${isDark ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200'}`}
+              >
+                <h5
+                  className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}
+                >
+                  Active Flags ({(room.flags || []).length})
+                </h5>
+                <div className='flex flex-wrap gap-1'>
+                  {(room.flags || []).map(flag => (
+                    <span
+                      key={flag}
+                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-800/50 text-blue-200' : 'bg-blue-100 text-blue-700'}`}
+                    >
+                      {flag.replace(/_/g, ' ')}
+                      <button
+                        onClick={() => {
+                          const newFlags = (room.flags || []).filter(
+                            f => f !== flag
+                          );
+                          onRoomChange('flags', newFlags);
+                        }}
+                        className='ml-1 hover:text-red-500'
+                        title={`Remove ${flag}`}
+                      >
+                        ×
+                      </button>
+                    </span>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         )}
       </div>

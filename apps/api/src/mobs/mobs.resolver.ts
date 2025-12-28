@@ -15,12 +15,6 @@ import { CreateMobInput, MobDto, UpdateMobInput } from './mob.dto';
 import { MobsService } from './mobs.service';
 
 interface MobFieldSource {
-  hpDiceNum?: number;
-  hpDiceSize?: number;
-  hpDiceBonus?: number;
-  damageDiceNum?: number;
-  damageDiceSize?: number;
-  damageDiceBonus?: number;
   totalWealth?: number;
 }
 
@@ -95,8 +89,8 @@ export class MobsResolver {
       };
     };
 
-    const hp = parseDice(hpDice || '1d8+0');
-    const dmg = parseDice(damageDice || '1d4+0');
+    const hp = parseDice(hpDice);
+    const dmg = parseDice(damageDice);
 
     const createData: Prisma.MobsCreateInput = {
       ...rest,
@@ -150,22 +144,10 @@ export class MobsResolver {
     return this.mobsService.deleteMany(ids);
   }
 
-  // Field resolvers to compute virtual fields from database
-  @ResolveField(() => String)
-  hpDice(@Parent() mob: MobFieldSource): string {
-    const num = mob.hpDiceNum || 1;
-    const size = mob.hpDiceSize || 8;
-    const bonus = mob.hpDiceBonus || 0;
-    return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
-  }
-
-  @ResolveField(() => String)
-  damageDice(@Parent() mob: MobFieldSource): string {
-    const num = mob.damageDiceNum || 1;
-    const size = mob.damageDiceSize || 4;
-    const bonus = mob.damageDiceBonus || 0;
-    return `${num}d${size}${bonus >= 0 ? '+' : ''}${bonus}`;
-  }
+  // Note: hpDice and damageDice are computed directly in the mapper (mapMob)
+  // from hpDiceNum/Size/Bonus and damageDiceNum/Size/Bonus fields.
+  // Do NOT add @ResolveField decorators here as they would override
+  // the correctly mapped values with fallback defaults.
 
   @ResolveField(() => Int, { nullable: true })
   wealth(@Parent() mob: MobFieldSource): number | null {

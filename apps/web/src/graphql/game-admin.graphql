@@ -1,0 +1,120 @@
+# Game Admin Operations - Bridge to FieryMUD game server
+
+query GetOnlinePlayers {
+  onlinePlayers {
+    name
+    level
+    class
+    race
+    roomId
+    godLevel
+    isLinkdead
+  }
+}
+
+query GetServerStatus {
+  serverStatus {
+    stats {
+      uptimeSeconds
+      totalConnections
+      currentConnections
+      peakConnections
+      totalCommands
+      failedCommands
+      totalLogins
+      failedLogins
+      commandsPerSecond
+    }
+    server {
+      name
+      port
+      tlsPort
+      maintenanceMode
+      running
+    }
+  }
+}
+
+query IsGameServerConnected {
+  gameServerConnected
+}
+
+mutation ExecuteGameCommand($command: String!, $executor: String) {
+  executeGameCommand(command: $command, executor: $executor) {
+    success
+    message
+    executor
+    note
+  }
+}
+
+mutation BroadcastMessage($message: String!, $sender: String) {
+  broadcastMessage(message: $message, sender: $sender) {
+    success
+    message
+    recipientCount
+  }
+}
+
+mutation KickPlayer($playerName: String!, $reason: String) {
+  kickPlayer(playerName: $playerName, reason: $reason) {
+    success
+    message
+    reason
+  }
+}
+
+# Subscriptions for real-time events
+subscription GameEvents {
+  gameEvents {
+    type
+    timestamp
+    playerName
+    zoneId
+    roomVnum
+    message
+    targetPlayer
+    metadata
+  }
+}
+
+subscription ChatMessages {
+  chatMessages {
+    type
+    timestamp
+    playerName
+    message
+    metadata
+  }
+}
+
+subscription PlayerActivity {
+  playerActivity {
+    type
+    timestamp
+    playerName
+    zoneId
+    message
+    metadata
+  }
+}
+
+subscription AdminAlerts {
+  adminAlerts {
+    type
+    timestamp
+    message
+    metadata
+  }
+}
+
+subscription WorldEvents {
+  worldEvents {
+    type
+    timestamp
+    zoneId
+    roomVnum
+    message
+    metadata
+  }
+}

@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_URL = 'http://localhost:4000/graphql';
+const API_URL = 'http://localhost:3001/graphql';
 
 test.describe('Grants System', () => {
   let godToken: string;
