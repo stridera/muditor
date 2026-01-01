@@ -170,6 +170,20 @@ function createExtendedPrismaClient() {
           return query(args);
         },
       },
+      quests: {
+        async create({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name);
+          }
+          return query(args);
+        },
+        async update({ args, query }: any) {
+          if (args.data.name) {
+            args.data.plainName = stripMarkup(args.data.name as string);
+          }
+          return query(args);
+        },
+      },
     },
   });
 }
@@ -385,6 +399,51 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   get discordConfig() {
     return this.client.discordConfig;
+  }
+
+  // Quest system
+  get quests() {
+    return this.client.quests;
+  }
+
+  get questPhases() {
+    return this.client.questPhases;
+  }
+
+  get questObjectives() {
+    return this.client.questObjectives;
+  }
+
+  get questDialogue() {
+    return this.client.questDialogue;
+  }
+
+  get questRewards() {
+    return this.client.questRewards;
+  }
+
+  get questPrerequisites() {
+    return this.client.questPrerequisites;
+  }
+
+  get characterQuests() {
+    return this.client.characterQuests;
+  }
+
+  get characterQuestObjectives() {
+    return this.client.characterQuestObjectives;
+  }
+
+  get dialogueTrees() {
+    return this.client.dialogueTrees;
+  }
+
+  get dialogueNodes() {
+    return this.client.dialogueNodes;
+  }
+
+  get dialogueResponses() {
+    return this.client.dialogueResponses;
   }
 
   // Pass-through Prisma client methods

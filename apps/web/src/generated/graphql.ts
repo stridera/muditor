@@ -460,6 +460,28 @@ export type CharacterLinkingInfoDto = {
   timePlayed: Scalars['Int']['output'];
 };
 
+export type CharacterQuestDto = {
+  __typename?: 'CharacterQuestDto';
+  acceptedAt: Scalars['DateTime']['output'];
+  characterId: Scalars['String']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  currentPhaseId?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['ID']['output'];
+  objectiveProgress?: Maybe<Array<CharacterQuestObjectiveDto>>;
+  quest?: Maybe<QuestDto>;
+  questId: Scalars['Int']['output'];
+  questZoneId: Scalars['Int']['output'];
+  status: QuestStatus;
+};
+
+export type CharacterQuestObjectiveDto = {
+  __typename?: 'CharacterQuestObjectiveDto';
+  completed: Scalars['Boolean']['output'];
+  completedAt?: Maybe<Scalars['DateTime']['output']>;
+  currentCount: Scalars['Int']['output'];
+  id: Scalars['ID']['output'];
+};
+
 export type CharacterSessionInfoDto = {
   __typename?: 'CharacterSessionInfoDto';
   currentSessionTime: Scalars['Int']['output'];
@@ -901,6 +923,81 @@ export type CreateObjectResetInput = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type CreateQuestDialogueInput = {
+  dialogueTreeId?: InputMaybe<Scalars['Int']['input']>;
+  matchKeywords?: Array<Scalars['String']['input']>;
+  matchType?: DialogueMatchType;
+  npcMessage: Scalars['String']['input'];
+  objectiveId: Scalars['Int']['input'];
+  phaseId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type CreateQuestInput = {
+  completerMobId?: InputMaybe<Scalars['Int']['input']>;
+  completerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  giverMobId?: InputMaybe<Scalars['Int']['input']>;
+  giverMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  hidden?: Scalars['Boolean']['input'];
+  id: Scalars['Int']['input'];
+  maxLevel?: InputMaybe<Scalars['Int']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  name: Scalars['String']['input'];
+  repeatable?: Scalars['Boolean']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type CreateQuestObjectiveInput = {
+  deliverToMobId?: InputMaybe<Scalars['Int']['input']>;
+  deliverToMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  id: Scalars['Int']['input'];
+  internalNote?: InputMaybe<Scalars['String']['input']>;
+  luaExpression?: InputMaybe<Scalars['String']['input']>;
+  objectiveType: QuestObjectiveType;
+  phaseId: Scalars['Int']['input'];
+  playerDescription: Scalars['String']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+  requiredCount?: Scalars['Int']['input'];
+  showProgress?: Scalars['Boolean']['input'];
+  targetAbilityId?: InputMaybe<Scalars['Int']['input']>;
+  targetMobId?: InputMaybe<Scalars['Int']['input']>;
+  targetMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  targetObjectId?: InputMaybe<Scalars['Int']['input']>;
+  targetObjectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  targetRoomId?: InputMaybe<Scalars['Int']['input']>;
+  targetRoomZoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type CreateQuestPhaseInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  id: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+  order: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type CreateQuestPrerequisiteInput = {
+  prerequisiteQuestId: Scalars['Int']['input'];
+  prerequisiteQuestZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type CreateQuestRewardInput = {
+  abilityId?: InputMaybe<Scalars['Int']['input']>;
+  amount?: InputMaybe<Scalars['Int']['input']>;
+  choiceGroup?: InputMaybe<Scalars['Int']['input']>;
+  objectId?: InputMaybe<Scalars['Int']['input']>;
+  objectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+  rewardType: QuestRewardType;
+};
+
 export type CreateRaceInput = {
   bonusDamroll?: Scalars['Int']['input'];
   bonusHitroll?: Scalars['Int']['input'];
@@ -1056,6 +1153,14 @@ export type DamageType =
   | 'THRASH'
   | 'WATER'
   | 'WHIP';
+
+export type DialogueMatchType =
+  | 'ANY_OF'
+  | 'ANY_RESPONSE'
+  | 'CONTAINS'
+  | 'EXACT'
+  | 'REGEX'
+  | 'STARTS_WITH';
 
 export type Direction =
   | 'DOWN'
@@ -1548,6 +1653,7 @@ export type MobFlag =
   | 'SCAVENGER'
   | 'SENTINEL'
   | 'SHAMAN'
+  | 'SHOPKEEPER'
   | 'SLOW_TRACK'
   | 'SORCERER'
   | 'SPEC'
@@ -1640,6 +1746,12 @@ export type Mutation = {
   createMobReset: MobResetDto;
   createObject: ObjectDto;
   createObjectReset: ObjectResetDto;
+  createQuest: QuestDto;
+  createQuestDialogue: QuestDialogueDto;
+  createQuestObjective: QuestObjectiveDto;
+  createQuestPhase: QuestPhaseDto;
+  createQuestPrerequisite: QuestPrerequisiteDto;
+  createQuestReward: QuestRewardDto;
   createRace: RaceDto;
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
@@ -1678,6 +1790,12 @@ export type Mutation = {
   deleteObjectReset: Scalars['Boolean']['output'];
   deleteObjects: Scalars['Int']['output'];
   deletePlayerMail: PlayerMailDto;
+  deleteQuest: QuestDto;
+  deleteQuestDialogue: QuestDialogueDto;
+  deleteQuestObjective: QuestObjectiveDto;
+  deleteQuestPhase: QuestPhaseDto;
+  deleteQuestPrerequisite: QuestPrerequisiteDto;
+  deleteQuestReward: QuestRewardDto;
   deleteRace: Scalars['Boolean']['output'];
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
@@ -1754,6 +1872,11 @@ export type Mutation = {
   updateObject: ObjectDto;
   updateObjectReset: ObjectResetDto;
   updateProfile: User;
+  updateQuest: QuestDto;
+  updateQuestDialogue: QuestDialogueDto;
+  updateQuestObjective: QuestObjectiveDto;
+  updateQuestPhase: QuestPhaseDto;
+  updateQuestReward: QuestRewardDto;
   updateRace: RaceDto;
   updateRaceSkill: RaceSkillDto;
   updateRoom: RoomDto;
@@ -1899,6 +2022,30 @@ export type MutationCreateObjectResetArgs = {
   data: CreateObjectResetInput;
 };
 
+export type MutationCreateQuestArgs = {
+  data: CreateQuestInput;
+};
+
+export type MutationCreateQuestDialogueArgs = {
+  data: CreateQuestDialogueInput;
+};
+
+export type MutationCreateQuestObjectiveArgs = {
+  data: CreateQuestObjectiveInput;
+};
+
+export type MutationCreateQuestPhaseArgs = {
+  data: CreateQuestPhaseInput;
+};
+
+export type MutationCreateQuestPrerequisiteArgs = {
+  data: CreateQuestPrerequisiteInput;
+};
+
+export type MutationCreateQuestRewardArgs = {
+  data: CreateQuestRewardInput;
+};
+
 export type MutationCreateRaceArgs = {
   data: CreateRaceInput;
 };
@@ -2034,6 +2181,36 @@ export type MutationDeleteObjectsArgs = {
 };
 
 export type MutationDeletePlayerMailArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestArgs = {
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestDialogueArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestObjectiveArgs = {
+  id: Scalars['Int']['input'];
+  phaseId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestPhaseArgs = {
+  id: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestPrerequisiteArgs = {
+  id: Scalars['Int']['input'];
+};
+
+export type MutationDeleteQuestRewardArgs = {
   id: Scalars['Int']['input'];
 };
 
@@ -2327,6 +2504,37 @@ export type MutationUpdateProfileArgs = {
   input: UpdateProfileInput;
 };
 
+export type MutationUpdateQuestArgs = {
+  data: UpdateQuestInput;
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type MutationUpdateQuestDialogueArgs = {
+  data: UpdateQuestDialogueInput;
+  id: Scalars['Int']['input'];
+};
+
+export type MutationUpdateQuestObjectiveArgs = {
+  data: UpdateQuestObjectiveInput;
+  id: Scalars['Int']['input'];
+  phaseId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type MutationUpdateQuestPhaseArgs = {
+  data: UpdateQuestPhaseInput;
+  id: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+export type MutationUpdateQuestRewardArgs = {
+  data: UpdateQuestRewardInput;
+  id: Scalars['Int']['input'];
+};
+
 export type MutationUpdateRaceArgs = {
   data: UpdateRaceInput;
   race: Race;
@@ -2489,9 +2697,9 @@ export type ObjectFlag =
   | 'NO_FALL'
   | 'NO_INVISIBLE'
   | 'NO_LOCATE'
-  | 'NO_RENT'
   | 'NO_SELL'
   | 'PERMANENT'
+  | 'TEMPORARY'
   | 'WAS_DISARMED';
 
 export type ObjectResetDto = {
@@ -2666,6 +2874,7 @@ export type Query = {
   allAccountMail: Array<AccountMailDto>;
   /** Get all unique permission flags used across commands */
   availablePermissions: Array<Scalars['String']['output']>;
+  availableQuests: Array<QuestDto>;
   banHistory: Array<BanRecord>;
   board?: Maybe<BoardDto>;
   boardMessage?: Maybe<BoardMessageDto>;
@@ -2681,6 +2890,7 @@ export type Query = {
   characterItem: CharacterItemDto;
   characterItems: Array<CharacterItemDto>;
   characterLinkingInfo: CharacterLinkingInfoDto;
+  characterQuests: Array<CharacterQuestDto>;
   characterSessionInfo: CharacterSessionInfoDto;
   characters: Array<CharacterDto>;
   charactersCount: Scalars['Int']['output'];
@@ -2776,6 +2986,10 @@ export type Query = {
   playerMail?: Maybe<PlayerMailDto>;
   playerMailCount: Scalars['Int']['output'];
   playerMails: Array<PlayerMailDto>;
+  quest?: Maybe<QuestDto>;
+  quests: Array<QuestDto>;
+  questsByZone: Array<QuestDto>;
+  questsCount: Scalars['Int']['output'];
   race: RaceDto;
   /** Get all skills for a race */
   raceSkills: Array<RaceSkillDto>;
@@ -2863,6 +3077,11 @@ export type QueryAllAccountMailArgs = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type QueryAvailableQuestsArgs = {
+  characterId: Scalars['String']['input'];
+  level: Scalars['Int']['input'];
+};
+
 export type QueryBanHistoryArgs = {
   userId: Scalars['ID']['input'];
 };
@@ -2914,6 +3133,10 @@ export type QueryCharacterItemsArgs = {
 
 export type QueryCharacterLinkingInfoArgs = {
   characterName: Scalars['String']['input'];
+};
+
+export type QueryCharacterQuestsArgs = {
+  characterId: Scalars['String']['input'];
 };
 
 export type QueryCharacterSessionInfoArgs = {
@@ -3112,6 +3335,25 @@ export type QueryPlayerMailsArgs = {
   take?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type QueryQuestArgs = {
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type QueryQuestsArgs = {
+  filter?: InputMaybe<QuestFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QueryQuestsByZoneArgs = {
+  zoneId: Scalars['Int']['input'];
+};
+
+export type QueryQuestsCountArgs = {
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type QueryRaceArgs = {
   race: Race;
 };
@@ -3239,6 +3481,122 @@ export type QueryZonesArgs = {
   skip?: InputMaybe<Scalars['Int']['input']>;
   take?: InputMaybe<Scalars['Int']['input']>;
 };
+
+export type QuestDialogueDto = {
+  __typename?: 'QuestDialogueDto';
+  dialogueTreeId?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['Int']['output'];
+  matchKeywords: Array<Scalars['String']['output']>;
+  matchType: DialogueMatchType;
+  npcMessage: Scalars['String']['output'];
+};
+
+export type QuestDto = {
+  __typename?: 'QuestDto';
+  completerMobId?: Maybe<Scalars['Int']['output']>;
+  completerMobZoneId?: Maybe<Scalars['Int']['output']>;
+  createdAt: Scalars['DateTime']['output'];
+  description?: Maybe<Scalars['String']['output']>;
+  giverMobId?: Maybe<Scalars['Int']['output']>;
+  giverMobZoneId?: Maybe<Scalars['Int']['output']>;
+  hidden: Scalars['Boolean']['output'];
+  id: Scalars['Int']['output'];
+  maxLevel?: Maybe<Scalars['Int']['output']>;
+  minLevel?: Maybe<Scalars['Int']['output']>;
+  name: Scalars['String']['output'];
+  phases?: Maybe<Array<QuestPhaseDto>>;
+  prerequisites?: Maybe<Array<QuestPrerequisiteDto>>;
+  repeatable: Scalars['Boolean']['output'];
+  rewards?: Maybe<Array<QuestRewardDto>>;
+  updatedAt: Scalars['DateTime']['output'];
+  zoneId: Scalars['Int']['output'];
+};
+
+export type QuestFilterInput = {
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
+  maxLevel?: InputMaybe<Scalars['Int']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  status?: InputMaybe<QuestStatus>;
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type QuestObjectiveDto = {
+  __typename?: 'QuestObjectiveDto';
+  deliverToMobId?: Maybe<Scalars['Int']['output']>;
+  deliverToMobZoneId?: Maybe<Scalars['Int']['output']>;
+  dialogue?: Maybe<QuestDialogueDto>;
+  id: Scalars['Int']['output'];
+  internalNote?: Maybe<Scalars['String']['output']>;
+  luaExpression?: Maybe<Scalars['String']['output']>;
+  objectiveType: QuestObjectiveType;
+  phaseId: Scalars['Int']['output'];
+  playerDescription: Scalars['String']['output'];
+  questId: Scalars['Int']['output'];
+  questZoneId: Scalars['Int']['output'];
+  requiredCount: Scalars['Int']['output'];
+  showProgress: Scalars['Boolean']['output'];
+  targetAbilityId?: Maybe<Scalars['Int']['output']>;
+  targetMobId?: Maybe<Scalars['Int']['output']>;
+  targetMobZoneId?: Maybe<Scalars['Int']['output']>;
+  targetObjectId?: Maybe<Scalars['Int']['output']>;
+  targetObjectZoneId?: Maybe<Scalars['Int']['output']>;
+  targetRoomId?: Maybe<Scalars['Int']['output']>;
+  targetRoomZoneId?: Maybe<Scalars['Int']['output']>;
+};
+
+export type QuestObjectiveType =
+  | 'COLLECT_ITEM'
+  | 'CUSTOM_LUA'
+  | 'DELIVER_ITEM'
+  | 'KILL_MOB'
+  | 'TALK_TO_NPC'
+  | 'USE_SKILL'
+  | 'VISIT_ROOM';
+
+export type QuestPhaseDto = {
+  __typename?: 'QuestPhaseDto';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  objectives?: Maybe<Array<QuestObjectiveDto>>;
+  order: Scalars['Int']['output'];
+  questId: Scalars['Int']['output'];
+  questZoneId: Scalars['Int']['output'];
+};
+
+export type QuestPrerequisiteDto = {
+  __typename?: 'QuestPrerequisiteDto';
+  id: Scalars['Int']['output'];
+  prerequisiteQuestId: Scalars['Int']['output'];
+  prerequisiteQuestZoneId: Scalars['Int']['output'];
+  questId: Scalars['Int']['output'];
+  questZoneId: Scalars['Int']['output'];
+};
+
+export type QuestRewardDto = {
+  __typename?: 'QuestRewardDto';
+  abilityId?: Maybe<Scalars['Int']['output']>;
+  amount?: Maybe<Scalars['Int']['output']>;
+  choiceGroup?: Maybe<Scalars['Int']['output']>;
+  id: Scalars['Int']['output'];
+  objectId?: Maybe<Scalars['Int']['output']>;
+  objectZoneId?: Maybe<Scalars['Int']['output']>;
+  rewardType: QuestRewardType;
+};
+
+export type QuestRewardType =
+  | 'ABILITY'
+  | 'EXPERIENCE'
+  | 'GOLD'
+  | 'ITEM'
+  | 'SKILL_POINTS';
+
+export type QuestStatus =
+  | 'ABANDONED'
+  | 'AVAILABLE'
+  | 'COMPLETED'
+  | 'FAILED'
+  | 'IN_PROGRESS';
 
 export type Race =
   | 'ANIMAL'
@@ -4113,6 +4471,59 @@ export type UpdatePreferencesInput = {
 
 export type UpdateProfileInput = {
   email?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateQuestDialogueInput = {
+  dialogueTreeId?: InputMaybe<Scalars['Int']['input']>;
+  matchKeywords?: InputMaybe<Array<Scalars['String']['input']>>;
+  matchType?: InputMaybe<DialogueMatchType>;
+  npcMessage?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type UpdateQuestInput = {
+  completerMobId?: InputMaybe<Scalars['Int']['input']>;
+  completerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  giverMobId?: InputMaybe<Scalars['Int']['input']>;
+  giverMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  hidden?: InputMaybe<Scalars['Boolean']['input']>;
+  maxLevel?: InputMaybe<Scalars['Int']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  repeatable?: InputMaybe<Scalars['Boolean']['input']>;
+};
+
+export type UpdateQuestObjectiveInput = {
+  deliverToMobId?: InputMaybe<Scalars['Int']['input']>;
+  deliverToMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  internalNote?: InputMaybe<Scalars['String']['input']>;
+  luaExpression?: InputMaybe<Scalars['String']['input']>;
+  objectiveType?: InputMaybe<QuestObjectiveType>;
+  playerDescription?: InputMaybe<Scalars['String']['input']>;
+  requiredCount?: InputMaybe<Scalars['Int']['input']>;
+  showProgress?: InputMaybe<Scalars['Boolean']['input']>;
+  targetAbilityId?: InputMaybe<Scalars['Int']['input']>;
+  targetMobId?: InputMaybe<Scalars['Int']['input']>;
+  targetMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  targetObjectId?: InputMaybe<Scalars['Int']['input']>;
+  targetObjectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  targetRoomId?: InputMaybe<Scalars['Int']['input']>;
+  targetRoomZoneId?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateQuestPhaseInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateQuestRewardInput = {
+  abilityId?: InputMaybe<Scalars['Int']['input']>;
+  amount?: InputMaybe<Scalars['Int']['input']>;
+  choiceGroup?: InputMaybe<Scalars['Int']['input']>;
+  objectId?: InputMaybe<Scalars['Int']['input']>;
+  objectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  rewardType?: InputMaybe<QuestRewardType>;
 };
 
 export type UpdateRaceInput = {
@@ -8221,6 +8632,429 @@ export type SearchMobsQuery = {
     level: number;
     race: Race;
   }>;
+};
+
+export type GetQuestsQueryVariables = Exact<{
+  filter?: InputMaybe<QuestFilterInput>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetQuestsQuery = {
+  __typename?: 'Query';
+  quests: Array<{
+    __typename?: 'QuestDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    description?: string | null;
+    minLevel?: number | null;
+    maxLevel?: number | null;
+    repeatable: boolean;
+    hidden: boolean;
+    giverMobZoneId?: number | null;
+    giverMobId?: number | null;
+    completerMobZoneId?: number | null;
+    completerMobId?: number | null;
+    createdAt: any;
+    updatedAt: any;
+    phases?: Array<{
+      __typename?: 'QuestPhaseDto';
+      id: number;
+      name: string;
+      description?: string | null;
+      order: number;
+      objectives?: Array<{
+        __typename?: 'QuestObjectiveDto';
+        id: number;
+        objectiveType: QuestObjectiveType;
+        playerDescription: string;
+        requiredCount: number;
+        showProgress: boolean;
+      }> | null;
+    }> | null;
+    rewards?: Array<{
+      __typename?: 'QuestRewardDto';
+      id: number;
+      rewardType: QuestRewardType;
+      amount?: number | null;
+      objectZoneId?: number | null;
+      objectId?: number | null;
+      abilityId?: number | null;
+    }> | null;
+    prerequisites?: Array<{
+      __typename?: 'QuestPrerequisiteDto';
+      id: number;
+      prerequisiteQuestZoneId: number;
+      prerequisiteQuestId: number;
+    }> | null;
+  }>;
+};
+
+export type GetQuestsByZoneQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+}>;
+
+export type GetQuestsByZoneQuery = {
+  __typename?: 'Query';
+  questsByZone: Array<{
+    __typename?: 'QuestDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    description?: string | null;
+    minLevel?: number | null;
+    maxLevel?: number | null;
+    repeatable: boolean;
+    hidden: boolean;
+    createdAt: any;
+    updatedAt: any;
+    phases?: Array<{
+      __typename?: 'QuestPhaseDto';
+      id: number;
+      name: string;
+      order: number;
+      objectives?: Array<{
+        __typename?: 'QuestObjectiveDto';
+        id: number;
+        objectiveType: QuestObjectiveType;
+        playerDescription: string;
+        requiredCount: number;
+      }> | null;
+    }> | null;
+  }>;
+};
+
+export type GetQuestQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+}>;
+
+export type GetQuestQuery = {
+  __typename?: 'Query';
+  quest?: {
+    __typename?: 'QuestDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    description?: string | null;
+    minLevel?: number | null;
+    maxLevel?: number | null;
+    repeatable: boolean;
+    hidden: boolean;
+    giverMobZoneId?: number | null;
+    giverMobId?: number | null;
+    completerMobZoneId?: number | null;
+    completerMobId?: number | null;
+    createdAt: any;
+    updatedAt: any;
+    phases?: Array<{
+      __typename?: 'QuestPhaseDto';
+      id: number;
+      questZoneId: number;
+      questId: number;
+      name: string;
+      description?: string | null;
+      order: number;
+      objectives?: Array<{
+        __typename?: 'QuestObjectiveDto';
+        id: number;
+        questZoneId: number;
+        questId: number;
+        phaseId: number;
+        objectiveType: QuestObjectiveType;
+        playerDescription: string;
+        internalNote?: string | null;
+        showProgress: boolean;
+        requiredCount: number;
+        targetMobZoneId?: number | null;
+        targetMobId?: number | null;
+        targetObjectZoneId?: number | null;
+        targetObjectId?: number | null;
+        targetRoomZoneId?: number | null;
+        targetRoomId?: number | null;
+        targetAbilityId?: number | null;
+        deliverToMobZoneId?: number | null;
+        deliverToMobId?: number | null;
+        luaExpression?: string | null;
+        dialogue?: {
+          __typename?: 'QuestDialogueDto';
+          id: number;
+          npcMessage: string;
+          matchType: DialogueMatchType;
+          matchKeywords: Array<string>;
+          dialogueTreeId?: number | null;
+        } | null;
+      }> | null;
+    }> | null;
+    rewards?: Array<{
+      __typename?: 'QuestRewardDto';
+      id: number;
+      rewardType: QuestRewardType;
+      amount?: number | null;
+      objectZoneId?: number | null;
+      objectId?: number | null;
+      abilityId?: number | null;
+      choiceGroup?: number | null;
+    }> | null;
+    prerequisites?: Array<{
+      __typename?: 'QuestPrerequisiteDto';
+      id: number;
+      questZoneId: number;
+      questId: number;
+      prerequisiteQuestZoneId: number;
+      prerequisiteQuestId: number;
+    }> | null;
+  } | null;
+};
+
+export type GetQuestsCountQueryVariables = Exact<{
+  zoneId?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+export type GetQuestsCountQuery = { __typename?: 'Query'; questsCount: number };
+
+export type CreateQuestMutationVariables = Exact<{
+  data: CreateQuestInput;
+}>;
+
+export type CreateQuestMutation = {
+  __typename?: 'Mutation';
+  createQuest: {
+    __typename?: 'QuestDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    description?: string | null;
+    minLevel?: number | null;
+    maxLevel?: number | null;
+    repeatable: boolean;
+    hidden: boolean;
+  };
+};
+
+export type UpdateQuestMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  data: UpdateQuestInput;
+}>;
+
+export type UpdateQuestMutation = {
+  __typename?: 'Mutation';
+  updateQuest: {
+    __typename?: 'QuestDto';
+    zoneId: number;
+    id: number;
+    name: string;
+    description?: string | null;
+    minLevel?: number | null;
+    maxLevel?: number | null;
+    repeatable: boolean;
+    hidden: boolean;
+  };
+};
+
+export type DeleteQuestMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteQuestMutation = {
+  __typename?: 'Mutation';
+  deleteQuest: { __typename?: 'QuestDto'; zoneId: number; id: number };
+};
+
+export type CreateQuestPhaseMutationVariables = Exact<{
+  data: CreateQuestPhaseInput;
+}>;
+
+export type CreateQuestPhaseMutation = {
+  __typename?: 'Mutation';
+  createQuestPhase: {
+    __typename?: 'QuestPhaseDto';
+    id: number;
+    questZoneId: number;
+    questId: number;
+    name: string;
+    description?: string | null;
+    order: number;
+  };
+};
+
+export type UpdateQuestPhaseMutationVariables = Exact<{
+  questZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  data: UpdateQuestPhaseInput;
+}>;
+
+export type UpdateQuestPhaseMutation = {
+  __typename?: 'Mutation';
+  updateQuestPhase: {
+    __typename?: 'QuestPhaseDto';
+    id: number;
+    questZoneId: number;
+    questId: number;
+    name: string;
+    description?: string | null;
+    order: number;
+  };
+};
+
+export type DeleteQuestPhaseMutationVariables = Exact<{
+  questZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteQuestPhaseMutation = {
+  __typename?: 'Mutation';
+  deleteQuestPhase: { __typename?: 'QuestPhaseDto'; id: number };
+};
+
+export type CreateQuestObjectiveMutationVariables = Exact<{
+  data: CreateQuestObjectiveInput;
+}>;
+
+export type CreateQuestObjectiveMutation = {
+  __typename?: 'Mutation';
+  createQuestObjective: {
+    __typename?: 'QuestObjectiveDto';
+    id: number;
+    questZoneId: number;
+    questId: number;
+    phaseId: number;
+    objectiveType: QuestObjectiveType;
+    playerDescription: string;
+    requiredCount: number;
+  };
+};
+
+export type UpdateQuestObjectiveMutationVariables = Exact<{
+  questZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  phaseId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  data: UpdateQuestObjectiveInput;
+}>;
+
+export type UpdateQuestObjectiveMutation = {
+  __typename?: 'Mutation';
+  updateQuestObjective: {
+    __typename?: 'QuestObjectiveDto';
+    id: number;
+    objectiveType: QuestObjectiveType;
+    playerDescription: string;
+    requiredCount: number;
+  };
+};
+
+export type DeleteQuestObjectiveMutationVariables = Exact<{
+  questZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  phaseId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteQuestObjectiveMutation = {
+  __typename?: 'Mutation';
+  deleteQuestObjective: { __typename?: 'QuestObjectiveDto'; id: number };
+};
+
+export type CreateQuestRewardMutationVariables = Exact<{
+  data: CreateQuestRewardInput;
+}>;
+
+export type CreateQuestRewardMutation = {
+  __typename?: 'Mutation';
+  createQuestReward: {
+    __typename?: 'QuestRewardDto';
+    id: number;
+    rewardType: QuestRewardType;
+    amount?: number | null;
+  };
+};
+
+export type UpdateQuestRewardMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateQuestRewardInput;
+}>;
+
+export type UpdateQuestRewardMutation = {
+  __typename?: 'Mutation';
+  updateQuestReward: {
+    __typename?: 'QuestRewardDto';
+    id: number;
+    rewardType: QuestRewardType;
+    amount?: number | null;
+  };
+};
+
+export type DeleteQuestRewardMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteQuestRewardMutation = {
+  __typename?: 'Mutation';
+  deleteQuestReward: { __typename?: 'QuestRewardDto'; id: number };
+};
+
+export type CreateQuestPrerequisiteMutationVariables = Exact<{
+  data: CreateQuestPrerequisiteInput;
+}>;
+
+export type CreateQuestPrerequisiteMutation = {
+  __typename?: 'Mutation';
+  createQuestPrerequisite: {
+    __typename?: 'QuestPrerequisiteDto';
+    id: number;
+    questZoneId: number;
+    questId: number;
+    prerequisiteQuestZoneId: number;
+    prerequisiteQuestId: number;
+  };
+};
+
+export type DeleteQuestPrerequisiteMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type DeleteQuestPrerequisiteMutation = {
+  __typename?: 'Mutation';
+  deleteQuestPrerequisite: { __typename?: 'QuestPrerequisiteDto'; id: number };
+};
+
+export type GetRoomsByZoneQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  lightweight?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+export type GetRoomsByZoneQuery = {
+  __typename?: 'Query';
+  roomsByZone: Array<{
+    __typename?: 'RoomDto';
+    id: number;
+    zoneId: number;
+    name: string;
+  }>;
+};
+
+export type GetRoomQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+}>;
+
+export type GetRoomQuery = {
+  __typename?: 'Query';
+  room: {
+    __typename?: 'RoomDto';
+    id: number;
+    zoneId: number;
+    name: string;
+    description: string;
+    sector: Sector;
+    flags: Array<RoomFlag>;
+  };
 };
 
 export type GetRacesQueryVariables = Exact<{ [key: string]: never }>;
@@ -22566,6 +23400,1825 @@ export const SearchMobsDocument = {
     },
   ],
 } as unknown as DocumentNode<SearchMobsQuery, SearchMobsQueryVariables>;
+export const GetQuestsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetQuests' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'filter' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'QuestFilterInput' },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'skip' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'take' } },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'quests' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'filter' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'filter' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'skip' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'skip' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'take' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'take' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'giverMobZoneId' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'giverMobId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'completerMobZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'completerMobId' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'phases' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'description' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectives' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectiveType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'playerDescription',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'requiredCount' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'showProgress' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'rewards' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'rewardType' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'amount' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectZoneId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'abilityId' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'prerequisites' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'prerequisiteQuestZoneId',
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'prerequisiteQuestId' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetQuestsQuery, GetQuestsQueryVariables>;
+export const GetQuestsByZoneDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetQuestsByZone' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'questsByZone' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'phases' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectives' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectiveType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'playerDescription',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'requiredCount' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  GetQuestsByZoneQuery,
+  GetQuestsByZoneQueryVariables
+>;
+export const GetQuestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetQuest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'quest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'giverMobZoneId' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'giverMobId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'completerMobZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'completerMobId' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'phases' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'questZoneId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'questId' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'description' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectives' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'questZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'questId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'phaseId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectiveType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'playerDescription',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'internalNote' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'showProgress' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'requiredCount' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetMobZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetMobId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'targetObjectZoneId',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetObjectId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetRoomZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetRoomId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'targetAbilityId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'deliverToMobZoneId',
+                              },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'deliverToMobId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'luaExpression' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'dialogue' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'id' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'npcMessage' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'matchType' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'matchKeywords',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'dialogueTreeId',
+                                    },
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'rewards' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'rewardType' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'amount' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectZoneId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'abilityId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'choiceGroup' },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'prerequisites' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'questZoneId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'questId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'prerequisiteQuestZoneId',
+                        },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'prerequisiteQuestId' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetQuestQuery, GetQuestQueryVariables>;
+export const GetQuestsCountDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetQuestsCount' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'questsCount' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+            ],
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetQuestsCountQuery, GetQuestsCountQueryVariables>;
+export const CreateQuestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateQuest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateQuestInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createQuest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<CreateQuestMutation, CreateQuestMutationVariables>;
+export const UpdateQuestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateQuest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateQuestInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateQuest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'minLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateQuestMutation, UpdateQuestMutationVariables>;
+export const DeleteQuestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteQuest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteQuest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<DeleteQuestMutation, DeleteQuestMutationVariables>;
+export const CreateQuestPhaseDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateQuestPhase' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateQuestPhaseInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createQuestPhase' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questZoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateQuestPhaseMutation,
+  CreateQuestPhaseMutationVariables
+>;
+export const UpdateQuestPhaseDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateQuestPhase' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questZoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateQuestPhaseInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateQuestPhase' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questZoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questZoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questZoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateQuestPhaseMutation,
+  UpdateQuestPhaseMutationVariables
+>;
+export const DeleteQuestPhaseDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteQuestPhase' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questZoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteQuestPhase' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questZoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questZoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteQuestPhaseMutation,
+  DeleteQuestPhaseMutationVariables
+>;
+export const CreateQuestObjectiveDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateQuestObjective' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateQuestObjectiveInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createQuestObjective' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questZoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'phaseId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectiveType' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'playerDescription' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'requiredCount' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateQuestObjectiveMutation,
+  CreateQuestObjectiveMutationVariables
+>;
+export const UpdateQuestObjectiveDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateQuestObjective' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questZoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'phaseId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateQuestObjectiveInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateQuestObjective' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questZoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questZoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'phaseId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'phaseId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectiveType' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'playerDescription' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'requiredCount' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateQuestObjectiveMutation,
+  UpdateQuestObjectiveMutationVariables
+>;
+export const DeleteQuestObjectiveDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteQuestObjective' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questZoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'questId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'phaseId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteQuestObjective' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questZoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questZoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'questId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'questId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'phaseId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'phaseId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteQuestObjectiveMutation,
+  DeleteQuestObjectiveMutationVariables
+>;
+export const CreateQuestRewardDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateQuestReward' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateQuestRewardInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createQuestReward' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'rewardType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'amount' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateQuestRewardMutation,
+  CreateQuestRewardMutationVariables
+>;
+export const UpdateQuestRewardDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateQuestReward' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateQuestRewardInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateQuestReward' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'rewardType' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'amount' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateQuestRewardMutation,
+  UpdateQuestRewardMutationVariables
+>;
+export const DeleteQuestRewardDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteQuestReward' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteQuestReward' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteQuestRewardMutation,
+  DeleteQuestRewardMutationVariables
+>;
+export const CreateQuestPrerequisiteDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateQuestPrerequisite' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateQuestPrerequisiteInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createQuestPrerequisite' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questZoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'prerequisiteQuestZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'prerequisiteQuestId' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateQuestPrerequisiteMutation,
+  CreateQuestPrerequisiteMutationVariables
+>;
+export const DeleteQuestPrerequisiteDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeleteQuestPrerequisite' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deleteQuestPrerequisite' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeleteQuestPrerequisiteMutation,
+  DeleteQuestPrerequisiteMutationVariables
+>;
+export const GetRoomsByZoneDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetRoomsByZone' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'lightweight' },
+          },
+          type: { kind: 'NamedType', name: { kind: 'Name', value: 'Boolean' } },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'roomsByZone' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'lightweight' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'lightweight' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>;
+export const GetRoomDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetRoom' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'room' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'sector' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetRoomQuery, GetRoomQueryVariables>;
 export const GetRacesDocument = {
   kind: 'Document',
   definitions: [

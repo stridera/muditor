@@ -231,6 +231,8 @@ describe('AuthService', () => {
       role: UserRole.PLAYER,
       createdAt: new Date(),
       updatedAt: new Date(),
+      deletedAt: null,
+      deletionReason: null,
       lastLoginAt: null,
       resetToken: null,
       resetTokenExpiry: null,

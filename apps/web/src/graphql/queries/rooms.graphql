@@ -1,0 +1,18 @@
+query GetRoomsByZone($zoneId: Int!, $lightweight: Boolean) {
+  roomsByZone(zoneId: $zoneId, lightweight: $lightweight) {
+    id
+    zoneId
+    name
+  }
+}
+
+query GetRoom($zoneId: Int!, $id: Int!) {
+  room(zoneId: $zoneId, id: $id) {
+    id
+    zoneId
+    name
+    description
+    sector
+    flags
+  }
+}

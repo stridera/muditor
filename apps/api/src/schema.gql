@@ -408,6 +408,26 @@ type CharacterLinkingInfoDto {
   timePlayed: Int!
 }
 
+type CharacterQuestDto {
+  acceptedAt: DateTime!
+  characterId: String!
+  completedAt: DateTime
+  currentPhaseId: Int
+  id: ID!
+  objectiveProgress: [CharacterQuestObjectiveDto!]
+  quest: QuestDto
+  questId: Int!
+  questZoneId: Int!
+  status: QuestStatus!
+}
+
+type CharacterQuestObjectiveDto {
+  completed: Boolean!
+  completedAt: DateTime
+  currentCount: Int!
+  id: ID!
+}
+
 type CharacterSessionInfoDto {
   currentSessionTime: Int!
   id: ID!
@@ -872,6 +892,81 @@ input CreateObjectResetInput {
   zoneId: Int!
 }
 
+input CreateQuestDialogueInput {
+  dialogueTreeId: Int
+  matchKeywords: [String!]! = []
+  matchType: DialogueMatchType! = CONTAINS
+  npcMessage: String!
+  objectiveId: Int!
+  phaseId: Int!
+  questId: Int!
+  questZoneId: Int!
+}
+
+input CreateQuestInput {
+  completerMobId: Int
+  completerMobZoneId: Int
+  description: String
+  giverMobId: Int
+  giverMobZoneId: Int
+  hidden: Boolean! = false
+  id: Int!
+  maxLevel: Int
+  minLevel: Int
+  name: String!
+  repeatable: Boolean! = false
+  zoneId: Int!
+}
+
+input CreateQuestObjectiveInput {
+  deliverToMobId: Int
+  deliverToMobZoneId: Int
+  id: Int!
+  internalNote: String
+  luaExpression: String
+  objectiveType: QuestObjectiveType!
+  phaseId: Int!
+  playerDescription: String!
+  questId: Int!
+  questZoneId: Int!
+  requiredCount: Int! = 1
+  showProgress: Boolean! = true
+  targetAbilityId: Int
+  targetMobId: Int
+  targetMobZoneId: Int
+  targetObjectId: Int
+  targetObjectZoneId: Int
+  targetRoomId: Int
+  targetRoomZoneId: Int
+}
+
+input CreateQuestPhaseInput {
+  description: String
+  id: Int!
+  name: String!
+  order: Int!
+  questId: Int!
+  questZoneId: Int!
+}
+
+input CreateQuestPrerequisiteInput {
+  prerequisiteQuestId: Int!
+  prerequisiteQuestZoneId: Int!
+  questId: Int!
+  questZoneId: Int!
+}
+
+input CreateQuestRewardInput {
+  abilityId: Int
+  amount: Int
+  choiceGroup: Int
+  objectId: Int
+  objectZoneId: Int
+  questId: Int!
+  questZoneId: Int!
+  rewardType: QuestRewardType!
+}
+
 input CreateRaceInput {
   bonusDamroll: Int! = 0
   bonusHitroll: Int! = 0
@@ -1048,6 +1143,15 @@ enum DamageType {
 A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
 """
 scalar DateTime
+
+enum DialogueMatchType {
+  ANY_OF
+  ANY_RESPONSE
+  CONTAINS
+  EXACT
+  REGEX
+  STARTS_WITH
+}
 
 enum Direction {
   DOWN
@@ -1600,6 +1704,7 @@ enum MobFlag {
   SCAVENGER
   SENTINEL
   SHAMAN
+  SHOPKEEPER
   SLOW_TRACK
   SORCERER
   SPEC
@@ -1696,6 +1801,12 @@ type Mutation {
   createMobReset(data: CreateMobResetInput!): MobResetDto!
   createObject(data: CreateObjectInput!): ObjectDto!
   createObjectReset(data: CreateObjectResetInput!): ObjectResetDto!
+  createQuest(data: CreateQuestInput!): QuestDto!
+  createQuestDialogue(data: CreateQuestDialogueInput!): QuestDialogueDto!
+  createQuestObjective(data: CreateQuestObjectiveInput!): QuestObjectiveDto!
+  createQuestPhase(data: CreateQuestPhaseInput!): QuestPhaseDto!
+  createQuestPrerequisite(data: CreateQuestPrerequisiteInput!): QuestPrerequisiteDto!
+  createQuestReward(data: CreateQuestRewardInput!): QuestRewardDto!
   createRace(data: CreateRaceInput!): RaceDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
@@ -1738,6 +1849,12 @@ type Mutation {
   deleteObjectReset(id: ID!): Boolean!
   deleteObjects(ids: [Int!]!): Int!
   deletePlayerMail(id: Int!): PlayerMailDto!
+  deleteQuest(id: Int!, zoneId: Int!): QuestDto!
+  deleteQuestDialogue(id: Int!): QuestDialogueDto!
+  deleteQuestObjective(id: Int!, phaseId: Int!, questId: Int!, questZoneId: Int!): QuestObjectiveDto!
+  deleteQuestPhase(id: Int!, questId: Int!, questZoneId: Int!): QuestPhaseDto!
+  deleteQuestPrerequisite(id: Int!): QuestPrerequisiteDto!
+  deleteQuestReward(id: Int!): QuestRewardDto!
   deleteRace(race: Race!): Boolean!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
@@ -1827,6 +1944,11 @@ type Mutation {
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectReset(data: UpdateObjectResetInput!, id: ID!): ObjectResetDto!
   updateProfile(input: UpdateProfileInput!): User!
+  updateQuest(data: UpdateQuestInput!, id: Int!, zoneId: Int!): QuestDto!
+  updateQuestDialogue(data: UpdateQuestDialogueInput!, id: Int!): QuestDialogueDto!
+  updateQuestObjective(data: UpdateQuestObjectiveInput!, id: Int!, phaseId: Int!, questId: Int!, questZoneId: Int!): QuestObjectiveDto!
+  updateQuestPhase(data: UpdateQuestPhaseInput!, id: Int!, questId: Int!, questZoneId: Int!): QuestPhaseDto!
+  updateQuestReward(data: UpdateQuestRewardInput!, id: Int!): QuestRewardDto!
   updateRace(data: UpdateRaceInput!, race: Race!): RaceDto!
   updateRaceSkill(data: UpdateRaceSkillInput!, id: ID!): RaceSkillDto!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
@@ -1930,9 +2052,9 @@ enum ObjectFlag {
   NO_FALL
   NO_INVISIBLE
   NO_LOCATE
-  NO_RENT
   NO_SELL
   PERMANENT
+  TEMPORARY
   WAS_DISARMED
 }
 
@@ -2102,6 +2224,7 @@ type Query {
 
   """Get all unique permission flags used across commands"""
   availablePermissions: [String!]!
+  availableQuests(characterId: String!, level: Int!): [QuestDto!]!
   banHistory(userId: ID!): [BanRecord!]!
   board(alias: String, id: Int): BoardDto
   boardMessage(id: Int!): BoardMessageDto
@@ -2118,6 +2241,7 @@ type Query {
   characterItem(id: ID!): CharacterItemDto!
   characterItems(characterId: ID!): [CharacterItemDto!]!
   characterLinkingInfo(characterName: String!): CharacterLinkingInfoDto!
+  characterQuests(characterId: String!): [CharacterQuestDto!]!
   characterSessionInfo(characterId: ID!): CharacterSessionInfoDto!
   characters(filter: CharacterFilterInput, skip: Int, take: Int): [CharacterDto!]!
   charactersCount(filter: CharacterFilterInput): Int!
@@ -2239,6 +2363,10 @@ type Query {
   playerMail(id: Int!): PlayerMailDto
   playerMailCount(filter: PlayerMailFilterInput): Int!
   playerMails(filter: PlayerMailFilterInput, skip: Int, take: Int): [PlayerMailDto!]!
+  quest(id: Int!, zoneId: Int!): QuestDto
+  quests(filter: QuestFilterInput, skip: Int, take: Int): [QuestDto!]!
+  questsByZone(zoneId: Int!): [QuestDto!]!
+  questsCount(zoneId: Int): Int!
   race(race: Race!): RaceDto!
 
   """Get all skills for a race"""
@@ -2308,6 +2436,119 @@ type Query {
   zone(id: Int!): ZoneDto!
   zones(skip: Int, take: Int): [ZoneDto!]!
   zonesCount: Int!
+}
+
+type QuestDialogueDto {
+  dialogueTreeId: Int
+  id: Int!
+  matchKeywords: [String!]!
+  matchType: DialogueMatchType!
+  npcMessage: String!
+}
+
+type QuestDto {
+  completerMobId: Int
+  completerMobZoneId: Int
+  createdAt: DateTime!
+  description: String
+  giverMobId: Int
+  giverMobZoneId: Int
+  hidden: Boolean!
+  id: Int!
+  maxLevel: Int
+  minLevel: Int
+  name: String!
+  phases: [QuestPhaseDto!]
+  prerequisites: [QuestPrerequisiteDto!]
+  repeatable: Boolean!
+  rewards: [QuestRewardDto!]
+  updatedAt: DateTime!
+  zoneId: Int!
+}
+
+input QuestFilterInput {
+  hidden: Boolean
+  maxLevel: Int
+  minLevel: Int
+  status: QuestStatus
+  zoneId: Int
+}
+
+type QuestObjectiveDto {
+  deliverToMobId: Int
+  deliverToMobZoneId: Int
+  dialogue: QuestDialogueDto
+  id: Int!
+  internalNote: String
+  luaExpression: String
+  objectiveType: QuestObjectiveType!
+  phaseId: Int!
+  playerDescription: String!
+  questId: Int!
+  questZoneId: Int!
+  requiredCount: Int!
+  showProgress: Boolean!
+  targetAbilityId: Int
+  targetMobId: Int
+  targetMobZoneId: Int
+  targetObjectId: Int
+  targetObjectZoneId: Int
+  targetRoomId: Int
+  targetRoomZoneId: Int
+}
+
+enum QuestObjectiveType {
+  COLLECT_ITEM
+  CUSTOM_LUA
+  DELIVER_ITEM
+  KILL_MOB
+  TALK_TO_NPC
+  USE_SKILL
+  VISIT_ROOM
+}
+
+type QuestPhaseDto {
+  description: String
+  id: Int!
+  name: String!
+  objectives: [QuestObjectiveDto!]
+  order: Int!
+  questId: Int!
+  questZoneId: Int!
+}
+
+type QuestPrerequisiteDto {
+  id: Int!
+  prerequisiteQuestId: Int!
+  prerequisiteQuestZoneId: Int!
+  questId: Int!
+  questZoneId: Int!
+}
+
+type QuestRewardDto {
+  abilityId: Int
+  amount: Int
+  choiceGroup: Int
+  id: Int!
+  objectId: Int
+  objectZoneId: Int
+  rewardType: QuestRewardType!
+}
+
+enum QuestRewardType {
+  ABILITY
+  EXPERIENCE
+  GOLD
+  ITEM
+  SKILL_POINTS
+}
+
+enum QuestStatus {
+  ABANDONED
+  AVAILABLE
+  COMPLETED
+  FAILED
+  IN_PROGRESS
 }
 
 enum Race {
@@ -3218,6 +3459,59 @@ input UpdatePreferencesInput {
 
 input UpdateProfileInput {
   email: String
+}
+
+input UpdateQuestDialogueInput {
+  dialogueTreeId: Int
+  matchKeywords: [String!]
+  matchType: DialogueMatchType
+  npcMessage: String
+}
+
+input UpdateQuestInput {
+  completerMobId: Int
+  completerMobZoneId: Int
+  description: String
+  giverMobId: Int
+  giverMobZoneId: Int
+  hidden: Boolean
+  maxLevel: Int
+  minLevel: Int
+  name: String
+  repeatable: Boolean
+}
+
+input UpdateQuestObjectiveInput {
+  deliverToMobId: Int
+  deliverToMobZoneId: Int
+  internalNote: String
+  luaExpression: String
+  objectiveType: QuestObjectiveType
+  playerDescription: String
+  requiredCount: Int
+  showProgress: Boolean
+  targetAbilityId: Int
+  targetMobId: Int
+  targetMobZoneId: Int
+  targetObjectId: Int
+  targetObjectZoneId: Int
+  targetRoomId: Int
+  targetRoomZoneId: Int
+}
+
+input UpdateQuestPhaseInput {
+  description: String
+  name: String
+  order: Int
+}
+
+input UpdateQuestRewardInput {
+  abilityId: Int
+  amount: Int
+  choiceGroup: Int
+  objectId: Int
+  objectZoneId: Int
+  rewardType: QuestRewardType
 }
 
 input UpdateRaceInput {
