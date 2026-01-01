@@ -68,7 +68,7 @@ export class TriggersService {
           },
         },
       },
-      orderBy: [{ legacyVnum: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ id: 'asc' }, { createdAt: 'desc' }],
     });
   }
 

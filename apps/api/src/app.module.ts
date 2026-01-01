@@ -14,6 +14,7 @@ import { GrantsModule } from './grants/grants.module';
 import { HelpModule } from './help/help.module';
 import { MobsModule } from './mobs/mobs.module';
 import { ObjectsModule } from './objects/objects.module';
+import { QuestsModule } from './quests/quests.module';
 import { RacesModule } from './races/races.module';
 import { RoomsModule } from './rooms/rooms.module';
 import { ShopsModule } from './shops/shops.module';
@@ -65,6 +66,7 @@ import { DiscordModule } from './discord/discord.module';
     RoomsModule,
     MobsModule,
     ObjectsModule,
+    QuestsModule,
     ShopsModule,
     TriggersModule,
     ValidationModule,

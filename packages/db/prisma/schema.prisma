@@ -64,6 +64,9 @@ model Ability {
   raceAbilities      RaceAbilities[]
   objectAbilities    ObjectAbilities[]
   commands           Command[]          // Commands that trigger this ability
+  // Quest system relations
+  questRewards       QuestRewards[]
+  questObjectives    QuestObjectives[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -129,7 +132,7 @@ model AbilitySavingThrow {
   id           Int      @id @default(autoincrement())
   abilityId    Int      @map("ability_id")
   ability      Ability  @relation(fields: [abilityId], references: [id], onDelete: Cascade)
-  saveType     SaveType @default(SPELL)
+  saveType     SaveType @default(WILL)
   dcFormula    String   @map("dc_formula")
   onSaveAction Json     @default("\"NEGATE\"") @map("on_save_action")
 }
@@ -212,11 +215,25 @@ model ClassAbilityCircles {
   @@unique([classId, circle])
 }
 
+/// Global spell slot progression table
+/// Determines how many spell slots are available at each level for each circle
+/// Same for all classes - class differences come from when they access circles (ClassAbilityCircles.minLevel)
+model SpellSlotProgression {
+  id     Int @id @default(autoincrement())
+  level  Int // Character level (1-100)
+  circle Int // Spell circle (1-14)
+  slots  Int // Number of slots available
+
+  @@unique([level, circle])
+  @@map("SpellSlotProgression")
+}
+
 model ClassAbilities {
   id             Int            @id @default(autoincrement())
   classId        Int            @map("class_id")
   abilityId      Int            @map("ability_id")
   circle         Int
+  proficiencyCap Int            @default(100) @map("proficiency_cap") // Max trainable proficiency (0-100)
   characterClass CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
   ability        Ability        @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
@@ -228,6 +245,7 @@ model ClassSkills {
   classId        Int            @map("class_id")
   abilityId      Int            @map("ability_id")
   minLevel       Int            @map("min_level")
+  proficiencyCap Int            @default(100) @map("proficiency_cap") // Max trainable proficiency (0-100)
   characterClass CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
   ability        Ability        @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
@@ -483,6 +501,8 @@ model Characters {
   mailReceived            PlayerMail[]         @relation("mailReceived")
   mailWealthRetrievedBy   PlayerMail[]         @relation("mailWealthRetrievedBy")
   mailObjectRetrievedBy   PlayerMail[]         @relation("mailObjectRetrievedBy")
+  // Quest progress tracking
+  characterQuests         CharacterQuests[]
 }
 
 model CharacterAliases {
@@ -673,6 +693,11 @@ model Mobs {
   triggers           Triggers[]      // Legacy direct FK (deprecated)
   mobTriggers        MobTriggers[]   // Proper many-to-many via junction table
   shopMobs           ShopMobs[]      // Mobs for sale at pet/mount shops
+  // Quest system relations
+  questsAsGiver      Quests[]        @relation("questGiver")
+  questsAsCompleter  Quests[]        @relation("questCompleter")
+  objectiveTargetMob QuestObjectives[] @relation("objectiveTargetMob")
+  objectiveDeliverTo QuestObjectives[] @relation("objectiveDeliverTo")
 
   @@id([zoneId, id])
   @@index([name])
@@ -794,6 +819,9 @@ model Objects {
   objectAbilities         ObjectAbilities[]
   accountItems            AccountItems[]
   mailAttachments         PlayerMail[]              // Objects attached to mail messages
+  // Quest system relations
+  questRewards            QuestRewards[]
+  objectiveTargetObject   QuestObjectives[] @relation("objectiveTargetObject")
 
   @@id([zoneId, id])
   @@index([name])
@@ -855,18 +883,34 @@ model Races {
   createdAt          DateTime        @default(now()) @map("created_at")
   updatedAt          DateTime        @updatedAt @map("updated_at")
   raceAbilities      RaceAbilities[]
+  raceSpellSlotBonuses RaceSpellSlotBonus[]
 }
 
 model RaceAbilities {
-  id        Int           @id @default(autoincrement())
-  race      Race
-  abilityId Int           @map("ability_id")
-  category  SkillCategory @default(SECONDARY)
-  bonus     Int           @default(0)
-  raceData  Races         @relation(fields: [race], references: [race], onDelete: Cascade)
-  ability   Ability       @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+  id             Int           @id @default(autoincrement())
+  race           Race
+  abilityId      Int           @map("ability_id")
+  category       SkillCategory @default(SECONDARY)
+  bonus          Int           @default(0)
+  proficiencyCap Int           @default(100) @map("proficiency_cap") // Max trainable proficiency (0-100)
+  raceData       Races         @relation(fields: [race], references: [race], onDelete: Cascade)
+  ability        Ability       @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
   @@unique([race, abilityId])
+}
+
+/// Race-specific bonus spell slots
+/// Some races may get extra slots for certain circles (e.g., elves +1 circle 1)
+model RaceSpellSlotBonus {
+  id     Int  @id @default(autoincrement())
+  race   Race
+  circle Int  // Spell circle (1-14)
+  bonus  Int  // Bonus slots (+1, +2, etc.)
+
+  raceData Races @relation(fields: [race], references: [race], onDelete: Cascade)
+
+  @@unique([race, circle])
+  @@map("RaceSpellSlotBonus")
 }
 
 model RoomExit {
@@ -917,6 +961,8 @@ model Room {
   entrances             RoomExit[]             @relation("roomEntrances")
   roomExtraDescriptions RoomExtraDescriptions[]
   zones                 Zones                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  // Quest system relations
+  questObjectives       QuestObjectives[]
 
   @@id([zoneId, id])
   @@index([plainRoomDescription])
@@ -1030,40 +1076,40 @@ model SpawnConditions {
 }
 
 model Triggers {
-  id           Int           @id @default(autoincrement())
-  name         String
-  attachType   ScriptType
-  numArgs      Int           @default(0) @map("num_args")
-  argList      String[]      @default([]) @map("arg_list")
-  commands     String
-  zoneId       Int?          @map("zone_id")
-  mobZoneId    Int?          @map("mob_zone_id")
-  mobId        Int?          @map("mob_id")
-  objectZoneId Int?          @map("object_zone_id")
-  objectId     Int?          @map("object_id")
-  variables    Json          @default("{}")
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  createdBy    String?       @map("created_by")
-  updatedBy    String?       @map("updated_by")
-  flags        TriggerFlag[]
-
-  // DG Scripts trigger vnum (e.g., 3011 = zone 30, id 11)
-  // Used to map "T <vnum>" lines in mob files to database triggers
-  vnum         Int?          @unique
+  id             Int           @id @default(autoincrement())
+  legacyZoneId   Int?          @map("legacy_zone_id")   // Zone from DG Script vnum (e.g., 3045 -> 30)
+  legacyId       Int?          @map("legacy_id")        // Local ID from vnum (e.g., 3045 -> 45)
+  name           String
+  attachType     ScriptType
+  numArgs        Int           @default(0) @map("num_args")
+  argList        String[]      @default([]) @map("arg_list")
+  commands       String
+  zoneId         Int?          @map("zone_id")
+  mobZoneId      Int?          @map("mob_zone_id")
+  mobId          Int?          @map("mob_id")
+  objectZoneId   Int?          @map("object_zone_id")
+  objectId       Int?          @map("object_id")
+  variables      Json          @default("{}")
+  createdAt      DateTime      @default(now()) @map("created_at")
+  updatedAt      DateTime      @updatedAt @map("updated_at")
+  createdBy      String?       @map("created_by")
+  updatedBy      String?       @map("updated_by")
+  flags          TriggerFlag[]
 
   // Validation tracking
-  needsReview  Boolean       @default(false) @map("needs_review")
-  syntaxError  String?       @map("syntax_error")
+  needsReview    Boolean       @default(false) @map("needs_review")
+  syntaxError    String?       @map("syntax_error")
 
   // Direct FK relations (for triggers attached to a single entity)
-  mobs         Mobs?         @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
-  objects      Objects?      @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  zones        Zones?        @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  mobs           Mobs?         @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
+  objects        Objects?      @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  zones          Zones?        @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   // Many-to-many junction tables (for shared triggers)
   mobTriggers    MobTriggers[]
   objectTriggers ObjectTriggers[]
+
+  @@unique([legacyZoneId, legacyId])
 }
 
 /// Junction table for Mob-Trigger many-to-many relationship
@@ -1208,6 +1254,8 @@ model Zones {
   rooms        Room[]
   shops        Shops[]
   triggers     Triggers[]
+  // Quest system
+  quests       Quests[]
 }
 
 // ============================================================================
@@ -1737,13 +1785,10 @@ enum SaveResult {
 }
 
 enum SaveType {
-  SPELL
-  POISON
-  BREATH
-  PARALYSIS
-  WAND
-  ROD
-  PETRIFICATION
+  // Modern D&D 3.x/5e style saves
+  REFLEX      // Dodge/avoid effects (DEX-based) - replaces legacy BREATH
+  FORTITUDE   // Resist physical effects (CON-based) - replaces legacy POISON, PARALYSIS, PETRIFICATION
+  WILL        // Resist mental effects (WIS-based) - replaces legacy SPELL, ROD, WAND
 }
 
 enum ApplyType {
@@ -1899,6 +1944,8 @@ enum TargetType {
   OBJECT_INV
   OBJECT_WORLD
   CORPSE
+  RIDER        // Target rider on a mount (for Buck skill)
+  UNCONSCIOUS  // Target unconscious entities (for Drag skill)
 }
 
 enum SpellSphere {
@@ -2518,8 +2565,8 @@ enum DialogueMatchType {
   EXACT           // Must match exactly: "paladin" → only "paladin"
   CONTAINS        // Keyword anywhere: "paladin" → "tell me about paladin"
   STARTS_WITH     // Response begins with: "yes" → "yes please"
-  ANY             // Any response continues (acknowledgments)
-  KEYWORD_SET     // Any of multiple: ["yes", "yep", "sure"]
+  ANY_RESPONSE    // Any text response continues (simple acknowledgments)
+  ANY_OF          // Match any from list: ["yes", "yep", "sure", "ok", "accept"]
   REGEX           // Pattern match for complex cases
 }
 
@@ -2552,4 +2599,313 @@ model SystemMessage {
 
   @@index([category])
   @@map("SystemMessage")
+}
+
+// ============================================================================
+// QUEST SYSTEM
+// ============================================================================
+
+/// Quest definitions - zone-scoped with composite primary key
+model Quests {
+  zoneId              Int                   @map("zone_id")
+  id                  Int
+  name                String                // Display name with color codes
+  plainName           String                @map("plain_name") // Plain text name for searches
+  description         String?               @db.Text // Long description for quest log
+  shortDescription    String?               @map("short_description") // One-liner for lists
+
+  // Level requirements
+  minLevel            Int                   @default(1) @map("min_level")
+  maxLevel            Int                   @default(100) @map("max_level")
+
+  // Flags and state
+  repeatable          Boolean               @default(false)
+  shareable           Boolean               @default(true) // Can share with group
+  autoAccept          Boolean               @default(false) @map("auto_accept")
+  hidden              Boolean               @default(false) // Hidden from quest lists
+
+  // Time limits
+  timeLimitMinutes    Int?                  @map("time_limit_minutes")
+  cooldownMinutes     Int?                  @map("cooldown_minutes")
+
+  // Quest giver/completer references (composite FKs)
+  giverMobZoneId      Int?                  @map("giver_mob_zone_id")
+  giverMobId          Int?                  @map("giver_mob_id")
+  completerMobZoneId  Int?                  @map("completer_mob_zone_id")
+  completerMobId      Int?                  @map("completer_mob_id")
+
+  // Availability Lua expression (e.g., "character.class == 'PALADIN'")
+  availabilityRequirement String?           @map("availability_requirement") @db.Text
+
+  // Tracking
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+  createdBy           String?               @map("created_by")
+  updatedBy           String?               @map("updated_by")
+
+  // Relations
+  phases              QuestPhases[]
+  rewards             QuestRewards[]
+  prerequisites       QuestPrerequisites[]  @relation("questPrerequisites")
+  dependents          QuestPrerequisites[]  @relation("prerequisiteQuest")
+  characterQuests     CharacterQuests[]
+  giverMob            Mobs?                 @relation("questGiver", fields: [giverMobZoneId, giverMobId], references: [zoneId, id])
+  completerMob        Mobs?                 @relation("questCompleter", fields: [completerMobZoneId, completerMobId], references: [zoneId, id])
+  zones               Zones                 @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+
+  @@id([zoneId, id])
+  @@index([plainName])
+  @@index([giverMobZoneId, giverMobId])
+  @@map("Quest")
+}
+
+/// Sequential phases within a quest - must complete in order
+model QuestPhases {
+  questZoneId         Int                   @map("quest_zone_id")
+  questId             Int                   @map("quest_id")
+  id                  Int
+  name                String                // Phase name (e.g., "The Investigation")
+  description         String?               // Phase description
+  order               Int                   @default(0) // Execution order
+
+  // Relations
+  quest               Quests                @relation(fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
+  objectives          QuestObjectives[]
+
+  @@id([questZoneId, questId, id])
+  @@index([questZoneId, questId, order])
+  @@map("QuestPhase")
+}
+
+/// Steps within a phase - can complete in any order within same phase
+model QuestObjectives {
+  questZoneId         Int                   @map("quest_zone_id")
+  questId             Int                   @map("quest_id")
+  phaseId             Int                   @map("phase_id")
+  id                  Int
+
+  objectiveType       QuestObjectiveType    @map("objective_type")
+
+  // Player-facing description (builder writes this)
+  playerDescription   String                @map("player_description") // "Kill the furry varmints"
+  internalNote        String?               @map("internal_note") // Builder note: "10 rats in sewers"
+  showProgress        Boolean               @default(true) @map("show_progress") // Show "3/10" or just description
+
+  // Count requirements
+  requiredCount       Int                   @default(1) @map("required_count")
+
+  // Target specifications (used based on objectiveType)
+  targetMobZoneId     Int?                  @map("target_mob_zone_id")
+  targetMobId         Int?                  @map("target_mob_id")
+  targetObjectZoneId  Int?                  @map("target_object_zone_id")
+  targetObjectId      Int?                  @map("target_object_id")
+  targetRoomZoneId    Int?                  @map("target_room_zone_id")
+  targetRoomId        Int?                  @map("target_room_id")
+  targetAbilityId     Int?                  @map("target_ability_id")
+
+  // For DELIVER_ITEM: who to deliver to
+  deliverToMobZoneId  Int?                  @map("deliver_to_mob_zone_id")
+  deliverToMobId      Int?                  @map("deliver_to_mob_id")
+
+  // Custom Lua expression for CUSTOM_LUA type
+  luaExpression       String?               @map("lua_expression") @db.Text
+
+  // Relations
+  phase               QuestPhases           @relation(fields: [questZoneId, questId, phaseId], references: [questZoneId, questId, id], onDelete: Cascade)
+  characterProgress   CharacterQuestObjectives[]
+  dialogue            QuestDialogue?
+  targetMob           Mobs?                 @relation("objectiveTargetMob", fields: [targetMobZoneId, targetMobId], references: [zoneId, id])
+  targetObject        Objects?              @relation("objectiveTargetObject", fields: [targetObjectZoneId, targetObjectId], references: [zoneId, id])
+  targetRoom          Room?                 @relation(fields: [targetRoomZoneId, targetRoomId], references: [zoneId, id])
+  targetAbility       Ability?              @relation(fields: [targetAbilityId], references: [id])
+  deliverToMob        Mobs?                 @relation("objectiveDeliverTo", fields: [deliverToMobZoneId, deliverToMobId], references: [zoneId, id])
+
+  @@id([questZoneId, questId, phaseId, id])
+  @@map("QuestObjective")
+}
+
+/// Dialogue attached to TALK_TO_NPC objectives
+model QuestDialogue {
+  id                  Int                   @id @default(autoincrement())
+  questZoneId         Int                   @map("quest_zone_id")
+  questId             Int                   @map("quest_id")
+  phaseId             Int                   @map("phase_id")
+  objectiveId         Int                   @map("objective_id")
+
+  // NPC message with markup: "Ask about the <b:gold>paladin</> path?"
+  npcMessage          String                @map("npc_message") @db.Text
+
+  // Response matching
+  matchType           DialogueMatchType     @default(CONTAINS) @map("match_type")
+  matchKeywords       String[]              @default([]) @map("match_keywords") // ["paladin", "holy"]
+
+  // Optional link to a full dialogue tree for complex conversations
+  dialogueTreeId      Int?                  @map("dialogue_tree_id")
+
+  // Relations
+  objective           QuestObjectives       @relation(fields: [questZoneId, questId, phaseId, objectiveId], references: [questZoneId, questId, phaseId, id], onDelete: Cascade)
+  dialogueTree        DialogueTrees?        @relation(fields: [dialogueTreeId], references: [id])
+
+  @@unique([questZoneId, questId, phaseId, objectiveId])
+  @@map("QuestDialogue")
+}
+
+/// Reusable dialogue trees for complex NPC conversations
+model DialogueTrees {
+  id                  Int                   @id @default(autoincrement())
+  name                String
+  description         String?
+
+  createdAt           DateTime              @default(now()) @map("created_at")
+  updatedAt           DateTime              @updatedAt @map("updated_at")
+  createdBy           String?               @map("created_by")
+  updatedBy           String?               @map("updated_by")
+
+  // Relations
+  nodes               DialogueNodes[]
+  questDialogues      QuestDialogue[]
+
+  @@map("DialogueTree")
+}
+
+/// Nodes in a dialogue tree
+model DialogueNodes {
+  id                  Int                   @id @default(autoincrement())
+  dialogueTreeId      Int                   @map("dialogue_tree_id")
+
+  // NPC message with markup
+  npcMessage          String                @map("npc_message") @db.Text
+  order               Int                   @default(0) // Order within tree
+  isRoot              Boolean               @default(false) @map("is_root")
+  isTerminal          Boolean               @default(false) @map("is_terminal") // End of conversation
+
+  // Relations
+  dialogueTree        DialogueTrees         @relation(fields: [dialogueTreeId], references: [id], onDelete: Cascade)
+  responses           DialogueResponses[]   @relation("nodeResponses")
+  incomingResponses   DialogueResponses[]   @relation("responseNextNode")
+
+  @@map("DialogueNode")
+}
+
+/// Player response options in dialogue
+model DialogueResponses {
+  id                  Int                   @id @default(autoincrement())
+  nodeId              Int                   @map("node_id") // Parent node
+  nextNodeId          Int?                  @map("next_node_id") // Where this response leads
+
+  // Response matching
+  matchType           DialogueMatchType     @default(CONTAINS) @map("match_type")
+  matchKeywords       String[]              @default([]) @map("match_keywords")
+
+  // Optional hint shown to player
+  displayHint         String?               @map("display_hint") // "Ask about the paladin path"
+
+  order               Int                   @default(0)
+
+  // Relations
+  node                DialogueNodes         @relation("nodeResponses", fields: [nodeId], references: [id], onDelete: Cascade)
+  nextNode            DialogueNodes?        @relation("responseNextNode", fields: [nextNodeId], references: [id])
+
+  @@map("DialogueResponse")
+}
+
+/// Quest rewards
+model QuestRewards {
+  id                  Int                   @id @default(autoincrement())
+  questZoneId         Int                   @map("quest_zone_id")
+  questId             Int                   @map("quest_id")
+
+  rewardType          QuestRewardType       @map("reward_type")
+
+  // Reward values (used based on rewardType)
+  amount              Int?                  // For EXPERIENCE, GOLD, SKILL_POINTS
+  objectZoneId        Int?                  @map("object_zone_id") // For ITEM
+  objectId            Int?                  @map("object_id")
+  abilityId           Int?                  @map("ability_id") // For ABILITY
+  quantity            Int                   @default(1) // Item quantity
+
+  // Choice rewards (player picks one from a group)
+  choiceGroup         Int?                  @map("choice_group")
+
+  // Optional Lua expression for conditional rewards
+  condition           String?               @db.Text // "character.class == 'PALADIN'"
+
+  // Relations
+  quest               Quests                @relation(fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
+  rewardObject        Objects?              @relation(fields: [objectZoneId, objectId], references: [zoneId, id])
+  rewardAbility       Ability?              @relation(fields: [abilityId], references: [id])
+
+  @@map("QuestReward")
+}
+
+/// Quest prerequisites for chaining
+model QuestPrerequisites {
+  id                      Int               @id @default(autoincrement())
+  questZoneId             Int               @map("quest_zone_id")
+  questId                 Int               @map("quest_id")
+  prerequisiteQuestZoneId Int               @map("prerequisite_quest_zone_id")
+  prerequisiteQuestId     Int               @map("prerequisite_quest_id")
+
+  // Prerequisite type
+  requireCompletion       Boolean           @default(true) @map("require_completion")
+
+  // Relations
+  quest                   Quests            @relation("questPrerequisites", fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
+  prerequisiteQuest       Quests            @relation("prerequisiteQuest", fields: [prerequisiteQuestZoneId, prerequisiteQuestId], references: [zoneId, id], onDelete: Cascade)
+
+  @@unique([questZoneId, questId, prerequisiteQuestZoneId, prerequisiteQuestId])
+  @@map("QuestPrerequisite")
+}
+
+/// Character quest progress (player's quest state)
+model CharacterQuests {
+  id                  String                @id @default(uuid())
+  characterId         String                @map("character_id")
+  questZoneId         Int                   @map("quest_zone_id")
+  questId             Int                   @map("quest_id")
+
+  status              QuestStatus           @default(IN_PROGRESS)
+  currentPhaseId      Int?                  @map("current_phase_id")
+
+  // Timestamps
+  acceptedAt          DateTime              @default(now()) @map("accepted_at")
+  completedAt         DateTime?             @map("completed_at")
+  expiresAt           DateTime?             @map("expires_at") // For timed quests
+
+  // Completion count (for repeatable quests)
+  completionCount     Int                   @default(0) @map("completion_count")
+
+  // Legacy compatibility: Quest variables as JSON
+  variables           Json                  @default("{}")
+
+  // Relations
+  character           Characters            @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  quest               Quests                @relation(fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
+  objectiveProgress   CharacterQuestObjectives[]
+
+  @@unique([characterId, questZoneId, questId])
+  @@index([characterId, status])
+  @@map("CharacterQuest")
+}
+
+/// Character objective progress
+model CharacterQuestObjectives {
+  id                    String              @id @default(uuid())
+  characterQuestId      String              @map("character_quest_id")
+  questZoneId           Int                 @map("quest_zone_id")
+  questId               Int                 @map("quest_id")
+  phaseId               Int                 @map("phase_id")
+  objectiveId           Int                 @map("objective_id")
+
+  // Progress tracking
+  currentCount          Int                 @default(0) @map("current_count")
+  completed             Boolean             @default(false)
+  completedAt           DateTime?           @map("completed_at")
+
+  // Relations
+  characterQuest        CharacterQuests     @relation(fields: [characterQuestId], references: [id], onDelete: Cascade)
+  objective             QuestObjectives     @relation(fields: [questZoneId, questId, phaseId, objectiveId], references: [questZoneId, questId, phaseId, id], onDelete: Cascade)
+
+  @@unique([characterQuestId, questZoneId, questId, phaseId, objectiveId])
+  @@map("CharacterQuestObjective")
 }

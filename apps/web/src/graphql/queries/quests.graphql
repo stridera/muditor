@@ -1,0 +1,283 @@
+query GetQuests($filter: QuestFilterInput, $skip: Int, $take: Int) {
+  quests(filter: $filter, skip: $skip, take: $take) {
+    zoneId
+    id
+    name
+    description
+    minLevel
+    maxLevel
+    repeatable
+    hidden
+    giverMobZoneId
+    giverMobId
+    completerMobZoneId
+    completerMobId
+    createdAt
+    updatedAt
+    phases {
+      id
+      name
+      description
+      order
+      objectives {
+        id
+        objectiveType
+        playerDescription
+        requiredCount
+        showProgress
+      }
+    }
+    rewards {
+      id
+      rewardType
+      amount
+      objectZoneId
+      objectId
+      abilityId
+    }
+    prerequisites {
+      id
+      prerequisiteQuestZoneId
+      prerequisiteQuestId
+    }
+  }
+}
+
+query GetQuestsByZone($zoneId: Int!) {
+  questsByZone(zoneId: $zoneId) {
+    zoneId
+    id
+    name
+    description
+    minLevel
+    maxLevel
+    repeatable
+    hidden
+    createdAt
+    updatedAt
+    phases {
+      id
+      name
+      order
+      objectives {
+        id
+        objectiveType
+        playerDescription
+        requiredCount
+      }
+    }
+  }
+}
+
+query GetQuest($zoneId: Int!, $id: Int!) {
+  quest(zoneId: $zoneId, id: $id) {
+    zoneId
+    id
+    name
+    description
+    minLevel
+    maxLevel
+    repeatable
+    hidden
+    giverMobZoneId
+    giverMobId
+    completerMobZoneId
+    completerMobId
+    createdAt
+    updatedAt
+    phases {
+      id
+      questZoneId
+      questId
+      name
+      description
+      order
+      objectives {
+        id
+        questZoneId
+        questId
+        phaseId
+        objectiveType
+        playerDescription
+        internalNote
+        showProgress
+        requiredCount
+        targetMobZoneId
+        targetMobId
+        targetObjectZoneId
+        targetObjectId
+        targetRoomZoneId
+        targetRoomId
+        targetAbilityId
+        deliverToMobZoneId
+        deliverToMobId
+        luaExpression
+        dialogue {
+          id
+          npcMessage
+          matchType
+          matchKeywords
+          dialogueTreeId
+        }
+      }
+    }
+    rewards {
+      id
+      rewardType
+      amount
+      objectZoneId
+      objectId
+      abilityId
+      choiceGroup
+    }
+    prerequisites {
+      id
+      questZoneId
+      questId
+      prerequisiteQuestZoneId
+      prerequisiteQuestId
+    }
+  }
+}
+
+query GetQuestsCount($zoneId: Int) {
+  questsCount(zoneId: $zoneId)
+}
+
+mutation CreateQuest($data: CreateQuestInput!) {
+  createQuest(data: $data) {
+    zoneId
+    id
+    name
+    description
+    minLevel
+    maxLevel
+    repeatable
+    hidden
+  }
+}
+
+mutation UpdateQuest($zoneId: Int!, $id: Int!, $data: UpdateQuestInput!) {
+  updateQuest(zoneId: $zoneId, id: $id, data: $data) {
+    zoneId
+    id
+    name
+    description
+    minLevel
+    maxLevel
+    repeatable
+    hidden
+  }
+}
+
+mutation DeleteQuest($zoneId: Int!, $id: Int!) {
+  deleteQuest(zoneId: $zoneId, id: $id) {
+    zoneId
+    id
+  }
+}
+
+mutation CreateQuestPhase($data: CreateQuestPhaseInput!) {
+  createQuestPhase(data: $data) {
+    id
+    questZoneId
+    questId
+    name
+    description
+    order
+  }
+}
+
+mutation UpdateQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!, $data: UpdateQuestPhaseInput!) {
+  updateQuestPhase(questZoneId: $questZoneId, questId: $questId, id: $id, data: $data) {
+    id
+    questZoneId
+    questId
+    name
+    description
+    order
+  }
+}
+
+mutation DeleteQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!) {
+  deleteQuestPhase(questZoneId: $questZoneId, questId: $questId, id: $id) {
+    id
+  }
+}
+
+mutation CreateQuestObjective($data: CreateQuestObjectiveInput!) {
+  createQuestObjective(data: $data) {
+    id
+    questZoneId
+    questId
+    phaseId
+    objectiveType
+    playerDescription
+    requiredCount
+  }
+}
+
+mutation UpdateQuestObjective(
+  $questZoneId: Int!
+  $questId: Int!
+  $phaseId: Int!
+  $id: Int!
+  $data: UpdateQuestObjectiveInput!
+) {
+  updateQuestObjective(
+    questZoneId: $questZoneId
+    questId: $questId
+    phaseId: $phaseId
+    id: $id
+    data: $data
+  ) {
+    id
+    objectiveType
+    playerDescription
+    requiredCount
+  }
+}
+
+mutation DeleteQuestObjective($questZoneId: Int!, $questId: Int!, $phaseId: Int!, $id: Int!) {
+  deleteQuestObjective(questZoneId: $questZoneId, questId: $questId, phaseId: $phaseId, id: $id) {
+    id
+  }
+}
+
+mutation CreateQuestReward($data: CreateQuestRewardInput!) {
+  createQuestReward(data: $data) {
+    id
+    rewardType
+    amount
+  }
+}
+
+mutation UpdateQuestReward($id: Int!, $data: UpdateQuestRewardInput!) {
+  updateQuestReward(id: $id, data: $data) {
+    id
+    rewardType
+    amount
+  }
+}
+
+mutation DeleteQuestReward($id: Int!) {
+  deleteQuestReward(id: $id) {
+    id
+  }
+}
+
+mutation CreateQuestPrerequisite($data: CreateQuestPrerequisiteInput!) {
+  createQuestPrerequisite(data: $data) {
+    id
+    questZoneId
+    questId
+    prerequisiteQuestZoneId
+    prerequisiteQuestId
+  }
+}
+
+mutation DeleteQuestPrerequisite($id: Int!) {
+  deleteQuestPrerequisite(id: $id) {
+    id
+  }
+}
