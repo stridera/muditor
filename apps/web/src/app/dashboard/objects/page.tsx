@@ -670,12 +670,9 @@ function ObjectsContent() {
                           />
                         </div>
                         <div className='flex flex-wrap gap-1 mb-2'>
-                          {(Array.isArray(fullObject.keywords)
-                            ? fullObject.keywords
-                            : fullObject.keywords.split(/\s+/)
-                          )
-                            .filter(k => k)
-                            .map((keyword, idx) => (
+                          {(fullObject.keywords ?? [])
+                            .filter((k: string) => k)
+                            .map((keyword: string, idx: number) => (
                               <span
                                 key={idx}
                                 className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground'

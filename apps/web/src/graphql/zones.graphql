@@ -5,6 +5,7 @@ query GetZones {
     id
     name
     climate
+    hemisphere
     lifespan
     resetMode
   }
@@ -14,5 +15,29 @@ query GetZonesForSelector {
   zones {
     id
     name
+  }
+}
+
+query GetZone($id: Int!) {
+  zone(id: $id) {
+    id
+    name
+    climate
+    hemisphere
+    lifespan
+    resetMode
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdateZone($id: Int!, $data: UpdateZoneInput!) {
+  updateZone(id: $id, data: $data) {
+    id
+    name
+    climate
+    hemisphere
+    lifespan
+    resetMode
   }
 }

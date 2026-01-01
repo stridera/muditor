@@ -235,7 +235,7 @@ function indexedColorToHex(index: number): string {
       '#00FFFF',
       '#FFFFFF',
     ];
-    return colors[index];
+    return colors[index] ?? '#FFFFFF';
   }
 
   // 16-231: 6x6x6 RGB cube

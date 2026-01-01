@@ -10,7 +10,7 @@ interface NumberSpinnerProps {
   min?: number;
   max?: number;
   step?: number;
-  error?: string;
+  error?: string | undefined;
   helpText?: string;
   className?: string;
   placeholder?: string;

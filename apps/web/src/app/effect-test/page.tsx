@@ -343,7 +343,7 @@ function EffectReadout({
   effect: AbilityEffectOutput;
   index: number;
 }) {
-  const info = getEffectInfo(effect.effectId);
+  const info = getEffectInfo(effect.effectId ?? 0);
   const Icon = info.icon;
 
   return (

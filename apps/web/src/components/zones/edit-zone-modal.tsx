@@ -26,16 +26,25 @@ interface EditZoneModalProps {
   onSuccess: () => void;
 }
 
-const RESET_MODES: ResetMode[] = ['NEVER', 'EMPTY', 'ALWAYS', 'NORMAL'];
+const RESET_MODES: ResetMode[] = ['NEVER', 'EMPTY', 'NORMAL'];
 const HEMISPHERES: Hemisphere[] = [
-  'NORTH',
-  'SOUTH',
   'NORTHWEST',
   'NORTHEAST',
   'SOUTHWEST',
   'SOUTHEAST',
 ];
-const CLIMATES: Climate[] = ['TEMPERATE', 'ARCTIC', 'TROPICAL', 'ARID', 'NONE'];
+const CLIMATES: Climate[] = [
+  'ALPINE',
+  'ARCTIC',
+  'ARID',
+  'NONE',
+  'OCEANIC',
+  'SEMIARID',
+  'SUBARCTIC',
+  'SUBTROPICAL',
+  'TEMPERATE',
+  'TROPICAL',
+];
 
 export function EditZoneModal({
   zone,
@@ -138,7 +147,10 @@ export function EditZoneModal({
               id='resetMode'
               value={formData.resetMode}
               onChange={e =>
-                setFormData({ ...formData, resetMode: e.target.value })
+                setFormData({
+                  ...formData,
+                  resetMode: e.target.value as ResetMode,
+                })
               }
               className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground'
               required
@@ -163,7 +175,7 @@ export function EditZoneModal({
               id='climate'
               value={formData.climate}
               onChange={e =>
-                setFormData({ ...formData, climate: e.target.value })
+                setFormData({ ...formData, climate: e.target.value as Climate })
               }
               className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground'
               required
@@ -188,7 +200,10 @@ export function EditZoneModal({
               id='hemisphere'
               value={formData.hemisphere}
               onChange={e =>
-                setFormData({ ...formData, hemisphere: e.target.value })
+                setFormData({
+                  ...formData,
+                  hemisphere: e.target.value as Hemisphere,
+                })
               }
               className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary bg-background text-foreground'
               required

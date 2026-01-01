@@ -20,7 +20,7 @@ export interface Script {
 }
 
 interface ScriptEditorProps {
-  script?: Script;
+  script?: Script | undefined;
   onSave?: (script: Partial<Script>) => void;
   onTest?: (script: Partial<Script>) => void;
   onChange?: (value: string) => void;

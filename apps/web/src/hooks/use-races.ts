@@ -27,7 +27,14 @@ export function useRaces(): UseRacesResult {
     errorPolicy: 'all',
   });
 
-  const races = data?.races || [];
+  const races: RaceOption[] = (data?.races || []).map(r => ({
+    race: r.race,
+    name: r.name,
+    displayName: r.plainName,
+    playable: r.playable,
+    humanoid: r.humanoid,
+    magical: r.magical,
+  }));
 
   return {
     races,

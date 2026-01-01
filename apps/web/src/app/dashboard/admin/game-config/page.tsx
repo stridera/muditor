@@ -218,8 +218,14 @@ interface LoginMessage {
 type SortField = 'category' | 'key' | 'value' | 'valueType';
 type SortDirection = 'asc' | 'desc';
 
+interface GameConfigsQueryResult {
+  gameConfigs: GameConfig[];
+  gameConfigCategories: string[];
+}
+
 function ConfigTab() {
-  const { data, loading, error, refetch } = useQuery(GET_GAME_CONFIGS);
+  const { data, loading, error, refetch } =
+    useQuery<GameConfigsQueryResult>(GET_GAME_CONFIGS);
   const [updateConfig] = useMutation(UPDATE_GAME_CONFIG);
   const [editConfig, setEditConfig] = useState<GameConfig | null>(null);
   const [editValue, setEditValue] = useState('');
@@ -507,8 +513,14 @@ function ConfigTab() {
 // Levels Tab Component
 // ============================================
 
+interface LevelDefinitionsQueryResult {
+  levelDefinitions: LevelDefinition[];
+  availablePermissions: string[];
+}
+
 function LevelsTab() {
-  const { data, loading, error, refetch } = useQuery(GET_LEVEL_DEFINITIONS);
+  const { data, loading, error, refetch } =
+    useQuery<LevelDefinitionsQueryResult>(GET_LEVEL_DEFINITIONS);
   const [updateLevel] = useMutation(UPDATE_LEVEL_DEFINITION);
   const [editLevel, setEditLevel] = useState<LevelDefinition | null>(null);
   const [editData, setEditData] = useState({
@@ -848,8 +860,13 @@ function LevelsTab() {
 // System Text Tab Component
 // ============================================
 
+interface SystemTextsQueryResult {
+  systemTexts: SystemText[];
+}
+
 function SystemTextTab() {
-  const { data, loading, error, refetch } = useQuery(GET_SYSTEM_TEXTS);
+  const { data, loading, error, refetch } =
+    useQuery<SystemTextsQueryResult>(GET_SYSTEM_TEXTS);
   const [updateText] = useMutation(UPDATE_SYSTEM_TEXT);
   const [editText, setEditText] = useState<SystemText | null>(null);
   const [editContent, setEditContent] = useState('');
@@ -982,8 +999,13 @@ function SystemTextTab() {
 // Login Messages Tab Component
 // ============================================
 
+interface LoginMessagesQueryResult {
+  loginMessages: LoginMessage[];
+}
+
 function LoginMessagesTab() {
-  const { data, loading, error, refetch } = useQuery(GET_LOGIN_MESSAGES);
+  const { data, loading, error, refetch } =
+    useQuery<LoginMessagesQueryResult>(GET_LOGIN_MESSAGES);
   const [updateMessage] = useMutation(UPDATE_LOGIN_MESSAGE);
   const [editMessage, setEditMessage] = useState<LoginMessage | null>(null);
   const [editContent, setEditContent] = useState('');

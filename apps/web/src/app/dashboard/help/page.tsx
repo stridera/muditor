@@ -195,7 +195,7 @@ const defaultFormData: HelpFormData = {
  */
 function parseSeeAlso(content: string): string[] {
   const seeAlsoMatch = content.match(/See\s+also\s*:?\s*(.+?)(?:\n\n|\n$|$)/i);
-  if (!seeAlsoMatch) return [];
+  if (!seeAlsoMatch || !seeAlsoMatch[1]) return [];
 
   const seeAlsoText = seeAlsoMatch[1];
   // Split by commas, "and", or multiple spaces
@@ -297,24 +297,9 @@ export default function HelpPage() {
       skip: !searchQuery,
     });
 
-  const [lookupByKeyword, { loading: lookingUp }] = useLazyQuery(
-    GET_HELP_BY_KEYWORD,
-    {
-      onCompleted: data => {
-        if (data?.helpByKeyword) {
-          // Push current entry to history before navigating
-          if (selectedEntry) {
-            setHistoryStack(prev => [...prev, selectedEntry]);
-          }
-          setSelectedEntry(data.helpByKeyword);
-        }
-      },
-      onError: err => {
-        setErrorMessage(`No help found for that topic: ${err.message}`);
-        setTimeout(() => setErrorMessage(''), 3000);
-      },
-    }
-  );
+  const [lookupByKeyword, { loading: lookingUp }] = useLazyQuery<{
+    helpByKeyword: HelpEntry | null;
+  }>(GET_HELP_BY_KEYWORD);
 
   const [createEntry, { loading: creating }] = useMutation(CREATE_HELP_ENTRY, {
     onCompleted: () => {
@@ -400,17 +385,32 @@ export default function HelpPage() {
   };
 
   const handleLinkClick = useCallback(
-    (keyword: string) => {
-      lookupByKeyword({ variables: { keyword } });
+    async (keyword: string) => {
+      try {
+        const { data } = await lookupByKeyword({ variables: { keyword } });
+        if (data?.helpByKeyword) {
+          // Push current entry to history before navigating
+          if (selectedEntry) {
+            setHistoryStack(prev => [...prev, selectedEntry]);
+          }
+          setSelectedEntry(data.helpByKeyword);
+        }
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Unknown error';
+        setErrorMessage(`No help found for that topic: ${message}`);
+        setTimeout(() => setErrorMessage(''), 3000);
+      }
     },
-    [lookupByKeyword]
+    [lookupByKeyword, selectedEntry]
   );
 
   const handleBackClick = useCallback(() => {
     if (historyStack.length > 0) {
-      const prev = historyStack[historyStack.length - 1];
-      setHistoryStack(prev => prev.slice(0, -1));
-      setSelectedEntry(prev);
+      const prevEntry = historyStack[historyStack.length - 1];
+      setHistoryStack(stack => stack.slice(0, -1));
+      if (prevEntry) {
+        setSelectedEntry(prevEntry);
+      }
     }
   }, [historyStack]);
 
@@ -477,7 +477,7 @@ export default function HelpPage() {
       );
       if (exactMatch) {
         handleEntryClick(exactMatch);
-      } else if (entries.length === 1) {
+      } else if (entries.length === 1 && entries[0]) {
         // If only one result, open it
         handleEntryClick(entries[0]);
       }

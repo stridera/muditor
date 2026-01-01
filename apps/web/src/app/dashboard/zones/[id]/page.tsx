@@ -3,6 +3,11 @@
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { ClimateBadge } from '@/components/ui/climate-badge';
 import { EditZoneModal } from '@/components/zones/edit-zone-modal';
+import {
+  type Climate,
+  type Hemisphere,
+  type ResetMode,
+} from '@/generated/graphql';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -11,9 +16,9 @@ interface ZoneDetail {
   id: number;
   name: string;
   lifespan: number;
-  climate: string;
-  resetMode: string;
-  hemisphere: string;
+  climate: Climate;
+  resetMode: ResetMode;
+  hemisphere: Hemisphere;
   _count: {
     rooms: number;
     mobs: number;

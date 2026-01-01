@@ -153,13 +153,14 @@ function validateEffect(
   index: number
 ): ValidationError[] {
   const errors: ValidationError[] = [];
-  const schema = EFFECT_SCHEMAS[effect.effectId];
+  const effectId = effect.effectId ?? 0;
+  const schema = EFFECT_SCHEMAS[effectId];
 
   // Basic validation
-  if (!effect.effectId || effect.effectId <= 0) {
+  if (!effectId || effectId <= 0) {
     errors.push({
       effectIndex: index,
-      effectId: effect.effectId,
+      effectId: effectId,
       field: 'effectId',
       message: 'Missing or invalid effect ID',
       severity: 'error',
@@ -171,7 +172,7 @@ function validateEffect(
   if (effect.chancePct < 0 || effect.chancePct > 100) {
     errors.push({
       effectIndex: index,
-      effectId: effect.effectId,
+      effectId: effectId,
       field: 'chancePct',
       message: 'Chance must be between 0 and 100',
       severity: 'error',
@@ -182,7 +183,7 @@ function validateEffect(
   if (effect.order < 0) {
     errors.push({
       effectIndex: index,
-      effectId: effect.effectId,
+      effectId: effectId,
       field: 'order',
       message: 'Order must be non-negative',
       severity: 'error',
@@ -198,7 +199,7 @@ function validateEffect(
       if (!(requiredParam in params)) {
         errors.push({
           effectIndex: index,
-          effectId: effect.effectId,
+          effectId: effectId,
           field: requiredParam,
           message: `Missing required parameter: ${requiredParam}`,
           severity: 'warning', // Warning since blocks have defaults
@@ -212,7 +213,7 @@ function validateEffect(
       if (validator && !validator(value)) {
         errors.push({
           effectIndex: index,
-          effectId: effect.effectId,
+          effectId: effectId,
           field: paramName,
           message: `Invalid value for ${paramName}: ${JSON.stringify(value)}`,
           severity: 'error',

@@ -44,6 +44,10 @@ model Ability {
   questOnly       Boolean      @default(false) @map("quest_only") // Quest-restricted ability
   humanoidOnly    Boolean      @default(false) @map("humanoid_only") // Only available to humanoids
 
+  // --- Stealth & Visibility ---
+  contestedVisibility Boolean     @default(false) @map("contested_visibility") // Room messages require perception checks
+  visibilityCheck     String?     @map("visibility_check") // Check formula: "stealth vs perception"
+
   // --- Relationships ---
   effects            AbilityEffect[]
   school             AbilitySchool?       @relation(fields: [schoolId], references: [id])
@@ -461,6 +465,9 @@ model Characters {
   userId             String?              @map("user_id")
   createdAt          DateTime             @default(now()) @map("created_at")
   updatedAt          DateTime             @updatedAt @map("updated_at")
+  // Soft delete support
+  deletedAt          DateTime?            @map("deleted_at")
+  deletionReason     String?              @map("deletion_reason")
   classId            Int?                 @map("class_id")
   experience         Int                  @default(0)
   skillPoints        Int                  @default(0) @map("skill_points")
@@ -665,6 +672,7 @@ model Mobs {
   shops              Shops[]
   triggers           Triggers[]      // Legacy direct FK (deprecated)
   mobTriggers        MobTriggers[]   // Proper many-to-many via junction table
+  shopMobs           ShopMobs[]      // Mobs for sale at pet/mount shops
 
   @@id([zoneId, id])
   @@index([name])
@@ -939,10 +947,36 @@ model ShopItems {
   shopId       Int     @map("shop_id")
   objectZoneId Int     @map("object_zone_id")
   objectId     Int     @map("object_id")
+
+  // Spawn and availability controls
+  spawnChance           Float   @default(1.0) @map("spawn_chance") // 0.0-1.0 probability
+  visibilityRequirement String? @map("visibility_requirement") // Lua expr: when shown in list
+  purchaseRequirement   String? @map("purchase_requirement") // Lua expr: when can buy
+
   objects      Objects @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   shops        Shops   @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
 
   @@unique([shopZoneId, shopId, objectZoneId, objectId])
+}
+
+// Mobs for sale at pet/mount shops (replaces legacy "backroom" hack)
+model ShopMobs {
+  id         Int   @id @default(autoincrement())
+  amount     Int   @default(-1) // -1 = unlimited stock
+  shopZoneId Int   @map("shop_zone_id")
+  shopId     Int   @map("shop_id")
+  mobZoneId  Int   @map("mob_zone_id")
+  mobId      Int   @map("mob_id")
+
+  // Spawn and availability controls
+  spawnChance           Float   @default(1.0) @map("spawn_chance") // 0.0-1.0 probability
+  visibilityRequirement String? @map("visibility_requirement") // Lua expr: when shown in list
+  purchaseRequirement   String? @map("purchase_requirement") // Lua expr: when can buy
+
+  mobs       Mobs  @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
+  shops      Shops @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
+
+  @@unique([shopZoneId, shopId, mobZoneId, mobId])
 }
 
 model ShopRooms {
@@ -977,6 +1011,7 @@ model Shops {
   shopAccepts         ShopAccepts[]
   shopHours           ShopHours[]
   shopItems           ShopItems[]
+  shopMobs            ShopMobs[]
   shopRooms           ShopRooms[]
   mobs                Mobs?            @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
   zones               Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
@@ -1088,6 +1123,9 @@ model Users {
   accountMailSent     AccountMail[] @relation("accountMailSent")
   accountMailReceived AccountMail[] @relation("accountMailReceived")
   discordLink         DiscordLink?
+  // Soft delete support
+  deletedAt           DateTime?    @map("deleted_at")
+  deletionReason      String?      @map("deletion_reason")
 }
 
 model UserGrants {
@@ -1127,6 +1165,28 @@ model AccountItems {
 
   @@index([userId])
   @@map("account_items")
+}
+
+// Global events for seasonal content, promotions, and special occasions
+model Events {
+  id          Int       @id @default(autoincrement())
+  name        String    @unique // e.g., "christmas", "halloween", "summer_festival"
+  displayName String    @map("display_name") // e.g., "Christmas Event"
+  description String?
+
+  // Scheduling (null = manual activation only)
+  startDate   DateTime? @map("start_date")
+  endDate     DateTime? @map("end_date")
+  recurring   Boolean   @default(false) // repeats yearly?
+
+  // Manual override
+  active      Boolean   @default(false) // manual on/off toggle
+
+  // Timestamps
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  createdBy   String?   @map("created_by")
+  updatedBy   String?   @map("updated_by")
 }
 
 model Zones {
@@ -1183,8 +1243,22 @@ model Social {
 }
 
 // ============================================================================
-// ENUMS 
+// ENUMS
 // ============================================================================
+
+enum ReportType {
+  BUG
+  IDEA
+  TYPO
+}
+
+enum ReportStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  WONT_FIX
+  DUPLICATE
+}
 
 enum Climate {
   NONE
@@ -1450,12 +1524,13 @@ enum MobFlag {
   BANKER
   RECEPTIONIST
   POSTMASTER
+  SHOPKEEPER
 }
 
 enum ObjectFlag {
   GLOW
   HUM
-  NO_RENT
+  TEMPORARY
   ANTI_BERSERKER
   NO_INVISIBLE
   INVISIBLE
@@ -2335,4 +2410,146 @@ model DiscordConfig {
   updatedAt       DateTime @updatedAt @map("updated_at")
 
   @@map("discord_config")
+}
+
+// ============================================================================
+// PLAYER REPORTS (Bug, Idea, Typo)
+// ============================================================================
+
+model Report {
+  id           Int          @id @default(autoincrement())
+  reportType   ReportType   @map("report_type")
+  status       ReportStatus @default(OPEN)
+
+  // Reporter info
+  reporterName String       @map("reporter_name") // Character name
+  reporterId   String?      @map("reporter_id")   // User ID if available
+
+  // Location context
+  roomZoneId   Int?         @map("room_zone_id")
+  roomId       Int?         @map("room_id")
+
+  // Report content
+  message      String       @db.Text
+
+  // Resolution
+  resolvedBy   String?      @map("resolved_by")   // Admin who resolved
+  resolvedAt   DateTime?    @map("resolved_at")
+  resolution   String?      @db.Text              // Resolution notes
+
+  createdAt    DateTime     @default(now()) @map("created_at")
+  updatedAt    DateTime     @updatedAt @map("updated_at")
+
+  @@index([reportType])
+  @@index([status])
+  @@index([reporterName])
+  @@index([createdAt])
+  @@map("reports")
+}
+
+// ============================================================================
+// COMBAT MESSAGE SYSTEM
+// ============================================================================
+
+// Combat messages with array columns for variety (random selection at runtime)
+// Supports weapon-type and attack-type specific messages
+model CombatMessage {
+  id          Int      @id @default(autoincrement())
+  hitType     HitType  @map("hit_type")        // miss, glancing, hit, critical
+  attackType  String?  @map("attack_type")     // slash, pierce, crush, magic, NULL = all
+  weaponType  String?  @map("weapon_type")     // sword, mace, dagger, NULL = all
+
+  // Message arrays - runtime randomly selects one
+  // Placeholders: {actor}, {target}, {damage}, {weapon}
+  toActor     String[] @map("to_actor")        // ["You miss {target}.", "Your swing goes wide!"]
+  toTarget    String[] @map("to_target")       // ["{actor} misses you.", "{actor}'s attack goes wide."]
+  toRoom      String[] @map("to_room")         // ["{actor} misses {target}.", "{actor} swings wildly."]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@unique([hitType, attackType, weaponType])
+  @@index([hitType])
+  @@map("CombatMessage")
+}
+
+enum HitType {
+  MISS
+  GLANCING
+  HIT
+  CRITICAL
+  DEATH       // Kill messages
+  DODGE       // Target dodged
+  PARRY       // Target parried
+  BLOCK       // Target blocked with shield
+}
+
+// ============================================================================
+// QUEST SYSTEM ENUMS
+// ============================================================================
+
+enum QuestObjectiveType {
+  KILL_MOB        // Kill specific mob(s)
+  COLLECT_ITEM    // Collect specific item(s)
+  DELIVER_ITEM    // Give item to NPC
+  VISIT_ROOM      // Visit specific room
+  TALK_TO_NPC     // Talk to specific NPC
+  USE_SKILL       // Use a skill/ability
+  CUSTOM_LUA      // Custom Lua expression
+}
+
+enum QuestRewardType {
+  EXPERIENCE      // XP reward
+  ITEM            // Object reward
+  GOLD            // Currency reward
+  ABILITY         // Learn spell/skill
+  SKILL_POINTS    // Skill points
+}
+
+enum QuestStatus {
+  AVAILABLE       // Can be accepted
+  IN_PROGRESS     // Currently active
+  COMPLETED       // Successfully finished
+  FAILED          // Failed (time expired, etc.)
+  ABANDONED       // Player abandoned
+}
+
+enum DialogueMatchType {
+  EXACT           // Must match exactly: "paladin" → only "paladin"
+  CONTAINS        // Keyword anywhere: "paladin" → "tell me about paladin"
+  STARTS_WITH     // Response begins with: "yes" → "yes please"
+  ANY             // Any response continues (acknowledgments)
+  KEYWORD_SET     // Any of multiple: ["yes", "yep", "sure"]
+  REGEX           // Pattern match for complex cases
+}
+
+// Position-based messages (sit, stand, rest, sleep transitions)
+model PositionMessage {
+  id           Int      @id @default(autoincrement())
+  fromPosition Position @map("from_position")
+  toPosition   Position @map("to_position")
+  command      String?  // "sit", "stand", "rest", etc. NULL = any transition
+
+  toActor      String[] @map("to_actor")  // ["You sit down.", "You take a seat."]
+  toRoom       String[] @map("to_room")   // ["{actor} sits down.", "{actor} takes a seat."]
+
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  @@unique([fromPosition, toPosition, command])
+  @@map("PositionMessage")
+}
+
+// System/error messages with variants
+model SystemMessage {
+  id          Int      @id @default(autoincrement())
+  key         String   @unique  // "error_too_heavy", "error_not_here", etc.
+  category    String   // "error", "combat", "magic", "movement"
+  messages    String[] // ["You can't carry any more.", "That's too heavy for you."]
+
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@index([category])
+  @@map("SystemMessage")
 }
