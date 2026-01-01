@@ -18,6 +18,13 @@ const GET_CHARACTER_NAME = gql`
   }
 `;
 
+interface CharacterNameQueryResult {
+  character: {
+    id: string;
+    name: string;
+  } | null;
+}
+
 export interface BreadcrumbItem {
   label: string;
   href?: string;
@@ -41,10 +48,13 @@ export function Breadcrumb({ items: customItems }: BreadcrumbProps) {
   const characterId = adminCharacterMatch ? adminCharacterMatch[1] : null;
 
   // Fetch character name for admin pages
-  const { data: characterData } = useQuery(GET_CHARACTER_NAME, {
-    variables: { id: characterId },
-    skip: !characterId,
-  });
+  const { data: characterData } = useQuery<CharacterNameQueryResult>(
+    GET_CHARACTER_NAME,
+    {
+      variables: { id: characterId },
+      skip: !characterId,
+    }
+  );
 
   // Read view mode from localStorage (same as Navigation component)
   const [viewMode, setViewMode] = useState<'player' | 'admin'>('admin');
@@ -108,7 +118,7 @@ export function Breadcrumb({ items: customItems }: BreadcrumbProps) {
         const characterMatch = pathname.match(
           /\/dashboard\/player\/characters\/([^/]+)$/
         );
-        if (characterMatch) {
+        if (characterMatch && characterMatch[1]) {
           const characterName = decodeURIComponent(characterMatch[1]);
           breadcrumbs.push({ label: characterName });
         }

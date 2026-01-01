@@ -20,6 +20,19 @@ const GET_CHARACTER_SESSION_INFO = gql`
   }
 `;
 
+interface CharacterSessionInfo {
+  id: string;
+  name: string;
+  isOnline: boolean;
+  lastLogin: string | null;
+  totalTimePlayed: number;
+  currentSessionTime: number;
+}
+
+interface CharacterSessionInfoQueryResult {
+  characterSessionInfo: CharacterSessionInfo | null;
+}
+
 interface CharacterSessionInfoProps {
   characterId: string;
   isOnline?: boolean;
@@ -29,13 +42,16 @@ export function CharacterSessionInfo({
   characterId,
   isOnline,
 }: CharacterSessionInfoProps) {
-  const { data: sessionData } = useQuery(GET_CHARACTER_SESSION_INFO, {
-    variables: { characterId },
-    pollInterval: 30000,
-    skip: !isOnline,
-    fetchPolicy: 'network-only',
-    notifyOnNetworkStatusChange: false,
-  });
+  const { data: sessionData } = useQuery<CharacterSessionInfoQueryResult>(
+    GET_CHARACTER_SESSION_INFO,
+    {
+      variables: { characterId },
+      pollInterval: 30000,
+      skip: !isOnline,
+      fetchPolicy: 'network-only',
+      notifyOnNetworkStatusChange: false,
+    }
+  );
 
   const sessionInfo = sessionData?.characterSessionInfo;
 

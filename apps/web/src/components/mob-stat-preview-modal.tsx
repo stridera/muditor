@@ -34,7 +34,7 @@ export function MobStatPreviewModal({
   // Parse dice notation to calculate stats
   const parseDiceStats = (diceStr: string) => {
     const match = String(diceStr).match(/(\d+)d(\d+)([+-]\d+)?/);
-    if (!match) return null;
+    if (!match || !match[1] || !match[2]) return null;
     const num = parseInt(match[1]);
     const size = parseInt(match[2]);
     const bonus = match[3] ? parseInt(match[3]) : 0;

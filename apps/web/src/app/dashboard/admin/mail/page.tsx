@@ -67,7 +67,7 @@ import { toast } from 'sonner';
 
 export default function AdminMailPage() {
   return (
-    <PermissionGuard requireRole='CODER'>
+    <PermissionGuard requireCoder>
       <AdminMailContent />
     </PermissionGuard>
   );

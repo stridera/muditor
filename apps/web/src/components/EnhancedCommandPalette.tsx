@@ -34,8 +34,15 @@ function parseSearchInput(input: string): ParsedInput {
 
   // Pattern: "30 o sword" or "30 m orc" (zone-scoped search)
   const zoneScopedMatch = trimmed.match(/^(\d+)\s+([mo])\s+(.+)$/i);
-  if (zoneScopedMatch) {
-    const [, zoneIdStr, modeChar, query] = zoneScopedMatch;
+  if (
+    zoneScopedMatch &&
+    zoneScopedMatch[1] &&
+    zoneScopedMatch[2] &&
+    zoneScopedMatch[3]
+  ) {
+    const zoneIdStr = zoneScopedMatch[1];
+    const modeChar = zoneScopedMatch[2];
+    const query = zoneScopedMatch[3];
     const zoneId = parseInt(zoneIdStr, 10);
     const mode = modeChar.toLowerCase() === 'm' ? 'mobs' : 'objects';
     return { mode, query, zoneId };

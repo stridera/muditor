@@ -7,12 +7,13 @@ import { stripMarkup } from '../utils/xmlLiteParser';
 
 export interface Searchable {
   id: number;
-  keywords?: string;
+  keywords?: string | string[];
   name?: string;
   roomDescription?: string;
   examineDescription?: string;
   level?: number;
   type?: string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
@@ -34,8 +35,11 @@ export function applySearchFilters<T extends Searchable>(
         searchTerm.startsWith('"') && searchTerm.endsWith('"');
       const searchValue = isExactMatch ? searchTerm.slice(1, -1) : searchTerm;
 
+      const keywordsStr = Array.isArray(item.keywords)
+        ? item.keywords.join(' ')
+        : item.keywords;
       const searchFields = [
-        item.keywords,
+        keywordsStr,
         item.name ? stripMarkup(item.name) : null,
         item.roomDescription ? stripMarkup(item.roomDescription) : null,
         item.examineDescription ? stripMarkup(item.examineDescription) : null,
@@ -140,7 +144,10 @@ export function generateSearchSuggestions<T extends Searchable>(
   items.forEach(item => {
     // Add matching keywords
     if (item.keywords) {
-      item.keywords.split(' ').forEach(keyword => {
+      const keywordArray = Array.isArray(item.keywords)
+        ? item.keywords
+        : item.keywords.split(' ');
+      keywordArray.forEach((keyword: string) => {
         if (keyword.toLowerCase().includes(term) && keyword.length > 2) {
           suggestions.add(keyword);
         }

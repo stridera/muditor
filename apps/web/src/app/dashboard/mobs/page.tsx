@@ -41,7 +41,7 @@ import {
 
 interface Mob {
   id: number;
-  keywords: string;
+  keywords: string[];
   name: string;
   roomDescription: string;
   examineDescription: string;
@@ -516,14 +516,8 @@ function MobsContent() {
           const result = await response.json();
           if (result.errors) {
             /* LoggingService.error('Error loading mob details:', result.errors[0].message); */
-          } else if (result.data.mob) {
-            // Update the mob in the list with detailed data
-            setMobs(prevMobs =>
-              prevMobs.map(m =>
-                m.id === mobId ? { ...m, ...result.data.mob } : m
-              )
-            );
           }
+          // Note: Detailed mob data is fetched but not stored - expand shows list data only
         } catch {
           /* LoggingService.error('Error loading mob details'); */
         } finally {
@@ -739,12 +733,9 @@ function MobsContent() {
                       </div>
                     </div>
                     <div className='flex flex-wrap gap-1 mb-2'>
-                      {(Array.isArray(mob.keywords)
-                        ? mob.keywords
-                        : mob.keywords.split(/\s+/)
-                      )
-                        .filter(k => k)
-                        .map((keyword, idx) => (
+                      {(mob.keywords ?? [])
+                        .filter((k: string) => k)
+                        .map((keyword: string, idx: number) => (
                           <span
                             key={`${mob.zoneId}-${mob.id}-kw-${idx}`}
                             className='inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-secondary text-secondary-foreground'

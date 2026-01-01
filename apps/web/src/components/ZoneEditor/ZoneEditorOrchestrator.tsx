@@ -899,13 +899,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     rooms.forEach(room => {
       room.mobs?.forEach(mob => {
         if (!mobMap.has(mob.id)) {
-          mobMap.set(mob.id, {
+          const mobEntry: Mob = {
             id: mob.id,
             name: mob.name,
             level: mob.level ?? 0,
             roomId: room.id,
-            description: mob.description ?? undefined,
-          });
+          };
+          if (mob.description) mobEntry.description = mob.description;
+          mobMap.set(mob.id, mobEntry);
         }
       });
     });
@@ -918,13 +919,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     rooms.forEach(room => {
       room.objects?.forEach(obj => {
         if (!objMap.has(obj.id)) {
-          objMap.set(obj.id, {
+          const objEntry: GameObject = {
             id: obj.id,
             name: obj.name,
             type: 'unknown', // We'll need to fetch this from a more detailed query
             roomId: room.id,
-            description: obj.description ?? undefined,
-          });
+          };
+          if (obj.description) objEntry.description = obj.description;
+          objMap.set(obj.id, objEntry);
         }
       });
     });

@@ -643,8 +643,7 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Class Skills</CardTitle>
                         <CardDescription>
-                          Skills available to the {selectedClass.plainName}{' '}
-                          class
+                          Skills available to the {selectedClass.name} class
                         </CardDescription>
                       </div>
                       {canEdit && !addingSkill && (
@@ -837,8 +836,7 @@ export default function ClassesPage() {
                       <div>
                         <CardTitle>Spell Circles</CardTitle>
                         <CardDescription>
-                          Spell progression for the {selectedClass.plainName}{' '}
-                          class
+                          Spell progression for the {selectedClass.name} class
                         </CardDescription>
                       </div>
                       {canEdit && !addingCircle && (

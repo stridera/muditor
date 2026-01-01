@@ -89,7 +89,7 @@ export default function PlayerMailboxPage() {
   const characters = charactersData?.myCharacters || [];
 
   // Auto-select first character if none selected
-  if (!selectedCharacterId && characters.length > 0) {
+  if (!selectedCharacterId && characters.length > 0 && characters[0]) {
     setSelectedCharacterId(characters[0].id);
   }
 

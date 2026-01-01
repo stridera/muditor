@@ -38,6 +38,7 @@ query GetMob($id: Int!, $zoneId: Int!) {
     charisma
     perception
     concealment
+    wealth
     race
     gender
     size

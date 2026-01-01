@@ -430,14 +430,16 @@ export default function AbilitiesPage() {
         variables: {
           abilityId: parseInt(viewingAbilityId, 10),
           data: {
-            effects: editedEffects.map(effect => ({
-              effectId: effect.effectId,
-              overrideParams: effect.overrideParams,
-              order: effect.order,
-              trigger: effect.trigger,
-              chancePct: effect.chancePct,
-              condition: effect.condition,
-            })),
+            effects: editedEffects
+              .filter(effect => effect.effectId != null)
+              .map(effect => ({
+                effectId: effect.effectId!,
+                overrideParams: effect.overrideParams,
+                order: effect.order,
+                trigger: effect.trigger ?? null,
+                chancePct: effect.chancePct,
+                condition: effect.condition ?? null,
+              })),
           },
         },
       });

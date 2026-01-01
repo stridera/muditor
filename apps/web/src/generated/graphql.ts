@@ -8118,6 +8118,7 @@ export type GetMobQuery = {
     charisma: number;
     perception: number;
     concealment: number;
+    wealth?: number | null;
     race: Race;
     gender: Gender;
     size: Size;
@@ -8992,6 +8993,7 @@ export type GetZonesQuery = {
     id: number;
     name: string;
     climate: Climate;
+    hemisphere: Hemisphere;
     lifespan: number;
     resetMode: ResetMode;
   }>;
@@ -9002,6 +9004,43 @@ export type GetZonesForSelectorQueryVariables = Exact<{ [key: string]: never }>;
 export type GetZonesForSelectorQuery = {
   __typename?: 'Query';
   zones: Array<{ __typename?: 'ZoneDto'; id: number; name: string }>;
+};
+
+export type GetZoneQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+export type GetZoneQuery = {
+  __typename?: 'Query';
+  zone: {
+    __typename?: 'ZoneDto';
+    id: number;
+    name: string;
+    climate: Climate;
+    hemisphere: Hemisphere;
+    lifespan: number;
+    resetMode: ResetMode;
+    createdAt: any;
+    updatedAt: any;
+  };
+};
+
+export type UpdateZoneMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateZoneInput;
+}>;
+
+export type UpdateZoneMutation = {
+  __typename?: 'Mutation';
+  updateZone: {
+    __typename?: 'ZoneDto';
+    id: number;
+    name: string;
+    climate: Climate;
+    hemisphere: Hemisphere;
+    lifespan: number;
+    resetMode: ResetMode;
+  };
 };
 
 export type OnlineCharactersQueryVariables = Exact<{
@@ -22243,6 +22282,7 @@ export const GetMobDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'charisma' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'perception' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'concealment' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'wealth' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'race' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'gender' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'size' } },
@@ -25170,6 +25210,7 @@ export const GetZonesDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'climate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hemisphere' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'lifespan' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'resetMode' } },
               ],
@@ -25209,6 +25250,127 @@ export const GetZonesForSelectorDocument = {
   GetZonesForSelectorQuery,
   GetZonesForSelectorQueryVariables
 >;
+export const GetZoneDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetZone' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'zone' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'climate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hemisphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'lifespan' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'resetMode' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetZoneQuery, GetZoneQueryVariables>;
+export const UpdateZoneDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateZone' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'data' } },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'UpdateZoneInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateZone' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'data' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'data' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'climate' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'hemisphere' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'lifespan' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'resetMode' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<UpdateZoneMutation, UpdateZoneMutationVariables>;
 export const OnlineCharactersDocument = {
   kind: 'Document',
   definitions: [

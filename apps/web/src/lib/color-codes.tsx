@@ -37,8 +37,8 @@ export function parseColorCodes(text: string): ColoredTextSegment[] {
 
     // Add the colored segment
     segments.push({
-      text: match[3],
-      color: match[2],
+      text: match[3] ?? '',
+      color: match[2] ?? 'white',
       bold: match[1] === 'b:',
     });
 

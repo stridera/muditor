@@ -345,7 +345,9 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
       const color = dominantSector
         ? getSectorColorHex(dominantSector)
         : `hsl(${(zoneId * 53) % 360} 70% 65%)`;
-      zoneStyles.set(zoneId, { color, dominantSector });
+      const style: { color: string; dominantSector?: string } = { color };
+      if (dominantSector) style.dominantSector = dominantSector;
+      zoneStyles.set(zoneId, style);
     });
 
     // Store in ref for hover detection

@@ -419,12 +419,12 @@ function MobViewContent() {
               </dt>
               <dd className='text-base'>{mob.stance}</dd>
             </div>
-            {mob.wealth !== null && mob.wealth !== undefined && (
+            {mob.wealth != null && (
               <div>
                 <dt className='text-sm font-medium text-muted-foreground'>
-                  Wealth
+                  Wealth (copper)
                 </dt>
-                <dd className='text-base'>{mob.wealth}</dd>
+                <dd className='text-base'>{mob.wealth.toLocaleString()}</dd>
               </div>
             )}
           </dl>

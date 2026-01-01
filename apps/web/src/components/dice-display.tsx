@@ -11,7 +11,7 @@ interface DiceDisplayProps {
   onBonusChange: (value: number) => void;
   label?: string;
   helpText?: string;
-  error?: string;
+  error?: string | undefined;
   className?: string;
 }
 

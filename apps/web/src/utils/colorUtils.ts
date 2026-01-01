@@ -16,7 +16,7 @@ export interface RGB {
  */
 export function hexToRgb(hex: string): RGB | null {
   const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
-  return result
+  return result && result[1] && result[2] && result[3]
     ? {
         r: parseInt(result[1], 16),
         g: parseInt(result[2], 16),
@@ -174,7 +174,7 @@ const COLOR_MAP: Record<string, string> = {
  */
 export interface ColorSegment {
   text: string;
-  color?: string;
+  color?: string | undefined;
   bold?: boolean;
 }
 
@@ -194,8 +194,8 @@ export function parseXmlLiteColors(text: string): ColorSegment[] {
 
     // Add the colored segment
     const isBold = text.substring(match.index, match.index + 3) === '<b:';
-    const color = match[1];
-    const content = match[2];
+    const color = match[1] ?? 'white';
+    const content = match[2] ?? '';
 
     segments.push({
       text: content,

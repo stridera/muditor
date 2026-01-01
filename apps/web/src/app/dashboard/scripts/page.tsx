@@ -100,7 +100,7 @@ const MARK_REVIEWED = gql(`
 `);
 
 interface TriggerData {
-  id: number;
+  id: string;
   name: string;
   attachType: string;
   numArgs: number;
@@ -120,18 +120,21 @@ interface TriggerData {
 }
 
 // Convert TriggerData to ScriptEditor's Script interface
-const convertTriggerToScript = (trigger: TriggerData): Script => ({
-  id: trigger.id.toString(),
-  name: trigger.name,
-  attachType: trigger.attachType,
-  numArgs: trigger.numArgs,
-  argList: trigger.argList?.join(', '),
-  commands: trigger.commands,
-  variables: {},
-  zoneId: trigger.zoneId ?? undefined,
-  mobId: trigger.mobId ?? undefined,
-  objectId: trigger.objectId ?? undefined,
-});
+const convertTriggerToScript = (trigger: TriggerData): Script => {
+  const script: Script = {
+    id: trigger.id,
+    name: trigger.name,
+    attachType: trigger.attachType,
+    numArgs: trigger.numArgs,
+    argList: trigger.argList?.join(', '),
+    commands: trigger.commands,
+    variables: {},
+  };
+  if (trigger.zoneId != null) script.zoneId = trigger.zoneId;
+  if (trigger.mobId != null) script.mobId = trigger.mobId;
+  if (trigger.objectId != null) script.objectId = trigger.objectId;
+  return script;
+};
 
 function ScriptsPageContent() {
   const [searchTerm, setSearchTerm] = useState('');
@@ -195,7 +198,7 @@ function ScriptsPageContent() {
       } else if (selectedTrigger) {
         await updateTrigger({
           variables: {
-            id: selectedTrigger.id,
+            id: parseFloat(selectedTrigger.id),
             input: {
               name: script.name,
               attachType: script.attachType as 'MOB' | 'OBJECT' | 'WORLD',
@@ -214,10 +217,11 @@ function ScriptsPageContent() {
     }
   };
 
-  const handleDeleteScript = async (id: number) => {
+  const handleDeleteScript = async (id: string | number) => {
     if (confirm('Are you sure you want to delete this script?')) {
       try {
-        await deleteTrigger({ variables: { id } });
+        const numId = typeof id === 'string' ? parseFloat(id) : id;
+        await deleteTrigger({ variables: { id: numId } });
         await refetch();
       } catch (err) {
         console.error('Failed to delete script:', err);
@@ -225,9 +229,11 @@ function ScriptsPageContent() {
     }
   };
 
-  const handleMarkReviewed = async (triggerId: number) => {
+  const handleMarkReviewed = async (triggerId: string | number) => {
     try {
-      await markReviewed({ variables: { triggerId } });
+      const numId =
+        typeof triggerId === 'string' ? parseFloat(triggerId) : triggerId;
+      await markReviewed({ variables: { triggerId: numId } });
       await refetch();
     } catch (err) {
       console.error('Failed to mark as reviewed:', err);
