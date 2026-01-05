@@ -19,8 +19,11 @@ registerEnumType(ScriptType, { name: 'ScriptType' });
 
 @ObjectType()
 export class TriggerDto {
-  @Field()
-  id: string;
+  @Field(() => Int)
+  zoneId: number;
+
+  @Field(() => Int)
+  id: number;
 
   @Field()
   name: string;
@@ -38,10 +41,13 @@ export class TriggerDto {
   commands: string;
 
   @Field(() => Int, { nullable: true })
-  zoneId?: number;
+  mobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   mobId?: number;
+
+  @Field(() => Int, { nullable: true })
+  objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   objectId?: number;
@@ -61,18 +67,12 @@ export class TriggerDto {
   @Field({ nullable: true })
   updatedBy?: string;
 
-  // Validation and legacy tracking
+  // Validation tracking
   @Field(() => Boolean, { defaultValue: false })
   needsReview: boolean;
 
   @Field({ nullable: true })
   syntaxError?: string;
-
-  @Field(() => Int, { nullable: true })
-  legacyVnum?: number;
-
-  @Field({ nullable: true })
-  legacyScript?: string;
 
   @Field(() => [String], { defaultValue: [] })
   flags: string[];
@@ -80,6 +80,15 @@ export class TriggerDto {
 
 @InputType()
 export class CreateTriggerInput {
+  @Field(() => Int)
+  @IsNumber()
+  zoneId: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  id?: number; // Optional - auto-generated if not provided
+
   @Field()
   @IsString()
   name: string;
@@ -105,12 +114,17 @@ export class CreateTriggerInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  zoneId?: number;
+  mobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
   mobId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -153,12 +167,17 @@ export class UpdateTriggerInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  zoneId?: number;
+  mobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
   mobId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -175,6 +194,10 @@ export class UpdateTriggerInput {
 export class AttachTriggerInput {
   @Field(() => Int)
   @IsNumber()
+  triggerZoneId: number;
+
+  @Field(() => Int)
+  @IsNumber()
   triggerId: number;
 
   @Field(() => ScriptType)
@@ -184,15 +207,20 @@ export class AttachTriggerInput {
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
+  mobZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
   mobId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  objectId?: number;
+  objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  zoneId?: number;
+  objectId?: number;
 }

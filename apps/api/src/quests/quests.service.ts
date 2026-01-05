@@ -40,9 +40,9 @@ export class QuestsService {
               orderBy: { id: 'asc' },
               include: { dialogue: true },
             },
+            rewards: true,
           },
         },
-        rewards: true,
         prerequisites: true,
       },
     });
@@ -63,12 +63,11 @@ export class QuestsService {
               orderBy: { id: 'asc' },
               include: { dialogue: true },
             },
+            rewards: true,
           },
         },
-        rewards: true,
         prerequisites: true,
-        giverMob: true,
-        completerMob: true,
+        triggerMob: true,
       },
     });
   }
@@ -90,14 +89,27 @@ export class QuestsService {
         maxLevel: data.maxLevel ?? 100,
         repeatable: data.repeatable ?? false,
         hidden: data.hidden ?? false,
-        giverMobZoneId: data.giverMobZoneId ?? null,
-        giverMobId: data.giverMobId ?? null,
-        completerMobZoneId: data.completerMobZoneId ?? null,
-        completerMobId: data.completerMobId ?? null,
+        // Branching paths
+        exclusiveGroup: data.exclusiveGroup ?? null,
+        // Trigger configuration
+        triggerType: data.triggerType ?? 'MOB',
+        triggerMobZoneId: data.triggerMobZoneId ?? null,
+        triggerMobId: data.triggerMobId ?? null,
+        triggerLevel: data.triggerLevel ?? null,
+        triggerItemZoneId: data.triggerItemZoneId ?? null,
+        triggerItemId: data.triggerItemId ?? null,
+        triggerRoomZoneId: data.triggerRoomZoneId ?? null,
+        triggerRoomId: data.triggerRoomId ?? null,
+        triggerAbilityId: data.triggerAbilityId ?? null,
+        triggerEventId: data.triggerEventId ?? null,
+        timeLimitMinutes: data.timeLimitMinutes ?? null,
+        // Availability requirement
+        availabilityRequirement: data.availabilityRequirement ?? null,
       },
       include: {
-        phases: true,
-        rewards: true,
+        phases: {
+          include: { rewards: true },
+        },
         prerequisites: true,
       },
     });
@@ -112,13 +124,35 @@ export class QuestsService {
     if (data.maxLevel !== undefined) updateData.maxLevel = data.maxLevel;
     if (data.repeatable !== undefined) updateData.repeatable = data.repeatable;
     if (data.hidden !== undefined) updateData.hidden = data.hidden;
-    if (data.giverMobZoneId !== undefined)
-      updateData.giverMobZoneId = data.giverMobZoneId;
-    if (data.giverMobId !== undefined) updateData.giverMobId = data.giverMobId;
-    if (data.completerMobZoneId !== undefined)
-      updateData.completerMobZoneId = data.completerMobZoneId;
-    if (data.completerMobId !== undefined)
-      updateData.completerMobId = data.completerMobId;
+    // Branching paths
+    if (data.exclusiveGroup !== undefined)
+      updateData.exclusiveGroup = data.exclusiveGroup;
+    // Trigger configuration
+    if (data.triggerType !== undefined)
+      updateData.triggerType = data.triggerType;
+    if (data.triggerMobZoneId !== undefined)
+      updateData.triggerMobZoneId = data.triggerMobZoneId;
+    if (data.triggerMobId !== undefined)
+      updateData.triggerMobId = data.triggerMobId;
+    if (data.triggerLevel !== undefined)
+      updateData.triggerLevel = data.triggerLevel;
+    if (data.triggerItemZoneId !== undefined)
+      updateData.triggerItemZoneId = data.triggerItemZoneId;
+    if (data.triggerItemId !== undefined)
+      updateData.triggerItemId = data.triggerItemId;
+    if (data.triggerRoomZoneId !== undefined)
+      updateData.triggerRoomZoneId = data.triggerRoomZoneId;
+    if (data.triggerRoomId !== undefined)
+      updateData.triggerRoomId = data.triggerRoomId;
+    if (data.triggerAbilityId !== undefined)
+      updateData.triggerAbilityId = data.triggerAbilityId;
+    if (data.triggerEventId !== undefined)
+      updateData.triggerEventId = data.triggerEventId;
+    if (data.timeLimitMinutes !== undefined)
+      updateData.timeLimitMinutes = data.timeLimitMinutes;
+    // Availability requirement
+    if (data.availabilityRequirement !== undefined)
+      updateData.availabilityRequirement = data.availabilityRequirement;
 
     return this.database.quests.update({
       where: { zoneId_id: { zoneId, id } },
@@ -131,9 +165,9 @@ export class QuestsService {
               orderBy: { id: 'asc' },
               include: { dialogue: true },
             },
+            rewards: true,
           },
         },
-        rewards: true,
         prerequisites: true,
       },
     });
@@ -157,6 +191,7 @@ export class QuestsService {
           orderBy: { id: 'asc' },
           include: { dialogue: true },
         },
+        rewards: true,
       },
     });
   }
@@ -171,7 +206,7 @@ export class QuestsService {
         description: data.description ?? null,
         order: data.order,
       },
-      include: { objectives: true },
+      include: { objectives: true, rewards: true },
     });
   }
 
@@ -190,7 +225,7 @@ export class QuestsService {
     return this.database.questPhases.update({
       where: { questZoneId_questId_id: { questZoneId, questId, id } },
       data: updateData,
-      include: { objectives: true },
+      include: { objectives: true, rewards: true },
     });
   }
 
@@ -348,9 +383,13 @@ export class QuestsService {
   // Reward CRUD
   // ============================================================================
 
-  async findRewardsByQuest(questZoneId: number, questId: number) {
+  async findRewardsByPhase(
+    questZoneId: number,
+    questId: number,
+    phaseId: number
+  ) {
     return this.database.questRewards.findMany({
-      where: { questZoneId, questId },
+      where: { questZoneId, questId, phaseId },
     });
   }
 
@@ -359,6 +398,7 @@ export class QuestsService {
       data: {
         questZoneId: data.questZoneId,
         questId: data.questId,
+        phaseId: data.phaseId,
         rewardType: data.rewardType,
         amount: data.amount ?? null,
         objectZoneId: data.objectZoneId ?? null,
@@ -460,9 +500,9 @@ export class QuestsService {
                 objectives: {
                   orderBy: { id: 'asc' },
                 },
+                rewards: true,
               },
             },
-            rewards: true,
           },
         },
         objectiveProgress: true,

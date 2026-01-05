@@ -175,5 +175,15 @@ export class MobsService {
     return result.count;
   }
 
-  // Mapping moved to GraphQL field resolver.
+  /**
+   * Find a CharacterClass by ID to get its name for combat formula calculations.
+   */
+  async findClassById(
+    classId: number
+  ): Promise<{ id: number; plainName: string } | null> {
+    return this.database.characterClass.findUnique({
+      where: { id: classId },
+      select: { id: true, plainName: true },
+    });
+  }
 }

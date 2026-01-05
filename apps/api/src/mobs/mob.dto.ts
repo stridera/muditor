@@ -336,13 +336,23 @@ export class CreateMobInput {
   @IsNumber()
   resistancePoison?: number;
 
-  @Field()
+  @Field({
+    nullable: true,
+    description:
+      'HP dice (e.g., "10d8+50"). If not provided, calculated from level/race/class.',
+  })
+  @IsOptional()
   @IsString()
-  hpDice: string;
+  hpDice?: string;
 
-  @Field()
+  @Field({
+    nullable: true,
+    description:
+      'Damage dice (e.g., "5d10+20"). If not provided, calculated from level/race/class.',
+  })
+  @IsOptional()
   @IsString()
-  damageDice: string;
+  damageDice?: string;
 
   @Field(() => DamageType, { defaultValue: DamageType.HIT })
   @IsOptional()
@@ -445,6 +455,33 @@ export class CreateMobInput {
   @IsOptional()
   @IsNumber()
   classId?: number;
+}
+
+@ObjectType()
+export class MobCombatDefaultsDto {
+  @Field()
+  hpDice: string;
+
+  @Field()
+  damageDice: string;
+
+  @Field(() => Int)
+  hpDiceNum: number;
+
+  @Field(() => Int)
+  hpDiceSize: number;
+
+  @Field(() => Int)
+  hpDiceBonus: number;
+
+  @Field(() => Int)
+  damageDiceNum: number;
+
+  @Field(() => Int)
+  damageDiceSize: number;
+
+  @Field(() => Int)
+  damageDiceBonus: number;
 }
 
 @InputType()

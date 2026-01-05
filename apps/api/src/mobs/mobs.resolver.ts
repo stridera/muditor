@@ -10,8 +10,14 @@ import {
 } from '@nestjs/graphql';
 import { Prisma, Race } from '@prisma/client'; // all enums already registered in mob.dto
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { calculateMobCombatDefaults } from '../common/dice-formulas';
 import { mapMob } from '../common/mappers/mob.mapper';
-import { CreateMobInput, MobDto, UpdateMobInput } from './mob.dto';
+import {
+  CreateMobInput,
+  MobCombatDefaultsDto,
+  MobDto,
+  UpdateMobInput,
+} from './mob.dto';
 import { MobsService } from './mobs.service';
 
 interface MobFieldSource {
@@ -69,16 +75,41 @@ export class MobsResolver {
     return mobs.map(m => mapMob(m));
   }
 
+  /**
+   * Calculate default combat stats (HP dice, damage dice) for a mob
+   * based on level, race, and optionally class.
+   *
+   * Uses legacy FieryMUD formulas for proper game balance.
+   */
+  @Query(() => MobCombatDefaultsDto, { name: 'mobCombatDefaults' })
+  async getMobCombatDefaults(
+    @Args('level', { type: () => Int, defaultValue: 1 }) level: number,
+    @Args('race', { type: () => Race, defaultValue: Race.HUMANOID }) race: Race,
+    @Args('classId', { type: () => Int, nullable: true }) classId?: number
+  ): Promise<MobCombatDefaultsDto> {
+    // Look up class name if classId provided
+    let className: string | undefined;
+    if (classId) {
+      const charClass = await this.mobsService.findClassById(classId);
+      if (charClass) {
+        className = charClass.plainName;
+      }
+    }
+
+    // Calculate defaults using legacy formulas
+    return calculateMobCombatDefaults(level, race, className);
+  }
+
   @Mutation(() => MobDto)
   @UseGuards(JwtAuthGuard)
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
     // Exclude wealth from direct persistence; it's derived (totalWealth) in DB
-    const { zoneId, race, hpDice, damageDice, wealth, ...rest } = data;
+    const { zoneId, race, hpDice, damageDice, wealth, classId, ...rest } = data;
 
     // Parse dice strings (e.g., "2d8+3" -> num=2, size=8, bonus=3)
     const parseDice = (diceStr: string) => {
       const match = /^(\d+)d(\d+)([+-]\d+)?$/.exec(diceStr);
-      if (!match) return { num: 1, size: 8, bonus: 0 };
+      if (!match) return null;
       const numStr = match[1]!;
       const sizeStr = match[2]!;
       const bonusStr = match[3];
@@ -89,22 +120,40 @@ export class MobsResolver {
       };
     };
 
-    const hp = parseDice(hpDice);
-    const dmg = parseDice(damageDice);
+    // Get class name for formula calculation if classId provided
+    let className: string | undefined;
+    if (classId) {
+      const charClass = await this.mobsService.findClassById(classId);
+      if (charClass) {
+        className = charClass.plainName;
+      }
+    }
+
+    // Calculate defaults using legacy formulas
+    const level = rest.level ?? 1;
+    const raceForCalc = race ?? Race.HUMANOID;
+    const defaults = calculateMobCombatDefaults(level, raceForCalc, className);
+
+    // Use provided dice or fall back to calculated defaults
+    const hp = hpDice ? parseDice(hpDice) : null;
+    const dmg = damageDice ? parseDice(damageDice) : null;
 
     const createData: Prisma.MobsCreateInput = {
       ...rest,
-      role: 'NORMAL', // Default mob role
-      hpDiceNum: hp.num,
-      hpDiceSize: hp.size,
-      hpDiceBonus: hp.bonus,
-      damageDiceNum: dmg.num,
-      damageDiceSize: dmg.size,
-      damageDiceBonus: dmg.bonus,
+      role: rest.role ?? 'NORMAL', // Default mob role
+      hpDiceNum: hp?.num ?? defaults.hpDiceNum,
+      hpDiceSize: hp?.size ?? defaults.hpDiceSize,
+      hpDiceBonus: hp?.bonus ?? defaults.hpDiceBonus,
+      damageDiceNum: dmg?.num ?? defaults.damageDiceNum,
+      damageDiceSize: dmg?.size ?? defaults.damageDiceSize,
+      damageDiceBonus: dmg?.bonus ?? defaults.damageDiceBonus,
       zones: { connect: { id: zoneId } },
     };
     if (race) {
       createData.race = race as Race;
+    }
+    if (classId) {
+      createData.characterClass = { connect: { id: classId } };
     }
     const created = await this.mobsService.create(createData);
     return mapMob(created);

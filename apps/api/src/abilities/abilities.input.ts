@@ -238,7 +238,7 @@ export class CreateAbilitySavingThrowInput {
   @Field(() => Int)
   abilityId: number;
 
-  @Field(() => SaveType, { defaultValue: SaveType.SPELL })
+  @Field(() => SaveType, { defaultValue: SaveType.WILL })
   saveType: SaveType;
 
   @Field()

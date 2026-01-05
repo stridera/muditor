@@ -65,8 +65,11 @@ model Ability {
   objectAbilities    ObjectAbilities[]
   commands           Command[]          // Commands that trigger this ability
   // Quest system relations
-  questRewards       QuestRewards[]
-  questObjectives    QuestObjectives[]
+  questRewards          QuestRewards[]
+  questObjectives       QuestObjectives[]
+  questTriggerAbility   Quests[]         @relation("questTriggerAbility")
+  // Shop system relations
+  shopAbilities         ShopAbilities[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -93,6 +96,7 @@ model Effect {
   categoryId    Int?             @map("category_id")
   category      ToolboxCategory? @relation(fields: [categoryId], references: [id])
   abilities     AbilityEffect[]
+  consumables   ConsumableEffect[]  // Applied when consuming liquids, foods, potions, etc.
 
   @@index([effectType])
   @@index([categoryId])
@@ -415,6 +419,11 @@ model CharacterItems {
   customName               String?          @map("custom_name")
   customExamineDescription String?          @map("custom_examine_description")
   customValues             Json             @default("{}") @map("custom_values")
+  // Liquid container state (for drinks)
+  liquidType               String?          @map("liquid_type")
+  liquidRemaining          Int              @default(0) @map("liquid_remaining")
+  liquidEffects            Int[]            @default([]) @map("liquid_effects")  // Effect IDs applied to this liquid instance
+  liquidIdentified         Boolean          @default(false) @map("liquid_identified")
   createdAt                DateTime         @default(now()) @map("created_at")
   updatedAt                DateTime         @map("updated_at")
   characters               Characters       @relation(fields: [characterId], references: [id], onDelete: Cascade)
@@ -436,9 +445,9 @@ model Characters {
   charisma           Int                  @default(13)
   luck               Int                  @default(13)
   hitPoints          Int                  @default(100) @map("hit_points")
-  movement           Int                  @default(100)
+  stamina            Int                  @default(100)
   hitPointsMax       Int                  @default(100) @map("hit_points_max")
-  movementMax        Int                  @default(100) @map("movement_max")
+  staminaMax         Int                  @default(100) @map("stamina_max")
   wealth             BigInt               @default(0) // Stored in copper units
   bankWealth         BigInt               @default(0) @map("bank_wealth") // Bank balance in copper
   averageStats       Int                  @default(13) @map("average_stats")
@@ -613,6 +622,9 @@ model Mobs {
   keywords           String[]
   name               String          @map("name")
   plainName          String          @default("") @map("plain_name")
+  baseName           String          @default("") @map("base_name")        // Name without article (with colors)
+  plainBaseName      String          @default("") @map("plain_base_name")  // Name without article (plain text)
+  article            String?         @map("article")                       // null=a/an, "the", "some", ""=none
   roomDescription    String          @map("room_description")
   plainRoomDescription String        @default("") @map("plain_room_description")
   examineDescription String          @map("examine_description")
@@ -694,8 +706,7 @@ model Mobs {
   mobTriggers        MobTriggers[]   // Proper many-to-many via junction table
   shopMobs           ShopMobs[]      // Mobs for sale at pet/mount shops
   // Quest system relations
-  questsAsGiver      Quests[]        @relation("questGiver")
-  questsAsCompleter  Quests[]        @relation("questCompleter")
+  questsAsTrigger    Quests[]        @relation("questTriggerMob")  // MOB trigger type quests
   objectiveTargetMob QuestObjectives[] @relation("objectiveTargetMob")
   objectiveDeliverTo QuestObjectives[] @relation("objectiveDeliverTo")
 
@@ -781,6 +792,9 @@ model Objects {
   keywords                String[]
   name                    String                    @map("name")
   plainName               String                    @default("") @map("plain_name")
+  baseName                String                    @default("") @map("base_name")        // Name without article (with colors)
+  plainBaseName           String                    @default("") @map("plain_base_name")  // Name without article (plain text)
+  article                 String?                   @map("article")                       // null=a/an, "the", "some", ""=none
   roomDescription         String                    @map("room_description")
   plainRoomDescription    String                    @default("") @map("plain_room_description")
   examineDescription      String?                   @map("examine_description")
@@ -816,12 +830,14 @@ model Objects {
   shopItems               ShopItems[]
   triggers                Triggers[]                // Legacy direct FK (deprecated)
   objectTriggers          ObjectTriggers[]          // Proper many-to-many via junction table
-  objectAbilities         ObjectAbilities[]
+  objectAbilities         ObjectAbilities[]         // Cast spells (quaff potion → cast spell)
+  consumableEffects       ConsumableEffect[]        // Direct effects (eat food → apply effect)
   accountItems            AccountItems[]
   mailAttachments         PlayerMail[]              // Objects attached to mail messages
   // Quest system relations
   questRewards            QuestRewards[]
   objectiveTargetObject   QuestObjectives[] @relation("objectiveTargetObject")
+  questTriggerItem        Quests[]          @relation("questTriggerItem")
 
   @@id([zoneId, id])
   @@index([name])
@@ -963,6 +979,7 @@ model Room {
   zones                 Zones                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   // Quest system relations
   questObjectives       QuestObjectives[]
+  questTriggerRoom      Quests[]            @relation("questTriggerRoom")
 
   @@id([zoneId, id])
   @@index([plainRoomDescription])
@@ -989,6 +1006,7 @@ model ShopHours {
 model ShopItems {
   id           Int     @id @default(autoincrement())
   amount       Int     @default(0)
+  price        Int     @default(0) @map("price") // Price in copper (0 = use object's base cost)
   shopZoneId   Int     @map("shop_zone_id")
   shopId       Int     @map("shop_id")
   objectZoneId Int     @map("object_zone_id")
@@ -1009,6 +1027,7 @@ model ShopItems {
 model ShopMobs {
   id         Int   @id @default(autoincrement())
   amount     Int   @default(-1) // -1 = unlimited stock
+  price      Int   @default(0) @map("price") // Price in copper (0 = use mob level * 100)
   shopZoneId Int   @map("shop_zone_id")
   shopId     Int   @map("shop_id")
   mobZoneId  Int   @map("mob_zone_id")
@@ -1023,6 +1042,25 @@ model ShopMobs {
   shops      Shops @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
 
   @@unique([shopZoneId, shopId, mobZoneId, mobId])
+}
+
+// Abilities/spells for sale at trainer/healer shops
+model ShopAbilities {
+  id         Int   @id @default(autoincrement())
+  price      Int   @default(0) @map("price") // Price in copper (0 = use ability circle * 1000)
+  shopZoneId Int   @map("shop_zone_id")
+  shopId     Int   @map("shop_id")
+  abilityId  Int   @map("ability_id")
+
+  // Spawn and availability controls
+  spawnChance           Float   @default(1.0) @map("spawn_chance") // 0.0-1.0 probability
+  visibilityRequirement String? @map("visibility_requirement") // Lua expr: when shown in list
+  purchaseRequirement   String? @map("purchase_requirement") // Lua expr: when can buy
+
+  ability    Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+  shops      Shops   @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
+
+  @@unique([shopZoneId, shopId, abilityId])
 }
 
 model ShopRooms {
@@ -1059,6 +1097,7 @@ model Shops {
   shopItems           ShopItems[]
   shopMobs            ShopMobs[]
   shopRooms           ShopRooms[]
+  shopAbilities       ShopAbilities[]
   mobs                Mobs?            @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
   zones               Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
@@ -1076,15 +1115,13 @@ model SpawnConditions {
 }
 
 model Triggers {
-  id             Int           @id @default(autoincrement())
-  legacyZoneId   Int?          @map("legacy_zone_id")   // Zone from DG Script vnum (e.g., 3045 -> 30)
-  legacyId       Int?          @map("legacy_id")        // Local ID from vnum (e.g., 3045 -> 45)
+  zoneId         Int           @map("zone_id")
+  id             Int
   name           String
   attachType     ScriptType
   numArgs        Int           @default(0) @map("num_args")
   argList        String[]      @default([]) @map("arg_list")
   commands       String
-  zoneId         Int?          @map("zone_id")
   mobZoneId      Int?          @map("mob_zone_id")
   mobId          Int?          @map("mob_id")
   objectZoneId   Int?          @map("object_zone_id")
@@ -1103,43 +1140,45 @@ model Triggers {
   // Direct FK relations (for triggers attached to a single entity)
   mobs           Mobs?         @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
   objects        Objects?      @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  zones          Zones?        @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  zones          Zones         @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   // Many-to-many junction tables (for shared triggers)
   mobTriggers    MobTriggers[]
   objectTriggers ObjectTriggers[]
 
-  @@unique([legacyZoneId, legacyId])
+  @@id([zoneId, id])
 }
 
 /// Junction table for Mob-Trigger many-to-many relationship
 /// In DG Scripts, triggers are shared - a single trigger can be attached to multiple mobs
 /// via "T <trigger_vnum>" lines in mob files
 model MobTriggers {
-  mobZoneId   Int      @map("mob_zone_id")
-  mobId       Int      @map("mob_id")
-  triggerId   Int      @map("trigger_id")
-  createdAt   DateTime @default(now()) @map("created_at")
+  mobZoneId     Int      @map("mob_zone_id")
+  mobId         Int      @map("mob_id")
+  triggerZoneId Int      @map("trigger_zone_id")
+  triggerId     Int      @map("trigger_id")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   mob      Mobs     @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
-  trigger  Triggers @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+  trigger  Triggers @relation(fields: [triggerZoneId, triggerId], references: [zoneId, id], onDelete: Cascade)
 
-  @@id([mobZoneId, mobId, triggerId])
-  @@index([triggerId])
+  @@id([mobZoneId, mobId, triggerZoneId, triggerId])
+  @@index([triggerZoneId, triggerId])
 }
 
 /// Junction table for Object-Trigger many-to-many relationship
 model ObjectTriggers {
-  objectZoneId Int      @map("object_zone_id")
-  objectId     Int      @map("object_id")
-  triggerId    Int      @map("trigger_id")
-  createdAt    DateTime @default(now()) @map("created_at")
+  objectZoneId  Int      @map("object_zone_id")
+  objectId      Int      @map("object_id")
+  triggerZoneId Int      @map("trigger_zone_id")
+  triggerId     Int      @map("trigger_id")
+  createdAt     DateTime @default(now()) @map("created_at")
 
   object   Objects  @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  trigger  Triggers @relation(fields: [triggerId], references: [id], onDelete: Cascade)
+  trigger  Triggers @relation(fields: [triggerZoneId, triggerId], references: [zoneId, id], onDelete: Cascade)
 
-  @@id([objectZoneId, objectId, triggerId])
-  @@index([triggerId])
+  @@id([objectZoneId, objectId, triggerZoneId, triggerId])
+  @@index([triggerZoneId, triggerId])
 }
 
 model Users {
@@ -1233,6 +1272,9 @@ model Events {
   updatedAt   DateTime  @updatedAt @map("updated_at")
   createdBy   String?   @map("created_by")
   updatedBy   String?   @map("updated_by")
+
+  // Quest system relations
+  questTriggerEvent Quests[] @relation("questTriggerEvent")
 }
 
 model Zones {
@@ -2605,6 +2647,18 @@ model SystemMessage {
 // QUEST SYSTEM
 // ============================================================================
 
+/// How a quest is triggered/started
+enum QuestTriggerType {
+  MOB         // Talk to NPC (traditional quest giver)
+  LEVEL       // Auto-granted when reaching certain level
+  ITEM        // Triggered when picking up/examining specific item
+  ROOM        // Triggered when entering specific room
+  SKILL       // Triggered when using specific skill
+  EVENT       // Triggered by game event (seasonal, etc.)
+  AUTO        // Auto-granted to all characters (tutorial)
+  MANUAL      // Only granted via GM command or scripts
+}
+
 /// Quest definitions - zone-scoped with composite primary key
 model Quests {
   zoneId              Int                   @map("zone_id")
@@ -2624,15 +2678,31 @@ model Quests {
   autoAccept          Boolean               @default(false) @map("auto_accept")
   hidden              Boolean               @default(false) // Hidden from quest lists
 
+  // Trigger type - how this quest is activated
+  triggerType         QuestTriggerType      @default(MOB) @map("trigger_type")
+  // For MOB trigger: talking to this mob starts the quest
+  triggerMobZoneId    Int?                  @map("trigger_mob_zone_id")
+  triggerMobId        Int?                  @map("trigger_mob_id")
+  // For LEVEL trigger: level that activates this quest
+  triggerLevel        Int?                  @map("trigger_level")
+  // For ITEM trigger: picking up/examining this item starts the quest
+  triggerItemZoneId   Int?                  @map("trigger_item_zone_id")
+  triggerItemId       Int?                  @map("trigger_item_id")
+  // For ROOM trigger: entering this room starts the quest
+  triggerRoomZoneId   Int?                  @map("trigger_room_zone_id")
+  triggerRoomId       Int?                  @map("trigger_room_id")
+  // For SKILL trigger: using this ability starts the quest
+  triggerAbilityId    Int?                  @map("trigger_ability_id")
+  // For EVENT trigger: which game event activates this quest
+  triggerEventId      Int?                  @map("trigger_event_id")
+
   // Time limits
   timeLimitMinutes    Int?                  @map("time_limit_minutes")
   cooldownMinutes     Int?                  @map("cooldown_minutes")
 
-  // Quest giver/completer references (composite FKs)
-  giverMobZoneId      Int?                  @map("giver_mob_zone_id")
-  giverMobId          Int?                  @map("giver_mob_id")
-  completerMobZoneId  Int?                  @map("completer_mob_zone_id")
-  completerMobId      Int?                  @map("completer_mob_id")
+  // Branching paths - quests with same non-null exclusiveGroup are mutually exclusive
+  // Once a quest in a group is accepted, others in that group become unavailable
+  exclusiveGroup      String?               @map("exclusive_group")
 
   // Availability Lua expression (e.g., "character.class == 'PALADIN'")
   availabilityRequirement String?           @map("availability_requirement") @db.Text
@@ -2645,17 +2715,24 @@ model Quests {
 
   // Relations
   phases              QuestPhases[]
-  rewards             QuestRewards[]
   prerequisites       QuestPrerequisites[]  @relation("questPrerequisites")
   dependents          QuestPrerequisites[]  @relation("prerequisiteQuest")
   characterQuests     CharacterQuests[]
-  giverMob            Mobs?                 @relation("questGiver", fields: [giverMobZoneId, giverMobId], references: [zoneId, id])
-  completerMob        Mobs?                 @relation("questCompleter", fields: [completerMobZoneId, completerMobId], references: [zoneId, id])
   zones               Zones                 @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  // Trigger relations - each trigger type has its own target
+  triggerMob          Mobs?                 @relation("questTriggerMob", fields: [triggerMobZoneId, triggerMobId], references: [zoneId, id])
+  triggerItem         Objects?              @relation("questTriggerItem", fields: [triggerItemZoneId, triggerItemId], references: [zoneId, id])
+  triggerRoom         Room?                 @relation("questTriggerRoom", fields: [triggerRoomZoneId, triggerRoomId], references: [zoneId, id])
+  triggerAbility      Ability?              @relation("questTriggerAbility", fields: [triggerAbilityId], references: [id])
+  triggerEvent        Events?               @relation("questTriggerEvent", fields: [triggerEventId], references: [id])
 
   @@id([zoneId, id])
   @@index([plainName])
-  @@index([giverMobZoneId, giverMobId])
+  @@index([triggerType])
+  @@index([triggerMobZoneId, triggerMobId])
+  @@index([triggerItemZoneId, triggerItemId])
+  @@index([triggerRoomZoneId, triggerRoomId])
+  @@index([exclusiveGroup])
   @@map("Quest")
 }
 
@@ -2671,6 +2748,7 @@ model QuestPhases {
   // Relations
   quest               Quests                @relation(fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
   objectives          QuestObjectives[]
+  rewards             QuestRewards[]
 
   @@id([questZoneId, questId, id])
   @@index([questZoneId, questId, order])
@@ -2814,6 +2892,7 @@ model QuestRewards {
   id                  Int                   @id @default(autoincrement())
   questZoneId         Int                   @map("quest_zone_id")
   questId             Int                   @map("quest_id")
+  phaseId             Int                   @map("phase_id")
 
   rewardType          QuestRewardType       @map("reward_type")
 
@@ -2831,10 +2910,11 @@ model QuestRewards {
   condition           String?               @db.Text // "character.class == 'PALADIN'"
 
   // Relations
-  quest               Quests                @relation(fields: [questZoneId, questId], references: [zoneId, id], onDelete: Cascade)
+  phase               QuestPhases           @relation(fields: [questZoneId, questId, phaseId], references: [questZoneId, questId, id], onDelete: Cascade)
   rewardObject        Objects?              @relation(fields: [objectZoneId, objectId], references: [zoneId, id])
   rewardAbility       Ability?              @relation(fields: [abilityId], references: [id])
 
+  @@index([questZoneId, questId, phaseId])
   @@map("QuestReward")
 }
 
@@ -2908,4 +2988,67 @@ model CharacterQuestObjectives {
 
   @@unique([characterQuestId, questZoneId, questId, phaseId, objectiveId])
   @@map("CharacterQuestObjective")
+}
+
+// ============================================================================
+// LIQUID TYPES
+// Reference data for drink containers - defines appearance and effects
+// ============================================================================
+
+model Liquid {
+  id              Int      @id @default(autoincrement())
+  name            String   @unique  // Display name: "water", "dark ale", "firebreather"
+  alias           String   @unique  // Keyword for commands: "water", "dark-ale", "firebreather"
+  colorDesc       String   @map("color_desc")  // Appearance when unidentified: "clear", "brown", "green"
+
+  // Effects on character conditions when consumed (per sip)
+  // Note: is_alcoholic can be derived from drunkEffect > 0
+  drunkEffect     Int      @default(0) @map("drunk_effect")   // How much it intoxicates
+  hungerEffect    Int      @default(0) @map("hunger_effect")  // How much it fills stomach
+  thirstEffect    Int      @default(0) @map("thirst_effect")  // How much it quenches thirst
+
+  // Optional extended properties
+  description     String?  // Flavor text for examine
+
+  // Applied effects when consumed (via effect system)
+  // Individual drink containers can override via ObjectAbilities
+  consumeEffects  ConsumableEffect[]
+
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@map("Liquids")
+}
+
+// ============================================================================
+// CONSUMABLE EFFECTS
+// Generic table for effects applied when consuming any type of consumable.
+// Can be linked to:
+//   - Type-level: liquidId (all drinks of this type apply the effect)
+//   - Object-level: objectZoneId + objectId (specific item applies the effect)
+// This bypasses the Ability/spell system for direct effect application.
+// ============================================================================
+
+model ConsumableEffect {
+  id          Int      @id @default(autoincrement())
+  effectId    Int      @map("effect_id")
+  chance      Float    @default(1.0)   // Probability of effect (0.0-1.0)
+  level       Int      @default(1)     // Effect level/potency
+  duration    Int?                     // Duration in ticks (null = effect default)
+
+  // Type-level references (for all items of a type)
+  liquidId    Int?     @map("liquid_id")
+  // foodId   Int?     @map("food_id")    // Add when Food model exists
+
+  // Object-level reference (for specific items like potions, scrolls, pills)
+  objectZoneId Int?    @map("object_zone_id")
+  objectId     Int?    @map("object_id")
+
+  liquid      Liquid?  @relation(fields: [liquidId], references: [id], onDelete: Cascade)
+  object      Objects? @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  effect      Effect   @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@unique([liquidId, effectId])
+  @@unique([objectZoneId, objectId, effectId])
+  @@map("ConsumableEffects")
 }

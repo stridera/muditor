@@ -240,9 +240,16 @@ function QuestsContent() {
                       </span>
                       <span>{quest.phases?.length || 0} phases</span>
                       <span>{totalObjectives} objectives</span>
-                      {quest.rewards && quest.rewards.length > 0 && (
-                        <span>{quest.rewards.length} rewards</span>
-                      )}
+                      {(() => {
+                        const totalRewards =
+                          quest.phases?.reduce(
+                            (sum, phase) => sum + (phase.rewards?.length || 0),
+                            0
+                          ) || 0;
+                        return totalRewards > 0 ? (
+                          <span>{totalRewards} rewards</span>
+                        ) : null;
+                      })()}
                     </div>
 
                     {/* Expanded Details */}
@@ -298,22 +305,39 @@ function QuestsContent() {
                           </div>
                         )}
 
-                        {/* Rewards Summary */}
-                        {quest.rewards && quest.rewards.length > 0 && (
+                        {/* Rewards Summary (per phase) */}
+                        {quest.phases?.some(
+                          phase => phase.rewards && phase.rewards.length > 0
+                        ) && (
                           <div className='mb-4'>
                             <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
                               Rewards
                             </h4>
-                            <div className='flex flex-wrap gap-2'>
-                              {quest.rewards.map(reward => (
-                                <span
-                                  key={reward.id}
-                                  className='inline-flex items-center px-2 py-1 rounded text-xs bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
-                                >
-                                  {reward.rewardType}
-                                  {reward.amount && `: ${reward.amount}`}
-                                </span>
-                              ))}
+                            <div className='space-y-2'>
+                              {quest.phases
+                                ?.filter(
+                                  phase =>
+                                    phase.rewards && phase.rewards.length > 0
+                                )
+                                .map(phase => (
+                                  <div key={phase.id}>
+                                    <span className='text-xs text-muted-foreground'>
+                                      {phase.name}:
+                                    </span>
+                                    <div className='flex flex-wrap gap-1 mt-1'>
+                                      {phase.rewards?.map(reward => (
+                                        <span
+                                          key={reward.id}
+                                          className='inline-flex items-center px-2 py-0.5 rounded text-xs bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-200'
+                                        >
+                                          {reward.rewardType}
+                                          {reward.amount &&
+                                            `: ${reward.amount}`}
+                                        </span>
+                                      ))}
+                                    </div>
+                                  </div>
+                                ))}
                             </div>
                           </div>
                         )}

@@ -935,17 +935,26 @@ export type CreateQuestDialogueInput = {
 };
 
 export type CreateQuestInput = {
-  completerMobId?: InputMaybe<Scalars['Int']['input']>;
-  completerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  availabilityRequirement?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
-  giverMobId?: InputMaybe<Scalars['Int']['input']>;
-  giverMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
   hidden?: Scalars['Boolean']['input'];
   id: Scalars['Int']['input'];
   maxLevel?: InputMaybe<Scalars['Int']['input']>;
   minLevel?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   repeatable?: Scalars['Boolean']['input'];
+  timeLimitMinutes?: InputMaybe<Scalars['Int']['input']>;
+  triggerAbilityId?: InputMaybe<Scalars['Int']['input']>;
+  triggerEventId?: InputMaybe<Scalars['Int']['input']>;
+  triggerItemId?: InputMaybe<Scalars['Int']['input']>;
+  triggerItemZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerLevel?: InputMaybe<Scalars['Int']['input']>;
+  triggerMobId?: InputMaybe<Scalars['Int']['input']>;
+  triggerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerRoomId?: InputMaybe<Scalars['Int']['input']>;
+  triggerRoomZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerType?: QuestTriggerType;
   zoneId: Scalars['Int']['input'];
 };
 
@@ -993,6 +1002,7 @@ export type CreateQuestRewardInput = {
   choiceGroup?: InputMaybe<Scalars['Int']['input']>;
   objectId?: InputMaybe<Scalars['Int']['input']>;
   objectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  phaseId: Scalars['Int']['input'];
   questId: Scalars['Int']['input'];
   questZoneId: Scalars['Int']['input'];
   rewardType: QuestRewardType;
@@ -3493,12 +3503,10 @@ export type QuestDialogueDto = {
 
 export type QuestDto = {
   __typename?: 'QuestDto';
-  completerMobId?: Maybe<Scalars['Int']['output']>;
-  completerMobZoneId?: Maybe<Scalars['Int']['output']>;
+  availabilityRequirement?: Maybe<Scalars['String']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
-  giverMobId?: Maybe<Scalars['Int']['output']>;
-  giverMobZoneId?: Maybe<Scalars['Int']['output']>;
+  exclusiveGroup?: Maybe<Scalars['String']['output']>;
   hidden: Scalars['Boolean']['output'];
   id: Scalars['Int']['output'];
   maxLevel?: Maybe<Scalars['Int']['output']>;
@@ -3507,7 +3515,17 @@ export type QuestDto = {
   phases?: Maybe<Array<QuestPhaseDto>>;
   prerequisites?: Maybe<Array<QuestPrerequisiteDto>>;
   repeatable: Scalars['Boolean']['output'];
-  rewards?: Maybe<Array<QuestRewardDto>>;
+  timeLimitMinutes?: Maybe<Scalars['Int']['output']>;
+  triggerAbilityId?: Maybe<Scalars['Int']['output']>;
+  triggerEventId?: Maybe<Scalars['Int']['output']>;
+  triggerItemId?: Maybe<Scalars['Int']['output']>;
+  triggerItemZoneId?: Maybe<Scalars['Int']['output']>;
+  triggerLevel?: Maybe<Scalars['Int']['output']>;
+  triggerMobId?: Maybe<Scalars['Int']['output']>;
+  triggerMobZoneId?: Maybe<Scalars['Int']['output']>;
+  triggerRoomId?: Maybe<Scalars['Int']['output']>;
+  triggerRoomZoneId?: Maybe<Scalars['Int']['output']>;
+  triggerType: QuestTriggerType;
   updatedAt: Scalars['DateTime']['output'];
   zoneId: Scalars['Int']['output'];
 };
@@ -3517,6 +3535,7 @@ export type QuestFilterInput = {
   maxLevel?: InputMaybe<Scalars['Int']['input']>;
   minLevel?: InputMaybe<Scalars['Int']['input']>;
   status?: InputMaybe<QuestStatus>;
+  triggerType?: InputMaybe<QuestTriggerType>;
   zoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
@@ -3562,6 +3581,7 @@ export type QuestPhaseDto = {
   order: Scalars['Int']['output'];
   questId: Scalars['Int']['output'];
   questZoneId: Scalars['Int']['output'];
+  rewards?: Maybe<Array<QuestRewardDto>>;
 };
 
 export type QuestPrerequisiteDto = {
@@ -3581,6 +3601,9 @@ export type QuestRewardDto = {
   id: Scalars['Int']['output'];
   objectId?: Maybe<Scalars['Int']['output']>;
   objectZoneId?: Maybe<Scalars['Int']['output']>;
+  phaseId: Scalars['Int']['output'];
+  questId: Scalars['Int']['output'];
+  questZoneId: Scalars['Int']['output'];
   rewardType: QuestRewardType;
 };
 
@@ -3597,6 +3620,17 @@ export type QuestStatus =
   | 'COMPLETED'
   | 'FAILED'
   | 'IN_PROGRESS';
+
+/** How a quest is triggered/started */
+export type QuestTriggerType =
+  | 'AUTO'
+  | 'EVENT'
+  | 'ITEM'
+  | 'LEVEL'
+  | 'MANUAL'
+  | 'MOB'
+  | 'ROOM'
+  | 'SKILL';
 
 export type Race =
   | 'ANIMAL'
@@ -3806,14 +3840,7 @@ export type RoomSummaryDto = {
   zoneId: Scalars['Int']['output'];
 };
 
-export type SaveType =
-  | 'BREATH'
-  | 'PARALYSIS'
-  | 'PETRIFICATION'
-  | 'POISON'
-  | 'ROD'
-  | 'SPELL'
-  | 'WAND';
+export type SaveType = 'FORTITUDE' | 'REFLEX' | 'WILL';
 
 export type ScriptType = 'MOB' | 'OBJECT' | 'WORLD';
 
@@ -4128,7 +4155,9 @@ export type TargetType =
   | 'ENEMY_PC'
   | 'OBJECT_INV'
   | 'OBJECT_WORLD'
-  | 'SELF';
+  | 'RIDER'
+  | 'SELF'
+  | 'UNCONSCIOUS';
 
 export type TriggerDto = {
   __typename?: 'TriggerDto';
@@ -4481,16 +4510,25 @@ export type UpdateQuestDialogueInput = {
 };
 
 export type UpdateQuestInput = {
-  completerMobId?: InputMaybe<Scalars['Int']['input']>;
-  completerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  availabilityRequirement?: InputMaybe<Scalars['String']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
-  giverMobId?: InputMaybe<Scalars['Int']['input']>;
-  giverMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
   hidden?: InputMaybe<Scalars['Boolean']['input']>;
   maxLevel?: InputMaybe<Scalars['Int']['input']>;
   minLevel?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   repeatable?: InputMaybe<Scalars['Boolean']['input']>;
+  timeLimitMinutes?: InputMaybe<Scalars['Int']['input']>;
+  triggerAbilityId?: InputMaybe<Scalars['Int']['input']>;
+  triggerEventId?: InputMaybe<Scalars['Int']['input']>;
+  triggerItemId?: InputMaybe<Scalars['Int']['input']>;
+  triggerItemZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerLevel?: InputMaybe<Scalars['Int']['input']>;
+  triggerMobId?: InputMaybe<Scalars['Int']['input']>;
+  triggerMobZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerRoomId?: InputMaybe<Scalars['Int']['input']>;
+  triggerRoomZoneId?: InputMaybe<Scalars['Int']['input']>;
+  triggerType?: InputMaybe<QuestTriggerType>;
 };
 
 export type UpdateQuestObjectiveInput = {
@@ -8652,10 +8690,12 @@ export type GetQuestsQuery = {
     maxLevel?: number | null;
     repeatable: boolean;
     hidden: boolean;
-    giverMobZoneId?: number | null;
-    giverMobId?: number | null;
-    completerMobZoneId?: number | null;
-    completerMobId?: number | null;
+    exclusiveGroup?: string | null;
+    triggerType: QuestTriggerType;
+    triggerMobZoneId?: number | null;
+    triggerMobId?: number | null;
+    triggerLevel?: number | null;
+    timeLimitMinutes?: number | null;
     createdAt: any;
     updatedAt: any;
     phases?: Array<{
@@ -8672,15 +8712,15 @@ export type GetQuestsQuery = {
         requiredCount: number;
         showProgress: boolean;
       }> | null;
-    }> | null;
-    rewards?: Array<{
-      __typename?: 'QuestRewardDto';
-      id: number;
-      rewardType: QuestRewardType;
-      amount?: number | null;
-      objectZoneId?: number | null;
-      objectId?: number | null;
-      abilityId?: number | null;
+      rewards?: Array<{
+        __typename?: 'QuestRewardDto';
+        id: number;
+        rewardType: QuestRewardType;
+        amount?: number | null;
+        objectZoneId?: number | null;
+        objectId?: number | null;
+        abilityId?: number | null;
+      }> | null;
     }> | null;
     prerequisites?: Array<{
       __typename?: 'QuestPrerequisiteDto';
@@ -8721,6 +8761,12 @@ export type GetQuestsByZoneQuery = {
         playerDescription: string;
         requiredCount: number;
       }> | null;
+      rewards?: Array<{
+        __typename?: 'QuestRewardDto';
+        id: number;
+        rewardType: QuestRewardType;
+        amount?: number | null;
+      }> | null;
     }> | null;
   }>;
 };
@@ -8742,10 +8788,19 @@ export type GetQuestQuery = {
     maxLevel?: number | null;
     repeatable: boolean;
     hidden: boolean;
-    giverMobZoneId?: number | null;
-    giverMobId?: number | null;
-    completerMobZoneId?: number | null;
-    completerMobId?: number | null;
+    exclusiveGroup?: string | null;
+    triggerType: QuestTriggerType;
+    triggerMobZoneId?: number | null;
+    triggerMobId?: number | null;
+    triggerLevel?: number | null;
+    triggerItemZoneId?: number | null;
+    triggerItemId?: number | null;
+    triggerRoomZoneId?: number | null;
+    triggerRoomId?: number | null;
+    triggerAbilityId?: number | null;
+    triggerEventId?: number | null;
+    timeLimitMinutes?: number | null;
+    availabilityRequirement?: string | null;
     createdAt: any;
     updatedAt: any;
     phases?: Array<{
@@ -8786,16 +8841,19 @@ export type GetQuestQuery = {
           dialogueTreeId?: number | null;
         } | null;
       }> | null;
-    }> | null;
-    rewards?: Array<{
-      __typename?: 'QuestRewardDto';
-      id: number;
-      rewardType: QuestRewardType;
-      amount?: number | null;
-      objectZoneId?: number | null;
-      objectId?: number | null;
-      abilityId?: number | null;
-      choiceGroup?: number | null;
+      rewards?: Array<{
+        __typename?: 'QuestRewardDto';
+        id: number;
+        questZoneId: number;
+        questId: number;
+        phaseId: number;
+        rewardType: QuestRewardType;
+        amount?: number | null;
+        objectZoneId?: number | null;
+        objectId?: number | null;
+        abilityId?: number | null;
+        choiceGroup?: number | null;
+      }> | null;
     }> | null;
     prerequisites?: Array<{
       __typename?: 'QuestPrerequisiteDto';
@@ -8830,6 +8888,19 @@ export type CreateQuestMutation = {
     maxLevel?: number | null;
     repeatable: boolean;
     hidden: boolean;
+    exclusiveGroup?: string | null;
+    triggerType: QuestTriggerType;
+    triggerMobZoneId?: number | null;
+    triggerMobId?: number | null;
+    triggerLevel?: number | null;
+    triggerItemZoneId?: number | null;
+    triggerItemId?: number | null;
+    triggerRoomZoneId?: number | null;
+    triggerRoomId?: number | null;
+    triggerAbilityId?: number | null;
+    triggerEventId?: number | null;
+    timeLimitMinutes?: number | null;
+    availabilityRequirement?: string | null;
   };
 };
 
@@ -8851,6 +8922,19 @@ export type UpdateQuestMutation = {
     maxLevel?: number | null;
     repeatable: boolean;
     hidden: boolean;
+    exclusiveGroup?: string | null;
+    triggerType: QuestTriggerType;
+    triggerMobZoneId?: number | null;
+    triggerMobId?: number | null;
+    triggerLevel?: number | null;
+    triggerItemZoneId?: number | null;
+    triggerItemId?: number | null;
+    triggerRoomZoneId?: number | null;
+    triggerRoomId?: number | null;
+    triggerAbilityId?: number | null;
+    triggerEventId?: number | null;
+    timeLimitMinutes?: number | null;
+    availabilityRequirement?: string | null;
   };
 };
 
@@ -8878,6 +8962,12 @@ export type CreateQuestPhaseMutation = {
     name: string;
     description?: string | null;
     order: number;
+    rewards?: Array<{
+      __typename?: 'QuestRewardDto';
+      id: number;
+      rewardType: QuestRewardType;
+      amount?: number | null;
+    }> | null;
   };
 };
 
@@ -8898,6 +8988,12 @@ export type UpdateQuestPhaseMutation = {
     name: string;
     description?: string | null;
     order: number;
+    rewards?: Array<{
+      __typename?: 'QuestRewardDto';
+      id: number;
+      rewardType: QuestRewardType;
+      amount?: number | null;
+    }> | null;
   };
 };
 
@@ -8970,6 +9066,9 @@ export type CreateQuestRewardMutation = {
   createQuestReward: {
     __typename?: 'QuestRewardDto';
     id: number;
+    questZoneId: number;
+    questId: number;
+    phaseId: number;
     rewardType: QuestRewardType;
     amount?: number | null;
   };
@@ -23475,16 +23574,24 @@ export const GetQuestsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'giverMobZoneId' },
+                  name: { kind: 'Name', value: 'exclusiveGroup' },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'giverMobId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'triggerType' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'completerMobZoneId' },
+                  name: { kind: 'Name', value: 'triggerMobZoneId' },
                 },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'completerMobId' },
+                  name: { kind: 'Name', value: 'triggerMobId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerLevel' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'timeLimitMinutes' },
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
@@ -23533,35 +23640,38 @@ export const GetQuestsDocument = {
                           ],
                         },
                       },
-                    ],
-                  },
-                },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'rewards' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'rewardType' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'amount' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'objectZoneId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'objectId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'abilityId' },
+                        name: { kind: 'Name', value: 'rewards' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rewardType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'amount' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'abilityId' },
+                            },
+                          ],
+                        },
                       },
                     ],
                   },
@@ -23681,6 +23791,27 @@ export const GetQuestsByZoneDocument = {
                           ],
                         },
                       },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'rewards' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rewardType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'amount' },
+                            },
+                          ],
+                        },
+                      },
                     ],
                   },
                 },
@@ -23760,16 +23891,52 @@ export const GetQuestDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'giverMobZoneId' },
+                  name: { kind: 'Name', value: 'exclusiveGroup' },
                 },
-                { kind: 'Field', name: { kind: 'Name', value: 'giverMobId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'triggerType' } },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'completerMobZoneId' },
+                  name: { kind: 'Name', value: 'triggerMobZoneId' },
                 },
                 {
                   kind: 'Field',
-                  name: { kind: 'Name', value: 'completerMobId' },
+                  name: { kind: 'Name', value: 'triggerMobId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerLevel' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerAbilityId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerEventId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'timeLimitMinutes' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'availabilityRequirement' },
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
@@ -23923,39 +24090,54 @@ export const GetQuestDocument = {
                           ],
                         },
                       },
-                    ],
-                  },
-                },
-                {
-                  kind: 'Field',
-                  name: { kind: 'Name', value: 'rewards' },
-                  selectionSet: {
-                    kind: 'SelectionSet',
-                    selections: [
-                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'rewardType' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'amount' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'objectZoneId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'objectId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'abilityId' },
-                      },
-                      {
-                        kind: 'Field',
-                        name: { kind: 'Name', value: 'choiceGroup' },
+                        name: { kind: 'Name', value: 'rewards' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'questZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'questId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'phaseId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'rewardType' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'amount' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectZoneId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'objectId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'abilityId' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'choiceGroup' },
+                            },
+                          ],
+                        },
                       },
                     ],
                   },
@@ -24083,6 +24265,55 @@ export const CreateQuestDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'exclusiveGroup' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'triggerType' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerMobZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerMobId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerLevel' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerAbilityId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerEventId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'timeLimitMinutes' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'availabilityRequirement' },
+                },
               ],
             },
           },
@@ -24173,6 +24404,55 @@ export const UpdateQuestDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'maxLevel' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'repeatable' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'hidden' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'exclusiveGroup' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'triggerType' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerMobZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerMobId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerLevel' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerItemId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomZoneId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerRoomId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerAbilityId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'triggerEventId' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'timeLimitMinutes' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'availabilityRequirement' },
+                },
               ],
             },
           },
@@ -24291,6 +24571,24 @@ export const CreateQuestPhaseDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'rewards' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'rewardType' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'amount' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -24401,6 +24699,24 @@ export const UpdateQuestPhaseDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'description' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'order' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'rewards' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'rewardType' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'amount' },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -24845,6 +25161,9 @@ export const CreateQuestRewardDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questZoneId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'questId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'phaseId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'rewardType' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'amount' } },
               ],

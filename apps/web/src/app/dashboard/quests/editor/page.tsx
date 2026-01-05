@@ -3,7 +3,8 @@
 export const dynamic = 'force-dynamic';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
-import { ColoredTextEditor } from '@/components/ColoredTextEditor';
+import { ColoredInput } from '@/components/ColoredInput';
+import { ColoredTextarea } from '@/components/ColoredTextarea';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { EntityAutocomplete } from '@/components/quests/EntityAutocomplete';
 import {
@@ -19,11 +20,10 @@ import {
   CreateQuestRewardDocument,
   UpdateQuestRewardDocument,
   DeleteQuestRewardDocument,
-  CreateQuestPrerequisiteDocument,
-  DeleteQuestPrerequisiteDocument,
   type GetQuestQuery,
   type QuestObjectiveType,
   type QuestRewardType,
+  type QuestTriggerType,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
@@ -32,7 +32,6 @@ import {
   ChevronUp,
   Gift,
   GripVertical,
-  Link2,
   Plus,
   Save,
   Target,
@@ -51,10 +50,22 @@ interface QuestFormData {
   maxLevel: number;
   repeatable: boolean;
   hidden: boolean;
-  giverMobZoneId: number | null;
-  giverMobId: number | null;
-  completerMobZoneId: number | null;
-  completerMobId: number | null;
+  // Branching paths
+  exclusiveGroup: string;
+  // Trigger configuration
+  triggerType: QuestTriggerType;
+  triggerMobZoneId: number | null;
+  triggerMobId: number | null;
+  triggerLevel: number | null;
+  triggerItemZoneId: number | null;
+  triggerItemId: number | null;
+  triggerRoomZoneId: number | null;
+  triggerRoomId: number | null;
+  triggerAbilityId: number | null;
+  triggerEventId: number | null;
+  timeLimitMinutes: number | null;
+  // Availability requirement (Lua expression for class/race checks)
+  availabilityRequirement: string;
 }
 
 interface PhaseFormData {
@@ -63,6 +74,7 @@ interface PhaseFormData {
   description: string;
   order: number;
   objectives: ObjectiveFormData[];
+  rewards: RewardFormData[];
 }
 
 interface ObjectiveFormData {
@@ -96,6 +108,7 @@ const OBJECTIVE_TYPES: { value: QuestObjectiveType; label: string }[] = [
 
 interface RewardFormData {
   id: number;
+  phaseId: number;
   rewardType: QuestRewardType;
   amount: number | null;
   objectZoneId: number | null;
@@ -111,11 +124,52 @@ const REWARD_TYPES: { value: QuestRewardType; label: string }[] = [
   { value: 'ABILITY' as QuestRewardType, label: 'Ability' },
 ];
 
-interface PrerequisiteFormData {
-  id: number;
-  prerequisiteQuestZoneId: number;
-  prerequisiteQuestId: number;
-}
+const TRIGGER_TYPES: {
+  value: QuestTriggerType;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: 'MANUAL' as QuestTriggerType,
+    label: 'Manual',
+    description: 'Quest is given by talking to an NPC quest giver',
+  },
+  {
+    value: 'MOB' as QuestTriggerType,
+    label: 'Mob Encounter',
+    description: 'Quest triggers when player encounters a specific mob',
+  },
+  {
+    value: 'LEVEL' as QuestTriggerType,
+    label: 'Level Reached',
+    description: 'Quest triggers when player reaches a certain level',
+  },
+  {
+    value: 'ITEM' as QuestTriggerType,
+    label: 'Item Obtained',
+    description: 'Quest triggers when player obtains a specific item',
+  },
+  {
+    value: 'ROOM' as QuestTriggerType,
+    label: 'Room Entered',
+    description: 'Quest triggers when player enters a specific room',
+  },
+  {
+    value: 'SKILL' as QuestTriggerType,
+    label: 'Skill Used',
+    description: 'Quest triggers when player uses a specific skill/ability',
+  },
+  {
+    value: 'EVENT' as QuestTriggerType,
+    label: 'Event Active',
+    description: 'Quest only available during a specific game event',
+  },
+  {
+    value: 'AUTO' as QuestTriggerType,
+    label: 'Auto-Start',
+    description: 'Quest automatically starts when player meets requirements',
+  },
+];
 
 function QuestEditorContent() {
   const searchParams = useSearchParams();
@@ -125,7 +179,7 @@ function QuestEditorContent() {
   const isNew = !questId || !zoneId;
 
   const [activeTab, setActiveTab] = useState<
-    'basic' | 'phases' | 'rewards' | 'prerequisites'
+    'basic' | 'requirements' | 'phases'
   >('basic');
   const [expandedPhases, setExpandedPhases] = useState<Set<number>>(new Set());
   const [generalError, setGeneralError] = useState<string>('');
@@ -139,18 +193,25 @@ function QuestEditorContent() {
     maxLevel: 100,
     repeatable: false,
     hidden: false,
-    giverMobZoneId: null,
-    giverMobId: null,
-    completerMobZoneId: null,
-    completerMobId: null,
+    // Branching paths
+    exclusiveGroup: '',
+    // Trigger defaults
+    triggerType: 'MOB' as QuestTriggerType,
+    triggerMobZoneId: null,
+    triggerMobId: null,
+    triggerLevel: null,
+    triggerItemZoneId: null,
+    triggerItemId: null,
+    triggerRoomZoneId: null,
+    triggerRoomId: null,
+    triggerAbilityId: null,
+    triggerEventId: null,
+    timeLimitMinutes: null,
+    // Availability requirement
+    availabilityRequirement: '',
   });
 
   const [phases, setPhases] = useState<PhaseFormData[]>([]);
-  const [rewards, setRewards] = useState<RewardFormData[]>([]);
-  const [prerequisites, setPrerequisites] = useState<PrerequisiteFormData[]>(
-    []
-  );
-  const [newPrereqInput, setNewPrereqInput] = useState('');
 
   const { loading, error, data } = useQuery(GetQuestDocument, {
     variables: {
@@ -173,8 +234,6 @@ function QuestEditorContent() {
   const [createReward] = useMutation(CreateQuestRewardDocument);
   const [updateReward] = useMutation(UpdateQuestRewardDocument);
   const [deleteReward] = useMutation(DeleteQuestRewardDocument);
-  const [createPrerequisite] = useMutation(CreateQuestPrerequisiteDocument);
-  const [deletePrerequisite] = useMutation(DeleteQuestPrerequisiteDocument);
 
   useEffect(() => {
     const typedData = data as GetQuestQuery | undefined;
@@ -189,13 +248,25 @@ function QuestEditorContent() {
         maxLevel: quest.maxLevel || 100,
         repeatable: quest.repeatable,
         hidden: quest.hidden,
-        giverMobZoneId: quest.giverMobZoneId || null,
-        giverMobId: quest.giverMobId || null,
-        completerMobZoneId: quest.completerMobZoneId || null,
-        completerMobId: quest.completerMobId || null,
+        // Branching paths
+        exclusiveGroup: quest.exclusiveGroup || '',
+        // Trigger fields
+        triggerType: quest.triggerType || ('MOB' as QuestTriggerType),
+        triggerMobZoneId: quest.triggerMobZoneId ?? null,
+        triggerMobId: quest.triggerMobId ?? null,
+        triggerLevel: quest.triggerLevel ?? null,
+        triggerItemZoneId: quest.triggerItemZoneId ?? null,
+        triggerItemId: quest.triggerItemId ?? null,
+        triggerRoomZoneId: quest.triggerRoomZoneId ?? null,
+        triggerRoomId: quest.triggerRoomId ?? null,
+        triggerAbilityId: quest.triggerAbilityId ?? null,
+        triggerEventId: quest.triggerEventId ?? null,
+        timeLimitMinutes: quest.timeLimitMinutes ?? null,
+        // Availability requirement
+        availabilityRequirement: quest.availabilityRequirement || '',
       });
 
-      // Load phases and objectives
+      // Load phases, objectives, and rewards (rewards are now per-phase)
       if (quest.phases) {
         setPhases(
           quest.phases.map(phase => ({
@@ -222,36 +293,21 @@ function QuestEditorContent() {
                 deliverToMobId: obj.deliverToMobId || null,
                 luaExpression: obj.luaExpression || '',
               })) || [],
+            rewards:
+              phase.rewards?.map(reward => ({
+                id: reward.id,
+                phaseId: phase.id,
+                rewardType: reward.rewardType,
+                amount: reward.amount ?? null,
+                objectZoneId: reward.objectZoneId ?? null,
+                objectId: reward.objectId ?? null,
+                abilityId: reward.abilityId ?? null,
+                choiceGroup: reward.choiceGroup ?? null,
+              })) || [],
           }))
         );
         // Expand all phases by default
         setExpandedPhases(new Set(quest.phases.map(p => p.id)));
-      }
-
-      // Load rewards
-      if (quest.rewards) {
-        setRewards(
-          quest.rewards.map(reward => ({
-            id: reward.id,
-            rewardType: reward.rewardType,
-            amount: reward.amount ?? null,
-            objectZoneId: reward.objectZoneId ?? null,
-            objectId: reward.objectId ?? null,
-            abilityId: reward.abilityId ?? null,
-            choiceGroup: reward.choiceGroup ?? null,
-          }))
-        );
-      }
-
-      // Load prerequisites
-      if (quest.prerequisites) {
-        setPrerequisites(
-          quest.prerequisites.map(prereq => ({
-            id: prereq.id,
-            prerequisiteQuestZoneId: prereq.prerequisiteQuestZoneId,
-            prerequisiteQuestId: prereq.prerequisiteQuestId,
-          }))
-        );
       }
     }
   }, [data]);
@@ -278,10 +334,23 @@ function QuestEditorContent() {
               maxLevel: formData.maxLevel,
               repeatable: formData.repeatable,
               hidden: formData.hidden,
-              giverMobZoneId: formData.giverMobZoneId || undefined,
-              giverMobId: formData.giverMobId || undefined,
-              completerMobZoneId: formData.completerMobZoneId || undefined,
-              completerMobId: formData.completerMobId || undefined,
+              // Branching paths
+              exclusiveGroup: formData.exclusiveGroup || undefined,
+              // Trigger fields
+              triggerType: formData.triggerType,
+              triggerMobZoneId: formData.triggerMobZoneId,
+              triggerMobId: formData.triggerMobId,
+              triggerLevel: formData.triggerLevel,
+              triggerItemZoneId: formData.triggerItemZoneId,
+              triggerItemId: formData.triggerItemId,
+              triggerRoomZoneId: formData.triggerRoomZoneId,
+              triggerRoomId: formData.triggerRoomId,
+              triggerAbilityId: formData.triggerAbilityId,
+              triggerEventId: formData.triggerEventId,
+              timeLimitMinutes: formData.timeLimitMinutes,
+              // Availability requirement
+              availabilityRequirement:
+                formData.availabilityRequirement || undefined,
             },
           },
         });
@@ -301,10 +370,23 @@ function QuestEditorContent() {
               maxLevel: formData.maxLevel,
               repeatable: formData.repeatable,
               hidden: formData.hidden,
-              giverMobZoneId: formData.giverMobZoneId,
-              giverMobId: formData.giverMobId,
-              completerMobZoneId: formData.completerMobZoneId,
-              completerMobId: formData.completerMobId,
+              // Branching paths
+              exclusiveGroup: formData.exclusiveGroup || undefined,
+              // Trigger fields
+              triggerType: formData.triggerType,
+              triggerMobZoneId: formData.triggerMobZoneId,
+              triggerMobId: formData.triggerMobId,
+              triggerLevel: formData.triggerLevel,
+              triggerItemZoneId: formData.triggerItemZoneId,
+              triggerItemId: formData.triggerItemId,
+              triggerRoomZoneId: formData.triggerRoomZoneId,
+              triggerRoomId: formData.triggerRoomId,
+              triggerAbilityId: formData.triggerAbilityId,
+              triggerEventId: formData.triggerEventId,
+              timeLimitMinutes: formData.timeLimitMinutes,
+              // Availability requirement
+              availabilityRequirement:
+                formData.availabilityRequirement || undefined,
             },
           },
         });
@@ -340,6 +422,7 @@ function QuestEditorContent() {
           description: '',
           order: newOrder,
           objectives: [],
+          rewards: [],
         },
       ]);
       setExpandedPhases(prev => new Set(prev).add(newPhaseId));
@@ -514,14 +597,15 @@ function QuestEditorContent() {
     }
   };
 
-  // Reward handlers
-  const handleAddReward = async () => {
+  // Reward handlers - rewards are now per-phase
+  const handleAddReward = async (phaseId: number) => {
     try {
       const result = await createReward({
         variables: {
           data: {
             questZoneId: formData.zoneId,
             questId: formData.id,
+            phaseId: phaseId,
             rewardType: 'EXPERIENCE' as QuestRewardType,
             amount: 100,
           },
@@ -530,18 +614,28 @@ function QuestEditorContent() {
 
       if (result.data?.createQuestReward) {
         const newReward = result.data.createQuestReward;
-        setRewards(prev => [
-          ...prev,
-          {
-            id: newReward.id,
-            rewardType: newReward.rewardType,
-            amount: newReward.amount ?? null,
-            objectZoneId: null,
-            objectId: null,
-            abilityId: null,
-            choiceGroup: null,
-          },
-        ]);
+        setPhases(prev =>
+          prev.map(p =>
+            p.id === phaseId
+              ? {
+                  ...p,
+                  rewards: [
+                    ...p.rewards,
+                    {
+                      id: newReward.id,
+                      phaseId: phaseId,
+                      rewardType: newReward.rewardType,
+                      amount: newReward.amount ?? null,
+                      objectZoneId: null,
+                      objectId: null,
+                      abilityId: null,
+                      choiceGroup: null,
+                    },
+                  ],
+                }
+              : p
+          )
+        );
       }
     } catch (err) {
       console.error('Error adding reward:', err);
@@ -550,17 +644,28 @@ function QuestEditorContent() {
   };
 
   const handleUpdateReward = async (
+    phaseId: number,
     rewardId: number,
     field: keyof RewardFormData,
     value: string | number | boolean | null
   ) => {
     // Update local state first
-    setRewards(prev =>
-      prev.map(r => (r.id === rewardId ? { ...r, [field]: value } : r))
+    setPhases(prev =>
+      prev.map(p =>
+        p.id === phaseId
+          ? {
+              ...p,
+              rewards: p.rewards.map(r =>
+                r.id === rewardId ? { ...r, [field]: value } : r
+              ),
+            }
+          : p
+      )
     );
 
     // Find the updated reward
-    const updatedReward = rewards.find(r => r.id === rewardId);
+    const phase = phases.find(p => p.id === phaseId);
+    const updatedReward = phase?.rewards.find(r => r.id === rewardId);
     if (!updatedReward) return;
 
     try {
@@ -600,7 +705,7 @@ function QuestEditorContent() {
     }
   };
 
-  const handleDeleteReward = async (rewardId: number) => {
+  const handleDeleteReward = async (phaseId: number, rewardId: number) => {
     if (!confirm('Delete this reward?')) return;
 
     try {
@@ -608,85 +713,16 @@ function QuestEditorContent() {
         variables: { id: rewardId },
       });
 
-      setRewards(prev => prev.filter(r => r.id !== rewardId));
+      setPhases(prev =>
+        prev.map(p =>
+          p.id === phaseId
+            ? { ...p, rewards: p.rewards.filter(r => r.id !== rewardId) }
+            : p
+        )
+      );
     } catch (err) {
       console.error('Error deleting reward:', err);
       setGeneralError('Failed to delete reward.');
-    }
-  };
-
-  // Prerequisite handlers
-  const handleAddPrerequisite = async () => {
-    // Parse input: "30:5" format
-    const match = newPrereqInput.match(/^(\d+):(\d+)$/);
-    if (!match || !match[1] || !match[2]) {
-      setGeneralError('Invalid format. Use "zone:questId" (e.g., "30:5")');
-      return;
-    }
-
-    const prereqZoneId = parseInt(match[1], 10);
-    const prereqQuestId = parseInt(match[2], 10);
-
-    // Check for self-reference
-    if (prereqZoneId === formData.zoneId && prereqQuestId === formData.id) {
-      setGeneralError('A quest cannot be its own prerequisite.');
-      return;
-    }
-
-    // Check for duplicates
-    if (
-      prerequisites.some(
-        p =>
-          p.prerequisiteQuestZoneId === prereqZoneId &&
-          p.prerequisiteQuestId === prereqQuestId
-      )
-    ) {
-      setGeneralError('This prerequisite already exists.');
-      return;
-    }
-
-    try {
-      const result = await createPrerequisite({
-        variables: {
-          data: {
-            questZoneId: formData.zoneId,
-            questId: formData.id,
-            prerequisiteQuestZoneId: prereqZoneId,
-            prerequisiteQuestId: prereqQuestId,
-          },
-        },
-      });
-
-      if (result.data?.createQuestPrerequisite) {
-        const newPrereq = result.data.createQuestPrerequisite;
-        setPrerequisites(prev => [
-          ...prev,
-          {
-            id: newPrereq.id,
-            prerequisiteQuestZoneId: newPrereq.prerequisiteQuestZoneId,
-            prerequisiteQuestId: newPrereq.prerequisiteQuestId,
-          },
-        ]);
-        setNewPrereqInput('');
-      }
-    } catch (err) {
-      console.error('Error adding prerequisite:', err);
-      setGeneralError('Failed to add prerequisite.');
-    }
-  };
-
-  const handleDeletePrerequisite = async (prereqId: number) => {
-    if (!confirm('Remove this prerequisite?')) return;
-
-    try {
-      await deletePrerequisite({
-        variables: { id: prereqId },
-      });
-
-      setPrerequisites(prev => prev.filter(p => p.id !== prereqId));
-    } catch (err) {
-      console.error('Error deleting prerequisite:', err);
-      setGeneralError('Failed to remove prerequisite.');
     }
   };
 
@@ -722,9 +758,8 @@ function QuestEditorContent() {
 
   const tabs = [
     { id: 'basic' as const, label: 'Basic Info' },
+    { id: 'requirements' as const, label: 'Requirements' },
     { id: 'phases' as const, label: 'Phases & Objectives' },
-    { id: 'rewards' as const, label: 'Rewards' },
-    { id: 'prerequisites' as const, label: 'Prerequisites' },
   ];
 
   return (
@@ -836,12 +871,10 @@ function QuestEditorContent() {
                 <label className='block text-sm font-medium text-card-foreground mb-1'>
                   Name *
                 </label>
-                <ColoredTextEditor
+                <ColoredInput
                   value={formData.name}
                   onChange={value => handleInputChange('name', value)}
                   placeholder='e.g., The Lost Artifact'
-                  maxLength={80}
-                  showPreview={true}
                 />
               </div>
 
@@ -849,14 +882,11 @@ function QuestEditorContent() {
                 <label className='block text-sm font-medium text-card-foreground mb-1'>
                   Description
                 </label>
-                <textarea
+                <ColoredTextarea
                   value={formData.description}
-                  onChange={e =>
-                    handleInputChange('description', e.target.value)
-                  }
+                  onChange={value => handleInputChange('description', value)}
                   placeholder='Quest description shown to players'
                   rows={3}
-                  className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                 />
               </div>
 
@@ -924,47 +954,234 @@ function QuestEditorContent() {
                 </label>
               </div>
 
-              {/* Quest Giver/Completer */}
-              <div className='grid grid-cols-2 gap-4 pt-4 border-t border-border'>
-                <div>
-                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                    Quest Giver
-                  </label>
-                  <EntityAutocomplete
-                    entityType='mob'
-                    value={{
-                      zoneId: formData.giverMobZoneId,
-                      id: formData.giverMobId,
-                    }}
-                    onChange={({ zoneId, id }) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        giverMobZoneId: zoneId,
-                        giverMobId: id,
-                      }));
-                    }}
-                    placeholder='Search mob (e.g., "helena" or "30:5")'
-                  />
+              {/* Trigger Configuration */}
+              <div className='pt-4 border-t border-border space-y-4'>
+                <h4 className='text-sm font-medium text-card-foreground'>
+                  Quest Trigger Configuration
+                </h4>
+                <div className='grid grid-cols-2 gap-4'>
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Trigger Type
+                    </label>
+                    <select
+                      value={formData.triggerType}
+                      onChange={e =>
+                        handleInputChange(
+                          'triggerType',
+                          e.target.value as QuestTriggerType
+                        )
+                      }
+                      className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    >
+                      {TRIGGER_TYPES.map(type => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                    <p className='text-xs text-muted-foreground mt-1'>
+                      {
+                        TRIGGER_TYPES.find(
+                          t => t.value === formData.triggerType
+                        )?.description
+                      }
+                    </p>
+                  </div>
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Time Limit (minutes)
+                    </label>
+                    <input
+                      type='number'
+                      value={formData.timeLimitMinutes || ''}
+                      onChange={e =>
+                        handleInputChange(
+                          'timeLimitMinutes',
+                          e.target.value ? parseInt(e.target.value) : null
+                        )
+                      }
+                      placeholder='No limit'
+                      min={1}
+                      className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    />
+                    <p className='text-xs text-muted-foreground mt-1'>
+                      Leave empty for no time limit
+                    </p>
+                  </div>
                 </div>
+
+                {/* Conditional trigger fields based on type */}
+                {formData.triggerType === 'MOB' && (
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Quest Giver Mob
+                    </label>
+                    <EntityAutocomplete
+                      entityType='mob'
+                      value={{
+                        zoneId: formData.triggerMobZoneId,
+                        id: formData.triggerMobId,
+                      }}
+                      onChange={({ zoneId, id }) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          triggerMobZoneId: zoneId,
+                          triggerMobId: id,
+                        }));
+                      }}
+                      placeholder='Search mob that gives quest (e.g., "helena" or "30:5")'
+                    />
+                    <p className='text-xs text-muted-foreground mt-1'>
+                      Player talks to this mob to receive the quest
+                    </p>
+                  </div>
+                )}
+
+                {formData.triggerType === 'LEVEL' && (
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                        Trigger Level
+                      </label>
+                      <input
+                        type='number'
+                        value={formData.triggerLevel || ''}
+                        onChange={e =>
+                          handleInputChange(
+                            'triggerLevel',
+                            e.target.value ? parseInt(e.target.value) : null
+                          )
+                        }
+                        placeholder='Level required'
+                        min={1}
+                        max={100}
+                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {formData.triggerType === 'ITEM' && (
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Trigger Item
+                    </label>
+                    <EntityAutocomplete
+                      entityType='object'
+                      value={{
+                        zoneId: formData.triggerItemZoneId,
+                        id: formData.triggerItemId,
+                      }}
+                      onChange={({ zoneId, id }) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          triggerItemZoneId: zoneId,
+                          triggerItemId: id,
+                        }));
+                      }}
+                      placeholder='Search item that triggers quest...'
+                    />
+                  </div>
+                )}
+
+                {formData.triggerType === 'ROOM' && (
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Trigger Room
+                    </label>
+                    <EntityAutocomplete
+                      entityType='room'
+                      value={{
+                        zoneId: formData.triggerRoomZoneId,
+                        id: formData.triggerRoomId,
+                      }}
+                      onChange={({ zoneId, id }) => {
+                        setFormData(prev => ({
+                          ...prev,
+                          triggerRoomZoneId: zoneId,
+                          triggerRoomId: id,
+                        }));
+                      }}
+                      placeholder='Search room that triggers quest...'
+                    />
+                  </div>
+                )}
+
+                {formData.triggerType === 'SKILL' && (
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                        Trigger Ability ID
+                      </label>
+                      <input
+                        type='number'
+                        value={formData.triggerAbilityId || ''}
+                        onChange={e =>
+                          handleInputChange(
+                            'triggerAbilityId',
+                            e.target.value ? parseInt(e.target.value) : null
+                          )
+                        }
+                        placeholder='Ability ID'
+                        min={1}
+                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {formData.triggerType === 'EVENT' && (
+                  <div className='grid grid-cols-2 gap-4'>
+                    <div>
+                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                        Trigger Event ID
+                      </label>
+                      <input
+                        type='number'
+                        value={formData.triggerEventId || ''}
+                        onChange={e =>
+                          handleInputChange(
+                            'triggerEventId',
+                            e.target.value ? parseInt(e.target.value) : null
+                          )
+                        }
+                        placeholder='Event ID'
+                        min={1}
+                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                      />
+                      <p className='text-xs text-muted-foreground mt-1'>
+                        Quest only available when this event is active
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Branching Paths */}
+              <div className='pt-4 border-t border-border space-y-4'>
+                <h4 className='text-sm font-medium text-card-foreground'>
+                  Branching Paths
+                </h4>
                 <div>
                   <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                    Quest Completer
+                    Exclusive Group
                   </label>
-                  <EntityAutocomplete
-                    entityType='mob'
-                    value={{
-                      zoneId: formData.completerMobZoneId,
-                      id: formData.completerMobId,
-                    }}
-                    onChange={({ zoneId, id }) => {
-                      setFormData(prev => ({
-                        ...prev,
-                        completerMobZoneId: zoneId,
-                        completerMobId: id,
-                      }));
-                    }}
-                    placeholder='Search mob (e.g., "helena" or "30:5")'
+                  <input
+                    type='text'
+                    value={formData.exclusiveGroup}
+                    onChange={e =>
+                      handleInputChange('exclusiveGroup', e.target.value)
+                    }
+                    placeholder='e.g., warrior-specialization, faction-choice'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
                   />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Quests with the same exclusive group are mutually exclusive.
+                    Once a player accepts one quest in a group, others become
+                    unavailable. Use this for class specializations, faction
+                    choices, etc.
+                  </p>
                 </div>
               </div>
             </div>
@@ -1272,6 +1489,181 @@ function QuestEditorContent() {
                             </div>
                           )}
                         </div>
+
+                        {/* Phase Rewards */}
+                        <div className='space-y-3 mt-6 pt-4 border-t border-border'>
+                          <div className='flex items-center justify-between'>
+                            <h4 className='text-sm font-medium text-muted-foreground flex items-center gap-2'>
+                              <Gift className='w-4 h-4' />
+                              Phase Rewards
+                            </h4>
+                            <button
+                              onClick={() => handleAddReward(phase.id)}
+                              className='inline-flex items-center text-sm text-primary hover:text-primary/80'
+                            >
+                              <Plus className='w-4 h-4 mr-1' />
+                              Add Reward
+                            </button>
+                          </div>
+
+                          {phase.rewards.map(reward => (
+                            <div
+                              key={reward.id}
+                              className='bg-amber-50/50 dark:bg-amber-900/20 rounded-lg p-3 space-y-3'
+                            >
+                              <div className='flex items-start gap-3'>
+                                <Gift className='w-4 h-4 text-amber-500 mt-2' />
+                                <div className='flex-1 space-y-3'>
+                                  <div className='grid grid-cols-4 gap-3'>
+                                    <div>
+                                      <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                        Type
+                                      </label>
+                                      <select
+                                        value={reward.rewardType}
+                                        onChange={e =>
+                                          handleUpdateReward(
+                                            phase.id,
+                                            reward.id,
+                                            'rewardType',
+                                            e.target.value as QuestRewardType
+                                          )
+                                        }
+                                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                                      >
+                                        {REWARD_TYPES.map(type => (
+                                          <option
+                                            key={type.value}
+                                            value={type.value}
+                                          >
+                                            {type.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                    </div>
+
+                                    {(reward.rewardType === 'EXPERIENCE' ||
+                                      reward.rewardType === 'GOLD') && (
+                                      <div>
+                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                          Amount
+                                        </label>
+                                        <input
+                                          type='number'
+                                          value={reward.amount || ''}
+                                          onChange={e =>
+                                            handleUpdateReward(
+                                              phase.id,
+                                              reward.id,
+                                              'amount',
+                                              e.target.value
+                                                ? parseInt(e.target.value)
+                                                : null
+                                            )
+                                          }
+                                          placeholder='Amount'
+                                          className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                                        />
+                                      </div>
+                                    )}
+
+                                    {reward.rewardType === 'ITEM' && (
+                                      <div className='col-span-2'>
+                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                          Item
+                                        </label>
+                                        <EntityAutocomplete
+                                          entityType='object'
+                                          value={{
+                                            zoneId: reward.objectZoneId,
+                                            id: reward.objectId,
+                                          }}
+                                          onChange={({ zoneId, id }) => {
+                                            handleUpdateReward(
+                                              phase.id,
+                                              reward.id,
+                                              'objectZoneId',
+                                              zoneId
+                                            );
+                                            handleUpdateReward(
+                                              phase.id,
+                                              reward.id,
+                                              'objectId',
+                                              id
+                                            );
+                                          }}
+                                          placeholder='Search item...'
+                                        />
+                                      </div>
+                                    )}
+
+                                    {reward.rewardType === 'ABILITY' && (
+                                      <div>
+                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                          Ability ID
+                                        </label>
+                                        <input
+                                          type='number'
+                                          value={reward.abilityId || ''}
+                                          onChange={e =>
+                                            handleUpdateReward(
+                                              phase.id,
+                                              reward.id,
+                                              'abilityId',
+                                              e.target.value
+                                                ? parseInt(e.target.value)
+                                                : null
+                                            )
+                                          }
+                                          placeholder='Ability ID'
+                                          className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                                        />
+                                      </div>
+                                    )}
+
+                                    <div>
+                                      <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                        Choice Group
+                                      </label>
+                                      <input
+                                        type='number'
+                                        value={reward.choiceGroup || ''}
+                                        onChange={e =>
+                                          handleUpdateReward(
+                                            phase.id,
+                                            reward.id,
+                                            'choiceGroup',
+                                            e.target.value
+                                              ? parseInt(e.target.value)
+                                              : null
+                                          )
+                                        }
+                                        placeholder='Group'
+                                        title='Same group = player chooses one'
+                                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                                      />
+                                    </div>
+                                  </div>
+                                </div>
+                                <button
+                                  onClick={() =>
+                                    handleDeleteReward(phase.id, reward.id)
+                                  }
+                                  className='p-1 text-destructive hover:bg-destructive/10 rounded'
+                                >
+                                  <Trash2 className='w-4 h-4' />
+                                </button>
+                              </div>
+                            </div>
+                          ))}
+
+                          {phase.rewards.length === 0 && (
+                            <div className='text-center py-4 text-muted-foreground text-sm'>
+                              No rewards for this phase. Click "Add Reward" to
+                              add one.
+                            </div>
+                          )}
+                        </div>
                       </div>
                     )}
                   </div>
@@ -1289,282 +1681,67 @@ function QuestEditorContent() {
           </div>
         )}
 
-        {/* Rewards Tab */}
-        {activeTab === 'rewards' && (
-          <div className='bg-card shadow rounded-lg p-6'>
-            <div className='flex items-center justify-between mb-4'>
-              <h3 className='text-lg font-medium text-card-foreground'>
-                Quest Rewards
-              </h3>
-              {!isNew && (
-                <button
-                  type='button'
-                  onClick={handleAddReward}
-                  className='inline-flex items-center px-3 py-1.5 text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90'
-                >
-                  <Plus className='w-4 h-4 mr-1' />
-                  Add Reward
-                </button>
-              )}
-            </div>
-
-            {isNew && (
-              <div className='bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4'>
-                <p className='text-amber-800 dark:text-amber-200 text-sm'>
-                  Save the quest first before adding rewards.
-                </p>
-              </div>
-            )}
-
-            {!isNew && rewards.length === 0 && (
-              <div className='text-center py-8 text-muted-foreground'>
-                No rewards yet. Click "Add Reward" to add quest rewards.
-              </div>
-            )}
-
-            {!isNew && rewards.length > 0 && (
-              <div className='space-y-4'>
-                {rewards.map(reward => (
-                  <div
-                    key={reward.id}
-                    className='bg-muted/50 rounded-lg p-4 space-y-3'
-                  >
-                    <div className='flex items-start gap-4'>
-                      <Gift className='w-5 h-5 text-amber-500 mt-1' />
-                      <div className='flex-1 space-y-3'>
-                        <div className='flex gap-4'>
-                          <div className='w-40'>
-                            <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                              Type
-                            </label>
-                            <select
-                              value={reward.rewardType}
-                              onChange={e =>
-                                handleUpdateReward(
-                                  reward.id,
-                                  'rewardType',
-                                  e.target.value as QuestRewardType
-                                )
-                              }
-                              className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                            >
-                              {REWARD_TYPES.map(type => (
-                                <option key={type.value} value={type.value}>
-                                  {type.label}
-                                </option>
-                              ))}
-                            </select>
-                          </div>
-
-                          {(reward.rewardType === 'EXPERIENCE' ||
-                            reward.rewardType === 'GOLD') && (
-                            <div className='w-32'>
-                              <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                Amount
-                              </label>
-                              <input
-                                type='number'
-                                value={reward.amount || ''}
-                                onChange={e =>
-                                  handleUpdateReward(
-                                    reward.id,
-                                    'amount',
-                                    e.target.value
-                                      ? parseInt(e.target.value)
-                                      : null
-                                  )
-                                }
-                                placeholder='Amount'
-                                className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                              />
-                            </div>
-                          )}
-
-                          {reward.rewardType === 'ITEM' && (
-                            <div className='flex-1'>
-                              <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                Item
-                              </label>
-                              <EntityAutocomplete
-                                entityType='object'
-                                value={{
-                                  zoneId: reward.objectZoneId,
-                                  id: reward.objectId,
-                                }}
-                                onChange={({ zoneId, id }) => {
-                                  handleUpdateReward(
-                                    reward.id,
-                                    'objectZoneId',
-                                    zoneId
-                                  );
-                                  handleUpdateReward(reward.id, 'objectId', id);
-                                }}
-                                placeholder='Search item...'
-                              />
-                            </div>
-                          )}
-
-                          {reward.rewardType === 'ABILITY' && (
-                            <div className='w-40'>
-                              <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                Ability ID
-                              </label>
-                              <input
-                                type='number'
-                                value={reward.abilityId || ''}
-                                onChange={e =>
-                                  handleUpdateReward(
-                                    reward.id,
-                                    'abilityId',
-                                    e.target.value
-                                      ? parseInt(e.target.value)
-                                      : null
-                                  )
-                                }
-                                placeholder='Ability ID'
-                                className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                              />
-                            </div>
-                          )}
-
-                          <div className='w-24'>
-                            <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                              Choice Group
-                            </label>
-                            <input
-                              type='number'
-                              value={reward.choiceGroup || ''}
-                              onChange={e =>
-                                handleUpdateReward(
-                                  reward.id,
-                                  'choiceGroup',
-                                  e.target.value
-                                    ? parseInt(e.target.value)
-                                    : null
-                                )
-                              }
-                              placeholder='Group'
-                              title='Same group = player chooses one'
-                              className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        type='button'
-                        onClick={() => handleDeleteReward(reward.id)}
-                        className='p-1.5 text-destructive hover:text-destructive-foreground hover:bg-destructive rounded'
-                        title='Delete reward'
-                      >
-                        <Trash2 className='w-4 h-4' />
-                      </button>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className='mt-4 text-sm text-muted-foreground'>
-              <p>
-                <strong>Tip:</strong> Use "Choice Group" to let players pick one
-                reward from a group. Rewards with the same group number are
-                mutually exclusive.
-              </p>
-            </div>
-          </div>
-        )}
-
-        {/* Prerequisites Tab */}
-        {activeTab === 'prerequisites' && (
-          <div className='space-y-6'>
-            <div className='flex items-center justify-between'>
+        {/* Requirements Tab */}
+        {activeTab === 'requirements' && (
+          <div className='space-y-8'>
+            {/* Availability Requirements Section */}
+            <div className='space-y-4'>
               <h2 className='text-lg font-semibold flex items-center gap-2'>
-                <Link2 className='w-5 h-5' />
-                Quest Prerequisites
+                <Target className='w-5 h-5' />
+                Availability Requirements
               </h2>
-            </div>
 
-            <p className='text-muted-foreground'>
-              Players must complete the prerequisite quests before this quest
-              becomes available.
-            </p>
+              <p className='text-muted-foreground'>
+                Use a Lua expression to control who can receive this quest. This
+                is checked in addition to level requirements.
+              </p>
 
-            {/* Add Prerequisite Input */}
-            <div className='bg-muted/50 rounded-lg p-4'>
-              <label className='block text-sm font-medium text-muted-foreground mb-2'>
-                Add Prerequisite Quest
-              </label>
-              <div className='flex items-center gap-2'>
-                <input
-                  type='text'
-                  value={newPrereqInput}
-                  onChange={e => setNewPrereqInput(e.target.value)}
-                  placeholder='Enter zone:questId (e.g., 30:5)'
-                  className='flex-1 rounded-md border border-input bg-background px-3 py-2 text-sm shadow-sm'
-                  onKeyDown={e => {
-                    if (e.key === 'Enter') {
-                      e.preventDefault();
-                      handleAddPrerequisite();
-                    }
-                  }}
+              <div className='bg-muted/50 rounded-lg p-4 space-y-3'>
+                <label className='block text-sm font-medium text-muted-foreground'>
+                  Lua Expression
+                </label>
+                <textarea
+                  value={formData.availabilityRequirement}
+                  onChange={e =>
+                    handleInputChange('availabilityRequirement', e.target.value)
+                  }
+                  placeholder="e.g., character.class == 'WARRIOR'"
+                  rows={3}
+                  className='block w-full rounded-md border border-input bg-background shadow-sm font-mono text-sm px-3 py-2'
                 />
-                <button
-                  type='button'
-                  onClick={handleAddPrerequisite}
-                  disabled={!newPrereqInput.trim()}
-                  className='inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90 disabled:opacity-50'
-                >
-                  <Plus className='w-4 h-4 mr-2' />
-                  Add
-                </button>
+                <div className='text-xs text-muted-foreground space-y-1'>
+                  <p>
+                    <strong>Examples:</strong>
+                  </p>
+                  <ul className='list-disc list-inside space-y-0.5 ml-2'>
+                    <li>
+                      <code className='bg-muted px-1 rounded'>
+                        character.class == &apos;WARRIOR&apos;
+                      </code>{' '}
+                      - Warriors only
+                    </li>
+                    <li>
+                      <code className='bg-muted px-1 rounded'>
+                        character.class == &apos;WARRIOR&apos; or
+                        character.class == &apos;PALADIN&apos;
+                      </code>{' '}
+                      - Warrior or Paladin
+                    </li>
+                    <li>
+                      <code className='bg-muted px-1 rounded'>
+                        character.race == &apos;ELF&apos;
+                      </code>{' '}
+                      - Elves only
+                    </li>
+                    <li>
+                      <code className='bg-muted px-1 rounded'>
+                        character:hasCompletedQuest(0, 5)
+                      </code>{' '}
+                      - Completed Quest 0:5
+                    </li>
+                  </ul>
+                </div>
               </div>
-              <p className='text-xs text-muted-foreground mt-2'>
-                Format: zone:questId (e.g., "185:1" for Quest 1 in Zone 185)
-              </p>
-            </div>
-
-            {/* Prerequisites List */}
-            {prerequisites.length === 0 ? (
-              <div className='text-center py-8 text-muted-foreground'>
-                <Link2 className='w-8 h-8 mx-auto mb-2 opacity-50' />
-                <p>No prerequisites configured</p>
-                <p className='text-sm'>
-                  This quest will be available to all players who meet the level
-                  requirements.
-                </p>
-              </div>
-            ) : (
-              <div className='space-y-2'>
-                {prerequisites.map(prereq => (
-                  <div
-                    key={prereq.id}
-                    className='flex items-center justify-between bg-muted/50 rounded-lg px-4 py-3'
-                  >
-                    <div className='flex items-center gap-3'>
-                      <Link2 className='w-4 h-4 text-muted-foreground' />
-                      <span className='font-mono text-sm'>
-                        Quest {prereq.prerequisiteQuestZoneId}:
-                        {prereq.prerequisiteQuestId}
-                      </span>
-                    </div>
-                    <button
-                      type='button'
-                      onClick={() => handleDeletePrerequisite(prereq.id)}
-                      className='p-1.5 text-destructive hover:text-destructive-foreground hover:bg-destructive rounded'
-                      title='Remove prerequisite'
-                    >
-                      <Trash2 className='w-4 h-4' />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            <div className='mt-4 text-sm text-muted-foreground'>
-              <p>
-                <strong>Note:</strong> Prerequisites create a linear quest
-                chain. Players must complete quests in order.
-              </p>
             </div>
           </div>
         )}
