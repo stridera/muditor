@@ -35,9 +35,36 @@ export class TriggersService {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
+      orderBy: [{ zoneId: 'asc' }, { id: 'asc' }],
+    });
+  }
+
+  async findByZone(zoneId: number) {
+    return this.prisma.triggers.findMany({
+      where: { zoneId },
+      include: {
+        mobs: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
+          },
+        },
+        objects: {
+          select: {
+            id: true,
+            zoneId: true,
+            name: true,
+          },
+        },
+        zones: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
       },
+      orderBy: { id: 'asc' },
     });
   }
 
@@ -68,7 +95,7 @@ export class TriggersService {
           },
         },
       },
-      orderBy: [{ id: 'asc' }, { createdAt: 'desc' }],
+      orderBy: [{ zoneId: 'asc' }, { id: 'asc' }],
     });
   }
 
@@ -80,9 +107,9 @@ export class TriggersService {
     });
   }
 
-  async clearNeedsReview(id: number, userId?: string) {
+  async clearNeedsReview(zoneId: number, id: number, userId?: string) {
     return this.prisma.triggers.update({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
       data: {
         needsReview: false,
         syntaxError: null,
@@ -91,9 +118,9 @@ export class TriggersService {
     });
   }
 
-  async findOne(id: number) {
+  async findOne(zoneId: number, id: number) {
     const trigger = await this.prisma.triggers.findUnique({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
       include: {
         mobs: {
           select: {
@@ -115,19 +142,48 @@ export class TriggersService {
             name: true,
           },
         },
+        mobTriggers: {
+          include: {
+            mob: {
+              select: {
+                id: true,
+                zoneId: true,
+                name: true,
+                plainName: true,
+              },
+            },
+          },
+        },
+        objectTriggers: {
+          include: {
+            object: {
+              select: {
+                id: true,
+                zoneId: true,
+                name: true,
+                plainName: true,
+              },
+            },
+          },
+        },
       },
     });
 
     if (!trigger) {
-      throw new NotFoundException(`Trigger with ID ${id} not found`);
+      throw new NotFoundException(`Trigger ${zoneId}:${id} not found`);
     }
 
     return trigger;
   }
 
-  async findByAttachment(attachType: ScriptType, entityId: number) {
+  async findByAttachment(
+    attachType: ScriptType,
+    zoneId: number,
+    entityId: number
+  ) {
     const whereClause = this.buildWhereClauseForAttachment(
       attachType,
+      zoneId,
       entityId
     );
 
@@ -155,14 +211,22 @@ export class TriggersService {
           },
         },
       },
-      orderBy: {
-        createdAt: 'desc',
-      },
+      orderBy: { id: 'asc' },
     });
   }
 
   async create(data: CreateTriggerInput, userId?: string) {
+    // Get next available ID in the zone
+    const maxTrigger = await this.prisma.triggers.findFirst({
+      where: { zoneId: data.zoneId },
+      orderBy: { id: 'desc' },
+      select: { id: true },
+    });
+    const nextId = data.id ?? (maxTrigger?.id ?? -1) + 1;
+
     const triggerData: Prisma.TriggersUncheckedCreateInput = {
+      zoneId: data.zoneId,
+      id: nextId,
       name: data.name,
       attachType: data.attachType,
       commands: data.commands,
@@ -173,19 +237,16 @@ export class TriggersService {
       mobId: null,
       objectZoneId: null,
       objectId: null,
-      zoneId: null,
       variables: {},
       flags: [],
     };
 
-    if (data.mobId) {
-      triggerData.mobZoneId = data.zoneId ?? null;
+    if (data.mobId && data.mobZoneId) {
+      triggerData.mobZoneId = data.mobZoneId;
       triggerData.mobId = data.mobId;
-    } else if (data.objectId) {
-      triggerData.objectZoneId = data.zoneId ?? null;
+    } else if (data.objectId && data.objectZoneId) {
+      triggerData.objectZoneId = data.objectZoneId;
       triggerData.objectId = data.objectId;
-    } else if (data.zoneId) {
-      triggerData.zoneId = data.zoneId;
     }
 
     return this.prisma.triggers.create({
@@ -215,8 +276,13 @@ export class TriggersService {
     });
   }
 
-  async update(id: number, data: UpdateTriggerInput, userId?: string) {
-    await this.findOne(id);
+  async update(
+    zoneId: number,
+    id: number,
+    data: UpdateTriggerInput,
+    userId?: string
+  ) {
+    await this.findOne(zoneId, id);
 
     const updateData: Prisma.TriggersUncheckedUpdateInput = {};
     if (data.name !== undefined) updateData.name = data.name;
@@ -232,22 +298,20 @@ export class TriggersService {
     if (data.variables) {
       updateData.variables = JSON.parse(data.variables);
     }
-    if (data.mobId !== undefined) {
+    if (data.mobId !== undefined && data.mobZoneId !== undefined) {
+      updateData.mobZoneId = data.mobZoneId;
       updateData.mobId = data.mobId;
+      updateData.objectZoneId = null;
       updateData.objectId = null;
-      updateData.zoneId = null;
-    } else if (data.objectId !== undefined) {
+    } else if (data.objectId !== undefined && data.objectZoneId !== undefined) {
+      updateData.objectZoneId = data.objectZoneId;
       updateData.objectId = data.objectId;
+      updateData.mobZoneId = null;
       updateData.mobId = null;
-      updateData.zoneId = null;
-    } else if (data.zoneId !== undefined) {
-      updateData.zoneId = data.zoneId;
-      updateData.mobId = null;
-      updateData.objectId = null;
     }
 
     return this.prisma.triggers.update({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
       data: updateData,
       include: {
         mobs: {
@@ -274,11 +338,11 @@ export class TriggersService {
     });
   }
 
-  async delete(id: number) {
-    const existing = await this.findOne(id);
+  async delete(zoneId: number, id: number) {
+    const existing = await this.findOne(zoneId, id);
 
     await this.prisma.triggers.delete({
-      where: { id },
+      where: { zoneId_id: { zoneId, id } },
     });
 
     return existing;
@@ -290,20 +354,25 @@ export class TriggersService {
     };
     if (userId !== undefined) updateData.updatedBy = userId;
 
+    updateData.mobZoneId = null;
     updateData.mobId = null;
+    updateData.objectZoneId = null;
     updateData.objectId = null;
-    updateData.zoneId = null;
 
-    if (data.mobId && data.attachType === ScriptType.MOB) {
+    if (data.mobId && data.mobZoneId && data.attachType === ScriptType.MOB) {
+      updateData.mobZoneId = data.mobZoneId;
       updateData.mobId = data.mobId;
-    } else if (data.objectId && data.attachType === ScriptType.OBJECT) {
+    } else if (
+      data.objectId &&
+      data.objectZoneId &&
+      data.attachType === ScriptType.OBJECT
+    ) {
+      updateData.objectZoneId = data.objectZoneId;
       updateData.objectId = data.objectId;
-    } else if (data.zoneId && data.attachType === ScriptType.WORLD) {
-      updateData.zoneId = data.zoneId;
     }
 
     return this.prisma.triggers.update({
-      where: { id: data.triggerId },
+      where: { zoneId_id: { zoneId: data.triggerZoneId, id: data.triggerId } },
       data: updateData,
       include: {
         mobs: {
@@ -330,17 +399,16 @@ export class TriggersService {
     });
   }
 
-  async detachFromEntity(triggerId: number, userId?: string) {
+  async detachFromEntity(zoneId: number, id: number, userId?: string) {
     const data: Prisma.TriggersUncheckedUpdateInput = {
       mobZoneId: null,
       mobId: null,
       objectZoneId: null,
       objectId: null,
-      zoneId: null,
     };
     if (userId !== undefined) data.updatedBy = userId;
     return this.prisma.triggers.update({
-      where: { id: triggerId },
+      where: { zoneId_id: { zoneId, id } },
       data,
       include: {
         mobs: {
@@ -369,23 +437,26 @@ export class TriggersService {
 
   private buildWhereClauseForAttachment(
     attachType: ScriptType,
+    zoneId: number,
     entityId: number
   ) {
     switch (attachType) {
       case ScriptType.MOB:
         return {
           attachType: ScriptType.MOB,
+          mobZoneId: zoneId,
           mobId: entityId,
         };
       case ScriptType.OBJECT:
         return {
           attachType: ScriptType.OBJECT,
+          objectZoneId: zoneId,
           objectId: entityId,
         };
       case ScriptType.WORLD:
         return {
           attachType: ScriptType.WORLD,
-          zoneId: entityId,
+          zoneId,
         };
       default:
         throw new Error(`Unknown attachment type: ${attachType}`);

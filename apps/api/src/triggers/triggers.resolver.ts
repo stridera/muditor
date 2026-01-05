@@ -26,6 +26,15 @@ export class TriggersResolver {
     }));
   }
 
+  @Query(() => [TriggerDto], { name: 'triggersByZone' })
+  async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number) {
+    const triggers = await this.triggersService.findByZone(zoneId);
+    return triggers.map(trigger => ({
+      ...trigger,
+      variables: '{}',
+    }));
+  }
+
   @Query(() => [TriggerDto], { name: 'triggersNeedingReview' })
   async findNeedingReview() {
     const triggers = await this.triggersService.findNeedingReview();
@@ -41,8 +50,11 @@ export class TriggersResolver {
   }
 
   @Query(() => TriggerDto, { name: 'trigger' })
-  async findOne(@Args('id') id: number) {
-    const trigger = await this.triggersService.findOne(id);
+  async findOne(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number
+  ) {
+    const trigger = await this.triggersService.findOne(zoneId, id);
     return {
       ...trigger,
       variables: '{}',
@@ -52,10 +64,12 @@ export class TriggersResolver {
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })
   async findByAttachment(
     @Args('attachType', { type: () => ScriptType }) attachType: ScriptType,
+    @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('entityId', { type: () => Int }) entityId: number
   ) {
     const triggers = await this.triggersService.findByAttachment(
       attachType,
+      zoneId,
       entityId
     );
     return triggers.map(trigger => ({
@@ -78,11 +92,17 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   async updateTrigger(
-    @Args('id') id: number,
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
     @Args('input') input: UpdateTriggerInput,
     @CurrentUser() user: Users
   ) {
-    const trigger = await this.triggersService.update(id, input, user.id);
+    const trigger = await this.triggersService.update(
+      zoneId,
+      id,
+      input,
+      user.id
+    );
     return {
       ...trigger,
       variables: '{}',
@@ -90,8 +110,11 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  async deleteTrigger(@Args('id') id: number) {
-    const trigger = await this.triggersService.delete(id);
+  async deleteTrigger(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number
+  ) {
+    const trigger = await this.triggersService.delete(zoneId, id);
     return {
       ...trigger,
       variables: '{}',
@@ -112,11 +135,13 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   async detachTrigger(
-    @Args('triggerId') triggerId: number,
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.detachFromEntity(
-      triggerId,
+      zoneId,
+      id,
       user.id
     );
     return {
@@ -127,11 +152,13 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   async markTriggerReviewed(
-    @Args('triggerId', { type: () => Int }) triggerId: number,
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.clearNeedsReview(
-      triggerId,
+      zoneId,
+      id,
       user.id
     );
     return {

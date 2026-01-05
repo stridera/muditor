@@ -8,10 +8,12 @@ query GetQuests($filter: QuestFilterInput, $skip: Int, $take: Int) {
     maxLevel
     repeatable
     hidden
-    giverMobZoneId
-    giverMobId
-    completerMobZoneId
-    completerMobId
+    exclusiveGroup
+    triggerType
+    triggerMobZoneId
+    triggerMobId
+    triggerLevel
+    timeLimitMinutes
     createdAt
     updatedAt
     phases {
@@ -26,14 +28,14 @@ query GetQuests($filter: QuestFilterInput, $skip: Int, $take: Int) {
         requiredCount
         showProgress
       }
-    }
-    rewards {
-      id
-      rewardType
-      amount
-      objectZoneId
-      objectId
-      abilityId
+      rewards {
+        id
+        rewardType
+        amount
+        objectZoneId
+        objectId
+        abilityId
+      }
     }
     prerequisites {
       id
@@ -65,6 +67,11 @@ query GetQuestsByZone($zoneId: Int!) {
         playerDescription
         requiredCount
       }
+      rewards {
+        id
+        rewardType
+        amount
+      }
     }
   }
 }
@@ -79,10 +86,19 @@ query GetQuest($zoneId: Int!, $id: Int!) {
     maxLevel
     repeatable
     hidden
-    giverMobZoneId
-    giverMobId
-    completerMobZoneId
-    completerMobId
+    exclusiveGroup
+    triggerType
+    triggerMobZoneId
+    triggerMobId
+    triggerLevel
+    triggerItemZoneId
+    triggerItemId
+    triggerRoomZoneId
+    triggerRoomId
+    triggerAbilityId
+    triggerEventId
+    timeLimitMinutes
+    availabilityRequirement
     createdAt
     updatedAt
     phases {
@@ -120,15 +136,18 @@ query GetQuest($zoneId: Int!, $id: Int!) {
           dialogueTreeId
         }
       }
-    }
-    rewards {
-      id
-      rewardType
-      amount
-      objectZoneId
-      objectId
-      abilityId
-      choiceGroup
+      rewards {
+        id
+        questZoneId
+        questId
+        phaseId
+        rewardType
+        amount
+        objectZoneId
+        objectId
+        abilityId
+        choiceGroup
+      }
     }
     prerequisites {
       id
@@ -154,6 +173,19 @@ mutation CreateQuest($data: CreateQuestInput!) {
     maxLevel
     repeatable
     hidden
+    exclusiveGroup
+    triggerType
+    triggerMobZoneId
+    triggerMobId
+    triggerLevel
+    triggerItemZoneId
+    triggerItemId
+    triggerRoomZoneId
+    triggerRoomId
+    triggerAbilityId
+    triggerEventId
+    timeLimitMinutes
+    availabilityRequirement
   }
 }
 
@@ -167,6 +199,19 @@ mutation UpdateQuest($zoneId: Int!, $id: Int!, $data: UpdateQuestInput!) {
     maxLevel
     repeatable
     hidden
+    exclusiveGroup
+    triggerType
+    triggerMobZoneId
+    triggerMobId
+    triggerLevel
+    triggerItemZoneId
+    triggerItemId
+    triggerRoomZoneId
+    triggerRoomId
+    triggerAbilityId
+    triggerEventId
+    timeLimitMinutes
+    availabilityRequirement
   }
 }
 
@@ -185,6 +230,11 @@ mutation CreateQuestPhase($data: CreateQuestPhaseInput!) {
     name
     description
     order
+    rewards {
+      id
+      rewardType
+      amount
+    }
   }
 }
 
@@ -196,6 +246,11 @@ mutation UpdateQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!, $data: 
     name
     description
     order
+    rewards {
+      id
+      rewardType
+      amount
+    }
   }
 }
 
@@ -247,6 +302,9 @@ mutation DeleteQuestObjective($questZoneId: Int!, $questId: Int!, $phaseId: Int!
 mutation CreateQuestReward($data: CreateQuestRewardInput!) {
   createQuestReward(data: $data) {
     id
+    questZoneId
+    questId
+    phaseId
     rewardType
     amount
   }

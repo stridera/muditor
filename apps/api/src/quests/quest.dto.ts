@@ -21,6 +21,7 @@ import {
   QuestRewardType,
   QuestStatus,
   DialogueMatchType,
+  QuestTriggerType,
 } from '@prisma/client';
 
 // Register enums for GraphQL
@@ -28,6 +29,10 @@ registerEnumType(QuestObjectiveType, { name: 'QuestObjectiveType' });
 registerEnumType(QuestRewardType, { name: 'QuestRewardType' });
 registerEnumType(QuestStatus, { name: 'QuestStatus' });
 registerEnumType(DialogueMatchType, { name: 'DialogueMatchType' });
+registerEnumType(QuestTriggerType, {
+  name: 'QuestTriggerType',
+  description: 'How a quest is triggered/started',
+});
 
 // ============================================================================
 // Quest DTOs (ordered by dependencies - leaf types first)
@@ -55,6 +60,15 @@ export class QuestDialogueDto {
 export class QuestRewardDto {
   @Field(() => Int)
   id: number;
+
+  @Field(() => Int)
+  questZoneId: number;
+
+  @Field(() => Int)
+  questId: number;
+
+  @Field(() => Int)
+  phaseId: number;
 
   @Field(() => QuestRewardType)
   rewardType: QuestRewardType;
@@ -178,6 +192,9 @@ export class QuestPhaseDto {
 
   @Field(() => [QuestObjectiveDto], { nullable: true })
   objectives?: QuestObjectiveDto[];
+
+  @Field(() => [QuestRewardDto], { nullable: true })
+  rewards?: QuestRewardDto[];
 }
 
 @ObjectType()
@@ -206,17 +223,47 @@ export class QuestDto {
   @Field(() => Boolean)
   hidden: boolean;
 
-  @Field(() => Int, { nullable: true })
-  giverMobZoneId?: number;
+  // Branching paths - quests with same non-null exclusiveGroup are mutually exclusive
+  @Field({ nullable: true })
+  exclusiveGroup?: string;
+
+  // Trigger configuration
+  @Field(() => QuestTriggerType)
+  triggerType: QuestTriggerType;
 
   @Field(() => Int, { nullable: true })
-  giverMobId?: number;
+  triggerMobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
-  completerMobZoneId?: number;
+  triggerMobId?: number;
 
   @Field(() => Int, { nullable: true })
-  completerMobId?: number;
+  triggerLevel?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerItemZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerItemId?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerRoomZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerRoomId?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerAbilityId?: number;
+
+  @Field(() => Int, { nullable: true })
+  triggerEventId?: number;
+
+  @Field(() => Int, { nullable: true })
+  timeLimitMinutes?: number;
+
+  // Availability requirement (Lua expression for class/race/etc restrictions)
+  @Field({ nullable: true })
+  availabilityRequirement?: string;
 
   @Field(() => Date)
   createdAt: Date;
@@ -226,9 +273,6 @@ export class QuestDto {
 
   @Field(() => [QuestPhaseDto], { nullable: true })
   phases?: QuestPhaseDto[];
-
-  @Field(() => [QuestRewardDto], { nullable: true })
-  rewards?: QuestRewardDto[];
 
   @Field(() => [QuestPrerequisiteDto], { nullable: true })
   prerequisites?: QuestPrerequisiteDto[];
@@ -331,25 +375,73 @@ export class CreateQuestInput {
   @IsBoolean()
   hidden?: boolean;
 
-  @Field(() => Int, { nullable: true })
+  // Branching paths
+  @Field({ nullable: true })
   @IsOptional()
-  @IsNumber()
-  giverMobZoneId?: number;
+  @IsString()
+  exclusiveGroup?: string;
+
+  // Trigger configuration
+  @Field(() => QuestTriggerType, { defaultValue: QuestTriggerType.MOB })
+  @IsOptional()
+  @IsEnum(QuestTriggerType)
+  triggerType?: QuestTriggerType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  giverMobId?: number;
+  triggerMobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  completerMobZoneId?: number;
+  triggerMobId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  completerMobId?: number;
+  triggerLevel?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerItemZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerItemId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerRoomZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerRoomId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerAbilityId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerEventId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  timeLimitMinutes?: number;
+
+  // Availability requirement (Lua expression for class/race/etc restrictions)
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  availabilityRequirement?: string;
 }
 
 @InputType()
@@ -384,25 +476,73 @@ export class UpdateQuestInput {
   @IsBoolean()
   hidden?: boolean;
 
-  @Field(() => Int, { nullable: true })
+  // Branching paths
+  @Field({ nullable: true })
   @IsOptional()
-  @IsNumber()
-  giverMobZoneId?: number;
+  @IsString()
+  exclusiveGroup?: string;
+
+  // Trigger configuration
+  @Field(() => QuestTriggerType, { nullable: true })
+  @IsOptional()
+  @IsEnum(QuestTriggerType)
+  triggerType?: QuestTriggerType;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  giverMobId?: number;
+  triggerMobZoneId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  completerMobZoneId?: number;
+  triggerMobId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  completerMobId?: number;
+  triggerLevel?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerItemZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerItemId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerRoomZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerRoomId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerAbilityId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  triggerEventId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  timeLimitMinutes?: number;
+
+  // Availability requirement (Lua expression for class/race/etc restrictions)
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  availabilityRequirement?: string;
 }
 
 @InputType()
@@ -693,6 +833,10 @@ export class CreateQuestRewardInput {
   @IsNumber()
   questId: number;
 
+  @Field(() => Int)
+  @IsNumber()
+  phaseId: number;
+
   @Field(() => QuestRewardType)
   @IsEnum(QuestRewardType)
   rewardType: QuestRewardType;
@@ -805,4 +949,9 @@ export class QuestFilterInput {
   @IsOptional()
   @IsBoolean()
   hidden?: boolean;
+
+  @Field(() => QuestTriggerType, { nullable: true })
+  @IsOptional()
+  @IsEnum(QuestTriggerType)
+  triggerType?: QuestTriggerType;
 }

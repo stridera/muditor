@@ -30,6 +30,7 @@ import {
   Mail,
   Map,
   MessageCircle,
+  ScrollText,
   Settings,
   Shield,
   ShoppingBag,
@@ -66,6 +67,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/shops': {
     name: 'Shops',
     icon: <ShoppingBag className='h-5 w-5' />,
+  },
+  '/dashboard/quests': {
+    name: 'Quests',
+    icon: <ScrollText className='h-5 w-5' />,
   },
   '/dashboard/scripts': {
     name: 'Scripts',
@@ -240,6 +245,11 @@ export function Navigation() {
       name: 'Shops',
       href: '/dashboard/shops',
       icon: <ShoppingBag className='h-4 w-4' />,
+    },
+    {
+      name: 'Quests',
+      href: '/dashboard/quests',
+      icon: <ScrollText className='h-4 w-4' />,
     },
     {
       name: 'Scripts',

@@ -181,9 +181,11 @@ input AssignSkillToRaceInput {
 input AttachTriggerInput {
   attachType: ScriptType!
   mobId: Int
+  mobZoneId: Int
   objectId: Int
+  objectZoneId: Int
   triggerId: Int!
-  zoneId: Int
+  triggerZoneId: Int!
 }
 
 type AuthPayload {
@@ -617,7 +619,7 @@ input CreateAbilitySavingThrowInput {
   abilityId: Int!
   dcFormula: String!
   onSaveAction: JSON! = "NEGATE"
-  saveType: SaveType! = SPELL
+  saveType: SaveType! = WILL
 }
 
 input CreateAbilityTargetingInput {
@@ -801,7 +803,11 @@ input CreateMobInput {
   composition: Composition! = FLESH
   concealment: Int! = 0
   constitution: Int! = 13
-  damageDice: String!
+
+  """
+  Damage dice (e.g., "5d10+20"). If not provided, calculated from level/race/class.
+  """
+  damageDice: String
   damageReductionPercent: Int! = 0
   damageType: DamageType! = HIT
   dexterity: Int! = 13
@@ -811,7 +817,11 @@ input CreateMobInput {
   gender: Gender! = NEUTRAL
   hardness: Int! = 0
   hitRoll: Int! = 0
-  hpDice: String!
+
+  """
+  HP dice (e.g., "10d8+50"). If not provided, calculated from level/race/class.
+  """
+  hpDice: String
   id: Int!
   intelligence: Int! = 13
   keywords: [String!]!
@@ -904,17 +914,26 @@ input CreateQuestDialogueInput {
 }
 
 input CreateQuestInput {
-  completerMobId: Int
-  completerMobZoneId: Int
+  availabilityRequirement: String
   description: String
-  giverMobId: Int
-  giverMobZoneId: Int
+  exclusiveGroup: String
   hidden: Boolean! = false
   id: Int!
   maxLevel: Int
   minLevel: Int
   name: String!
   repeatable: Boolean! = false
+  timeLimitMinutes: Int
+  triggerAbilityId: Int
+  triggerEventId: Int
+  triggerItemId: Int
+  triggerItemZoneId: Int
+  triggerLevel: Int
+  triggerMobId: Int
+  triggerMobZoneId: Int
+  triggerRoomId: Int
+  triggerRoomZoneId: Int
+  triggerType: QuestTriggerType! = MOB
   zoneId: Int!
 }
 
@@ -962,6 +981,7 @@ input CreateQuestRewardInput {
   choiceGroup: Int
   objectId: Int
   objectZoneId: Int
+  phaseId: Int!
   questId: Int!
   questZoneId: Int!
   rewardType: QuestRewardType!
@@ -1094,12 +1114,15 @@ input CreateTriggerInput {
   argList: [String!]! = []
   attachType: ScriptType!
   commands: String!
+  id: Int
   mobId: Int
+  mobZoneId: Int
   name: String!
   numArgs: Int! = 0
   objectId: Int
+  objectZoneId: Int
   variables: String! = "{}"
-  zoneId: Int
+  zoneId: Int!
 }
 
 input CreateZoneInput {
@@ -1589,6 +1612,17 @@ enum LoginStage {
   WELCOME_BANNER
 }
 
+type MobCombatDefaultsDto {
+  damageDice: String!
+  damageDiceBonus: Int!
+  damageDiceNum: Int!
+  damageDiceSize: Int!
+  hpDice: String!
+  hpDiceBonus: Int!
+  hpDiceNum: Int!
+  hpDiceSize: Int!
+}
+
 type MobDto {
   accuracy: Int!
   alignment: Int!
@@ -1865,11 +1899,11 @@ type Mutation {
 
   """Delete a system text entry"""
   deleteSystemText(id: ID!): Boolean!
-  deleteTrigger(id: Float!): TriggerDto!
+  deleteTrigger(id: Int!, zoneId: Int!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
   depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
   depositWealth(amount: BigInt!, characterId: String!): BigInt!
-  detachTrigger(triggerId: Float!): TriggerDto!
+  detachTrigger(id: Int!, zoneId: Int!): TriggerDto!
 
   """Execute a god command on FieryMUD"""
   executeGameCommand(command: String!, executor: String): CommandResultType!
@@ -1886,7 +1920,7 @@ type Mutation {
   markAccountMailRead(id: Int!): AccountMailDto!
   markMailRead(id: Int!): PlayerMailDto!
   markObjectRetrieved(characterId: String!, id: Int!, movedToAccountStorage: Boolean! = false): PlayerMailDto!
-  markTriggerReviewed(triggerId: Int!): TriggerDto!
+  markTriggerReviewed(id: Int!, zoneId: Int!): TriggerDto!
   markWealthRetrieved(characterId: String!, id: Int!): PlayerMailDto!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
@@ -1962,7 +1996,7 @@ type Mutation {
 
   """Update a system text entry"""
   updateSystemText(data: UpdateSystemTextInput!, id: ID!): SystemTextDto!
-  updateTrigger(id: Float!, input: UpdateTriggerInput!): TriggerDto!
+  updateTrigger(id: Int!, input: UpdateTriggerInput!, zoneId: Int!): TriggerDto!
   updateUser(input: UpdateUserInput!): User!
   updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
@@ -2330,6 +2364,7 @@ type Query {
   loginMessagesByStage(stage: LoginStage!): [LoginMessageDto!]!
   me: User!
   mob(id: Int!, zoneId: Int!): MobDto!
+  mobCombatDefaults(classId: Int, level: Int! = 1, race: Race! = HUMANOID): MobCombatDefaultsDto!
   mobReset(id: ID!): MobResetDto
   mobResets(mobId: Int!, mobZoneId: Int!): [MobResetDto!]!
   mobs(search: String, skip: Int, take: Int): [MobDto!]!
@@ -2417,9 +2452,10 @@ type Query {
 
   """Get system text entries by category"""
   systemTextsByCategory(category: String!): [SystemTextDto!]!
-  trigger(id: Float!): TriggerDto!
+  trigger(id: Int!, zoneId: Int!): TriggerDto!
   triggers: [TriggerDto!]!
-  triggersByAttachment(attachType: ScriptType!, entityId: Int!): [TriggerDto!]!
+  triggersByAttachment(attachType: ScriptType!, entityId: Int!, zoneId: Int!): [TriggerDto!]!
+  triggersByZone(zoneId: Int!): [TriggerDto!]!
   triggersNeedingReview: [TriggerDto!]!
   triggersNeedingReviewCount: Int!
   user(id: ID!): User!
@@ -2447,12 +2483,10 @@ type QuestDialogueDto {
 }
 
 type QuestDto {
-  completerMobId: Int
-  completerMobZoneId: Int
+  availabilityRequirement: String
   createdAt: DateTime!
   description: String
-  giverMobId: Int
-  giverMobZoneId: Int
+  exclusiveGroup: String
   hidden: Boolean!
   id: Int!
   maxLevel: Int
@@ -2461,7 +2495,17 @@ type QuestDto {
   phases: [QuestPhaseDto!]
   prerequisites: [QuestPrerequisiteDto!]
   repeatable: Boolean!
-  rewards: [QuestRewardDto!]
+  timeLimitMinutes: Int
+  triggerAbilityId: Int
+  triggerEventId: Int
+  triggerItemId: Int
+  triggerItemZoneId: Int
+  triggerLevel: Int
+  triggerMobId: Int
+  triggerMobZoneId: Int
+  triggerRoomId: Int
+  triggerRoomZoneId: Int
+  triggerType: QuestTriggerType!
   updatedAt: DateTime!
   zoneId: Int!
 }
@@ -2471,6 +2515,7 @@ input QuestFilterInput {
   maxLevel: Int
   minLevel: Int
   status: QuestStatus
+  triggerType: QuestTriggerType
   zoneId: Int
 }
 
@@ -2515,6 +2560,7 @@ type QuestPhaseDto {
   order: Int!
   questId: Int!
   questZoneId: Int!
+  rewards: [QuestRewardDto!]
 }
 
 type QuestPrerequisiteDto {
@@ -2532,6 +2578,9 @@ type QuestRewardDto {
   id: Int!
   objectId: Int
   objectZoneId: Int
+  phaseId: Int!
+  questId: Int!
+  questZoneId: Int!
   rewardType: QuestRewardType!
 }
 
@@ -2549,6 +2598,18 @@ enum QuestStatus {
   COMPLETED
   FAILED
   IN_PROGRESS
+}
+
+"""How a quest is triggered/started"""
+enum QuestTriggerType {
+  AUTO
+  EVENT
+  ITEM
+  LEVEL
+  MANUAL
+  MOB
+  ROOM
+  SKILL
 }
 
 enum Race {
@@ -2763,13 +2824,9 @@ type RoomSummaryDto {
 }
 
 enum SaveType {
-  BREATH
-  PARALYSIS
-  PETRIFICATION
-  POISON
-  ROD
-  SPELL
-  WAND
+  FORTITUDE
+  REFLEX
+  WILL
 }
 
 enum ScriptType {
@@ -3098,7 +3155,9 @@ enum TargetType {
   ENEMY_PC
   OBJECT_INV
   OBJECT_WORLD
+  RIDER
   SELF
+  UNCONSCIOUS
 }
 
 type TriggerDto {
@@ -3108,19 +3167,19 @@ type TriggerDto {
   createdAt: DateTime!
   createdBy: String
   flags: [String!]!
-  id: String!
-  legacyScript: String
-  legacyVnum: Int
+  id: Int!
   mobId: Int
+  mobZoneId: Int
   name: String!
   needsReview: Boolean!
   numArgs: Int!
   objectId: Int
+  objectZoneId: Int
   syntaxError: String
   updatedAt: DateTime!
   updatedBy: String
   variables: String!
-  zoneId: Int
+  zoneId: Int!
 }
 
 input UnbanUserInput {
@@ -3469,16 +3528,25 @@ input UpdateQuestDialogueInput {
 }
 
 input UpdateQuestInput {
-  completerMobId: Int
-  completerMobZoneId: Int
+  availabilityRequirement: String
   description: String
-  giverMobId: Int
-  giverMobZoneId: Int
+  exclusiveGroup: String
   hidden: Boolean
   maxLevel: Int
   minLevel: Int
   name: String
   repeatable: Boolean
+  timeLimitMinutes: Int
+  triggerAbilityId: Int
+  triggerEventId: Int
+  triggerItemId: Int
+  triggerItemZoneId: Int
+  triggerLevel: Int
+  triggerMobId: Int
+  triggerMobZoneId: Int
+  triggerRoomId: Int
+  triggerRoomZoneId: Int
+  triggerType: QuestTriggerType
 }
 
 input UpdateQuestObjectiveInput {
@@ -3643,11 +3711,12 @@ input UpdateTriggerInput {
   attachType: ScriptType
   commands: String
   mobId: Int
+  mobZoneId: Int
   name: String
   numArgs: Int
   objectId: Int
+  objectZoneId: Int
   variables: String
-  zoneId: Int
 }
 
 input UpdateUserInput {

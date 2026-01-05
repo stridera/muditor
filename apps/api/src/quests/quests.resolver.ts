@@ -45,6 +45,8 @@ export class QuestsResolver {
       where.minLevel = { gte: filter.minLevel };
     if (filter?.maxLevel !== undefined)
       where.maxLevel = { lte: filter.maxLevel };
+    if (filter?.triggerType !== undefined)
+      where.triggerType = filter.triggerType;
 
     const args: {
       where?: Record<string, unknown>;
