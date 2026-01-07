@@ -2,20 +2,20 @@
 
 fragment TriggerFields on TriggerDto {
   id
+  zoneId
   name
   attachType
   numArgs
   argList
   commands
-  zoneId
+  mobZoneId
   mobId
+  objectZoneId
   objectId
   variables
   flags
   needsReview
   syntaxError
-  legacyVnum
-  legacyScript
   createdAt
   updatedAt
   createdBy
@@ -38,14 +38,14 @@ query GetTriggersNeedingReviewCount {
   triggersNeedingReviewCount
 }
 
-query GetTrigger($id: Float!) {
-  trigger(id: $id) {
+query GetTrigger($zoneId: Int!, $id: Int!) {
+  trigger(zoneId: $zoneId, id: $id) {
     ...TriggerFields
   }
 }
 
-query GetTriggersByAttachment($attachType: ScriptType!, $entityId: Int!) {
-  triggersByAttachment(attachType: $attachType, entityId: $entityId) {
+query GetTriggersByAttachment($attachType: ScriptType!, $zoneId: Int!, $entityId: Int!) {
+  triggersByAttachment(attachType: $attachType, zoneId: $zoneId, entityId: $entityId) {
     ...TriggerFields
   }
 }
@@ -56,15 +56,16 @@ mutation CreateTrigger($input: CreateTriggerInput!) {
   }
 }
 
-mutation UpdateTrigger($id: Float!, $input: UpdateTriggerInput!) {
-  updateTrigger(id: $id, input: $input) {
+mutation UpdateTrigger($zoneId: Int!, $id: Int!, $input: UpdateTriggerInput!) {
+  updateTrigger(zoneId: $zoneId, id: $id, input: $input) {
     ...TriggerFields
   }
 }
 
-mutation DeleteTrigger($id: Float!) {
-  deleteTrigger(id: $id) {
+mutation DeleteTrigger($zoneId: Int!, $id: Int!) {
+  deleteTrigger(zoneId: $zoneId, id: $id) {
     id
+    zoneId
   }
 }
 
@@ -74,14 +75,15 @@ mutation AttachTrigger($input: AttachTriggerInput!) {
   }
 }
 
-mutation DetachTrigger($triggerId: Float!) {
-  detachTrigger(triggerId: $triggerId) {
+mutation DetachTrigger($zoneId: Int!, $id: Int!) {
+  detachTrigger(zoneId: $zoneId, id: $id) {
     id
+    zoneId
   }
 }
 
-mutation MarkTriggerReviewed($triggerId: Int!) {
-  markTriggerReviewed(triggerId: $triggerId) {
+mutation MarkTriggerReviewed($zoneId: Int!, $id: Int!) {
+  markTriggerReviewed(zoneId: $zoneId, id: $id) {
     ...TriggerFields
   }
 }

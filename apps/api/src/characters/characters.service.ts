@@ -165,9 +165,9 @@ export class CharactersService {
         ...data,
         users: { connect: { id: userId } },
         hitPointsMax: Math.max(50, data.constitution * 5 + data.level * 10),
-        movementMax: Math.max(100, data.constitution * 8 + data.level * 5),
         hitPoints: Math.max(50, data.constitution * 5 + data.level * 10),
-        movement: Math.max(100, data.constitution * 8 + data.level * 5),
+        staminaMax: Math.max(100, data.constitution * 8 + data.level * 5),
+        stamina: Math.max(100, data.constitution * 8 + data.level * 5),
       };
     return this.db.characters.create({
       data: createData,

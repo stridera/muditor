@@ -32,18 +32,19 @@ const GET_TRIGGERS = gql(`
   query GetTriggersForScriptsPage {
     triggers {
       id
+      zoneId
       name
       attachType
       numArgs
       argList
       commands
-      zoneId
+      mobZoneId
       mobId
+      objectZoneId
       objectId
       flags
       needsReview
       syntaxError
-      legacyVnum
       createdAt
       updatedAt
       createdBy
@@ -68,14 +69,16 @@ const CREATE_TRIGGER = gql(`
 `);
 
 const UPDATE_TRIGGER = gql(`
-  mutation UpdateTriggerFromScriptsPage($id: Float!, $input: UpdateTriggerInput!) {
-    updateTrigger(id: $id, input: $input) {
+  mutation UpdateTriggerFromScriptsPage($zoneId: Int!, $id: Int!, $input: UpdateTriggerInput!) {
+    updateTrigger(zoneId: $zoneId, id: $id, input: $input) {
       id
+      zoneId
       name
       attachType
       commands
-      zoneId
+      mobZoneId
       mobId
+      objectZoneId
       objectId
       needsReview
     }
@@ -83,36 +86,39 @@ const UPDATE_TRIGGER = gql(`
 `);
 
 const DELETE_TRIGGER = gql(`
-  mutation DeleteTriggerFromScriptsPage($id: Float!) {
-    deleteTrigger(id: $id) {
+  mutation DeleteTriggerFromScriptsPage($zoneId: Int!, $id: Int!) {
+    deleteTrigger(zoneId: $zoneId, id: $id) {
       id
+      zoneId
     }
   }
 `);
 
 const MARK_REVIEWED = gql(`
-  mutation MarkTriggerReviewedFromScriptsPage($triggerId: Int!) {
-    markTriggerReviewed(triggerId: $triggerId) {
+  mutation MarkTriggerReviewedFromScriptsPage($zoneId: Int!, $id: Int!) {
+    markTriggerReviewed(zoneId: $zoneId, id: $id) {
       id
+      zoneId
       needsReview
     }
   }
 `);
 
 interface TriggerData {
-  id: string;
+  id: number;
+  zoneId: number;
   name: string;
   attachType: string;
   numArgs: number;
   argList: string[];
   commands: string;
-  zoneId?: number | null;
+  mobZoneId?: number | null;
   mobId?: number | null;
+  objectZoneId?: number | null;
   objectId?: number | null;
   flags: string[];
   needsReview: boolean;
   syntaxError?: string | null;
-  legacyVnum?: number | null;
   createdAt: string;
   updatedAt: string;
   createdBy?: string | null;
@@ -122,7 +128,7 @@ interface TriggerData {
 // Convert TriggerData to ScriptEditor's Script interface
 const convertTriggerToScript = (trigger: TriggerData): Script => {
   const script: Script = {
-    id: trigger.id,
+    id: String(trigger.id),
     name: trigger.name,
     attachType: trigger.attachType,
     numArgs: trigger.numArgs,
@@ -159,7 +165,7 @@ function ScriptsPageContent() {
     const matchesSearch =
       trigger.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       trigger.commands.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      (trigger.legacyVnum?.toString().includes(searchTerm) ?? false);
+      trigger.id.toString().includes(searchTerm);
     const matchesType =
       filterType === 'all' || trigger.attachType === filterType;
     const matchesReview =
@@ -187,6 +193,7 @@ function ScriptsPageContent() {
         await createTrigger({
           variables: {
             input: {
+              zoneId: script.zoneId || 1, // Default to zone 1 for new scripts
               name: script.name || 'New Script',
               attachType:
                 (script.attachType as 'MOB' | 'OBJECT' | 'WORLD') || 'MOB',
@@ -198,7 +205,8 @@ function ScriptsPageContent() {
       } else if (selectedTrigger) {
         await updateTrigger({
           variables: {
-            id: parseFloat(selectedTrigger.id),
+            zoneId: selectedTrigger.zoneId,
+            id: selectedTrigger.id,
             input: {
               name: script.name,
               attachType: script.attachType as 'MOB' | 'OBJECT' | 'WORLD',
@@ -217,11 +225,12 @@ function ScriptsPageContent() {
     }
   };
 
-  const handleDeleteScript = async (id: string | number) => {
+  const handleDeleteScript = async (trigger: TriggerData) => {
     if (confirm('Are you sure you want to delete this script?')) {
       try {
-        const numId = typeof id === 'string' ? parseFloat(id) : id;
-        await deleteTrigger({ variables: { id: numId } });
+        await deleteTrigger({
+          variables: { zoneId: trigger.zoneId, id: trigger.id },
+        });
         await refetch();
       } catch (err) {
         console.error('Failed to delete script:', err);
@@ -229,11 +238,11 @@ function ScriptsPageContent() {
     }
   };
 
-  const handleMarkReviewed = async (triggerId: string | number) => {
+  const handleMarkReviewed = async (trigger: TriggerData) => {
     try {
-      const numId =
-        typeof triggerId === 'string' ? parseFloat(triggerId) : triggerId;
-      await markReviewed({ variables: { triggerId: numId } });
+      await markReviewed({
+        variables: { zoneId: trigger.zoneId, id: trigger.id },
+      });
       await refetch();
     } catch (err) {
       console.error('Failed to mark as reviewed:', err);
@@ -254,10 +263,11 @@ function ScriptsPageContent() {
   };
 
   const getAttachmentLabel = (trigger: TriggerData) => {
-    if (trigger.mobId) return `Mob ${trigger.zoneId}:${trigger.mobId}`;
-    if (trigger.objectId) return `Object ${trigger.zoneId}:${trigger.objectId}`;
-    if (trigger.zoneId) return `Zone ${trigger.zoneId}`;
-    return 'Unattached';
+    if (trigger.mobId)
+      return `Mob ${trigger.mobZoneId ?? trigger.zoneId}:${trigger.mobId}`;
+    if (trigger.objectId)
+      return `Object ${trigger.objectZoneId ?? trigger.zoneId}:${trigger.objectId}`;
+    return `Zone ${trigger.zoneId}`;
   };
 
   if (isEditing) {
@@ -400,11 +410,9 @@ function ScriptsPageContent() {
                             Review
                           </Badge>
                         )}
-                        {trigger.legacyVnum && (
-                          <Badge variant='secondary' className='text-xs'>
-                            v{trigger.legacyVnum}
-                          </Badge>
-                        )}
+                        <Badge variant='secondary' className='text-xs'>
+                          #{trigger.zoneId}:{trigger.id}
+                        </Badge>
                       </div>
                     </div>
                     <div className='flex space-x-1'>
@@ -412,7 +420,7 @@ function ScriptsPageContent() {
                         <Button
                           variant='ghost'
                           size='sm'
-                          onClick={() => handleMarkReviewed(trigger.id)}
+                          onClick={() => handleMarkReviewed(trigger)}
                           title='Mark as reviewed'
                         >
                           <Check className='w-4 h-4 text-green-600' />
@@ -428,7 +436,7 @@ function ScriptsPageContent() {
                       <Button
                         variant='ghost'
                         size='sm'
-                        onClick={() => handleDeleteScript(trigger.id)}
+                        onClick={() => handleDeleteScript(trigger)}
                         className='text-red-600 hover:text-red-700'
                       >
                         <Trash2 className='w-4 h-4' />
