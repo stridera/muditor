@@ -72,6 +72,17 @@ export function mapMob(db: MobMapperSource): MobDto {
     composition: db.composition,
     mobFlags: db.mobFlags,
     effectFlags: db.effectFlags,
+    traits: db.traits ?? [],
+    behaviors: db.behaviors ?? [],
+    ...(db.aggressionFormula !== null &&
+      db.aggressionFormula !== undefined && {
+        aggressionFormula: db.aggressionFormula,
+      }),
+    ...(db.activityRestrictions !== null &&
+      db.activityRestrictions !== undefined && {
+        activityRestrictions: db.activityRestrictions,
+      }),
+    resistances: (resistances as Record<string, number>) ?? {},
     position: db.position,
     stance: db.stance,
     ...(db.classId !== null &&

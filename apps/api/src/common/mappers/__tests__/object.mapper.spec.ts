@@ -35,6 +35,13 @@ function base(): ObjectMapperSource {
     deletedAt: null,
     createdBy: null,
     updatedBy: null,
+    // New restriction fields
+    restrictedClassIds: [],
+    restrictedAlignments: [],
+    minSize: null,
+    maxSize: null,
+    allowedRaces: [],
+    passengerCapacity: null,
   };
 }
 

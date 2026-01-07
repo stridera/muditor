@@ -1,4 +1,10 @@
-import { Direction, ExitFlag, RoomFlag, Sector } from '@prisma/client';
+import {
+  Direction,
+  ExitFlag,
+  ExitState,
+  RoomFlag,
+  Sector,
+} from '@prisma/client';
 import { mapRoom } from '../room.mapper';
 import { RoomMapperSource } from '../types';
 
@@ -14,7 +20,9 @@ describe('mapRoom', () => {
       {
         id: 100,
         direction: Direction.NORTH,
-        flags: [ExitFlag.CLOSED],
+        flags: [ExitFlag.IS_DOOR],
+        defaultState: ExitState.CLOSED,
+        hitPoints: null,
         roomZoneId: 9,
         roomId: 55,
         keywords: ['door'],
@@ -27,6 +35,8 @@ describe('mapRoom', () => {
         id: 101,
         direction: Direction.SOUTH,
         flags: [],
+        defaultState: ExitState.OPEN,
+        hitPoints: null,
         roomZoneId: 9,
         roomId: 55,
         keywords: [],

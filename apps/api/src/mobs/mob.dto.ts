@@ -11,13 +11,16 @@ import {
   EffectFlag,
   Gender,
   LifeForce,
+  MobBehavior,
   MobFlag,
   MobRole,
+  MobTrait,
   Position,
   Race,
   Size,
   Stance,
 } from '@prisma/client';
+import GraphQLJSON from 'graphql-type-json';
 import {
   IsArray,
   IsEnum,
@@ -38,6 +41,8 @@ registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(Stance, { name: 'Stance' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(MobRole, { name: 'MobRole' });
+registerEnumType(MobTrait, { name: 'MobTrait' });
+registerEnumType(MobBehavior, { name: 'MobBehavior' });
 
 // This DTO matches the actual Prisma Mob model
 @ObjectType()
@@ -188,6 +193,21 @@ export class MobDto {
 
   @Field(() => [EffectFlag])
   effectFlags: EffectFlag[];
+
+  @Field(() => [MobTrait])
+  traits: MobTrait[];
+
+  @Field(() => [MobBehavior])
+  behaviors: MobBehavior[];
+
+  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  aggressionFormula?: string;
+
+  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  activityRestrictions?: string;
+
+  @Field(() => GraphQLJSON, { description: 'JSON resistances map: {"FIRE": 0, "charm": 50}' })
+  resistances: Record<string, number>;
 
   @Field(() => Position)
   position: Position;
@@ -440,6 +460,36 @@ export class CreateMobInput {
   @IsArray()
   @IsEnum(EffectFlag, { each: true })
   effectFlags?: EffectFlag[];
+
+  @Field(() => [MobTrait], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobTrait, { each: true })
+  traits?: MobTrait[];
+
+  @Field(() => [MobBehavior], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobBehavior, { each: true })
+  behaviors?: MobBehavior[];
+
+  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  @IsOptional()
+  @IsString()
+  aggressionFormula?: string;
+
+  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  @IsOptional()
+  @IsString()
+  activityRestrictions?: string;
+
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+    defaultValue: {},
+    description: 'JSON resistances map: {"FIRE": 0, "charm": 50}',
+  })
+  @IsOptional()
+  resistances?: Record<string, number>;
 
   @Field(() => Position, { defaultValue: Position.STANDING })
   @IsOptional()
@@ -707,6 +757,32 @@ export class UpdateMobInput {
   @IsArray()
   @IsEnum(EffectFlag, { each: true })
   effectFlags?: EffectFlag[];
+
+  @Field(() => [MobTrait], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobTrait, { each: true })
+  traits?: MobTrait[];
+
+  @Field(() => [MobBehavior], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobBehavior, { each: true })
+  behaviors?: MobBehavior[];
+
+  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  @IsOptional()
+  @IsString()
+  aggressionFormula?: string;
+
+  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  @IsOptional()
+  @IsString()
+  activityRestrictions?: string;
+
+  @Field(() => GraphQLJSON, { nullable: true, description: 'JSON resistances map' })
+  @IsOptional()
+  resistances?: Record<string, number>;
 
   @Field(() => Position, { nullable: true })
   @IsOptional()

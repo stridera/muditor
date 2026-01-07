@@ -117,7 +117,7 @@ describe('MobResetService mapping', () => {
           id: 100,
           objectZoneId: 5,
           objectId: 201,
-          wearLocation: WearFlag.WIELD,
+          wearLocation: WearFlag.MAINHAND,
           maxInstances: 1,
           probability: 1.0,
           objects: { id: 201, zoneId: 5, name: 'Short Bow', type: 'WEAPON' },
@@ -129,6 +129,6 @@ describe('MobResetService mapping', () => {
     (db.mobResets.findMany as jest.Mock).mockResolvedValue([mockReset]);
 
     const result = await service.findByMob(5, 23);
-    expect(result[0]!.equipment[0]!.wearLocation).toBe(WearFlag.WIELD);
+    expect(result[0]!.equipment[0]!.wearLocation).toBe(WearFlag.MAINHAND);
   });
 });

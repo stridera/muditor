@@ -36,15 +36,17 @@ const GET_TRIGGERS = gql`
   query GetTriggersInline {
     triggers {
       id
+      zoneId
       name
       attachType
       numArgs
       argList
       commands
       variables
+      mobZoneId
       mobId
+      objectZoneId
       objectId
-      zoneId
       createdAt
       updatedAt
     }
@@ -54,19 +56,26 @@ const GET_TRIGGERS = gql`
 const GET_TRIGGERS_BY_ATTACHMENT = gql`
   query GetTriggersByAttachmentInline(
     $attachType: ScriptType!
+    $zoneId: Int!
     $entityId: Int!
   ) {
-    triggersByAttachment(attachType: $attachType, entityId: $entityId) {
+    triggersByAttachment(
+      attachType: $attachType
+      zoneId: $zoneId
+      entityId: $entityId
+    ) {
       id
+      zoneId
       name
       attachType
       numArgs
       argList
       commands
       variables
+      mobZoneId
       mobId
+      objectZoneId
       objectId
-      zoneId
       createdAt
       updatedAt
     }
@@ -86,9 +95,14 @@ const CREATE_TRIGGER = gql`
 `;
 
 const UPDATE_TRIGGER = gql`
-  mutation UpdateTriggerInline($id: Float!, $input: UpdateTriggerInput!) {
-    updateTrigger(id: $id, input: $input) {
+  mutation UpdateTriggerInline(
+    $zoneId: Int!
+    $id: Int!
+    $input: UpdateTriggerInput!
+  ) {
+    updateTrigger(zoneId: $zoneId, id: $id, input: $input) {
       id
+      zoneId
       name
       attachType
       commands
@@ -98,9 +112,10 @@ const UPDATE_TRIGGER = gql`
 `;
 
 const DELETE_TRIGGER = gql`
-  mutation DeleteTriggerInline($id: Float!) {
-    deleteTrigger(id: $id) {
+  mutation DeleteTriggerInline($zoneId: Int!, $id: Int!) {
+    deleteTrigger(zoneId: $zoneId, id: $id) {
       id
+      zoneId
     }
   }
 `;
@@ -118,32 +133,36 @@ const ATTACH_TRIGGER = gql`
 `;
 
 const DETACH_TRIGGER = gql`
-  mutation DetachTriggerInline($triggerId: Float!) {
-    detachTrigger(triggerId: $triggerId) {
+  mutation DetachTriggerInline($zoneId: Int!, $id: Int!) {
+    detachTrigger(zoneId: $zoneId, id: $id) {
       id
+      zoneId
       name
     }
   }
 `;
 
 interface TriggerData {
-  id: string;
+  id: number;
+  zoneId: number;
   name: string;
   attachType: 'MOB' | 'OBJECT' | 'WORLD';
   numArgs: number;
   argList?: string;
   commands: string;
   variables: string;
-  flags: string[];
+  flags?: string[];
+  mobZoneId?: number;
   mobId?: number;
+  objectZoneId?: number;
   objectId?: number;
-  zoneId?: number;
   createdAt: string;
   updatedAt: string;
 }
 
 interface TriggerManagerProps {
   entityType: 'MOB' | 'OBJECT' | 'WORLD';
+  entityZoneId: number;
   entityId: number;
   entityName: string;
   onTriggerChange?: () => void;
@@ -151,6 +170,7 @@ interface TriggerManagerProps {
 
 export default function TriggerManager({
   entityType,
+  entityZoneId,
   entityId,
   entityName,
   onTriggerChange,
@@ -175,6 +195,7 @@ export default function TriggerManager({
   } = useQuery(GET_TRIGGERS_BY_ATTACHMENT, {
     variables: {
       attachType: entityType,
+      zoneId: entityZoneId,
       entityId: entityId,
     },
   });
@@ -213,6 +234,7 @@ export default function TriggerManager({
       const variables = JSON.stringify(script.variables || {});
 
       const input: any = {
+        zoneId: entityZoneId, // Use the entity's zone for new triggers
         name: script.name || 'New Trigger',
         attachType: entityType,
         commands: script.commands || '',
@@ -223,11 +245,11 @@ export default function TriggerManager({
 
       // Attach to current entity immediately
       if (entityType === 'MOB') {
+        input.mobZoneId = entityZoneId;
         input.mobId = entityId;
       } else if (entityType === 'OBJECT') {
+        input.objectZoneId = entityZoneId;
         input.objectId = entityId;
-      } else if (entityType === 'WORLD') {
-        input.zoneId = entityId;
       }
 
       await createTrigger({ variables: { input } });
@@ -257,6 +279,7 @@ export default function TriggerManager({
 
       await updateTrigger({
         variables: {
+          zoneId: selectedTrigger.zoneId,
           id: selectedTrigger.id,
           input,
         },
@@ -272,11 +295,13 @@ export default function TriggerManager({
     }
   };
 
-  const handleDeleteTrigger = async (triggerId: string) => {
+  const handleDeleteTrigger = async (trigger: TriggerData) => {
     if (!confirm('Are you sure you want to delete this trigger?')) return;
 
     try {
-      await deleteTrigger({ variables: { id: triggerId } });
+      await deleteTrigger({
+        variables: { zoneId: trigger.zoneId, id: trigger.id },
+      });
       refetchAttached();
       refetchAll();
       onTriggerChange?.();
@@ -288,16 +313,17 @@ export default function TriggerManager({
   const handleAttachTrigger = async (trigger: TriggerData) => {
     try {
       const input: any = {
+        triggerZoneId: trigger.zoneId,
         triggerId: trigger.id,
         attachType: entityType,
       };
 
       if (entityType === 'MOB') {
+        input.mobZoneId = entityZoneId;
         input.mobId = entityId;
       } else if (entityType === 'OBJECT') {
+        input.objectZoneId = entityZoneId;
         input.objectId = entityId;
-      } else if (entityType === 'WORLD') {
-        input.zoneId = entityId;
       }
 
       await attachTrigger({ variables: { input } });
@@ -309,9 +335,11 @@ export default function TriggerManager({
     }
   };
 
-  const handleDetachTrigger = async (triggerId: string) => {
+  const handleDetachTrigger = async (trigger: TriggerData) => {
     try {
-      await detachTrigger({ variables: { triggerId } });
+      await detachTrigger({
+        variables: { zoneId: trigger.zoneId, id: trigger.id },
+      });
       refetchAttached();
       refetchAll();
       onTriggerChange?.();
@@ -325,6 +353,7 @@ export default function TriggerManager({
       const variables = JSON.stringify(trigger.variables || {});
 
       const input: any = {
+        zoneId: entityZoneId, // Use the entity's zone for copied triggers
         name: `${trigger.name} (Copy)`,
         attachType: entityType,
         commands: trigger.commands,
@@ -335,11 +364,11 @@ export default function TriggerManager({
 
       // Attach to current entity immediately
       if (entityType === 'MOB') {
+        input.mobZoneId = entityZoneId;
         input.mobId = entityId;
       } else if (entityType === 'OBJECT') {
+        input.objectZoneId = entityZoneId;
         input.objectId = entityId;
-      } else if (entityType === 'WORLD') {
-        input.zoneId = entityId;
       }
 
       await createTrigger({ variables: { input } });
@@ -370,7 +399,7 @@ export default function TriggerManager({
   const convertTriggerToScript = (trigger: TriggerData): Script => {
     // Build incrementally to avoid assigning undefined to required properties
     const base: Partial<Script> = {
-      id: trigger.id,
+      id: String(trigger.id),
       name: trigger.name,
       attachType: trigger.attachType,
       numArgs: trigger.numArgs,
@@ -556,7 +585,7 @@ export default function TriggerManager({
                       <Edit className='h-4 w-4' />
                     </Button>
                     <Button
-                      onClick={() => handleDetachTrigger(trigger.id)}
+                      onClick={() => handleDetachTrigger(trigger)}
                       size='sm'
                       variant='outline'
                       title='Detach from Entity'
@@ -564,7 +593,7 @@ export default function TriggerManager({
                       <Unlink className='h-4 w-4' />
                     </Button>
                     <Button
-                      onClick={() => handleDeleteTrigger(trigger.id)}
+                      onClick={() => handleDeleteTrigger(trigger)}
                       size='sm'
                       variant='destructive'
                       title='Delete Trigger'
