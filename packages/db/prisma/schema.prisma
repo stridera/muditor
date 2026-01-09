@@ -698,7 +698,7 @@ model Mobs {
   mobFlags        MobFlag[]
   // Lua expression defining who this mob attacks on sight
   // Examples: "target.alignment <= -350", "target.race == 'HUMAN'", "true" (attacks all)
-  aggroCondition     String?         @map("aggro_condition")
+  aggroCondition  String?      @map("aggro_condition")
   effectFlags     EffectFlag[]
   position        Position     @default(STANDING)
   defaultPosition Position     @default(STANDING)
@@ -728,12 +728,13 @@ model Mobs {
   characterClass     CharacterClass?   @relation(fields: [classId], references: [id])
   zones              Zones             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shops              Shops[]
-  mobTriggers        MobTriggers[]   // Trigger attachments via junction table
+  mobTriggers        MobTriggers[] // Trigger attachments via junction table
   shopMobs           ShopMobs[] // Mobs for sale at pet/mount shops
   // Quest system relations
   questsAsTrigger    Quests[]          @relation("questTriggerMob") // MOB trigger type quests
   objectiveTargetMob QuestObjectives[] @relation("objectiveTargetMob")
   objectiveDeliverTo QuestObjectives[] @relation("objectiveDeliverTo")
+  Triggers           Triggers[]
 
   @@id([zoneId, id])
   @@index([name])
@@ -813,42 +814,42 @@ model ObjectResetContents {
 
 model Objects {
   id                      Int
-  type                    ObjectType   @default(NOTHING)
+  type                    ObjectType @default(NOTHING)
   keywords                String[]
-  name                    String       @map("name")
-  plainName               String       @default("") @map("plain_name")
-  baseName                String       @default("") @map("base_name") // Name without article (with colors)
-  plainBaseName           String       @default("") @map("plain_base_name") // Name without article (plain text)
-  article                 String?      @map("article") // null=a/an, "the", "some", ""=none
-  roomDescription         String       @map("room_description")
-  plainRoomDescription    String       @default("") @map("plain_room_description")
-  examineDescription      String?      @map("examine_description")
-  plainExamineDescription String?      @default("") @map("plain_examine_description")
-  actionDescription       String?      @map("action_desc")
-  plainActionDescription  String?      @default("") @map("plain_action_desc")
-  weight                  Float        @default(0.0)
-  cost                    Int          @default(0)
-  timer                   Int          @default(0)
-  decomposeTimer          Int          @default(0) @map("decompose_timer")
-  level                   Int          @default(1)
-  concealment             Int          @default(0)
-  values                  Json         @default("{}")
-  zoneId                  Int          @map("zone_id")
+  name                    String     @map("name")
+  plainName               String     @default("") @map("plain_name")
+  baseName                String     @default("") @map("base_name") // Name without article (with colors)
+  plainBaseName           String     @default("") @map("plain_base_name") // Name without article (plain text)
+  article                 String?    @map("article") // null=a/an, "the", "some", ""=none
+  roomDescription         String     @map("room_description")
+  plainRoomDescription    String     @default("") @map("plain_room_description")
+  examineDescription      String?    @map("examine_description")
+  plainExamineDescription String?    @default("") @map("plain_examine_description")
+  actionDescription       String?    @map("action_desc")
+  plainActionDescription  String?    @default("") @map("plain_action_desc")
+  weight                  Float      @default(0.0)
+  cost                    Int        @default(0)
+  timer                   Int        @default(0)
+  decomposeTimer          Int        @default(0) @map("decompose_timer")
+  level                   Int        @default(1)
+  concealment             Int        @default(0)
+  values                  Json       @default("{}")
+  zoneId                  Int        @map("zone_id")
 
   // Permanent fixture: If set, this object always exists in this room (no reset needed)
   // Use for fountains, signs, furniture, etc. that never move or despawn
-  fixtureRoomZoneId       Int?                      @map("fixture_room_zone_id")
-  fixtureRoomId           Int?                      @map("fixture_room_id")
-  fixtureRoom             Room?                     @relation("roomFixtures", fields: [fixtureRoomZoneId, fixtureRoomId], references: [zoneId, id])
+  fixtureRoomZoneId Int?  @map("fixture_room_zone_id")
+  fixtureRoomId     Int?  @map("fixture_room_id")
+  fixtureRoom       Room? @relation("roomFixtures", fields: [fixtureRoomZoneId, fixtureRoomId], references: [zoneId, id])
 
-  createdAt               DateTime     @default(now()) @map("created_at")
-  updatedAt               DateTime     @updatedAt @map("updated_at")
-  deletedAt               DateTime?    @map("deleted_at")
-  createdBy               String?      @map("created_by")
-  updatedBy               String?      @map("updated_by")
-  flags                   ObjectFlag[]
-  effectFlags             EffectFlag[]
-  wearFlags               WearFlag[]
+  createdAt   DateTime     @default(now()) @map("created_at")
+  updatedAt   DateTime     @updatedAt @map("updated_at")
+  deletedAt   DateTime?    @map("deleted_at")
+  createdBy   String?      @map("created_by")
+  updatedBy   String?      @map("updated_by")
+  flags       ObjectFlag[]
+  effectFlags EffectFlag[]
+  wearFlags   WearFlag[]
 
   // FLAG REORGANIZATION FIELDS (NEW)
   // Equipment restrictions (replaces ANTI_* flags)
@@ -872,7 +873,7 @@ model Objects {
   objectResistances       ObjectResistance[] // Resistance bonuses granted by this item
   zones                   Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shopItems               ShopItems[]
-  objectTriggers          ObjectTriggers[]          // Trigger attachments via junction table
+  objectTriggers          ObjectTriggers[] // Trigger attachments via junction table
   objectAbilities         ObjectAbilities[] // Cast spells (quaff potion → cast spell)
   consumableEffects       ConsumableEffect[] // Direct effects (eat food → apply effect)
   accountItems            AccountItems[]
@@ -881,6 +882,7 @@ model Objects {
   questRewards            QuestRewards[]
   objectiveTargetObject   QuestObjectives[]         @relation("objectiveTargetObject")
   questTriggerItem        Quests[]                  @relation("questTriggerItem")
+  Triggers                Triggers[]
 
   @@id([zoneId, id])
   @@index([name])
@@ -983,7 +985,6 @@ model RoomExit {
   roomZoneId  Int        @map("room_zone_id")
   roomId      Int        @map("room_id")
   flags       ExitFlag[] @default([])
-  defaultState    ExitState  @default(OPEN) @map("default_state")  // State on zone reset
 
   // FLAG REORGANIZATION FIELDS (NEW)
   // Replaces CLOSED/LOCKED runtime flags with default state (restored on zone reset)
@@ -1035,7 +1036,7 @@ model Room {
   entrances             RoomExit[]              @relation("roomEntrances")
   roomExtraDescriptions RoomExtraDescriptions[]
   zones                 Zones                   @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  fixtures              Objects[]               @relation("roomFixtures")  // Permanent objects in this room
+  fixtures              Objects[]               @relation("roomFixtures") // Permanent objects in this room
   // Quest system relations
   questObjectives       QuestObjectives[]
   questTriggerRoom      Quests[]                @relation("questTriggerRoom")
