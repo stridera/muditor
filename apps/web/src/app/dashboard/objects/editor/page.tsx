@@ -130,57 +130,59 @@ const OBJECT_TYPES = [
 ];
 
 const WEAR_FLAGS = [
-  'TAKE',
+  // Jewelry
   'FINGER',
   'NECK',
-  'BODY',
+  'EAR',
+  'WRIST',
+  // Head/Face
   'HEAD',
+  'EYES',
+  'FACE',
+  // Body
+  'BODY',
+  'ABOUT',
+  'ARMS',
+  'HANDS',
+  'WAIST',
+  'BELT',
+  // Lower body
   'LEGS',
   'FEET',
-  'HANDS',
-  'ARMS',
-  'SHIELD',
-  'ABOUT',
-  'WAIST',
-  'WRIST',
-  'WIELD',
-  'HOLD',
+  'TAIL',
+  // Weapons/Held
+  'MAINHAND',
+  'OFFHAND',
+  'TWOHAND',
+  // Special
   'BADGE',
-  'EARS',
-  'FACE',
-  'ANKLE',
+  'HOVER',
+  'DISGUISE',
 ];
 
+// Object intrinsic properties
 const OBJECT_FLAGS = [
-  'GLOW',
-  'HUM',
-  'NORENT',
-  'NODONATE',
-  'NOINVIS',
-  'INVISIBLE',
-  'MAGIC',
-  'NODROP',
-  'BLESS',
-  'ANTI_GOOD',
-  'ANTI_EVIL',
-  'ANTI_NEUTRAL',
-  'ANTI_WIZARD',
-  'ANTI_CLERIC',
-  'ANTI_ROGUE',
-  'ANTI_FIGHTER',
-  'NOSELL',
-  'ANTI_DRUID',
-  'ANTI_BARD',
-  'ANTI_RANGER',
-  'ANTI_PALADIN',
-  'ANTI_HUMAN',
-  'ANTI_ELF',
-  'ANTI_DWARF',
-  'ANTI_GIANT',
-  'ANTI_HALFLING',
-  'ANTI_GNOME',
-  'POISONED',
-  'CRYOGAS',
+  'GLOW', // Emits light
+  'HUM', // Makes sound
+  'INVISIBLE', // Invisible by default
+  'MAGIC', // Magical item
+  'PERMANENT', // Doesn't decay
+  'TEMPORARY', // Vanishes on logout
+  'DECOMPOSING', // Actively decaying
+  'FLOAT', // Floats in air
+  'BUOYANT', // Floats in water
+  'VEHICLE', // Can carry passengers
+  'SOULBOUND', // Cannot trade/drop
+];
+
+// Object behavioral restrictions
+const OBJECT_RESTRICTIONS = [
+  'NO_DROP', // Cannot be dropped
+  'NO_TAKE', // Cannot be picked up
+  'NO_SELL', // Cannot be sold
+  'NO_BURN', // Immune to fire
+  'NO_LOCATE', // Cannot be located
+  'NO_INVISIBLE', // Cannot be made invisible
 ];
 
 // Define validation rules for object form

@@ -225,28 +225,34 @@ interface GameObject {
 }
 
 const EQUIPMENT_SLOTS = [
-  'TAKE',
+  // Jewelry
   'FINGER',
   'NECK',
-  'BODY',
-  'HEAD',
-  'LEGS',
-  'FEET',
-  'HANDS',
-  'ARMS',
-  'SHIELD',
-  'ABOUT',
-  'WAIST',
+  'EAR',
   'WRIST',
-  'WIELD',
-  'HOLD',
-  'TWO_HAND_WIELD',
+  // Head/Face
+  'HEAD',
   'EYES',
   'FACE',
-  'EAR',
-  'BADGE',
+  // Body
+  'BODY',
+  'ABOUT',
+  'ARMS',
+  'HANDS',
+  'WAIST',
   'BELT',
+  // Lower body
+  'LEGS',
+  'FEET',
+  'TAIL',
+  // Weapons/Held
+  'MAINHAND',
+  'OFFHAND',
+  'TWOHAND',
+  // Special
+  'BADGE',
   'HOVER',
+  'DISGUISE',
 ];
 
 export default function MobEquipmentManager({

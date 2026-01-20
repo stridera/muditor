@@ -403,7 +403,7 @@ export enum Race {
   OGRE = 'OGRE',
   ORC = 'ORC',
   HALF_ELF = 'HALF_ELF',
-  BARBARIAN = 'BARBARIAN',
+  GOLIATH = 'GOLIATH',
   HALFLING = 'HALFLING',
   PLANT = 'PLANT',
   HUMANOID = 'HUMANOID',
@@ -581,85 +581,65 @@ export enum ObjectType {
   INSTRUMENT = 'INSTRUMENT',
 }
 
+// ObjectFlag - intrinsic object properties
+// Note: ANTI_* flags removed - use restrictedClassIds, restrictedAlignments, restrictedRaces, minSize, maxSize instead
+// Note: NO_* behavioral restrictions moved to ObjectRestriction enum
 export enum ObjectFlag {
-  GLOW = 'GLOW',
-  HUM = 'HUM',
-  NO_RENT = 'NO_RENT',
-  ANTI_BERSERKER = 'ANTI_BERSERKER',
-  NO_INVISIBLE = 'NO_INVISIBLE',
-  INVISIBLE = 'INVISIBLE',
-  MAGIC = 'MAGIC',
-  NO_DROP = 'NO_DROP',
-  PERMANENT = 'PERMANENT',
-  ANTI_GOOD = 'ANTI_GOOD',
-  ANTI_EVIL = 'ANTI_EVIL',
-  ANTI_NEUTRAL = 'ANTI_NEUTRAL',
-  ANTI_SORCERER = 'ANTI_SORCERER',
-  ANTI_CLERIC = 'ANTI_CLERIC',
-  ANTI_ROGUE = 'ANTI_ROGUE',
-  ANTI_WARRIOR = 'ANTI_WARRIOR',
-  NO_SELL = 'NO_SELL',
-  ANTI_PALADIN = 'ANTI_PALADIN',
-  ANTI_ANTI_PALADIN = 'ANTI_ANTI_PALADIN',
-  ANTI_RANGER = 'ANTI_RANGER',
-  ANTI_DRUID = 'ANTI_DRUID',
-  ANTI_SHAMAN = 'ANTI_SHAMAN',
-  ANTI_ASSASSIN = 'ANTI_ASSASSIN',
-  ANTI_MERCENARY = 'ANTI_MERCENARY',
-  ANTI_NECROMANCER = 'ANTI_NECROMANCER',
-  ANTI_CONJURER = 'ANTI_CONJURER',
-  NO_BURN = 'NO_BURN',
-  NO_LOCATE = 'NO_LOCATE',
-  DECOMPOSING = 'DECOMPOSING',
-  FLOAT = 'FLOAT',
-  NO_FALL = 'NO_FALL',
-  WAS_DISARMED = 'WAS_DISARMED',
-  ANTI_MONK = 'ANTI_MONK',
-  ANTI_BARD = 'ANTI_BARD',
-  ELVEN = 'ELVEN',
-  DWARVEN = 'DWARVEN',
-  ANTI_THIEF = 'ANTI_THIEF',
-  ANTI_PYROMANCER = 'ANTI_PYROMANCER',
-  ANTI_CRYOMANCER = 'ANTI_CRYOMANCER',
-  ANTI_ILLUSIONIST = 'ANTI_ILLUSIONIST',
-  ANTI_PRIEST = 'ANTI_PRIEST',
-  ANTI_DIABOLIST = 'ANTI_DIABOLIST',
-  ANTI_TINY = 'ANTI_TINY',
-  ANTI_SMALL = 'ANTI_SMALL',
-  ANTI_MEDIUM = 'ANTI_MEDIUM',
-  ANTI_LARGE = 'ANTI_LARGE',
-  ANTI_HUGE = 'ANTI_HUGE',
-  ANTI_GIANT = 'ANTI_GIANT',
-  ANTI_GARGANTUAN = 'ANTI_GARGANTUAN',
-  ANTI_COLOSSAL = 'ANTI_COLOSSAL',
-  ANTI_TITANIC = 'ANTI_TITANIC',
-  ANTI_MOUNTAINOUS = 'ANTI_MOUNTAINOUS',
-  ANTI_ARBOREAN = 'ANTI_ARBOREAN',
+  GLOW = 'GLOW', // Emits light
+  HUM = 'HUM', // Makes sound
+  INVISIBLE = 'INVISIBLE', // Invisible by default
+  MAGIC = 'MAGIC', // Magical item
+  PERMANENT = 'PERMANENT', // Doesn't decay
+  TEMPORARY = 'TEMPORARY', // Vanishes on logout
+  DECOMPOSING = 'DECOMPOSING', // Actively decaying
+  FLOAT = 'FLOAT', // Floats in air
+  BUOYANT = 'BUOYANT', // Floats in water
+  VEHICLE = 'VEHICLE', // Can carry passengers
+  SOULBOUND = 'SOULBOUND', // Cannot trade/drop, persists through death
 }
 
+// ObjectRestriction - behavioral restrictions on what can be done with the object
+export enum ObjectRestriction {
+  NO_DROP = 'NO_DROP', // Cannot be dropped
+  NO_TAKE = 'NO_TAKE', // Cannot be picked up
+  NO_SELL = 'NO_SELL', // Cannot be sold
+  NO_BURN = 'NO_BURN', // Immune to fire
+  NO_LOCATE = 'NO_LOCATE', // Cannot be located by spell
+  NO_INVISIBLE = 'NO_INVISIBLE', // Cannot be made invisible
+}
+
+// WearFlag - equipment slots where items can be worn
+// Note: TAKE, WIELD, TWO_HAND_WIELD, HOLD, SHIELD removed
+// Use ObjectRestriction for TAKE, MAINHAND/OFFHAND/TWOHAND for weapons
 export enum WearFlag {
-  TAKE = 'TAKE',
+  // Jewelry
   FINGER = 'FINGER',
   NECK = 'NECK',
-  BODY = 'BODY',
-  HEAD = 'HEAD',
-  LEGS = 'LEGS',
-  FEET = 'FEET',
-  HANDS = 'HANDS',
-  ARMS = 'ARMS',
-  SHIELD = 'SHIELD',
-  ABOUT = 'ABOUT',
-  WAIST = 'WAIST',
+  EAR = 'EAR',
   WRIST = 'WRIST',
-  WIELD = 'WIELD',
-  HOLD = 'HOLD',
-  TWO_HAND_WIELD = 'TWO_HAND_WIELD',
+  // Head/Face
+  HEAD = 'HEAD',
   EYES = 'EYES',
   FACE = 'FACE',
-  EAR = 'EAR',
-  BADGE = 'BADGE',
+  // Body
+  BODY = 'BODY',
+  ABOUT = 'ABOUT',
+  ARMS = 'ARMS',
+  HANDS = 'HANDS',
+  WAIST = 'WAIST',
   BELT = 'BELT',
+  // Lower body
+  LEGS = 'LEGS',
+  FEET = 'FEET',
+  TAIL = 'TAIL',
+  // Weapons/Held
+  MAINHAND = 'MAINHAND',
+  OFFHAND = 'OFFHAND',
+  TWOHAND = 'TWOHAND',
+  // Special
+  BADGE = 'BADGE',
   HOVER = 'HOVER',
+  DISGUISE = 'DISGUISE',
 }
 
 export enum Sector {
