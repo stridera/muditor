@@ -2615,7 +2615,7 @@ enum QuestTriggerType {
 enum Race {
   ANIMAL
   ARBOREAN
-  BARBARIAN
+  GOLIATH
   BROWNIE
   DEMON
   DRAGONBORN_ACID

@@ -138,7 +138,7 @@ Character and mob races.
 | `OGRE`                 | Ogre race               |
 | `ORC`                  | Orc race                |
 | `HALF_ELF`             | Half-elf race           |
-| `BARBARIAN`            | Barbarian human variant |
+| `GOLIATH`              | Goliath race            |
 | `HALFLING`             | Halfling race           |
 | `PLANT`                | Plant-based creatures   |
 | `HUMANOID`             | Generic humanoid        |

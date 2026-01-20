@@ -345,7 +345,7 @@ A mob's physical position.
 
 ### `Race`
 
-- `Human`, `Elf`, `Gnome`, `Dwarf`, `Troll`, `Drow`, `Duergar`, `Ogre`, `Orc`, `HalfElf`, `Barbarian`, `Halfling`, `Plant`, `Humanoid`, `Animal`, `DragonGeneral`, `Giant`, `Other`, `Goblin`, `Demon`, `Brownie`, `DragonFire`, `DragonFrost`, `DragonAcid`, `DragonLightning`, `DragonGas`, `DragonbornFire`, `DragonbornFrost`, `DragonbornAcid`, `DragonbornLightning`, `DragonbornGas`, `Sverfneblin`, `FaerieSeelie`, `FaerieUnseelie`, `Nymph`, `Arborean`
+- `Human`, `Elf`, `Gnome`, `Dwarf`, `Troll`, `Drow`, `Duergar`, `Ogre`, `Orc`, `HalfElf`, `Goliath`, `Halfling`, `Plant`, `Humanoid`, `Animal`, `DragonGeneral`, `Giant`, `Other`, `Goblin`, `Demon`, `Brownie`, `DragonFire`, `DragonFrost`, `DragonAcid`, `DragonLightning`, `DragonGas`, `DragonbornFire`, `DragonbornFrost`, `DragonbornAcid`, `DragonbornLightning`, `DragonbornGas`, `Sverfneblin`, `FaerieSeelie`, `FaerieUnseelie`, `Nymph`, `Arborean`
 
 ### `ResetModes`
 

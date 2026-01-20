@@ -98,6 +98,37 @@ model Effect {
   abilities     AbilityEffect[]
   consumables   ConsumableEffect[] // Applied when consuming liquids, foods, potions, etc.
 
+  // Effect relationships
+  grantsImmunityTo   Effect[]       @relation("EffectImmunity")
+  immuneFrom         Effect[]       @relation("EffectImmunity")
+  presenceOverride   String?        @map("presence_override") // "{actor} floats in the air..."
+
+  // Positions that apply this effect (e.g., UNDERWATER applies DROWNING)
+  appliedByPositions PositionData[] @relation("PositionAppliesEffect")
+
+  // Rooms that apply this effect as environmental hazard
+  appliedByRooms     RoomEnvironmentalEffect[]
+
+  // Effect timing (for applied effects like DROWNING)
+  delaySeconds     Int?            @map("delay_seconds")     // Grace period before effect kicks in
+  tickIntervalSec  Int?            @map("tick_interval_sec") // How often effect ticks
+
+  // Lua scripts for effect behavior
+  onApply          String?         @map("on_apply")  // Lua: actor:send("You begin to drown!")
+  onTick           String?         @map("on_tick")   // Lua: actor:damage(10, "drowning")
+  onRemove         String?         @map("on_remove") // Lua: actor:send("You gasp for air!")
+
+  // Action restrictions when effect is active
+  preventsSpeaking Boolean         @default(false) @map("prevents_speaking")
+  preventsCasting  Boolean         @default(false) @map("prevents_casting")
+  preventsMovement Boolean         @default(false) @map("prevents_movement")
+
+  // Relations to entities that can have this effect
+  characterEffects   CharacterEffects[]   // Runtime effects on characters
+  mobDefaultEffects  MobDefaultEffects[]  // Default effects mobs always have
+  objectEffects      ObjectEffects[]      // Effects granted by objects when worn/held
+  raceEffects        RaceEffects[]        // Permanent effects for races
+
   @@index([effectType])
   @@index([categoryId])
 }
@@ -391,19 +422,75 @@ model ChangeLogs {
   @@index([userId, timestamp])
 }
 
+// Runtime effects currently applied to a character (with duration, strength, etc.)
 model CharacterEffects {
   id           Int        @id @default(autoincrement())
   characterId  String     @map("character_id")
-  effectName   String     @map("effect_name")
-  effectType   String?    @map("effect_type")
-  duration     Int?
-  strength     Int        @default(1)
-  modifierData Json       @default("{}") @map("modifier_data")
-  sourceType   String?    @map("source_type")
-  sourceId     Int?       @map("source_id")
+  effectId     Int        @map("effect_id") // Foreign key to Effect table
+  duration     Int? // Remaining duration in seconds (null = permanent)
+  strength     Int        @default(1) // Effect strength/stacks
+  modifierData Json       @default("{}") @map("modifier_data") // Additional parameters
+  sourceType   String?    @map("source_type") // "ability", "item", "room", etc.
+  sourceId     Int?       @map("source_id") // ID of source
   appliedAt    DateTime   @default(now()) @map("applied_at")
   expiresAt    DateTime?  @map("expires_at")
+
   characters   Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  effect       Effect     @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@index([characterId])
+  @@index([effectId])
+}
+
+// Default effects that mobs always spawn with (e.g., a ghost mob has INVISIBLE effect)
+model MobDefaultEffects {
+  id           Int      @id @default(autoincrement())
+  mobZoneId    Int      @map("mob_zone_id")
+  mobId        Int      @map("mob_id")
+  effectId     Int      @map("effect_id")
+  strength     Int      @default(1)         // Effect strength/stacks
+  modifierData Json     @default("{}") @map("modifier_data") // Additional parameters
+
+  mob          Mobs     @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
+  effect       Effect   @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@unique([mobZoneId, mobId, effectId])
+  @@index([mobZoneId, mobId])
+  @@index([effectId])
+}
+
+// Effects granted by objects when worn/held (e.g., ring of invisibility grants INVISIBLE)
+model ObjectEffects {
+  id           Int      @id @default(autoincrement())
+  objectZoneId Int      @map("object_zone_id")
+  objectId     Int      @map("object_id")
+  effectId     Int      @map("effect_id")
+  strength     Int      @default(1)         // Effect strength/stacks
+  modifierData Json     @default("{}") @map("modifier_data") // Additional parameters
+  wearLocation WearFlag? @map("wear_location") // Only apply when worn in specific slot (null = any)
+
+  object       Objects  @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  effect       Effect   @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@unique([objectZoneId, objectId, effectId])
+  @@index([objectZoneId, objectId])
+  @@index([effectId])
+}
+
+// Permanent effects granted to races (e.g., INFRAVISION for elves)
+model RaceEffects {
+  id           Int      @id @default(autoincrement())
+  race         Race
+  effectId     Int      @map("effect_id")
+  strength     Int      @default(1)         // Effect strength/stacks
+  modifierData Json     @default("{}") @map("modifier_data") // Additional parameters
+
+  raceData     Races    @relation(fields: [race], references: [race], onDelete: Cascade)
+  effect       Effect   @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@unique([race, effectId])
+  @@index([race])
+  @@index([effectId])
 }
 
 model CharacterItems {
@@ -415,7 +502,7 @@ model CharacterItems {
   equippedLocation         String?          @map("equipped_location")
   condition                Int              @default(100)
   charges                  Int              @default(-1)
-  instanceFlags            String[]         @default([]) @map("instance_flags")
+  instanceFlags            ItemInstanceFlag[] @default([]) @map("instance_flags")
   customName               String?          @map("custom_name")
   customExamineDescription String?          @map("custom_examine_description")
   customValues             Json             @default("{}") @map("custom_values")
@@ -467,10 +554,8 @@ model Characters {
   armorClass            Int                  @default(10) @map("armor_class")
   currentRoomZoneId     Int?                 @map("current_room_zone_id")
   currentRoomId         Int?                 @map("current_room_id")
-  saveRoomZoneId        Int?                 @map("save_room_zone_id")
-  saveRoomId            Int?                 @map("save_room_id")
-  homeRoomZoneId        Int?                 @map("home_room_zone_id")
-  homeRoomId            Int?                 @map("home_room_id")
+  recallRoomZoneId      Int?                 @map("recall_room_zone_id")
+  recallRoomId          Int?                 @map("recall_room_id")
   lastLogin             DateTime?            @map("last_login")
   timePlayed            Int                  @default(0) @map("time_played")
   isOnline              Boolean              @default(false) @map("is_online")
@@ -480,9 +565,8 @@ model Characters {
   title                 String?
   prompt                String               @default("<%%h/%%Hhp %%v/%%Vmv>")
   pageLength            Int                  @default(25) @map("page_length")
-  playerFlags           String[]             @default([]) @map("player_flags")
-  effectFlags           String[]             @default([]) @map("effect_flags")
-  privilegeFlags        String[]             @default([]) @map("privilege_flags")
+  playerFlags           PlayerFlag[]         @default([]) @map("player_flags")
+  permissions           Permission[]         @default([]) @map("permissions") // Direct permission grants beyond level
   olcZones              Int[]                @default([]) @map("olc_zones")
   invisLevel            Int                  @default(0) @map("invis_level")
   wimpyThreshold        Int                  @default(0) @map("wimpy_threshold")
@@ -498,6 +582,8 @@ model Characters {
   classId               Int?                 @map("class_id")
   experience            Int                  @default(0)
   skillPoints           Int                  @default(0) @map("skill_points")
+  // Position state (persisted so ghost state survives logout)
+  position              Position             @default(STANDING)
   characterAliases      CharacterAliases[]
   characterEffects      CharacterEffects[]
   characterItems        CharacterItems[]
@@ -695,14 +781,11 @@ model Mobs {
   updatedBy       String?      @map("updated_by")
   classId         Int?         @map("class_id")
   race            Race         @default(HUMANOID)
-  mobFlags        MobFlag[]
-  // Lua expression defining who this mob attacks on sight
-  // Examples: "target.alignment <= -350", "target.race == 'HUMAN'", "true" (attacks all)
-  aggroCondition  String?      @map("aggro_condition")
-  effectFlags     EffectFlag[]
   position        Position     @default(STANDING)
-  defaultPosition Position     @default(STANDING)
-  gender          Gender       @default(NEUTRAL)
+  defaultPosition     Position     @default(STANDING)
+  movementMode        MovementMode @default(NORMAL) @map("movement_mode")
+  defaultMovementMode MovementMode @default(NORMAL) @map("default_movement_mode")
+  gender              Gender       @default(NEUTRAL)
   size            Size         @default(MEDIUM)
   lifeForce       LifeForce    @default(LIFE)
   composition     Composition  @default(FLESH)
@@ -711,8 +794,13 @@ model Mobs {
 
   // FLAG REORGANIZATION FIELDS (NEW)
   // Organized flag system - replaces monolithic mobFlags
-  traits    MobTrait[]    @default([]) // What mob IS (identity)
-  behaviors MobBehavior[] @default([]) // How mob ACTS
+  traits      MobTrait[]      @default([]) // What mob IS (identity)
+  behaviors   MobBehavior[]   @default([]) // How mob ACTS
+  professions MobProfession[] @default([]) // Services mob provides (BANKER, SHOPKEEPER, etc.)
+
+  // Mount system: How rider appears when mounted on this mob
+  // e.g., "{actor} circles overhead astride {mount}." or "{actor} rides {mount}."
+  riderPresenceMessage String? @map("rider_presence_message")
 
   // Aggression formula (Lua expression) - who mob attacks on sight
   // Examples: "true" (attacks all), "target.alignment < -350", "target.race == 'ELF'"
@@ -724,6 +812,7 @@ model Mobs {
 
   mobResets          MobResets[]
   mobAbilities       MobAbilities[]
+  defaultEffects     MobDefaultEffects[] // Effects mob always spawns with
   characterPets      CharacterPets[]
   characterClass     CharacterClass?   @relation(fields: [classId], references: [id])
   zones              Zones             @relation(fields: [zoneId], references: [id], onDelete: Cascade)
@@ -847,20 +936,28 @@ model Objects {
   deletedAt   DateTime?    @map("deleted_at")
   createdBy   String?      @map("created_by")
   updatedBy   String?      @map("updated_by")
-  flags       ObjectFlag[]
-  effectFlags EffectFlag[]
-  wearFlags   WearFlag[]
+  flags        ObjectFlag[]
+  restrictions ObjectRestriction[] @default([]) // Behavioral restrictions (NO_DROP, NO_SELL, etc.)
+  wearFlags    WearFlag[]
 
   // FLAG REORGANIZATION FIELDS (NEW)
   // Equipment restrictions (replaces ANTI_* flags)
+  // Exclusive restrictions: these races/classes/alignments CANNOT use the item
   restrictedClassIds   Int[]       @default([]) @map("restricted_class_ids") // Class IDs that CANNOT use
   restrictedAlignments Alignment[] @default([]) @map("restricted_alignments") // Alignments that CANNOT use
+  restrictedRaces      Race[]      @default([]) @map("restricted_races") // Races that CANNOT use
+  // Inclusive restrictions: ONLY these races can use the item (e.g., ELVEN sword)
+  // If empty, all races can use (subject to restrictedRaces)
+  allowedRaces         Race[]      @default([]) @map("allowed_races") // Only these races CAN use
   minSize              Size?       @map("min_size") // Minimum size to use
   maxSize              Size?       @map("max_size") // Maximum size to use
-  allowedRaces         Race[]      @default([]) @map("allowed_races") // Only these races can use (empty = all)
 
   // Vehicle properties
   passengerCapacity Int? @map("passenger_capacity") // For VEHICLE items - number of riders
+
+  // Position system: If this item grants/affects position, override presence message
+  // e.g., flying carpet: "{actor} soars through the air on a flying carpet."
+  presenceOverride String? @map("presence_override")
 
   characterItems          CharacterItems[]
   equipmentSetItems       EquipmentSetItems[]
@@ -871,6 +968,7 @@ model Objects {
   objectResets            ObjectResets[]
   objectResetContents     ObjectResetContents[]
   objectResistances       ObjectResistance[] // Resistance bonuses granted by this item
+  grantedEffects          ObjectEffects[]    // Effects granted when worn/held
   zones                   Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
   shopItems               ShopItems[]
   objectTriggers          ObjectTriggers[] // Trigger attachments via junction table
@@ -930,8 +1028,6 @@ model Races {
   acFactor           Int          @default(100) @map("ac_factor")
   enterVerb          String?      @map("enter_verb")
   leaveVerb          String?      @map("leave_verb")
-  permanentEffects   EffectFlag[] @map("permanent_effects")
-
   // Elemental resistances: JSON object { "FIRE": 25, "COLD": -25, "HOLY": 100 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively.
   resistances Json? @default("{}")
@@ -943,6 +1039,7 @@ model Races {
 
   createdAt            DateTime             @default(now()) @map("created_at")
   updatedAt            DateTime             @updatedAt @map("updated_at")
+  permanentEffects     RaceEffects[]        // Effects always active for this race
   raceAbilities        RaceAbilities[]
   raceSpellSlotBonuses RaceSpellSlotBonus[]
 }
@@ -1019,13 +1116,42 @@ model Room {
   deletedAt            DateTime?  @map("deleted_at")
   createdBy            String?    @map("created_by")
   updatedBy            String?    @map("updated_by")
-  flags                RoomFlag[]
 
-  // FLAG REORGANIZATION FIELDS (NEW)
+  // Lighting system - base light level determines visibility
+  // Positive values = lit, negative = dark, 0 = ambient (time/weather dependent)
+  // Examples: 5 = brilliantly lit, -3 = deep darkness, -5 = magical void
+  baseLightLevel       Int        @default(0) @map("base_light_level")
+
+  // FLAG REORGANIZATION FIELDS
   // Replaces size flags (LARGE, MEDIUM, etc.) with numeric capacity
   capacity      Int            @default(10) // Max occupants for combat (0 = unlimited)
   // Replaces elemental flags (EARTH, AIR, FIRE, WATER) with magic affinity
   magicAffinity MagicAffinity? @map("magic_affinity")
+
+  // Position/effect system integration
+  // What position mechanic is required to be in this room (null = ground OK)
+  requiredMechanic     PositionMechanic? @map("required_mechanic")
+  // Environmental effects applied to all occupants (e.g., TOXIC_GAS, EXTREME_COLD)
+  environmentalEffects RoomEnvironmentalEffect[]
+
+  // Room restrictions - Lua expressions for access control
+  // entryRestriction: Lua expression checked when actor tries to enter
+  //   Context: actor (who's entering), room (this room), direction (from where)
+  //   Returns: true = allow, false = deny, string = deny with message
+  //   Examples:
+  //     "return actor:is_god()" -- god room
+  //     "return actor:is_player()" -- no mobs allowed
+  //     "return actor:has_effect('Fly') or actor:has_effect('WaterBreathing')" -- swim/fly required
+  entryRestriction String? @map("entry_restriction") @db.Text
+
+  // Common room state flags (for efficient checks without Lua)
+  // These can be overridden by entryRestriction for complex logic
+  isPeaceful    Boolean @default(false) @map("is_peaceful") // No combat allowed
+  allowsMagic   Boolean @default(true) @map("allows_magic") // Magic can be cast
+  allowsRecall  Boolean @default(true) @map("allows_recall") // Recall spell works
+  allowsSummon  Boolean @default(true) @map("allows_summon") // Summon spell works
+  allowsTeleport Boolean @default(true) @map("allows_teleport") // Teleport works
+  isDeathTrap   Boolean @default(false) @map("is_death_trap") // Instant death room
 
   layoutX               Int?                    @map("layout_x")
   layoutY               Int?                    @map("layout_y")
@@ -1043,6 +1169,19 @@ model Room {
 
   @@id([zoneId, id])
   @@index([plainRoomDescription])
+}
+
+// Junction table for Room environmental effects (Room has composite PK)
+model RoomEnvironmentalEffect {
+  roomZoneId Int    @map("room_zone_id")
+  roomId     Int    @map("room_id")
+  effectId   Int    @map("effect_id")
+
+  room       Room   @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  effect     Effect @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([roomZoneId, roomId, effectId])
+  @@map("RoomEnvironmentalEffect")
 }
 
 model ShopAccepts {
@@ -1484,94 +1623,12 @@ enum Direction {
   NONE
 }
 
-enum EffectFlag {
-  BLIND
-  INVISIBLE
-  DETECT_ALIGN
-  DETECT_INVIS
-  DETECT_MAGIC
-  SENSE_LIFE
-  WATERWALK
-  SANCTUARY
-  CONFUSION
-  CURSE
-  INFRAVISION
-  POISON
-  PROTECT_EVIL
-  PROTECT_GOOD
-  SLEEP
-  NO_TRACK
-  TAMED
-  BERSERK
-  SNEAK
-  STEALTH
-  FLY
-  CHARM
-  STONE_SKIN
-  FARSEE
-  HASTE
-  BLUR
-  VITALITY
-  GLORY
-  MAJOR_PARALYSIS
-  FAMILIARITY
-  MESMERIZED
-  IMMOBILIZED
-  LIGHT
-  UNUSED
-  MINOR_PARALYSIS
-  HURT_THROAT
-  FEATHER_FALL
-  WATERBREATH
-  SOULSHIELD
-  SILENCE
-  PROTECT_FIRE
-  PROTECT_COLD
-  PROTECT_AIR
-  PROTECT_EARTH
-  FIRESHIELD
-  COLDSHIELD
-  MINOR_GLOBE
-  MAJOR_GLOBE
-  HARNESS
-  ON_FIRE
-  FEAR
-  TONGUES
-  DISEASE
-  INSANITY
-  ULTRAVISION
-  NEGATE_HEAT
-  NEGATE_COLD
-  NEGATE_AIR
-  NEGATE_EARTH
-  REMOTE_AGGRO
-  AWARE
-  REDUCE
-  ENLARGE
-  VAMPIRIC_TOUCH
-  RAY_OF_ENFEEBLEMENT
-  ANIMATED
-  EXPOSED
-  SHADOWING
-  CAMOUFLAGED
-  SPIRIT_WOLF
-  SPIRIT_BEAR
-  WRATH
-  MISDIRECTION
-  MISDIRECTING
-  BLESS
-  HEX
-  DETECT_POISON
-  SONG_OF_REST
-  DISPLACEMENT
-  GREATER_DISPLACEMENT
-  FIRE_WEAPON
-  ICE_WEAPON
-  POISON_WEAPON
-  ACID_WEAPON
-  SHOCK_WEAPON
-  RADIANT_WEAPON
-}
+// EffectFlag enum REMOVED
+// Effects are defined in the Effect table and linked via junction tables:
+// - MobDefaultEffects: Effects mobs always spawn with
+// - ObjectEffects: Effects objects grant when worn/held
+// - CharacterEffects: Runtime effects on player characters
+// This allows builders to create custom effects without schema changes
 
 enum ExitFlag {
   IS_DOOR // Has a door (enables open/close/lock/pick)
@@ -1664,6 +1721,17 @@ enum MagicAffinity {
   CHAOS // Wild magic - unpredictable side effects
 }
 
+// Mob profession - special NPC roles that provide services
+// A mob can have multiple professions (e.g., banker + receptionist)
+enum MobProfession {
+  BANKER // Manages player bank accounts
+  SHOPKEEPER // Runs shops (buy/sell items)
+  RECEPTIONIST // Manages lodging/inn services
+  POSTMASTER // Handles mail system
+  GUILDMASTER // Manages guild services
+  TRAINER // Trains skills/abilities
+}
+
 // Exit default state - restored on zone reset
 enum ExitState {
   OPEN // Door open or no door
@@ -1687,138 +1755,43 @@ enum LifeForce {
   ELEMENTAL
 }
 
-enum MobFlag {
-  SPEC
-  SENTINEL
-  SCAVENGER
-  IS_NPC
-  AWARE
-  AGGRESSIVE
-  STAY_ZONE
-  WIMPY
-  AGGRO_EVIL
-  AGGRO_GOOD
-  AGGRO_NEUTRAL
-  AGGRO_EVIL_RACE
-  AGGRO_GOOD_RACE
-  AGGRO_NEUTRAL_RACE
-  MEMORY
-  HELPER
-  NO_CHARM
-  NO_SUMMON
-  NO_SLEEP
-  NO_BASH
-  NO_BLIND
-  MOUNT
-  STAY_SECT
-  HATES_SUN
-  NO_KILL
-  TRACK
-  ILLUSION
-  POISON_BITE
-  THIEF
-  WARRIOR
-  SORCERER
-  CLERIC
-  PALADIN
-  ANTI_PALADIN
-  RANGER
-  DRUID
-  SHAMAN
-  ASSASSIN
-  MERCENARY
-  NECROMANCER
-  CONJURER
-  MONK
-  BERSERKER
-  DIABOLIST
-  SLOW_TRACK
-  NO_SILENCE
-  PEACEFUL
-  PROTECTOR
-  PEACEKEEPER
-  HASTE
-  BLUR
-  TEACHER
-  MOUNTABLE
-  NO_VICIOUS
-  NO_CLASS_AI
-  FAST_TRACK
-  AQUATIC
-  NO_EQ_RESTRICT
-  SUMMONED_MOUNT
-  NO_POISON
-  BANKER
-  RECEPTIONIST
-  POSTMASTER
-  SHOPKEEPER
-  // Additional legacy flags
-  ANIMATED // Mob is animated - dies if no anim effect
-  PLAYER_PHANTASM // Illusion of player; mobs are aggro to it
-  NO_SCRIPT // Mob does not execute triggers or specprocs
-  PET // Mob was purchased/tamed and is now a pet
-  MEDITATE // Mob meditates
+// MobFlag enum REMOVED - all functionality now handled by:
+// - MobTrait[] for identity (what mob IS)
+// - MobBehavior[] for behavior (how mob ACTS)
+// - MobProfession[] for services (what mob DOES for players)
+// - classId for class-based AI
+// - aggressionFormula for aggro targeting (Lua)
+// - activityRestrictions for environmental restrictions (Lua)
+// - effectFlags for buffs/debuffs (effects system)
+// - resistances for immunities (JSON field)
+
+// Object intrinsic properties - what the object IS
+enum ObjectFlag {
+  GLOW // Object emits light.  Can be found in dark rooms, but doesn't light area
+  HUM // Object hums audibly.  Can be found if blind or invisible
+  INVISIBLE // Object is invisible by default
+  MAGIC // Object is magical (affects identify, dispel)
+  PERMANENT // Object doesn't decay
+  TEMPORARY // Object vanishes on rent/logout
+  DECOMPOSING // Object is actively decaying
+  FLOAT // Doesn't fall in air/gravity rooms
+  BUOYANT // Floats in water (boats)
+  VEHICLE // Can carry passengers
+  SOULBOUND // Persists through death, cannot trade/drop
 }
 
-enum ObjectFlag {
-  GLOW
-  HUM
-  TEMPORARY
-  ANTI_BERSERKER
-  NO_INVISIBLE
-  INVISIBLE
-  MAGIC
-  NO_DROP
-  PERMANENT
-  ANTI_GOOD
-  ANTI_EVIL
-  ANTI_NEUTRAL
-  ANTI_SORCERER
-  ANTI_CLERIC
-  ANTI_ROGUE
-  ANTI_WARRIOR
-  NO_SELL
-  ANTI_PALADIN
-  ANTI_ANTI_PALADIN
-  ANTI_RANGER
-  ANTI_DRUID
-  ANTI_SHAMAN
-  ANTI_ASSASSIN
-  ANTI_MERCENARY
-  ANTI_NECROMANCER
-  ANTI_CONJURER
-  NO_BURN
-  NO_LOCATE
-  DECOMPOSING
-  FLOAT // Doesn't fall in air/gravity rooms (feather, NO_FALL synonym)
-  NO_TAKE // Cannot be picked up (furniture, fixtures)
-  SOULBOUND // Persists through death, cannot trade/drop
-  BUOYANT // Doesn't sink in water (boat)
-  VEHICLE // Can carry passengers (use with FLOAT/BUOYANT for terrain)
-  ANTI_MONK
-  ANTI_BARD
-  ELVEN
-  DWARVEN
-  ANTI_THIEF
-  ANTI_PYROMANCER
-  ANTI_CRYOMANCER
-  ANTI_ILLUSIONIST
-  ANTI_PRIEST
-  ANTI_DIABOLIST
-  ANTI_TINY
-  ANTI_SMALL
-  ANTI_MEDIUM
-  ANTI_LARGE
-  ANTI_HUGE
-  ANTI_GIANT
-  ANTI_GARGANTUAN
-  ANTI_COLOSSAL
-  ANTI_TITANIC
-  ANTI_MOUNTAINOUS
-  ANTI_ARBOREAN
+// Object behavioral restrictions - what CAN'T be done with the object
+enum ObjectRestriction {
+  NO_DROP // Cannot be dropped
+  NO_TAKE // Cannot be picked up (fixture)
+  NO_SELL // Cannot be sold to shops
+  NO_BURN // Immune to fire damage
+  NO_LOCATE // Cannot be found with locate spell
+  NO_INVISIBLE // Cannot be made invisible by spells
 }
 
 enum ObjectType {
+  // Core item types
   NOTHING
   LIGHT
   SCROLL
@@ -1850,61 +1823,101 @@ enum ObjectType {
   TOUCHSTONE
   BOARD
   INSTRUMENT
+  // Additional game-specific types
+  VEHICLE     // Rideable vehicles
+  CORPSE      // Character remains
+  KIT         // Tool kits (crafting, etc.)
+  WINGS       // Flight-granting items
+  PERFUME     // Scent items
+  DISGUISE    // Appearance modifiers
+  POISON      // Poison items
 }
 
+// Body position - physical state of an actor
+// Separate from movement mode (flying, swimming, etc.)
 enum Position {
-  DEAD
-  GHOST
-  MORTALLY_WOUNDED
-  INCAPACITATED
-  STUNNED
-  SLEEPING
-  RESTING
-  SITTING
-  KNEELING
-  PRONE
-  FIGHTING
-  STANDING
-  FLYING
+  // Incapacitation states
+  DEAD // Killed - awaiting respawn
+  GHOST // Player post-death state - can use 'release'
+  MORTALLY_WOUNDED // Critical HP - dying
+  INCAPACITATED // Knocked out
+  STUNNED // Temporarily unable to act
+  // Rest states
+  SLEEPING // Asleep - fast regen, vulnerable
+  RESTING // Lying down or prone - moderate regen
+  // Seated states
+  SITTING // Seated - some actions restricted
+  // Active states
+  STANDING // Default upright position
 }
 
+// Movement mode - how an actor is traveling
+// Can combine with any body position (e.g., sleeping while flying on carpet)
+enum MovementMode {
+  NORMAL // Walking/running on ground
+  FLYING // Airborne - aerial combat rules
+  SWIMMING // On water surface
+  UNDERWATER // Submerged - breathing required
+  MOUNTED // Riding a mount
+  ETHEREAL // Phased/incorporeal
+}
+
+// Position mechanics - C++ has hardcoded game rules for each mechanic
+// Positions/modes map to mechanics for gameplay rules
+enum PositionMechanic {
+  GROUND // Normal ground-based (standing, sitting, resting)
+  AERIAL // Flying/hovering - aerial combat rules, immune to ground effects
+  AQUATIC // Swimming on surface - water combat rules
+  SUBMERGED // Underwater - breathing checks, spell restrictions
+  ETHEREAL // Phasing/incorporeal - pass through certain terrain
+  MOUNTED // Riding a mount - mount-based combat rules
+  INCAPACITATED // Dead, stunned, unconscious - can't act
+}
+
+// Race enum - species/creature types
 enum Race {
+  // Playable races
   HUMAN
   ELF
   GNOME
   DWARF
-  TROLL
   DROW
   DUERGAR
+  HALF_ELF
+  HALFLING
+  SVERFNEBLIN
+  GOLIATH
+  // Fey races
+  BROWNIE
+  FAERIE_SEELIE
+  FAERIE_UNSEELIE
+  NYMPH
+  ARBOREAN
+  // Monstrous races
+  TROLL
   OGRE
   ORC
-  HALF_ELF
-  BARBARIAN
-  HALFLING
-  PLANT
-  HUMANOID
-  ANIMAL
-  DRAGON_GENERAL
-  GIANT
-  OTHER
   GOBLIN
+  GIANT
   DEMON
-  BROWNIE
+  // Dragon types
+  DRAGON_GENERAL
   DRAGON_FIRE
   DRAGON_FROST
   DRAGON_ACID
   DRAGON_LIGHTNING
   DRAGON_GAS
+  // Dragonborn
   DRAGONBORN_FIRE
   DRAGONBORN_FROST
   DRAGONBORN_ACID
   DRAGONBORN_LIGHTNING
   DRAGONBORN_GAS
-  SVERFNEBLIN
-  FAERIE_SEELIE
-  FAERIE_UNSEELIE
-  NYMPH
-  ARBOREAN
+  // Generic categories
+  HUMANOID // Default for unspecified humanoids
+  ANIMAL
+  PLANT
+  OTHER
 }
 
 enum RaceAlign {
@@ -1926,49 +1939,12 @@ enum ResetMode {
   NORMAL
 }
 
-enum RoomFlag {
-  DARK
-  DEATH
-  NO_MOB
-  INDOORS
-  PEACEFUL
-  SOUNDPROOF
-  NO_TRACK
-  NO_MAGIC
-  TUNNEL
-  PRIVATE
-  GODROOM
-  HOUSE
-  HOUSECRASH
-  ATRIUM
-  OLC
-  BFS_MARK
-  WORLDMAP
-  FERRY_DEST
-  ISOLATED
-  ARENA
-  LARGE
-  MEDIUM_LARGE
-  MEDIUM
-  MEDIUM_SMALL
-  SMALL
-  VERY_SMALL
-  ONE_PERSON
-  EFFECTS_NEXT
-  ALWAYS_LIT
-  GUILDHALL
-  NO_WELL
-  NO_SUMMON
-  NO_SCAN
-  UNDERDARK
-  NO_SHIFT
-  NO_RECALL
-  ALT_EXIT
-  OBSERVATORY
-  INN // Rentable room - player checks out on return
-  TEMPLE // Holy place - player rises from meditation on return
-  CAMPSITE // Designated camping area - easier rest
-}
+// RoomFlag enum REMOVED - replaced by:
+// - baseLightLevel field for lighting (numeric, more flexible)
+// - Lua room restrictions for access control (godroom, no_mob, no_magic, etc.)
+// - Sector type for environment (indoors, underwater, underground, etc.)
+// - capacity field for occupancy limits
+// - Mob presence for features (shop, bank, inn, temple)
 
 enum SaveResult {
   NONE
@@ -2261,30 +2237,130 @@ enum GrantPermission {
   ADMIN
 }
 
+// Wear flags - equipment slots where an item can be worn
+// Note: TAKE was removed - use ObjectRestriction.NO_TAKE instead
 enum WearFlag {
-  TAKE // Object can be picked up (legacy - now using !NO_TAKE in ObjectFlag)
+  // Jewelry
   FINGER // Rings
   NECK // Necklaces, amulets
-  BODY // Armor, robes, shirts
-  HEAD // Helmets, hats, crowns
-  LEGS // Pants, greaves
-  FEET // Boots, shoes
-  HANDS // Gloves, gauntlets
-  ARMS // Arm guards, sleeves
-  ABOUT // Cloaks, capes
-  WAIST // Belts, sashes, girdles
+  EAR // Earrings
   WRIST // Bracelets, bracers
+  // Head/Face
+  HEAD // Helmets, hats, crowns
   EYES // Goggles, glasses
   FACE // Masks, veils
-  EAR // Earrings
-  BADGE // Badges, insignia
+  // Body
+  BODY // Armor, robes, shirts
+  ABOUT // Cloaks, capes
+  ARMS // Arm guards, sleeves
+  HANDS // Gloves, gauntlets
+  WAIST // Belts, sashes, girdles
   BELT // Items hanging from belt (requires WAIST)
-  HOVER // Hovering items (ioun stones, familiars)
+  // Lower body
+  LEGS // Pants, greaves
+  FEET // Boots, shoes
   TAIL // Tail decorations (for tailed races)
-  DISGUISE // Disguise/transformation slot
+  // Weapons/Held
   MAINHAND // Primary weapon/tool
   OFFHAND // Shield, offhand weapon, torch, held item
   TWOHAND // Requires both hands (versatile weapons have MAINHAND + TWOHAND)
+  // Special
+  BADGE // Badges, insignia
+  HOVER // Hovering items (ioun stones, familiars)
+  DISGUISE // Disguise/transformation slot
+}
+
+// Player preference and state flags (mirrors C++ PlayerFlag enum)
+enum PlayerFlag {
+  // Display preferences
+  BRIEF // Show shortened room descriptions
+  COMPACT // Reduce blank lines in output
+  NO_REPEAT // Don't echo commands back
+
+  // Auto-actions
+  AUTO_LOOT // Automatically loot corpses after kills
+  AUTO_GOLD // Automatically take gold from corpses
+  AUTO_SPLIT // Automatically split gold with group
+  AUTO_EXIT // Automatically show exits
+  AUTO_ASSIST // Automatically assist group members
+
+  // Combat preferences
+  WIMPY // Flee when HP is low (threshold stored separately)
+  SHOW_DICE_ROLLS // Show detailed dice rolls and damage calculations
+
+  // Social/Status
+  AFK // Away from keyboard
+  DEAF // Ignore shouts and gossip
+  NO_TELL // Refuse tells from non-gods
+  NO_SUMMON // Refuse summon spells
+  QUEST // Currently on a quest
+
+  // PK/Consent
+  PK_ENABLED // Player killing enabled
+  CONSENT // Consent to dangerous actions from other players
+
+  // Accessibility
+  COLOR_BLIND // Use colorblind-friendly colors
+  MSP // MUD Sound Protocol enabled
+  MXP_ENABLED // MUD eXtension Protocol enabled
+
+  // Immortal preferences
+  HOLY_LIGHT // See everything (invisible, dark, hidden, etc.)
+  SHOW_IDS // Show entity IDs on mobs/objects/rooms
+}
+
+// Permission flags for commands and staff abilities
+// Granted by levels and can be individually assigned to characters
+enum Permission {
+  // Role-based permissions
+  BUILD // Can use OLC/builder commands
+  CODE // Can use coding/debugging commands
+  ADMIN // Can use administrative commands
+  GOD // Full god-level access
+
+  // System commands
+  SHUTDOWN // Can shut down the MUD
+  WIZLOCK // Can lock out mortals
+  SYSLOG // Can view system logs
+  LOG // Can toggle logging on players
+
+  // Player management
+  FORCE // Can force players to execute commands
+  SNOOP // Can monitor player sessions
+  FREEZE // Can freeze players
+  THAW // Can unfreeze players
+  BAN // Can ban players/IPs
+  UNBAN // Can remove bans
+  DC // Can disconnect players
+  ADVANCE // Can change player levels
+  RESTORE // Can fully restore players
+  NOTITLE // Can remove player titles
+  SQUELCH // Can squelch players from channels
+
+  // World manipulation
+  TELEPORT // Can teleport self/others
+  TRANSFER // Can transfer players between rooms
+  SUMMON // Can summon players
+  INVISIBLE // Can go invisible at will
+  NOHASSLE // Immune to mob aggro
+  ZONE_RESET // Can manually reset zones
+
+  // Communication
+  WIZNET // Can use immortal communication channel
+  OLC // Can use online creation system
+}
+
+// Per-instance flags for items in player inventory
+// These track state specific to one instance of an item
+enum ItemInstanceFlag {
+  IDENTIFIED // The item has been identified (reveals stats)
+  CURSED_KNOWN // The player knows the item is cursed
+  ATTUNED // Item is attuned to this character (for attunement items)
+  CUSTOM_NAMED // Has a player-given custom name
+  CUSTOM_DESCRIBED // Has a player-given custom description
+  STOLEN // Item was stolen (some NPCs may refuse to buy)
+  QUEST_FLAGGED // Marked as relevant to a quest
+  HEIRLOOM // Protected from accidental sale/discard
 }
 
 // ============================================================================
@@ -2419,8 +2495,8 @@ model LevelDefinition {
   expRequired Int      @default(0) @map("exp_required") // XP to reach this level
   hpGain      Int      @default(10) @map("hp_gain") // HP gained at this level
   staminaGain Int      @default(5) @map("stamina_gain") // Stamina gained at this level
-  isImmortal  Boolean  @default(false) @map("is_immortal")
-  permissions String[] @default([]) // Permission flags granted at this level (see Command.permissions)
+  isImmortal  Boolean      @default(false) @map("is_immortal")
+  permissions Permission[] @default([]) // Permission flags granted at this level
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -2437,7 +2513,7 @@ model Command {
   description  String? // Brief help text
   usage        String? // Syntax: "shutdown [delay]"
   immortalOnly Boolean         @default(false) @map("immortal_only") // Requires isImmortal level
-  permissions  String[]        @default([]) // Required permission flags: ["shutdown"]
+  permissions  Permission[]    @default([]) // Required permission flags
 
   // Optional link to ability for skill/spell/chant/song commands
   // If set, executing this command triggers the linked ability's effects
@@ -2763,6 +2839,33 @@ enum DialogueMatchType {
   ANY_RESPONSE // Any text response continues (simple acknowledgments)
   ANY_OF // Match any from list: ["yes", "yep", "sure", "ok", "accept"]
   REGEX // Pattern match for complex cases
+}
+
+// Position metadata - defines what each position does and requires
+// Positions map to mechanics (C++ hardcoded rules) but metadata is data-driven
+model PositionData {
+  position        Position         @id
+  mechanic        PositionMechanic
+  displayName     String           @map("display_name") // "standing", "flying"
+
+  // Lua expression for requirements to enter this position
+  // Examples: "has_effect('FLYING')", "has_skill('SWIM')", "has_effect('FLYING') or has_skill('SWIM')"
+  // Available: has_effect(name), has_skill(name), skill_level(name), actor.race, actor.level
+  entryRequirement String?         @map("entry_requirement")
+
+  // Effects this position applies to actors (e.g., UNDERWATER applies DROWNING)
+  appliedEffects  Effect[]         @relation("PositionAppliesEffect")
+
+  // Room presence message template
+  defaultPresence String           @map("default_presence") // "{actor} is {position} here."
+
+  // Priority for auto-position selection when multiple are possible
+  priority        Int              @default(0)
+
+  createdAt       DateTime         @default(now()) @map("created_at")
+  updatedAt       DateTime         @updatedAt @map("updated_at")
+
+  @@map("PositionData")
 }
 
 // Position-based messages (sit, stand, rest, sleep transitions)

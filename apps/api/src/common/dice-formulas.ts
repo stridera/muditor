@@ -24,7 +24,7 @@ export const RACE_DICE_FACTORS: Record<string, number> = {
   ORC: 100,
   HALF_ELF: 90,
   HALF_ORC: 100,
-  BARBARIAN: 110,
+  GOLIATH: 110,
   DUERGAR: 100,
   SVERFNEBLIN: 90,
   NYMPH: 70,
