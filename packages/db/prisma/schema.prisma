@@ -1345,6 +1345,9 @@ model Triggers {
   mobTriggers    MobTriggers[]
   objectTriggers ObjectTriggers[]
 
+  // Error logging for debugging
+  errorLogs ScriptErrorLog[]
+
   @@id([zoneId, id])
 }
 
@@ -1378,6 +1381,25 @@ model ObjectTriggers {
 
   @@id([objectZoneId, objectId, triggerZoneId, triggerId])
   @@index([triggerZoneId, triggerId])
+}
+
+/// Script error log for tracking trigger execution failures over time
+/// Used by the scripterrors command to review and debug failed scripts
+model ScriptErrorLog {
+  id             Int      @id @default(autoincrement())
+  triggerZoneId  Int      @map("trigger_zone_id")
+  triggerId      Int      @map("trigger_id")
+  errorType      String   @map("error_type") // "compilation", "runtime", "timeout"
+  errorMessage   String   @map("error_message") @db.Text
+  scriptLine     Int?     @map("script_line")
+  contextInfo    Json?    @map("context_info") // Entity info, variables, etc.
+  occurredAt     DateTime @default(now()) @map("occurred_at")
+
+  trigger Triggers @relation(fields: [triggerZoneId, triggerId], references: [zoneId, id], onDelete: Cascade)
+
+  @@index([triggerZoneId, triggerId])
+  @@index([occurredAt])
+  @@map("script_error_log")
 }
 
 model Users {
