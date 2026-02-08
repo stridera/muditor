@@ -19,7 +19,6 @@ describe('RoomsService', () => {
     roomDescription: 'This is a test room for unit testing',
     zoneId: 511,
     sector: Sector.CITY,
-    flags: [],
     layoutX: 0,
     layoutY: 0,
     layoutZ: 0,

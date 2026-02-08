@@ -8,13 +8,13 @@ import {
 import {
   Composition,
   DamageType,
-  EffectFlag,
   Gender,
   LifeForce,
   MobBehavior,
-  MobFlag,
+  MobProfession,
   MobRole,
   MobTrait,
+  MovementMode,
   Position,
   Race,
   Size,
@@ -30,8 +30,6 @@ import {
 } from 'class-validator';
 
 // Register GraphQL enums
-registerEnumType(MobFlag, { name: 'MobFlag' });
-registerEnumType(EffectFlag, { name: 'EffectFlag' });
 registerEnumType(Gender, { name: 'Gender' });
 registerEnumType(Race, { name: 'Race' });
 registerEnumType(DamageType, { name: 'DamageType' });
@@ -43,6 +41,8 @@ registerEnumType(Size, { name: 'Size' });
 registerEnumType(MobRole, { name: 'MobRole' });
 registerEnumType(MobTrait, { name: 'MobTrait' });
 registerEnumType(MobBehavior, { name: 'MobBehavior' });
+registerEnumType(MobProfession, { name: 'MobProfession' });
+registerEnumType(MovementMode, { name: 'MovementMode' });
 
 // This DTO matches the actual Prisma Mob model
 @ObjectType()
@@ -188,32 +188,52 @@ export class MobDto {
   @Field(() => Composition)
   composition: Composition;
 
-  @Field(() => [MobFlag])
-  mobFlags: MobFlag[];
-
-  @Field(() => [EffectFlag])
-  effectFlags: EffectFlag[];
-
   @Field(() => [MobTrait])
   traits: MobTrait[];
 
   @Field(() => [MobBehavior])
   behaviors: MobBehavior[];
 
-  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  @Field(() => [MobProfession])
+  professions: MobProfession[];
+
+  @Field({
+    nullable: true,
+    description: 'Lua formula for aggression targeting',
+  })
   aggressionFormula?: string;
 
-  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  @Field({
+    nullable: true,
+    description: 'Lua formula for activity restrictions',
+  })
   activityRestrictions?: string;
 
-  @Field(() => GraphQLJSON, { description: 'JSON resistances map: {"FIRE": 0, "charm": 50}' })
+  @Field(() => GraphQLJSON, {
+    description: 'JSON resistances map: {"FIRE": 0, "charm": 50}',
+  })
   resistances: Record<string, number>;
 
   @Field(() => Position)
   position: Position;
 
+  @Field(() => Position)
+  defaultPosition: Position;
+
+  @Field(() => MovementMode)
+  movementMode: MovementMode;
+
+  @Field(() => MovementMode)
+  defaultMovementMode: MovementMode;
+
   @Field(() => Stance)
   stance: Stance;
+
+  @Field({
+    nullable: true,
+    description: 'Custom presence message when ridden as mount',
+  })
+  riderPresenceMessage?: string;
 
   @Field(() => Int, { nullable: true })
   classId?: number;
@@ -449,18 +469,6 @@ export class CreateMobInput {
   @IsEnum(Composition)
   composition?: Composition;
 
-  @Field(() => [MobFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(MobFlag, { each: true })
-  mobFlags?: MobFlag[];
-
-  @Field(() => [EffectFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
   @Field(() => [MobTrait], { defaultValue: [] })
   @IsOptional()
   @IsArray()
@@ -473,19 +481,30 @@ export class CreateMobInput {
   @IsEnum(MobBehavior, { each: true })
   behaviors?: MobBehavior[];
 
-  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  @Field(() => [MobProfession], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobProfession, { each: true })
+  professions?: MobProfession[];
+
+  @Field({
+    nullable: true,
+    description: 'Lua formula for aggression targeting',
+  })
   @IsOptional()
   @IsString()
   aggressionFormula?: string;
 
-  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  @Field({
+    nullable: true,
+    description: 'Lua formula for activity restrictions',
+  })
   @IsOptional()
   @IsString()
   activityRestrictions?: string;
 
   @Field(() => GraphQLJSON, {
     nullable: true,
-    defaultValue: {},
     description: 'JSON resistances map: {"FIRE": 0, "charm": 50}',
   })
   @IsOptional()
@@ -496,10 +515,33 @@ export class CreateMobInput {
   @IsEnum(Position)
   position?: Position;
 
+  @Field(() => Position, { defaultValue: Position.STANDING })
+  @IsOptional()
+  @IsEnum(Position)
+  defaultPosition?: Position;
+
+  @Field(() => MovementMode, { defaultValue: MovementMode.NORMAL })
+  @IsOptional()
+  @IsEnum(MovementMode)
+  movementMode?: MovementMode;
+
+  @Field(() => MovementMode, { defaultValue: MovementMode.NORMAL })
+  @IsOptional()
+  @IsEnum(MovementMode)
+  defaultMovementMode?: MovementMode;
+
   @Field(() => Stance, { defaultValue: Stance.ALERT })
   @IsOptional()
   @IsEnum(Stance)
   stance?: Stance;
+
+  @Field({
+    nullable: true,
+    description: 'Custom presence message when ridden as mount',
+  })
+  @IsOptional()
+  @IsString()
+  riderPresenceMessage?: string;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -746,18 +788,6 @@ export class UpdateMobInput {
   @IsEnum(Composition)
   composition?: Composition;
 
-  @Field(() => [MobFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(MobFlag, { each: true })
-  mobFlags?: MobFlag[];
-
-  @Field(() => [EffectFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
   @Field(() => [MobTrait], { nullable: true })
   @IsOptional()
   @IsArray()
@@ -770,17 +800,32 @@ export class UpdateMobInput {
   @IsEnum(MobBehavior, { each: true })
   behaviors?: MobBehavior[];
 
-  @Field({ nullable: true, description: 'Lua formula for aggression targeting' })
+  @Field(() => [MobProfession], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(MobProfession, { each: true })
+  professions?: MobProfession[];
+
+  @Field({
+    nullable: true,
+    description: 'Lua formula for aggression targeting',
+  })
   @IsOptional()
   @IsString()
   aggressionFormula?: string;
 
-  @Field({ nullable: true, description: 'Lua formula for activity restrictions' })
+  @Field({
+    nullable: true,
+    description: 'Lua formula for activity restrictions',
+  })
   @IsOptional()
   @IsString()
   activityRestrictions?: string;
 
-  @Field(() => GraphQLJSON, { nullable: true, description: 'JSON resistances map' })
+  @Field(() => GraphQLJSON, {
+    nullable: true,
+    description: 'JSON resistances map',
+  })
   @IsOptional()
   resistances?: Record<string, number>;
 
@@ -789,10 +834,33 @@ export class UpdateMobInput {
   @IsEnum(Position)
   position?: Position;
 
+  @Field(() => Position, { nullable: true })
+  @IsOptional()
+  @IsEnum(Position)
+  defaultPosition?: Position;
+
+  @Field(() => MovementMode, { nullable: true })
+  @IsOptional()
+  @IsEnum(MovementMode)
+  movementMode?: MovementMode;
+
+  @Field(() => MovementMode, { nullable: true })
+  @IsOptional()
+  @IsEnum(MovementMode)
+  defaultMovementMode?: MovementMode;
+
   @Field(() => Stance, { nullable: true })
   @IsOptional()
   @IsEnum(Stance)
   stance?: Stance;
+
+  @Field({
+    nullable: true,
+    description: 'Custom presence message when ridden as mount',
+  })
+  @IsOptional()
+  @IsString()
+  riderPresenceMessage?: string;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

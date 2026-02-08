@@ -22,7 +22,7 @@ interface RoomExitResult {
   flags: string[];
 }
 
-import { RoomFlag, Sector } from '@prisma/client';
+import { Sector } from '@prisma/client';
 
 interface RoomServiceResultBase {
   id: number;
@@ -31,7 +31,6 @@ interface RoomServiceResultBase {
   description: string; // canonical
   roomDescription: string; // deprecated alias value (same as description)
   sector: Sector; // Prisma enum Sector
-  flags: RoomFlag[];
   exits: RoomExitResult[]; // full exits (lightweight will be empty array)
   extraDescs: Array<{ id: number; keywords: string[]; description: string }>;
   createdAt: Date;
@@ -73,7 +72,6 @@ export class RoomsService {
     name: string;
     roomDescription: string;
     sector: Sector;
-    flags: RoomFlag[];
     exits?: RoomExitResult[];
     roomExtraDescriptions?: Array<{
       id: number;
@@ -97,7 +95,6 @@ export class RoomsService {
       description: room.roomDescription, // DB column still roomDescription
       roomDescription: room.roomDescription, // alias
       sector: room.sector,
-      flags: room.flags as RoomFlag[],
       exits: room.exits ?? [],
       extraDescs: room.roomExtraDescriptions ?? [],
       mobResets: room.mobResets ?? [],
@@ -132,7 +129,6 @@ export class RoomsService {
           name: string;
           roomDescription: string;
           sector: Sector;
-          flags: string[];
           createdAt: Date;
           updatedAt: Date;
           layoutX: number | null;
@@ -145,7 +141,6 @@ export class RoomsService {
                r.name,
                r.room_description as "roomDescription",
                r.sector,
-               r.flags,
                r.created_at as "createdAt",
                r.updated_at as "updatedAt",
                r.layout_x as "layoutX",
@@ -209,7 +204,6 @@ export class RoomsService {
           ...r,
           exits: roomExits,
           roomExtraDescriptions: [],
-          flags: (r.flags as unknown as RoomFlag[]) || [],
         });
       });
     }
@@ -266,7 +260,6 @@ export class RoomsService {
         name: data.name,
         roomDescription: data.description ?? data.roomDescription ?? '',
         sector: data.sector || 'STRUCTURE',
-        flags: data.flags || [],
       },
       include: this.includeFull,
     });
@@ -285,7 +278,6 @@ export class RoomsService {
     else if (data.roomDescription !== undefined)
       update.roomDescription = data.roomDescription; // legacy alias
     if (data.sector !== undefined) update.sector = data.sector;
-    if (data.flags !== undefined) update.flags = data.flags;
     const room = await this.db.room.update({
       where: { zoneId_id: { zoneId, id } },
       data: update,

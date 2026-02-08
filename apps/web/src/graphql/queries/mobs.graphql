@@ -44,9 +44,16 @@ query GetMob($id: Int!, $zoneId: Int!) {
     size
     lifeForce
     composition
-    mobFlags
-    effectFlags
+    traits
+    behaviors
+    professions
+    aggressionFormula
+    activityRestrictions
+    riderPresenceMessage
     position
+    defaultPosition
+    movementMode
+    defaultMovementMode
     stance
     createdAt
     updatedAt
@@ -76,8 +83,9 @@ query GetMobs($skip: Int, $take: Int) {
     lifeForce
     hpDice
     damageDice
-    mobFlags
-    effectFlags
+    traits
+    behaviors
+    professions
   }
 }
 
@@ -104,8 +112,9 @@ query GetMobsByZone($zoneId: Int!) {
     wealth
     hpDice
     damageDice
-    mobFlags
-    effectFlags
+    traits
+    behaviors
+    professions
     lifeForce
   }
 }

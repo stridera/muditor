@@ -14,9 +14,12 @@ import {
   IsArray,
 } from 'class-validator';
 import {
-  ObjectType as ObjectTypeEnum,
+  Alignment,
   ObjectFlag,
-  EffectFlag,
+  ObjectRestriction,
+  ObjectType as ObjectTypeEnum,
+  Race,
+  Size,
   WearFlag,
 } from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
@@ -24,8 +27,9 @@ import GraphQLJSON from 'graphql-type-json';
 // Register GraphQL enums
 registerEnumType(ObjectTypeEnum, { name: 'ObjectType' });
 registerEnumType(ObjectFlag, { name: 'ObjectFlag' });
-registerEnumType(EffectFlag, { name: 'EffectFlag' });
 registerEnumType(WearFlag, { name: 'WearFlag' });
+registerEnumType(ObjectRestriction, { name: 'ObjectRestriction' });
+registerEnumType(Alignment, { name: 'Alignment' });
 
 @ObjectType()
 export class ObjectDto {
@@ -65,11 +69,35 @@ export class ObjectDto {
   @Field(() => [ObjectFlag])
   flags: ObjectFlag[];
 
-  @Field(() => [EffectFlag])
-  effectFlags: EffectFlag[];
-
   @Field(() => [WearFlag])
   wearFlags: WearFlag[];
+
+  @Field(() => [ObjectRestriction])
+  restrictions: ObjectRestriction[];
+
+  @Field(() => [Int])
+  restrictedClassIds: number[];
+
+  @Field(() => [Alignment])
+  restrictedAlignments: Alignment[];
+
+  @Field(() => [Race])
+  restrictedRaces: Race[];
+
+  @Field(() => [Race])
+  allowedRaces: Race[];
+
+  @Field(() => Size, { nullable: true })
+  minSize?: Size;
+
+  @Field(() => Size, { nullable: true })
+  maxSize?: Size;
+
+  @Field(() => Int, { nullable: true })
+  passengerCapacity?: number;
+
+  @Field({ nullable: true })
+  presenceOverride?: string;
 
   @Field(() => Float)
   weight: number;
@@ -144,17 +172,60 @@ export class CreateObjectInput {
   @IsEnum(ObjectFlag, { each: true })
   flags?: ObjectFlag[];
 
-  @Field(() => [EffectFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
   @Field(() => [WearFlag], { defaultValue: [] })
   @IsOptional()
   @IsArray()
   @IsEnum(WearFlag, { each: true })
   wearFlags?: WearFlag[];
+
+  @Field(() => [ObjectRestriction], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(ObjectRestriction, { each: true })
+  restrictions?: ObjectRestriction[];
+
+  @Field(() => [Int], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  restrictedClassIds?: number[];
+
+  @Field(() => [Alignment], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Alignment, { each: true })
+  restrictedAlignments?: Alignment[];
+
+  @Field(() => [Race], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Race, { each: true })
+  restrictedRaces?: Race[];
+
+  @Field(() => [Race], { defaultValue: [] })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Race, { each: true })
+  allowedRaces?: Race[];
+
+  @Field(() => Size, { nullable: true })
+  @IsOptional()
+  @IsEnum(Size)
+  minSize?: Size;
+
+  @Field(() => Size, { nullable: true })
+  @IsOptional()
+  @IsEnum(Size)
+  maxSize?: Size;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  passengerCapacity?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  presenceOverride?: string;
 
   @Field(() => Float, { defaultValue: 0.0 })
   @IsOptional()
@@ -229,17 +300,60 @@ export class UpdateObjectInput {
   @IsEnum(ObjectFlag, { each: true })
   flags?: ObjectFlag[];
 
-  @Field(() => [EffectFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  effectFlags?: EffectFlag[];
-
   @Field(() => [WearFlag], { nullable: true })
   @IsOptional()
   @IsArray()
   @IsEnum(WearFlag, { each: true })
   wearFlags?: WearFlag[];
+
+  @Field(() => [ObjectRestriction], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(ObjectRestriction, { each: true })
+  restrictions?: ObjectRestriction[];
+
+  @Field(() => [Int], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  restrictedClassIds?: number[];
+
+  @Field(() => [Alignment], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Alignment, { each: true })
+  restrictedAlignments?: Alignment[];
+
+  @Field(() => [Race], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Race, { each: true })
+  restrictedRaces?: Race[];
+
+  @Field(() => [Race], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(Race, { each: true })
+  allowedRaces?: Race[];
+
+  @Field(() => Size, { nullable: true })
+  @IsOptional()
+  @IsEnum(Size)
+  minSize?: Size;
+
+  @Field(() => Size, { nullable: true })
+  @IsOptional()
+  @IsEnum(Size)
+  maxSize?: Size;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  passengerCapacity?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  presenceOverride?: string;
 
   @Field(() => Float, { nullable: true })
   @IsOptional()

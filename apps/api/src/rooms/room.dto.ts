@@ -5,7 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Direction, ExitFlag, RoomFlag, Sector } from '@prisma/client';
+import { Direction, ExitFlag, Sector } from '@prisma/client';
 import {
   IsArray,
   IsEnum,
@@ -23,7 +23,6 @@ import { ShopDto } from '../shops/shop.dto';
 // Register GraphQL enums
 registerEnumType(Sector, { name: 'Sector' });
 registerEnumType(Direction, { name: 'Direction' });
-registerEnumType(RoomFlag, { name: 'RoomFlag' });
 registerEnumType(ExitFlag, { name: 'ExitFlag' });
 
 @ObjectType()
@@ -94,9 +93,6 @@ export class RoomDto {
   @Field(() => Sector)
   sector: Sector;
 
-  @Field(() => [RoomFlag])
-  flags: RoomFlag[];
-
   @Field(() => Int)
   zoneId: number;
 
@@ -164,12 +160,6 @@ export class CreateRoomInput {
   @IsEnum(Sector)
   sector?: Sector;
 
-  @Field(() => [RoomFlag], { defaultValue: [] })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(RoomFlag, { each: true })
-  flags?: RoomFlag[];
-
   @Field(() => Int)
   @IsNumber()
   zoneId: number;
@@ -196,12 +186,6 @@ export class UpdateRoomInput {
   @IsOptional()
   @IsEnum(Sector)
   sector?: Sector;
-
-  @Field(() => [RoomFlag], { nullable: true })
-  @IsOptional()
-  @IsArray()
-  @IsEnum(RoomFlag, { each: true })
-  flags?: RoomFlag[];
 
   // 3D Grid coordinates for zone editor (integer-based for MUD grid system)
   @Field(() => Int, { nullable: true })

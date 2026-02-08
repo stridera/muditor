@@ -62,8 +62,9 @@ interface Mob {
   charisma?: number;
   wealth?: number;
   mobClass?: string;
-  mobFlags?: string[];
-  effectFlags?: string[];
+  traits?: string[];
+  behaviors?: string[];
+  professions?: string[];
   zoneId: number;
 }
 
@@ -308,8 +309,9 @@ function MobsContent() {
             constitution
             charisma
             raceAlign
-            mobFlags
-            effectFlags
+            traits
+            behaviors
+            professions
             zoneId
           }
         }
@@ -364,8 +366,9 @@ function MobsContent() {
         constitution: originalMob.constitution,
         charisma: originalMob.charisma,
         raceAlign: originalMob.raceAlign,
-        mobFlags: originalMob.mobFlags,
-        effectFlags: originalMob.effectFlags,
+        traits: originalMob.traits,
+        behaviors: originalMob.behaviors,
+        professions: originalMob.professions,
         zoneId: originalMob.zoneId,
       };
 
@@ -491,8 +494,9 @@ function MobsContent() {
                 silver
                 gold
                 platinum
-                mobFlags
-                effectFlags
+                traits
+                behaviors
+                professions
                 zoneId
                 createdAt
                 updatedAt
@@ -880,24 +884,25 @@ function MobsContent() {
                             </div>
                           </div>
 
-                          {/* Flags */}
-                          {(mob.mobFlags?.length ||
-                            mob.effectFlags?.length) && (
+                          {/* Traits / Behaviors / Professions */}
+                          {(mob.traits?.length ||
+                            mob.behaviors?.length ||
+                            mob.professions?.length) && (
                             <div className='md:col-span-2'>
                               <h4 className='font-semibold text-sm text-muted-foreground mb-2'>
-                                Flags
+                                Classification
                               </h4>
                               <div className='space-y-2'>
-                                {mob.mobFlags && mob.mobFlags.length > 0 && (
+                                {mob.traits && mob.traits.length > 0 && (
                                   <div>
                                     <span className='text-xs text-muted-foreground block'>
-                                      Mob Flags:
+                                      Traits:
                                     </span>
                                     <div className='flex flex-wrap gap-1'>
-                                      {mob.mobFlags.map(
+                                      {mob.traits.map(
                                         (flag: string, index: number) => (
                                           <span
-                                            key={`${mob.zoneId}-${mob.id}-mf-${index}`}
+                                            key={`${mob.zoneId}-${mob.id}-tr-${index}`}
                                             className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                           >
                                             {flag}
@@ -907,17 +912,36 @@ function MobsContent() {
                                     </div>
                                   </div>
                                 )}
-                                {mob.effectFlags &&
-                                  mob.effectFlags.length > 0 && (
+                                {mob.behaviors && mob.behaviors.length > 0 && (
+                                  <div>
+                                    <span className='text-xs text-muted-foreground block'>
+                                      Behaviors:
+                                    </span>
+                                    <div className='flex flex-wrap gap-1'>
+                                      {mob.behaviors.map(
+                                        (flag: string, index: number) => (
+                                          <span
+                                            key={`${mob.zoneId}-${mob.id}-bh-${index}`}
+                                            className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
+                                          >
+                                            {flag}
+                                          </span>
+                                        )
+                                      )}
+                                    </div>
+                                  </div>
+                                )}
+                                {mob.professions &&
+                                  mob.professions.length > 0 && (
                                     <div>
                                       <span className='text-xs text-muted-foreground block'>
-                                        Effect Flags:
+                                        Professions:
                                       </span>
                                       <div className='flex flex-wrap gap-1'>
-                                        {mob.effectFlags.map(
+                                        {mob.professions.map(
                                           (flag: string, index: number) => (
                                             <span
-                                              key={`${mob.zoneId}-${mob.id}-ef-${index}`}
+                                              key={`${mob.zoneId}-${mob.id}-pr-${index}`}
                                               className='inline-block bg-muted text-muted-foreground text-xs px-2 py-1 rounded'
                                             >
                                               {flag}

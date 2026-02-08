@@ -222,11 +222,11 @@ function ObjectViewContent() {
           </section>
         )}
 
-        {obj.effectFlags && obj.effectFlags.length > 0 && (
+        {obj.restrictions && obj.restrictions.length > 0 && (
           <section>
-            <h2 className='text-xl font-semibold mb-2'>Effect Flags</h2>
+            <h2 className='text-xl font-semibold mb-2'>Restrictions</h2>
             <div className='flex flex-wrap gap-2'>
-              {obj.effectFlags.map((flag, i) => (
+              {obj.restrictions.map((flag, i) => (
                 <span
                   key={i}
                   className='px-2 py-1 bg-primary/10 text-primary rounded text-sm border border-primary/20'

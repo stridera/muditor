@@ -206,7 +206,7 @@ export class CharactersService {
 
     return this.db.characters.update({
       where: { id },
-      data: data,
+      data: data as any,
       include: {
         characterItems: {
           include: {
@@ -310,7 +310,7 @@ export class CharactersService {
       equippedLocation: data.equippedLocation ?? null,
       condition: data.condition,
       charges: data.charges,
-      instanceFlags: data.instanceFlags,
+      instanceFlags: data.instanceFlags as any,
       customName: data.customShortDesc ?? null,
       customExamineDescription: data.customLongDesc ?? null,
       customValues: {},
@@ -352,7 +352,7 @@ export class CharactersService {
 
     return this.db.characterItems.update({
       where: { id },
-      data,
+      data: data as any,
       include: {
         characters: true,
         objects: {
@@ -409,18 +409,15 @@ export class CharactersService {
     await this.findCharacterById(data.characterId);
 
     // Duration is stored and expiration is calculated on-the-fly
-    const effectCreateData: Parameters<
-      typeof this.db.characterEffects.create
-    >[0]['data'] = {
+    const effectCreateData = {
       characterId: data.characterId,
-      effectName: data.effectName,
-      effectType: data.effectType ?? null,
+      effectId: parseInt(data.effectName, 10),
       duration: data.duration ?? null,
       strength: data.strength,
       sourceType: data.sourceType ?? null,
       sourceId: data.sourceId ?? null,
       appliedAt: new Date(),
-    };
+    } as Parameters<typeof this.db.characterEffects.create>[0]['data'];
     return this.db.characterEffects.create({
       data: effectCreateData,
       include: {
@@ -642,10 +639,12 @@ export class CharactersService {
 
     if (isLegacyHash) {
       // Legacy Unix crypt() hash - validate and upgrade to bcrypt
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const crypt = require('unix-crypt-td-js');
       const hashedPassword = crypt(characterPassword, character.passwordHash);
       // Compare only first 10 characters (legacy system truncated to 10 chars)
-      isPasswordValid = hashedPassword.substring(0, 10) === character.passwordHash;
+      isPasswordValid =
+        hashedPassword.substring(0, 10) === character.passwordHash;
 
       if (isPasswordValid) {
         // Upgrade to bcrypt for future logins
@@ -776,10 +775,12 @@ export class CharactersService {
 
     if (isLegacyHash) {
       // Legacy Unix crypt() hash
+      // eslint-disable-next-line @typescript-eslint/no-require-imports
       const crypt = require('unix-crypt-td-js');
       const hashedPassword = crypt(password, character.passwordHash);
       // Compare only first 10 characters (legacy system truncated to 10 chars)
-      isPasswordValid = hashedPassword.substring(0, 10) === character.passwordHash;
+      isPasswordValid =
+        hashedPassword.substring(0, 10) === character.passwordHash;
 
       if (isPasswordValid) {
         // Upgrade to bcrypt for future logins

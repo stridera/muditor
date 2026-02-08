@@ -20,8 +20,18 @@ function base(): ObjectMapperSource {
     actionDescription: null,
     plainActionDescription: null,
     flags: [],
-    effectFlags: [],
     wearFlags: [],
+    restrictions: [],
+    restrictedClassIds: [],
+    restrictedAlignments: [],
+    restrictedRaces: [],
+    allowedRaces: [],
+    minSize: null,
+    maxSize: null,
+    passengerCapacity: null,
+    presenceOverride: null,
+    fixtureRoomZoneId: null,
+    fixtureRoomId: null,
     weight: 1,
     cost: 2,
     timer: 0,
@@ -35,13 +45,6 @@ function base(): ObjectMapperSource {
     deletedAt: null,
     createdBy: null,
     updatedBy: null,
-    // New restriction fields
-    restrictedClassIds: [],
-    restrictedAlignments: [],
-    minSize: null,
-    maxSize: null,
-    allowedRaces: [],
-    passengerCapacity: null,
   };
 }
 

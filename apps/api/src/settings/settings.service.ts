@@ -194,7 +194,7 @@ export class SettingsService {
 
     return this.db.levelDefinition.update({
       where: { level },
-      data,
+      data: data as any,
     });
   }
 

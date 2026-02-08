@@ -430,12 +430,12 @@ function MobViewContent() {
           </dl>
         </section>
 
-        {/* Flags */}
-        {mob.mobFlags && mob.mobFlags.length > 0 && (
+        {/* Traits */}
+        {mob.traits && mob.traits.length > 0 && (
           <section>
-            <h2 className='text-xl font-semibold mb-2'>Mob Flags</h2>
+            <h2 className='text-xl font-semibold mb-2'>Traits</h2>
             <div className='flex flex-wrap gap-2'>
-              {mob.mobFlags.map((flag, i) => (
+              {mob.traits.map((flag, i) => (
                 <span
                   key={i}
                   className='px-2 py-1 bg-purple-100 dark:bg-purple-900/30 text-purple-800 dark:text-purple-300 rounded text-sm'
@@ -447,14 +447,32 @@ function MobViewContent() {
           </section>
         )}
 
-        {mob.effectFlags && mob.effectFlags.length > 0 && (
+        {/* Behaviors */}
+        {mob.behaviors && mob.behaviors.length > 0 && (
           <section>
-            <h2 className='text-xl font-semibold mb-2'>Effect Flags</h2>
+            <h2 className='text-xl font-semibold mb-2'>Behaviors</h2>
             <div className='flex flex-wrap gap-2'>
-              {mob.effectFlags.map((flag, i) => (
+              {mob.behaviors.map((flag, i) => (
                 <span
                   key={i}
                   className='px-2 py-1 bg-green-100 dark:bg-green-900/30 text-green-800 dark:text-green-300 rounded text-sm'
+                >
+                  {flag}
+                </span>
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Professions */}
+        {mob.professions && mob.professions.length > 0 && (
+          <section>
+            <h2 className='text-xl font-semibold mb-2'>Professions</h2>
+            <div className='flex flex-wrap gap-2'>
+              {mob.professions.map((flag, i) => (
+                <span
+                  key={i}
+                  className='px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300 rounded text-sm'
                 >
                   {flag}
                 </span>

@@ -8,7 +8,6 @@ import {
   IsOptional,
   Min,
   Max,
-  IsArray,
 } from 'class-validator';
 import {
   Race,
@@ -16,7 +15,6 @@ import {
   Size,
   LifeForce,
   Composition,
-  EffectFlag,
   SkillCategory,
 } from '@prisma/client';
 
@@ -142,10 +140,7 @@ export class CreateRaceInput {
   @Min(1)
   hpFactor: number;
 
-  @Field(() => [EffectFlag], { defaultValue: [] })
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  permanentEffects: EffectFlag[];
+  // permanentEffects now managed via RaceEffects junction table (Phase 3)
 }
 
 @InputType()
@@ -285,11 +280,7 @@ export class UpdateRaceInput {
   @IsOptional()
   hpFactor?: number;
 
-  @Field(() => [EffectFlag], { nullable: true })
-  @IsArray()
-  @IsEnum(EffectFlag, { each: true })
-  @IsOptional()
-  permanentEffects?: EffectFlag[];
+  // permanentEffects now managed via RaceEffects junction table (Phase 3)
 }
 
 @InputType()

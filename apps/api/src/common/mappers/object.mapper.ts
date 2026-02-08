@@ -17,8 +17,24 @@ export function mapObject(db: ObjectMapperSource): ObjectDto {
       plainActionDescription: db.plainActionDescription,
     }),
     flags: db.flags,
-    effectFlags: db.effectFlags,
     wearFlags: db.wearFlags,
+    restrictions: db.restrictions ?? [],
+    restrictedClassIds: db.restrictedClassIds ?? [],
+    restrictedAlignments: db.restrictedAlignments ?? [],
+    restrictedRaces: db.restrictedRaces ?? [],
+    allowedRaces: db.allowedRaces ?? [],
+    ...(db.minSize !== null &&
+      db.minSize !== undefined && { minSize: db.minSize }),
+    ...(db.maxSize !== null &&
+      db.maxSize !== undefined && { maxSize: db.maxSize }),
+    ...(db.passengerCapacity !== null &&
+      db.passengerCapacity !== undefined && {
+        passengerCapacity: db.passengerCapacity,
+      }),
+    ...(db.presenceOverride !== null &&
+      db.presenceOverride !== undefined && {
+        presenceOverride: db.presenceOverride,
+      }),
     weight: db.weight,
     cost: db.cost,
     timer: db.timer,

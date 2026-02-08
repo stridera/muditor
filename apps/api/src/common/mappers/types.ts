@@ -7,7 +7,6 @@ import {
   Objects,
   RoomExit as PrismaRoomExit,
   RoomExtraDescriptions,
-  RoomFlag,
   Sector,
 } from '@prisma/client';
 
@@ -17,7 +16,6 @@ export interface RoomMapperSource {
   name: string;
   roomDescription: string;
   sector: Sector;
-  flags: RoomFlag[];
   zoneId: number;
   createdAt: Date;
   updatedAt: Date;
@@ -50,7 +48,6 @@ export function isRoomMapperSource(value: unknown): value is RoomMapperSource {
     'name' in value &&
     'roomDescription' in value &&
     'sector' in value &&
-    'flags' in value &&
     'zoneId' in value
   );
 }

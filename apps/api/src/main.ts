@@ -95,11 +95,14 @@ async function bootstrap() {
       const requiredEnums = [
         'ObjectType',
         'ObjectFlag',
-        'EffectFlag',
+        'ObjectRestriction',
         'WearFlag',
         'Race',
-        'MobFlag',
-        'RoomFlag',
+        'MobTrait',
+        'MobBehavior',
+        'MobProfession',
+        'MovementMode',
+        'Alignment',
       ];
       const missingEnums = requiredEnums.filter(name => !schema.getType(name));
       if (missingEnums.length) {

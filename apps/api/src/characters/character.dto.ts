@@ -153,9 +153,6 @@ export class CharacterDto {
   playerFlags: string[];
 
   @Field(() => [String])
-  effectFlags: string[];
-
-  @Field(() => [String])
   privilegeFlags: string[];
 
   // Builder/God specific

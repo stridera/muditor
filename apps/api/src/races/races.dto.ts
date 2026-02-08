@@ -5,7 +5,6 @@ import {
   Size,
   LifeForce,
   Composition,
-  EffectFlag,
   SkillCategory,
 } from '@prisma/client';
 
@@ -15,7 +14,6 @@ registerEnumType(RaceAlign, { name: 'RaceAlign' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(LifeForce, { name: 'LifeForce' });
 registerEnumType(Composition, { name: 'Composition' });
-registerEnumType(EffectFlag, { name: 'EffectFlag' });
 registerEnumType(SkillCategory, { name: 'SkillCategory' });
 
 @ObjectType()
@@ -89,8 +87,7 @@ export class RaceDto {
   @Field(() => Int)
   hpFactor: number;
 
-  @Field(() => [EffectFlag])
-  permanentEffects: EffectFlag[];
+  // permanentEffects now lives in the RaceEffects junction table (Phase 3)
 
   @Field()
   createdAt: Date;
