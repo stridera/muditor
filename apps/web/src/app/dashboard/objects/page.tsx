@@ -342,8 +342,8 @@ function ObjectsContent() {
         zoneId: originalObject.zoneId,
         values: originalObject.values,
         flags: originalObject.flags,
-        effectFlags: originalObject.effectFlags,
         wearFlags: originalObject.wearFlags,
+        restrictions: originalObject.restrictions,
       };
 
       const createResult = await createObject({
@@ -843,7 +843,7 @@ function ObjectsContent() {
                         {/* Flags */}
                         {isDetailed(fullObject) &&
                           (fullObject.flags.length > 0 ||
-                            fullObject.effectFlags.length > 0 ||
+                            fullObject.restrictions.length > 0 ||
                             fullObject.wearFlags.length > 0) && (
                             <div>
                               <h4 className='font-medium text-foreground mb-2'>
@@ -862,13 +862,13 @@ function ObjectsContent() {
                                     </div>
                                   </div>
                                 )}
-                                {fullObject.effectFlags.length > 0 && (
+                                {fullObject.restrictions.length > 0 && (
                                   <div>
                                     <span className='text-muted-foreground'>
-                                      Effect Flags:
+                                      Restrictions:
                                     </span>
                                     <div className='flex flex-wrap gap-1 mt-1'>
-                                      {fullObject.effectFlags.map(
+                                      {fullObject.restrictions.map(
                                         (flag: string) => (
                                           <FlagBadge key={flag} flag={flag} />
                                         )

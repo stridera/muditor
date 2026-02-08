@@ -33,8 +33,9 @@ interface MobEntity {
   charisma?: number;
   perception?: number;
   concealment?: number;
-  mobFlags?: string[];
-  effectFlags?: string[];
+  traits?: string[];
+  behaviors?: string[];
+  professions?: string[];
   position?: string;
   stance?: string;
   equipment?: Array<{
@@ -436,13 +437,13 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
             <div className='space-y-6'>
               {entity.kind === 'mob' && (
                 <>
-                  {(entity.data as MobEntity).mobFlags?.length ? (
+                  {(entity.data as MobEntity).traits?.length ? (
                     <div>
                       <h5 className='text-xs uppercase tracking-wide font-semibold mb-2'>
-                        Mob Flags
+                        Traits
                       </h5>
                       <div className='flex flex-wrap gap-1'>
-                        {(entity.data as MobEntity).mobFlags!.map(f => (
+                        {(entity.data as MobEntity).traits!.map(f => (
                           <span
                             key={f}
                             className='px-1 py-0.5 text-xs rounded bg-blue-100 dark:bg-blue-900 dark:text-blue-200'
@@ -453,16 +454,33 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
                       </div>
                     </div>
                   ) : null}
-                  {(entity.data as MobEntity).effectFlags?.length ? (
+                  {(entity.data as MobEntity).behaviors?.length ? (
                     <div>
                       <h5 className='text-xs uppercase tracking-wide font-semibold mb-2'>
-                        Effect Flags
+                        Behaviors
                       </h5>
                       <div className='flex flex-wrap gap-1'>
-                        {(entity.data as MobEntity).effectFlags!.map(f => (
+                        {(entity.data as MobEntity).behaviors!.map(f => (
                           <span
                             key={f}
                             className='px-1 py-0.5 text-xs rounded bg-purple-100 dark:bg-purple-900 dark:text-purple-200'
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  {(entity.data as MobEntity).professions?.length ? (
+                    <div>
+                      <h5 className='text-xs uppercase tracking-wide font-semibold mb-2'>
+                        Professions
+                      </h5>
+                      <div className='flex flex-wrap gap-1'>
+                        {(entity.data as MobEntity).professions!.map(f => (
+                          <span
+                            key={f}
+                            className='px-1 py-0.5 text-xs rounded bg-green-100 dark:bg-green-900 dark:text-green-200'
                           >
                             {f}
                           </span>

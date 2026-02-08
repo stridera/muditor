@@ -70,10 +70,9 @@ export function mapMob(db: MobMapperSource): MobDto {
     size: db.size,
     lifeForce: db.lifeForce,
     composition: db.composition,
-    mobFlags: db.mobFlags,
-    effectFlags: db.effectFlags,
     traits: db.traits ?? [],
     behaviors: db.behaviors ?? [],
+    professions: db.professions ?? [],
     ...(db.aggressionFormula !== null &&
       db.aggressionFormula !== undefined && {
         aggressionFormula: db.aggressionFormula,
@@ -84,7 +83,14 @@ export function mapMob(db: MobMapperSource): MobDto {
       }),
     resistances: (resistances as Record<string, number>) ?? {},
     position: db.position,
+    defaultPosition: db.defaultPosition,
+    movementMode: db.movementMode,
+    defaultMovementMode: db.defaultMovementMode,
     stance: db.stance,
+    ...(db.riderPresenceMessage !== null &&
+      db.riderPresenceMessage !== undefined && {
+        riderPresenceMessage: db.riderPresenceMessage,
+      }),
     ...(db.classId !== null &&
       db.classId !== undefined && { classId: db.classId }),
     createdAt: db.createdAt,

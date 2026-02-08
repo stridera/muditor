@@ -16,15 +16,13 @@ describe('RoomsService (description canonical + deprecated roomDescription)', ()
   beforeEach(async () => {
     db = {
       room: {
-        create: jest
-          .fn()
-          .mockImplementation(({ data }) => ({
-            ...data,
-            exits: [],
-            extraDescs: [],
-            mobResets: [],
-            objResets: [],
-          })),
+        create: jest.fn().mockImplementation(({ data }) => ({
+          ...data,
+          exits: [],
+          extraDescs: [],
+          mobResets: [],
+          objResets: [],
+        })),
         update: jest.fn(),
       },
       roomExit: {
@@ -48,7 +46,6 @@ describe('RoomsService (description canonical + deprecated roomDescription)', ()
       name: 'Hallway',
       description: 'A long narrow hallway',
       sector: Sector.CITY,
-      flags: [],
     };
     await service.create(input);
     expect(db.room.create).toHaveBeenCalled();

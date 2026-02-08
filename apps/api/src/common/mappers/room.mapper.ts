@@ -43,7 +43,6 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     description: db.roomDescription,
     roomDescription: db.roomDescription, // deprecated alias
     sector: db.sector,
-    flags: db.flags,
     zoneId: db.zoneId,
     exits,
     extraDescs,

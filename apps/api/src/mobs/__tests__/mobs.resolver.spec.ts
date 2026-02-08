@@ -47,8 +47,9 @@ describe('MobsResolver', () => {
         roomDescription: 'A longer description',
         examineDescription: 'Detailed description',
         role: 'NORMAL',
-        mobFlags: [],
-        effectFlags: [],
+        traits: [],
+        behaviors: [],
+        professions: [],
         alignment: 0,
         level: 1,
         armorClass: 10,
@@ -148,8 +149,9 @@ describe('MobsResolver', () => {
         move: 0,
         alignment: 0,
         level: 1,
-        mobFlags: [],
-        effectFlags: [],
+        traits: [],
+        behaviors: [],
+        professions: [],
         strength: 13,
         intelligence: 13,
         wisdom: 13,
@@ -193,8 +195,9 @@ describe('MobsResolver', () => {
           hpDice?: string;
           damageDice?: string;
           damageType: DamageType | string;
-          mobFlags: unknown[];
-          effectFlags: unknown[];
+          traits: unknown[];
+          behaviors: unknown[];
+          professions: unknown[];
         }
       );
 
@@ -224,8 +227,9 @@ describe('MobsResolver', () => {
         ...createData,
         id: 1,
         zoneId: 30,
-        mobFlags: [],
-        effectFlags: [],
+        traits: [],
+        behaviors: [],
+        professions: [],
         alignment: 0,
         level: 1,
         move: 0,
@@ -283,8 +287,9 @@ describe('MobsResolver', () => {
           damageDiceSize: number;
           damageDiceBonus: number;
           damageType: DamageType | string;
-          mobFlags: unknown[];
-          effectFlags: unknown[];
+          traits: unknown[];
+          behaviors: unknown[];
+          professions: unknown[];
           alignment: number;
           level: number;
           strength: number;

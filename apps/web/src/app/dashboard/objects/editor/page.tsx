@@ -36,8 +36,16 @@ const GET_OBJECT = gql`
       values
       zoneId
       flags
-      effectFlags
       wearFlags
+      restrictions
+      restrictedClassIds
+      restrictedAlignments
+      restrictedRaces
+      allowedRaces
+      minSize
+      maxSize
+      passengerCapacity
+      presenceOverride
       createdAt
       updatedAt
     }
@@ -249,6 +257,19 @@ function ObjectEditorContent() {
   const [generalError, setGeneralError] = useState<string>('');
   const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
   const [selectedWearFlags, setSelectedWearFlags] = useState<string[]>([]);
+  const [selectedRestrictions, setSelectedRestrictions] = useState<string[]>(
+    []
+  );
+  const [restrictedAlignments, setRestrictedAlignments] = useState<string[]>(
+    []
+  );
+  const [restrictedRaces, setRestrictedRaces] = useState<string[]>([]);
+  const [allowedRaces, setAllowedRaces] = useState<string[]>([]);
+  const [restrictedClassIds, setRestrictedClassIds] = useState<number[]>([]);
+  const [minSize, setMinSize] = useState<string>('');
+  const [maxSize, setMaxSize] = useState<string>('');
+  const [passengerCapacity, setPassengerCapacity] = useState<number>(0);
+  const [presenceOverride, setPresenceOverride] = useState<string>('');
 
   const { loading, error, data } = useQuery(GET_OBJECT, {
     variables: {
@@ -267,6 +288,15 @@ function ObjectEditorContent() {
           object?: Partial<ObjectFormData> & {
             flags?: string[];
             wearFlags?: string[];
+            restrictions?: string[];
+            restrictedAlignments?: string[];
+            restrictedRaces?: string[];
+            allowedRaces?: string[];
+            restrictedClassIds?: number[];
+            minSize?: string | null;
+            maxSize?: string | null;
+            passengerCapacity?: number | null;
+            presenceOverride?: string | null;
             values?: Record<string, unknown>;
           };
         }
@@ -290,6 +320,15 @@ function ObjectEditorContent() {
       });
       setSelectedFlags(object.flags || []);
       setSelectedWearFlags(object.wearFlags || []);
+      setSelectedRestrictions(object.restrictions || []);
+      setRestrictedAlignments(object.restrictedAlignments || []);
+      setRestrictedRaces(object.restrictedRaces || []);
+      setAllowedRaces(object.allowedRaces || []);
+      setRestrictedClassIds(object.restrictedClassIds || []);
+      setMinSize(object.minSize || '');
+      setMaxSize(object.maxSize || '');
+      setPassengerCapacity(object.passengerCapacity || 0);
+      setPresenceOverride(object.presenceOverride || '');
     }
   }, [data]);
 
@@ -351,6 +390,15 @@ function ObjectEditorContent() {
         ...formData,
         flags: selectedFlags,
         wearFlags: selectedWearFlags,
+        restrictions: selectedRestrictions,
+        restrictedAlignments,
+        restrictedRaces,
+        allowedRaces,
+        restrictedClassIds,
+        ...(minSize ? { minSize } : {}),
+        ...(maxSize ? { maxSize } : {}),
+        ...(passengerCapacity > 0 ? { passengerCapacity } : {}),
+        ...(presenceOverride ? { presenceOverride } : {}),
       };
 
       if (isNew) {
@@ -385,6 +433,7 @@ function ObjectEditorContent() {
     { id: 'basic', label: 'Basic Info' },
     { id: 'properties', label: 'Properties' },
     { id: 'flags', label: 'Flags & Wear' },
+    { id: 'restrictions', label: 'Restrictions' },
     { id: 'values', label: 'Type Values' },
   ];
 
@@ -783,6 +832,303 @@ function ObjectEditorContent() {
                     </span>
                   </label>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Restrictions Tab */}
+        {activeTab === 'restrictions' && (
+          <div className='space-y-6'>
+            {/* Object Restrictions */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-1'>
+                Object Restrictions
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                Behavioral restrictions on this object
+              </p>
+              <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
+                {OBJECT_RESTRICTIONS.map(flag => (
+                  <label
+                    key={flag}
+                    className='flex items-center gap-2 cursor-pointer'
+                  >
+                    <input
+                      type='checkbox'
+                      checked={selectedRestrictions.includes(flag)}
+                      onChange={e => {
+                        setSelectedRestrictions(prev =>
+                          e.target.checked
+                            ? [...prev, flag]
+                            : prev.filter(f => f !== flag)
+                        );
+                      }}
+                      className='rounded border-input'
+                    />
+                    <span className='text-sm text-foreground'>
+                      {flag.replace(/_/g, ' ')}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Alignment Restrictions */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-1'>
+                Alignment Restrictions
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                Only characters with these alignments can use this object
+              </p>
+              <div className='grid grid-cols-3 gap-3'>
+                {(['GOOD', 'NEUTRAL', 'EVIL'] as const).map(align => (
+                  <label
+                    key={align}
+                    className='flex items-center gap-2 cursor-pointer'
+                  >
+                    <input
+                      type='checkbox'
+                      checked={restrictedAlignments.includes(align)}
+                      onChange={e => {
+                        setRestrictedAlignments(prev =>
+                          e.target.checked
+                            ? [...prev, align]
+                            : prev.filter(a => a !== align)
+                        );
+                      }}
+                      className='rounded border-input'
+                    />
+                    <span className='text-sm text-foreground'>
+                      {align.charAt(0) + align.slice(1).toLowerCase()}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Race Restrictions */}
+            <div className='grid grid-cols-2 gap-6'>
+              <div className='bg-card shadow rounded-lg p-6 border border-border'>
+                <h3 className='text-lg font-medium text-foreground mb-1'>
+                  Restricted Races
+                </h3>
+                <p className='text-sm text-muted-foreground mb-4'>
+                  Races that CANNOT use this object
+                </p>
+                <div className='grid grid-cols-2 gap-2 max-h-64 overflow-y-auto'>
+                  {(
+                    [
+                      'HUMAN',
+                      'ELF',
+                      'HALF_ELF',
+                      'DROW',
+                      'DWARF',
+                      'DUERGAR',
+                      'GNOME',
+                      'SVERFNEBLIN',
+                      'HALFLING',
+                      'ORC',
+                      'OGRE',
+                      'TROLL',
+                      'GOBLIN',
+                      'GOLIATH',
+                      'BROWNIE',
+                      'NYMPH',
+                      'ARBOREAN',
+                      'DRAGONBORN_FIRE',
+                      'DRAGONBORN_FROST',
+                      'DRAGONBORN_ACID',
+                      'DRAGONBORN_LIGHTNING',
+                      'DRAGONBORN_GAS',
+                      'FAERIE_SEELIE',
+                      'FAERIE_UNSEELIE',
+                      'GIANT',
+                      'DEMON',
+                    ] as const
+                  ).map(race => (
+                    <label
+                      key={race}
+                      className='flex items-center gap-2 cursor-pointer'
+                    >
+                      <input
+                        type='checkbox'
+                        checked={restrictedRaces.includes(race)}
+                        onChange={e => {
+                          setRestrictedRaces(prev =>
+                            e.target.checked
+                              ? [...prev, race]
+                              : prev.filter(r => r !== race)
+                          );
+                        }}
+                        className='rounded border-input'
+                      />
+                      <span className='text-xs text-foreground'>
+                        {race.replace(/_/g, ' ')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className='bg-card shadow rounded-lg p-6 border border-border'>
+                <h3 className='text-lg font-medium text-foreground mb-1'>
+                  Allowed Races
+                </h3>
+                <p className='text-sm text-muted-foreground mb-4'>
+                  Only these races CAN use this object (empty = all allowed)
+                </p>
+                <div className='grid grid-cols-2 gap-2 max-h-64 overflow-y-auto'>
+                  {(
+                    [
+                      'HUMAN',
+                      'ELF',
+                      'HALF_ELF',
+                      'DROW',
+                      'DWARF',
+                      'DUERGAR',
+                      'GNOME',
+                      'SVERFNEBLIN',
+                      'HALFLING',
+                      'ORC',
+                      'OGRE',
+                      'TROLL',
+                      'GOBLIN',
+                      'GOLIATH',
+                      'BROWNIE',
+                      'NYMPH',
+                      'ARBOREAN',
+                      'DRAGONBORN_FIRE',
+                      'DRAGONBORN_FROST',
+                      'DRAGONBORN_ACID',
+                      'DRAGONBORN_LIGHTNING',
+                      'DRAGONBORN_GAS',
+                      'FAERIE_SEELIE',
+                      'FAERIE_UNSEELIE',
+                      'GIANT',
+                      'DEMON',
+                    ] as const
+                  ).map(race => (
+                    <label
+                      key={race}
+                      className='flex items-center gap-2 cursor-pointer'
+                    >
+                      <input
+                        type='checkbox'
+                        checked={allowedRaces.includes(race)}
+                        onChange={e => {
+                          setAllowedRaces(prev =>
+                            e.target.checked
+                              ? [...prev, race]
+                              : prev.filter(r => r !== race)
+                          );
+                        }}
+                        className='rounded border-input'
+                      />
+                      <span className='text-xs text-foreground'>
+                        {race.replace(/_/g, ' ')}
+                      </span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            {/* Size Restrictions & Other */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <h3 className='text-lg font-medium text-foreground mb-4'>
+                Size & Other
+              </h3>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    Minimum Size
+                  </label>
+                  <select
+                    value={minSize}
+                    onChange={e => setMinSize(e.target.value)}
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
+                  >
+                    <option value=''>No minimum</option>
+                    {[
+                      'TINY',
+                      'SMALL',
+                      'MEDIUM',
+                      'LARGE',
+                      'HUGE',
+                      'GIANT',
+                      'GARGANTUAN',
+                      'COLOSSAL',
+                      'MOUNTAINOUS',
+                      'TITANIC',
+                    ].map(s => (
+                      <option key={s} value={s}>
+                        {s.charAt(0) + s.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    Maximum Size
+                  </label>
+                  <select
+                    value={maxSize}
+                    onChange={e => setMaxSize(e.target.value)}
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
+                  >
+                    <option value=''>No maximum</option>
+                    {[
+                      'TINY',
+                      'SMALL',
+                      'MEDIUM',
+                      'LARGE',
+                      'HUGE',
+                      'GIANT',
+                      'GARGANTUAN',
+                      'COLOSSAL',
+                      'MOUNTAINOUS',
+                      'TITANIC',
+                    ].map(s => (
+                      <option key={s} value={s}>
+                        {s.charAt(0) + s.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    Passenger Capacity
+                  </label>
+                  <input
+                    type='number'
+                    value={passengerCapacity}
+                    onChange={e =>
+                      setPassengerCapacity(parseInt(e.target.value) || 0)
+                    }
+                    min='0'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
+                  />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    For vehicles — how many passengers it can carry
+                  </p>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    Presence Override
+                  </label>
+                  <input
+                    type='text'
+                    value={presenceOverride}
+                    onChange={e => setPresenceOverride(e.target.value)}
+                    placeholder='e.g., is parked here'
+                    className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
+                  />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Custom room presence text for this object
+                  </p>
+                </div>
               </div>
             </div>
           </div>

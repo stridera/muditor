@@ -165,6 +165,12 @@ type AdminUser {
   username: String!
 }
 
+enum Alignment {
+  EVIL
+  GOOD
+  NEUTRAL
+}
+
 input AssignSkillToClassInput {
   abilityId: Int!
   classId: Int!
@@ -313,7 +319,6 @@ type CharacterDto {
   damageRoll: Int!
   description: String
   dexterity: Int!
-  effectFlags: [String!]!
   experience: Int!
   gender: String!
   gold: Int!
@@ -794,10 +799,17 @@ input CreateMobEquipmentSetInput {
 
 input CreateMobInput {
   accuracy: Int! = 0
+
+  """Lua formula for activity restrictions"""
+  activityRestrictions: String
+
+  """Lua formula for aggression targeting"""
+  aggressionFormula: String
   alignment: Int! = 0
   armorClass: Int! = 0
   armorRating: Int! = 0
   attackPower: Int! = 0
+  behaviors: [MobBehavior!]! = []
   charisma: Int! = 13
   classId: Int
   composition: Composition! = FLESH
@@ -810,8 +822,9 @@ input CreateMobInput {
   damageDice: String
   damageReductionPercent: Int! = 0
   damageType: DamageType! = HIT
+  defaultMovementMode: MovementMode! = NORMAL
+  defaultPosition: Position! = STANDING
   dexterity: Int! = 13
-  effectFlags: [EffectFlag!]! = []
   evasion: Int! = 0
   examineDescription: String!
   gender: Gender! = NEUTRAL
@@ -827,18 +840,25 @@ input CreateMobInput {
   keywords: [String!]!
   level: Int! = 1
   lifeForce: LifeForce! = LIFE
-  mobFlags: [MobFlag!]! = []
+  movementMode: MovementMode! = NORMAL
   name: String!
   penetrationFlat: Int! = 0
   penetrationPercent: Int! = 0
   perception: Int! = 0
   position: Position! = STANDING
+  professions: [MobProfession!]! = []
   race: Race! = HUMANOID
   resistanceAcid: Int! = 0
   resistanceCold: Int! = 0
   resistanceFire: Int! = 0
   resistanceLightning: Int! = 0
   resistancePoison: Int! = 0
+
+  """JSON resistances map: {"FIRE": 0, "charm": 50}"""
+  resistances: JSON
+
+  """Custom presence message when ridden as mount"""
+  riderPresenceMessage: String
   role: MobRole! = NORMAL
   roomDescription: String!
   size: Size! = MEDIUM
@@ -846,6 +866,7 @@ input CreateMobInput {
   spellPower: Int! = 0
   stance: Stance! = ALERT
   strength: Int! = 13
+  traits: [MobTrait!]! = []
   wardPercent: Int! = 0
   wealth: Int! = 0
   wisdom: Int! = 13
@@ -874,16 +895,24 @@ input CreateMobResetInput {
 
 input CreateObjectInput {
   actionDescription: String
+  allowedRaces: [Race!]! = []
   concealment: Int! = 0
   cost: Int! = 0
   decomposeTimer: Int! = 0
-  effectFlags: [EffectFlag!]! = []
   examineDescription: String!
   flags: [ObjectFlag!]! = []
   id: Int!
   keywords: [String!]!
   level: Int! = 1
+  maxSize: Size
+  minSize: Size
   name: String!
+  passengerCapacity: Int
+  presenceOverride: String
+  restrictedAlignments: [Alignment!]! = []
+  restrictedClassIds: [Int!]! = []
+  restrictedRaces: [Race!]! = []
+  restrictions: [ObjectRestriction!]! = []
   roomDescription: String!
   timer: Int! = 0
   type: ObjectType! = NOTHING
@@ -1009,7 +1038,6 @@ input CreateRaceInput {
   maxStrength: Int! = 76
   maxWisdom: Int! = 76
   name: String!
-  permanentEffects: [EffectFlag!]! = []
   plainName: String!
   playable: Boolean! = false
   race: Race!
@@ -1029,7 +1057,6 @@ input CreateRoomExitInput {
 
 input CreateRoomInput {
   description: String!
-  flags: [RoomFlag!]! = []
   id: Int!
   name: String!
   roomDescription: String
@@ -1203,95 +1230,6 @@ type Effect {
   tags: [String!]!
 }
 
-enum EffectFlag {
-  ACID_WEAPON
-  ANIMATED
-  AWARE
-  BERSERK
-  BLESS
-  BLIND
-  BLUR
-  CAMOUFLAGED
-  CHARM
-  COLDSHIELD
-  CONFUSION
-  CURSE
-  DETECT_ALIGN
-  DETECT_INVIS
-  DETECT_MAGIC
-  DETECT_POISON
-  DISEASE
-  DISPLACEMENT
-  ENLARGE
-  EXPOSED
-  FAMILIARITY
-  FARSEE
-  FEAR
-  FEATHER_FALL
-  FIRESHIELD
-  FIRE_WEAPON
-  FLY
-  GLORY
-  GREATER_DISPLACEMENT
-  HARNESS
-  HASTE
-  HEX
-  HURT_THROAT
-  ICE_WEAPON
-  IMMOBILIZED
-  INFRAVISION
-  INSANITY
-  INVISIBLE
-  LIGHT
-  MAJOR_GLOBE
-  MAJOR_PARALYSIS
-  MESMERIZED
-  MINOR_GLOBE
-  MINOR_PARALYSIS
-  MISDIRECTING
-  MISDIRECTION
-  NEGATE_AIR
-  NEGATE_COLD
-  NEGATE_EARTH
-  NEGATE_HEAT
-  NO_TRACK
-  ON_FIRE
-  POISON
-  POISON_WEAPON
-  PROTECT_AIR
-  PROTECT_COLD
-  PROTECT_EARTH
-  PROTECT_EVIL
-  PROTECT_FIRE
-  PROTECT_GOOD
-  RADIANT_WEAPON
-  RAY_OF_ENFEEBLEMENT
-  REDUCE
-  REMOTE_AGGRO
-  SANCTUARY
-  SENSE_LIFE
-  SHADOWING
-  SHOCK_WEAPON
-  SILENCE
-  SLEEP
-  SNEAK
-  SONG_OF_REST
-  SOULSHIELD
-  SPIRIT_BEAR
-  SPIRIT_WOLF
-  STEALTH
-  STONE_SKIN
-  TAMED
-  TONGUES
-  ULTRAVISION
-  UNUSED
-  VAMPIRIC_TOUCH
-  VITALITY
-  WATERBREATH
-  WATERWALK
-  WRATH
-}
-
 enum ElementType {
   ACID
   AIR
@@ -1337,10 +1275,10 @@ type EquipmentSetItemDto {
 }
 
 enum ExitFlag {
-  CLOSED
+  BASHABLE
   HIDDEN
   IS_DOOR
-  LOCKED
+  MAGICPROOF
   PICKPROOF
 }
 
@@ -1612,6 +1550,30 @@ enum LoginStage {
   WELCOME_BANNER
 }
 
+enum MobBehavior {
+  AWARE
+  FAST_TRACK
+  HELPER
+  MEDITATE
+  MEMORY
+  NO_BASH
+  NO_CLASS_AI
+  NO_KILL
+  NO_SCRIPT
+  NO_SUMMON
+  NO_VICIOUS
+  PEACEFUL
+  PEACEKEEPER
+  PROTECTOR
+  SCAVENGER
+  SENTINEL
+  SLOW_TRACK
+  STAY_ZONE
+  TEACHER
+  TRACK
+  WIMPY
+}
+
 type MobCombatDefaultsDto {
   damageDice: String!
   damageDiceBonus: Int!
@@ -1625,10 +1587,17 @@ type MobCombatDefaultsDto {
 
 type MobDto {
   accuracy: Int!
+
+  """Lua formula for activity restrictions"""
+  activityRestrictions: String
+
+  """Lua formula for aggression targeting"""
+  aggressionFormula: String
   alignment: Int!
   armorClass: Int!
   armorRating: Int!
   attackPower: Int!
+  behaviors: [MobBehavior!]!
   charisma: Int!
   classId: Int
   composition: Composition!
@@ -1638,8 +1607,9 @@ type MobDto {
   damageDice: String!
   damageReductionPercent: Int!
   damageType: DamageType!
+  defaultMovementMode: MovementMode!
+  defaultPosition: Position!
   dexterity: Int!
-  effectFlags: [EffectFlag!]!
   evasion: Int!
   examineDescription: String!
   gender: Gender!
@@ -1651,7 +1621,7 @@ type MobDto {
   keywords: [String!]!
   level: Int!
   lifeForce: LifeForce!
-  mobFlags: [MobFlag!]!
+  movementMode: MovementMode!
   name: String!
   penetrationFlat: Int!
   penetrationPercent: Int!
@@ -1660,12 +1630,19 @@ type MobDto {
   plainName: String!
   plainRoomDescription: String!
   position: Position!
+  professions: [MobProfession!]!
   race: Race!
   resistanceAcid: Int!
   resistanceCold: Int!
   resistanceFire: Int!
   resistanceLightning: Int!
   resistancePoison: Int!
+
+  """JSON resistances map: {"FIRE": 0, "charm": 50}"""
+  resistances: JSON!
+
+  """Custom presence message when ridden as mount"""
+  riderPresenceMessage: String
   role: MobRole!
   roomDescription: String!
   size: Size!
@@ -1673,6 +1650,7 @@ type MobDto {
   spellPower: Int!
   stance: Stance!
   strength: Int!
+  traits: [MobTrait!]!
   updatedAt: DateTime!
   wardPercent: Int!
   wealth: Int
@@ -1688,68 +1666,13 @@ type MobEquipmentSetDto {
   probability: Float!
 }
 
-enum MobFlag {
-  AGGRESSIVE
-  AGGRO_EVIL
-  AGGRO_GOOD
-  AGGRO_NEUTRAL
-  ANTI_PALADIN
-  AQUATIC
-  ASSASSIN
-  AWARE
+enum MobProfession {
   BANKER
-  BERSERKER
-  BLUR
-  CLERIC
-  CONJURER
-  DIABOLIST
-  DRUID
-  FAST_TRACK
-  HASTE
-  HATES_SUN
-  HELPER
-  ILLUSION
-  IS_NPC
-  MEMORY
-  MERCENARY
-  MONK
-  MOUNT
-  MOUNTABLE
-  NECROMANCER
-  NO_BASH
-  NO_BLIND
-  NO_CHARM
-  NO_CLASS_AI
-  NO_EQ_RESTRICT
-  NO_KILL
-  NO_POISON
-  NO_SILENCE
-  NO_SLEEP
-  NO_SUMMON
-  NO_VICIOUS
-  PALADIN
-  PEACEFUL
-  PEACEKEEPER
-  POISON_BITE
+  GUILDMASTER
   POSTMASTER
-  PROTECTOR
-  RANGER
   RECEPTIONIST
-  SCAVENGER
-  SENTINEL
-  SHAMAN
   SHOPKEEPER
-  SLOW_TRACK
-  SORCERER
-  SPEC
-  STAY_SECT
-  STAY_ZONE
-  SUMMONED_MOUNT
-  TEACHER
-  THIEF
-  TRACK
-  WARRIOR
-  WIMPY
+  TRAINER
 }
 
 type MobResetDto {
@@ -1792,6 +1715,25 @@ type MobSummaryDto {
   id: Int!
   name: String!
   zoneId: Int!
+}
+
+enum MobTrait {
+  ANIMATED
+  AQUATIC
+  ILLUSION
+  MOUNT
+  PET
+  PLAYER_PHANTASM
+  SUMMONED
+}
+
+enum MovementMode {
+  ETHEREAL
+  FLYING
+  MOUNTED
+  NORMAL
+  SWIMMING
+  UNDERWATER
 }
 
 type Mutation {
@@ -2011,21 +1953,29 @@ type ObjectAffectDto {
 
 type ObjectDto {
   actionDescription: String
+  allowedRaces: [Race!]!
   concealment: Int!
   cost: Int!
   createdAt: DateTime!
   decomposeTimer: Int!
-  effectFlags: [EffectFlag!]!
   examineDescription: String!
   flags: [ObjectFlag!]!
   id: Int!
   keywords: [String!]!
   level: Int!
+  maxSize: Size
+  minSize: Size
   name: String!
+  passengerCapacity: Int
   plainActionDescription: String
   plainExamineDescription: String!
   plainName: String!
   plainRoomDescription: String!
+  presenceOverride: String
+  restrictedAlignments: [Alignment!]!
+  restrictedClassIds: [Int!]!
+  restrictedRaces: [Race!]!
+  restrictions: [ObjectRestriction!]!
   roomDescription: String!
   timer: Int!
   type: ObjectType!
@@ -2037,59 +1987,17 @@ type ObjectDto {
 }
 
 enum ObjectFlag {
-  ANTI_ANTI_PALADIN
-  ANTI_ARBOREAN
-  ANTI_ASSASSIN
-  ANTI_BARD
-  ANTI_BERSERKER
-  ANTI_CLERIC
-  ANTI_COLOSSAL
-  ANTI_CONJURER
-  ANTI_CRYOMANCER
-  ANTI_DIABOLIST
-  ANTI_DRUID
-  ANTI_EVIL
-  ANTI_GARGANTUAN
-  ANTI_GIANT
-  ANTI_GOOD
-  ANTI_HUGE
-  ANTI_ILLUSIONIST
-  ANTI_LARGE
-  ANTI_MEDIUM
-  ANTI_MERCENARY
-  ANTI_MONK
-  ANTI_MOUNTAINOUS
-  ANTI_NECROMANCER
-  ANTI_NEUTRAL
-  ANTI_PALADIN
-  ANTI_PRIEST
-  ANTI_PYROMANCER
-  ANTI_RANGER
-  ANTI_ROGUE
-  ANTI_SHAMAN
-  ANTI_SMALL
-  ANTI_SORCERER
-  ANTI_THIEF
-  ANTI_TINY
-  ANTI_TITANIC
-  ANTI_WARRIOR
+  BUOYANT
   DECOMPOSING
-  DWARVEN
-  ELVEN
   FLOAT
   GLOW
   HUM
   INVISIBLE
   MAGIC
-  NO_BURN
-  NO_DROP
-  NO_FALL
-  NO_INVISIBLE
-  NO_LOCATE
-  NO_SELL
   PERMANENT
+  SOULBOUND
   TEMPORARY
-  WAS_DISARMED
+  VEHICLE
 }
 
 type ObjectResetDto {
@@ -2104,9 +2012,17 @@ type ObjectResetDto {
   zoneId: Int!
 }
 
+enum ObjectRestriction {
+  NO_BURN
+  NO_DROP
+  NO_INVISIBLE
+  NO_LOCATE
+  NO_SELL
+  NO_TAKE
+}
+
 type ObjectSummaryDto {
   cost: Int
-  effectFlags: [String!]
   examineDescription: String
   flags: [String!]
   id: Int!
@@ -2125,12 +2041,15 @@ enum ObjectType {
   BOARD
   BOAT
   CONTAINER
+  CORPSE
+  DISGUISE
   DRINKCONTAINER
   FIREWEAPON
   FOOD
   FOUNTAIN
   INSTRUMENT
   KEY
+  KIT
   LIGHT
   MISSILE
   MONEY
@@ -2138,6 +2057,8 @@ enum ObjectType {
   NOTHING
   OTHER
   PEN
+  PERFUME
+  POISON
   PORTAL
   POTION
   ROPE
@@ -2148,9 +2069,11 @@ enum ObjectType {
   TRAP
   TRASH
   TREASURE
+  VEHICLE
   WALL
   WAND
   WEAPON
+  WINGS
   WORN
 }
 
@@ -2233,13 +2156,9 @@ type PlayerMailObjectDto {
 
 enum Position {
   DEAD
-  FIGHTING
-  FLYING
   GHOST
   INCAPACITATED
-  KNEELING
   MORTALLY_WOUNDED
-  PRONE
   RESTING
   SITTING
   SLEEPING
@@ -2615,7 +2534,6 @@ enum QuestTriggerType {
 enum Race {
   ANIMAL
   ARBOREAN
-  GOLIATH
   BROWNIE
   DEMON
   DRAGONBORN_ACID
@@ -2638,6 +2556,7 @@ enum Race {
   GIANT
   GNOME
   GOBLIN
+  GOLIATH
   HALFLING
   HALF_ELF
   HUMAN
@@ -2678,7 +2597,6 @@ type RaceDto {
   maxStrength: Int!
   maxWisdom: Int!
   name: String!
-  permanentEffects: [EffectFlag!]!
   plainName: String!
   playable: Boolean!
   race: Race!
@@ -2727,7 +2645,6 @@ type RoomDto {
   description: String!
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
-  flags: [RoomFlag!]!
   id: Int!
   layoutX: Int
   layoutY: Int
@@ -2761,50 +2678,6 @@ type RoomExtraDescriptionDto {
   description: String!
   id: String!
   keywords: [String!]!
-}
-
-enum RoomFlag {
-  ALT_EXIT
-  ALWAYS_LIT
-  ARENA
-  ATRIUM
-  BFS_MARK
-  CAMPSITE
-  DARK
-  DEATH
-  EFFECTS_NEXT
-  FERRY_DEST
-  GODROOM
-  GUILDHALL
-  HOUSE
-  HOUSECRASH
-  INDOORS
-  INN
-  ISOLATED
-  LARGE
-  MEDIUM
-  MEDIUM_LARGE
-  MEDIUM_SMALL
-  NO_MAGIC
-  NO_MOB
-  NO_RECALL
-  NO_SCAN
-  NO_SHIFT
-  NO_SUMMON
-  NO_TRACK
-  NO_WELL
-  OBSERVATORY
-  OLC
-  ONE_PERSON
-  PEACEFUL
-  PRIVATE
-  SMALL
-  SOUNDPROOF
-  TEMPLE
-  TUNNEL
-  UNDERDARK
-  VERY_SMALL
-  WORLDMAP
 }
 
 type RoomReference {
@@ -3407,10 +3280,17 @@ input UpdateLoginMessageInput {
 
 input UpdateMobInput {
   accuracy: Int
+
+  """Lua formula for activity restrictions"""
+  activityRestrictions: String
+
+  """Lua formula for aggression targeting"""
+  aggressionFormula: String
   alignment: Int
   armorClass: Int
   armorRating: Int
   attackPower: Int
+  behaviors: [MobBehavior!]
   charisma: Int
   classId: Int
   composition: Composition
@@ -3419,8 +3299,9 @@ input UpdateMobInput {
   damageDice: String
   damageReductionPercent: Int
   damageType: DamageType
+  defaultMovementMode: MovementMode
+  defaultPosition: Position
   dexterity: Int
-  effectFlags: [EffectFlag!]
   evasion: Int
   examineDescription: String
   gender: Gender
@@ -3431,18 +3312,25 @@ input UpdateMobInput {
   keywords: [String!]
   level: Int
   lifeForce: LifeForce
-  mobFlags: [MobFlag!]
+  movementMode: MovementMode
   name: String
   penetrationFlat: Int
   penetrationPercent: Int
   perception: Int
   position: Position
+  professions: [MobProfession!]
   race: Race
   resistanceAcid: Int
   resistanceCold: Int
   resistanceFire: Int
   resistanceLightning: Int
   resistancePoison: Int
+
+  """JSON resistances map"""
+  resistances: JSON
+
+  """Custom presence message when ridden as mount"""
+  riderPresenceMessage: String
   role: MobRole
   roomDescription: String
   size: Size
@@ -3450,6 +3338,7 @@ input UpdateMobInput {
   spellPower: Int
   stance: Stance
   strength: Int
+  traits: [MobTrait!]
   wardPercent: Int
   wealth: Int
   wisdom: Int
@@ -3475,15 +3364,23 @@ input UpdateMobResetInput {
 
 input UpdateObjectInput {
   actionDescription: String
+  allowedRaces: [Race!]
   concealment: Int
   cost: Int
   decomposeTimer: Int
-  effectFlags: [EffectFlag!]
   examineDescription: String
   flags: [ObjectFlag!]
   keywords: [String!]
   level: Int
+  maxSize: Size
+  minSize: Size
   name: String
+  passengerCapacity: Int
+  presenceOverride: String
+  restrictedAlignments: [Alignment!]
+  restrictedClassIds: [Int!]
+  restrictedRaces: [Race!]
+  restrictions: [ObjectRestriction!]
   roomDescription: String
   timer: Int
   type: ObjectType
@@ -3604,7 +3501,6 @@ input UpdateRaceInput {
   maxStrength: Int
   maxWisdom: Int
   name: String
-  permanentEffects: [EffectFlag!]
   plainName: String
   playable: Boolean
   raceAlign: RaceAlign
@@ -3617,7 +3513,6 @@ input UpdateRaceSkillInput {
 
 input UpdateRoomInput {
   description: String
-  flags: [RoomFlag!]
   layoutX: Int
   layoutY: Int
   layoutZ: Int
@@ -3893,6 +3788,7 @@ enum WearFlag {
   BADGE
   BELT
   BODY
+  DISGUISE
   EAR
   EYES
   FACE
@@ -3900,15 +3796,14 @@ enum WearFlag {
   FINGER
   HANDS
   HEAD
-  HOLD
   HOVER
   LEGS
+  MAINHAND
   NECK
-  SHIELD
-  TAKE
-  TWO_HAND_WIELD
+  OFFHAND
+  TAIL
+  TWOHAND
   WAIST
-  WIELD
   WRIST
 }
 

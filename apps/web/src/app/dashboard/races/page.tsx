@@ -46,7 +46,6 @@ const GET_RACES = gql`
       maxCharisma
       expFactor
       hpFactor
-      permanentEffects
     }
     racesCount
   }
@@ -81,7 +80,6 @@ const UPDATE_RACE = gql`
       maxCharisma
       expFactor
       hpFactor
-      permanentEffects
     }
   }
 `;
@@ -98,7 +96,6 @@ type RaceFormData = {
   maxCharisma: number;
   expFactor: number;
   hpFactor: number;
-  permanentEffects: string[];
 };
 
 export default function RacesPage() {
@@ -124,7 +121,6 @@ export default function RacesPage() {
     maxCharisma: 76,
     expFactor: 100,
     hpFactor: 100,
-    permanentEffects: [],
   });
 
   const { data, loading, error, refetch } = useQuery(GET_RACES);
@@ -172,7 +168,6 @@ export default function RacesPage() {
       maxCharisma: race.maxCharisma,
       expFactor: race.expFactor,
       hpFactor: race.hpFactor,
-      permanentEffects: race.permanentEffects || [],
     });
     setIsEditOpen(true);
   };
@@ -192,7 +187,6 @@ export default function RacesPage() {
       maxCharisma: formData.maxCharisma,
       expFactor: formData.expFactor,
       hpFactor: formData.hpFactor,
-      permanentEffects: formData.permanentEffects,
     };
 
     await updateRace({
@@ -366,11 +360,10 @@ export default function RacesPage() {
             </DialogHeader>
 
             <Tabs defaultValue='flags' className='mt-4'>
-              <TabsList className='grid w-full grid-cols-4'>
+              <TabsList className='grid w-full grid-cols-3'>
                 <TabsTrigger value='flags'>Flags</TabsTrigger>
                 <TabsTrigger value='stats'>Stats</TabsTrigger>
                 <TabsTrigger value='factors'>Factors</TabsTrigger>
-                <TabsTrigger value='effects'>Effects</TabsTrigger>
               </TabsList>
 
               <TabsContent value='flags' className='space-y-4 mt-4'>
@@ -567,80 +560,6 @@ export default function RacesPage() {
                   </p>
                 </div>
               </TabsContent>
-
-              <TabsContent value='effects' className='space-y-4 mt-4'>
-                <div>
-                  <h3 className='font-semibold text-sm mb-3'>
-                    Permanent Effects
-                  </h3>
-                  <p className='text-xs text-gray-500 mb-4'>
-                    Select effects that are permanently active for this race
-                  </p>
-                  <div className='grid grid-cols-2 gap-3 max-h-96 overflow-y-auto'>
-                    {[
-                      'INFRAVISION',
-                      'DETECT_INVIS',
-                      'DETECT_MAGIC',
-                      'SENSE_LIFE',
-                      'WATERWALK',
-                      'WATERBREATH',
-                      'FLY',
-                      'STEALTH',
-                      'SNEAK',
-                      'INVISIBLE',
-                      'DETECT_ALIGN',
-                      'PROTECT_EVIL',
-                      'PROTECT_GOOD',
-                      'PROTECT_FIRE',
-                      'PROTECT_COLD',
-                      'PROTECT_AIR',
-                      'PROTECT_EARTH',
-                      'SANCTUARY',
-                      'STONE_SKIN',
-                      'BLUR',
-                      'HASTE',
-                      'VITALITY',
-                      'LIGHT',
-                      'FARSEE',
-                      'FEATHER_FALL',
-                      'SOULSHIELD',
-                      'HARNESS',
-                    ].map(effect => (
-                      <div key={effect} className='flex items-center space-x-2'>
-                        <Checkbox
-                          id={`effect-${effect}`}
-                          checked={formData.permanentEffects.includes(effect)}
-                          onCheckedChange={(checked: boolean) => {
-                            if (checked) {
-                              setFormData({
-                                ...formData,
-                                permanentEffects: [
-                                  ...formData.permanentEffects,
-                                  effect,
-                                ],
-                              });
-                            } else {
-                              setFormData({
-                                ...formData,
-                                permanentEffects:
-                                  formData.permanentEffects.filter(
-                                    e => e !== effect
-                                  ),
-                              });
-                            }
-                          }}
-                        />
-                        <Label
-                          htmlFor={`effect-${effect}`}
-                          className='cursor-pointer text-sm'
-                        >
-                          {effect.replace(/_/g, ' ')}
-                        </Label>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </TabsContent>
             </Tabs>
 
             <DialogFooter className='mt-6'>
@@ -731,25 +650,9 @@ export default function RacesPage() {
                 <h3 className='font-semibold text-sm mb-2'>
                   Permanent Effects
                 </h3>
-                {selectedRace?.permanentEffects &&
-                selectedRace.permanentEffects.length > 0 ? (
-                  <div className='flex flex-wrap gap-2'>
-                    {selectedRace.permanentEffects.map(
-                      (effect: string, idx: number) => (
-                        <span
-                          key={idx}
-                          className='text-xs bg-blue-100 text-blue-700 px-2 py-1 rounded'
-                        >
-                          {effect.replace(/_/g, ' ')}
-                        </span>
-                      )
-                    )}
-                  </div>
-                ) : (
-                  <p className='text-sm text-gray-500'>
-                    No permanent effects assigned
-                  </p>
-                )}
+                <p className='text-sm text-gray-500'>
+                  Effect management via junction tables coming soon (Phase 3).
+                </p>
               </div>
             </TabsContent>
 
@@ -814,7 +717,6 @@ export default function RacesPage() {
                     maxCharisma: selectedRace.maxCharisma,
                     expFactor: selectedRace.expFactor,
                     hpFactor: selectedRace.hpFactor,
-                    permanentEffects: selectedRace.permanentEffects || [],
                   });
                 }}
               >

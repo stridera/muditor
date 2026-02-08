@@ -1,10 +1,4 @@
-import {
-  Direction,
-  ExitFlag,
-  ExitState,
-  RoomFlag,
-  Sector,
-} from '@prisma/client';
+import { Direction, ExitFlag, ExitState, Sector } from '@prisma/client';
 import { mapRoom } from '../room.mapper';
 import { RoomMapperSource } from '../types';
 
@@ -14,7 +8,6 @@ describe('mapRoom', () => {
     name: 'Hall',
     roomDescription: 'A long hallway',
     sector: Sector.STRUCTURE,
-    flags: [RoomFlag.DARK],
     zoneId: 9,
     exits: [
       {

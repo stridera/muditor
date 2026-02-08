@@ -12,46 +12,47 @@ import { buildSchema, GraphQLError, parse, validate } from 'graphql';
 
 // Mock GraphQL schema based on the current API DTOs
 const mockSchema = buildSchema(`
-  enum MobFlag {
-    SCAVENGER
-    SENTINEL
-    AGGRESSIVE
-    STAY_ZONE
-    WIMPY
-    AGGR_EVIL
-    AGGR_GOOD
-    AGGR_NEUTRAL
-    MEMORY
-    HELPER
-    NOCHARM
-    NOSUMMON
-    NOSLEEP
-    NOBASH
-    NOBLIND
+  enum MobTrait {
+    ILLUSION
+    ANIMATED
+    PLAYER_PHANTASM
+    AQUATIC
+    MOUNT
+    SUMMONED
+    PET
   }
 
-  enum EffectFlag {
-    BLIND
-    INVISIBLE
-    DETECT_ALIGN
-    DETECT_INVIS
-    DETECT_MAGIC
-    SENSE_LIFE
-    WATERWALK
-    SANCTUARY
-    GROUP
-    CURSE
-    INFRAVISION
-    POISON
-    PROTECT_EVIL
-    PROTECT_GOOD
-    SLEEP
-    NOTRACK
-    SNEAK
-    HIDE
-    CHARM
-    FLYING
-    BREATHE_WATER
+  enum MobBehavior {
+    SENTINEL
+    STAY_ZONE
+    SCAVENGER
+    TRACK
+    SLOW_TRACK
+    FAST_TRACK
+    WIMPY
+    AWARE
+    HELPER
+    PROTECTOR
+    PEACEKEEPER
+    NO_BASH
+    NO_SUMMON
+    NO_VICIOUS
+    MEMORY
+    TEACHER
+    MEDITATE
+    NO_SCRIPT
+    NO_CLASS_AI
+    PEACEFUL
+    NO_KILL
+  }
+
+  enum MobProfession {
+    BANKER
+    SHOPKEEPER
+    RECEPTIONIST
+    POSTMASTER
+    GUILDMASTER
+    TRAINER
   }
 
   enum Gender {
@@ -148,8 +149,9 @@ const mockSchema = buildSchema(`
     name: String!
     roomDescription: String!
     examineDescription: String!
-    mobFlags: [MobFlag!]!
-    effectFlags: [EffectFlag!]!
+    traits: [MobTrait!]!
+    behaviors: [MobBehavior!]!
+    professions: [MobProfession!]!
     alignment: Int!
     level: Int!
     armorClass: Int!
@@ -216,8 +218,9 @@ const mobQueries = {
         constitution
         charisma
         raceAlign
-        mobFlags
-        effectFlags
+        traits
+        behaviors
+        professions
         zoneId
       }
     }

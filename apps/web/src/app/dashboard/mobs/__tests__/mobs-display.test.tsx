@@ -27,8 +27,9 @@ const mockMobData = {
   dexterity: 16,
   constitution: 17,
   charisma: 10,
-  mobFlags: ['AGGRESSIVE'],
-  effectFlags: ['SANCTUARY'],
+  traits: ['MOUNT'],
+  behaviors: ['SENTINEL'],
+  professions: ['SHOPKEEPER'],
   zoneId: 53,
 };
 
@@ -180,8 +181,9 @@ describe('Mob Data Display', () => {
       'charisma',
       'lifeForce',
       'damageType',
-      'mobFlags',
-      'effectFlags',
+      'traits',
+      'behaviors',
+      'professions',
     ];
 
     // Verify our mock data has all required fields

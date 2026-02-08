@@ -57,9 +57,6 @@ export class ObjectSummaryDto {
   flags?: string[];
 
   @Field(() => [String], { nullable: true })
-  effectFlags?: string[];
-
-  @Field(() => [String], { nullable: true })
   wearFlags?: string[];
 
   @Field(() => [ObjectAffectDto], { nullable: true })

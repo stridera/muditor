@@ -15,7 +15,11 @@ import {
   type Gender,
   type GetMobQuery,
   type LifeForce,
+  type MobBehavior,
+  type MobProfession,
   type MobRole,
+  type MobTrait,
+  type MovementMode,
   type Position,
   type Race,
   type Size,
@@ -94,6 +98,14 @@ interface MobFormData {
   composition: string;
   stance: string;
   damageType: string;
+  traits: string[];
+  behaviors: string[];
+  professions: string[];
+  movementMode: string;
+  defaultMovementMode: string;
+  riderPresenceMessage: string;
+  aggressionFormula: string;
+  activityRestrictions: string;
 }
 
 // Define validation rules for mob form
@@ -205,6 +217,14 @@ function MobEditorContent() {
     composition: 'FLESH',
     stance: 'ALERT',
     damageType: 'HIT',
+    traits: [],
+    behaviors: [],
+    professions: [],
+    movementMode: 'NORMAL',
+    defaultMovementMode: 'NORMAL',
+    riderPresenceMessage: '',
+    aggressionFormula: '',
+    activityRestrictions: '',
   });
 
   // Initialize real-time validation
@@ -301,20 +321,28 @@ function MobEditorContent() {
         zoneId: mob.zoneId,
         race: mob.race,
         position: mob.position,
-        defaultPosition: mob.position || 'STANDING', // Use position since defaultPosition doesn't exist
+        defaultPosition: mob.defaultPosition || 'STANDING',
         gender: mob.gender,
         size: mob.size,
         lifeForce: mob.lifeForce,
         composition: mob.composition,
         stance: mob.stance,
         damageType: mob.damageType,
+        traits: mob.traits || [],
+        behaviors: mob.behaviors || [],
+        professions: mob.professions || [],
+        movementMode: mob.movementMode || 'NORMAL',
+        defaultMovementMode: mob.defaultMovementMode || 'NORMAL',
+        riderPresenceMessage: mob.riderPresenceMessage || '',
+        aggressionFormula: mob.aggressionFormula || '',
+        activityRestrictions: mob.activityRestrictions || '',
       });
     }
   }, [data]);
 
   const handleInputChange = (
     field: keyof MobFormData,
-    value: string | number
+    value: string | number | string[]
   ) => {
     const updatedFormData = {
       ...formData,
@@ -395,6 +423,21 @@ function MobEditorContent() {
         lifeForce: formData.lifeForce as LifeForce,
         composition: formData.composition as Composition,
         stance: formData.stance as Stance,
+        traits: formData.traits as MobTrait[],
+        behaviors: formData.behaviors as MobBehavior[],
+        professions: formData.professions as MobProfession[],
+        movementMode: formData.movementMode as MovementMode,
+        defaultMovementMode: formData.defaultMovementMode as MovementMode,
+        defaultPosition: formData.defaultPosition as Position,
+        ...(formData.riderPresenceMessage
+          ? { riderPresenceMessage: formData.riderPresenceMessage }
+          : {}),
+        ...(formData.aggressionFormula
+          ? { aggressionFormula: formData.aggressionFormula }
+          : {}),
+        ...(formData.activityRestrictions
+          ? { activityRestrictions: formData.activityRestrictions }
+          : {}),
       };
 
       if (isNew) {
@@ -479,6 +522,7 @@ function MobEditorContent() {
 
   const tabs = [
     { id: 'basic', label: 'Basic Info' },
+    { id: 'flags', label: 'Flags & Behavior' },
     { id: 'stats', label: 'Combat Stats' },
     { id: 'attributes', label: 'Attributes' },
     { id: 'equipment', label: 'Equipment & Resets' },
@@ -703,6 +747,290 @@ function MobEditorContent() {
                     <option value='HUGE'>Huge</option>
                     <option value='GIGANTIC'>Gigantic</option>
                   </select>
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Flags & Behavior Tab */}
+        {activeTab === 'flags' && (
+          <div className='space-y-6'>
+            {/* Traits */}
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-1'>
+                Traits
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                Innate qualities of the mob (what it is)
+              </p>
+              <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
+                {(
+                  [
+                    'ANIMATED',
+                    'AQUATIC',
+                    'ILLUSION',
+                    'MOUNT',
+                    'PET',
+                    'PLAYER_PHANTASM',
+                    'SUMMONED',
+                  ] as const
+                ).map(trait => (
+                  <label
+                    key={trait}
+                    className='flex items-center gap-2 cursor-pointer'
+                  >
+                    <input
+                      type='checkbox'
+                      checked={formData.traits.includes(trait)}
+                      onChange={e => {
+                        const next = e.target.checked
+                          ? [...formData.traits, trait]
+                          : formData.traits.filter(t => t !== trait);
+                        handleInputChange('traits', next);
+                      }}
+                      className='rounded border-input'
+                    />
+                    <span className='text-sm text-card-foreground'>
+                      {trait.replace(/_/g, ' ')}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Behaviors */}
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-1'>
+                Behaviors
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                How the mob acts in the world
+              </p>
+              <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
+                {(
+                  [
+                    'AWARE',
+                    'FAST_TRACK',
+                    'HELPER',
+                    'MEDITATE',
+                    'MEMORY',
+                    'NO_BASH',
+                    'NO_CLASS_AI',
+                    'NO_KILL',
+                    'NO_SCRIPT',
+                    'NO_SUMMON',
+                    'NO_VICIOUS',
+                    'PEACEFUL',
+                    'PEACEKEEPER',
+                    'PROTECTOR',
+                    'SCAVENGER',
+                    'SENTINEL',
+                    'SLOW_TRACK',
+                    'STAY_ZONE',
+                    'TEACHER',
+                    'TRACK',
+                    'WIMPY',
+                  ] as const
+                ).map(behavior => (
+                  <label
+                    key={behavior}
+                    className='flex items-center gap-2 cursor-pointer'
+                  >
+                    <input
+                      type='checkbox'
+                      checked={formData.behaviors.includes(behavior)}
+                      onChange={e => {
+                        const next = e.target.checked
+                          ? [...formData.behaviors, behavior]
+                          : formData.behaviors.filter(b => b !== behavior);
+                        handleInputChange('behaviors', next);
+                      }}
+                      className='rounded border-input'
+                    />
+                    <span className='text-sm text-card-foreground'>
+                      {behavior.replace(/_/g, ' ')}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Professions */}
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-1'>
+                Professions
+              </h3>
+              <p className='text-sm text-muted-foreground mb-4'>
+                Special NPC roles (shopkeeper, trainer, etc.)
+              </p>
+              <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
+                {(
+                  [
+                    'BANKER',
+                    'GUILDMASTER',
+                    'POSTMASTER',
+                    'RECEPTIONIST',
+                    'SHOPKEEPER',
+                    'TRAINER',
+                  ] as const
+                ).map(prof => (
+                  <label
+                    key={prof}
+                    className='flex items-center gap-2 cursor-pointer'
+                  >
+                    <input
+                      type='checkbox'
+                      checked={formData.professions.includes(prof)}
+                      onChange={e => {
+                        const next = e.target.checked
+                          ? [...formData.professions, prof]
+                          : formData.professions.filter(p => p !== prof);
+                        handleInputChange('professions', next);
+                      }}
+                      className='rounded border-input'
+                    />
+                    <span className='text-sm text-card-foreground'>
+                      {prof.replace(/_/g, ' ')}
+                    </span>
+                  </label>
+                ))}
+              </div>
+            </div>
+
+            {/* Movement & Position */}
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
+                Movement & Position
+              </h3>
+              <div className='grid grid-cols-2 gap-4'>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Default Position
+                  </label>
+                  <select
+                    value={formData.defaultPosition}
+                    onChange={e =>
+                      handleInputChange('defaultPosition', e.target.value)
+                    }
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    {['STANDING', 'SITTING', 'RESTING', 'SLEEPING'].map(pos => (
+                      <option key={pos} value={pos}>
+                        {pos.charAt(0) + pos.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Movement Mode
+                  </label>
+                  <select
+                    value={formData.movementMode}
+                    onChange={e =>
+                      handleInputChange('movementMode', e.target.value)
+                    }
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    {[
+                      'NORMAL',
+                      'FLYING',
+                      'SWIMMING',
+                      'UNDERWATER',
+                      'ETHEREAL',
+                      'MOUNTED',
+                    ].map(mode => (
+                      <option key={mode} value={mode}>
+                        {mode.charAt(0) + mode.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Default Movement Mode
+                  </label>
+                  <select
+                    value={formData.defaultMovementMode}
+                    onChange={e =>
+                      handleInputChange('defaultMovementMode', e.target.value)
+                    }
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    {[
+                      'NORMAL',
+                      'FLYING',
+                      'SWIMMING',
+                      'UNDERWATER',
+                      'ETHEREAL',
+                      'MOUNTED',
+                    ].map(mode => (
+                      <option key={mode} value={mode}>
+                        {mode.charAt(0) + mode.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Scripting & Lua */}
+            <div className='bg-card shadow rounded-lg p-6'>
+              <h3 className='text-lg font-medium text-card-foreground mb-4'>
+                Scripting
+              </h3>
+              <div className='space-y-4'>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Rider Presence Message
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.riderPresenceMessage}
+                    onChange={e =>
+                      handleInputChange('riderPresenceMessage', e.target.value)
+                    }
+                    placeholder='e.g., ridden by a knight'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Shown when the mob has a rider (only for mounts)
+                  </p>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Aggression Formula
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.aggressionFormula}
+                    onChange={e =>
+                      handleInputChange('aggressionFormula', e.target.value)
+                    }
+                    placeholder='e.g., level < 10 or alignment < -500'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Lua expression controlling when this mob becomes aggressive
+                  </p>
+                </div>
+                <div>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Activity Restrictions
+                  </label>
+                  <input
+                    type='text'
+                    value={formData.activityRestrictions}
+                    onChange={e =>
+                      handleInputChange('activityRestrictions', e.target.value)
+                    }
+                    placeholder='e.g., night_only or zone_peaceful'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  />
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Lua formula for activity restrictions
+                  </p>
                 </div>
               </div>
             </div>

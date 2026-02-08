@@ -38,7 +38,7 @@ export class ObjectsService {
         },
         objectExtraDescriptions: true,
         objectAffects: true,
-        triggers: true,
+        Triggers: true,
         shopItems: {
           include: {
             shops: {

@@ -81,7 +81,6 @@ const GET_CHARACTER_DETAILS = gql`
       damageRoll
       armorClass
       playerFlags
-      effectFlags
       privilegeFlags
       invisLevel
       birthTime
@@ -101,7 +100,6 @@ const GET_CHARACTER_DETAILS = gql`
           level
           values
           flags
-          effectFlags
           wearFlags
           objectAffects {
             location

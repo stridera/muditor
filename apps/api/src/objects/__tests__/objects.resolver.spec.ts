@@ -20,7 +20,7 @@ describe('ObjectsResolver', () => {
         examineDescription: 'exam',
         actionDescription: null,
         flags: [],
-        effectFlags: [],
+        restrictions: [],
         wearFlags: [],
         weight: 0,
         cost: 0,

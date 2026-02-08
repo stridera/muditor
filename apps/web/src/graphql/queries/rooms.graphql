@@ -13,6 +13,5 @@ query GetRoom($zoneId: Int!, $id: Int!) {
     name
     description
     sector
-    flags
   }
 }

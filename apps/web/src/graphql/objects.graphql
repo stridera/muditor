@@ -21,8 +21,16 @@ fragment ObjectDetails on ObjectDto {
   timer
   decomposeTimer
   flags
-  effectFlags
   wearFlags
+  restrictions
+  restrictedClassIds
+  restrictedAlignments
+  restrictedRaces
+  allowedRaces
+  minSize
+  maxSize
+  passengerCapacity
+  presenceOverride
   createdAt
   updatedAt
 }

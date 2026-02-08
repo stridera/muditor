@@ -26,9 +26,16 @@ mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
     size
     lifeForce
     composition
-    mobFlags
-    effectFlags
+    traits
+    behaviors
+    professions
+    aggressionFormula
+    activityRestrictions
+    riderPresenceMessage
     position
+    defaultPosition
+    movementMode
+    defaultMovementMode
     stance
   }
 }
@@ -61,9 +68,16 @@ mutation CreateMob($data: CreateMobInput!) {
     size
     lifeForce
     composition
-    mobFlags
-    effectFlags
+    traits
+    behaviors
+    professions
+    aggressionFormula
+    activityRestrictions
+    riderPresenceMessage
     position
+    defaultPosition
+    movementMode
+    defaultMovementMode
     stance
   }
 }
