@@ -88,3 +88,21 @@ mutation DeleteMob($zoneId: Int!, $id: Int!) {
     zoneId
   }
 }
+
+mutation UpdateMobDefaultEffects($zoneId: Int!, $id: Int!, $effects: [MobDefaultEffectInput!]!) {
+  updateMobDefaultEffects(zoneId: $zoneId, id: $id, effects: $effects) {
+    id
+    zoneId
+    defaultEffects {
+      id
+      effectId
+      strength
+      modifierData
+      effect {
+        id
+        name
+        effectType
+      }
+    }
+  }
+}

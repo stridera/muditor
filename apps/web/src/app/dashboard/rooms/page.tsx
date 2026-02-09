@@ -32,8 +32,18 @@ interface Room {
   name: string;
   roomDescription: string;
   sector: string;
-  flags: string[];
   zoneId: number;
+  isPeaceful?: boolean;
+  isDeathTrap?: boolean;
+  allowsMagic?: boolean;
+  allowsRecall?: boolean;
+  allowsSummon?: boolean;
+  allowsTeleport?: boolean;
+  baseLightLevel?: number;
+  capacity?: number;
+  magicAffinity?: string | null;
+  requiredMechanic?: string | null;
+  entryRestriction?: string | null;
   exits?: RoomExit[];
   extraDescs?: RoomExtraDescription[];
   createdAt?: string;
@@ -100,8 +110,9 @@ function RoomsContent() {
                   name
                   roomDescription
                   sector
-                  flags
                   zoneId
+                  isPeaceful
+                  isDeathTrap
                 }
                 roomsCount
               }
@@ -159,8 +170,18 @@ function RoomsContent() {
               name
               roomDescription
               sector
-              flags
               zoneId
+              baseLightLevel
+              capacity
+              magicAffinity
+              requiredMechanic
+              entryRestriction
+              isPeaceful
+              allowsMagic
+              allowsRecall
+              allowsSummon
+              allowsTeleport
+              isDeathTrap
               exits {
                 id
                 direction
@@ -170,6 +191,8 @@ function RoomsContent() {
                 toZoneId
                 toRoomId
                 flags
+                defaultState
+                hitPoints
               }
               extraDescs {
                 id
@@ -381,10 +404,16 @@ function RoomsContent() {
                     <div className='flex items-center gap-4 text-sm text-muted-foreground'>
                       <span>Room #{room.id}</span>
                       <span>Zone {room.zoneId}</span>
-                      {room.flags && room.flags.length > 0 && (
+                      {room.isPeaceful && (
                         <>
                           <span>•</span>
-                          <span>Flags: {room.flags.join(', ')}</span>
+                          <span>Peaceful</span>
+                        </>
+                      )}
+                      {room.isDeathTrap && (
+                        <>
+                          <span>•</span>
+                          <span>Death Trap</span>
                         </>
                       )}
                     </div>
@@ -556,18 +585,39 @@ function RoomsContent() {
                             </span>
                             <span>{room.extraDescs?.length || 0}</span>
                           </div>
-                          {room.flags && room.flags.length > 0 && (
-                            <div>
-                              <span className='text-muted-foreground'>
-                                Room Flags:
-                              </span>
-                              <div className='flex flex-wrap gap-1 mt-1'>
-                                {room.flags.map((flag: string) => (
-                                  <FlagBadge key={flag} flag={flag} />
-                                ))}
+                          {(() => {
+                            const props: string[] = [];
+                            if (room.isPeaceful) props.push('Peaceful');
+                            if (room.isDeathTrap) props.push('Death Trap');
+                            if (room.allowsMagic === false)
+                              props.push('No Magic');
+                            if (room.allowsRecall === false)
+                              props.push('No Recall');
+                            if (room.allowsSummon === false)
+                              props.push('No Summon');
+                            if (room.allowsTeleport === false)
+                              props.push('No Teleport');
+                            if (room.magicAffinity)
+                              props.push(`Affinity: ${room.magicAffinity}`);
+                            if (room.requiredMechanic)
+                              props.push(`Requires: ${room.requiredMechanic}`);
+                            if ((room.baseLightLevel ?? 0) !== 0)
+                              props.push(`Light: ${room.baseLightLevel}`);
+                            if ((room.capacity ?? 10) !== 10)
+                              props.push(`Capacity: ${room.capacity}`);
+                            return props.length > 0 ? (
+                              <div>
+                                <span className='text-muted-foreground'>
+                                  Properties:
+                                </span>
+                                <div className='flex flex-wrap gap-1 mt-1'>
+                                  {props.map((prop: string) => (
+                                    <FlagBadge key={prop} flag={prop} />
+                                  ))}
+                                </div>
                               </div>
-                            </div>
-                          )}
+                            ) : null;
+                          })()}
                           <div className='border-t pt-2 mt-2'>
                             {room.createdAt && (
                               <div className='flex justify-between'>

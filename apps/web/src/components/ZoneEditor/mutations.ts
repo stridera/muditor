@@ -40,7 +40,22 @@ export async function updateRoomPositionMutation(
 
 interface UpdateRoomArgs {
   id: number;
-  data: { name: string; description: string; sector: string };
+  data: {
+    name: string;
+    description: string;
+    sector: string;
+    baseLightLevel?: number;
+    capacity?: number;
+    magicAffinity?: string | null;
+    requiredMechanic?: string | null;
+    entryRestriction?: string | null;
+    isPeaceful?: boolean;
+    allowsMagic?: boolean;
+    allowsRecall?: boolean;
+    allowsSummon?: boolean;
+    allowsTeleport?: boolean;
+    isDeathTrap?: boolean;
+  };
 }
 
 export async function updateRoomMutation(
@@ -56,6 +71,17 @@ export async function updateRoomMutation(
           name
           roomDescription
           sector
+          baseLightLevel
+          capacity
+          magicAffinity
+          requiredMechanic
+          entryRestriction
+          isPeaceful
+          allowsMagic
+          allowsRecall
+          allowsSummon
+          allowsTeleport
+          isDeathTrap
         }
       }`,
       variables: { id, data },

@@ -579,6 +579,22 @@ enum ConfigValueType {
   STRING
 }
 
+type ConsumableEffectDto {
+  chance: Float!
+  duration: Int
+  effect: Effect!
+  effectId: Int!
+  id: Int!
+  level: Int!
+}
+
+input ConsumableEffectInput {
+  chance: Float! = 1
+  duration: Int
+  effectId: Int!
+  level: Int! = 1
+}
+
 input CreateAbilityInput {
   abilityType: String! = "SPELL"
   castTimeRounds: Int! = 1
@@ -1045,8 +1061,10 @@ input CreateRaceInput {
 }
 
 input CreateRoomExitInput {
+  defaultState: ExitState = OPEN
   description: String
   direction: Direction!
+  hitPoints: Int
   key: String
   keywords: [String!]
   roomId: Int!
@@ -1056,9 +1074,20 @@ input CreateRoomExitInput {
 }
 
 input CreateRoomInput {
+  allowsMagic: Boolean! = true
+  allowsRecall: Boolean! = true
+  allowsSummon: Boolean! = true
+  allowsTeleport: Boolean! = true
+  baseLightLevel: Int! = 0
+  capacity: Int! = 10
   description: String!
+  entryRestriction: String
   id: Int!
+  isDeathTrap: Boolean! = false
+  isPeaceful: Boolean! = false
+  magicAffinity: MagicAffinity
   name: String!
+  requiredMechanic: PositionMechanic
   roomDescription: String
   sector: Sector! = STRUCTURE
   zoneId: Int!
@@ -1280,6 +1309,12 @@ enum ExitFlag {
   IS_DOOR
   MAGICPROOF
   PICKPROOF
+}
+
+enum ExitState {
+  CLOSED
+  LOCKED
+  OPEN
 }
 
 """Game configuration entry"""
@@ -1550,6 +1585,22 @@ enum LoginStage {
   WELCOME_BANNER
 }
 
+enum MagicAffinity {
+  AIR
+  ARCANE
+  ASTRAL
+  CHAOS
+  COLD
+  DEATH
+  EARTH
+  FIRE
+  HOLY
+  NATURE
+  SHADOW
+  UNHOLY
+  WATER
+}
+
 enum MobBehavior {
   AWARE
   FAST_TRACK
@@ -1585,6 +1636,20 @@ type MobCombatDefaultsDto {
   hpDiceSize: Int!
 }
 
+type MobDefaultEffectDto {
+  effect: Effect!
+  effectId: Int!
+  id: Int!
+  modifierData: JSON!
+  strength: Int!
+}
+
+input MobDefaultEffectInput {
+  effectId: Int!
+  modifierData: JSON
+  strength: Int! = 1
+}
+
 type MobDto {
   accuracy: Int!
 
@@ -1607,6 +1672,7 @@ type MobDto {
   damageDice: String!
   damageReductionPercent: Int!
   damageType: DamageType!
+  defaultEffects: [MobDefaultEffectDto!]!
   defaultMovementMode: MovementMode!
   defaultPosition: Position!
   dexterity: Int!
@@ -1899,6 +1965,7 @@ type Mutation {
   updateClass(data: UpdateClassInput!, id: ID!): ClassDto!
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
+  updateConsumableEffects(effects: [ConsumableEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
   updateEffect(data: UpdateEffectInput!, id: ID!): Effect!
   updateEquipmentSet(data: UpdateEquipmentSetInput!, id: ID!): EquipmentSetDto!
 
@@ -1915,10 +1982,13 @@ type Mutation {
   """Update a login message"""
   updateLoginMessage(data: UpdateLoginMessageInput!, id: ID!): LoginMessageDto!
   updateMob(data: UpdateMobInput!, id: Int!, zoneId: Int!): MobDto!
+  updateMobDefaultEffects(effects: [MobDefaultEffectInput!]!, id: Int!, zoneId: Int!): MobDto!
   updateMobReset(data: UpdateMobResetInput!, id: ID!): MobResetDto!
   updateMobResetEquipment(id: ID!, maxInstances: Int, probability: Float, wearLocation: WearFlag): Boolean!
   updateObject(data: UpdateObjectInput!, id: Int!, zoneId: Int!): ObjectDto!
+  updateObjectEffects(effects: [ObjectEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
   updateObjectReset(data: UpdateObjectResetInput!, id: ID!): ObjectResetDto!
+  updateObjectResistances(id: Int!, resistances: [ObjectResistanceInput!]!, zoneId: Int!): ObjectDto!
   updateProfile(input: UpdateProfileInput!): User!
   updateQuest(data: UpdateQuestInput!, id: Int!, zoneId: Int!): QuestDto!
   updateQuestDialogue(data: UpdateQuestDialogueInput!, id: Int!): QuestDialogueDto!
@@ -1955,17 +2025,20 @@ type ObjectDto {
   actionDescription: String
   allowedRaces: [Race!]!
   concealment: Int!
+  consumableEffects: [ConsumableEffectDto!]!
   cost: Int!
   createdAt: DateTime!
   decomposeTimer: Int!
   examineDescription: String!
   flags: [ObjectFlag!]!
+  grantedEffects: [ObjectEffectDto!]!
   id: Int!
   keywords: [String!]!
   level: Int!
   maxSize: Size
   minSize: Size
   name: String!
+  objectResistances: [ObjectResistanceDto!]!
   passengerCapacity: Int
   plainActionDescription: String
   plainExamineDescription: String!
@@ -1984,6 +2057,22 @@ type ObjectDto {
   wearFlags: [WearFlag!]!
   weight: Float!
   zoneId: Int!
+}
+
+type ObjectEffectDto {
+  effect: Effect!
+  effectId: Int!
+  id: Int!
+  modifierData: JSON!
+  strength: Int!
+  wearLocation: WearFlag
+}
+
+input ObjectEffectInput {
+  effectId: Int!
+  modifierData: JSON
+  strength: Int! = 1
+  wearLocation: WearFlag
 }
 
 enum ObjectFlag {
@@ -2010,6 +2099,19 @@ type ObjectResetDto {
   probability: Float!
   roomId: Int!
   zoneId: Int!
+}
+
+type ObjectResistanceDto {
+  allowAbsorption: Boolean!
+  element: ElementType!
+  id: Int!
+  value: Int!
+}
+
+input ObjectResistanceInput {
+  allowAbsorption: Boolean! = false
+  element: ElementType!
+  value: Int!
 }
 
 enum ObjectRestriction {
@@ -2164,6 +2266,16 @@ enum Position {
   SLEEPING
   STANDING
   STUNNED
+}
+
+enum PositionMechanic {
+  AERIAL
+  AQUATIC
+  ETHEREAL
+  GROUND
+  INCAPACITATED
+  MOUNTED
+  SUBMERGED
 }
 
 type Query {
@@ -2640,18 +2752,29 @@ input ResetPasswordInput {
 }
 
 type RoomDto {
+  allowsMagic: Boolean!
+  allowsRecall: Boolean!
+  allowsSummon: Boolean!
+  allowsTeleport: Boolean!
+  baseLightLevel: Int!
+  capacity: Int!
   createdAt: DateTime!
   createdBy: String
   description: String!
+  entryRestriction: String
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
   id: Int!
+  isDeathTrap: Boolean!
+  isPeaceful: Boolean!
   layoutX: Int
   layoutY: Int
   layoutZ: Int
+  magicAffinity: MagicAffinity
   mobs: [MobDto!]!
   name: String!
   objects: [ObjectDto!]!
+  requiredMechanic: PositionMechanic
   roomDescription: String! @deprecated(reason: "Use description instead")
   sector: Sector!
   shops: [ShopDto!]!
@@ -2661,9 +2784,11 @@ type RoomDto {
 }
 
 type RoomExitDto {
+  defaultState: ExitState!
   description: String
   direction: Direction!
   flags: [ExitFlag!]!
+  hitPoints: Int
   id: String!
   key: String
   keyword: String @deprecated(reason: "Use keywords array instead")
@@ -3512,11 +3637,22 @@ input UpdateRaceSkillInput {
 }
 
 input UpdateRoomInput {
+  allowsMagic: Boolean
+  allowsRecall: Boolean
+  allowsSummon: Boolean
+  allowsTeleport: Boolean
+  baseLightLevel: Int
+  capacity: Int
   description: String
+  entryRestriction: String
+  isDeathTrap: Boolean
+  isPeaceful: Boolean
   layoutX: Int
   layoutY: Int
   layoutZ: Int
+  magicAffinity: MagicAffinity
   name: String
+  requiredMechanic: PositionMechanic
   roomDescription: String
   sector: Sector
 }

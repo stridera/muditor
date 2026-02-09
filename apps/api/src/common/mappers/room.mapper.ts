@@ -15,6 +15,7 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       direction: e.direction,
       keywords: e.keywords || [],
       flags: e.flags || [],
+      defaultState: (e as any).defaultState ?? 'OPEN',
       roomZoneId: e.roomZoneId,
       roomId: e.roomId,
       ...(e.description ? { description: e.description } : {}),
@@ -25,6 +26,9 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
         : {}),
       ...(e.toRoomId !== null && e.toRoomId !== undefined
         ? { toRoomId: e.toRoomId }
+        : {}),
+      ...((e as any).hitPoints != null
+        ? { hitPoints: (e as any).hitPoints }
         : {}),
     };
     return exit;
@@ -48,6 +52,14 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     extraDescs,
     createdAt: db.createdAt,
     updatedAt: db.updatedAt,
+    baseLightLevel: db.baseLightLevel ?? 0,
+    capacity: db.capacity ?? 10,
+    isPeaceful: db.isPeaceful ?? false,
+    allowsMagic: db.allowsMagic ?? true,
+    allowsRecall: db.allowsRecall ?? true,
+    allowsSummon: db.allowsSummon ?? true,
+    allowsTeleport: db.allowsTeleport ?? true,
+    isDeathTrap: db.isDeathTrap ?? false,
     ...(db.createdBy && { createdBy: db.createdBy }),
     ...(db.updatedBy && { updatedBy: db.updatedBy }),
     ...(db.layoutX !== null &&
@@ -56,6 +68,13 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       db.layoutY !== undefined && { layoutY: db.layoutY }),
     ...(db.layoutZ !== null &&
       db.layoutZ !== undefined && { layoutZ: db.layoutZ }),
+    ...(db.magicAffinity != null && { magicAffinity: db.magicAffinity }),
+    ...(db.requiredMechanic != null && {
+      requiredMechanic: db.requiredMechanic,
+    }),
+    ...(db.entryRestriction != null && {
+      entryRestriction: db.entryRestriction,
+    }),
     // Pass through mobResets and objectResets for GraphQL field resolvers
     // These will be undefined for rooms loaded without these relations
     ...((db as any).mobResets && { mobResets: (db as any).mobResets }),

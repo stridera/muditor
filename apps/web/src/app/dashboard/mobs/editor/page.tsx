@@ -8,8 +8,10 @@ import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import {
   CreateMobDocument,
+  GetEffectsDocument,
   GetMobDocument,
   UpdateMobDocument,
+  UpdateMobDefaultEffectsDocument,
   type Composition,
   type DamageType,
   type Gender,
@@ -246,6 +248,25 @@ function MobEditorContent() {
     useMutation(UpdateMobDocument);
   const [createMob, { loading: createLoading }] =
     useMutation(CreateMobDocument);
+  const [updateMobDefaultEffects] = useMutation(
+    UpdateMobDefaultEffectsDocument
+  );
+
+  // Default effects state (separate from main form - saved via dedicated mutation)
+  interface DefaultEffect {
+    effectId: number;
+    strength: number;
+    modifierData: any;
+    effectName: string;
+    effectType: string;
+  }
+  const [defaultEffects, setDefaultEffects] = useState<DefaultEffect[]>([]);
+  const [effectsDirty, setEffectsDirty] = useState(false);
+
+  // Fetch available effects for picker
+  const { data: effectsData } = useQuery(GetEffectsDocument, {
+    variables: { take: 500 },
+  });
 
   // Helper function to parse dice notation (accepts undefined/null safely)
   const parseDice = (diceStr: string | undefined | null) => {
@@ -337,6 +358,17 @@ function MobEditorContent() {
         aggressionFormula: mob.aggressionFormula || '',
         activityRestrictions: mob.activityRestrictions || '',
       });
+
+      // Load default effects
+      setDefaultEffects(
+        (mob.defaultEffects || []).map(de => ({
+          effectId: parseInt(String(de.effect.id)),
+          strength: de.strength,
+          modifierData: de.modifierData,
+          effectName: de.effect.name,
+          effectType: de.effect.effectType,
+        }))
+      );
     }
   }, [data]);
 
@@ -525,6 +557,7 @@ function MobEditorContent() {
     { id: 'flags', label: 'Flags & Behavior' },
     { id: 'stats', label: 'Combat Stats' },
     { id: 'attributes', label: 'Attributes' },
+    { id: 'effects', label: 'Default Effects' },
     { id: 'equipment', label: 'Equipment & Resets' },
   ];
 
@@ -1181,6 +1214,194 @@ function MobEditorContent() {
                   />
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Default Effects Tab */}
+        {activeTab === 'effects' && !isNew && (
+          <div className='space-y-6'>
+            <div className='bg-card shadow rounded-lg p-6'>
+              <div className='flex items-center justify-between mb-4'>
+                <h3 className='text-lg font-medium text-card-foreground'>
+                  Default Effects
+                </h3>
+                <div className='flex gap-2'>
+                  {effectsDirty && (
+                    <button
+                      onClick={async () => {
+                        try {
+                          await updateMobDefaultEffects({
+                            variables: {
+                              zoneId: parseInt(zoneId!),
+                              id: parseInt(mobId!),
+                              effects: defaultEffects.map(e => ({
+                                effectId: e.effectId,
+                                strength: e.strength,
+                                modifierData: e.modifierData || {},
+                              })),
+                            },
+                          });
+                          setEffectsDirty(false);
+                        } catch (err) {
+                          console.error('Error saving effects:', err);
+                          setGeneralError('Failed to save default effects.');
+                        }
+                      }}
+                      className='inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90'
+                    >
+                      <Save className='w-4 h-4 mr-1' />
+                      Save Effects
+                    </button>
+                  )}
+                </div>
+              </div>
+              <p className='text-sm text-muted-foreground mb-4'>
+                Effects this mob always spawns with (e.g., INVISIBLE for a
+                ghost, SANCTUARY for a guardian).
+              </p>
+
+              {/* Current effects table */}
+              {defaultEffects.length > 0 && (
+                <table className='w-full text-sm mb-4'>
+                  <thead>
+                    <tr className='border-b border-border'>
+                      <th className='text-left py-2 text-card-foreground'>
+                        Effect
+                      </th>
+                      <th className='text-left py-2 text-card-foreground'>
+                        Type
+                      </th>
+                      <th className='text-left py-2 text-card-foreground w-24'>
+                        Strength
+                      </th>
+                      <th className='text-right py-2 text-card-foreground w-16'></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {defaultEffects.map((eff, idx) => (
+                      <tr key={idx} className='border-b border-border'>
+                        <td className='py-2 text-card-foreground'>
+                          {eff.effectName}
+                        </td>
+                        <td className='py-2 text-muted-foreground'>
+                          {eff.effectType}
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={eff.strength}
+                            onChange={e => {
+                              setDefaultEffects(
+                                defaultEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        strength: parseInt(e.target.value) || 1,
+                                        modifierData: eff.modifierData,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setEffectsDirty(true);
+                            }}
+                            min={1}
+                            className='w-20 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2 text-right'>
+                          <button
+                            onClick={() => {
+                              setDefaultEffects(
+                                defaultEffects.filter((_, i) => i !== idx)
+                              );
+                              setEffectsDirty(true);
+                            }}
+                            className='text-destructive hover:text-destructive/80 text-sm'
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              {/* Add effect picker */}
+              <div className='flex gap-2 items-end'>
+                <div className='flex-1'>
+                  <label className='block text-sm font-medium text-card-foreground mb-1'>
+                    Add Effect
+                  </label>
+                  <select
+                    id='effect-picker'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    defaultValue=''
+                  >
+                    <option value='' disabled>
+                      Select an effect...
+                    </option>
+                    {(effectsData?.effects || [])
+                      .filter(
+                        e =>
+                          !defaultEffects.some(
+                            de => de.effectId === parseInt(String(e.id))
+                          )
+                      )
+                      .map(e => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} ({e.effectType})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => {
+                    const select = document.getElementById(
+                      'effect-picker'
+                    ) as HTMLSelectElement;
+                    if (!select?.value) return;
+                    const effectId = parseInt(select.value);
+                    const effect = effectsData?.effects?.find(
+                      e => parseInt(String(e.id)) === effectId
+                    );
+                    if (!effect) return;
+                    setDefaultEffects([
+                      ...defaultEffects,
+                      {
+                        effectId,
+                        strength: 1,
+                        modifierData: {},
+                        effectName: effect.name,
+                        effectType: effect.effectType,
+                      },
+                    ]);
+                    setEffectsDirty(true);
+                    select.value = '';
+                  }}
+                  className='px-3 py-2 rounded-md border border-input bg-background hover:bg-accent text-sm'
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Default Effects Tab - New Mob Warning */}
+        {activeTab === 'effects' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6'>
+            <div className='text-center py-8'>
+              <h3 className='text-sm font-medium text-card-foreground'>
+                Save mob first
+              </h3>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                You need to save this mob before you can configure its default
+                effects.
+              </p>
             </div>
           </div>
         )}

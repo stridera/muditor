@@ -3,8 +3,16 @@
 // lightweight raw query results and partial selections.
 
 import {
+  Effect,
+  ExitState,
+  MagicAffinity,
   Mobs,
+  MobDefaultEffects,
   Objects,
+  ObjectEffects,
+  ObjectResistance,
+  ConsumableEffect,
+  PositionMechanic,
   RoomExit as PrismaRoomExit,
   RoomExtraDescriptions,
   Sector,
@@ -24,7 +32,21 @@ export interface RoomMapperSource {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
-  exits?: PrismaRoomExit[];
+  baseLightLevel?: number;
+  capacity?: number;
+  magicAffinity?: MagicAffinity | null;
+  requiredMechanic?: PositionMechanic | null;
+  entryRestriction?: string | null;
+  isPeaceful?: boolean;
+  allowsMagic?: boolean;
+  allowsRecall?: boolean;
+  allowsSummon?: boolean;
+  allowsTeleport?: boolean;
+  isDeathTrap?: boolean;
+  exits?: (PrismaRoomExit & {
+    defaultState?: ExitState;
+    hitPoints?: number | null;
+  })[];
   roomExtraDescriptions?: RoomExtraDescriptions[];
   deletedAt?: Date | null;
   [key: string]: unknown;
@@ -34,10 +56,15 @@ export interface RoomMapperSource {
 // Allow wealth to be optional/null even though Prisma model exposes numeric field via aggregated queries
 export type MobMapperSource = Omit<Mobs, 'wealth'> & {
   totalWealth?: number | null;
+  defaultEffects?: (MobDefaultEffects & { effect: Effect })[];
 };
 
-// Object source currently identical to Prisma Objects; reserved for future narrowing/extension.
-export type ObjectMapperSource = Objects;
+// Object source with optional effect relations (populated by findOne, absent from findAll)
+export type ObjectMapperSource = Objects & {
+  grantedEffects?: (ObjectEffects & { effect: Effect })[];
+  objectResistances?: ObjectResistance[];
+  consumableEffects?: (ConsumableEffect & { effect: Effect })[];
+};
 
 // Utility type guards (optional future usage)
 export function isRoomMapperSource(value: unknown): value is RoomMapperSource {

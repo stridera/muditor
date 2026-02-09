@@ -617,6 +617,23 @@ export type Composition =
 /** Type of configuration value */
 export type ConfigValueType = 'BOOL' | 'FLOAT' | 'INT' | 'JSON' | 'STRING';
 
+export type ConsumableEffectDto = {
+  __typename?: 'ConsumableEffectDto';
+  chance: Scalars['Float']['output'];
+  duration?: Maybe<Scalars['Int']['output']>;
+  effect: Effect;
+  effectId: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
+  level: Scalars['Int']['output'];
+};
+
+export type ConsumableEffectInput = {
+  chance?: Scalars['Float']['input'];
+  duration?: InputMaybe<Scalars['Int']['input']>;
+  effectId: Scalars['Int']['input'];
+  level?: Scalars['Int']['input'];
+};
+
 export type CreateAbilityInput = {
   abilityType?: Scalars['String']['input'];
   castTimeRounds?: Scalars['Int']['input'];
@@ -1524,6 +1541,21 @@ export type MobCombatDefaultsDto = {
   hpDiceSize: Scalars['Int']['output'];
 };
 
+export type MobDefaultEffectDto = {
+  __typename?: 'MobDefaultEffectDto';
+  effect: Effect;
+  effectId: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
+  modifierData: Scalars['JSON']['output'];
+  strength: Scalars['Int']['output'];
+};
+
+export type MobDefaultEffectInput = {
+  effectId: Scalars['Int']['input'];
+  modifierData?: InputMaybe<Scalars['JSON']['input']>;
+  strength?: Scalars['Int']['input'];
+};
+
 export type MobDto = {
   __typename?: 'MobDto';
   accuracy: Scalars['Int']['output'];
@@ -1545,6 +1577,7 @@ export type MobDto = {
   damageDice: Scalars['String']['output'];
   damageReductionPercent: Scalars['Int']['output'];
   damageType: DamageType;
+  defaultEffects: Array<MobDefaultEffectDto>;
   defaultMovementMode: MovementMode;
   defaultPosition: Position;
   dexterity: Scalars['Int']['output'];
@@ -1817,6 +1850,7 @@ export type Mutation = {
   updateClass: ClassDto;
   updateClassCircle: ClassCircleDto;
   updateClassSkill: ClassSkillDto;
+  updateConsumableEffects: ObjectDto;
   updateEffect: Effect;
   updateEquipmentSet: EquipmentSetDto;
   /** Update a game configuration value */
@@ -1829,10 +1863,13 @@ export type Mutation = {
   /** Update a login message */
   updateLoginMessage: LoginMessageDto;
   updateMob: MobDto;
+  updateMobDefaultEffects: MobDto;
   updateMobReset: MobResetDto;
   updateMobResetEquipment: Scalars['Boolean']['output'];
   updateObject: ObjectDto;
+  updateObjectEffects: ObjectDto;
   updateObjectReset: ObjectResetDto;
+  updateObjectResistances: ObjectDto;
   updateProfile: User;
   updateQuest: QuestDto;
   updateQuestDialogue: QuestDialogueDto;
@@ -2400,6 +2437,12 @@ export type MutationUpdateClassSkillArgs = {
   id: Scalars['ID']['input'];
 };
 
+export type MutationUpdateConsumableEffectsArgs = {
+  effects: Array<ConsumableEffectInput>;
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
 export type MutationUpdateEffectArgs = {
   data: UpdateEffectInput;
   id: Scalars['ID']['input'];
@@ -2442,6 +2485,12 @@ export type MutationUpdateMobArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type MutationUpdateMobDefaultEffectsArgs = {
+  effects: Array<MobDefaultEffectInput>;
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
 export type MutationUpdateMobResetArgs = {
   data: UpdateMobResetInput;
   id: Scalars['ID']['input'];
@@ -2460,9 +2509,21 @@ export type MutationUpdateObjectArgs = {
   zoneId: Scalars['Int']['input'];
 };
 
+export type MutationUpdateObjectEffectsArgs = {
+  effects: Array<ObjectEffectInput>;
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
 export type MutationUpdateObjectResetArgs = {
   data: UpdateObjectResetInput;
   id: Scalars['ID']['input'];
+};
+
+export type MutationUpdateObjectResistancesArgs = {
+  id: Scalars['Int']['input'];
+  resistances: Array<ObjectResistanceInput>;
+  zoneId: Scalars['Int']['input'];
 };
 
 export type MutationUpdateProfileArgs = {
@@ -2590,17 +2651,20 @@ export type ObjectDto = {
   actionDescription?: Maybe<Scalars['String']['output']>;
   allowedRaces: Array<Race>;
   concealment: Scalars['Int']['output'];
+  consumableEffects: Array<ConsumableEffectDto>;
   cost: Scalars['Int']['output'];
   createdAt: Scalars['DateTime']['output'];
   decomposeTimer: Scalars['Int']['output'];
   examineDescription: Scalars['String']['output'];
   flags: Array<ObjectFlag>;
+  grantedEffects: Array<ObjectEffectDto>;
   id: Scalars['Int']['output'];
   keywords: Array<Scalars['String']['output']>;
   level: Scalars['Int']['output'];
   maxSize?: Maybe<Size>;
   minSize?: Maybe<Size>;
   name: Scalars['String']['output'];
+  objectResistances: Array<ObjectResistanceDto>;
   passengerCapacity?: Maybe<Scalars['Int']['output']>;
   plainActionDescription?: Maybe<Scalars['String']['output']>;
   plainExamineDescription: Scalars['String']['output'];
@@ -2619,6 +2683,23 @@ export type ObjectDto = {
   wearFlags: Array<WearFlag>;
   weight: Scalars['Float']['output'];
   zoneId: Scalars['Int']['output'];
+};
+
+export type ObjectEffectDto = {
+  __typename?: 'ObjectEffectDto';
+  effect: Effect;
+  effectId: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
+  modifierData: Scalars['JSON']['output'];
+  strength: Scalars['Int']['output'];
+  wearLocation?: Maybe<WearFlag>;
+};
+
+export type ObjectEffectInput = {
+  effectId: Scalars['Int']['input'];
+  modifierData?: InputMaybe<Scalars['JSON']['input']>;
+  strength?: Scalars['Int']['input'];
+  wearLocation?: InputMaybe<WearFlag>;
 };
 
 export type ObjectFlag =
@@ -2645,6 +2726,20 @@ export type ObjectResetDto = {
   probability: Scalars['Float']['output'];
   roomId: Scalars['Int']['output'];
   zoneId: Scalars['Int']['output'];
+};
+
+export type ObjectResistanceDto = {
+  __typename?: 'ObjectResistanceDto';
+  allowAbsorption: Scalars['Boolean']['output'];
+  element: ElementType;
+  id: Scalars['Int']['output'];
+  value: Scalars['Int']['output'];
+};
+
+export type ObjectResistanceInput = {
+  allowAbsorption?: Scalars['Boolean']['input'];
+  element: ElementType;
+  value: Scalars['Int']['input'];
 };
 
 export type ObjectRestriction =
@@ -7948,6 +8043,34 @@ export type DeleteMobMutation = {
   deleteMob: { __typename?: 'MobDto'; id: number; zoneId: number };
 };
 
+export type UpdateMobDefaultEffectsMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  effects: Array<MobDefaultEffectInput> | MobDefaultEffectInput;
+}>;
+
+export type UpdateMobDefaultEffectsMutation = {
+  __typename?: 'Mutation';
+  updateMobDefaultEffects: {
+    __typename?: 'MobDto';
+    id: number;
+    zoneId: number;
+    defaultEffects: Array<{
+      __typename?: 'MobDefaultEffectDto';
+      id: number;
+      effectId: number;
+      strength: number;
+      modifierData: any;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
+  };
+};
+
 export type ObjectSummaryFragment = {
   __typename?: 'ObjectDto';
   id: number;
@@ -7991,6 +8114,41 @@ export type ObjectDetailsFragment = {
   zoneId: number;
   keywords: Array<string>;
   values: any;
+  grantedEffects: Array<{
+    __typename?: 'ObjectEffectDto';
+    id: number;
+    effectId: number;
+    strength: number;
+    modifierData: any;
+    wearLocation?: WearFlag | null;
+    effect: {
+      __typename?: 'Effect';
+      id: string;
+      name: string;
+      effectType: string;
+    };
+  }>;
+  objectResistances: Array<{
+    __typename?: 'ObjectResistanceDto';
+    id: number;
+    element: ElementType;
+    value: number;
+    allowAbsorption: boolean;
+  }>;
+  consumableEffects: Array<{
+    __typename?: 'ConsumableEffectDto';
+    id: number;
+    effectId: number;
+    chance: number;
+    level: number;
+    duration?: number | null;
+    effect: {
+      __typename?: 'Effect';
+      id: string;
+      name: string;
+      effectType: string;
+    };
+  }>;
 };
 
 export type GetObjectsQueryVariables = Exact<{
@@ -8072,6 +8230,41 @@ export type GetObjectQuery = {
     zoneId: number;
     keywords: Array<string>;
     values: any;
+    grantedEffects: Array<{
+      __typename?: 'ObjectEffectDto';
+      id: number;
+      effectId: number;
+      strength: number;
+      modifierData: any;
+      wearLocation?: WearFlag | null;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
+    objectResistances: Array<{
+      __typename?: 'ObjectResistanceDto';
+      id: number;
+      element: ElementType;
+      value: number;
+      allowAbsorption: boolean;
+    }>;
+    consumableEffects: Array<{
+      __typename?: 'ConsumableEffectDto';
+      id: number;
+      effectId: number;
+      chance: number;
+      level: number;
+      duration?: number | null;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
   };
 };
 
@@ -8153,6 +8346,72 @@ export type DeleteObjectsMutationVariables = Exact<{
 export type DeleteObjectsMutation = {
   __typename?: 'Mutation';
   deleteObjects: number;
+};
+
+export type UpdateObjectEffectsMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  effects: Array<ObjectEffectInput> | ObjectEffectInput;
+}>;
+
+export type UpdateObjectEffectsMutation = {
+  __typename?: 'Mutation';
+  updateObjectEffects: {
+    __typename?: 'ObjectDto';
+    id: number;
+    name: string;
+    type: ObjectType;
+    level: number;
+    weight: number;
+    cost: number;
+    zoneId: number;
+    keywords: Array<string>;
+    values: any;
+  };
+};
+
+export type UpdateObjectResistancesMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  resistances: Array<ObjectResistanceInput> | ObjectResistanceInput;
+}>;
+
+export type UpdateObjectResistancesMutation = {
+  __typename?: 'Mutation';
+  updateObjectResistances: {
+    __typename?: 'ObjectDto';
+    id: number;
+    name: string;
+    type: ObjectType;
+    level: number;
+    weight: number;
+    cost: number;
+    zoneId: number;
+    keywords: Array<string>;
+    values: any;
+  };
+};
+
+export type UpdateConsumableEffectsMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  effects: Array<ConsumableEffectInput> | ConsumableEffectInput;
+}>;
+
+export type UpdateConsumableEffectsMutation = {
+  __typename?: 'Mutation';
+  updateConsumableEffects: {
+    __typename?: 'ObjectDto';
+    id: number;
+    name: string;
+    type: ObjectType;
+    level: number;
+    weight: number;
+    cost: number;
+    zoneId: number;
+    keywords: Array<string>;
+    values: any;
+  };
 };
 
 export type PlayerMailCharacterFieldsFragment = {
@@ -8561,6 +8820,19 @@ export type GetMobQuery = {
     stance: Stance;
     createdAt: any;
     updatedAt: any;
+    defaultEffects: Array<{
+      __typename?: 'MobDefaultEffectDto';
+      id: number;
+      effectId: number;
+      strength: number;
+      modifierData: any;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
   };
 };
 
@@ -10548,6 +10820,86 @@ export const ObjectDetailsFragmentDoc = {
           { kind: 'Field', name: { kind: 'Name', value: 'maxSize' } },
           { kind: 'Field', name: { kind: 'Name', value: 'passengerCapacity' } },
           { kind: 'Field', name: { kind: 'Name', value: 'presenceOverride' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'grantedEffects' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'strength' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'modifierData' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wearLocation' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'effect' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectType' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectResistances' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'element' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'allowAbsorption' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'consumableEffects' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'chance' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'effect' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectType' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
           { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
           { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
         ],
@@ -21481,6 +21833,145 @@ export const DeleteMobDocument = {
     },
   ],
 } as unknown as DocumentNode<DeleteMobMutation, DeleteMobMutationVariables>;
+export const UpdateMobDefaultEffectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateMobDefaultEffects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'effects' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'MobDefaultEffectInput' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateMobDefaultEffects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'effects' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'effects' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'defaultEffects' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'strength' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'modifierData' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effect' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectType' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateMobDefaultEffectsMutation,
+  UpdateMobDefaultEffectsMutationVariables
+>;
 export const GetObjectsDocument = {
   kind: 'Document',
   definitions: [
@@ -21765,6 +22256,86 @@ export const GetObjectDocument = {
           { kind: 'Field', name: { kind: 'Name', value: 'maxSize' } },
           { kind: 'Field', name: { kind: 'Name', value: 'passengerCapacity' } },
           { kind: 'Field', name: { kind: 'Name', value: 'presenceOverride' } },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'grantedEffects' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'strength' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'modifierData' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'wearLocation' },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'effect' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectType' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'objectResistances' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'element' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'value' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'allowAbsorption' },
+                },
+              ],
+            },
+          },
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'consumableEffects' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'effectId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'chance' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'duration' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'effect' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectType' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
           { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
           { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
         ],
@@ -22164,6 +22735,366 @@ export const DeleteObjectsDocument = {
 } as unknown as DocumentNode<
   DeleteObjectsMutation,
   DeleteObjectsMutationVariables
+>;
+export const UpdateObjectEffectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateObjectEffects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'effects' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'ObjectEffectInput' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateObjectEffects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'effects' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'effects' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'ObjectSummary' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'ObjectSummary' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'ObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'weight' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'cost' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'values' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateObjectEffectsMutation,
+  UpdateObjectEffectsMutationVariables
+>;
+export const UpdateObjectResistancesDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateObjectResistances' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'resistances' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'ObjectResistanceInput' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateObjectResistances' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'resistances' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'resistances' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'ObjectSummary' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'ObjectSummary' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'ObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'weight' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'cost' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'values' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateObjectResistancesMutation,
+  UpdateObjectResistancesMutationVariables
+>;
+export const UpdateConsumableEffectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateConsumableEffects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'effects' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'ConsumableEffectInput' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateConsumableEffects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'effects' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'effects' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'FragmentSpread',
+                  name: { kind: 'Name', value: 'ObjectSummary' },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+    {
+      kind: 'FragmentDefinition',
+      name: { kind: 'Name', value: 'ObjectSummary' },
+      typeCondition: {
+        kind: 'NamedType',
+        name: { kind: 'Name', value: 'ObjectDto' },
+      },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'type' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'level' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'weight' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'cost' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'values' } },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateConsumableEffectsMutation,
+  UpdateConsumableEffectsMutationVariables
 >;
 export const GetMyMailDocument = {
   kind: 'Document',
@@ -23484,6 +24415,49 @@ export const GetMobDocument = {
                   name: { kind: 'Name', value: 'defaultMovementMode' },
                 },
                 { kind: 'Field', name: { kind: 'Name', value: 'stance' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'defaultEffects' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'strength' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'modifierData' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effect' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectType' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
               ],

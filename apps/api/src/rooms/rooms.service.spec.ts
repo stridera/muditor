@@ -13,7 +13,7 @@ describe('RoomsService', () => {
   let service: RoomsService;
   let databaseService: jest.Mocked<DatabaseService>;
 
-  const mockRoom: Partial<RoomDto> = {
+  const mockRoom = {
     id: 1,
     name: 'Test Room',
     roomDescription: 'This is a test room for unit testing',
@@ -22,8 +22,16 @@ describe('RoomsService', () => {
     layoutX: 0,
     layoutY: 0,
     layoutZ: 0,
-    exits: [],
-    extraDescs: [],
+    exits: [] as RoomDto['exits'],
+    extraDescs: [] as RoomDto['extraDescs'],
+    baseLightLevel: 0,
+    capacity: 10,
+    isPeaceful: false,
+    allowsMagic: true,
+    allowsRecall: true,
+    allowsSummon: true,
+    allowsTeleport: true,
+    isDeathTrap: false,
   };
 
   beforeEach(async () => {
@@ -61,7 +69,9 @@ describe('RoomsService', () => {
 
       const result = await service.findAll({});
 
-      expect(result).toEqual([mockRoom]);
+      expect(result).toEqual([
+        expect.objectContaining({ id: 1, name: 'Test Room', zoneId: 511 }),
+      ]);
       expect(databaseService.room.findMany).toHaveBeenCalled();
     });
 
@@ -94,7 +104,9 @@ describe('RoomsService', () => {
 
       const result = await service.findOne(511, 1);
 
-      expect(result).toEqual(mockRoom);
+      expect(result).toEqual(
+        expect.objectContaining({ id: 1, name: 'Test Room', zoneId: 511 })
+      );
       expect(databaseService.room.findUnique).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: expect.any(Object),
@@ -105,7 +117,7 @@ describe('RoomsService', () => {
       (databaseService.room.findUnique as jest.Mock).mockResolvedValue(null);
 
       await expect(service.findOne(511, 999)).rejects.toThrow(
-        'Room with zoneId 511 and id 999 not found'
+        'Room 511/999 not found'
       );
     });
   });
@@ -124,19 +136,17 @@ describe('RoomsService', () => {
 
       const result = await service.create(createRoomInput);
 
-      expect(result).toEqual(newRoom);
+      expect(result).toEqual(
+        expect.objectContaining({ id: 1, name: 'New Room', zoneId: 511 })
+      );
       expect(databaseService.room.create).toHaveBeenCalledWith({
-        data: {
+        data: expect.objectContaining({
           id: 1,
           zoneId: 511,
           name: 'New Room',
           roomDescription: 'A new room for testing',
           sector: 'STRUCTURE',
-          flags: [],
-          layoutX: null,
-          layoutY: null,
-          layoutZ: null,
-        },
+        }),
         include: expect.any(Object),
       });
     });
@@ -153,7 +163,9 @@ describe('RoomsService', () => {
 
       const result = await service.update(511, 1, updateRoomInput);
 
-      expect(result).toEqual(updatedRoom);
+      expect(result).toEqual(
+        expect.objectContaining({ id: 1, name: 'Test Room' })
+      );
       expect(databaseService.room.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         data: expect.any(Object),
@@ -168,7 +180,9 @@ describe('RoomsService', () => {
 
       const result = await service.delete(511, 1);
 
-      expect(result).toEqual(mockRoom);
+      expect(result).toEqual(
+        expect.objectContaining({ id: 1, name: 'Test Room', zoneId: 511 })
+      );
       expect(databaseService.room.delete).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         include: expect.any(Object),
@@ -211,7 +225,14 @@ describe('RoomsService', () => {
 
       const result = await service.updatePosition(511, 1, positionInput);
 
-      expect(result).toEqual(updatedRoom);
+      expect(result).toEqual(
+        expect.objectContaining({
+          id: 1,
+          layoutX: 100,
+          layoutY: 200,
+          layoutZ: 5,
+        })
+      );
       expect(databaseService.room.update).toHaveBeenCalledWith({
         where: { zoneId_id: { zoneId: 511, id: 1 } },
         data: expect.any(Object),

@@ -1,5 +1,19 @@
+import { Effect as PrismaEffect } from '@prisma/client';
+import { Effect } from '../../abilities/abilities.dto';
 import { MobDto } from '../../mobs/mob.dto';
 import { MobMapperSource } from './types';
+
+function mapEffect(e: PrismaEffect): Effect {
+  return {
+    id: e.id,
+    name: e.name,
+    ...(e.description != null && { description: e.description }),
+    effectType: e.effectType,
+    tags: e.tags,
+    defaultParams: e.defaultParams,
+    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
+  };
+}
 
 // Computes dice string from numeric components
 function buildDice(num: number, size: number, bonus: number): string {
@@ -93,6 +107,13 @@ export function mapMob(db: MobMapperSource): MobDto {
       }),
     ...(db.classId !== null &&
       db.classId !== undefined && { classId: db.classId }),
+    defaultEffects: (db.defaultEffects ?? []).map(de => ({
+      id: de.id,
+      effectId: de.effectId,
+      effect: mapEffect(de.effect),
+      strength: de.strength,
+      modifierData: de.modifierData,
+    })),
     createdAt: db.createdAt,
     updatedAt: db.updatedAt,
   };

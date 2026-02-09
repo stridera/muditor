@@ -18,6 +18,7 @@ import {
   MobDto,
   UpdateMobInput,
 } from './mob.dto';
+import { MobDefaultEffectInput } from './mob-effects.dto';
 import { MobsService } from './mobs.service';
 
 interface MobFieldSource {
@@ -202,5 +203,21 @@ export class MobsResolver {
   wealth(@Parent() mob: MobFieldSource): number | null {
     // Map totalWealth from database to wealth in DTO
     return mob.totalWealth ?? null;
+  }
+
+  @Mutation(() => MobDto)
+  @UseGuards(JwtAuthGuard)
+  async updateMobDefaultEffects(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('effects', { type: () => [MobDefaultEffectInput] })
+    effects: MobDefaultEffectInput[]
+  ): Promise<MobDto> {
+    const mob = await this.mobsService.updateMobDefaultEffects(
+      zoneId,
+      id,
+      effects
+    );
+    return mapMob(mob!);
   }
 }
