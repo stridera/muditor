@@ -5,6 +5,11 @@ import { ObjectType as ObjectTypeEnum } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';
+import {
+  ObjectEffectInput,
+  ObjectResistanceInput,
+  ConsumableEffectInput,
+} from './object-effects.dto';
 import { ObjectsService } from './objects.service';
 
 @Resolver(() => ObjectDto)
@@ -107,5 +112,53 @@ export class ObjectsResolver {
     @Args('ids', { type: () => [Int] }) ids: number[]
   ): Promise<number> {
     return this.objectsService.deleteMany(ids);
+  }
+
+  @Mutation(() => ObjectDto)
+  @UseGuards(JwtAuthGuard)
+  async updateObjectEffects(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('effects', { type: () => [ObjectEffectInput] })
+    effects: ObjectEffectInput[]
+  ): Promise<ObjectDto> {
+    const obj = await this.objectsService.updateObjectEffects(
+      zoneId,
+      id,
+      effects
+    );
+    return mapObject(obj!);
+  }
+
+  @Mutation(() => ObjectDto)
+  @UseGuards(JwtAuthGuard)
+  async updateObjectResistances(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('resistances', { type: () => [ObjectResistanceInput] })
+    resistances: ObjectResistanceInput[]
+  ): Promise<ObjectDto> {
+    const obj = await this.objectsService.updateObjectResistances(
+      zoneId,
+      id,
+      resistances
+    );
+    return mapObject(obj!);
+  }
+
+  @Mutation(() => ObjectDto)
+  @UseGuards(JwtAuthGuard)
+  async updateConsumableEffects(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('effects', { type: () => [ConsumableEffectInput] })
+    effects: ConsumableEffectInput[]
+  ): Promise<ObjectDto> {
+    const obj = await this.objectsService.updateConsumableEffects(
+      zoneId,
+      id,
+      effects
+    );
+    return mapObject(obj!);
   }
 }

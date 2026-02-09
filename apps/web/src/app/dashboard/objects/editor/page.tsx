@@ -6,6 +6,14 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { TagInput } from '@/components/ui/tag-input';
 import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import {
+  type ElementType,
+  GetEffectsDocument,
+  UpdateObjectEffectsDocument,
+  UpdateObjectResistancesDocument,
+  UpdateConsumableEffectsDocument,
+  type WearFlag,
+} from '@/generated/graphql';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -46,6 +54,36 @@ const GET_OBJECT = gql`
       maxSize
       passengerCapacity
       presenceOverride
+      grantedEffects {
+        id
+        effectId
+        strength
+        modifierData
+        wearLocation
+        effect {
+          id
+          name
+          effectType
+        }
+      }
+      objectResistances {
+        id
+        element
+        value
+        allowAbsorption
+      }
+      consumableEffects {
+        id
+        effectId
+        chance
+        level
+        duration
+        effect {
+          id
+          name
+          effectType
+        }
+      }
       createdAt
       updatedAt
     }
@@ -193,6 +231,33 @@ const OBJECT_RESTRICTIONS = [
   'NO_INVISIBLE', // Cannot be made invisible
 ];
 
+const ELEMENT_TYPES = [
+  'FIRE',
+  'COLD',
+  'LIGHTNING',
+  'ACID',
+  'POISON',
+  'HOLY',
+  'UNHOLY',
+  'SHADOW',
+  'RADIANT',
+  'NECROTIC',
+  'FORCE',
+  'SONIC',
+  'MENTAL',
+  'NATURE',
+  'WATER',
+  'AIR',
+  'EARTH',
+  'PHYSICAL',
+  'SLASH',
+  'PIERCE',
+  'CRUSH',
+  'BLEED',
+  'HEAL',
+  'SHOCK',
+];
+
 // Define validation rules for object form
 const objectValidationRules: ValidationRules<ObjectFormData> = [
   {
@@ -281,6 +346,49 @@ function ObjectEditorContent() {
 
   const [updateObject, { loading: updateLoading }] = useMutation(UPDATE_OBJECT);
   const [createObject, { loading: createLoading }] = useMutation(CREATE_OBJECT);
+  const [updateObjectEffects] = useMutation(UpdateObjectEffectsDocument);
+  const [updateObjectResistances] = useMutation(
+    UpdateObjectResistancesDocument
+  );
+  const [updateConsumableEffects] = useMutation(
+    UpdateConsumableEffectsDocument
+  );
+
+  // Effects state (saved via dedicated mutations, separate from main form)
+  interface GrantedEffect {
+    effectId: number;
+    strength: number;
+    modifierData: any;
+    wearLocation: string;
+    effectName: string;
+    effectType: string;
+  }
+  interface Resistance {
+    element: string;
+    value: number;
+    allowAbsorption: boolean;
+  }
+  interface ConsumableEff {
+    effectId: number;
+    chance: number;
+    level: number;
+    duration: number;
+    effectName: string;
+    effectType: string;
+  }
+  const [grantedEffects, setGrantedEffects] = useState<GrantedEffect[]>([]);
+  const [objectResistances, setObjectResistances] = useState<Resistance[]>([]);
+  const [consumableEffects, setConsumableEffects] = useState<ConsumableEff[]>(
+    []
+  );
+  const [effectsDirty, setEffectsDirty] = useState(false);
+  const [resistancesDirty, setResistancesDirty] = useState(false);
+  const [consumablesDirty, setConsumablesDirty] = useState(false);
+
+  // Fetch available effects for picker
+  const { data: effectsData } = useQuery(GetEffectsDocument, {
+    variables: { take: 500 },
+  });
 
   useEffect(() => {
     const typedData = data as
@@ -298,6 +406,25 @@ function ObjectEditorContent() {
             passengerCapacity?: number | null;
             presenceOverride?: string | null;
             values?: Record<string, unknown>;
+            grantedEffects?: Array<{
+              effectId: number;
+              strength: number;
+              modifierData: any;
+              wearLocation?: string | null;
+              effect: { id: string; name: string; effectType: string };
+            }>;
+            objectResistances?: Array<{
+              element: string;
+              value: number;
+              allowAbsorption: boolean;
+            }>;
+            consumableEffects?: Array<{
+              effectId: number;
+              chance: number;
+              level: number;
+              duration?: number | null;
+              effect: { id: string; name: string; effectType: string };
+            }>;
           };
         }
       | undefined;
@@ -329,6 +456,39 @@ function ObjectEditorContent() {
       setMaxSize(object.maxSize || '');
       setPassengerCapacity(object.passengerCapacity || 0);
       setPresenceOverride(object.presenceOverride || '');
+
+      // Load granted effects
+      setGrantedEffects(
+        (object.grantedEffects || []).map(ge => ({
+          effectId: parseInt(String(ge.effect.id)),
+          strength: ge.strength,
+          modifierData: ge.modifierData,
+          wearLocation: ge.wearLocation || '',
+          effectName: ge.effect.name,
+          effectType: ge.effect.effectType,
+        }))
+      );
+
+      // Load resistances
+      setObjectResistances(
+        (object.objectResistances || []).map(r => ({
+          element: r.element,
+          value: r.value,
+          allowAbsorption: r.allowAbsorption,
+        }))
+      );
+
+      // Load consumable effects
+      setConsumableEffects(
+        (object.consumableEffects || []).map(ce => ({
+          effectId: parseInt(String(ce.effect.id)),
+          chance: ce.chance,
+          level: ce.level,
+          duration: ce.duration ?? 0,
+          effectName: ce.effect.name,
+          effectType: ce.effect.effectType,
+        }))
+      );
     }
   }, [data]);
 
@@ -434,6 +594,7 @@ function ObjectEditorContent() {
     { id: 'properties', label: 'Properties' },
     { id: 'flags', label: 'Flags & Wear' },
     { id: 'restrictions', label: 'Restrictions' },
+    { id: 'effects', label: 'Effects' },
     { id: 'values', label: 'Type Values' },
   ];
 
@@ -1130,6 +1291,622 @@ function ObjectEditorContent() {
                   </p>
                 </div>
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* Effects Tab */}
+        {activeTab === 'effects' && !isNew && (
+          <div className='space-y-6'>
+            {/* Granted Effects (worn/held) */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <div className='flex items-center justify-between mb-4'>
+                <div>
+                  <h3 className='text-lg font-medium text-foreground'>
+                    Granted Effects
+                  </h3>
+                  <p className='text-sm text-muted-foreground'>
+                    Effects applied when this object is worn or held
+                  </p>
+                </div>
+                {effectsDirty && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await updateObjectEffects({
+                          variables: {
+                            zoneId: parseInt(zoneIdParam || '0'),
+                            id: parseInt(objectId || '0'),
+                            effects: grantedEffects.map(e => ({
+                              effectId: e.effectId,
+                              strength: e.strength,
+                              modifierData: e.modifierData || {},
+                              ...(e.wearLocation
+                                ? { wearLocation: e.wearLocation as WearFlag }
+                                : {}),
+                            })),
+                          },
+                        });
+                        setEffectsDirty(false);
+                      } catch (err) {
+                        console.error('Error saving effects:', err);
+                        setGeneralError('Failed to save granted effects.');
+                      }
+                    }}
+                    className='inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90'
+                  >
+                    <Save className='w-4 h-4 mr-1' />
+                    Save Effects
+                  </button>
+                )}
+              </div>
+
+              {grantedEffects.length > 0 && (
+                <table className='w-full text-sm mb-4'>
+                  <thead>
+                    <tr className='border-b border-border'>
+                      <th className='text-left py-2 text-foreground'>Effect</th>
+                      <th className='text-left py-2 text-foreground'>Type</th>
+                      <th className='text-left py-2 text-foreground w-24'>
+                        Strength
+                      </th>
+                      <th className='text-left py-2 text-foreground w-32'>
+                        Wear Loc
+                      </th>
+                      <th className='text-right py-2 text-foreground w-16'></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {grantedEffects.map((eff, idx) => (
+                      <tr key={idx} className='border-b border-border'>
+                        <td className='py-2 text-foreground'>
+                          {eff.effectName}
+                        </td>
+                        <td className='py-2 text-muted-foreground'>
+                          {eff.effectType}
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={eff.strength}
+                            onChange={e => {
+                              setGrantedEffects(
+                                grantedEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        strength: parseInt(e.target.value) || 1,
+                                        modifierData: eff.modifierData,
+                                        wearLocation: eff.wearLocation,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setEffectsDirty(true);
+                            }}
+                            min={1}
+                            className='w-20 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2'>
+                          <select
+                            value={eff.wearLocation}
+                            onChange={e => {
+                              setGrantedEffects(
+                                grantedEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        strength: eff.strength,
+                                        modifierData: eff.modifierData,
+                                        wearLocation: e.target.value,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setEffectsDirty(true);
+                            }}
+                            className='w-28 rounded-md border border-input bg-background shadow-sm text-sm'
+                          >
+                            <option value=''>Any</option>
+                            {WEAR_FLAGS.map(wf => (
+                              <option key={wf} value={wf}>
+                                {wf.toLowerCase()}
+                              </option>
+                            ))}
+                          </select>
+                        </td>
+                        <td className='py-2 text-right'>
+                          <button
+                            onClick={() => {
+                              setGrantedEffects(
+                                grantedEffects.filter((_, i) => i !== idx)
+                              );
+                              setEffectsDirty(true);
+                            }}
+                            className='text-destructive hover:text-destructive/80 text-sm'
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              <div className='flex gap-2 items-end'>
+                <div className='flex-1'>
+                  <label className='block text-sm font-medium text-foreground mb-1'>
+                    Add Effect
+                  </label>
+                  <select
+                    id='granted-effect-picker'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    defaultValue=''
+                  >
+                    <option value='' disabled>
+                      Select an effect...
+                    </option>
+                    {(effectsData?.effects || [])
+                      .filter(
+                        e =>
+                          !grantedEffects.some(
+                            ge => ge.effectId === parseInt(String(e.id))
+                          )
+                      )
+                      .map(e => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} ({e.effectType})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => {
+                    const select = document.getElementById(
+                      'granted-effect-picker'
+                    ) as HTMLSelectElement;
+                    if (!select?.value) return;
+                    const effectId = parseInt(select.value);
+                    const effect = effectsData?.effects?.find(
+                      e => parseInt(String(e.id)) === effectId
+                    );
+                    if (!effect) return;
+                    setGrantedEffects([
+                      ...grantedEffects,
+                      {
+                        effectId,
+                        strength: 1,
+                        modifierData: {},
+                        wearLocation: '',
+                        effectName: effect.name,
+                        effectType: effect.effectType,
+                      },
+                    ]);
+                    setEffectsDirty(true);
+                    select.value = '';
+                  }}
+                  className='px-3 py-2 rounded-md border border-input bg-background hover:bg-accent text-sm'
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Object Resistances */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <div className='flex items-center justify-between mb-4'>
+                <div>
+                  <h3 className='text-lg font-medium text-foreground'>
+                    Resistances
+                  </h3>
+                  <p className='text-sm text-muted-foreground'>
+                    Elemental resistances granted by this object
+                  </p>
+                </div>
+                {resistancesDirty && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await updateObjectResistances({
+                          variables: {
+                            zoneId: parseInt(zoneIdParam || '0'),
+                            id: parseInt(objectId || '0'),
+                            resistances: objectResistances.map(r => ({
+                              element: r.element as ElementType,
+                              value: r.value,
+                              allowAbsorption: r.allowAbsorption,
+                            })),
+                          },
+                        });
+                        setResistancesDirty(false);
+                      } catch (err) {
+                        console.error('Error saving resistances:', err);
+                        setGeneralError('Failed to save resistances.');
+                      }
+                    }}
+                    className='inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90'
+                  >
+                    <Save className='w-4 h-4 mr-1' />
+                    Save Resistances
+                  </button>
+                )}
+              </div>
+
+              {objectResistances.length > 0 && (
+                <table className='w-full text-sm mb-4'>
+                  <thead>
+                    <tr className='border-b border-border'>
+                      <th className='text-left py-2 text-foreground'>
+                        Element
+                      </th>
+                      <th className='text-left py-2 text-foreground w-24'>
+                        Value
+                      </th>
+                      <th className='text-left py-2 text-foreground w-32'>
+                        Absorb
+                      </th>
+                      <th className='text-right py-2 text-foreground w-16'></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {objectResistances.map((res, idx) => (
+                      <tr key={idx} className='border-b border-border'>
+                        <td className='py-2 text-foreground'>
+                          {res.element.charAt(0) +
+                            res.element.slice(1).toLowerCase()}
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={res.value}
+                            onChange={e => {
+                              setObjectResistances(
+                                objectResistances.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        element: res.element,
+                                        value: parseInt(e.target.value) || 0,
+                                        allowAbsorption: res.allowAbsorption,
+                                      }
+                                    : item
+                                )
+                              );
+                              setResistancesDirty(true);
+                            }}
+                            className='w-20 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='checkbox'
+                            checked={res.allowAbsorption}
+                            onChange={e => {
+                              setObjectResistances(
+                                objectResistances.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        element: res.element,
+                                        value: res.value,
+                                        allowAbsorption: e.target.checked,
+                                      }
+                                    : item
+                                )
+                              );
+                              setResistancesDirty(true);
+                            }}
+                            className='rounded border-input'
+                          />
+                        </td>
+                        <td className='py-2 text-right'>
+                          <button
+                            onClick={() => {
+                              setObjectResistances(
+                                objectResistances.filter((_, i) => i !== idx)
+                              );
+                              setResistancesDirty(true);
+                            }}
+                            className='text-destructive hover:text-destructive/80 text-sm'
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              <div className='flex gap-2 items-end'>
+                <div className='flex-1'>
+                  <label className='block text-sm font-medium text-foreground mb-1'>
+                    Add Resistance
+                  </label>
+                  <select
+                    id='resistance-picker'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    defaultValue=''
+                  >
+                    <option value='' disabled>
+                      Select an element...
+                    </option>
+                    {ELEMENT_TYPES.filter(
+                      el => !objectResistances.some(r => r.element === el)
+                    ).map(el => (
+                      <option key={el} value={el}>
+                        {el.charAt(0) + el.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => {
+                    const select = document.getElementById(
+                      'resistance-picker'
+                    ) as HTMLSelectElement;
+                    if (!select?.value) return;
+                    setObjectResistances([
+                      ...objectResistances,
+                      {
+                        element: select.value,
+                        value: 0,
+                        allowAbsorption: false,
+                      },
+                    ]);
+                    setResistancesDirty(true);
+                    select.value = '';
+                  }}
+                  className='px-3 py-2 rounded-md border border-input bg-background hover:bg-accent text-sm'
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+
+            {/* Consumable Effects */}
+            <div className='bg-card shadow rounded-lg p-6 border border-border'>
+              <div className='flex items-center justify-between mb-4'>
+                <div>
+                  <h3 className='text-lg font-medium text-foreground'>
+                    Consumable Effects
+                  </h3>
+                  <p className='text-sm text-muted-foreground'>
+                    Effects applied when this object is consumed (food, potions,
+                    drinks)
+                  </p>
+                </div>
+                {consumablesDirty && (
+                  <button
+                    onClick={async () => {
+                      try {
+                        await updateConsumableEffects({
+                          variables: {
+                            zoneId: parseInt(zoneIdParam || '0'),
+                            id: parseInt(objectId || '0'),
+                            effects: consumableEffects.map(e => ({
+                              effectId: e.effectId,
+                              chance: e.chance,
+                              level: e.level,
+                              ...(e.duration > 0
+                                ? { duration: e.duration }
+                                : {}),
+                            })),
+                          },
+                        });
+                        setConsumablesDirty(false);
+                      } catch (err) {
+                        console.error('Error saving consumable effects:', err);
+                        setGeneralError('Failed to save consumable effects.');
+                      }
+                    }}
+                    className='inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium bg-primary text-primary-foreground hover:bg-primary/90'
+                  >
+                    <Save className='w-4 h-4 mr-1' />
+                    Save Consumables
+                  </button>
+                )}
+              </div>
+
+              {consumableEffects.length > 0 && (
+                <table className='w-full text-sm mb-4'>
+                  <thead>
+                    <tr className='border-b border-border'>
+                      <th className='text-left py-2 text-foreground'>Effect</th>
+                      <th className='text-left py-2 text-foreground'>Type</th>
+                      <th className='text-left py-2 text-foreground w-20'>
+                        Chance%
+                      </th>
+                      <th className='text-left py-2 text-foreground w-20'>
+                        Level
+                      </th>
+                      <th className='text-left py-2 text-foreground w-24'>
+                        Duration
+                      </th>
+                      <th className='text-right py-2 text-foreground w-16'></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {consumableEffects.map((eff, idx) => (
+                      <tr key={idx} className='border-b border-border'>
+                        <td className='py-2 text-foreground'>
+                          {eff.effectName}
+                        </td>
+                        <td className='py-2 text-muted-foreground'>
+                          {eff.effectType}
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={eff.chance}
+                            onChange={e => {
+                              setConsumableEffects(
+                                consumableEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        chance: parseInt(e.target.value) || 0,
+                                        level: eff.level,
+                                        duration: eff.duration,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setConsumablesDirty(true);
+                            }}
+                            min={0}
+                            max={100}
+                            className='w-16 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={eff.level}
+                            onChange={e => {
+                              setConsumableEffects(
+                                consumableEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        chance: eff.chance,
+                                        level: parseInt(e.target.value) || 1,
+                                        duration: eff.duration,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setConsumablesDirty(true);
+                            }}
+                            min={1}
+                            className='w-16 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2'>
+                          <input
+                            type='number'
+                            value={eff.duration}
+                            onChange={e => {
+                              setConsumableEffects(
+                                consumableEffects.map((item, i) =>
+                                  i === idx
+                                    ? {
+                                        effectId: eff.effectId,
+                                        chance: eff.chance,
+                                        level: eff.level,
+                                        duration: parseInt(e.target.value) || 0,
+                                        effectName: eff.effectName,
+                                        effectType: eff.effectType,
+                                      }
+                                    : item
+                                )
+                              );
+                              setConsumablesDirty(true);
+                            }}
+                            min={0}
+                            placeholder='rounds'
+                            className='w-20 rounded-md border border-input bg-background shadow-sm text-sm'
+                          />
+                        </td>
+                        <td className='py-2 text-right'>
+                          <button
+                            onClick={() => {
+                              setConsumableEffects(
+                                consumableEffects.filter((_, i) => i !== idx)
+                              );
+                              setConsumablesDirty(true);
+                            }}
+                            className='text-destructive hover:text-destructive/80 text-sm'
+                          >
+                            Remove
+                          </button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              )}
+
+              <div className='flex gap-2 items-end'>
+                <div className='flex-1'>
+                  <label className='block text-sm font-medium text-foreground mb-1'>
+                    Add Consumable Effect
+                  </label>
+                  <select
+                    id='consumable-effect-picker'
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                    defaultValue=''
+                  >
+                    <option value='' disabled>
+                      Select an effect...
+                    </option>
+                    {(effectsData?.effects || [])
+                      .filter(
+                        e =>
+                          !consumableEffects.some(
+                            ce => ce.effectId === parseInt(String(e.id))
+                          )
+                      )
+                      .map(e => (
+                        <option key={e.id} value={e.id}>
+                          {e.name} ({e.effectType})
+                        </option>
+                      ))}
+                  </select>
+                </div>
+                <button
+                  onClick={() => {
+                    const select = document.getElementById(
+                      'consumable-effect-picker'
+                    ) as HTMLSelectElement;
+                    if (!select?.value) return;
+                    const effectId = parseInt(select.value);
+                    const effect = effectsData?.effects?.find(
+                      e => parseInt(String(e.id)) === effectId
+                    );
+                    if (!effect) return;
+                    setConsumableEffects([
+                      ...consumableEffects,
+                      {
+                        effectId,
+                        chance: 100,
+                        level: 1,
+                        duration: 0,
+                        effectName: effect.name,
+                        effectType: effect.effectType,
+                      },
+                    ]);
+                    setConsumablesDirty(true);
+                    select.value = '';
+                  }}
+                  className='px-3 py-2 rounded-md border border-input bg-background hover:bg-accent text-sm'
+                >
+                  Add
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Effects Tab - New Object Warning */}
+        {activeTab === 'effects' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6 border border-border'>
+            <div className='text-center py-8'>
+              <h3 className='text-sm font-medium text-foreground'>
+                Save object first
+              </h3>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                You need to save this object before you can configure its
+                effects and resistances.
+              </p>
             </div>
           </div>
         )}

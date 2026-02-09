@@ -23,6 +23,11 @@ import {
   WearFlag,
 } from '@prisma/client';
 import GraphQLJSON from 'graphql-type-json';
+import {
+  ObjectEffectDto,
+  ObjectResistanceDto,
+  ConsumableEffectDto,
+} from './object-effects.dto';
 
 // Register GraphQL enums
 registerEnumType(ObjectTypeEnum, { name: 'ObjectType' });
@@ -122,6 +127,15 @@ export class ObjectDto {
 
   @Field(() => Int)
   zoneId: number;
+
+  @Field(() => [ObjectEffectDto], { defaultValue: [] })
+  grantedEffects: ObjectEffectDto[];
+
+  @Field(() => [ObjectResistanceDto], { defaultValue: [] })
+  objectResistances: ObjectResistanceDto[];
+
+  @Field(() => [ConsumableEffectDto], { defaultValue: [] })
+  consumableEffects: ConsumableEffectDto[];
 
   @Field(() => Date)
   createdAt: Date;

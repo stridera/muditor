@@ -188,10 +188,12 @@ export class RoomsResolver {
     const mapped: RoomExitDto = {
       ...exit,
       id: String(exit.id),
+      defaultState: exit.defaultState as any,
       description: exit.description ?? undefined,
       key: exit.key ?? undefined,
       toZoneId: exit.toZoneId ?? undefined,
       toRoomId: exit.toRoomId ?? undefined,
+      hitPoints: exit.hitPoints ?? undefined,
     } as RoomExitDto;
     return mapped;
   }
@@ -203,10 +205,12 @@ export class RoomsResolver {
     const mapped: RoomExitDto = {
       ...exit,
       id: String(exit.id),
+      defaultState: exit.defaultState as any,
       description: exit.description ?? undefined,
       key: exit.key ?? undefined,
       toZoneId: exit.toZoneId ?? undefined,
       toRoomId: exit.toRoomId ?? undefined,
+      hitPoints: exit.hitPoints ?? undefined,
     } as RoomExitDto;
     return mapped;
   }

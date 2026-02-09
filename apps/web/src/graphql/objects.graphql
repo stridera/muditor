@@ -31,6 +31,36 @@ fragment ObjectDetails on ObjectDto {
   maxSize
   passengerCapacity
   presenceOverride
+  grantedEffects {
+    id
+    effectId
+    strength
+    modifierData
+    wearLocation
+    effect {
+      id
+      name
+      effectType
+    }
+  }
+  objectResistances {
+    id
+    element
+    value
+    allowAbsorption
+  }
+  consumableEffects {
+    id
+    effectId
+    chance
+    level
+    duration
+    effect {
+      id
+      name
+      effectType
+    }
+  }
   createdAt
   updatedAt
 }
@@ -85,4 +115,22 @@ mutation DeleteObject($id: Int!, $zoneId: Int!) {
 
 mutation DeleteObjects($ids: [Int!]!) {
   deleteObjects(ids: $ids)
+}
+
+mutation UpdateObjectEffects($zoneId: Int!, $id: Int!, $effects: [ObjectEffectInput!]!) {
+  updateObjectEffects(zoneId: $zoneId, id: $id, effects: $effects) {
+    ...ObjectSummary
+  }
+}
+
+mutation UpdateObjectResistances($zoneId: Int!, $id: Int!, $resistances: [ObjectResistanceInput!]!) {
+  updateObjectResistances(zoneId: $zoneId, id: $id, resistances: $resistances) {
+    ...ObjectSummary
+  }
+}
+
+mutation UpdateConsumableEffects($zoneId: Int!, $id: Int!, $effects: [ConsumableEffectInput!]!) {
+  updateConsumableEffects(zoneId: $zoneId, id: $id, effects: $effects) {
+    ...ObjectSummary
+  }
 }

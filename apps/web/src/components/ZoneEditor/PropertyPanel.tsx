@@ -19,7 +19,17 @@ interface Room {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
-  flags?: string[];
+  baseLightLevel?: number;
+  capacity?: number;
+  magicAffinity?: string | null;
+  requiredMechanic?: string | null;
+  entryRestriction?: string | null;
+  isPeaceful?: boolean;
+  allowsMagic?: boolean;
+  allowsRecall?: boolean;
+  allowsSummon?: boolean;
+  allowsTeleport?: boolean;
+  isDeathTrap?: boolean;
   exits: RoomExit[];
   mobs?: Array<{
     id: number;
@@ -54,13 +64,18 @@ interface RoomExit {
   keywords?: string[];
   key?: string;
   flags?: string[];
+  defaultState?: string;
+  hitPoints?: number | null;
 }
 
 interface PropertyPanelProps {
   room: Room;
   allRooms: Room[];
   zones?: Array<{ id: number; name: string }>; // For cross-zone exit display
-  onRoomChange: (field: keyof Room, value: string | string[]) => void;
+  onRoomChange: (
+    field: keyof Room,
+    value: string | string[] | number | boolean | null
+  ) => void;
   onSaveRoom: () => void;
   onCreateExit: (exitData: {
     direction: string;
@@ -464,6 +479,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           )}
                         </div>
                         {(exit.flags?.length ||
+                          exit.defaultState !== 'OPEN' ||
+                          exit.hitPoints ||
                           exit.keywords?.length ||
                           exit.key) && (
                           <div className='mt-2 flex flex-wrap gap-1'>
@@ -472,12 +489,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 Door
                               </span>
                             )}
-                            {exit.flags?.includes('CLOSED') && (
+                            {exit.defaultState === 'CLOSED' && (
                               <span className='px-2 py-0.5 text-[10px] rounded-full bg-yellow-100 text-yellow-700 border border-yellow-300'>
                                 Closed
                               </span>
                             )}
-                            {exit.flags?.includes('LOCKED') && (
+                            {exit.defaultState === 'LOCKED' && (
                               <span className='px-2 py-0.5 text-[10px] rounded-full bg-red-100 text-red-700 border border-red-300'>
                                 Locked
                               </span>
@@ -485,6 +502,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             {exit.flags?.includes('PICKPROOF') && (
                               <span className='px-2 py-0.5 text-[10px] rounded-full bg-purple-100 text-purple-700 border border-purple-300'>
                                 Pickproof
+                              </span>
+                            )}
+                            {exit.hitPoints != null && (
+                              <span className='px-2 py-0.5 text-[10px] rounded-full bg-orange-100 text-orange-700 border border-orange-300'>
+                                HP: {exit.hitPoints}
                               </span>
                             )}
                             {exit.key && (
@@ -838,6 +860,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
                         {/* Exit State Badges */}
                         {(exit.flags?.length ||
+                          exit.defaultState !== 'OPEN' ||
+                          exit.hitPoints ||
                           exit.keywords?.length ||
                           exit.key) && (
                           <div className='flex flex-wrap gap-1 mt-2'>
@@ -846,12 +870,12 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 🚪 Door
                               </span>
                             )}
-                            {exit.flags?.includes('CLOSED') && (
+                            {exit.defaultState === 'CLOSED' && (
                               <span className='inline-flex items-center gap-1 text-xs bg-yellow-100 text-yellow-700 px-2 py-0.5 rounded-full border border-yellow-300'>
                                 🚧 Closed
                               </span>
                             )}
-                            {exit.flags?.includes('LOCKED') && (
+                            {exit.defaultState === 'LOCKED' && (
                               <span className='inline-flex items-center gap-1 text-xs bg-red-100 text-red-700 px-2 py-0.5 rounded-full border border-red-300'>
                                 🔒 Locked
                               </span>
@@ -864,6 +888,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             {exit.flags?.includes('HIDDEN') && (
                               <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
                                 👁️ Hidden
+                              </span>
+                            )}
+                            {exit.hitPoints != null && (
+                              <span className='inline-flex items-center gap-1 text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full border border-orange-300'>
+                                💪 HP: {exit.hitPoints}
                               </span>
                             )}
                             {exit.keywords?.map((keyword, idx) => (
@@ -1429,432 +1458,333 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
             <h4
               className={`text-sm font-medium mb-3 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
             >
-              Room Flags
+              Room Properties
             </h4>
 
-            {/* Environment & Lighting */}
+            {/* Lighting & Environment */}
             <div
               className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
             >
               <h5
                 className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
               >
-                Environment & Lighting
+                Lighting & Environment
               </h5>
-              <div className='grid grid-cols-2 gap-2'>
-                {[
-                  {
-                    flag: 'DARK',
-                    label: '🌑 Dark',
-                    desc: 'Room is dark without light',
-                  },
-                  {
-                    flag: 'ALWAYS_LIT',
-                    label: '☀️ Always Lit',
-                    desc: 'Never dark',
-                  },
-                  {
-                    flag: 'INDOORS',
-                    label: '🏠 Indoors',
-                    desc: 'Inside a building',
-                  },
-                  {
-                    flag: 'UNDERDARK',
-                    label: '🕳️ Underdark',
-                    desc: 'Underground area',
-                  },
-                ].map(({ flag, label, desc }) => (
+              <div className='space-y-3'>
+                {/* Base Light Level */}
+                <div>
                   <label
-                    key={flag}
-                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
-                      (room.flags || []).includes(flag)
-                        ? isDark
-                          ? 'bg-blue-900/40 border border-blue-700'
-                          : 'bg-blue-50 border border-blue-200'
-                        : isDark
-                          ? 'hover:bg-gray-600'
-                          : 'hover:bg-gray-100'
-                    }`}
-                    title={desc}
+                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
                   >
-                    <input
-                      type='checkbox'
-                      checked={(room.flags || []).includes(flag)}
-                      onChange={e => {
-                        const currentFlags = room.flags || [];
-                        const newFlags = e.target.checked
-                          ? [...currentFlags, flag]
-                          : currentFlags.filter(f => f !== flag);
-                        onRoomChange('flags', newFlags);
-                      }}
-                      className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
-                    />
-                    <span className='text-xs'>{label}</span>
+                    Base Light Level
                   </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Room Size */}
-            <div
-              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
-            >
-              <h5
-                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-              >
-                Room Size (Combat)
-              </h5>
-              <div className='grid grid-cols-2 gap-2'>
-                {[
-                  {
-                    flag: 'LARGE',
-                    label: '📐 Large',
-                    desc: 'Large combat area',
-                  },
-                  {
-                    flag: 'MEDIUM_LARGE',
-                    label: '📏 Medium-Large',
-                    desc: 'Medium-large area',
-                  },
-                  {
-                    flag: 'MEDIUM',
-                    label: '📍 Medium',
-                    desc: 'Standard room size',
-                  },
-                  {
-                    flag: 'MEDIUM_SMALL',
-                    label: '📌 Medium-Small',
-                    desc: 'Medium-small area',
-                  },
-                  {
-                    flag: 'SMALL',
-                    label: '🔹 Small',
-                    desc: 'Small combat area',
-                  },
-                  {
-                    flag: 'VERY_SMALL',
-                    label: '🔸 Very Small',
-                    desc: 'Very cramped',
-                  },
-                  {
-                    flag: 'ONE_PERSON',
-                    label: '👤 One Person',
-                    desc: 'Single occupant only',
-                  },
-                  {
-                    flag: 'TUNNEL',
-                    label: '🚇 Tunnel',
-                    desc: 'Narrow passage',
-                  },
-                ].map(({ flag, label, desc }) => (
-                  <label
-                    key={flag}
-                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
-                      (room.flags || []).includes(flag)
-                        ? isDark
-                          ? 'bg-purple-900/40 border border-purple-700'
-                          : 'bg-purple-50 border border-purple-200'
-                        : isDark
-                          ? 'hover:bg-gray-600'
-                          : 'hover:bg-gray-100'
-                    }`}
-                    title={desc}
-                  >
+                  <div className='flex items-center gap-2'>
                     <input
-                      type='checkbox'
-                      checked={(room.flags || []).includes(flag)}
-                      onChange={e => {
-                        const currentFlags = room.flags || [];
-                        const newFlags = e.target.checked
-                          ? [...currentFlags, flag]
-                          : currentFlags.filter(f => f !== flag);
-                        onRoomChange('flags', newFlags);
-                      }}
-                      className='rounded border-gray-300 text-purple-600 focus:ring-purple-500'
+                      type='range'
+                      min={-5}
+                      max={5}
+                      value={room.baseLightLevel ?? 0}
+                      onChange={e =>
+                        onRoomChange(
+                          'baseLightLevel',
+                          parseInt(e.target.value, 10)
+                        )
+                      }
+                      className='flex-1'
                     />
-                    <span className='text-xs'>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Restrictions */}
-            <div
-              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
-            >
-              <h5
-                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-              >
-                Restrictions
-              </h5>
-              <div className='grid grid-cols-2 gap-2'>
-                {[
-                  {
-                    flag: 'NO_MOB',
-                    label: '🚫 No Mobs',
-                    desc: 'Mobs cannot enter',
-                  },
-                  {
-                    flag: 'NO_MAGIC',
-                    label: '✨ No Magic',
-                    desc: 'Magic is blocked',
-                  },
-                  {
-                    flag: 'NO_TRACK',
-                    label: '👣 No Track',
-                    desc: 'Cannot be tracked',
-                  },
-                  {
-                    flag: 'NO_SUMMON',
-                    label: '🔮 No Summon',
-                    desc: 'Cannot summon here',
-                  },
-                  { flag: 'NO_SCAN', label: '👁️ No Scan', desc: 'Cannot scan' },
-                  {
-                    flag: 'NO_WELL',
-                    label: '💧 No Well',
-                    desc: 'Cannot create wells',
-                  },
-                  {
-                    flag: 'NO_SHIFT',
-                    label: '🌀 No Shift',
-                    desc: 'Cannot plane shift',
-                  },
-                  {
-                    flag: 'NO_RECALL',
-                    label: '🏠 No Recall',
-                    desc: 'Cannot recall out',
-                  },
-                ].map(({ flag, label, desc }) => (
-                  <label
-                    key={flag}
-                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
-                      (room.flags || []).includes(flag)
-                        ? isDark
-                          ? 'bg-red-900/40 border border-red-700'
-                          : 'bg-red-50 border border-red-200'
-                        : isDark
-                          ? 'hover:bg-gray-600'
-                          : 'hover:bg-gray-100'
-                    }`}
-                    title={desc}
-                  >
-                    <input
-                      type='checkbox'
-                      checked={(room.flags || []).includes(flag)}
-                      onChange={e => {
-                        const currentFlags = room.flags || [];
-                        const newFlags = e.target.checked
-                          ? [...currentFlags, flag]
-                          : currentFlags.filter(f => f !== flag);
-                        onRoomChange('flags', newFlags);
-                      }}
-                      className='rounded border-gray-300 text-red-600 focus:ring-red-500'
-                    />
-                    <span className='text-xs'>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Special Areas */}
-            <div
-              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
-            >
-              <h5
-                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-              >
-                Special Areas
-              </h5>
-              <div className='grid grid-cols-2 gap-2'>
-                {[
-                  {
-                    flag: 'PEACEFUL',
-                    label: '🕊️ Peaceful',
-                    desc: 'No combat allowed',
-                  },
-                  {
-                    flag: 'SOUNDPROOF',
-                    label: '🔇 Soundproof',
-                    desc: 'Sound blocked',
-                  },
-                  {
-                    flag: 'PRIVATE',
-                    label: '🔒 Private',
-                    desc: 'Limited access',
-                  },
-                  { flag: 'ARENA', label: '⚔️ Arena', desc: 'PvP combat area' },
-                  {
-                    flag: 'DEATH',
-                    label: '💀 Death',
-                    desc: 'Instant death room',
-                  },
-                  {
-                    flag: 'GODROOM',
-                    label: '👑 Godroom',
-                    desc: 'Immortal-only area',
-                  },
-                  { flag: 'HOUSE', label: '🏡 House', desc: 'Player housing' },
-                  {
-                    flag: 'GUILDHALL',
-                    label: '🏛️ Guildhall',
-                    desc: 'Guild headquarters',
-                  },
-                  {
-                    flag: 'ATRIUM',
-                    label: '🚪 Atrium',
-                    desc: 'House entrance',
-                  },
-                  {
-                    flag: 'HOUSECRASH',
-                    label: '💥 Housecrash',
-                    desc: 'Crash-save room',
-                  },
-                ].map(({ flag, label, desc }) => (
-                  <label
-                    key={flag}
-                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
-                      (room.flags || []).includes(flag)
-                        ? isDark
-                          ? 'bg-amber-900/40 border border-amber-700'
-                          : 'bg-amber-50 border border-amber-200'
-                        : isDark
-                          ? 'hover:bg-gray-600'
-                          : 'hover:bg-gray-100'
-                    }`}
-                    title={desc}
-                  >
-                    <input
-                      type='checkbox'
-                      checked={(room.flags || []).includes(flag)}
-                      onChange={e => {
-                        const currentFlags = room.flags || [];
-                        const newFlags = e.target.checked
-                          ? [...currentFlags, flag]
-                          : currentFlags.filter(f => f !== flag);
-                        onRoomChange('flags', newFlags);
-                      }}
-                      className='rounded border-gray-300 text-amber-600 focus:ring-amber-500'
-                    />
-                    <span className='text-xs'>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Technical/System Flags */}
-            <div
-              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
-            >
-              <h5
-                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
-              >
-                Technical / System
-              </h5>
-              <div className='grid grid-cols-2 gap-2'>
-                {[
-                  {
-                    flag: 'WORLDMAP',
-                    label: '🗺️ Worldmap',
-                    desc: 'World map location',
-                  },
-                  {
-                    flag: 'FERRY_DEST',
-                    label: '⛴️ Ferry Dest',
-                    desc: 'Ferry destination',
-                  },
-                  {
-                    flag: 'ISOLATED',
-                    label: '🏝️ Isolated',
-                    desc: 'Isolated area',
-                  },
-                  {
-                    flag: 'ALT_EXIT',
-                    label: '🚪 Alt Exit',
-                    desc: 'Alternative exits',
-                  },
-                  {
-                    flag: 'OBSERVATORY',
-                    label: '🔭 Observatory',
-                    desc: 'View distant areas',
-                  },
-                  {
-                    flag: 'EFFECTS_NEXT',
-                    label: '✨ Effects Next',
-                    desc: 'Effects continue',
-                  },
-                  { flag: 'OLC', label: '🔧 OLC', desc: 'Being edited' },
-                  {
-                    flag: 'BFS_MARK',
-                    label: '📍 BFS Mark',
-                    desc: 'Pathfinding marker',
-                  },
-                ].map(({ flag, label, desc }) => (
-                  <label
-                    key={flag}
-                    className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
-                      (room.flags || []).includes(flag)
-                        ? isDark
-                          ? 'bg-green-900/40 border border-green-700'
-                          : 'bg-green-50 border border-green-200'
-                        : isDark
-                          ? 'hover:bg-gray-600'
-                          : 'hover:bg-gray-100'
-                    }`}
-                    title={desc}
-                  >
-                    <input
-                      type='checkbox'
-                      checked={(room.flags || []).includes(flag)}
-                      onChange={e => {
-                        const currentFlags = room.flags || [];
-                        const newFlags = e.target.checked
-                          ? [...currentFlags, flag]
-                          : currentFlags.filter(f => f !== flag);
-                        onRoomChange('flags', newFlags);
-                      }}
-                      className='rounded border-gray-300 text-green-600 focus:ring-green-500'
-                    />
-                    <span className='text-xs'>{label}</span>
-                  </label>
-                ))}
-              </div>
-            </div>
-
-            {/* Active Flags Summary */}
-            {(room.flags || []).length > 0 && (
-              <div
-                className={`p-3 rounded-lg border ${isDark ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200'}`}
-              >
-                <h5
-                  className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}
-                >
-                  Active Flags ({(room.flags || []).length})
-                </h5>
-                <div className='flex flex-wrap gap-1'>
-                  {(room.flags || []).map(flag => (
                     <span
-                      key={flag}
-                      className={`inline-flex items-center gap-1 text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-800/50 text-blue-200' : 'bg-blue-100 text-blue-700'}`}
+                      className={`text-xs font-mono w-20 text-right ${isDark ? 'text-gray-300' : 'text-gray-600'}`}
                     >
-                      {flag.replace(/_/g, ' ')}
-                      <button
-                        onClick={() => {
-                          const newFlags = (room.flags || []).filter(
-                            f => f !== flag
-                          );
-                          onRoomChange('flags', newFlags);
-                        }}
-                        className='ml-1 hover:text-red-500'
-                        title={`Remove ${flag}`}
-                      >
-                        ×
-                      </button>
+                      {room.baseLightLevel ?? 0} (
+                      {(room.baseLightLevel ?? 0) <= -5
+                        ? 'Void'
+                        : (room.baseLightLevel ?? 0) <= -3
+                          ? 'Dark'
+                          : (room.baseLightLevel ?? 0) <= -1
+                            ? 'Dim'
+                            : (room.baseLightLevel ?? 0) === 0
+                              ? 'Ambient'
+                              : (room.baseLightLevel ?? 0) <= 2
+                                ? 'Lit'
+                                : (room.baseLightLevel ?? 0) <= 4
+                                  ? 'Bright'
+                                  : 'Brilliant'}
+                      )
                     </span>
+                  </div>
+                </div>
+
+                {/* Magic Affinity */}
+                <div>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Magic Affinity
+                  </label>
+                  <select
+                    value={room.magicAffinity || ''}
+                    onChange={e =>
+                      onRoomChange('magicAffinity', e.target.value || null)
+                    }
+                    className={`w-full px-2 py-1.5 text-xs border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
+                  >
+                    <option value=''>None</option>
+                    {[
+                      'FIRE',
+                      'WATER',
+                      'COLD',
+                      'EARTH',
+                      'AIR',
+                      'HOLY',
+                      'UNHOLY',
+                      'SHADOW',
+                      'DEATH',
+                      'ASTRAL',
+                      'NATURE',
+                      'ARCANE',
+                      'CHAOS',
+                    ].map(v => (
+                      <option key={v} value={v}>
+                        {v.charAt(0) + v.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                {/* Required Mechanic */}
+                <div>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Required Position Mechanic
+                  </label>
+                  <select
+                    value={room.requiredMechanic || ''}
+                    onChange={e =>
+                      onRoomChange('requiredMechanic', e.target.value || null)
+                    }
+                    className={`w-full px-2 py-1.5 text-xs border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
+                  >
+                    <option value=''>None (ground OK)</option>
+                    {[
+                      'GROUND',
+                      'AERIAL',
+                      'AQUATIC',
+                      'SUBMERGED',
+                      'ETHEREAL',
+                      'MOUNTED',
+                      'INCAPACITATED',
+                    ].map(v => (
+                      <option key={v} value={v}>
+                        {v.charAt(0) + v.slice(1).toLowerCase()}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+            </div>
+
+            {/* Room Properties */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Room Properties
+              </h5>
+              <div className='space-y-3'>
+                {/* Capacity */}
+                <div>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Capacity (max combat occupants, 0 = unlimited)
+                  </label>
+                  <input
+                    type='number'
+                    min={0}
+                    max={100}
+                    value={room.capacity ?? 10}
+                    onChange={e =>
+                      onRoomChange(
+                        'capacity',
+                        parseInt(e.target.value, 10) || 0
+                      )
+                    }
+                    className={`w-full px-2 py-1.5 text-xs border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
+                  />
+                </div>
+
+                {/* Boolean flags */}
+                <div className='grid grid-cols-2 gap-2'>
+                  {[
+                    {
+                      field: 'isPeaceful' as const,
+                      label: 'Peaceful',
+                      desc: 'No combat allowed',
+                      defaultVal: false,
+                    },
+                    {
+                      field: 'isDeathTrap' as const,
+                      label: 'Death Trap',
+                      desc: 'Instant death room',
+                      defaultVal: false,
+                    },
+                  ].map(({ field, label, desc, defaultVal }) => (
+                    <label
+                      key={field}
+                      className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                        (room[field] ?? defaultVal)
+                          ? isDark
+                            ? 'bg-red-900/40 border border-red-700'
+                            : 'bg-red-50 border border-red-200'
+                          : isDark
+                            ? 'hover:bg-gray-600'
+                            : 'hover:bg-gray-100'
+                      }`}
+                      title={desc}
+                    >
+                      <input
+                        type='checkbox'
+                        checked={room[field] ?? defaultVal}
+                        onChange={e => onRoomChange(field, e.target.checked)}
+                        className='rounded border-gray-300 text-red-600 focus:ring-red-500'
+                      />
+                      <span className='text-xs'>{label}</span>
+                    </label>
                   ))}
                 </div>
               </div>
-            )}
+            </div>
+
+            {/* Access Control */}
+            <div
+              className={`p-3 rounded-lg border ${isDark ? 'bg-gray-700/50 border-gray-600' : 'bg-gray-50 border-gray-200'}`}
+            >
+              <h5
+                className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-gray-400' : 'text-gray-500'}`}
+              >
+                Access Control
+              </h5>
+              <div className='space-y-3'>
+                <div className='grid grid-cols-2 gap-2'>
+                  {[
+                    {
+                      field: 'allowsMagic' as const,
+                      label: 'Allows Magic',
+                      desc: 'Magic can be cast',
+                      defaultVal: true,
+                    },
+                    {
+                      field: 'allowsRecall' as const,
+                      label: 'Allows Recall',
+                      desc: 'Recall spell works',
+                      defaultVal: true,
+                    },
+                    {
+                      field: 'allowsSummon' as const,
+                      label: 'Allows Summon',
+                      desc: 'Summon spell works',
+                      defaultVal: true,
+                    },
+                    {
+                      field: 'allowsTeleport' as const,
+                      label: 'Allows Teleport',
+                      desc: 'Teleport works',
+                      defaultVal: true,
+                    },
+                  ].map(({ field, label, desc, defaultVal }) => (
+                    <label
+                      key={field}
+                      className={`flex items-center gap-2 p-2 rounded cursor-pointer transition-colors ${
+                        !(room[field] ?? defaultVal)
+                          ? isDark
+                            ? 'bg-red-900/40 border border-red-700'
+                            : 'bg-red-50 border border-red-200'
+                          : isDark
+                            ? 'hover:bg-gray-600'
+                            : 'hover:bg-gray-100'
+                      }`}
+                      title={desc}
+                    >
+                      <input
+                        type='checkbox'
+                        checked={room[field] ?? defaultVal}
+                        onChange={e => onRoomChange(field, e.target.checked)}
+                        className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                      />
+                      <span className='text-xs'>{label}</span>
+                    </label>
+                  ))}
+                </div>
+
+                {/* Entry Restriction */}
+                <div>
+                  <label
+                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
+                  >
+                    Entry Restriction (Lua expression)
+                  </label>
+                  <input
+                    type='text'
+                    value={room.entryRestriction || ''}
+                    onChange={e =>
+                      onRoomChange('entryRestriction', e.target.value || null)
+                    }
+                    placeholder={`e.g., return actor:has_effect('Fly')`}
+                    className={`w-full px-2 py-1.5 text-xs border rounded font-mono ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Active Properties Summary */}
+            {(() => {
+              const activeProps: string[] = [];
+              if (room.isPeaceful) activeProps.push('Peaceful');
+              if (room.isDeathTrap) activeProps.push('Death Trap');
+              if (!room.allowsMagic && room.allowsMagic !== undefined)
+                activeProps.push('No Magic');
+              if (!room.allowsRecall && room.allowsRecall !== undefined)
+                activeProps.push('No Recall');
+              if (!room.allowsSummon && room.allowsSummon !== undefined)
+                activeProps.push('No Summon');
+              if (!room.allowsTeleport && room.allowsTeleport !== undefined)
+                activeProps.push('No Teleport');
+              if (room.magicAffinity)
+                activeProps.push(`Affinity: ${room.magicAffinity}`);
+              if (room.requiredMechanic)
+                activeProps.push(`Requires: ${room.requiredMechanic}`);
+              if (room.entryRestriction)
+                activeProps.push('Has Entry Restriction');
+              if ((room.baseLightLevel ?? 0) !== 0)
+                activeProps.push(`Light: ${room.baseLightLevel}`);
+              if ((room.capacity ?? 10) !== 10)
+                activeProps.push(`Capacity: ${room.capacity}`);
+
+              return activeProps.length > 0 ? (
+                <div
+                  className={`p-3 rounded-lg border ${isDark ? 'bg-blue-900/20 border-blue-700' : 'bg-blue-50 border-blue-200'}`}
+                >
+                  <h5
+                    className={`text-xs font-semibold uppercase tracking-wide mb-2 ${isDark ? 'text-blue-300' : 'text-blue-600'}`}
+                  >
+                    Active Properties ({activeProps.length})
+                  </h5>
+                  <div className='flex flex-wrap gap-1'>
+                    {activeProps.map(prop => (
+                      <span
+                        key={prop}
+                        className={`text-xs px-2 py-1 rounded-full ${isDark ? 'bg-blue-800/50 text-blue-200' : 'bg-blue-100 text-blue-700'}`}
+                      >
+                        {prop}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : null;
+            })()}
           </div>
         )}
       </div>

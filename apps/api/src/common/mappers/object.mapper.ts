@@ -1,5 +1,19 @@
+import { Effect as PrismaEffect } from '@prisma/client';
+import { Effect } from '../../abilities/abilities.dto';
 import { ObjectDto } from '../../objects/object.dto';
 import { ObjectMapperSource } from './types';
+
+function mapEffect(e: PrismaEffect): Effect {
+  return {
+    id: e.id,
+    name: e.name,
+    ...(e.description != null && { description: e.description }),
+    effectType: e.effectType,
+    tags: e.tags,
+    defaultParams: e.defaultParams,
+    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
+  };
+}
 
 export function mapObject(db: ObjectMapperSource): ObjectDto {
   const dto: ObjectDto = {
@@ -43,6 +57,28 @@ export function mapObject(db: ObjectMapperSource): ObjectDto {
     concealment: db.concealment,
     values: db.values as unknown as Record<string, unknown>,
     zoneId: db.zoneId,
+    grantedEffects: (db.grantedEffects ?? []).map(ge => ({
+      id: ge.id,
+      effectId: ge.effectId,
+      effect: mapEffect(ge.effect),
+      strength: ge.strength,
+      modifierData: ge.modifierData,
+      ...(ge.wearLocation && { wearLocation: ge.wearLocation }),
+    })),
+    objectResistances: (db.objectResistances ?? []).map(r => ({
+      id: r.id,
+      element: r.element,
+      value: r.value,
+      allowAbsorption: r.allowAbsorption,
+    })),
+    consumableEffects: (db.consumableEffects ?? []).map(ce => ({
+      id: ce.id,
+      effectId: ce.effectId,
+      effect: mapEffect(ce.effect),
+      chance: ce.chance,
+      level: ce.level,
+      ...(ce.duration !== null && { duration: ce.duration }),
+    })),
     createdAt: db.createdAt,
     updatedAt: db.updatedAt,
   };

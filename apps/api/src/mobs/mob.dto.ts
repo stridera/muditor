@@ -28,6 +28,7 @@ import {
   IsOptional,
   IsString,
 } from 'class-validator';
+import { MobDefaultEffectDto } from './mob-effects.dto';
 
 // Register GraphQL enums
 registerEnumType(Gender, { name: 'Gender' });
@@ -237,6 +238,9 @@ export class MobDto {
 
   @Field(() => Int, { nullable: true })
   classId?: number;
+
+  @Field(() => [MobDefaultEffectDto], { defaultValue: [] })
+  defaultEffects: MobDefaultEffectDto[];
 
   @Field(() => Date)
   createdAt: Date;

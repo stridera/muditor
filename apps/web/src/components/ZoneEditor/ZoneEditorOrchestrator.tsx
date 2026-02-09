@@ -73,6 +73,8 @@ interface RoomExit {
   toRoomId: number | null;
   description?: string | null;
   flags?: string[];
+  defaultState?: string;
+  hitPoints?: number | null;
   keywords?: string[];
   key?: string | null;
 }
@@ -86,7 +88,17 @@ interface Room {
   layoutX: number | null;
   layoutY: number | null;
   layoutZ: number | null;
-  flags?: string[];
+  baseLightLevel?: number;
+  capacity?: number;
+  magicAffinity?: string | null;
+  requiredMechanic?: string | null;
+  entryRestriction?: string | null;
+  isPeaceful?: boolean;
+  allowsMagic?: boolean;
+  allowsRecall?: boolean;
+  allowsSummon?: boolean;
+  allowsTeleport?: boolean;
+  isDeathTrap?: boolean;
   exits?: RoomExit[];
   mobs?: {
     id: number;
@@ -107,6 +119,8 @@ interface PropertyPanelRoomExit {
   keywords?: string[];
   key?: string;
   flags?: string[];
+  defaultState?: string;
+  hitPoints?: number | null;
 }
 interface PropertyPanelRoom {
   id: number;
@@ -117,7 +131,17 @@ interface PropertyPanelRoom {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
-  flags?: string[];
+  baseLightLevel?: number;
+  capacity?: number;
+  magicAffinity?: string | null;
+  requiredMechanic?: string | null;
+  entryRestriction?: string | null;
+  isPeaceful?: boolean;
+  allowsMagic?: boolean;
+  allowsRecall?: boolean;
+  allowsSummon?: boolean;
+  allowsTeleport?: boolean;
+  isDeathTrap?: boolean;
   exits: PropertyPanelRoomExit[];
   mobs?: {
     id: number;
@@ -630,8 +654,10 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             query: `query GetRooms($zoneId: Int!, $lightweight: Boolean){
               zones { id name climate }
               roomsByZone(zoneId: $zoneId, lightweight: $lightweight){
-                id zoneId name description roomDescription sector layoutX layoutY layoutZ flags
-                exits{ id direction toZoneId toRoomId description keywords key flags }
+                id zoneId name description roomDescription sector layoutX layoutY layoutZ
+                baseLightLevel capacity magicAffinity requiredMechanic entryRestriction
+                isPeaceful allowsMagic allowsRecall allowsSummon allowsTeleport isDeathTrap
+                exits{ id direction toZoneId toRoomId description keywords key flags defaultState hitPoints }
                 mobs{ id name level roomDescription }
                 objects{ id name roomDescription }
                 shops{ id buyProfit sellProfit keeperId }
@@ -649,6 +675,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             toRoomId?: number | null;
             description?: string | null;
             flags?: string[] | null;
+            defaultState?: string | null;
+            hitPoints?: number | null;
             keywords?: string[] | null;
             key?: string | null;
           };
@@ -679,7 +707,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             layoutX: number | null;
             layoutY: number | null;
             layoutZ: number | null;
-            flags?: string[] | null;
+            baseLightLevel?: number;
+            capacity?: number;
+            magicAffinity?: string | null;
+            requiredMechanic?: string | null;
+            entryRestriction?: string | null;
+            isPeaceful?: boolean;
+            allowsMagic?: boolean;
+            allowsRecall?: boolean;
+            allowsSummon?: boolean;
+            allowsTeleport?: boolean;
+            isDeathTrap?: boolean;
             exits?: RawExit[] | null;
             mobs?: RawMob[] | null;
             objects?: RawObject[] | null;
@@ -699,7 +737,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: r.layoutX,
               layoutY: r.layoutY,
               layoutZ: r.layoutZ,
-              flags: r.flags ?? [],
+              baseLightLevel: r.baseLightLevel ?? 0,
+              capacity: r.capacity ?? 10,
+              magicAffinity: r.magicAffinity ?? null,
+              requiredMechanic: r.requiredMechanic ?? null,
+              entryRestriction: r.entryRestriction ?? null,
+              isPeaceful: r.isPeaceful ?? false,
+              allowsMagic: r.allowsMagic ?? true,
+              allowsRecall: r.allowsRecall ?? true,
+              allowsSummon: r.allowsSummon ?? true,
+              allowsTeleport: r.allowsTeleport ?? true,
+              isDeathTrap: r.isDeathTrap ?? false,
               exits: (r.exits || []).map((e: RawExit) => ({
                 id: String(e.id ?? `${r.id}-${e.direction}`),
                 direction: e.direction,
@@ -707,6 +755,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 toRoomId: e.toRoomId ?? null,
                 description: e.description ?? null,
                 flags: e.flags ?? undefined,
+                defaultState: e.defaultState ?? 'OPEN',
+                hitPoints: e.hitPoints ?? null,
                 keywords: e.keywords ?? undefined,
                 key: e.key ?? null,
               })),
@@ -1524,7 +1574,10 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
   // Room property change handler
   const handleRoomChange = useCallback(
-    (field: keyof PropertyPanelRoom, value: string | string[]) => {
+    (
+      field: keyof PropertyPanelRoom,
+      value: string | string[] | number | boolean | null
+    ) => {
       // Update pending edits
       setPendingRoomEdits(prev => ({ ...prev, [field]: value }));
       // Optimistically update rooms state
@@ -1561,9 +1614,28 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       if (pendingRoomEdits.sector !== undefined) {
         updateInput.sector = pendingRoomEdits.sector;
       }
-      if (pendingRoomEdits.flags !== undefined) {
-        updateInput.flags = pendingRoomEdits.flags;
-      }
+      if (pendingRoomEdits.baseLightLevel !== undefined)
+        updateInput.baseLightLevel = pendingRoomEdits.baseLightLevel;
+      if (pendingRoomEdits.capacity !== undefined)
+        updateInput.capacity = pendingRoomEdits.capacity;
+      if (pendingRoomEdits.magicAffinity !== undefined)
+        updateInput.magicAffinity = pendingRoomEdits.magicAffinity;
+      if (pendingRoomEdits.requiredMechanic !== undefined)
+        updateInput.requiredMechanic = pendingRoomEdits.requiredMechanic;
+      if (pendingRoomEdits.entryRestriction !== undefined)
+        updateInput.entryRestriction = pendingRoomEdits.entryRestriction;
+      if (pendingRoomEdits.isPeaceful !== undefined)
+        updateInput.isPeaceful = pendingRoomEdits.isPeaceful;
+      if (pendingRoomEdits.allowsMagic !== undefined)
+        updateInput.allowsMagic = pendingRoomEdits.allowsMagic;
+      if (pendingRoomEdits.allowsRecall !== undefined)
+        updateInput.allowsRecall = pendingRoomEdits.allowsRecall;
+      if (pendingRoomEdits.allowsSummon !== undefined)
+        updateInput.allowsSummon = pendingRoomEdits.allowsSummon;
+      if (pendingRoomEdits.allowsTeleport !== undefined)
+        updateInput.allowsTeleport = pendingRoomEdits.allowsTeleport;
+      if (pendingRoomEdits.isDeathTrap !== undefined)
+        updateInput.isDeathTrap = pendingRoomEdits.isDeathTrap;
 
       const response = await authenticatedFetch('/graphql', {
         method: 'POST',
@@ -1575,7 +1647,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 name
                 description
                 sector
-                flags
+                baseLightLevel
+                capacity
+                magicAffinity
+                requiredMechanic
+                entryRestriction
+                isPeaceful
+                allowsMagic
+                allowsRecall
+                allowsSummon
+                allowsTeleport
+                isDeathTrap
                 zoneId
               }
             }
@@ -1600,7 +1682,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                   name: updated.name,
                   roomDescription: updated.description,
                   sector: updated.sector,
-                  flags: updated.flags,
+                  baseLightLevel: updated.baseLightLevel,
+                  capacity: updated.capacity,
+                  magicAffinity: updated.magicAffinity,
+                  requiredMechanic: updated.requiredMechanic,
+                  entryRestriction: updated.entryRestriction,
+                  isPeaceful: updated.isPeaceful,
+                  allowsMagic: updated.allowsMagic,
+                  allowsRecall: updated.allowsRecall,
+                  allowsSummon: updated.allowsSummon,
+                  allowsTeleport: updated.allowsTeleport,
+                  isDeathTrap: updated.isDeathTrap,
                 }
               : r
           )
@@ -1830,7 +1922,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           const response = await authenticatedFetch('/graphql', {
             method: 'POST',
             body: JSON.stringify({
-              query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags } }`,
+              query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags defaultState hitPoints } }`,
               variables: {
                 data: {
                   roomId: fromRoomId,
@@ -1865,6 +1957,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                         keywords: created.keywords ?? [],
                         key: created.key ?? null,
                         flags: created.flags ?? [],
+                        defaultState: created.defaultState ?? 'OPEN',
+                        hitPoints: created.hitPoints ?? null,
                       },
                     ],
                   }
@@ -2283,7 +2377,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
           body: JSON.stringify({
-            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags } }`,
+            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags defaultState hitPoints } }`,
             variables: {
               data: {
                 roomId: selectedRoom.id,
@@ -2312,6 +2406,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                             toRoomId: created.toRoomId ?? null,
                             description: created.description ?? null,
                             flags: created.flags || [],
+                            defaultState: created.defaultState ?? 'OPEN',
+                            hitPoints: created.hitPoints ?? null,
                             keywords: created.keywords || [],
                             key: created.key ?? null,
                           }
@@ -2407,7 +2503,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
           body: JSON.stringify({
-            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags } }`,
+            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords key flags defaultState hitPoints } }`,
             variables: {
               data: {
                 roomId: room.id,
@@ -2443,6 +2539,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                           keywords: created.keywords || [],
                           key: created.key ?? null,
                           flags: created.flags || [],
+                          defaultState: created.defaultState ?? 'OPEN',
+                          hitPoints: created.hitPoints ?? null,
                         },
                       ]),
                   }
@@ -2727,7 +2825,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: selectedRoom.layoutX,
               layoutY: selectedRoom.layoutY,
               layoutZ: selectedRoom.layoutZ,
-              flags: selectedRoom.flags || [],
+              baseLightLevel: selectedRoom.baseLightLevel ?? 0,
+              capacity: selectedRoom.capacity ?? 10,
+              magicAffinity: selectedRoom.magicAffinity ?? null,
+              requiredMechanic: selectedRoom.requiredMechanic ?? null,
+              entryRestriction: selectedRoom.entryRestriction ?? null,
+              isPeaceful: selectedRoom.isPeaceful ?? false,
+              allowsMagic: selectedRoom.allowsMagic ?? true,
+              allowsRecall: selectedRoom.allowsRecall ?? true,
+              allowsSummon: selectedRoom.allowsSummon ?? true,
+              allowsTeleport: selectedRoom.allowsTeleport ?? true,
+              isDeathTrap: selectedRoom.isDeathTrap ?? false,
               exits: (selectedRoom.exits || []).map(e => {
                 const base: Omit<PropertyPanelRoomExit, 'key'> & {
                   key?: string;
@@ -2739,6 +2847,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                   description: e.description ?? '',
                   keywords: e.keywords ?? [],
                   flags: e.flags ?? [],
+                  defaultState: e.defaultState ?? 'OPEN',
+                  hitPoints: e.hitPoints ?? null,
                 };
                 if (e.key) {
                   base.key = e.key;
@@ -2766,7 +2876,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutX: r.layoutX,
               layoutY: r.layoutY,
               layoutZ: r.layoutZ,
-              flags: r.flags || [],
+              baseLightLevel: r.baseLightLevel ?? 0,
+              capacity: r.capacity ?? 10,
+              magicAffinity: r.magicAffinity ?? null,
+              requiredMechanic: r.requiredMechanic ?? null,
+              entryRestriction: r.entryRestriction ?? null,
+              isPeaceful: r.isPeaceful ?? false,
+              allowsMagic: r.allowsMagic ?? true,
+              allowsRecall: r.allowsRecall ?? true,
+              allowsSummon: r.allowsSummon ?? true,
+              allowsTeleport: r.allowsTeleport ?? true,
+              isDeathTrap: r.isDeathTrap ?? false,
               exits: (r.exits || []).map(e => {
                 const base: Omit<PropertyPanelRoomExit, 'key'> & {
                   key?: string;
@@ -2778,6 +2898,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                   description: e.description ?? '',
                   keywords: e.keywords ?? [],
                   flags: e.flags ?? [],
+                  defaultState: e.defaultState ?? 'OPEN',
+                  hitPoints: e.hitPoints ?? null,
                 };
                 if (e.key) {
                   base.key = e.key;

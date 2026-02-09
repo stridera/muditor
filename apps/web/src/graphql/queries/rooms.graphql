@@ -13,5 +13,30 @@ query GetRoom($zoneId: Int!, $id: Int!) {
     name
     description
     sector
+    baseLightLevel
+    capacity
+    magicAffinity
+    requiredMechanic
+    entryRestriction
+    isPeaceful
+    allowsMagic
+    allowsRecall
+    allowsSummon
+    allowsTeleport
+    isDeathTrap
+    exits {
+      id
+      direction
+      description
+      keywords
+      key
+      flags
+      defaultState
+      hitPoints
+      toZoneId
+      toRoomId
+      roomZoneId
+      roomId
+    }
   }
 }

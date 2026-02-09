@@ -20,9 +20,16 @@ interface RoomExitResult {
   toRoomId: number | null;
   key: string | null;
   flags: string[];
+  defaultState: string;
+  hitPoints: number | null;
 }
 
-import { Sector } from '@prisma/client';
+import {
+  ExitState,
+  MagicAffinity,
+  PositionMechanic,
+  Sector,
+} from '@prisma/client';
 
 interface RoomServiceResultBase {
   id: number;
@@ -40,6 +47,17 @@ interface RoomServiceResultBase {
   layoutX: number | null;
   layoutY: number | null;
   layoutZ: number | null;
+  baseLightLevel: number;
+  capacity: number;
+  magicAffinity: MagicAffinity | null;
+  requiredMechanic: PositionMechanic | null;
+  entryRestriction: string | null;
+  isPeaceful: boolean;
+  allowsMagic: boolean;
+  allowsRecall: boolean;
+  allowsSummon: boolean;
+  allowsTeleport: boolean;
+  isDeathTrap: boolean;
   mobResets?: any[]; // Populated for GraphQL field resolvers
   objectResets?: any[]; // Populated for GraphQL field resolvers
 }
@@ -87,6 +105,17 @@ export class RoomsService {
     layoutX?: number | null;
     layoutY?: number | null;
     layoutZ?: number | null;
+    baseLightLevel?: number;
+    capacity?: number;
+    magicAffinity?: MagicAffinity | null;
+    requiredMechanic?: PositionMechanic | null;
+    entryRestriction?: string | null;
+    isPeaceful?: boolean;
+    allowsMagic?: boolean;
+    allowsRecall?: boolean;
+    allowsSummon?: boolean;
+    allowsTeleport?: boolean;
+    isDeathTrap?: boolean;
   }): RoomServiceResult {
     return {
       id: room.id,
@@ -106,6 +135,17 @@ export class RoomsService {
       layoutX: room.layoutX ?? null,
       layoutY: room.layoutY ?? null,
       layoutZ: room.layoutZ ?? null,
+      baseLightLevel: room.baseLightLevel ?? 0,
+      capacity: room.capacity ?? 10,
+      magicAffinity: room.magicAffinity ?? null,
+      requiredMechanic: room.requiredMechanic ?? null,
+      entryRestriction: room.entryRestriction ?? null,
+      isPeaceful: room.isPeaceful ?? false,
+      allowsMagic: room.allowsMagic ?? true,
+      allowsRecall: room.allowsRecall ?? true,
+      allowsSummon: room.allowsSummon ?? true,
+      allowsTeleport: room.allowsTeleport ?? true,
+      isDeathTrap: room.isDeathTrap ?? false,
     };
   }
 
@@ -194,6 +234,8 @@ export class RoomsService {
           toRoomId: exit.toRoomId,
           key: null,
           flags: [],
+          defaultState: 'OPEN',
+          hitPoints: null,
         });
       }
 
@@ -260,6 +302,17 @@ export class RoomsService {
         name: data.name,
         roomDescription: data.description ?? data.roomDescription ?? '',
         sector: data.sector || 'STRUCTURE',
+        baseLightLevel: data.baseLightLevel ?? 0,
+        capacity: data.capacity ?? 10,
+        magicAffinity: data.magicAffinity ?? null,
+        requiredMechanic: data.requiredMechanic ?? null,
+        entryRestriction: data.entryRestriction ?? null,
+        isPeaceful: data.isPeaceful ?? false,
+        allowsMagic: data.allowsMagic ?? true,
+        allowsRecall: data.allowsRecall ?? true,
+        allowsSummon: data.allowsSummon ?? true,
+        allowsTeleport: data.allowsTeleport ?? true,
+        isDeathTrap: data.isDeathTrap ?? false,
       },
       include: this.includeFull,
     });
@@ -278,6 +331,24 @@ export class RoomsService {
     else if (data.roomDescription !== undefined)
       update.roomDescription = data.roomDescription; // legacy alias
     if (data.sector !== undefined) update.sector = data.sector;
+    if (data.baseLightLevel !== undefined)
+      update.baseLightLevel = data.baseLightLevel;
+    if (data.capacity !== undefined) update.capacity = data.capacity;
+    if (data.magicAffinity !== undefined)
+      update.magicAffinity = data.magicAffinity;
+    if (data.requiredMechanic !== undefined)
+      update.requiredMechanic = data.requiredMechanic;
+    if (data.entryRestriction !== undefined)
+      update.entryRestriction = data.entryRestriction;
+    if (data.isPeaceful !== undefined) update.isPeaceful = data.isPeaceful;
+    if (data.allowsMagic !== undefined) update.allowsMagic = data.allowsMagic;
+    if (data.allowsRecall !== undefined)
+      update.allowsRecall = data.allowsRecall;
+    if (data.allowsSummon !== undefined)
+      update.allowsSummon = data.allowsSummon;
+    if (data.allowsTeleport !== undefined)
+      update.allowsTeleport = data.allowsTeleport;
+    if (data.isDeathTrap !== undefined) update.isDeathTrap = data.isDeathTrap;
     const room = await this.db.room.update({
       where: { zoneId_id: { zoneId, id } },
       data: update,
@@ -311,6 +382,8 @@ export class RoomsService {
         toRoomId,
         key: data.key ?? null,
         flags: [],
+        defaultState: data.defaultState ?? ('OPEN' as ExitState),
+        hitPoints: data.hitPoints ?? null,
       },
     });
     return exit as RoomExitResult;

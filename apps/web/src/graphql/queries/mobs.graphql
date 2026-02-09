@@ -55,6 +55,17 @@ query GetMob($id: Int!, $zoneId: Int!) {
     movementMode
     defaultMovementMode
     stance
+    defaultEffects {
+      id
+      effectId
+      strength
+      modifierData
+      effect {
+        id
+        name
+        effectType
+      }
+    }
     createdAt
     updatedAt
   }

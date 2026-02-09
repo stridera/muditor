@@ -45,6 +45,7 @@ export class MobsService {
       },
       include: {
         mobAbilities: { include: { ability: true } },
+        defaultEffects: { include: { effect: true } },
         mobResets: {
           include: {
             rooms: { select: { id: true, zoneId: true, name: true } },
@@ -185,5 +186,33 @@ export class MobsService {
       where: { id: classId },
       select: { id: true, plainName: true },
     });
+  }
+
+  async updateMobDefaultEffects(
+    zoneId: number,
+    id: number,
+    effects: Array<{
+      effectId: number;
+      strength?: number;
+      modifierData?: any;
+    }>
+  ) {
+    await this.database.$transaction(async tx => {
+      await tx.mobDefaultEffects.deleteMany({
+        where: { mobZoneId: zoneId, mobId: id },
+      });
+      if (effects.length > 0) {
+        await tx.mobDefaultEffects.createMany({
+          data: effects.map(e => ({
+            mobZoneId: zoneId,
+            mobId: id,
+            effectId: e.effectId,
+            strength: e.strength ?? 1,
+            modifierData: e.modifierData ?? {},
+          })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
   }
 }

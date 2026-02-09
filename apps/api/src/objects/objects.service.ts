@@ -39,6 +39,9 @@ export class ObjectsService {
         objectExtraDescriptions: true,
         objectAffects: true,
         Triggers: true,
+        grantedEffects: { include: { effect: true } },
+        objectResistances: true,
+        consumableEffects: { include: { effect: true } },
         shopItems: {
           include: {
             shops: {
@@ -194,5 +197,93 @@ export class ObjectsService {
       where: { id: { in: ids } },
     });
     return result.count;
+  }
+
+  async updateObjectEffects(
+    zoneId: number,
+    id: number,
+    effects: Array<{
+      effectId: number;
+      strength?: number;
+      modifierData?: any;
+      wearLocation?: string;
+    }>
+  ) {
+    await this.database.$transaction(async tx => {
+      await tx.objectEffects.deleteMany({
+        where: { objectZoneId: zoneId, objectId: id },
+      });
+      if (effects.length > 0) {
+        await tx.objectEffects.createMany({
+          data: effects.map(e => ({
+            objectZoneId: zoneId,
+            objectId: id,
+            effectId: e.effectId,
+            strength: e.strength ?? 1,
+            modifierData: e.modifierData ?? {},
+            ...(e.wearLocation && { wearLocation: e.wearLocation as any }),
+          })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
+  }
+
+  async updateObjectResistances(
+    zoneId: number,
+    id: number,
+    resistances: Array<{
+      element: string;
+      value: number;
+      allowAbsorption?: boolean;
+    }>
+  ) {
+    await this.database.$transaction(async tx => {
+      await tx.objectResistance.deleteMany({
+        where: { objectZoneId: zoneId, objectId: id },
+      });
+      if (resistances.length > 0) {
+        await tx.objectResistance.createMany({
+          data: resistances.map(r => ({
+            objectZoneId: zoneId,
+            objectId: id,
+            element: r.element as any,
+            value: r.value,
+            allowAbsorption: r.allowAbsorption ?? false,
+          })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
+  }
+
+  async updateConsumableEffects(
+    zoneId: number,
+    id: number,
+    effects: Array<{
+      effectId: number;
+      chance?: number;
+      level?: number;
+      duration?: number;
+    }>
+  ) {
+    await this.database.$transaction(async tx => {
+      await tx.consumableEffect.deleteMany({
+        where: { objectZoneId: zoneId, objectId: id },
+      });
+      if (effects.length > 0) {
+        await tx.consumableEffect.createMany({
+          data: effects.map(e => ({
+            objectZoneId: zoneId,
+            objectId: id,
+            effectId: e.effectId,
+            chance: e.chance ?? 1.0,
+            level: e.level ?? 1,
+            ...(e.duration !== undefined && { duration: e.duration }),
+          })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
   }
 }

@@ -5,9 +5,17 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { Direction, ExitFlag, Sector } from '@prisma/client';
+import {
+  Direction,
+  ExitFlag,
+  ExitState,
+  MagicAffinity,
+  PositionMechanic,
+  Sector,
+} from '@prisma/client';
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsInt,
   IsNumber,
@@ -24,6 +32,9 @@ import { ShopDto } from '../shops/shop.dto';
 registerEnumType(Sector, { name: 'Sector' });
 registerEnumType(Direction, { name: 'Direction' });
 registerEnumType(ExitFlag, { name: 'ExitFlag' });
+registerEnumType(ExitState, { name: 'ExitState' });
+registerEnumType(MagicAffinity, { name: 'MagicAffinity' });
+registerEnumType(PositionMechanic, { name: 'PositionMechanic' });
 
 @ObjectType()
 export class RoomExitDto {
@@ -45,6 +56,12 @@ export class RoomExitDto {
 
   @Field(() => [ExitFlag], { defaultValue: [] })
   flags: ExitFlag[];
+
+  @Field(() => ExitState, { defaultValue: ExitState.OPEN })
+  defaultState: ExitState;
+
+  @Field(() => Int, { nullable: true })
+  hitPoints?: number;
 
   @Field({ nullable: true })
   key?: string;
@@ -124,6 +141,41 @@ export class RoomDto {
   @Field(() => Int, { nullable: true, defaultValue: 0 })
   layoutZ?: number;
 
+  // Lighting & environment
+  @Field(() => Int, { defaultValue: 0 })
+  baseLightLevel: number;
+
+  @Field(() => Int, { defaultValue: 10 })
+  capacity: number;
+
+  @Field(() => MagicAffinity, { nullable: true })
+  magicAffinity?: MagicAffinity;
+
+  @Field(() => PositionMechanic, { nullable: true })
+  requiredMechanic?: PositionMechanic;
+
+  @Field({ nullable: true })
+  entryRestriction?: string;
+
+  // Room property flags
+  @Field({ defaultValue: false })
+  isPeaceful: boolean;
+
+  @Field({ defaultValue: true })
+  allowsMagic: boolean;
+
+  @Field({ defaultValue: true })
+  allowsRecall: boolean;
+
+  @Field({ defaultValue: true })
+  allowsSummon: boolean;
+
+  @Field({ defaultValue: true })
+  allowsTeleport: boolean;
+
+  @Field({ defaultValue: false })
+  isDeathTrap: boolean;
+
   // Related entities (populated by GraphQL field resolvers)
   @Field(() => [MobDto], { defaultValue: [] })
   mobs?: MobDto[];
@@ -163,6 +215,61 @@ export class CreateRoomInput {
   @Field(() => Int)
   @IsNumber()
   zoneId: number;
+
+  @Field(() => Int, { defaultValue: 0 })
+  @IsOptional()
+  @IsInt()
+  baseLightLevel?: number;
+
+  @Field(() => Int, { defaultValue: 10 })
+  @IsOptional()
+  @IsInt()
+  capacity?: number;
+
+  @Field(() => MagicAffinity, { nullable: true })
+  @IsOptional()
+  @IsEnum(MagicAffinity)
+  magicAffinity?: MagicAffinity;
+
+  @Field(() => PositionMechanic, { nullable: true })
+  @IsOptional()
+  @IsEnum(PositionMechanic)
+  requiredMechanic?: PositionMechanic;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  entryRestriction?: string;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isPeaceful?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsMagic?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsRecall?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsSummon?: boolean;
+
+  @Field({ defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsTeleport?: boolean;
+
+  @Field({ defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  isDeathTrap?: boolean;
 }
 
 @InputType()
@@ -202,6 +309,61 @@ export class UpdateRoomInput {
   @IsOptional()
   @IsInt()
   layoutZ?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  baseLightLevel?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  capacity?: number;
+
+  @Field(() => MagicAffinity, { nullable: true })
+  @IsOptional()
+  @IsEnum(MagicAffinity)
+  magicAffinity?: MagicAffinity;
+
+  @Field(() => PositionMechanic, { nullable: true })
+  @IsOptional()
+  @IsEnum(PositionMechanic)
+  requiredMechanic?: PositionMechanic;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  entryRestriction?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isPeaceful?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsMagic?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsRecall?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsSummon?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  allowsTeleport?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  isDeathTrap?: boolean;
 }
 
 @InputType()
@@ -315,4 +477,14 @@ export class CreateRoomExitInput {
   @Field(() => Int)
   @IsNumber()
   roomId: number;
+
+  @Field(() => ExitState, { nullable: true, defaultValue: ExitState.OPEN })
+  @IsOptional()
+  @IsEnum(ExitState)
+  defaultState?: ExitState;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  hitPoints?: number;
 }

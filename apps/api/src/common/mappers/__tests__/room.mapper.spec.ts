@@ -63,12 +63,15 @@ describe('mapRoom', () => {
     expect(dto.exits).toHaveLength(2);
     const north = dto.exits.find(e => e.direction === Direction.NORTH)!;
     expect(north.description).toBe('A sturdy wooden door');
+    expect(north.defaultState).toBe(ExitState.CLOSED);
     expect(north).not.toHaveProperty('key');
     expect(north).not.toHaveProperty('toRoomId');
+    expect(north).not.toHaveProperty('hitPoints');
     const south = dto.exits.find(e => e.direction === Direction.SOUTH)!;
     expect(south.key).toBe('777');
     expect(south.toRoomId).toBe(77);
     expect(south.toZoneId).toBe(10);
+    expect(south.defaultState).toBe(ExitState.OPEN);
   });
 
   it('maps extra descriptions with default empty string for null description', () => {
@@ -88,5 +91,20 @@ describe('mapRoom', () => {
     const dto = mapRoom(base());
     expect(dto.updatedBy).toBe('tester');
     expect(dto).not.toHaveProperty('createdBy');
+  });
+
+  it('maps new room property fields with defaults', () => {
+    const dto = mapRoom(base());
+    expect(dto.baseLightLevel).toBe(0);
+    expect(dto.capacity).toBe(10);
+    expect(dto.isPeaceful).toBe(false);
+    expect(dto.allowsMagic).toBe(true);
+    expect(dto.allowsRecall).toBe(true);
+    expect(dto.allowsSummon).toBe(true);
+    expect(dto.allowsTeleport).toBe(true);
+    expect(dto.isDeathTrap).toBe(false);
+    expect(dto).not.toHaveProperty('magicAffinity');
+    expect(dto).not.toHaveProperty('requiredMechanic');
+    expect(dto).not.toHaveProperty('entryRestriction');
   });
 });
