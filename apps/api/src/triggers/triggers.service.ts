@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, ScriptType } from '@prisma/client';
+import { Prisma, ScriptType, TriggerFlag } from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -238,7 +238,7 @@ export class TriggersService {
       objectZoneId: null,
       objectId: null,
       variables: {},
-      flags: data.flags ?? [],
+      flags: (data.flags ?? []) as TriggerFlag[],
     };
 
     if (data.mobId && data.mobZoneId) {
