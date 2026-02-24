@@ -74,9 +74,7 @@ const OBJECT_FLAGS = [
 
 const WORLD_FLAGS = ['RESET', 'PREENTRY', 'POSTENTRY'] as const;
 
-function getTypeSpecificFlags(
-  attachType: string
-): readonly string[] {
+function getTypeSpecificFlags(attachType: string): readonly string[] {
   switch (attachType) {
     case 'MOB':
       return MOB_FLAGS;
@@ -97,6 +95,7 @@ function getAllValidFlags(attachType: string): Set<string> {
 }
 
 // Lua language configuration for Monaco
+/* eslint-disable no-useless-escape -- Monaco tokenizer regex patterns require specific escaping */
 const luaLanguageConfig: any = {
   keywords: [
     'and',
@@ -257,6 +256,7 @@ const luaLanguageConfig: any = {
     ],
   },
 };
+/* eslint-enable no-useless-escape */
 
 // Enhanced Lua script templates organized by category
 const scriptTemplates = {
@@ -973,7 +973,9 @@ export default function ScriptEditor({
                 <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
                   Trigger Flags
                   {flags.length > 0 && (
-                    <span className='ml-1 text-foreground'>({flags.length})</span>
+                    <span className='ml-1 text-foreground'>
+                      ({flags.length})
+                    </span>
                   )}
                 </label>
 

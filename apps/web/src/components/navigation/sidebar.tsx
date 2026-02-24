@@ -100,19 +100,21 @@ export function Sidebar() {
   });
 
   // Tab memory — remember last path per mode
-  const lastPathRef = useRef<{ player: string; admin: string }>(() => {
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem('muditor-mode-paths');
-      if (saved) {
-        try {
-          return JSON.parse(saved);
-        } catch {
-          /* ignore */
+  const lastPathRef = useRef<{ player: string; admin: string }>(
+    (() => {
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('muditor-mode-paths');
+        if (saved) {
+          try {
+            return JSON.parse(saved);
+          } catch {
+            /* ignore */
+          }
         }
       }
-    }
-    return { player: '/dashboard', admin: '/dashboard' };
-  });
+      return { player: '/dashboard', admin: '/dashboard' };
+    })()
+  );
 
   // Track the current path for the active mode
   useEffect(() => {

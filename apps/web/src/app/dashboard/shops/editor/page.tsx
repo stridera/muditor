@@ -516,9 +516,18 @@ function ShopEditorContent() {
           setGeneralError('Shop ID is required for creation');
           return;
         }
+        if (formData.keeperId == null) {
+          setGeneralError('Keeper mob is required for creation');
+          return;
+        }
         const createResult = await createShop({
           variables: {
-            data: { id: formData.id, ...saveData },
+            data: {
+              id: formData.id,
+              ...saveData,
+              keeperId: formData.keeperId,
+              keeperZoneId: formData.zoneId,
+            },
           },
         });
         const newId = createResult.data?.createShop?.id;

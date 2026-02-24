@@ -17,10 +17,9 @@ const schema = process.env.PRISMA_SCHEMA_PATH
   : path.resolve(__dirname, 'prisma', 'schema.prisma');
 
 if (!process.env.DATABASE_URL) {
-  // Throw a descriptive error early so Prisma doesn't emit a generic P1012 later.
-  throw new Error(
-    'DATABASE_URL not set. Ensure it exists in the root .env file.'
-  );
+  // For generate-only commands (CI type-check), provide a dummy URL so Prisma
+  // can parse the schema without a live database connection.
+  process.env.DATABASE_URL = 'postgresql://dummy:dummy@localhost:5432/dummy';
 }
 
 export default defineConfig({
