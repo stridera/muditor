@@ -1,6 +1,6 @@
 import {
   Injectable,
-  ExecutionContext,
+  type ExecutionContext,
   UnauthorizedException,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';

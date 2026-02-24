@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import crypt from 'unix-crypt-td-js';
 import { DatabaseService } from '../database/database.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
 import {
@@ -654,8 +655,7 @@ export class CharactersService {
 
     if (isLegacyHash) {
       // Legacy Unix crypt() hash - validate and upgrade to bcrypt
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const crypt = require('unix-crypt-td-js');
+      // unix-crypt-td-js imported at top of file
       const hashedPassword = crypt(characterPassword, character.passwordHash);
       // Compare only first 10 characters (legacy system truncated to 10 chars)
       isPasswordValid =
@@ -790,8 +790,7 @@ export class CharactersService {
 
     if (isLegacyHash) {
       // Legacy Unix crypt() hash
-      // eslint-disable-next-line @typescript-eslint/no-require-imports
-      const crypt = require('unix-crypt-td-js');
+      // unix-crypt-td-js imported at top of file
       const hashedPassword = crypt(password, character.passwordHash);
       // Compare only first 10 characters (legacy system truncated to 10 chars)
       isPasswordValid =

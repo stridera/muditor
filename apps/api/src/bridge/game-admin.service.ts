@@ -1,4 +1,4 @@
-import { Injectable, Logger, OnModuleInit } from '@nestjs/common';
+import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
 /**
@@ -10,6 +10,7 @@ export interface OnlinePlayer {
   class: string;
   race: string;
   roomId: number;
+  roomZoneId: number;
   godLevel: number;
   isLinkdead: boolean;
 }
@@ -163,6 +164,7 @@ export class GameAdminService implements OnModuleInit {
         class: string;
         race: string;
         room_id: number;
+        room_zone_id: number;
         god_level: number;
         is_linkdead: boolean;
       }>;
@@ -179,6 +181,7 @@ export class GameAdminService implements OnModuleInit {
       class: p.class,
       race: p.race,
       roomId: p.room_id,
+      roomZoneId: p.room_zone_id,
       godLevel: p.god_level,
       isLinkdead: p.is_linkdead,
     }));

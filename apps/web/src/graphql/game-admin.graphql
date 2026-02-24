@@ -1,16 +1,5 @@
 # Game Admin Operations - Bridge to FieryMUD game server
-
-query GetOnlinePlayers {
-  onlinePlayers {
-    name
-    level
-    class
-    race
-    roomId
-    godLevel
-    isLinkdead
-  }
-}
+# Note: GetOnlinePlayers is defined in use-game-admin.ts (includes roomZoneId)
 
 query GetServerStatus {
   serverStatus {

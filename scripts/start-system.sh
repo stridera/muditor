@@ -21,17 +21,17 @@ sleep 5
 
 # Generate Prisma client
 echo "🔧 Generating Prisma client..."
-pnpm db:generate
+bun run db:generate
 
 # Run migrations
 echo "📊 Running database migrations..."
-pnpm db:migrate
+bun run db:migrate
 
 # Start development servers
 echo "🌐 Starting development servers..."
-pnpm run dev
+bun run run dev
 
 echo "✅ Muditor system started successfully!"
 echo "🌐 Web app: http://localhost:3000"
 echo "🔗 API: http://localhost:3001/graphql"
-echo "📊 Database Studio: pnpm db:studio"
+echo "📊 Database Studio: bun run db:studio"

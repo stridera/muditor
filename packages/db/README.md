@@ -5,6 +5,7 @@ Prisma TypeScript client and database utilities for Muditor.
 ## Overview
 
 This package provides:
+
 - Prisma TypeScript client (`prisma-client-js`)
 - Database schema for PostgreSQL
 - Game system seeding only (races, classes, spells, skills)
@@ -14,19 +15,19 @@ This package provides:
 
 ```bash
 # Generate Prisma client
-pnpm generate
+bun run generate
 
 # Push schema changes (dev)
-pnpm push
+bun run push
 
 # Create migration (prod)
-pnpm migrate:dev
+bun run migrate:dev
 
 # Open Prisma Studio
-pnpm studio
+bun run studio
 
 # Seed game system data only (races, classes, spells, skills)
-pnpm seed
+bun run seed
 ```
 
 ## Schema
@@ -44,7 +45,7 @@ See `SCHEMA_NOTE.md` for details on schema management.
 ### What Muditor Seeds (Game System Only)
 
 ```bash
-pnpm seed  # Seeds races, classes, spells, skills only
+bun run seed  # Seeds races, classes, spells, skills only
 ```
 
 ### What FieryLib Seeds (Everything Else)
@@ -102,16 +103,16 @@ This should match the parent `.env` and FieryLib `.env`.
 
 ```bash
 # Install dependencies
-pnpm install
+bun run install
 
 # Generate client after schema changes
-pnpm generate
+bun run generate
 
 # Type check
-pnpm type-check
+bun run type-check
 
 # Clean generated files
-pnpm clean
+bun run clean
 ```
 
 ## Migration Workflow
@@ -120,20 +121,20 @@ pnpm clean
 
 ```bash
 # Push schema changes without migration
-pnpm push
+bun run push
 
 # Generate client
-pnpm generate
+bun run generate
 ```
 
 ### Production
 
 ```bash
 # Create migration
-pnpm migrate:dev
+bun run migrate:dev
 
 # Deploy migration
-pnpm migrate:deploy
+bun run migrate:deploy
 ```
 
 ## Schema Sync
@@ -142,7 +143,7 @@ If schemas drift between FieryLib and Muditor:
 
 ```bash
 # Pull current database schema
-pnpm prisma db pull
+bunx prisma db pull
 
 # This updates schema.prisma to match the actual database
 ```
@@ -154,7 +155,7 @@ Then commit the updated schema.
 Visual database browser:
 
 ```bash
-pnpm studio
+bun run studio
 # Opens http://localhost:5555
 ```
 

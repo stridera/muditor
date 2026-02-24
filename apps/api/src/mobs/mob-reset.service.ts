@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { MobResetEquipment, MobResets, Prisma, WearFlag } from '@prisma/client';
+import {
+  type MobResetEquipment,
+  type MobResets,
+  Prisma,
+  WearFlag,
+} from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateMobResetInput,

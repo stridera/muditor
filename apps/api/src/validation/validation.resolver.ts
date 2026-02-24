@@ -1,5 +1,5 @@
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
-import { ValidationService, ValidationReport } from './validation.service';
+import { ValidationService, type ValidationReport } from './validation.service';
 import {
   ValidationReportType,
   ValidationSummaryType,

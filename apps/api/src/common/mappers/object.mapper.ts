@@ -1,7 +1,7 @@
-import { Effect as PrismaEffect } from '@prisma/client';
+import type { Effect as PrismaEffect } from '@prisma/client';
 import { Effect } from '../../abilities/abilities.dto';
 import { ObjectDto } from '../../objects/object.dto';
-import { ObjectMapperSource } from './types';
+import type { ObjectMapperSource } from './types';
 
 function mapEffect(e: PrismaEffect): Effect {
   return {

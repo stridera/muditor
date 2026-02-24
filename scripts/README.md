@@ -46,8 +46,8 @@ Checks system health and dependencies.
 
 ## Requirements
 
-- Node.js and pnpm
-- tsx (TypeScript executor) - automatically installed as dev dependency
+- Bun (runtime + package manager)
+
 - Access to the PostgreSQL database
 
 ## Notes

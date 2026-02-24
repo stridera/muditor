@@ -231,9 +231,7 @@ function AdminMailContent() {
                         <TableCell className='font-medium'>
                           {mail.senderName}
                         </TableCell>
-                        <TableCell>
-                          {mail.recipient?.name || mail.recipientCharacterId}
-                        </TableCell>
+                        <TableCell>{mail.recipientName}</TableCell>
                         <TableCell>
                           {new Date(mail.sentAt).toLocaleDateString()}
                         </TableCell>
@@ -549,8 +547,7 @@ function MailViewDialog({ mail }: { mail: PlayerMail | AccountMail }) {
             <Label className='text-muted-foreground'>To</Label>
             <p className='font-medium'>
               {isPlayerMail
-                ? (mail as PlayerMail).recipient?.name ||
-                  (mail as PlayerMail).recipientCharacterId
+                ? (mail as PlayerMail).recipientName
                 : (mail as AccountMail).isBroadcast
                   ? 'All Users (Broadcast)'
                   : (mail as AccountMail).recipient?.username ||

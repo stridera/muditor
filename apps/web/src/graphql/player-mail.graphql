@@ -35,6 +35,7 @@ fragment PlayerMailFields on PlayerMailDto {
   isDeleted
   createdAt
   senderName
+  recipientName
   wealthRetrievalInfo
   objectRetrievalInfo
   sender {

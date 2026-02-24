@@ -1,5 +1,5 @@
 import { PrismaClient } from '@muditor/db';
-import { INestApplication } from '@nestjs/common';
+import type { INestApplication } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import request from 'supertest';
 import { AppModule } from '../app.module';

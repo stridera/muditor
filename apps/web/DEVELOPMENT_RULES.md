@@ -51,7 +51,7 @@ interface Zone {
 
 1. Check if the query exists in `apps/api/src/**/*.graphql`
 2. If not, add it to the appropriate `.graphql` file
-3. Run `pnpm codegen` to generate types
+3. Run `bun run codegen` to generate types
 4. Never use manual `gql` tags for production code
 
 ---
@@ -60,7 +60,7 @@ interface Zone {
 
 ### ✅ NEVER Kill or Restart Development Servers Automatically
 
-**Rule:** Do not programmatically kill or restart `pnpm dev` processes. Instead, inform the user to restart manually.
+**Rule:** Do not programmatically kill or restart `bun run dev` processes. Instead, inform the user to restart manually.
 
 **Why:**
 
@@ -76,15 +76,15 @@ interface Zone {
 ```
 "The GraphQL schema has been updated. Please restart the development server:
 1. Stop the server (Ctrl+C)
-2. Run `pnpm dev` again"
+2. Run `bun run dev` again"
 ```
 
 ❌ **Wrong:**
 
 ```bash
 # Don't do this
-pkill -f "pnpm dev"
-pnpm dev &
+pkill -f "bun run dev"
+bun run dev &
 ```
 
 **Exceptions:**

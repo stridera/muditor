@@ -1,7 +1,7 @@
 import {
   Injectable,
-  OnModuleInit,
-  OnModuleDestroy,
+  type OnModuleInit,
+  type OnModuleDestroy,
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

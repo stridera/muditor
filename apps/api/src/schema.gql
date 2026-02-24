@@ -199,6 +199,16 @@ type AuthPayload {
   user: User!
 }
 
+"""Result of banning a player"""
+type BanPlayerResultType {
+  expiresAt: DateTime
+  kicked: Boolean!
+  message: String!
+  playerName: String!
+  reason: String!
+  success: Boolean!
+}
+
 type BanRecord {
   active: Boolean!
 
@@ -1087,7 +1097,7 @@ input CreateRoomInput {
   magicAffinity: MagicAffinity
   name: String!
   requiredMechanic: PositionMechanic
-  roomDescription: String
+  roomDescription: String @deprecated(reason: "Use description instead")
   sector: Sector! = STRUCTURE
   zoneId: Int!
 }
@@ -1812,6 +1822,9 @@ type Mutation {
   """Assign a skill to a race"""
   assignSkillToRace(data: AssignSkillToRaceInput!): RaceSkillDto!
   attachTrigger(input: AttachTriggerInput!): TriggerDto!
+
+  """Ban a player by character name - kicks and prevents login"""
+  banPlayer(expiresAt: String, playerName: String!, reason: String!): BanPlayerResultType!
   banUser(input: BanUserInput!): BanRecord!
   batchUpdateRoomPositions(input: BatchUpdateRoomPositionsInput!): BatchUpdateResult!
 
@@ -2200,6 +2213,7 @@ type OnlinePlayerType {
   name: String!
   race: String!
   roomId: Int!
+  roomZoneId: Int!
 }
 
 type PasswordResetResponse {
@@ -2233,6 +2247,7 @@ type PlayerMailDto {
   readAt: DateTime
   recipient: PlayerMailCharacterDto
   recipientCharacterId: String
+  recipientName: String!
   sender: PlayerMailCharacterDto
   senderCharacterId: String
   senderName: String!
@@ -3654,7 +3669,7 @@ input UpdateRoomInput {
   magicAffinity: MagicAffinity
   name: String
   requiredMechanic: PositionMechanic
-  roomDescription: String
+  roomDescription: String @deprecated(reason: "Use description instead")
   sector: Sector
 }
 

@@ -43,7 +43,7 @@ describe('API Integration Tests', () => {
       } catch (error) {
         console.warn('⚠️  API not available at', API_URL);
         console.warn(
-          '   Skipping integration tests. Start the API with: pnpm --filter @muditor/api dev'
+          '   Skipping integration tests. Start the API with: bun run dev:api'
         );
         apiAvailable = false;
       }

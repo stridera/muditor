@@ -1,7 +1,6 @@
-#!/usr/bin/env tsx
 /**
  * Build-time GraphQL schema generation.
- * Run: pnpm build:schema
+ * Run: bun run build:schema
  */
 import type { INestApplication } from '@nestjs/common';
 import { GraphQLSchemaHost } from '@nestjs/graphql';

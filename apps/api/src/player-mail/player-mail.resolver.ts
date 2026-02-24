@@ -24,14 +24,25 @@ function mapPlayerMail(mail: any): PlayerMailDto {
   if (mail.sender?.name) {
     senderName = mail.sender.name;
   } else if (mail.legacySenderId) {
-    senderName = `Legacy Player #${mail.legacySenderId}`;
+    senderName = `Deleted User #${mail.legacySenderId}`;
   } else {
     senderName = '<deleted>';
+  }
+
+  // Determine recipient name: character name > legacy ID > deleted
+  let recipientName: string;
+  if (mail.recipient?.name) {
+    recipientName = mail.recipient.name;
+  } else if (mail.legacyRecipientId) {
+    recipientName = `Deleted User #${mail.legacyRecipientId}`;
+  } else {
+    recipientName = '<deleted>';
   }
 
   return {
     ...mail,
     senderName,
+    recipientName,
     wealthRetrievalInfo: mail.wealthRetrievedAt
       ? mail.wealthRetrievedByCharacter?.name
         ? `Retrieved by ${mail.wealthRetrievedByCharacter.name}`

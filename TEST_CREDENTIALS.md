@@ -22,18 +22,21 @@ poetry run fierylib import-legacy --with-users
 After seeding:
 
 ### Admin (GOD Level)
+
 - **Username:** `admin`
 - **Email:** `admin@muditor.dev`
 - **Password:** `admin123`
 - **Role:** GOD (full access)
 
 ### Builder
+
 - **Username:** `builder`
 - **Email:** `builder@muditor.dev`
 - **Password:** `builder123`
 - **Role:** BUILDER (can edit zones)
 
 ### Test Player
+
 - **Username:** `testplayer`
 - **Email:** `player@muditor.dev`
 - **Password:** `player123`
@@ -51,10 +54,11 @@ After seeding:
 
 ```bash
 cd /home/strider/Code/mud/muditor
-pnpm dev
+bun run dev
 ```
 
 Then navigate to:
+
 - **Web UI:** http://localhost:3002
 - **GraphQL API:** http://localhost:4000/graphql
 
@@ -68,6 +72,7 @@ poetry run fierylib seed users --reset
 ```
 
 This will:
+
 - Reset passwords for existing users
 - NOT delete existing world data
 - Use the passwords shown above
@@ -79,17 +84,20 @@ This will:
 - **PLAYER**: Read-only access for testing
 
 All users can:
+
 - View the world map
 - Browse zones and rooms
 - See mob and object data
 
 Builders and above can:
+
 - Create and edit zones
 - Modify rooms and exits
 - Design mobs and objects
 - Write Lua scripts
 
 GOD users can:
+
 - Manage user accounts
 - Access system settings
 - View audit logs

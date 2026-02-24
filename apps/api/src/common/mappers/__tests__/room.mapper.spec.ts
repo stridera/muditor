@@ -1,6 +1,6 @@
 import { Direction, ExitFlag, ExitState, Sector } from '@prisma/client';
 import { mapRoom } from '../room.mapper';
-import { RoomMapperSource } from '../types';
+import type { RoomMapperSource } from '../types';
 
 describe('mapRoom', () => {
   const base = (): RoomMapperSource => ({

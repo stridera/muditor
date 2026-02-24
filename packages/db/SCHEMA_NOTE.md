@@ -45,8 +45,8 @@ Both connect to the same database, just with different client libraries.
    ```bash
    cd /home/strider/Code/mud/muditor
    # Edit packages/db/prisma/schema.prisma
-   pnpm db:push         # Apply to database
-   pnpm db:generate     # Regenerate TypeScript client
+   bun run db:push         # Apply to database
+   bun run db:generate     # Regenerate TypeScript client
    ```
 
 2. **Sync changes to FieryLib** (only if you need to re-import)
@@ -61,8 +61,8 @@ Both connect to the same database, just with different client libraries.
 3. **Verify**
    ```bash
    cd muditor
-   pnpm type-check      # Check TypeScript
-   pnpm dev             # Test API
+   bun run type-check      # Check TypeScript
+   bun run dev             # Test API
    ```
 
 **Note:** You rarely need to sync to FieryLib - it's only used for initial import. Once your database is seeded, use Muditor for all ongoing work.
@@ -94,16 +94,16 @@ The seed files in this package are deprecated:
 
 ```bash
 # Generate TypeScript client
-pnpm db:generate
+bun run db:generate
 
 # Push schema changes (development only)
-pnpm db:push
+bun run db:push
 
 # Create migration (production)
-pnpm db:migrate
+bun run db:migrate
 
 # Open Prisma Studio
-pnpm db:studio
+bun run db:studio
 ```
 
 ## See Also

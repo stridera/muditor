@@ -2,6 +2,7 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "composite": true,
+    "noEmit": false,
     "declaration": true,
     // Only emit type declarations into a separate directory; avoid generating JS alongside Next.js sources (prevents duplicate route files)
     "emitDeclarationOnly": true,
@@ -19,7 +20,8 @@
       "@muditor/db": ["../../packages/db/src"],
       "@muditor/types": ["../../packages/types/src"],
       "@muditor/ui": ["../../packages/ui/src"]
-    }
+    },
+    "esModuleInterop": true
   },
   "include": [
     "next-env.d.ts",

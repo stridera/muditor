@@ -3,7 +3,7 @@ import {
   RoomExitDto,
   RoomExtraDescriptionDto,
 } from '../../rooms/room.dto';
-import { RoomMapperSource } from './types';
+import type { RoomMapperSource } from './types';
 
 export function mapRoom(db: RoomMapperSource): RoomDto {
   const exitsSource = db.exits || [];

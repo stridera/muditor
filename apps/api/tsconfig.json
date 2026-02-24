@@ -4,27 +4,15 @@
     "composite": true,
     "noEmit": false,
     "rootDir": "./src",
-    // TEMPORARY RELAXATIONS (Target re-enable: 2026-Q1 after DTO constructors & ESM migration):
-    // - verbatimModuleSyntax: false (project still CJS; switch to true after adding "type":"module" or full ESM migration)
-    // - strictPropertyInitialization: false (will add constructors/definite assignment assertions to DTO/input types)
-    // Track in README Null & Optional Policy section.
-    // Use Node16 module system to align with moduleResolution=node16 for TS 6 strict config
-    "module": "Node16",
-    "moduleResolution": "node16",
-    // Node16 resolution active; ensure module kind matches for proper conditional exports handling.
-    // Override a few root-level ultra-strict flags temporarily while we migrate the API codebase.
-    // 1. verbatimModuleSyntax off because NestJS project is still effectively CommonJS (no "type":"module").
-    //    This prevents a flood of TS1295 errors about ESM syntax in CJS files.
-    // 2. strictPropertyInitialization off to defer adding definite assignment operators/ctors to every DTO.
-    //    We'll re-enable after refactoring DTO/property initialization patterns.
-    "verbatimModuleSyntax": false,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "verbatimModuleSyntax": true,
     "strictPropertyInitialization": false,
     "declaration": true,
     "removeComments": true,
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
-    "allowSyntheticDefaultImports": true,
-    "target": "ES2020",
+    "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
     "incremental": true,
@@ -35,25 +23,13 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "~/*": [
-        "./src/*"
-      ],
-      "@muditor/db": [
-        "../../packages/db/src"
-      ],
-      "@muditor/types": [
-        "../../packages/types/src"
-      ]
+      "~/*": ["./src/*"],
+      "@muditor/db": ["../../packages/db/src"],
+      "@muditor/types": ["../../packages/types/src"]
     }
   },
-  "include": [
-    "src/**/*.ts",
-    "src/common/mappers/**/*.ts" // Explicit to satisfy project references / ts-loader edge case (TS6307)
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ],
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules", "dist"],
   "references": [
     {
       "path": "../../packages/db"

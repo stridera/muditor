@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import {
-  ObjectResets,
+  type ObjectResets,
   ObjectType as ObjectTypeEnum,
   Prisma,
 } from '@prisma/client';

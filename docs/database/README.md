@@ -42,21 +42,25 @@ Muditor uses PostgreSQL with Prisma ORM to store MUD world data in a normalized 
 ## Key Features
 
 ### Type Safety
+
 - Comprehensive enum system for all flag types
 - Strict validation of flag combinations
 - Type-safe database operations throughout
 
 ### Data Integrity
+
 - Foreign key constraints maintain referential integrity
 - Cascade deletes prevent orphaned records
 - Comprehensive validation rules
 
 ### Legacy Compatibility
+
 - Import system handles legacy JSON world files
 - Graceful migration from string-based to enum-based flags
 - Backward-compatible data transformations
 
 ### Performance Optimized
+
 - Indexed relationships for fast queries
 - Efficient enum storage
 - Optimized for read-heavy MUD operations
@@ -64,8 +68,8 @@ Muditor uses PostgreSQL with Prisma ORM to store MUD world data in a normalized 
 ## Getting Started
 
 1. **Setup**: Database is automatically configured via Docker Compose
-2. **Migration**: Use `pnpm prisma db push` to sync schema
-3. **Seeding**: Run `pnpm seed` to populate with world data
-4. **Exploration**: Use Prisma Studio with `pnpm prisma studio`
+2. **Migration**: Use `bunx prisma db push` to sync schema
+3. **Seeding**: Run `bun run seed` to populate with world data
+4. **Exploration**: Use Prisma Studio with `bunx prisma studio`
 
 For detailed information, see the specific documentation files in this directory.

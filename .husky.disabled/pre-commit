@@ -1,6 +1,6 @@
 # Husky v9+ hook (no bootstrap lines needed). Keep commands minimal & fast.
 # 1. Lint & format only staged files
-npx lint-staged
+bunx lint-staged
 
 # 2. (Optional) Type checking across workspace. Comment out if too slow.
-pnpm type-check
+bun run type-check
