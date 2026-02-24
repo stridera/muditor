@@ -7,7 +7,7 @@
     "build": "npm run validate:graphql && next build",
     "build:skip-validation": "next build",
     "start": "next start",
-    "lint": "next lint --max-warnings -1",
+    "lint": "next lint --quiet",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
     "validate:graphql": "node ../../scripts/validate-graphql.js",
