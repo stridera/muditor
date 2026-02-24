@@ -3,7 +3,6 @@ import { ValidationService, type ValidationReport } from './validation.service';
 import {
   ValidationReportType,
   ValidationSummaryType,
-  ValidationIssue,
 } from './validation.types';
 
 @Resolver()

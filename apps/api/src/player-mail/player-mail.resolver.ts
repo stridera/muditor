@@ -17,8 +17,54 @@ import {
 } from './player-mail.dto';
 import { PlayerMailService } from './player-mail.service';
 
+// Raw shapes returned by Prisma with includes (used for mapper functions).
+// These use `| null` for DB-nullable fields that the DTO declares as optional.
+interface PlayerMailRaw {
+  id: number;
+  legacySenderId?: number | null;
+  legacyRecipientId?: number | null;
+  senderCharacterId?: string | null;
+  recipientCharacterId?: string | null;
+  body: string;
+  sentAt: Date;
+  readAt?: Date | null;
+  attachedCopper: number;
+  attachedSilver: number;
+  attachedGold: number;
+  attachedPlatinum: number;
+  attachedObjectZoneId?: number | null;
+  attachedObjectId?: number | null;
+  wealthRetrievedAt?: Date | null;
+  wealthRetrievedByCharacterId?: string | null;
+  objectRetrievedAt?: Date | null;
+  objectRetrievedByCharacterId?: string | null;
+  objectMovedToAccountStorage?: boolean;
+  isDeleted: boolean;
+  createdAt: Date;
+  sender?: { id: string; name: string } | null;
+  recipient?: { id: string; name: string } | null;
+  attachedObject?: { zoneId: number; id: number; name: string } | null;
+  wealthRetrievedByCharacter?: { name: string } | null;
+  objectRetrievedByCharacter?: { name: string } | null;
+}
+
+interface AccountMailRaw {
+  id: number;
+  senderUserId: string;
+  recipientUserId?: string | null;
+  isBroadcast: boolean;
+  subject: string;
+  body: string;
+  sentAt: Date;
+  readAt?: Date | null;
+  isDeleted: boolean;
+  createdAt: Date;
+  sender?: { id: string; username: string; email: string } | null;
+  recipient?: { id: string; username: string; email: string } | null;
+}
+
 // Helper to map database result to DTO with computed fields
-function mapPlayerMail(mail: any): PlayerMailDto {
+function mapPlayerMail(mail: PlayerMailRaw): PlayerMailDto {
   // Determine sender name: character name > legacy ID > deleted
   let senderName: string;
   if (mail.sender?.name) {
@@ -39,35 +85,94 @@ function mapPlayerMail(mail: any): PlayerMailDto {
     recipientName = '<deleted>';
   }
 
-  return {
-    ...mail,
+  const dto: PlayerMailDto = {
+    id: mail.id,
+    body: mail.body,
+    sentAt: mail.sentAt,
+    attachedCopper: mail.attachedCopper,
+    attachedSilver: mail.attachedSilver,
+    attachedGold: mail.attachedGold,
+    attachedPlatinum: mail.attachedPlatinum,
+    objectMovedToAccountStorage: mail.objectMovedToAccountStorage ?? false,
+    isDeleted: mail.isDeleted,
+    createdAt: mail.createdAt,
     senderName,
     recipientName,
-    wealthRetrievalInfo: mail.wealthRetrievedAt
-      ? mail.wealthRetrievedByCharacter?.name
-        ? `Retrieved by ${mail.wealthRetrievedByCharacter.name}`
-        : 'Retrieved'
-      : null,
-    objectRetrievalInfo: mail.objectRetrievedAt
-      ? mail.objectMovedToAccountStorage
-        ? 'Moved to account storage'
-        : mail.objectRetrievedByCharacter?.name
-          ? `Retrieved by ${mail.objectRetrievedByCharacter.name}`
-          : 'Retrieved'
-      : null,
-    sender: mail.sender ?? null,
-    recipient: mail.recipient ?? null,
-    attachedObject: mail.attachedObject ?? null,
+    ...(mail.legacySenderId != null
+      ? { legacySenderId: mail.legacySenderId }
+      : {}),
+    ...(mail.legacyRecipientId != null
+      ? { legacyRecipientId: mail.legacyRecipientId }
+      : {}),
+    ...(mail.senderCharacterId != null
+      ? { senderCharacterId: mail.senderCharacterId }
+      : {}),
+    ...(mail.recipientCharacterId != null
+      ? { recipientCharacterId: mail.recipientCharacterId }
+      : {}),
+    ...(mail.readAt != null ? { readAt: mail.readAt } : {}),
+    ...(mail.attachedObjectZoneId != null
+      ? { attachedObjectZoneId: mail.attachedObjectZoneId }
+      : {}),
+    ...(mail.attachedObjectId != null
+      ? { attachedObjectId: mail.attachedObjectId }
+      : {}),
+    ...(mail.wealthRetrievedAt != null
+      ? { wealthRetrievedAt: mail.wealthRetrievedAt }
+      : {}),
+    ...(mail.wealthRetrievedByCharacterId != null
+      ? { wealthRetrievedByCharacterId: mail.wealthRetrievedByCharacterId }
+      : {}),
+    ...(mail.objectRetrievedAt != null
+      ? { objectRetrievedAt: mail.objectRetrievedAt }
+      : {}),
+    ...(mail.objectRetrievedByCharacterId != null
+      ? { objectRetrievedByCharacterId: mail.objectRetrievedByCharacterId }
+      : {}),
+    ...(mail.wealthRetrievedAt
+      ? {
+          wealthRetrievalInfo: mail.wealthRetrievedByCharacter?.name
+            ? `Retrieved by ${mail.wealthRetrievedByCharacter.name}`
+            : 'Retrieved',
+        }
+      : {}),
+    ...(mail.objectRetrievedAt
+      ? {
+          objectRetrievalInfo: mail.objectMovedToAccountStorage
+            ? 'Moved to account storage'
+            : mail.objectRetrievedByCharacter?.name
+              ? `Retrieved by ${mail.objectRetrievedByCharacter.name}`
+              : 'Retrieved',
+        }
+      : {}),
+    ...(mail.sender != null ? { sender: mail.sender } : {}),
+    ...(mail.recipient != null ? { recipient: mail.recipient } : {}),
+    ...(mail.attachedObject != null
+      ? { attachedObject: mail.attachedObject }
+      : {}),
   };
+  return dto;
 }
 
-function mapAccountMail(mail: any): AccountMailDto {
-  return {
-    ...mail,
+function mapAccountMail(mail: AccountMailRaw): AccountMailDto {
+  const dto: AccountMailDto = {
+    id: mail.id,
+    senderUserId: mail.senderUserId,
+    isBroadcast: mail.isBroadcast,
+    subject: mail.subject,
+    body: mail.body,
+    sentAt: mail.sentAt,
+    isDeleted: mail.isDeleted,
+    createdAt: mail.createdAt,
     senderName: mail.sender?.username ?? mail.sender?.email ?? '<unknown>',
-    sender: mail.sender ?? null,
-    recipient: mail.recipient ?? null,
+    ...(mail.recipientUserId != null
+      ? { recipientUserId: mail.recipientUserId }
+      : {}),
+    ...(mail.readAt != null ? { readAt: mail.readAt } : {}),
+    ...(mail.sender != null ? { sender: mail.sender } : {}),
+    ...(mail.recipient != null ? { recipient: mail.recipient } : {}),
   };
+  return dto;
 }
 
 @Resolver()

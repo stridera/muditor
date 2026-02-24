@@ -98,7 +98,7 @@ export class ShopsResolver {
       const base: ShopAcceptDto = {
         id: String(a.id),
         type: a.type,
-      } as ShopAcceptDto;
+      };
       if (a.keywords && a.keywords.length) {
         // Non-empty check above doesn't narrow array emptiness for TS with exactOptionalPropertyTypes; use non-null assertion
         (base as unknown as { keywords?: string }).keywords = a.keywords[0]!;

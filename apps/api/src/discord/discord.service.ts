@@ -234,7 +234,6 @@ export class DiscordService implements OnModuleInit, OnModuleDestroy {
   private async handleGossipCommand(interaction: ChatInputCommandInteraction) {
     const message = interaction.options.getString('message', true);
     const discordId = interaction.user.id;
-    const discordName = interaction.user.username;
 
     // Check if user is linked
     const link = await this.databaseService.discordLink.findUnique({

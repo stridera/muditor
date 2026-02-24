@@ -1,6 +1,6 @@
 import { Field, Float, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { IsBoolean, IsNumber, IsOptional, IsEnum } from 'class-validator';
-import { ElementType, WearFlag } from '@muditor/db';
+import { ElementType, Prisma, WearFlag } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import { Effect } from '../abilities/abilities.dto';
 
@@ -21,7 +21,7 @@ export class ObjectEffectDto {
   strength: number;
 
   @Field(() => GraphQLJSON)
-  modifierData: any;
+  modifierData: Prisma.JsonValue;
 
   @Field(() => WearFlag, { nullable: true })
   wearLocation?: WearFlag;
@@ -40,7 +40,7 @@ export class ObjectEffectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
-  modifierData?: any;
+  modifierData?: Prisma.JsonValue;
 
   @Field(() => WearFlag, { nullable: true })
   @IsOptional()

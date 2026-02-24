@@ -7,7 +7,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { WearFlag } from '@muditor/db';
+import { Prisma, WearFlag } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 
 // Register WearFlag enum for GraphQL
@@ -51,7 +51,7 @@ export class ObjectSummaryDto {
   level?: number;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  values?: any;
+  values?: Prisma.JsonValue;
 
   @Field(() => [String], { nullable: true })
   flags?: string[];

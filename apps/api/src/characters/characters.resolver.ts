@@ -9,7 +9,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import type { Users } from '@muditor/db';
+import type { Characters, Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import {
@@ -40,78 +40,78 @@ export class CharactersResolver {
 
   // Map Prisma's stamina/staminaMax to the GraphQL movement/movementMax fields
   @ResolveField(() => Int, { name: 'movement' })
-  resolveMovement(@Parent() character: any): number {
-    return character.stamina ?? character.movement ?? 0;
+  resolveMovement(@Parent() character: Characters): number {
+    return character.stamina ?? 0;
   }
 
   @ResolveField(() => Int, { name: 'movementMax' })
-  resolveMovementMax(@Parent() character: any): number {
-    return character.staminaMax ?? character.movementMax ?? 0;
+  resolveMovementMax(@Parent() character: Characters): number {
+    return character.staminaMax ?? 0;
   }
 
   // Map Prisma's wealth (single BigInt in copper) to individual denomination fields
   // 1 platinum = 1000 copper, 1 gold = 100 copper, 1 silver = 10 copper
   @ResolveField(() => Int, { name: 'copper' })
-  resolveCopper(@Parent() character: any): number {
+  resolveCopper(@Parent() character: Characters): number {
     return Number(character.wealth ?? 0) % 10;
   }
 
   @ResolveField(() => Int, { name: 'silver' })
-  resolveSilver(@Parent() character: any): number {
+  resolveSilver(@Parent() character: Characters): number {
     return Math.floor(Number(character.wealth ?? 0) / 10) % 10;
   }
 
   @ResolveField(() => Int, { name: 'gold' })
-  resolveGold(@Parent() character: any): number {
+  resolveGold(@Parent() character: Characters): number {
     return Math.floor(Number(character.wealth ?? 0) / 100) % 10;
   }
 
   @ResolveField(() => Int, { name: 'platinum' })
-  resolvePlatinum(@Parent() character: any): number {
+  resolvePlatinum(@Parent() character: Characters): number {
     return Math.floor(Number(character.wealth ?? 0) / 1000);
   }
 
   @ResolveField(() => Int, { name: 'bankCopper' })
-  resolveBankCopper(@Parent() character: any): number {
+  resolveBankCopper(@Parent() character: Characters): number {
     return Number(character.bankWealth ?? 0) % 10;
   }
 
   @ResolveField(() => Int, { name: 'bankSilver' })
-  resolveBankSilver(@Parent() character: any): number {
+  resolveBankSilver(@Parent() character: Characters): number {
     return Math.floor(Number(character.bankWealth ?? 0) / 10) % 10;
   }
 
   @ResolveField(() => Int, { name: 'bankGold' })
-  resolveBankGold(@Parent() character: any): number {
+  resolveBankGold(@Parent() character: Characters): number {
     return Math.floor(Number(character.bankWealth ?? 0) / 100) % 10;
   }
 
   @ResolveField(() => Int, { name: 'bankPlatinum' })
-  resolveBankPlatinum(@Parent() character: any): number {
+  resolveBankPlatinum(@Parent() character: Characters): number {
     return Math.floor(Number(character.bankWealth ?? 0) / 1000);
   }
 
   // Map Prisma's 'permissions' array to DTO's 'privilegeFlags'
   @ResolveField(() => [String], { name: 'privilegeFlags', nullable: true })
-  resolvePrivilegeFlags(@Parent() character: any): string[] {
-    return character.permissions ?? character.privilegeFlags ?? [];
+  resolvePrivilegeFlags(@Parent() character: Characters): string[] {
+    return character.permissions ?? [];
   }
 
   // Map Prisma's currentRoomId to DTO's currentRoom
   @ResolveField(() => Int, { name: 'currentRoom', nullable: true })
-  resolveCurrentRoom(@Parent() character: any): number | null {
-    return character.currentRoomId ?? character.currentRoom ?? null;
+  resolveCurrentRoom(@Parent() character: Characters): number | null {
+    return character.currentRoomId ?? null;
   }
 
   // Map Prisma's recallRoomId to DTO's saveRoom/homeRoom
   @ResolveField(() => Int, { name: 'saveRoom', nullable: true })
-  resolveSaveRoom(@Parent() character: any): number | null {
-    return character.recallRoomId ?? character.saveRoom ?? null;
+  resolveSaveRoom(@Parent() character: Characters): number | null {
+    return character.recallRoomId ?? null;
   }
 
   @ResolveField(() => Int, { name: 'homeRoom', nullable: true })
-  resolveHomeRoom(@Parent() character: any): number | null {
-    return character.recallRoomId ?? character.homeRoom ?? null;
+  resolveHomeRoom(@Parent() character: Characters): number | null {
+    return character.recallRoomId ?? null;
   }
 
   // Character queries

@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateAbilityInput,
@@ -22,7 +23,7 @@ export class AbilitiesService {
     abilityType?: string,
     search?: string
   ) {
-    const where: any = {};
+    const where: Prisma.AbilityWhereInput = {};
 
     if (abilityType) {
       where.abilityType = abilityType;
@@ -37,7 +38,7 @@ export class AbilitiesService {
       ];
     }
 
-    const args: any = {
+    const args: Prisma.AbilityFindManyArgs = {
       where,
       include: {
         school: true,
@@ -55,7 +56,7 @@ export class AbilitiesService {
   }
 
   async count(abilityType?: string, search?: string) {
-    const where: any = {};
+    const where: Prisma.AbilityWhereInput = {};
 
     if (abilityType) {
       where.abilityType = abilityType;
@@ -95,7 +96,7 @@ export class AbilitiesService {
   }
 
   async create(data: CreateAbilityInput) {
-    const createData: any = {
+    const createData: Prisma.AbilityUncheckedCreateInput = {
       name: data.name,
       plainName: data.name
         .toLowerCase()
@@ -138,7 +139,7 @@ export class AbilitiesService {
   }
 
   async update(id: number, data: UpdateAbilityInput) {
-    const updateData: any = {};
+    const updateData: Prisma.AbilityUncheckedUpdateInput = {};
     if (data.name !== undefined) {
       updateData.name = data.name;
       updateData.plainName = data.name
@@ -200,7 +201,7 @@ export class AbilitiesService {
     abilityId: number,
     effects: Array<{
       effectId: number;
-      overrideParams?: any;
+      overrideParams?: Prisma.InputJsonValue;
       order: number;
       trigger?: string;
       chancePct: number;
@@ -317,7 +318,7 @@ export class AbilitiesService {
 
   // Effects methods
   async findAllEffects(skip?: number, take?: number, search?: string) {
-    const where: any = {};
+    const where: Prisma.EffectWhereInput = {};
 
     if (search) {
       where.OR = [
@@ -327,7 +328,7 @@ export class AbilitiesService {
       ];
     }
 
-    const args: any = {
+    const args: Prisma.EffectFindManyArgs = {
       where,
       orderBy: { effectType: 'asc' },
     };
@@ -337,7 +338,7 @@ export class AbilitiesService {
   }
 
   async countEffects(search?: string) {
-    const where: any = {};
+    const where: Prisma.EffectWhereInput = {};
 
     if (search) {
       where.OR = [
@@ -364,13 +365,13 @@ export class AbilitiesService {
         effectType: data.effectType,
         tags: data.tags ?? [],
         defaultParams: data.defaultParams ?? {},
-        paramSchema: data.paramSchema ?? null,
+        paramSchema: data.paramSchema ?? Prisma.JsonNull,
       },
     });
   }
 
   async updateEffect(id: number, data: UpdateEffectInput) {
-    const updateData: any = {};
+    const updateData: Prisma.EffectUncheckedUpdateInput = {};
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined)
       updateData.description = data.description;

@@ -22,6 +22,7 @@ import {
   Size,
   WearFlag,
 } from '@muditor/db';
+import { Prisma } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import {
   ObjectEffectDto,
@@ -123,7 +124,7 @@ export class ObjectDto {
   concealment: number;
 
   @Field(() => GraphQLJSON)
-  values: any;
+  values: Prisma.JsonValue;
 
   @Field(() => Int)
   zoneId: number;
@@ -273,7 +274,7 @@ export class CreateObjectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
-  values?: any;
+  values?: Prisma.JsonValue;
 }
 
 @InputType()
@@ -401,7 +402,7 @@ export class UpdateObjectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
-  values?: any;
+  values?: Prisma.JsonValue;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

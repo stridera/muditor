@@ -1,5 +1,6 @@
 import { Field, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { IsNumber, IsOptional } from 'class-validator';
+import { Prisma } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import { Effect } from '../abilities/abilities.dto';
 
@@ -18,7 +19,7 @@ export class MobDefaultEffectDto {
   strength: number;
 
   @Field(() => GraphQLJSON)
-  modifierData: any;
+  modifierData: Prisma.JsonValue;
 }
 
 @InputType()
@@ -34,5 +35,5 @@ export class MobDefaultEffectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   @IsOptional()
-  modifierData?: any;
+  modifierData?: Prisma.JsonValue;
 }

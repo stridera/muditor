@@ -24,8 +24,6 @@ const REDIS_CHANNELS = [
   'fierymud:events:world',
 ] as const;
 
-type RedisChannel = (typeof REDIS_CHANNELS)[number];
-
 /**
  * BridgeService subscribes to Redis pub/sub channels and emits game events
  * for GraphQL subscriptions.

@@ -93,7 +93,8 @@ export class UsersService {
     return {
       ...updatedUser,
       isBanned: false, // After an update, we assume not banned
-      preferences: updatedUser.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma JsonValue needs runtime cast for GraphQL UserPreferences resolution
+      preferences: updatedUser.preferences as any,
     };
   }
 
@@ -244,7 +245,8 @@ export class UsersService {
       isBanned: user.banRecords.length > 0,
       // Preserve original nullable fields (null instead of undefined)
       banRecords: user.banRecords.map(r => ({ ...r })),
-      preferences: user.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma JsonValue needs runtime cast for GraphQL UserPreferences resolution
+      preferences: user.preferences as any,
     };
   }
 
@@ -271,7 +273,8 @@ export class UsersService {
       ...user,
       isBanned: user.banRecords.length > 0,
       banRecords: user.banRecords.map(r => ({ ...r })),
-      preferences: user.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma JsonValue needs runtime cast for GraphQL UserPreferences resolution
+      preferences: user.preferences as any,
     }));
   }
 
@@ -421,11 +424,12 @@ export class UsersService {
     });
 
     // Merge existing preferences with new ones
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma JsonValue needs runtime cast for preferences merge
     const currentPreferences = (user?.preferences as any) || {};
     const updatedPreferences = {
       ...currentPreferences,
       ...Object.fromEntries(
-        Object.entries(input).filter(([_, v]) => v !== undefined && v !== null)
+        Object.entries(input).filter(([, v]) => v !== undefined && v !== null)
       ),
     };
 
@@ -441,7 +445,8 @@ export class UsersService {
     return {
       ...updatedUser,
       isBanned,
-      preferences: updatedUser.preferences as any, // Cast JsonValue to UserPreferences for GraphQL
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma JsonValue needs runtime cast for GraphQL UserPreferences resolution
+      preferences: updatedUser.preferences as any,
     };
   }
 }

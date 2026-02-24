@@ -194,7 +194,7 @@ export class MobsService {
     effects: Array<{
       effectId: number;
       strength?: number;
-      modifierData?: any;
+      modifierData?: Prisma.JsonValue;
     }>
   ) {
     await this.database.$transaction(async tx => {
