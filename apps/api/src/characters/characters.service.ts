@@ -539,7 +539,7 @@ export class CharactersService {
           isOnline: true,
         };
 
-    return this.db.characters.findMany({
+    const characters = await this.db.characters.findMany({
       where,
       select: {
         id: true,
@@ -548,7 +548,11 @@ export class CharactersService {
         lastLogin: true,
         isOnline: true,
         race: true,
-        classId: true,
+        characterClass: {
+          select: {
+            plainName: true,
+          },
+        },
         users: {
           select: {
             id: true,
@@ -559,6 +563,17 @@ export class CharactersService {
       },
       orderBy: { lastLogin: 'desc' },
     });
+
+    return characters.map(c => ({
+      id: c.id,
+      name: c.name,
+      level: c.level,
+      lastLogin: c.lastLogin,
+      isOnline: c.isOnline,
+      raceType: c.race ?? undefined,
+      playerClass: c.characterClass?.plainName ?? undefined,
+      user: c.users,
+    }));
   }
 
   async getCharacterSessionInfo(characterId: string) {

@@ -238,7 +238,7 @@ export class TriggersService {
       objectZoneId: null,
       objectId: null,
       variables: {},
-      flags: [],
+      flags: data.flags ?? [],
     };
 
     if (data.mobId && data.mobZoneId) {
@@ -294,6 +294,11 @@ export class TriggersService {
         set: data.argList,
       } as Prisma.TriggersUpdateargListInput;
       updateData.numArgs = data.argList.length;
+    }
+    if (data.flags) {
+      updateData.flags = {
+        set: data.flags,
+      } as Prisma.TriggersUpdateflagsInput;
     }
     if (data.variables) {
       updateData.variables = JSON.parse(data.variables);

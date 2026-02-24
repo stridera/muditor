@@ -4,6 +4,7 @@ import { useState, useRef, useEffect } from 'react';
 import Editor from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { useTheme } from 'next-themes';
+import { ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
 
 export interface Script {
   id: string;
@@ -13,6 +14,7 @@ export interface Script {
   argList?: string;
   commands: string;
   variables: Record<string, any>;
+  flags?: string[];
   zoneId?: number;
   mobId?: number;
   objectId?: number;
@@ -26,6 +28,72 @@ interface ScriptEditorProps {
   onChange?: (value: string) => void;
   readOnly?: boolean;
   height?: string;
+}
+
+// Trigger flag definitions grouped by category
+const COMMON_FLAGS = [
+  'GLOBAL',
+  'RANDOM',
+  'COMMAND',
+  'LOAD',
+  'CAST',
+  'LEAVE',
+  'TIME',
+] as const;
+
+const MOB_FLAGS = [
+  'SPEECH',
+  'ACT',
+  'DEATH',
+  'GREET',
+  'GREET_ALL',
+  'ENTRY',
+  'RECEIVE',
+  'FIGHT',
+  'HIT_PERCENT',
+  'BRIBE',
+  'MEMORY',
+  'DOOR',
+  'SPEECH_TO',
+  'LOOK',
+  'AUTO',
+] as const;
+
+const OBJECT_FLAGS = [
+  'ATTACK',
+  'DEFEND',
+  'TIMER',
+  'GET',
+  'DROP',
+  'GIVE',
+  'WEAR',
+  'REMOVE',
+  'USE',
+  'CONSUME',
+] as const;
+
+const WORLD_FLAGS = ['RESET', 'PREENTRY', 'POSTENTRY'] as const;
+
+function getTypeSpecificFlags(
+  attachType: string
+): readonly string[] {
+  switch (attachType) {
+    case 'MOB':
+      return MOB_FLAGS;
+    case 'OBJECT':
+      return OBJECT_FLAGS;
+    case 'WORLD':
+      return WORLD_FLAGS;
+    default:
+      return [];
+  }
+}
+
+function getAllValidFlags(attachType: string): Set<string> {
+  const valid = new Set<string>();
+  for (const f of COMMON_FLAGS) valid.add(f);
+  for (const f of getTypeSpecificFlags(attachType)) valid.add(f);
+  return valid;
 }
 
 // Lua language configuration for Monaco
@@ -55,7 +123,6 @@ const luaLanguageConfig: any = {
     'while',
   ],
   mudFunctions: [
-    // Common MUD script functions
     'char',
     'mob',
     'obj',
@@ -193,7 +260,6 @@ const luaLanguageConfig: any = {
 
 // Enhanced Lua script templates organized by category
 const scriptTemplates = {
-  // MOB INTERACTION TEMPLATES
   mob_greeting: {
     name: 'Mob Greeting',
     category: 'Mob Interaction',
@@ -226,7 +292,7 @@ if char and mob and random(1, 100) <= 25 then  -- 25% chance
     local damage = dice(2, 8) + 5
     send_to_char(char, "The " .. mob.name .. " unleashes a devastating attack!")
     send_to_room(mob.room, "The " .. mob.name .. " glows with menacing energy!", char)
-    
+
     damage(char, damage, "special")
 end`,
   },
@@ -245,14 +311,13 @@ local mob = get_mobile()
 if killer and mob then
     send_to_char(killer, "As " .. mob.name .. " dies, you feel a strange energy surge through you.")
     send_to_room(mob.room, "The air shimmers as " .. mob.name .. " breathes its last.", killer)
-    
+
     -- Special death effects here
     -- heal(killer, dice(3, 8))  -- Healing on kill
     -- grant_exp(killer, 100)    -- Bonus experience
 end`,
   },
 
-  // OBJECT INTERACTION TEMPLATES
   object_use: {
     name: 'Object Use',
     category: 'Object Interaction',
@@ -267,7 +332,7 @@ local obj = get_object()
 if char and obj then
     send_to_char(char, "You use the " .. obj.name .. ".")
     send_to_room(char.room, char.name .. " uses " .. obj.name .. ".", char)
-    
+
     -- Add your custom effects here
     -- heal(char, dice(2, 8))     -- Healing potion
 end`,
@@ -287,7 +352,7 @@ local obj = get_object()
 if char and obj then
     send_to_char(char, "As you wear " .. obj.name .. ", you feel its power flow through you.")
     send_to_room(char.room, char.name .. " is surrounded by a faint aura as they don " .. obj.name .. ".", char)
-    
+
     -- Add stat bonuses or special effects
     -- set_char_var(char, "magic_armor_bonus", 2)
 end`,
@@ -309,7 +374,7 @@ if char and obj then
     local ticks = get_obj_var(obj, "timer_ticks") or 0
     ticks = ticks + 1
     set_obj_var(obj, "timer_ticks", ticks)
-    
+
     if ticks % 10 == 0 then  -- Every 10 ticks
         send_to_char(char, obj.name .. " pulses with magical energy.")
         heal(char, dice(1, 4))  -- Small healing over time
@@ -317,7 +382,6 @@ if char and obj then
 end`,
   },
 
-  // ROOM INTERACTION TEMPLATES
   room_enter: {
     name: 'Room Enter',
     category: 'Room Events',
@@ -332,7 +396,7 @@ local room = get_room()
 if char and room then
     if is_pc(char) then
         send_to_char(char, "You feel a strange presence as you enter this place.")
-        
+
         -- Room-specific checks
         if get_char_var(char, "first_visit_" .. room.id) == nil then
             set_char_var(char, "first_visit_" .. room.id, true)
@@ -359,7 +423,7 @@ local args = get_arguments()
 if char and room and command then
     if command == "search" then
         send_to_char(char, "You search the area carefully...")
-        
+
         if random(1, 100) <= 30 then  -- 30% chance
             send_to_char(char, "You discover something hidden!")
             -- create_obj(1234, char)  -- Give hidden item
@@ -374,7 +438,6 @@ if char and room and command then
 end`,
   },
 
-  // ZONE MANAGEMENT TEMPLATES
   zone_reset: {
     name: 'Zone Reset',
     category: 'Zone Management',
@@ -387,15 +450,15 @@ local zone = get_zone()
 
 if zone then
     mudlog("Zone " .. zone.name .. " is resetting")
-    
+
     -- Reset special doors
     -- set_door_state(zone.id, 1234, "north", "closed")
-    
+
     -- Respawn special mobs that might have been killed
     -- if not mob_exists(zone.id, 1001) then
     --     create_mob(1001, get_room(zone.id, 1200))
     -- end
-    
+
     -- Reset zone-wide variables
     -- set_zone_var(zone.id, "special_event_active", false)
 end`,
@@ -414,22 +477,21 @@ local zone = get_zone()
 if zone then
     local weather = get_zone_var(zone.id, "current_weather") or "clear"
     local weather_timer = get_zone_var(zone.id, "weather_timer") or 0
-    
+
     weather_timer = weather_timer + 1
     set_zone_var(zone.id, "weather_timer", weather_timer)
-    
+
     -- Change weather every 20 ticks
     if weather_timer >= 20 then
         local new_weather = {"clear", "cloudy", "rainy", "stormy"}[random(1, 4)]
         set_zone_var(zone.id, "current_weather", new_weather)
         set_zone_var(zone.id, "weather_timer", 0)
-        
+
         send_to_zone(zone.id, "The weather begins to change as " .. new_weather .. " conditions set in.")
     end
 end`,
   },
 
-  // UTILITY TEMPLATES
   utility_variable: {
     name: 'Variable Manager',
     category: 'Utility',
@@ -447,7 +509,7 @@ if char and command == "setvar" then
     if #parts >= 2 then
         local key = parts[1]
         local value = table.concat(parts, " ", 2)
-        
+
         set_char_var(char, key, value)
         send_to_char(char, "Variable '" .. key .. "' set to: " .. value)
     else
@@ -483,7 +545,7 @@ if char and room then
     if command == "destinations" or command == "list" then
         send_to_char(char, "Available destinations:")
         send_to_char(char, "1. Temple (goto temple)")
-        send_to_char(char, "2. Market (goto market)")  
+        send_to_char(char, "2. Market (goto market)")
         send_to_char(char, "3. Arena (goto arena)")
         send_to_char(char, "4. Wilderness (goto wild)")
     elseif command == "goto" then
@@ -494,7 +556,7 @@ if char and room then
             arena = 3100,
             wild = 3200
         }
-        
+
         if destinations[dest] then
             send_to_char(char, "The magical portal swirls and transports you!")
             send_to_room(room, char.name .. " steps through a shimmering portal and vanishes.")
@@ -514,18 +576,22 @@ export default function ScriptEditor({
   onTest,
   onChange,
   readOnly = false,
-  height = '400px',
+  height = '600px',
 }: ScriptEditorProps) {
   const [code, setCode] = useState(script?.commands || '');
+  const [scriptName, setScriptName] = useState(script?.name || '');
+  const [attachType, setAttachType] = useState(script?.attachType || 'MOB');
+  const [flags, setFlags] = useState<string[]>(script?.flags || []);
+  const [argList, setArgList] = useState(script?.argList || '');
   const [selectedTemplate, setSelectedTemplate] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('');
   const [isValidating, setIsValidating] = useState(false);
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const [showSidebar, setShowSidebar] = useState(true);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  // Ensure we're mounted before accessing theme
   useEffect(() => {
     setMounted(true);
   }, []);
@@ -534,17 +600,18 @@ export default function ScriptEditor({
     if (script?.commands !== code) {
       setCode(script?.commands || '');
     }
+    if (script?.name !== undefined) setScriptName(script.name);
+    if (script?.attachType !== undefined) setAttachType(script.attachType);
+    if (script?.flags !== undefined) setFlags(script.flags);
+    if (script?.argList !== undefined) setArgList(script.argList || '');
   }, [script]);
 
-  // Define themes before editor mounts
   const handleEditorWillMount = (monaco: typeof import('monaco-editor')) => {
-    // Register Lua language if not already registered
     if (!monaco.languages.getLanguages().find(lang => lang.id === 'lua')) {
       monaco.languages.register({ id: 'lua' });
       monaco.languages.setMonarchTokensProvider('lua', luaLanguageConfig);
     }
 
-    // Define dark theme
     monaco.editor.defineTheme('muditor-dark', {
       base: 'vs-dark',
       inherit: true,
@@ -565,7 +632,6 @@ export default function ScriptEditor({
       },
     });
 
-    // Define light theme
     monaco.editor.defineTheme('muditor-light', {
       base: 'vs',
       inherit: true,
@@ -590,15 +656,14 @@ export default function ScriptEditor({
   const handleEditorDidMount = (editor: editor.IStandaloneCodeEditor) => {
     editorRef.current = editor;
 
-    // Set language to Lua
-    if (typeof window !== 'undefined') {
+    const model = editor.getModel();
+    if (model && typeof window !== 'undefined') {
       import('monaco-editor').then(monaco => {
-        monaco.editor.setModelLanguage(editor.getModel()!, 'lua');
+        monaco.editor.setModelLanguage(model, 'lua');
       });
     }
   };
 
-  // Update Monaco theme when system theme changes
   useEffect(() => {
     if (mounted && editorRef.current && typeof window !== 'undefined') {
       import('monaco-editor').then(monaco => {
@@ -614,7 +679,6 @@ export default function ScriptEditor({
     setCode(newCode);
     onChange?.(newCode);
 
-    // Clear validation errors when code changes
     if (validationErrors.length > 0) {
       setValidationErrors([]);
     }
@@ -623,18 +687,13 @@ export default function ScriptEditor({
   const validateScript = async () => {
     setIsValidating(true);
     try {
-      // Basic Lua syntax validation
       const errors: string[] = [];
-
-      // Check for basic syntax issues
       const lines = code.split('\n');
-      const inComment = false;
 
       lines.forEach((line, index) => {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('--')) return;
 
-        // Check for common issues
         if (
           trimmed.includes('function') &&
           !trimmed.includes('end') &&
@@ -656,7 +715,6 @@ export default function ScriptEditor({
         }
       });
 
-      // Check balanced parentheses
       const openParens = (code.match(/\(/g) || []).length;
       const closeParens = (code.match(/\)/g) || []).length;
       if (openParens !== closeParens) {
@@ -683,7 +741,6 @@ export default function ScriptEditor({
     }
   };
 
-  // Get unique categories from templates
   const categories = Array.from(
     new Set(
       Object.values(scriptTemplates).map(template =>
@@ -694,9 +751,8 @@ export default function ScriptEditor({
     )
   ).sort();
 
-  // Filter templates by selected category
   const filteredTemplates = Object.entries(scriptTemplates).filter(
-    ([key, template]) => {
+    ([_key, template]) => {
       if (!selectedCategory) return true;
       return (
         typeof template === 'object' &&
@@ -712,10 +768,26 @@ export default function ScriptEditor({
     }
   };
 
+  const handleAttachTypeChange = (newType: string) => {
+    const validFlags = getAllValidFlags(newType);
+    setAttachType(newType);
+    setFlags(prev => prev.filter(f => validFlags.has(f)));
+  };
+
+  const toggleFlag = (flag: string) => {
+    setFlags(prev =>
+      prev.includes(flag) ? prev.filter(f => f !== flag) : [...prev, flag]
+    );
+  };
+
   const handleSave = () => {
     if (onSave) {
       onSave({
         ...script,
+        name: scriptName,
+        attachType,
+        flags,
+        argList,
         commands: code,
       });
     }
@@ -725,16 +797,39 @@ export default function ScriptEditor({
     if (onTest) {
       onTest({
         ...script,
+        name: scriptName,
+        attachType,
+        flags,
+        argList,
         commands: code,
       });
     }
   };
+
+  const typeSpecificFlags = getTypeSpecificFlags(attachType);
+  const argCount = argList
+    .split(',')
+    .map(s => s.trim())
+    .filter(Boolean).length;
 
   return (
     <div className='script-editor border border-border rounded-lg overflow-hidden bg-card'>
       {/* Toolbar */}
       <div className='bg-muted border-b border-border px-4 py-2 space-y-2'>
         <div className='flex items-center gap-4'>
+          <button
+            onClick={() => setShowSidebar(!showSidebar)}
+            className='text-sm border border-border rounded px-2 py-1 bg-background text-foreground hover:bg-accent flex items-center gap-1'
+            title={showSidebar ? 'Hide properties' : 'Show properties'}
+          >
+            <Settings2 className='w-3.5 h-3.5' />
+            {showSidebar ? (
+              <ChevronLeft className='w-3 h-3' />
+            ) : (
+              <ChevronRight className='w-3 h-3' />
+            )}
+          </button>
+
           <div className='flex items-center gap-2'>
             <label className='text-sm font-medium text-foreground'>
               Category:
@@ -789,7 +884,6 @@ export default function ScriptEditor({
           </button>
         </div>
 
-        {/* Template Info */}
         {selectedTemplate &&
           (() => {
             const template =
@@ -838,46 +932,166 @@ export default function ScriptEditor({
         </div>
       </div>
 
-      {/* Editor */}
-      <Editor
-        height={height}
-        defaultLanguage='lua'
-        theme={
-          mounted
-            ? resolvedTheme === 'dark'
-              ? 'muditor-dark'
-              : 'muditor-light'
-            : 'vs'
-        }
-        value={code}
-        onChange={handleCodeChange}
-        beforeMount={handleEditorWillMount}
-        onMount={handleEditorDidMount}
-        options={{
-          readOnly,
-          minimap: { enabled: true },
-          scrollBeyondLastLine: false,
-          wordWrap: 'on',
-          lineNumbers: 'on',
-          folding: true,
-          matchBrackets: 'always',
-          autoIndent: 'full',
-          formatOnPaste: true,
-          formatOnType: true,
-          fontSize: 14,
-          fontFamily: '"Fira Code", "JetBrains Mono", monospace',
-          suggest: {
-            showKeywords: true,
-            showSnippets: true,
-            showFunctions: true,
-          },
-          quickSuggestions: {
-            other: true,
-            comments: false,
-            strings: false,
-          },
-        }}
-      />
+      {/* Sidebar + Editor */}
+      <div className='flex' style={{ height }}>
+        {/* Properties Sidebar */}
+        {showSidebar && (
+          <div className='w-[280px] shrink-0 border-r border-border bg-muted/50 overflow-y-auto'>
+            <div className='p-3 space-y-4'>
+              {/* Script Name */}
+              <div>
+                <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Script Name
+                </label>
+                <input
+                  type='text'
+                  value={scriptName}
+                  onChange={e => setScriptName(e.target.value)}
+                  className='mt-1 w-full text-sm border border-border rounded px-2 py-1.5 bg-background text-foreground'
+                  placeholder='Script name...'
+                />
+              </div>
+
+              {/* Attach Type */}
+              <div>
+                <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Attach Type
+                </label>
+                <select
+                  value={attachType}
+                  onChange={e => handleAttachTypeChange(e.target.value)}
+                  className='mt-1 w-full text-sm border border-border rounded px-2 py-1.5 bg-background text-foreground'
+                >
+                  <option value='MOB'>MOB</option>
+                  <option value='OBJECT'>OBJECT</option>
+                  <option value='WORLD'>WORLD</option>
+                </select>
+              </div>
+
+              {/* Trigger Flags */}
+              <div>
+                <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Trigger Flags
+                  {flags.length > 0 && (
+                    <span className='ml-1 text-foreground'>({flags.length})</span>
+                  )}
+                </label>
+
+                {/* Common Flags */}
+                <div className='mt-2'>
+                  <div className='text-[10px] font-medium text-muted-foreground/70 uppercase mb-1'>
+                    Common
+                  </div>
+                  <div className='grid grid-cols-2 gap-x-2 gap-y-0.5'>
+                    {COMMON_FLAGS.map(flag => (
+                      <label
+                        key={flag}
+                        className='flex items-center gap-1.5 text-xs cursor-pointer hover:text-foreground text-muted-foreground py-0.5'
+                      >
+                        <input
+                          type='checkbox'
+                          checked={flags.includes(flag)}
+                          onChange={() => toggleFlag(flag)}
+                          className='rounded border-border h-3 w-3'
+                        />
+                        {flag}
+                      </label>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Type-specific Flags */}
+                {typeSpecificFlags.length > 0 && (
+                  <div className='mt-2'>
+                    <div className='text-[10px] font-medium text-muted-foreground/70 uppercase mb-1'>
+                      {attachType}
+                    </div>
+                    <div className='grid grid-cols-2 gap-x-2 gap-y-0.5'>
+                      {typeSpecificFlags.map(flag => (
+                        <label
+                          key={flag}
+                          className='flex items-center gap-1.5 text-xs cursor-pointer hover:text-foreground text-muted-foreground py-0.5'
+                        >
+                          <input
+                            type='checkbox'
+                            checked={flags.includes(flag)}
+                            onChange={() => toggleFlag(flag)}
+                            className='rounded border-border h-3 w-3'
+                          />
+                          {flag}
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Arguments */}
+              <div>
+                <label className='text-xs font-medium text-muted-foreground uppercase tracking-wider'>
+                  Arguments
+                  {argCount > 0 && (
+                    <span className='ml-1 text-foreground'>({argCount})</span>
+                  )}
+                </label>
+                <input
+                  type='text'
+                  value={argList}
+                  onChange={e => setArgList(e.target.value)}
+                  className='mt-1 w-full text-sm border border-border rounded px-2 py-1.5 bg-background text-foreground'
+                  placeholder='arg1, arg2, ...'
+                />
+                <p className='text-[10px] text-muted-foreground/70 mt-0.5'>
+                  Comma-separated list
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Editor */}
+        <div className='flex-1 min-w-0'>
+          <Editor
+            height='100%'
+            defaultLanguage='lua'
+            theme={
+              mounted
+                ? resolvedTheme === 'dark'
+                  ? 'muditor-dark'
+                  : 'muditor-light'
+                : 'vs'
+            }
+            value={code}
+            onChange={handleCodeChange}
+            beforeMount={handleEditorWillMount}
+            onMount={handleEditorDidMount}
+            options={{
+              readOnly,
+              minimap: { enabled: true },
+              scrollBeyondLastLine: false,
+              wordWrap: 'on',
+              lineNumbers: 'on',
+              folding: true,
+              matchBrackets: 'always',
+              autoIndent: 'full',
+              formatOnPaste: true,
+              formatOnType: true,
+              fontSize: 14,
+              fontFamily: '"Fira Code", "JetBrains Mono", monospace',
+              suggest: {
+                showKeywords: true,
+                showSnippets: true,
+                showFunctions: true,
+              },
+              quickSuggestions: {
+                other: true,
+                comments: false,
+                strings: false,
+              },
+            }}
+          />
+        </div>
+      </div>
 
       {/* Validation Results */}
       {validationErrors.length > 0 && (
@@ -899,7 +1113,7 @@ export default function ScriptEditor({
       {/* Help Section */}
       <details className='bg-muted border-t border-border'>
         <summary className='px-4 py-2 cursor-pointer text-sm font-medium text-foreground hover:bg-accent'>
-          📚 Lua Scripting Reference
+          Lua Scripting Reference
         </summary>
         <div className='px-4 py-3 space-y-3 text-sm'>
           <div>
@@ -922,7 +1136,6 @@ export default function ScriptEditor({
               <code className='bg-accent px-1 rounded'>actor.level</code>,{' '}
               <code className='bg-accent px-1 rounded'>actor.hp</code>,{' '}
               <code className='bg-accent px-1 rounded'>actor.max_hp</code>,{' '}
-              <code className='bg-accent px-1 rounded'>actor.mana</code>,{' '}
               <code className='bg-accent px-1 rounded'>actor.alignment</code>,{' '}
               <code className='bg-accent px-1 rounded'>actor.gold</code>
               <br />

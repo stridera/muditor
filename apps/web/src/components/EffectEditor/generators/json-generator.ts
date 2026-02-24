@@ -32,25 +32,35 @@ export interface AbilityEffectOutput {
  * Effect ID mapping is now loaded dynamically from the database
  * via getEffectIdForBlockType() from data-registry.ts
  *
- * The 18-effect schema is defined in the Effect table:
- * 1. damage  - Deal damage (instant/periodic/chain)
- * 2. heal    - Restore resources
- * 3. modify  - Change any numeric value
- * 4. status  - Apply/remove flags
- * 5. cleanse - Remove conditions
- * 6. dispel  - Remove magical effects
- * 7. reveal  - One-time show hidden
- * 8. teleport - Move characters
- * 9. extract - Remove mob/object from game
- * 10. move   - Forced movement (knockback/pull/swap)
- * 11. interrupt - Stop casting/channeling
- * 12. transform - Change form (shapechange)
- * 13. resurrect - Bring back dead
- * 14. create - Create object
- * 15. summon - Create creature
- * 16. enchant - Apply effect to object
- * 17. globe  - Spell immunity by circle
- * 18. room   - Room-wide effects/barriers
+ * The effect schema is defined in the Effect table:
+ * 1. damage       - Deal damage (instant/periodic/chain)
+ * 2. heal         - Restore resources
+ * 3. modify       - Change any numeric value
+ * 4. status       - Apply/remove flags
+ * 5. cleanse      - Remove conditions
+ * 6. dispel       - Remove magical effects
+ * 7. reveal       - One-time show hidden
+ * 8. teleport     - Move characters
+ * 9. extract      - Remove mob/object from game
+ * 10. move        - Forced movement (knockback/pull/swap)
+ * 11. interrupt   - Stop casting/channeling
+ * 12. transform   - Change form (shapechange)
+ * 13. resurrect   - Bring back dead
+ * 14. create      - Create object
+ * 15. summon      - Create creature
+ * 16. enchant     - Apply effect to object
+ * 17. globe       - Spell immunity by circle
+ * 18. room        - Room-wide effects/barriers
+ * 19. portal      - Bidirectional portal creation
+ * 20. conceal_item - Hide item from detection
+ * 21. dismount    - Force off mount
+ * 22. drag        - Force target to move with caster
+ * 23. inspect     - Identify item properties
+ * 24. intercept   - Bodyguard / redirect attacks to self
+ * 25. knockdown   - Knock to ground
+ * 26. redirect    - Reflect/redirect damage
+ * 27. stun        - Daze, unable to act
+ * 28. stop_combat - End combat / disengage
  */
 
 /**
@@ -178,6 +188,8 @@ function isOptionalField(blockType: string, fieldName: string): boolean {
     effect_damage: ['type', 'interval', 'duration', 'maxJumps', 'attenuation'],
     effect_summon: ['mobRef', 'mobZoneFilter'], // mob template is optional - some summons just use mobType
     effect_create: ['objectRef', 'objectZoneFilter'], // object template can be optional
+    effect_conceal_item: ['contestedBy'],
+    effect_redirect: ['type'], // damage type filter is optional (all types if omitted)
   };
   return optionalFields[blockType]?.includes(fieldName) ?? false;
 }

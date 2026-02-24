@@ -80,11 +80,11 @@ export interface OnlineCharacter {
   isOnline: boolean;
   raceType?: string;
   playerClass?: string;
-  user: {
+  user?: {
     id: string;
     username: string;
     role: string;
-  };
+  } | null;
 }
 
 export interface CharacterSessionInfo {

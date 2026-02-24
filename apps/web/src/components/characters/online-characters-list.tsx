@@ -15,6 +15,7 @@ import {
   useOnlineCharacters,
 } from '@/hooks/use-character-status';
 import { Gamepad2, RefreshCw, Users } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { CharacterStatusCard, OnlineStatus } from './online-status';
 
@@ -33,6 +34,7 @@ export function OnlineCharactersList({
   showActions = true,
   maxHeight = '400px',
 }: OnlineCharactersListProps) {
+  const router = useRouter();
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   const {
@@ -146,8 +148,7 @@ export function OnlineCharactersList({
                 showUser={showAllUsers}
                 showActions={showActions}
                 onCharacterClick={id => {
-                  // Could navigate to character detail page
-                  console.log('Character clicked:', id);
+                  router.push(`/dashboard/admin/characters/${id}`);
                 }}
               />
             ))}
@@ -195,11 +196,12 @@ export function OnlineStats({ showMyStats = false }: OnlineStatsProps) {
   // Calculate some stats
   const totalOnline = onlineCharacters.length;
   const uniqueUsers = new Set(
-    onlineCharacters.map((c: OnlineCharacter) => c.user.id)
+    onlineCharacters.map((c: OnlineCharacter) => c.user?.id ?? 'unknown')
   ).size;
   const roleStats = onlineCharacters.reduce(
     (acc: Record<string, number>, char: OnlineCharacter) => {
-      acc[char.user.role] = (acc[char.user.role] || 0) + 1;
+      const role = char.user?.role ?? 'Unknown';
+      acc[role] = (acc[role] || 0) + 1;
       return acc;
     },
     {} as Record<string, number>

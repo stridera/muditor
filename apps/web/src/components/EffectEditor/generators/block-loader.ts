@@ -10,25 +10,9 @@ import {
  * Effect ID to block type mapping is now loaded dynamically from the database
  * via getBlockTypeForEffectId() from data-registry.ts
  *
- * The 18-effect schema is defined in the Effect table:
- * 1. damage  - Deal damage (instant/periodic/chain)
- * 2. heal    - Restore resources
- * 3. modify  - Change any numeric value
- * 4. status  - Apply/remove flags
- * 5. cleanse - Remove conditions
- * 6. dispel  - Remove magical effects
- * 7. reveal  - One-time show hidden
- * 8. teleport - Move characters
- * 9. extract - Remove mob/object from game
- * 10. move   - Forced movement (knockback/pull/swap)
- * 11. interrupt - Stop casting/channeling
- * 12. transform - Change form (shapechange)
- * 13. resurrect - Bring back dead
- * 14. create - Create object
- * 15. summon - Create creature
- * 16. enchant - Apply effect to object
- * 17. globe  - Spell immunity by circle
- * 18. room   - Room-wide effects/barriers
+ * All effect types are defined in the Effect table and mapped to
+ * Blockly block types using the convention: effect_{name}
+ * (e.g., effect_damage, effect_stun, effect_stop_combat)
  */
 
 /**

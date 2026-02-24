@@ -376,6 +376,6 @@ export class OnlineCharacterDto {
   @Field({ nullable: true })
   playerClass?: string;
 
-  @Field(() => UserSummaryDto)
-  user: UserSummaryDto;
+  @Field(() => UserSummaryDto, { nullable: true })
+  user?: UserSummaryDto;
 }
