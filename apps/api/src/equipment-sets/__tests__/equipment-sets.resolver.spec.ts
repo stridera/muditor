@@ -1,7 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { EquipmentSetsResolver } from '../equipment-sets.resolver';
 import { EquipmentSetsService } from '../equipment-sets.service';
-import { CreateEquipmentSetInput, CreateEquipmentSetItemStandaloneInput } from '../equipment-set.dto';
+import {
+  CreateEquipmentSetInput,
+  CreateEquipmentSetItemStandaloneInput,
+} from '../equipment-set.dto';
 
 describe('EquipmentSetsResolver', () => {
   let resolver: EquipmentSetsResolver;
@@ -110,7 +113,9 @@ describe('EquipmentSetsResolver', () => {
         probability: 0.8,
       };
 
-      mockEquipmentSetsService.createEquipmentSetItem.mockResolvedValue(expectedResult);
+      mockEquipmentSetsService.createEquipmentSetItem.mockResolvedValue(
+        expectedResult
+      );
 
       const result = await resolver.createEquipmentSetItem(input);
       expect(result).toBe(expectedResult);

@@ -46,7 +46,9 @@ test.describe('Game Systems UI - Editor Pages', () => {
     await expect(table).toBeVisible();
   });
 
-  test('Classes editor page should load and display table', async ({ page }) => {
+  test('Classes editor page should load and display table', async ({
+    page,
+  }) => {
     await page.goto('http://localhost:3000/dashboard/classes');
 
     // Wait for page to load
@@ -129,7 +131,10 @@ test.describe('Game Systems UI - Editor Pages', () => {
     await page.waitForSelector('table tbody tr', { state: 'visible' });
 
     // Click first edit button
-    const editButton = page.locator('button').filter({ has: page.locator('svg') }).first();
+    const editButton = page
+      .locator('button')
+      .filter({ has: page.locator('svg') })
+      .first();
     await editButton.click();
 
     // Check dialog opens

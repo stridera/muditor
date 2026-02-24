@@ -413,10 +413,7 @@ function ScriptsPageContent() {
               )}
             </h1>
             <div className='space-x-2'>
-              <Button
-                variant='outline'
-                onClick={handleCancel}
-              >
+              <Button variant='outline' onClick={handleCancel}>
                 Cancel
               </Button>
             </div>

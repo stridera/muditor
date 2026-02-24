@@ -29,9 +29,11 @@ interface IRepository<T, CreateInput, UpdateInput> {
 }
 
 // Example implementation
-export class MobRepository
-  implements IRepository<Mob, MobCreateInput, MobUpdateInput>
-{
+export class MobRepository implements IRepository<
+  Mob,
+  MobCreateInput,
+  MobUpdateInput
+> {
   constructor(private prisma: PrismaClient) {}
 
   async findById(id: number): Promise<Mob | null> {

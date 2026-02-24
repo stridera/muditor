@@ -94,13 +94,13 @@ Fields are grouped logically. Unless otherwise stated, fields are persisted and 
 
 ### Location & Persistence
 
-| Field       | Type              | Description                                          |
-| ----------- | ----------------- | ---------------------------------------------------- |
-| `home`      | str               | Home location (may be a room tag / starting area).   |
+| Field       | Type              | Description                                        |
+| ----------- | ----------------- | -------------------------------------------------- |
+| `home`      | str               | Home location (may be a room tag / starting area). |
 | `load_room` | int or None       | Room id to load into on login (overrides default). |
-| `save_room` | int or None       | Last saved room (for crash / linkdead recovery).     |
-| `olc_zones` | list[int] or None | Builder-editable zone identifiers.                   |
-| `clan`      | int or None       | Clan identifier (numeric id).                        |
+| `save_room` | int or None       | Last saved room (for crash / linkdead recovery).   |
+| `olc_zones` | list[int] or None | Builder-editable zone identifiers.                 |
+| `clan`      | int or None       | Clan identifier (numeric id).                      |
 
 ### Combat & Survivability
 

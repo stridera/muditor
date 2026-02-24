@@ -126,44 +126,44 @@ Character gender options.
 
 Character and mob races.
 
-| Value                  | Description             |
-| ---------------------- | ----------------------- |
-| `HUMAN`                | Human race              |
-| `ELF`                  | Elven race              |
-| `GNOME`                | Gnome race              |
-| `DWARF`                | Dwarven race            |
-| `TROLL`                | Troll race              |
-| `DROW`                 | Dark elf race           |
-| `DUERGAR`              | Gray dwarf race         |
-| `OGRE`                 | Ogre race               |
-| `ORC`                  | Orc race                |
-| `HALF_ELF`             | Half-elf race           |
-| `GOLIATH`              | Goliath race            |
-| `HALFLING`             | Halfling race           |
-| `PLANT`                | Plant-based creatures   |
-| `HUMANOID`             | Generic humanoid        |
-| `ANIMAL`               | Animal creatures        |
-| `DRAGON_GENERAL`       | General dragon type     |
-| `GIANT`                | Giant humanoids         |
-| `OTHER`                | Other/unknown race      |
-| `GOBLIN`               | Goblin race             |
-| `DEMON`                | Demonic beings          |
-| `BROWNIE`              | Brownie fey             |
-| `DRAGON_FIRE`          | Fire dragon             |
-| `DRAGON_FROST`         | Frost dragon            |
-| `DRAGON_ACID`          | Acid dragon             |
-| `DRAGON_LIGHTNING`     | Lightning dragon        |
-| `DRAGON_GAS`           | Gas dragon              |
-| `DRAGONBORN_FIRE`      | Fire dragonborn         |
-| `DRAGONBORN_FROST`     | Frost dragonborn        |
-| `DRAGONBORN_ACID`      | Acid dragonborn         |
-| `DRAGONBORN_LIGHTNING` | Lightning dragonborn    |
-| `DRAGONBORN_GAS`       | Gas dragonborn          |
-| `SVERFNEBLIN`          | Deep gnome              |
-| `FAERIE_SEELIE`        | Seelie court fey        |
-| `FAERIE_UNSEELIE`      | Unseelie court fey      |
-| `NYMPH`                | Nature spirit           |
-| `ARBOREAN`             | Tree-like beings        |
+| Value                  | Description           |
+| ---------------------- | --------------------- |
+| `HUMAN`                | Human race            |
+| `ELF`                  | Elven race            |
+| `GNOME`                | Gnome race            |
+| `DWARF`                | Dwarven race          |
+| `TROLL`                | Troll race            |
+| `DROW`                 | Dark elf race         |
+| `DUERGAR`              | Gray dwarf race       |
+| `OGRE`                 | Ogre race             |
+| `ORC`                  | Orc race              |
+| `HALF_ELF`             | Half-elf race         |
+| `GOLIATH`              | Goliath race          |
+| `HALFLING`             | Halfling race         |
+| `PLANT`                | Plant-based creatures |
+| `HUMANOID`             | Generic humanoid      |
+| `ANIMAL`               | Animal creatures      |
+| `DRAGON_GENERAL`       | General dragon type   |
+| `GIANT`                | Giant humanoids       |
+| `OTHER`                | Other/unknown race    |
+| `GOBLIN`               | Goblin race           |
+| `DEMON`                | Demonic beings        |
+| `BROWNIE`              | Brownie fey           |
+| `DRAGON_FIRE`          | Fire dragon           |
+| `DRAGON_FROST`         | Frost dragon          |
+| `DRAGON_ACID`          | Acid dragon           |
+| `DRAGON_LIGHTNING`     | Lightning dragon      |
+| `DRAGON_GAS`           | Gas dragon            |
+| `DRAGONBORN_FIRE`      | Fire dragonborn       |
+| `DRAGONBORN_FROST`     | Frost dragonborn      |
+| `DRAGONBORN_ACID`      | Acid dragonborn       |
+| `DRAGONBORN_LIGHTNING` | Lightning dragonborn  |
+| `DRAGONBORN_GAS`       | Gas dragonborn        |
+| `SVERFNEBLIN`          | Deep gnome            |
+| `FAERIE_SEELIE`        | Seelie court fey      |
+| `FAERIE_UNSEELIE`      | Unseelie court fey    |
+| `NYMPH`                | Nature spirit         |
+| `ARBOREAN`             | Tree-like beings      |
 
 ### Position
 

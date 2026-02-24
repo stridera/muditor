@@ -11,18 +11,33 @@ export class RoomReference {
 
 @ObjectType()
 export class UserPreferences {
-  @Field({ nullable: true, description: 'Theme preference: light, dark, or system' })
+  @Field({
+    nullable: true,
+    description: 'Theme preference: light, dark, or system',
+  })
   theme?: string;
 
-  @Field({ nullable: true, description: 'View mode preference: player or admin' })
+  @Field({
+    nullable: true,
+    description: 'View mode preference: player or admin',
+  })
   viewMode?: string;
 
-  @Field(() => [Int], { nullable: true, description: 'List of favorite zone IDs' })
+  @Field(() => [Int], {
+    nullable: true,
+    description: 'List of favorite zone IDs',
+  })
   favoriteZones?: number[];
 
-  @Field(() => [Int], { nullable: true, description: 'Recently visited zone IDs (max 5)' })
+  @Field(() => [Int], {
+    nullable: true,
+    description: 'Recently visited zone IDs (max 5)',
+  })
   recentZones?: number[];
 
-  @Field(() => [RoomReference], { nullable: true, description: 'Recently visited rooms (max 10)' })
+  @Field(() => [RoomReference], {
+    nullable: true,
+    description: 'Recently visited rooms (max 10)',
+  })
   recentRooms?: RoomReference[];
 }

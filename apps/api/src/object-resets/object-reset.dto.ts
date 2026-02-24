@@ -1,17 +1,5 @@
-import {
-  ObjectType,
-  Field,
-  Int,
-  InputType,
-  Float,
-} from '@nestjs/graphql';
-import {
-  IsOptional,
-  IsString,
-  IsNumber,
-  Min,
-  Max,
-} from 'class-validator';
+import { ObjectType, Field, Int, InputType, Float } from '@nestjs/graphql';
+import { IsOptional, IsString, IsNumber, Min, Max } from 'class-validator';
 import { ObjectDto } from '../objects/object.dto';
 
 @ObjectType()

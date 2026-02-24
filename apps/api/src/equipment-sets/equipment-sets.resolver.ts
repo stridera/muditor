@@ -25,14 +25,16 @@ export class EquipmentSetsResolver {
   }
 
   @Mutation(() => EquipmentSetDto)
-  createEquipmentSet(@Args('data') createEquipmentSetInput: CreateEquipmentSetInput) {
+  createEquipmentSet(
+    @Args('data') createEquipmentSetInput: CreateEquipmentSetInput
+  ) {
     return this.equipmentSetsService.create(createEquipmentSetInput);
   }
 
   @Mutation(() => EquipmentSetDto)
   updateEquipmentSet(
     @Args('id', { type: () => ID }) id: string,
-    @Args('data') updateEquipmentSetInput: UpdateEquipmentSetInput,
+    @Args('data') updateEquipmentSetInput: UpdateEquipmentSetInput
   ) {
     return this.equipmentSetsService.update(id, updateEquipmentSetInput);
   }
@@ -44,7 +46,9 @@ export class EquipmentSetsResolver {
   }
 
   @Mutation(() => EquipmentSetItemDto)
-  createEquipmentSetItem(@Args('data') data: CreateEquipmentSetItemStandaloneInput) {
+  createEquipmentSetItem(
+    @Args('data') data: CreateEquipmentSetItemStandaloneInput
+  ) {
     return this.equipmentSetsService.createEquipmentSetItem(data);
   }
 

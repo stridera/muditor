@@ -24,21 +24,21 @@ The database is organized into several logical groups:
 
 Primary user account for system access with enhanced security features.
 
-| Field                   | Type            | Description                  |
-| ----------------------- | --------------- | ---------------------------- |
-| `id`                    | String (CUID)   | Primary key                  |
-| `email`                 | String (unique) | User email address           |
-| `username`              | String (unique) | Display username             |
-| `passwordHash`          | String          | Bcrypt hashed password       |
-| `role`                  | UserRole        | Permission level             |
-| `createdAt`             | DateTime        | Account creation             |
-| `updatedAt`             | DateTime        | Last modification            |
-| `lastLoginAt`           | DateTime?       | Last login timestamp         |
-| `resetToken`            | String?         | Password reset token         |
-| `resetTokenExpiry`      | DateTime?       | Reset token expiration       |
-| `failedLoginAttempts`   | Int             | Failed login count           |
-| `lockedUntil`           | DateTime?       | Account lockout expiration   |
-| `lastFailedLogin`       | DateTime?       | Last failed login attempt    |
+| Field                 | Type            | Description                |
+| --------------------- | --------------- | -------------------------- |
+| `id`                  | String (CUID)   | Primary key                |
+| `email`               | String (unique) | User email address         |
+| `username`            | String (unique) | Display username           |
+| `passwordHash`        | String          | Bcrypt hashed password     |
+| `role`                | UserRole        | Permission level           |
+| `createdAt`           | DateTime        | Account creation           |
+| `updatedAt`           | DateTime        | Last modification          |
+| `lastLoginAt`         | DateTime?       | Last login timestamp       |
+| `resetToken`          | String?         | Password reset token       |
+| `resetTokenExpiry`    | DateTime?       | Reset token expiration     |
+| `failedLoginAttempts` | Int             | Failed login count         |
+| `lockedUntil`         | DateTime?       | Account lockout expiration |
+| `lastFailedLogin`     | DateTime?       | Last failed login attempt  |
 
 **Relations:**
 
@@ -52,67 +52,67 @@ Primary user account for system access with enhanced security features.
 
 Player characters in the game world with comprehensive stats and progression system.
 
-| Field               | Type            | Description                         |
-| ------------------- | --------------- | ----------------------------------- |
-| `id`                | String (CUID)   | Primary key                         |
-| `name`              | String (unique) | Character name                      |
-| `level`             | Int             | Character level (default: 1)        |
-| `race`              | Race            | Character race                      |
-| `raceType`          | String          | Race type string                    |
-| `playerClass`       | String?         | Character class name                |
-| `classId`           | Int?            | Class reference                     |
-| `alignment`         | Int             | Good/evil alignment (-1000 to 1000) |
-| `strength`          | Int             | STR attribute (default: 13)         |
-| `intelligence`      | Int             | INT attribute (default: 13)         |
-| `wisdom`            | Int             | WIS attribute (default: 13)         |
-| `dexterity`         | Int             | DEX attribute (default: 13)         |
-| `constitution`      | Int             | CON attribute (default: 13)         |
-| `charisma`          | Int             | CHA attribute (default: 13)         |
-| `luck`              | Int             | LUCK attribute (default: 13)        |
-| `hitPoints`         | Int             | Current HP (default: 100)           |
-| `hitPointsMax`      | Int             | Maximum HP (default: 100)           |
-| `movement`          | Int             | Current movement (default: 100)     |
-| `movementMax`       | Int             | Maximum movement (default: 100)     |
-| `experience`        | Int             | Total experience points             |
-| `skillPoints`       | Int             | Available skill points              |
-| `copper`            | Int             | Copper pieces                       |
-| `silver`            | Int             | Silver pieces                       |
-| `gold`              | Int             | Gold pieces                         |
-| `platinum`          | Int             | Platinum pieces                     |
-| `bankCopper`        | Int             | Banked copper pieces                |
-| `bankSilver`        | Int             | Banked silver pieces                |
-| `bankGold`          | Int             | Banked gold pieces                  |
-| `bankPlatinum`      | Int             | Banked platinum pieces              |
-| `totalWealth`       | Int             | Calculated total wealth             |
-| `averageStats`      | Int             | Average attribute value             |
-| `passwordHash`      | String?         | Character password hash             |
-| `gender`            | String          | Character gender                    |
-| `height`            | Int?            | Character height                    |
-| `weight`            | Int?            | Character weight                    |
-| `baseSize`          | Int             | Base size category                  |
-| `currentSize`       | Int             | Current size (with modifiers)       |
-| `hitRoll`           | Int             | Attack bonus                        |
-| `damageRoll`        | Int             | Damage bonus                        |
-| `armorClass`        | Int             | Armor class value                   |
-| `currentRoom`       | Int?            | Current location                    |
-| `saveRoom`          | Int?            | Saved/recall location               |
-| `homeRoom`          | Int?            | Home location                       |
-| `lastLogin`         | DateTime?       | Last login time                     |
-| `timePlayed`        | Int             | Total time played (seconds)         |
-| `isOnline`          | Boolean         | Currently online status             |
-| `hunger`            | Int             | Hunger level                        |
-| `thirst`            | Int             | Thirst level                        |
-| `description`       | String?         | Character description               |
-| `title`             | String?         | Character title                     |
-| `prompt`            | String          | Command prompt format               |
-| `pageLength`        | Int             | Paging size                         |
-| `playerFlags`       | String[]        | Player behavior flags               |
-| `effectFlags`       | String[]        | Active magical effects              |
-| `privilegeFlags`    | String[]        | Special privileges                  |
-| `olcZones`          | Int[]           | Online creation zones               |
-| `invisLevel`        | Int             | Invisibility level                  |
-| `birthTime`         | DateTime        | Character creation time             |
-| `userId`            | String          | Owner reference                     |
+| Field            | Type            | Description                         |
+| ---------------- | --------------- | ----------------------------------- |
+| `id`             | String (CUID)   | Primary key                         |
+| `name`           | String (unique) | Character name                      |
+| `level`          | Int             | Character level (default: 1)        |
+| `race`           | Race            | Character race                      |
+| `raceType`       | String          | Race type string                    |
+| `playerClass`    | String?         | Character class name                |
+| `classId`        | Int?            | Class reference                     |
+| `alignment`      | Int             | Good/evil alignment (-1000 to 1000) |
+| `strength`       | Int             | STR attribute (default: 13)         |
+| `intelligence`   | Int             | INT attribute (default: 13)         |
+| `wisdom`         | Int             | WIS attribute (default: 13)         |
+| `dexterity`      | Int             | DEX attribute (default: 13)         |
+| `constitution`   | Int             | CON attribute (default: 13)         |
+| `charisma`       | Int             | CHA attribute (default: 13)         |
+| `luck`           | Int             | LUCK attribute (default: 13)        |
+| `hitPoints`      | Int             | Current HP (default: 100)           |
+| `hitPointsMax`   | Int             | Maximum HP (default: 100)           |
+| `movement`       | Int             | Current movement (default: 100)     |
+| `movementMax`    | Int             | Maximum movement (default: 100)     |
+| `experience`     | Int             | Total experience points             |
+| `skillPoints`    | Int             | Available skill points              |
+| `copper`         | Int             | Copper pieces                       |
+| `silver`         | Int             | Silver pieces                       |
+| `gold`           | Int             | Gold pieces                         |
+| `platinum`       | Int             | Platinum pieces                     |
+| `bankCopper`     | Int             | Banked copper pieces                |
+| `bankSilver`     | Int             | Banked silver pieces                |
+| `bankGold`       | Int             | Banked gold pieces                  |
+| `bankPlatinum`   | Int             | Banked platinum pieces              |
+| `totalWealth`    | Int             | Calculated total wealth             |
+| `averageStats`   | Int             | Average attribute value             |
+| `passwordHash`   | String?         | Character password hash             |
+| `gender`         | String          | Character gender                    |
+| `height`         | Int?            | Character height                    |
+| `weight`         | Int?            | Character weight                    |
+| `baseSize`       | Int             | Base size category                  |
+| `currentSize`    | Int             | Current size (with modifiers)       |
+| `hitRoll`        | Int             | Attack bonus                        |
+| `damageRoll`     | Int             | Damage bonus                        |
+| `armorClass`     | Int             | Armor class value                   |
+| `currentRoom`    | Int?            | Current location                    |
+| `saveRoom`       | Int?            | Saved/recall location               |
+| `homeRoom`       | Int?            | Home location                       |
+| `lastLogin`      | DateTime?       | Last login time                     |
+| `timePlayed`     | Int             | Total time played (seconds)         |
+| `isOnline`       | Boolean         | Currently online status             |
+| `hunger`         | Int             | Hunger level                        |
+| `thirst`         | Int             | Thirst level                        |
+| `description`    | String?         | Character description               |
+| `title`          | String?         | Character title                     |
+| `prompt`         | String          | Command prompt format               |
+| `pageLength`     | Int             | Paging size                         |
+| `playerFlags`    | String[]        | Player behavior flags               |
+| `effectFlags`    | String[]        | Active magical effects              |
+| `privilegeFlags` | String[]        | Special privileges                  |
+| `olcZones`       | Int[]           | Online creation zones               |
+| `invisLevel`     | Int             | Invisibility level                  |
+| `birthTime`      | DateTime        | Character creation time             |
+| `userId`         | String          | Owner reference                     |
 
 **Relations:**
 
@@ -164,6 +164,7 @@ Zones automatically reset based on their `resetMode` and `lifespan` configuratio
 - **ResetMode.NORMAL**: Reset every `lifespan` minutes regardless of players
 
 When a zone resets:
+
 1. All existing mob instances are removed
 2. Each MobReset entry spawns new mobs up to its `max` limit
 3. Spawned mobs receive their configured carrying/equipped items
@@ -176,7 +177,7 @@ Individual locations in the world with 3D layout support.
 | Field         | Type          | Description               |
 | ------------- | ------------- | ------------------------- |
 | `id`          | Int           | Room number (primary key) |
-| `id`        | Int           | Zone-relative room number |
+| `id`          | Int           | Zone-relative room number |
 | `name`        | String        | Room title                |
 | `description` | String (Text) | Room description          |
 | `sector`      | Sector        | Terrain type              |
@@ -199,6 +200,7 @@ Individual locations in the world with 3D layout support.
 - `mobResets[]` - Mob spawns in this room
 
 **Unique Constraints:**
+
 - `(zoneId, id)` - Zone-relative room numbers must be unique
 
 ### RoomExit
@@ -423,15 +425,15 @@ Zone reset systems control how and when mobs and objects respawn in the world. T
 
 Mob spawning configuration that defines where and how many mobs spawn in rooms.
 
-| Field           | Type          | Description                    |
-| --------------- | ------------- | ------------------------------ |
-| `id`            | String (CUID) | Primary key                    |
-| `max`           | Int           | Maximum mob instances (default: 1) |
-| `name`          | String?       | Human-readable reset description |
-| `mobId`         | Int           | Mob prototype to spawn         |
-| `roomId`        | Int           | Room where mob spawns          |
-| `zoneId`        | Int           | Parent zone                    |
-| `probability`   | Float         | Spawn probability (0.0-1.0, default: 1.0) |
+| Field         | Type          | Description                               |
+| ------------- | ------------- | ----------------------------------------- |
+| `id`          | String (CUID) | Primary key                               |
+| `max`         | Int           | Maximum mob instances (default: 1)        |
+| `name`        | String?       | Human-readable reset description          |
+| `mobId`       | Int           | Mob prototype to spawn                    |
+| `roomId`      | Int           | Room where mob spawns                     |
+| `zoneId`      | Int           | Parent zone                               |
+| `probability` | Float         | Spawn probability (0.0-1.0, default: 1.0) |
 
 **Relations:**
 
@@ -442,6 +444,7 @@ Mob spawning configuration that defines where and how many mobs spawn in rooms.
 - `conditions[]` - Conditional spawn logic
 
 **Zone Reset Logic:**
+
 - When a zone resets, it checks each MobReset
 - Applies probability calculation to determine if spawn occurs
 - Evaluates spawn conditions if present
@@ -452,13 +455,13 @@ Mob spawning configuration that defines where and how many mobs spawn in rooms.
 
 Reusable collections of equipment for consistent mob outfitting.
 
-| Field         | Type          | Description                    |
-| ------------- | ------------- | ------------------------------ |
-| `id`          | String (CUID) | Primary key                    |
-| `name`        | String        | Equipment set name             |
-| `description` | String?       | Set description                |
-| `createdAt`   | DateTime      | Creation timestamp             |
-| `updatedAt`   | DateTime      | Last modified timestamp        |
+| Field         | Type          | Description             |
+| ------------- | ------------- | ----------------------- |
+| `id`          | String (CUID) | Primary key             |
+| `name`        | String        | Equipment set name      |
+| `description` | String?       | Set description         |
+| `createdAt`   | DateTime      | Creation timestamp      |
+| `updatedAt`   | DateTime      | Last modified timestamp |
 
 **Relations:**
 
@@ -466,6 +469,7 @@ Reusable collections of equipment for consistent mob outfitting.
 - `mobResets[]` - Mob resets using this equipment set
 
 **Usage Benefits:**
+
 - Consistent equipment across multiple mob types
 - Easy maintenance of common equipment combinations
 - Support for thematic equipment groupings (e.g., "Guard Captain Set", "Mage Robes")
@@ -474,13 +478,13 @@ Reusable collections of equipment for consistent mob outfitting.
 
 Individual equipment pieces within an equipment set.
 
-| Field             | Type          | Description                      |
-| ----------------- | ------------- | -------------------------------- |
-| `id`              | String (CUID) | Primary key                      |
-| `equipmentSetId`  | String        | Parent equipment set             |
-| `objectId`        | Int           | Object prototype to create       |
-| `slot`            | String        | Equipment slot name              |
-| `probability`     | Float         | Item spawn probability (default: 1.0) |
+| Field            | Type          | Description                           |
+| ---------------- | ------------- | ------------------------------------- |
+| `id`             | String (CUID) | Primary key                           |
+| `equipmentSetId` | String        | Parent equipment set                  |
+| `objectId`       | Int           | Object prototype to create            |
+| `slot`           | String        | Equipment slot name                   |
+| `probability`    | Float         | Item spawn probability (default: 1.0) |
 
 **Relations:**
 
@@ -496,12 +500,12 @@ Standard slots include: `Light`, `FingerRight`, `FingerLeft`, `Neck1`, `Neck2`, 
 
 Links mob resets to equipment sets with spawn probabilities.
 
-| Field             | Type          | Description                      |
-| ----------------- | ------------- | -------------------------------- |
-| `id`              | String (CUID) | Primary key                      |
-| `mobResetId`      | String        | Parent mob reset                 |
-| `equipmentSetId`  | String        | Equipment set to apply           |
-| `probability`     | Float         | Set application probability (default: 1.0) |
+| Field            | Type          | Description                                |
+| ---------------- | ------------- | ------------------------------------------ |
+| `id`             | String (CUID) | Primary key                                |
+| `mobResetId`     | String        | Parent mob reset                           |
+| `equipmentSetId` | String        | Equipment set to apply                     |
+| `probability`    | Float         | Set application probability (default: 1.0) |
 
 **Relations:**
 
@@ -509,6 +513,7 @@ Links mob resets to equipment sets with spawn probabilities.
 - `equipmentSet` - Equipment set definition
 
 **Reset Behavior:**
+
 - When mob spawns, applies probability to determine if set is used
 - If applied, creates all items from the equipment set
 - Items are automatically equipped to their designated slots
@@ -520,14 +525,14 @@ Links mob resets to equipment sets with spawn probabilities.
 
 Object spawning configuration for items that appear in rooms.
 
-| Field         | Type          | Description                    |
-| ------------- | ------------- | ------------------------------ |
-| `id`          | String (CUID) | Primary key                    |
-| `max`         | Int           | Maximum object instances (default: 1) |
-| `name`        | String?       | Human-readable reset description |
-| `objectId`    | Int           | Object prototype to spawn      |
-| `roomId`      | Int           | Room where object spawns       |
-| `zoneId`      | Int           | Parent zone                    |
+| Field         | Type          | Description                               |
+| ------------- | ------------- | ----------------------------------------- |
+| `id`          | String (CUID) | Primary key                               |
+| `max`         | Int           | Maximum object instances (default: 1)     |
+| `name`        | String?       | Human-readable reset description          |
+| `objectId`    | Int           | Object prototype to spawn                 |
+| `roomId`      | Int           | Room where object spawns                  |
+| `zoneId`      | Int           | Parent zone                               |
 | `probability` | Float         | Spawn probability (0.0-1.0, default: 1.0) |
 
 **Relations:**
@@ -538,6 +543,7 @@ Object spawning configuration for items that appear in rooms.
 - `conditions[]` - Conditional spawn logic
 
 **Reset Behavior:**
+
 - When a zone resets, it checks each ObjectReset
 - Applies probability calculation to determine if spawn occurs
 - Evaluates spawn conditions if present
@@ -562,6 +568,7 @@ Conditional logic for advanced spawn behavior.
 - `objectReset` - Parent object reset (if applicable)
 
 **Condition Types:**
+
 - `time_of_day` - Spawn only during specific game hours
 - `weather` - Spawn based on weather conditions
 - `player_count` - Spawn based on active player count
@@ -570,6 +577,7 @@ Conditional logic for advanced spawn behavior.
 - `custom` - Custom Lua evaluation logic
 
 **Example Parameters:**
+
 ```json
 {
   "type": "time_of_day",
@@ -660,21 +668,21 @@ Complete change tracking for all modifications.
 
 Items in character inventory with instance-specific properties.
 
-| Field                | Type          | Description                    |
-| -------------------- | ------------- | ------------------------------ |
-| `id`                 | String (CUID) | Primary key                    |
-| `characterId`        | String        | Owner character                |
-| `objectPrototypeId`  | Int           | Base object reference          |
-| `containerId`        | String?       | Container item reference       |
-| `equippedLocation`   | String?       | Equipment slot                 |
-| `condition`          | Int           | Item condition (0-100)         |
-| `charges`            | Int           | Remaining charges (-1 = N/A)   |
-| `instanceFlags`      | String[]      | Instance-specific flags        |
-| `customShortDesc`    | String?       | Custom short description       |
-| `customLongDesc`     | String?       | Custom long description        |
-| `customValues`       | Json          | Custom property overrides      |
-| `createdAt`          | DateTime      | Creation timestamp             |
-| `updatedAt`          | DateTime      | Last modification              |
+| Field               | Type          | Description                  |
+| ------------------- | ------------- | ---------------------------- |
+| `id`                | String (CUID) | Primary key                  |
+| `characterId`       | String        | Owner character              |
+| `objectPrototypeId` | Int           | Base object reference        |
+| `containerId`       | String?       | Container item reference     |
+| `equippedLocation`  | String?       | Equipment slot               |
+| `condition`         | Int           | Item condition (0-100)       |
+| `charges`           | Int           | Remaining charges (-1 = N/A) |
+| `instanceFlags`     | String[]      | Instance-specific flags      |
+| `customShortDesc`   | String?       | Custom short description     |
+| `customLongDesc`    | String?       | Custom long description      |
+| `customValues`      | Json          | Custom property overrides    |
+| `createdAt`         | DateTime      | Creation timestamp           |
+| `updatedAt`         | DateTime      | Last modification            |
 
 **Relations:**
 
@@ -687,19 +695,19 @@ Items in character inventory with instance-specific properties.
 
 Temporary and permanent effects on characters.
 
-| Field          | Type          | Description            |
-| -------------- | ------------- | ---------------------- |
-| `id`           | String (CUID) | Primary key            |
-| `characterId`  | String        | Affected character     |
-| `effectName`   | String        | Effect identifier      |
-| `effectType`   | String?       | Effect category        |
-| `duration`     | Int?          | Duration in seconds    |
-| `strength`     | Int           | Effect strength        |
-| `modifierData` | Json          | Effect-specific data   |
+| Field          | Type          | Description                  |
+| -------------- | ------------- | ---------------------------- |
+| `id`           | String (CUID) | Primary key                  |
+| `characterId`  | String        | Affected character           |
+| `effectName`   | String        | Effect identifier            |
+| `effectType`   | String?       | Effect category              |
+| `duration`     | Int?          | Duration in seconds          |
+| `strength`     | Int           | Effect strength              |
+| `modifierData` | Json          | Effect-specific data         |
 | `sourceType`   | String?       | Source type (spell/item/etc) |
-| `sourceId`     | Int?          | Source entity ID       |
-| `appliedAt`    | DateTime      | When effect was applied |
-| `expiresAt`    | DateTime?     | When effect expires    |
+| `sourceId`     | Int?          | Source entity ID             |
+| `appliedAt`    | DateTime      | When effect was applied      |
+| `expiresAt`    | DateTime?     | When effect expires          |
 
 **Relations:**
 
@@ -713,15 +721,15 @@ Temporary and permanent effects on characters.
 
 Character classes with progression rules.
 
-| Field         | Type         | Description                |
-| ------------- | ------------ | -------------------------- |
-| `id`          | Int          | Primary key (auto)         |
-| `name`        | String       | Class name (unique)        |
-| `description` | String?      | Class description          |
-| `hitDice`     | String       | HP progression dice        |
-| `primaryStat` | String?      | Primary attribute          |
-| `createdAt`   | DateTime     | Creation timestamp         |
-| `updatedAt`   | DateTime     | Last modification          |
+| Field         | Type     | Description         |
+| ------------- | -------- | ------------------- |
+| `id`          | Int      | Primary key (auto)  |
+| `name`        | String   | Class name (unique) |
+| `description` | String?  | Class description   |
+| `hitDice`     | String   | HP progression dice |
+| `primaryStat` | String?  | Primary attribute   |
+| `createdAt`   | DateTime | Creation timestamp  |
+| `updatedAt`   | DateTime | Last modification   |
 
 **Relations:**
 
@@ -734,20 +742,20 @@ Character classes with progression rules.
 
 Magic spell definitions with comprehensive targeting and effects.
 
-| Field            | Type         | Description                    |
-| ---------------- | ------------ | ------------------------------ |
-| `id`             | Int          | Primary key (auto)             |
-| `name`           | String       | Spell name (unique)            |
-| `schoolId`       | Int?         | Magic school reference         |
-| `minPosition`    | Position     | Minimum casting position       |
-| `violent`        | Boolean      | Causes combat flag             |
-| `castTimeRounds` | Int          | Casting time in rounds         |
-| `cooldownMs`     | Int          | Cooldown in milliseconds       |
-| `inCombatOnly`   | Boolean      | Combat-only restriction        |
-| `isArea`         | Boolean      | Area effect spell              |
-| `notes`          | String?      | Designer notes                 |
-| `createdAt`      | DateTime     | Creation timestamp             |
-| `updatedAt`      | DateTime     | Last modification              |
+| Field            | Type     | Description              |
+| ---------------- | -------- | ------------------------ |
+| `id`             | Int      | Primary key (auto)       |
+| `name`           | String   | Spell name (unique)      |
+| `schoolId`       | Int?     | Magic school reference   |
+| `minPosition`    | Position | Minimum casting position |
+| `violent`        | Boolean  | Causes combat flag       |
+| `castTimeRounds` | Int      | Casting time in rounds   |
+| `cooldownMs`     | Int      | Cooldown in milliseconds |
+| `inCombatOnly`   | Boolean  | Combat-only restriction  |
+| `isArea`         | Boolean  | Area effect spell        |
+| `notes`          | String?  | Designer notes           |
+| `createdAt`      | DateTime | Creation timestamp       |
+| `updatedAt`      | DateTime | Last modification        |
 
 **Relations:**
 
@@ -766,11 +774,11 @@ Magic spell definitions with comprehensive targeting and effects.
 
 Magic schools for spell organization.
 
-| Field         | Type     | Description            |
-| ------------- | -------- | ---------------------- |
-| `id`          | Int      | Primary key (auto)     |
-| `name`        | String   | School name (unique)   |
-| `description` | String?  | School description     |
+| Field         | Type    | Description          |
+| ------------- | ------- | -------------------- |
+| `id`          | Int     | Primary key (auto)   |
+| `name`        | String  | School name (unique) |
+| `description` | String? | School description   |
 
 **Relations:**
 
@@ -780,16 +788,16 @@ Magic schools for spell organization.
 
 Character abilities and skills.
 
-| Field         | Type          | Description               |
-| ------------- | ------------- | ------------------------- |
-| `id`          | Int           | Primary key (auto)        |
-| `name`        | String        | Skill name (unique)       |
-| `description` | String?       | Skill description         |
-| `type`        | SkillType     | Skill category            |
-| `category`    | SkillCategory | Availability level        |
-| `maxLevel`    | Int           | Maximum skill level       |
-| `createdAt`   | DateTime      | Creation timestamp        |
-| `updatedAt`   | DateTime      | Last modification         |
+| Field         | Type          | Description         |
+| ------------- | ------------- | ------------------- |
+| `id`          | Int           | Primary key (auto)  |
+| `name`        | String        | Skill name (unique) |
+| `description` | String?       | Skill description   |
+| `type`        | SkillType     | Skill category      |
+| `category`    | SkillCategory | Availability level  |
+| `maxLevel`    | Int           | Maximum skill level |
+| `createdAt`   | DateTime      | Creation timestamp  |
+| `updatedAt`   | DateTime      | Last modification   |
 
 **Relations:**
 
@@ -822,14 +830,14 @@ Character skill progression tracking.
 
 Character spell knowledge and proficiency.
 
-| Field         | Type          | Description             |
-| ------------- | ------------- | ----------------------- |
-| `id`          | String (CUID) | Primary key             |
-| `characterId` | String        | Character reference     |
-| `spellId`     | Int           | Spell reference         |
-| `known`       | Boolean       | Spell is known          |
-| `proficiency` | Int           | Casting proficiency     |
-| `lastCast`    | DateTime?     | Last cast timestamp     |
+| Field         | Type          | Description         |
+| ------------- | ------------- | ------------------- |
+| `id`          | String (CUID) | Primary key         |
+| `characterId` | String        | Character reference |
+| `spellId`     | Int           | Spell reference     |
+| `known`       | Boolean       | Spell is known      |
+| `proficiency` | Int           | Casting proficiency |
+| `lastCast`    | DateTime?     | Last cast timestamp |
 
 **Relations:**
 
@@ -846,22 +854,23 @@ Character spell knowledge and proficiency.
 
 Comprehensive change tracking for all modifications.
 
-| Field         | Type          | Description                      |
-| ------------- | ------------- | -------------------------------- |
-| `id`          | String (CUID) | Primary key                      |
-| `entityType`  | String        | Type of entity modified          |
-| `entityId`    | String        | Entity identifier                |
-| `action`      | String        | Action performed                 |
-| `changes`     | Json          | Detailed change data             |
-| `userId`      | String        | User who made change             |
-| `timestamp`   | DateTime      | When change occurred             |
-| `description` | String?       | Human-readable description       |
+| Field         | Type          | Description                |
+| ------------- | ------------- | -------------------------- |
+| `id`          | String (CUID) | Primary key                |
+| `entityType`  | String        | Type of entity modified    |
+| `entityId`    | String        | Entity identifier          |
+| `action`      | String        | Action performed           |
+| `changes`     | Json          | Detailed change data       |
+| `userId`      | String        | User who made change       |
+| `timestamp`   | DateTime      | When change occurred       |
+| `description` | String?       | Human-readable description |
 
 **Relations:**
 
 - `user` - User who made the change
 
 **Indexes:**
+
 - `(entityType, entityId)` - Entity lookups
 - `(userId, timestamp)` - User activity
 - `timestamp` - Chronological sorting
@@ -870,17 +879,17 @@ Comprehensive change tracking for all modifications.
 
 User ban management system.
 
-| Field         | Type          | Description               |
-| ------------- | ------------- | ------------------------- |
-| `id`          | String (CUID) | Primary key               |
-| `userId`      | String        | Banned user               |
-| `bannedBy`    | String        | Admin who issued ban      |
-| `reason`      | String        | Ban reason                |
-| `bannedAt`    | DateTime      | Ban timestamp             |
-| `expiresAt`   | DateTime?     | Expiration (null = permanent) |
-| `unbannedAt`  | DateTime?     | Unban timestamp           |
-| `unbannedBy`  | String?       | Admin who lifted ban      |
-| `active`      | Boolean       | Currently active          |
+| Field        | Type          | Description                   |
+| ------------ | ------------- | ----------------------------- |
+| `id`         | String (CUID) | Primary key                   |
+| `userId`     | String        | Banned user                   |
+| `bannedBy`   | String        | Admin who issued ban          |
+| `reason`     | String        | Ban reason                    |
+| `bannedAt`   | DateTime      | Ban timestamp                 |
+| `expiresAt`  | DateTime?     | Expiration (null = permanent) |
+| `unbannedAt` | DateTime?     | Unban timestamp               |
+| `unbannedBy` | String?       | Admin who lifted ban          |
+| `active`     | Boolean       | Currently active              |
 
 **Relations:**
 
@@ -888,6 +897,7 @@ User ban management system.
 - `admin` - Banning administrator
 
 **Indexes:**
+
 - `userId` - User ban lookups
 - `bannedBy` - Admin activity
 - `active` - Active ban queries

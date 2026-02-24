@@ -36,8 +36,8 @@ export function ThemeToggle() {
 
   if (!mounted) {
     return (
-      <Button variant="ghost" size="icon" className="h-9 w-9">
-        <Sun className="h-4 w-4" />
+      <Button variant='ghost' size='icon' className='h-9 w-9'>
+        <Sun className='h-4 w-4' />
       </Button>
     );
   }
@@ -65,17 +65,17 @@ export function ThemeToggle() {
       <Tooltip>
         <TooltipTrigger asChild>
           <Button
-            variant="ghost"
-            size="icon"
+            variant='ghost'
+            size='icon'
             onClick={toggleTheme}
-            className="h-9 w-9 transition-transform hover:scale-110"
+            className='h-9 w-9 transition-transform hover:scale-110'
           >
             {isDark ? (
-              <Moon className="h-4 w-4 rotate-0 transition-all" />
+              <Moon className='h-4 w-4 rotate-0 transition-all' />
             ) : (
-              <Sun className="h-4 w-4 rotate-0 transition-all" />
+              <Sun className='h-4 w-4 rotate-0 transition-all' />
             )}
-            <span className="sr-only">Toggle theme</span>
+            <span className='sr-only'>Toggle theme</span>
           </Button>
         </TooltipTrigger>
         <TooltipContent>

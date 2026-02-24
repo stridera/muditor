@@ -21,11 +21,13 @@ model RaceAbilities {
 ```
 
 **Purpose**: Defines racial bonuses to abilities
+
 - Elves: +15 bonus to Archery, +10 to Stealth
 - Dwarves: +20 bonus to Mining, +15 to Smithing
 - Halflings: +15 bonus to Hiding, +10 to Pickpocketing
 
 **Fields**:
+
 - `race`: Which race gets the bonus
 - `abilityId`: Which ability gets the bonus
 - `category`: PRIMARY (core racial skill), SECONDARY (common), RESTRICTED (limited), FORBIDDEN (cannot learn)
@@ -53,12 +55,14 @@ model ObjectAbilities {
 **Purpose**: Allows objects to cast abilities (scrolls, wands, potions, magical weapons)
 
 **Examples**:
+
 - Scroll of Fireball: `{ abilityId: "fireball", level: 10, charges: 1 }`
 - Wand of Magic Missile: `{ abilityId: "magic_missile", level: 5, charges: 20 }`
 - Potion of Healing: `{ abilityId: "cure_light", level: 7, charges: 1 }`
 - Flaming Sword: `{ abilityId: "flame_weapon", level: 12, charges: -1 }` (infinite)
 
 **Fields**:
+
 - `abilityId`: Which ability the object can cast
 - `level`: Caster level (affects damage, duration, DC calculations)
 - `charges`: Overrides object.charges if needed, -1 = infinite
@@ -140,37 +144,67 @@ await prisma.raceAbilities.createMany({
 
     // Halflings
     { race: 'HALFLING', abilityId: hidingId, category: 'PRIMARY', bonus: 15 },
-    { race: 'HALFLING', abilityId: pickpocketId, category: 'SECONDARY', bonus: 10 },
-  ]
+    {
+      race: 'HALFLING',
+      abilityId: pickpocketId,
+      category: 'SECONDARY',
+      bonus: 10,
+    },
+  ],
 });
 
 // Magical items
 await prisma.objectAbilities.createMany({
   data: [
     // Scroll of Fireball (zone 30, object 101)
-    { objectZoneId: 30, objectId: 101, abilityId: fireballId, level: 10, charges: 1 },
+    {
+      objectZoneId: 30,
+      objectId: 101,
+      abilityId: fireballId,
+      level: 10,
+      charges: 1,
+    },
 
     // Wand of Magic Missile (zone 30, object 102)
-    { objectZoneId: 30, objectId: 102, abilityId: magicMissileId, level: 5, charges: 20 },
+    {
+      objectZoneId: 30,
+      objectId: 102,
+      abilityId: magicMissileId,
+      level: 5,
+      charges: 20,
+    },
 
     // Potion of Healing (zone 30, object 103)
-    { objectZoneId: 30, objectId: 103, abilityId: cureLightId, level: 7, charges: 1 },
+    {
+      objectZoneId: 30,
+      objectId: 103,
+      abilityId: cureLightId,
+      level: 7,
+      charges: 1,
+    },
 
     // Flaming Longsword (zone 30, object 104)
-    { objectZoneId: 30, objectId: 104, abilityId: flameWeaponId, level: 12, charges: -1 },
-  ]
+    {
+      objectZoneId: 30,
+      objectId: 104,
+      abilityId: flameWeaponId,
+      level: 12,
+      charges: -1,
+    },
+  ],
 });
 ```
 
 ## Game Logic Integration
 
 ### Racial Ability System
+
 ```typescript
 // When character is created, apply racial bonuses
 async function applyRacialBonuses(characterId: string, race: Race) {
   const racialBonuses = await prisma.raceAbilities.findMany({
     where: { race },
-    include: { ability: true }
+    include: { ability: true },
   });
 
   for (const bonus of racialBonuses) {
@@ -180,23 +214,28 @@ async function applyRacialBonuses(characterId: string, race: Race) {
         abilityId: bonus.abilityId,
         known: bonus.category !== 'FORBIDDEN',
         proficiency: bonus.bonus, // Start with racial bonus
-      }
+      },
     });
   }
 }
 ```
 
 ### Object Ability System
+
 ```typescript
 // When object is used (read scroll, zap wand, quaff potion)
-async function useObjectAbility(characterId: string, objectZoneId: number, objectId: number) {
+async function useObjectAbility(
+  characterId: string,
+  objectZoneId: number,
+  objectId: number
+) {
   const objectAbilities = await prisma.objectAbilities.findMany({
     where: { objectZoneId, objectId },
-    include: { ability: true }
+    include: { ability: true },
   });
 
   if (objectAbilities.length === 0) {
-    return { success: false, message: "Nothing happens." };
+    return { success: false, message: 'Nothing happens.' };
   }
 
   // Cast the ability at the specified level
