@@ -1,9 +1,9 @@
 import { PrismaPg } from '@prisma/adapter-pg';
-import { PrismaClient } from './generated/prisma/client.js';
+import { PrismaClient } from './generated/prisma/client';
 
 // Re-export everything from the generated client
 export { PrismaClient };
-export * from './generated/prisma/client.js';
+export * from './generated/prisma/client';
 
 // Create adapter for PostgreSQL
 function createAdapter() {

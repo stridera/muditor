@@ -6,7 +6,12 @@ import { AppModule } from '../app.module';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 
-describe('Quest Data Integrity Tests', () => {
+const describeOrSkip =
+  process.env.MUDITOR_DB_STUB === '1' || !process.env.DATABASE_URL
+    ? describe.skip
+    : describe;
+
+describeOrSkip('Quest Data Integrity Tests', () => {
   let app: INestApplication;
   let prisma: PrismaClient;
 

@@ -1,8 +1,7 @@
 export default {
   displayName: 'api',
-  preset: 'ts-jest/presets/default-esm',
+  preset: 'ts-jest',
   testEnvironment: 'node',
-  extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ['js', 'json', 'ts'],
   rootDir: '.',
   testMatch: ['<rootDir>/src/**/*.(test|spec).ts'],
@@ -10,8 +9,7 @@ export default {
     '^.+\\.ts$': [
       'ts-jest',
       {
-        useESM: true,
-        tsconfig: 'tsconfig.json',
+        tsconfig: 'tsconfig.test.json',
       },
     ],
   },
@@ -21,8 +19,10 @@ export default {
     '!**/node_modules/**',
     '!**/dist/**',
   ],
+  setupFiles: ['<rootDir>/test/jest-setup.ts'],
   coverageDirectory: '<rootDir>/coverage',
   moduleNameMapper: {
+    '^@muditor/db$': '<rootDir>/test/db-test-stub.ts',
     '^@muditor/(.*)$': '<rootDir>/../../packages/$1/src',
     '^~/(.*)$': '<rootDir>/src/$1',
   },

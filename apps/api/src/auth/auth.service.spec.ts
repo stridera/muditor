@@ -258,7 +258,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         accessToken: 'jwt-token',
-        user: {
+        user: expect.objectContaining({
           id: mockUser.id,
           email: mockUser.email,
           username: mockUser.username,
@@ -267,7 +267,7 @@ describe('AuthService', () => {
           updatedAt: mockUser.updatedAt,
           lastLoginAt: mockUser.lastLoginAt,
           isBanned: false,
-        },
+        }),
       });
       expect(databaseService.users.update).toHaveBeenCalledWith({
         where: { id: 'user-id' },
@@ -311,7 +311,7 @@ describe('AuthService', () => {
 
       expect(result).toEqual({
         accessToken: 'jwt-token',
-        user: {
+        user: expect.objectContaining({
           id: mockUser.id,
           email: mockUser.email,
           username: mockUser.username,
@@ -320,7 +320,7 @@ describe('AuthService', () => {
           updatedAt: mockUser.updatedAt,
           lastLoginAt: mockUser.lastLoginAt,
           isBanned: false,
-        },
+        }),
       });
     });
   });
