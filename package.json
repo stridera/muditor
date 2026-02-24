@@ -64,9 +64,9 @@
     "@playwright/test": "^1.56.1",
     "@prisma/client": "^6.16.1",
     "@types/jest": "^30.0.0",
-    "@types/node": "^24.9.2",
-    "@types/react": "19.2.1",
-    "@types/react-dom": "19.2.1",
+    "@types/node": "^24.10.13",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
     "@typescript/native-preview": "^7.0.0-dev.20260223.1",
@@ -75,13 +75,13 @@
     "eslint-import-resolver-typescript": "^4.4.4",
     "eslint-plugin-import": "^2.32.0",
     "eslint-plugin-jsx-a11y": "^6.10.2",
-    "eslint-plugin-prettier": "^5.5.4",
+    "eslint-plugin-prettier": "^5.5.5",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^7.0.1",
     "globals": "^16.5.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.6",
-    "prettier": "^3.6.2",
+    "prettier": "^3.8.1",
     "prisma": "^6.16.1",
     "turbo": "^2.6.0",
     "typescript": "6.0.0-beta",
@@ -89,7 +89,7 @@
   },
   "overrides": {
     "axios": "^1.12.0",
-    "@types/node": "24.9.2"
+    "@types/node": "24.10.13"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -112,6 +112,8 @@
     "nestjs"
   ],
   "dependencies": {
+    "lucide-react": "^0.575.0",
+    "monaco-editor": "^0.55.1",
     "unix-crypt-td-js": "^1.1.4"
   },
   "trustedDependencies": [
