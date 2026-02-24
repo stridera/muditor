@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { Prisma, ScriptType, TriggerFlag } from '@prisma/client';
+import { Prisma, ScriptType, TriggerFlag } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,

@@ -13,11 +13,13 @@
     "migrate:deploy": "prisma migrate deploy && bun run generate",
     "seed": "bun src/seed/index.ts",
     "type-check": "tsc --noEmit",
-    "clean": "rm -rf node_modules/.prisma"
+    "clean": "rm -rf src/generated"
   },
   "dependencies": {
-    "@prisma/client": "^6.16.1",
+    "@prisma/adapter-pg": "^7.0.0",
+    "@prisma/client": "^7.0.0",
     "bcrypt": "^6.0.0",
+    "pg": "^8.16.0",
     "zod": "^4.1.8"
   },
   "devDependencies": {
@@ -30,7 +32,8 @@
     "@types/node": "^24.9.2",
     "dotenv": "^17.2.2",
     "husky": "^9.1.7",
-    "prisma": "^6.16.1",
+    "@types/pg": "^8.15.4",
+    "prisma": "^7.0.0",
     "typescript": "6.0.0-beta"
   }
 }

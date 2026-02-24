@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import type { Users } from '@prisma/client';
-import { ScriptType } from '@prisma/client';
+import type { Users } from '@muditor/db';
+import { ScriptType } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {

@@ -4,7 +4,7 @@ import {
   type BoardMessage,
   type BoardMessageEdit,
   Prisma,
-} from '@prisma/client';
+} from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()

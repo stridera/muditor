@@ -23,8 +23,8 @@ export class ShopsResolver {
     buyProfit: number;
     sellProfit: number;
     temper: number;
-    flags: import('@prisma/client').ShopFlag[];
-    tradesWithFlags: import('@prisma/client').ShopTradesWith[];
+    flags: import('@muditor/db').ShopFlag[];
+    tradesWithFlags: import('@muditor/db').ShopTradesWith[];
     noSuchItemMessages: string[];
     doNotBuyMessages: string[];
     missingCashMessages: string[];

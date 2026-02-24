@@ -9,7 +9,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import type { Users } from '@prisma/client';
+import type { Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import {

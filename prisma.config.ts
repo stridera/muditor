@@ -1,5 +1,5 @@
 import dotenv from 'dotenv';
-import { defineConfig } from 'prisma';
+import { defineConfig } from 'prisma/config';
 
 // Load .env for PRISMA_SCHEMA_PATH
 dotenv.config();

@@ -1,5 +1,5 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
-import { GrantPermission, GrantResourceType, Prisma } from '@prisma/client';
+import { GrantPermission, GrantResourceType, Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateGrantInput,

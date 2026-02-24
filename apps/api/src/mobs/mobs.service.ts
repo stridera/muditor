@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { type Mobs, Prisma } from '@prisma/client';
+import { type Mobs, Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()

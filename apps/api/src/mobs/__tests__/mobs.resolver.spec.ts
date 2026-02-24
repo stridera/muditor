@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck -- Test file intentionally bypasses exhaustive Prisma model typing; we only validate resolver mapping logic.
 import { Test, TestingModule } from '@nestjs/testing';
-import { DamageType, Race } from '@prisma/client';
+import { DamageType, Race } from '@muditor/db';
 import { MobsResolver } from '../mobs.resolver';
 import { MobsService } from '../mobs.service';
 

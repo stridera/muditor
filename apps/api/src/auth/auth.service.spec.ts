@@ -1,7 +1,7 @@
 import { ConflictException, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { Test, TestingModule } from '@nestjs/testing';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import * as bcrypt from 'bcrypt';
 import { DatabaseService } from '../database/database.service';
 import { EmailService } from '../email/email.service';

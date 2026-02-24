@@ -7,7 +7,7 @@ import {
   IsEnum,
   MaxLength,
 } from 'class-validator';
-import { Position } from '@prisma/client';
+import { Position } from '@muditor/db';
 
 @InputType({ description: 'Input for creating a new social command' })
 export class CreateSocialInput {

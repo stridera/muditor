@@ -3,7 +3,7 @@ import {
   type ObjectResets,
   ObjectType as ObjectTypeEnum,
   Prisma,
-} from '@prisma/client';
+} from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateObjectResetInput,

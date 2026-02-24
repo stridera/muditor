@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@muditor/db';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   BoardDto,

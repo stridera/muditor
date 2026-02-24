@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { WearFlag } from '@prisma/client';
+import { WearFlag } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { MobResetService } from './mob-reset.service';
 

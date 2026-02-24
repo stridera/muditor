@@ -1,4 +1,4 @@
-import type { Effect as PrismaEffect } from '@prisma/client';
+import type { Effect as PrismaEffect } from '@muditor/db';
 import { Effect } from '../../abilities/abilities.dto';
 import { ObjectDto } from '../../objects/object.dto';
 import type { ObjectMapperSource } from './types';

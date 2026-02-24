@@ -7,7 +7,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { WearFlag } from '@prisma/client';
+import { WearFlag } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 
 // Register WearFlag enum for GraphQL

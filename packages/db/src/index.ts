@@ -1,4 +1,16 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from './generated/prisma/client.js';
+
+// Re-export everything from the generated client
+export { PrismaClient };
+export * from './generated/prisma/client.js';
+
+// Create adapter for PostgreSQL
+function createAdapter() {
+  return new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+  });
+}
 
 // Global PrismaClient instance
 const globalForPrisma = globalThis as unknown as {
@@ -9,6 +21,7 @@ const globalForPrisma = globalThis as unknown as {
 export const prisma =
   globalForPrisma.prisma ??
   new PrismaClient({
+    adapter: createAdapter(),
     log:
       process.env.NODE_ENV === 'development'
         ? ['query', 'error', 'warn']
@@ -20,16 +33,13 @@ if (process.env.NODE_ENV !== 'production') {
   globalForPrisma.prisma = prisma;
 }
 
-// Export Prisma types for use in other packages
-export * from '@prisma/client';
-
 // Export utility functions
 export async function connectDatabase() {
   try {
     await prisma.$connect();
-    console.log('✅ Database connected successfully');
+    console.log('Database connected successfully');
   } catch (error) {
-    console.error('❌ Database connection failed:', error);
+    console.error('Database connection failed:', error);
     throw error;
   }
 }
@@ -37,9 +47,9 @@ export async function connectDatabase() {
 export async function disconnectDatabase() {
   try {
     await prisma.$disconnect();
-    console.log('✅ Database disconnected successfully');
+    console.log('Database disconnected successfully');
   } catch (error) {
-    console.error('❌ Database disconnection failed:', error);
+    console.error('Database disconnection failed:', error);
     throw error;
   }
 }
@@ -56,18 +66,3 @@ export async function checkDatabaseHealth() {
     };
   }
 }
-
-// REMOVED: Import and parsing functionality moved to FieryLib
-// All world data import operations should now be performed using FieryLib:
-//   cd ../fierylib
-//   poetry run fierylib import-legacy
-//
-// This database package now only provides:
-//   - Prisma client and types
-//   - Database connection utilities
-//   - Health check functions
-//
-// Game system seeding (races, classes, spells, skills) remains in ./seed/
-
-// Lua sandbox utilities
-// export * from './sandbox/lua-sandbox'; // TODO: Implement when needed

@@ -12,7 +12,7 @@ import {
   CreateLoginMessageInput,
   UpdateLoginMessageInput,
 } from './settings.input';
-import { LoginStage, CommandCategory } from '@prisma/client';
+import { LoginStage, CommandCategory } from '@muditor/db';
 
 @Injectable()
 export class SettingsService {

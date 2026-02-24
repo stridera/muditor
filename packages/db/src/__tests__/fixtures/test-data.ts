@@ -3,7 +3,7 @@
  * Provides consistent test data for all testing layers
  */
 
-import { Race, MobFlag, RoomFlag } from '@prisma/client';
+import { Race, MobFlag, RoomFlag } from '@muditor/db';
 import { TriggerFlag, ItemType, SectorType, ExitFlag } from '@muditor/types';
 
 export interface TestMobData {

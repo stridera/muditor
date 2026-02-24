@@ -5,7 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import { BanRecord } from './ban-record.entity';
 import { UserPreferences } from './user-preferences.entity';
 
@@ -62,6 +62,9 @@ export class User {
   @Field({ description: 'Whether the user is currently banned' })
   isBanned: boolean;
 
-  @Field(() => UserPreferences, { nullable: true, description: 'User preferences for UI and navigation' })
+  @Field(() => UserPreferences, {
+    nullable: true,
+    description: 'User preferences for UI and navigation',
+  })
   preferences?: UserPreferences;
 }

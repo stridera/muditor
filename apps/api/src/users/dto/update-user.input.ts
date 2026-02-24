@@ -1,5 +1,5 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import { IsEnum, IsOptional, IsEmail, IsInt, Min, Max } from 'class-validator';
 
 @InputType()

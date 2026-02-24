@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 // Import enum only AFTER GraphQL enums have been registered in object.dto (registration side-effect)
-import { ObjectType as ObjectTypeEnum } from '@prisma/client';
+import { ObjectType as ObjectTypeEnum } from '@muditor/db';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';

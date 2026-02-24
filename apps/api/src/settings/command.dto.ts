@@ -1,5 +1,5 @@
 import { ObjectType, Field, registerEnumType } from '@nestjs/graphql';
-import { CommandCategory } from '@prisma/client';
+import { CommandCategory } from '@muditor/db';
 
 // Register the enum for GraphQL
 registerEnumType(CommandCategory, {

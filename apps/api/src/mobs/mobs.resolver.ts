@@ -8,7 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Prisma, Race } from '@prisma/client'; // all enums already registered in mob.dto
+import { Prisma, Race } from '@muditor/db'; // all enums already registered in mob.dto
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { calculateMobCombatDefaults } from '../common/dice-formulas';
 import { mapMob } from '../common/mappers/mob.mapper';

@@ -1,4 +1,4 @@
-import { ObjectType } from '@prisma/client';
+import { ObjectType } from '@muditor/db';
 import { mapObject } from '../object.mapper';
 import type { ObjectMapperSource } from '../types';
 

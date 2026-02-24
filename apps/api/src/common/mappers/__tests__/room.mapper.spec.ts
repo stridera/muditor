@@ -1,4 +1,4 @@
-import { Direction, ExitFlag, ExitState, Sector } from '@prisma/client';
+import { Direction, ExitFlag, ExitState, Sector } from '@muditor/db';
 import { mapRoom } from '../room.mapper';
 import type { RoomMapperSource } from '../types';
 

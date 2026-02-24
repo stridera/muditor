@@ -22,7 +22,7 @@ import {
   QuestStatus,
   DialogueMatchType,
   QuestTriggerType,
-} from '@prisma/client';
+} from '@muditor/db';
 
 // Register enums for GraphQL
 registerEnumType(QuestObjectiveType, { name: 'QuestObjectiveType' });

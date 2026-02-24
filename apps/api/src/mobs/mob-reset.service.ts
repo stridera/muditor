@@ -4,7 +4,7 @@ import {
   type MobResets,
   Prisma,
   WearFlag,
-} from '@prisma/client';
+} from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateMobResetInput,

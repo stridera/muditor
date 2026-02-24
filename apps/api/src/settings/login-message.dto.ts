@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { LoginStage } from '@prisma/client';
+import { LoginStage } from '@muditor/db';
 
 registerEnumType(LoginStage, {
   name: 'LoginStage',

@@ -16,7 +16,7 @@ import {
   type RoomExit as PrismaRoomExit,
   type RoomExtraDescriptions,
   Sector,
-} from '@prisma/client';
+} from '@muditor/db';
 
 // Room source interface used by mapRoom
 export interface RoomMapperSource {

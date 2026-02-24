@@ -19,7 +19,7 @@ import {
   Race,
   Size,
   Stance,
-} from '@prisma/client';
+} from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import {
   IsArray,

@@ -7,7 +7,7 @@ import {
   Race,
   Size,
   Stance,
-} from '@prisma/client';
+} from '@muditor/db';
 import { mapMob } from '../mob.mapper';
 import type { MobMapperSource } from '../types';
 

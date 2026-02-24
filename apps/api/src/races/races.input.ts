@@ -16,7 +16,7 @@ import {
   LifeForce,
   Composition,
   SkillCategory,
-} from '@prisma/client';
+} from '@muditor/db';
 
 @InputType()
 export class CreateRaceInput {

@@ -1,6 +1,6 @@
 import { Field, Float, InputType, Int, ObjectType } from '@nestjs/graphql';
 import { IsBoolean, IsNumber, IsOptional, IsEnum } from 'class-validator';
-import { ElementType, WearFlag } from '@prisma/client';
+import { ElementType, WearFlag } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import { Effect } from '../abilities/abilities.dto';
 

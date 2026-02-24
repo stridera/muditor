@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, Int } from '@nestjs/graphql';
-import { SkillCategory } from '@prisma/client';
+import { SkillCategory } from '@muditor/db';
 
 @ObjectType()
 export class ClassDto {

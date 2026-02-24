@@ -8,7 +8,7 @@ import {
   SkillCategory,
   SpellSphere,
   ElementType,
-} from '@prisma/client';
+} from '@muditor/db';
 
 // Register enums with GraphQL (Position already registered in mob.dto.ts)
 registerEnumType(SaveType, { name: 'SaveType' });
