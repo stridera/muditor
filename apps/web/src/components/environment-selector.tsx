@@ -38,16 +38,18 @@ export function EnvironmentSelector() {
           <DropdownMenuItem
             key={env.value}
             onClick={() => setEnvironment(env.value)}
-            className={currentEnvironment === env.value ? 'bg-gray-100' : ''}
+            className={currentEnvironment === env.value ? 'bg-accent' : ''}
           >
             <Badge className={`mr-2 ${env.color}`}>{env.label}</Badge>
             {currentEnvironment === env.value && (
-              <span className='ml-auto text-xs text-gray-500'>Current</span>
+              <span className='ml-auto text-xs text-muted-foreground'>
+                Current
+              </span>
             )}
           </DropdownMenuItem>
         ))}
         <DropdownMenuSeparator />
-        <div className='px-2 py-1 text-xs text-gray-500'>
+        <div className='px-2 py-1 text-xs text-muted-foreground'>
           Environment affects database and API connections
         </div>
       </DropdownMenuContent>

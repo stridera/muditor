@@ -218,15 +218,15 @@ export default function EffectsPage() {
     const category = getEffectTypeCategory(effectType);
     switch (category) {
       case 'Status Effect':
-        return 'bg-purple-100 text-purple-700';
+        return 'bg-purple-950/30 text-purple-400';
       case 'Stat Modifier':
-        return 'bg-blue-100 text-blue-700';
+        return 'bg-primary/10 text-primary';
       case 'Damage':
-        return 'bg-red-100 text-red-700';
+        return 'bg-red-950/30 text-red-400';
       case 'Healing':
-        return 'bg-green-100 text-green-700';
+        return 'bg-green-950/30 text-green-400';
       default:
-        return 'bg-gray-100 text-gray-700';
+        return 'bg-muted text-muted-foreground';
     }
   };
 
@@ -400,7 +400,7 @@ export default function EffectsPage() {
           <div className='flex flex-col md:flex-row gap-4 mb-6'>
             <div className='flex-1'>
               <div className='relative'>
-                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 <Input
                   placeholder='Search effects...'
                   value={searchTerm}
@@ -419,7 +419,7 @@ export default function EffectsPage() {
 
           {loading ? (
             <div className='flex items-center justify-center py-12'>
-              <Loader2 className='h-8 w-8 animate-spin text-gray-400' />
+              <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
             </div>
           ) : error ? (
             <Alert variant='destructive'>
@@ -430,7 +430,7 @@ export default function EffectsPage() {
             </Alert>
           ) : effects.length === 0 ? (
             <div className='text-center py-12 text-muted-foreground'>
-              <Zap className='h-12 w-12 mx-auto mb-4 text-gray-300' />
+              <Zap className='h-12 w-12 mx-auto mb-4 text-muted-foreground/60' />
               <p>No effects found matching your search</p>
             </div>
           ) : (
@@ -634,7 +634,7 @@ export default function EffectsPage() {
         <DialogContent className='max-w-2xl max-h-[90vh] overflow-y-auto'>
           {loadingDetails ? (
             <div className='flex items-center justify-center p-8'>
-              <Loader2 className='h-8 w-8 animate-spin text-gray-400' />
+              <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
             </div>
           ) : effectDetailsData?.effect ? (
             <>

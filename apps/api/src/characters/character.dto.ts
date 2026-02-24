@@ -149,15 +149,15 @@ export class CharacterDto {
   pageLength: number;
 
   // Flags
-  @Field(() => [String])
-  playerFlags: string[];
+  @Field(() => [String], { nullable: true })
+  playerFlags?: string[];
 
-  @Field(() => [String])
-  privilegeFlags: string[];
+  @Field(() => [String], { nullable: true })
+  privilegeFlags?: string[];
 
   // Builder/God specific
-  @Field(() => [Int])
-  olcZones: number[];
+  @Field(() => [Int], { nullable: true })
+  olcZones?: number[];
 
   @Field(() => Int)
   invisLevel: number;
@@ -166,8 +166,8 @@ export class CharacterDto {
   @Field()
   birthTime: Date;
 
-  @Field()
-  userId: string;
+  @Field({ nullable: true })
+  userId?: string;
 
   @Field()
   createdAt: Date;
@@ -177,9 +177,6 @@ export class CharacterDto {
 
   @Field(() => Int, { nullable: true })
   classId?: number;
-
-  @Field(() => Int)
-  raceId: number;
 
   @Field(() => Int)
   experience: number;

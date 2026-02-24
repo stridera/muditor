@@ -1,5 +1,6 @@
 'use client';
 
+import { VIEW_MODE_EVENT } from '@/components/navigation/sidebar';
 import { usePermissions } from '@/hooks/use-permissions';
 import { Loader2 } from 'lucide-react';
 import type { ReactNode } from 'react';
@@ -20,7 +21,7 @@ export function DualInterface({
 }: DualInterfaceProps) {
   const { loading, isPlayer, isImmortal } = usePermissions();
 
-  // View toggle state - read from localStorage (synced by Navigation)
+  // View toggle state - read from localStorage (synced by Sidebar)
   const [forcePlayerView, setForcePlayerView] = useState<boolean>(() => {
     if (typeof window !== 'undefined') {
       const saved = localStorage.getItem('muditor-view-preference');
@@ -29,24 +30,28 @@ export function DualInterface({
     return false;
   });
 
-  // Listen for localStorage changes (when Navigation updates it)
+  // Listen for custom event from Sidebar (replaces polling)
   useEffect(() => {
+    const handleViewModeChange = (e: Event) => {
+      const mode = (e as CustomEvent).detail;
+      setForcePlayerView(mode === 'player');
+    };
+
+    // Listen for custom event from Sidebar
+    window.addEventListener(VIEW_MODE_EVENT, handleViewModeChange);
+
+    // Also listen for storage events (cross-tab sync)
     const handleStorageChange = () => {
       if (typeof window !== 'undefined') {
         const saved = localStorage.getItem('muditor-view-preference');
         setForcePlayerView(saved === 'player');
       }
     };
-
-    // Listen for storage events from Navigation component
     window.addEventListener('storage', handleStorageChange);
 
-    // Also check periodically (for same-tab updates)
-    const interval = setInterval(handleStorageChange, 500);
-
     return () => {
+      window.removeEventListener(VIEW_MODE_EVENT, handleViewModeChange);
       window.removeEventListener('storage', handleStorageChange);
-      clearInterval(interval);
     };
   }, []);
 
@@ -72,12 +77,12 @@ export function DualInterface({
     <div className='space-y-6'>
       {/* Show admin view for IMMORTAL+ role users */}
       {showAdminInterface && adminView && (
-        <div className='admin-interface'>{adminView}</div>
+        <div className='admin-interface animate-fade-in'>{adminView}</div>
       )}
 
       {/* Show player view for PLAYER role users or when switched */}
       {showPlayerInterface && playerView && (
-        <div className='player-interface'>{playerView}</div>
+        <div className='player-interface animate-fade-in'>{playerView}</div>
       )}
 
       {/* Show fallback interface if no role-specific interface is available */}

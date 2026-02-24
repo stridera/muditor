@@ -108,6 +108,7 @@ apps/web/src/**/*.d.ts
 
 # dotenv environment variables file
 .env.test
+.env.prod
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test

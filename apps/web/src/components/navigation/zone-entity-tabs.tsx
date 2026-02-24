@@ -54,7 +54,7 @@ export function ZoneEntityTabs() {
   const tabs = [visualEditorTab, ...zoneTabs];
 
   return (
-    <div className='flex items-center gap-2 border-l border-gray-200 dark:border-gray-700 pl-4'>
+    <div className='flex items-center gap-2 border-l border-border pl-4'>
       {tabs.map(tab => {
         const isActive =
           (tab.id === 'visual-editor' && pathname.includes('/zones/editor')) ||
@@ -67,8 +67,8 @@ export function ZoneEntityTabs() {
               size='sm'
               className={`flex items-center gap-2 transition-all duration-200 ${
                 isActive
-                  ? 'bg-blue-600 text-white hover:bg-blue-700 dark:bg-blue-500 dark:hover:bg-blue-600'
-                  : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+                  ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+                  : 'hover:bg-accent'
               }`}
             >
               {tab.icon}

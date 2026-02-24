@@ -154,10 +154,13 @@ export class CreateShopInput {
   @IsArray()
   sellMessages?: string[];
 
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
+  @Field(() => Int)
   @IsNumber()
-  keeperId?: number;
+  keeperZoneId: number;
+
+  @Field(() => Int)
+  @IsNumber()
+  keeperId: number;
 
   @Field(() => Int)
   @IsNumber()

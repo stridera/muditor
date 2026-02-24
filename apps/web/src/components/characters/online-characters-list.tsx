@@ -131,7 +131,7 @@ export function OnlineCharactersList({
             <div className='text-muted-foreground mb-2'>
               No characters online
             </div>
-            <div className='text-sm text-gray-500'>
+            <div className='text-sm text-muted-foreground'>
               {showAllUsers
                 ? 'No players are currently connected to the game.'
                 : 'None of your characters are currently online.'}

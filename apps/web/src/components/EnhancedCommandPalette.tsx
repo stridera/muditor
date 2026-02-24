@@ -328,11 +328,11 @@ export function EnhancedCommandPalette() {
       onClick={() => setIsOpen(false)}
     >
       <div
-        className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4'
+        className='bg-card rounded-lg shadow-2xl w-full max-w-2xl mx-4 border border-border'
         onClick={e => e.stopPropagation()}
       >
         {/* Search Input */}
-        <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+        <div className='p-4 border-b border-border'>
           {/* Mode badge */}
           {parsedInput.mode !== 'zones' && (
             <div className='mb-2'>
@@ -340,7 +340,7 @@ export function EnhancedCommandPalette() {
                 {parsedInput.mode === 'mobs' ? '🧙 ' : '📦 '}
                 {modeLabel}
               </span>
-              <span className='ml-2 text-xs text-gray-500 dark:text-gray-400'>
+              <span className='ml-2 text-xs text-muted-foreground'>
                 {contextInfo}
               </span>
             </div>
@@ -355,18 +355,14 @@ export function EnhancedCommandPalette() {
             autoFocus
           />
 
-          <div className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded'>
-              m &lt;name&gt;
-            </kbd>{' '}
+          <div className='text-xs text-muted-foreground mt-2'>
+            <kbd className='px-2 py-1 bg-muted rounded'>m &lt;name&gt;</kbd>{' '}
             Mobs{' '}
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded ml-2'>
+            <kbd className='px-2 py-1 bg-muted rounded ml-2'>
               o &lt;name&gt;
             </kbd>{' '}
             Objects{' '}
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded ml-2'>
-              &lt;name&gt;
-            </kbd>{' '}
+            <kbd className='px-2 py-1 bg-muted rounded ml-2'>&lt;name&gt;</kbd>{' '}
             Zones
           </div>
         </div>
@@ -374,7 +370,7 @@ export function EnhancedCommandPalette() {
         {/* Results List */}
         <div className='max-h-96 overflow-y-auto'>
           {loading ? (
-            <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
+            <div className='p-8 text-center text-muted-foreground'>
               Loading...
             </div>
           ) : error ? (
@@ -382,7 +378,7 @@ export function EnhancedCommandPalette() {
               Failed to load results. Please try again.
             </div>
           ) : results.length === 0 ? (
-            <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
+            <div className='p-8 text-center text-muted-foreground'>
               No results found
             </div>
           ) : (
@@ -390,15 +386,15 @@ export function EnhancedCommandPalette() {
               <button
                 key={`${result.type}-${result.zoneId}-${result.id}-${index}`}
                 onClick={() => selectResult(result)}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                className={`w-full px-4 py-3 text-left hover:bg-accent transition-colors ${
                   index === selectedIndex
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                    ? 'bg-primary/10 border-l-4 border-primary'
                     : ''
                 }`}
               >
                 <div className='font-medium'>{result.displayName}</div>
                 {result.description && (
-                  <div className='text-sm text-gray-500 dark:text-gray-400'>
+                  <div className='text-sm text-muted-foreground'>
                     {result.description}
                   </div>
                 )}

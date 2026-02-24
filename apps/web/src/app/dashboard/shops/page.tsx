@@ -320,7 +320,7 @@ function ShopsContent() {
         <div className='grid gap-4'>
           {filteredShops.map((shop: Shop) => (
             <div
-              key={shop.id}
+              key={`${shop.zoneId}-${shop.id}`}
               className='bg-card border border-border rounded-lg hover:shadow-md transition-shadow'
             >
               <div

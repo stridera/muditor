@@ -38,18 +38,19 @@ const cache = new InMemoryCache({
     ShopDto: {
       keyFields: ['zoneId', 'id'],
     },
+    QuestDto: {
+      keyFields: ['zoneId', 'id'],
+    },
+    QuestPhaseDto: {
+      keyFields: ['questZoneId', 'questId', 'id'],
+    },
+    QuestObjectiveDto: {
+      keyFields: ['questZoneId', 'questId', 'phaseId', 'id'],
+    },
   },
 });
 
 export const apolloClient = new ApolloClient({
   link: authLink.concat(httpLink),
   cache,
-  defaultOptions: {
-    watchQuery: {
-      errorPolicy: 'ignore',
-    },
-    query: {
-      errorPolicy: 'all',
-    },
-  },
 });

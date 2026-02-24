@@ -52,7 +52,7 @@ const OnlineStatusComponent = ({
               className={`flex items-center gap-1 ${badgeSize}`}
             >
               <Circle
-                className={`${iconSize} fill-current ${isOnline ? 'text-green-500' : 'text-gray-400'}`}
+                className={`${iconSize} fill-current ${isOnline ? 'text-green-500' : 'text-muted-foreground/50'}`}
               />
               {isOnline ? 'Online' : 'Offline'}
             </Badge>
@@ -70,7 +70,7 @@ const OnlineStatusComponent = ({
       <Tooltip>
         <TooltipTrigger asChild>
           <Circle
-            className={`${iconSize} fill-current ${isOnline ? 'text-green-500' : 'text-gray-400'}`}
+            className={`${iconSize} fill-current ${isOnline ? 'text-green-500' : 'text-muted-foreground/50'}`}
           />
         </TooltipTrigger>
         <TooltipContent>
@@ -178,7 +178,7 @@ export function CharacterStatusCard({
 }: CharacterStatusCardProps) {
   return (
     <div
-      className={`p-4 border rounded-lg bg-white hover:bg-gray-50 transition-colors ${
+      className={`p-4 border rounded-lg bg-card hover:bg-accent transition-colors ${
         onCharacterClick ? 'cursor-pointer' : ''
       }`}
       onClick={() => onCharacterClick?.(character.id)}
@@ -186,7 +186,7 @@ export function CharacterStatusCard({
       <div className='flex items-start justify-between'>
         <div className='flex-1'>
           <div className='flex items-center gap-2 mb-2'>
-            <h3 className='font-medium text-gray-900'>{character.name}</h3>
+            <h3 className='font-medium text-foreground'>{character.name}</h3>
             <OnlineStatus
               isOnline={character.isOnline}
               size='sm'
@@ -196,7 +196,7 @@ export function CharacterStatusCard({
             />
           </div>
 
-          <div className='text-sm text-gray-600 space-y-1'>
+          <div className='text-sm text-muted-foreground space-y-1'>
             <div className='flex items-center gap-2'>
               <span>Level {character.level}</span>
               {character.raceType && (

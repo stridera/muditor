@@ -29,7 +29,6 @@ export default function RegisterPage() {
     e.preventDefault();
     setError('');
 
-    // Validation
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
@@ -64,24 +63,30 @@ export default function RegisterPage() {
   if (loading) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-background text-foreground py-12 px-4 sm:px-6 lg:px-8'>
-      <div className='max-w-md w-full space-y-8'>
-        <div>
-          <h2 className='mt-6 text-center text-3xl font-extrabold text-foreground'>
-            Create your account
+    <div className='min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden py-12 px-4'>
+      {/* Ambient gradient */}
+      <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--gold)/0.06)_0%,transparent_70%)]' />
+
+      <div className='relative max-w-md w-full animate-fade-in'>
+        <div className='text-center mb-8'>
+          <Link href='/'>
+            <h1 className='text-3xl font-display font-bold text-foreground tracking-wider mb-1'>
+              MUDITOR
+            </h1>
+          </Link>
+          <div className='w-16 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent mx-auto mb-3' />
+          <h2 className='text-xl font-display text-foreground/80'>
+            Join the Guild
           </h2>
-          <p className='mt-2 text-center text-sm text-muted-foreground'>
-            Join Muditor to start building worlds
-          </p>
         </div>
 
-        <Card>
+        <Card className='border-border/50 shadow-xl backdrop-blur-sm bg-card/95'>
           <CardHeader>
             <CardTitle>Register</CardTitle>
             <CardDescription>
@@ -110,6 +115,7 @@ export default function RegisterPage() {
                   maxLength={20}
                   pattern='^[a-zA-Z0-9_]+$'
                   title='Username can only contain letters, numbers, and underscores'
+                  className='focus-visible:ring-primary'
                 />
               </div>
 
@@ -123,6 +129,7 @@ export default function RegisterPage() {
                   required
                   disabled={isLoading}
                   placeholder='Enter your email address'
+                  className='focus-visible:ring-primary'
                 />
               </div>
 
@@ -138,6 +145,7 @@ export default function RegisterPage() {
                   placeholder='Enter your password'
                   minLength={8}
                   maxLength={128}
+                  className='focus-visible:ring-primary'
                 />
                 <p className='text-xs text-muted-foreground'>
                   8-128 characters required
@@ -154,6 +162,7 @@ export default function RegisterPage() {
                   required
                   disabled={isLoading}
                   placeholder='Confirm your password'
+                  className='focus-visible:ring-primary'
                 />
               </div>
 
@@ -175,7 +184,7 @@ export default function RegisterPage() {
               </span>
               <Link
                 href='/login'
-                className='font-medium text-primary hover:text-primary-foreground'
+                className='font-medium text-primary hover:text-primary/80'
               >
                 Sign in
               </Link>

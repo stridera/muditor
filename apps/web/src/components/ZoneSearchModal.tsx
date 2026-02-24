@@ -131,11 +131,11 @@ export function ZoneSearchModal() {
       onClick={() => setIsOpen(false)}
     >
       <div
-        className='bg-white dark:bg-gray-800 rounded-lg shadow-2xl w-full max-w-2xl mx-4'
+        className='bg-card rounded-lg shadow-2xl w-full max-w-2xl mx-4 border border-border'
         onClick={e => e.stopPropagation()}
       >
         {/* Search Input */}
-        <div className='p-4 border-b border-gray-200 dark:border-gray-700'>
+        <div className='p-4 border-b border-border'>
           <input
             type='text'
             placeholder='Search zones by name or ID...'
@@ -144,34 +144,25 @@ export function ZoneSearchModal() {
             className='w-full px-4 py-2 text-lg bg-transparent border-none outline-none'
             autoFocus
           />
-          <div className='text-xs text-gray-500 dark:text-gray-400 mt-2'>
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded'>
-              ↑↓
-            </kbd>{' '}
-            Navigate{' '}
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded ml-2'>
-              Enter
-            </kbd>{' '}
-            Select{' '}
-            <kbd className='px-2 py-1 bg-gray-100 dark:bg-gray-700 rounded ml-2'>
-              Esc
-            </kbd>{' '}
-            Close
+          <div className='text-xs text-muted-foreground mt-2'>
+            <kbd className='px-2 py-1 bg-muted rounded'>↑↓</kbd> Navigate{' '}
+            <kbd className='px-2 py-1 bg-muted rounded ml-2'>Enter</kbd> Select{' '}
+            <kbd className='px-2 py-1 bg-muted rounded ml-2'>Esc</kbd> Close
           </div>
         </div>
 
         {/* Results List */}
         <div className='max-h-96 overflow-y-auto'>
           {loading ? (
-            <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
+            <div className='p-8 text-center text-muted-foreground'>
               Loading zones...
             </div>
           ) : error ? (
-            <div className='p-8 text-center text-red-500'>
+            <div className='p-8 text-center text-destructive'>
               Failed to load zones. Please try again.
             </div>
           ) : filteredZones.length === 0 ? (
-            <div className='p-8 text-center text-gray-500 dark:text-gray-400'>
+            <div className='p-8 text-center text-muted-foreground'>
               No zones found
             </div>
           ) : (
@@ -179,14 +170,14 @@ export function ZoneSearchModal() {
               <button
                 key={zone.id}
                 onClick={() => selectZone(zone)}
-                className={`w-full px-4 py-3 text-left hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                className={`w-full px-4 py-3 text-left hover:bg-accent transition-colors ${
                   index === selectedIndex
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border-l-4 border-blue-500'
+                    ? 'bg-primary/10 border-l-4 border-primary'
                     : ''
                 }`}
               >
                 <div className='font-medium'>{zone.name}</div>
-                <div className='text-sm text-gray-500 dark:text-gray-400'>
+                <div className='text-sm text-muted-foreground'>
                   Zone {zone.id}
                 </div>
               </button>

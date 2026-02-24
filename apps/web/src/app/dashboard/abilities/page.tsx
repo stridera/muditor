@@ -590,9 +590,9 @@ export default function AbilitiesPage() {
 
       {/* Success/Error Messages */}
       {successMessage && (
-        <Alert className='bg-green-50 border-green-200'>
-          <CheckCircle className='h-4 w-4 text-green-600' />
-          <AlertDescription className='text-green-800'>
+        <Alert className='bg-green-950/20 border-green-800/30'>
+          <CheckCircle className='h-4 w-4 text-green-500' />
+          <AlertDescription className='text-green-400'>
             {successMessage}
           </AlertDescription>
         </Alert>
@@ -622,7 +622,7 @@ export default function AbilitiesPage() {
           <div className='flex flex-col md:flex-row gap-4 mb-6'>
             <div className='flex-1'>
               <div className='relative'>
-                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400' />
+                <Search className='absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground' />
                 <Input
                   placeholder='Search abilities...'
                   value={searchTerm}
@@ -684,15 +684,15 @@ export default function AbilitiesPage() {
 
           {loading ? (
             <div className='flex items-center justify-center py-12'>
-              <Loader2 className='h-8 w-8 animate-spin text-gray-400' />
+              <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
             </div>
           ) : error ? (
-            <div className='text-center py-12 text-red-600'>
+            <div className='text-center py-12 text-destructive'>
               Error loading abilities: {error.message}
             </div>
           ) : filteredAbilities.length === 0 ? (
             <div className='text-center py-12 text-muted-foreground'>
-              <BookOpen className='h-12 w-12 mx-auto mb-4 text-gray-300' />
+              <BookOpen className='h-12 w-12 mx-auto mb-4 text-muted-foreground/60' />
               <p>No abilities found matching your filters</p>
             </div>
           ) : (
@@ -773,7 +773,7 @@ export default function AbilitiesPage() {
                               {ability.violent ? (
                                 <Badge
                                   variant='destructive'
-                                  className='text-xs bg-red-100 text-red-700'
+                                  className='text-xs bg-red-950/30 text-red-400'
                                 >
                                   <Zap className='h-3 w-3 mr-1' />
                                   Violent
@@ -781,7 +781,7 @@ export default function AbilitiesPage() {
                               ) : (
                                 <Badge
                                   variant='secondary'
-                                  className='text-xs bg-blue-100 text-blue-700'
+                                  className='text-xs bg-primary/10 text-primary'
                                 >
                                   <Shield className='h-3 w-3 mr-1' />
                                   Peaceful
@@ -828,7 +828,7 @@ export default function AbilitiesPage() {
                                       handleDelete(ability);
                                     }}
                                   >
-                                    <Trash2 className='h-4 w-4 text-red-600' />
+                                    <Trash2 className='h-4 w-4 text-destructive' />
                                   </Button>
                                 )}
                               </div>
@@ -970,7 +970,7 @@ export default function AbilitiesPage() {
             <AlertDialogAction
               onClick={confirmDelete}
               disabled={deleting}
-              className='bg-red-600 hover:bg-red-700'
+              className='bg-destructive hover:bg-destructive/90'
             >
               {deleting ? 'Deleting...' : 'Delete'}
             </AlertDialogAction>
@@ -1717,7 +1717,7 @@ export default function AbilitiesPage() {
                           <h4 className='font-medium text-muted-foreground mb-2'>
                             Success
                           </h4>
-                          <div className='space-y-1 pl-2 border-l-2 border-green-200'>
+                          <div className='space-y-1 pl-2 border-l-2 border-green-800/40'>
                             {abilityDetailsData.ability.messages
                               .successToCaster && (
                               <div>
@@ -1766,7 +1766,7 @@ export default function AbilitiesPage() {
                           <h4 className='font-medium text-muted-foreground mb-2'>
                             Self-Cast
                           </h4>
-                          <div className='space-y-1 pl-2 border-l-2 border-blue-200'>
+                          <div className='space-y-1 pl-2 border-l-2 border-primary/30'>
                             {abilityDetailsData.ability.messages
                               .successToSelf && (
                               <div>
@@ -1803,7 +1803,7 @@ export default function AbilitiesPage() {
                           <h4 className='font-medium text-muted-foreground mb-2'>
                             Fail
                           </h4>
-                          <div className='space-y-1 pl-2 border-l-2 border-red-200'>
+                          <div className='space-y-1 pl-2 border-l-2 border-red-800/40'>
                             {abilityDetailsData.ability.messages
                               .failToCaster && (
                               <div>
@@ -1847,7 +1847,7 @@ export default function AbilitiesPage() {
                           <h4 className='font-medium text-muted-foreground mb-2'>
                             Wear Off
                           </h4>
-                          <div className='space-y-1 pl-2 border-l-2 border-yellow-200'>
+                          <div className='space-y-1 pl-2 border-l-2 border-yellow-800/40'>
                             {abilityDetailsData.ability.messages
                               .wearoffToTarget && (
                               <div>
@@ -1882,7 +1882,7 @@ export default function AbilitiesPage() {
                           <h4 className='font-medium text-muted-foreground mb-2'>
                             Look
                           </h4>
-                          <div className='space-y-1 pl-2 border-l-2 border-purple-200'>
+                          <div className='space-y-1 pl-2 border-l-2 border-purple-800/40'>
                             <div>
                               {abilityDetailsData.ability.messages.lookMessage}
                             </div>

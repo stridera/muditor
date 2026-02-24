@@ -1,5 +1,6 @@
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { GraphQLModule } from '@nestjs/graphql';
 import type { Request, Response } from 'express';
 import { join } from 'path';
@@ -32,6 +33,10 @@ import { DiscordModule } from './discord/discord.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: ['.env', '../../.env', '../../.env.development'],
+    }),
     CommonModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,

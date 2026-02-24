@@ -304,7 +304,7 @@ function RoomsContent() {
     <div>
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-foreground'>
+          <h1 className='text-3xl font-bold font-display text-foreground'>
             {selectedZone ? `Zone ${selectedZone} Rooms` : 'Rooms'}
           </h1>
           <p className='text-muted-foreground mt-1'>
@@ -312,12 +312,6 @@ function RoomsContent() {
             {selectedZone && ' in this zone'}
           </p>
         </div>
-        <Link
-          href='/dashboard/zones/editor'
-          className='bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors'
-        >
-          Visual Zone Editor
-        </Link>
       </div>
 
       <div className='bg-card rounded-lg shadow mb-6 p-4'>
@@ -333,7 +327,7 @@ function RoomsContent() {
               type='text'
               id='search'
               placeholder='Search by name, ID, or description...'
-              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+              className='w-full px-3 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -348,7 +342,7 @@ function RoomsContent() {
             </label>
             <select
               id='sector'
-              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+              className='w-full px-3 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
               value={selectedSector}
               onChange={e => setSelectedSector(e.target.value)}
             >
@@ -376,7 +370,7 @@ function RoomsContent() {
         <div className='grid gap-4'>
           {filteredRooms.map(room => (
             <div
-              key={room.id}
+              key={`${room.zoneId}-${room.id}`}
               className='bg-card border border-border rounded-lg shadow hover:shadow-md transition-shadow'
             >
               <div
@@ -443,7 +437,7 @@ function RoomsContent() {
                   {loadingDetails.has(room.id) ? (
                     <div className='text-center py-4'>
                       <div className='inline-flex items-center'>
-                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600 mr-2'></div>
+                        <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2'></div>
                         <span className='text-sm text-muted-foreground'>
                           Loading room details...
                         </span>

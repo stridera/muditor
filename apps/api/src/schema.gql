@@ -338,14 +338,13 @@ type CharacterDto {
   movement: Int!
   movementMax: Int!
   name: String!
-  olcZones: [Int!]!
+  olcZones: [Int!]
   pageLength: Int!
   platinum: Int!
   playerClass: String
-  playerFlags: [String!]!
-  privilegeFlags: [String!]!
+  playerFlags: [String!]
+  privilegeFlags: [String!]
   prompt: String!
-  raceId: Int!
   raceType: String
   saveRoom: Int
   silver: Int!
@@ -355,7 +354,7 @@ type CharacterDto {
   timePlayed: Int!
   title: String
   updatedAt: DateTime!
-  userId: String!
+  userId: String
   weight: Int
   wisdom: Int!
 }
@@ -1099,7 +1098,8 @@ input CreateShopInput {
   doNotBuyMessages: [String!]! = []
   flags: [ShopFlag!]! = []
   id: Int!
-  keeperId: Int
+  keeperId: Int!
+  keeperZoneId: Int!
   missingCashMessages: [String!]! = []
   noSuchItemMessages: [String!]! = []
   sellMessages: [String!]! = []

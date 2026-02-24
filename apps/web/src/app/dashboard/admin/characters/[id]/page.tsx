@@ -2,14 +2,15 @@
 
 import { CharacterDetails } from '@/components/characters/character-details';
 import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
 export default function AdminCharacterDetailsPage({
   params,
 }: {
-  params: { id: string };
+  params: Promise<{ id: string }>;
 }) {
+  const { id: characterId } = use(params);
   const router = useRouter();
-  const characterId = params.id;
 
   const handleBackToList = () => {
     router.push('/dashboard/admin/characters');

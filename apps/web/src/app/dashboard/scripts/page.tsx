@@ -252,11 +252,11 @@ function ScriptsPageContent() {
   const getTypeColor = (type: string) => {
     switch (type) {
       case 'MOB':
-        return 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-300';
+        return 'bg-emerald-500/10 text-emerald-500';
       case 'OBJECT':
-        return 'bg-purple-100 text-purple-800 dark:bg-purple-900/30 dark:text-purple-300';
+        return 'bg-purple-500/10 text-purple-400';
       case 'WORLD':
-        return 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-300';
+        return 'bg-primary/10 text-primary';
       default:
         return 'bg-muted text-muted-foreground';
     }
@@ -316,7 +316,7 @@ function ScriptsPageContent() {
             <p className='text-muted-foreground mt-1'>
               Manage Lua scripts for mobs, objects, and zones
               {needsReviewCount > 0 && (
-                <span className='ml-2 text-yellow-600 dark:text-yellow-400'>
+                <span className='ml-2 text-yellow-500'>
                   ({needsReviewCount} need review)
                 </span>
               )}
@@ -384,11 +384,9 @@ function ScriptsPageContent() {
           ) : (
             filteredTriggers.map(trigger => (
               <Card
-                key={trigger.id}
+                key={`${trigger.zoneId}-${trigger.id}`}
                 className={`hover:shadow-md transition-shadow ${
-                  trigger.needsReview
-                    ? 'border-yellow-500 dark:border-yellow-600'
-                    : ''
+                  trigger.needsReview ? 'border-yellow-500' : ''
                 }`}
               >
                 <CardHeader className='pb-3'>
@@ -404,7 +402,7 @@ function ScriptsPageContent() {
                         {trigger.needsReview && (
                           <Badge
                             variant='outline'
-                            className='text-yellow-600 border-yellow-600 dark:text-yellow-400 dark:border-yellow-400'
+                            className='text-yellow-500 border-yellow-500'
                           >
                             <AlertTriangle className='w-3 h-3 mr-1' />
                             Review
@@ -423,7 +421,7 @@ function ScriptsPageContent() {
                           onClick={() => handleMarkReviewed(trigger)}
                           title='Mark as reviewed'
                         >
-                          <Check className='w-4 h-4 text-green-600' />
+                          <Check className='w-4 h-4 text-emerald-500' />
                         </Button>
                       )}
                       <Button
@@ -437,7 +435,7 @@ function ScriptsPageContent() {
                         variant='ghost'
                         size='sm'
                         onClick={() => handleDeleteScript(trigger)}
-                        className='text-red-600 hover:text-red-700'
+                        className='text-destructive hover:text-destructive/80'
                       >
                         <Trash2 className='w-4 h-4' />
                       </Button>

@@ -13,7 +13,6 @@ import {
 import { TriggersService } from './triggers.service';
 
 @Resolver(() => TriggerDto)
-@UseGuards(JwtAuthGuard)
 export class TriggersResolver {
   constructor(private readonly triggersService: TriggersService) {}
 
@@ -79,6 +78,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async createTrigger(
     @Args('input') input: CreateTriggerInput,
     @CurrentUser() user: Users
@@ -91,6 +91,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async updateTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -110,6 +111,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async deleteTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -122,6 +124,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async attachTrigger(
     @Args('input') input: AttachTriggerInput,
     @CurrentUser() user: Users
@@ -134,6 +137,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async detachTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -151,6 +155,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
+  @UseGuards(JwtAuthGuard)
   async markTriggerReviewed(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
