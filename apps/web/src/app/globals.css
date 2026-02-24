@@ -21,69 +21,99 @@
   --color-popover-foreground: hsl(var(--popover-foreground));
   --color-card: hsl(var(--card));
   --color-card-foreground: hsl(var(--card-foreground));
+  --color-sidebar: hsl(var(--sidebar));
+  --color-sidebar-foreground: hsl(var(--sidebar-foreground));
+  --color-sidebar-border: hsl(var(--sidebar-border));
+  --color-sidebar-accent: hsl(var(--sidebar-accent));
+  --color-gold: hsl(var(--gold));
+  --color-copper: hsl(var(--copper));
+  --font-display: var(--font-cinzel);
+  --font-body: var(--font-jakarta);
 }
 
+/* ============================================
+   Ember & Stone Theme
+   ============================================ */
+
 @layer base {
+  /* Light Mode: Warm Parchment */
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    --background: 40 33% 97%;
+    --foreground: 24 10% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 24 10% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 24 10% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 32 95% 37%;
+    --primary-foreground: 40 33% 97%;
 
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222.2 84% 4.9%;
+    --secondary: 30 15% 93%;
+    --secondary-foreground: 24 10% 10%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 24 6% 93%;
+    --muted-foreground: 24 5% 40%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222.2 84% 4.9%;
+    --accent: 30 15% 93%;
+    --accent-foreground: 24 10% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 24 6% 83%;
+    --input: 24 6% 83%;
+    --ring: 38 92% 50%;
 
     --radius: 0.5rem;
+
+    --sidebar: 30 10% 95%;
+    --sidebar-foreground: 24 10% 10%;
+    --sidebar-border: 24 6% 88%;
+    --sidebar-accent: 32 95% 37%;
+
+    --gold: 38 92% 50%;
+    --copper: 25 70% 45%;
   }
 
+  /* Dark Mode: Deep Warm Stone */
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    --background: 20 14% 4%;
+    --foreground: 30 10% 90%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 20 12% 10%;
+    --card-foreground: 30 10% 90%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 20 12% 10%;
+    --popover-foreground: 30 10% 90%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 38 92% 50%;
+    --primary-foreground: 20 14% 6%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 20 10% 15%;
+    --secondary-foreground: 30 10% 90%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 20 10% 15%;
+    --muted-foreground: 24 5% 64%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 24 10% 16%;
+    --accent-foreground: 30 10% 90%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 20 10% 15%;
+    --input: 20 10% 18%;
+    --ring: 38 92% 50%;
+
+    --sidebar: 20 14% 6%;
+    --sidebar-foreground: 30 10% 90%;
+    --sidebar-border: 20 10% 15%;
+    --sidebar-accent: 38 92% 50%;
+
+    --gold: 38 92% 50%;
+    --copper: 25 70% 50%;
   }
 }
 
@@ -95,7 +125,64 @@
   }
   body {
     @apply bg-background text-foreground;
+    font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
   }
+}
+
+/* ============================================
+   Custom Animations
+   ============================================ */
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-16px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes glow-pulse {
+  0%, 100% {
+    box-shadow: 0 0 4px hsl(var(--gold) / 0.3);
+  }
+  50% {
+    box-shadow: 0 0 16px hsl(var(--gold) / 0.5);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out both;
+}
+
+.animate-slide-in-left {
+  animation: slide-in-left 0.25s ease-out both;
+}
+
+.animate-glow-pulse {
+  animation: glow-pulse 2s ease-in-out infinite;
+}
+
+/* Font utility classes */
+.font-display {
+  font-family: var(--font-cinzel), ui-serif, Georgia, serif;
+}
+
+.font-body {
+  font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
 /* React Flow Z-level layering fix */
@@ -119,92 +206,92 @@
    Blockly Effect Editor Theme Styles
    ============================================ */
 
-/* Light theme (default) */
+/* Light theme (default) — warm parchment tones */
 .blocklySvg {
-  background-color: #f8fafc !important;
+  background-color: #faf9f6 !important;
 }
 .blocklyMainBackground {
-  fill: #f8fafc !important;
+  fill: #faf9f6 !important;
 }
 .blocklyToolboxDiv {
-  background-color: #f1f5f9 !important;
-  color: #1e293b !important;
+  background-color: #f5f0eb !important;
+  color: #1c1917 !important;
 }
 .blocklyTreeLabel {
-  color: #1e293b !important;
+  color: #1c1917 !important;
 }
 .blocklyFlyout {
-  background-color: #f1f5f9 !important;
+  background-color: #f5f0eb !important;
 }
 .blocklyFlyoutBackground {
-  fill: #f1f5f9 !important;
+  fill: #f5f0eb !important;
   fill-opacity: 0.95 !important;
 }
 .blocklyScrollbarHandle {
-  fill: #94a3b8 !important;
+  fill: #a8a29e !important;
   fill-opacity: 0.6 !important;
 }
 .blocklyScrollbarBackground {
   fill: transparent !important;
 }
 .blocklyTreeRow:hover {
-  background-color: #e2e8f0 !important;
+  background-color: #e7e5e4 !important;
 }
 .blocklyTreeSelected {
-  background-color: #cbd5e1 !important;
+  background-color: #d6d3d1 !important;
 }
 .blocklyTreeIcon {
-  fill: #1e293b !important;
+  fill: #1c1917 !important;
 }
 
-/* Dark theme - targets .dark class on html element */
+/* Dark theme — deep warm stone */
 .dark .blocklySvg {
-  background-color: #1e1e2e !important;
+  background-color: #1c1917 !important;
 }
 .dark .blocklyMainBackground {
-  fill: #1e1e2e !important;
+  fill: #1c1917 !important;
 }
 .dark .blocklyToolboxDiv {
-  background-color: #11111b !important;
-  color: #cdd6f4 !important;
+  background-color: #0c0a09 !important;
+  color: #d6d3d1 !important;
 }
 .dark .blocklyToolboxContents {
-  background-color: #11111b !important;
+  background-color: #0c0a09 !important;
 }
 .dark .blocklyToolboxCategory {
-  background-color: #11111b !important;
+  background-color: #0c0a09 !important;
 }
 .dark .blocklyTreeRoot {
-  background-color: #11111b !important;
+  background-color: #0c0a09 !important;
 }
 .dark .blocklyTreeRow {
-  background-color: #11111b !important;
+  background-color: #0c0a09 !important;
 }
 .dark .blocklyTreeLabel {
-  color: #cdd6f4 !important;
+  color: #d6d3d1 !important;
 }
 .dark .blocklyTreeRowContentContainer {
-  background-color: #11111b !important;
+  background-color: #0c0a09 !important;
 }
 .dark .blocklyFlyout {
-  background-color: #181825 !important;
+  background-color: #1c1917 !important;
 }
 .dark .blocklyFlyoutBackground {
-  fill: #181825 !important;
+  fill: #1c1917 !important;
   fill-opacity: 0.95 !important;
 }
 .dark .blocklyScrollbarHandle {
-  fill: #585b70 !important;
+  fill: #57534e !important;
   fill-opacity: 0.7 !important;
 }
 .dark .blocklyTreeRow:hover {
-  background-color: #313244 !important;
+  background-color: #292524 !important;
 }
 .dark .blocklyTreeSelected {
-  background-color: #45475a !important;
+  background-color: #44403c !important;
 }
 .dark .blocklyTreeIcon {
-  fill: #cdd6f4 !important;
+  fill: #d6d3d1 !important;
 }
 /* Category color icons in dark mode */
 .dark .blocklyTreeRowContentContainer .blocklyTreeIcon {
@@ -214,52 +301,52 @@
 /* Fallback for system dark mode preference (before .dark class is applied) */
 @media (prefers-color-scheme: dark) {
   html:not(.light) .blocklySvg {
-    background-color: #1e1e2e !important;
+    background-color: #1c1917 !important;
   }
   html:not(.light) .blocklyMainBackground {
-    fill: #1e1e2e !important;
+    fill: #1c1917 !important;
   }
   html:not(.light) .blocklyToolboxDiv {
-    background-color: #11111b !important;
-    color: #cdd6f4 !important;
+    background-color: #0c0a09 !important;
+    color: #d6d3d1 !important;
   }
   html:not(.light) .blocklyToolboxContents {
-    background-color: #11111b !important;
+    background-color: #0c0a09 !important;
   }
   html:not(.light) .blocklyToolboxCategory {
-    background-color: #11111b !important;
+    background-color: #0c0a09 !important;
   }
   html:not(.light) .blocklyTreeRoot {
-    background-color: #11111b !important;
+    background-color: #0c0a09 !important;
   }
   html:not(.light) .blocklyTreeRow {
-    background-color: #11111b !important;
+    background-color: #0c0a09 !important;
   }
   html:not(.light) .blocklyTreeLabel {
-    color: #cdd6f4 !important;
+    color: #d6d3d1 !important;
   }
   html:not(.light) .blocklyTreeRowContentContainer {
-    background-color: #11111b !important;
+    background-color: #0c0a09 !important;
   }
   html:not(.light) .blocklyFlyout {
-    background-color: #181825 !important;
+    background-color: #1c1917 !important;
   }
   html:not(.light) .blocklyFlyoutBackground {
-    fill: #181825 !important;
+    fill: #1c1917 !important;
     fill-opacity: 0.95 !important;
   }
   html:not(.light) .blocklyScrollbarHandle {
-    fill: #585b70 !important;
+    fill: #57534e !important;
     fill-opacity: 0.7 !important;
   }
   html:not(.light) .blocklyTreeRow:hover {
-    background-color: #313244 !important;
+    background-color: #292524 !important;
   }
   html:not(.light) .blocklyTreeSelected {
-    background-color: #45475a !important;
+    background-color: #44403c !important;
   }
   html:not(.light) .blocklyTreeIcon {
-    fill: #cdd6f4 !important;
+    fill: #d6d3d1 !important;
   }
   html:not(.light) .blocklyTreeRowContentContainer .blocklyTreeIcon {
     background-color: inherit !important;

@@ -206,7 +206,7 @@ export default function RacesPage() {
   if (loading) {
     return (
       <div className='flex items-center justify-center h-96'>
-        <Loader2 className='h-8 w-8 animate-spin text-gray-500' />
+        <Loader2 className='h-8 w-8 animate-spin text-muted-foreground' />
       </div>
     );
   }
@@ -214,9 +214,9 @@ export default function RacesPage() {
   if (error) {
     return (
       <div className='container mx-auto p-6'>
-        <Alert className='bg-red-50 border-red-200'>
-          <XCircle className='h-4 w-4 text-red-600' />
-          <AlertDescription className='text-red-800'>
+        <Alert className='bg-destructive/10 border-destructive/30'>
+          <XCircle className='h-4 w-4 text-destructive' />
+          <AlertDescription className='text-destructive'>
             Error loading races: {error.message}
           </AlertDescription>
         </Alert>
@@ -228,22 +228,24 @@ export default function RacesPage() {
     <div className='container mx-auto p-6'>
       <div className='mb-6'>
         <h1 className='text-3xl font-bold mb-2'>Races</h1>
-        <p className='text-gray-600'>Edit race attributes and statistics</p>
+        <p className='text-muted-foreground'>
+          Edit race attributes and statistics
+        </p>
       </div>
 
       {successMessage && (
-        <Alert className='mb-4 bg-green-50 border-green-200'>
-          <CheckCircle className='h-4 w-4 text-green-600' />
-          <AlertDescription className='text-green-800'>
+        <Alert className='mb-4 bg-green-950/20 border-green-800/30'>
+          <CheckCircle className='h-4 w-4 text-green-500' />
+          <AlertDescription className='text-green-400'>
             {successMessage}
           </AlertDescription>
         </Alert>
       )}
 
       {errorMessage && (
-        <Alert className='mb-4 bg-red-50 border-red-200'>
-          <XCircle className='h-4 w-4 text-red-600' />
-          <AlertDescription className='text-red-800'>
+        <Alert className='mb-4 bg-destructive/10 border-destructive/30'>
+          <XCircle className='h-4 w-4 text-destructive' />
+          <AlertDescription className='text-destructive'>
             {errorMessage}
           </AlertDescription>
         </Alert>
@@ -275,7 +277,7 @@ export default function RacesPage() {
               filteredRaces.map((race: any) => (
                 <TableRow
                   key={race.race}
-                  className='cursor-pointer hover:bg-gray-50'
+                  className='cursor-pointer hover:bg-accent'
                   onClick={() => handleRaceClick(race)}
                 >
                   <TableCell className='font-medium'>
@@ -287,17 +289,17 @@ export default function RacesPage() {
                   <TableCell>
                     <div className='flex gap-1'>
                       {race.playable && (
-                        <span className='text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-green-950/30 text-green-400 px-2 py-0.5 rounded'>
                           Playable
                         </span>
                       )}
                       {race.humanoid && (
-                        <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-0.5 rounded'>
                           Humanoid
                         </span>
                       )}
                       {race.magical && (
-                        <span className='text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-purple-950/30 text-purple-400 px-2 py-0.5 rounded'>
                           Magical
                         </span>
                       )}
@@ -338,7 +340,7 @@ export default function RacesPage() {
               <TableRow>
                 <TableCell
                   colSpan={canEdit ? 6 : 5}
-                  className='text-center text-gray-500 py-8'
+                  className='text-center text-muted-foreground py-8'
                 >
                   No races found
                 </TableCell>
@@ -535,7 +537,7 @@ export default function RacesPage() {
                     min={1}
                     required
                   />
-                  <p className='text-xs text-gray-500 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Hit point multiplier (100 = standard)
                   </p>
                 </div>
@@ -555,7 +557,7 @@ export default function RacesPage() {
                     min={1}
                     required
                   />
-                  <p className='text-xs text-gray-500 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Experience point multiplier (100 = standard)
                   </p>
                 </div>
@@ -601,17 +603,17 @@ export default function RacesPage() {
                   <div className='space-y-1 text-sm'>
                     <div className='flex items-center gap-2'>
                       {selectedRace?.playable && (
-                        <span className='text-xs bg-green-100 text-green-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-green-950/30 text-green-400 px-2 py-0.5 rounded'>
                           Playable
                         </span>
                       )}
                       {selectedRace?.humanoid && (
-                        <span className='text-xs bg-blue-100 text-blue-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-primary/10 text-primary px-2 py-0.5 rounded'>
                           Humanoid
                         </span>
                       )}
                       {selectedRace?.magical && (
-                        <span className='text-xs bg-purple-100 text-purple-700 px-2 py-0.5 rounded'>
+                        <span className='text-xs bg-purple-950/30 text-purple-400 px-2 py-0.5 rounded'>
                           Magical
                         </span>
                       )}
@@ -650,7 +652,7 @@ export default function RacesPage() {
                 <h3 className='font-semibold text-sm mb-2'>
                   Permanent Effects
                 </h3>
-                <p className='text-sm text-gray-500'>
+                <p className='text-sm text-muted-foreground'>
                   Effect management via junction tables coming soon (Phase 3).
                 </p>
               </div>
@@ -663,7 +665,7 @@ export default function RacesPage() {
                 </h3>
                 {loadingSkills ? (
                   <div className='flex items-center justify-center py-4'>
-                    <Loader2 className='h-6 w-6 animate-spin text-gray-500' />
+                    <Loader2 className='h-6 w-6 animate-spin text-muted-foreground' />
                   </div>
                 ) : (raceSkillsData as any)?.raceSkills &&
                   (raceSkillsData as any).raceSkills.length > 0 ? (
@@ -671,18 +673,18 @@ export default function RacesPage() {
                     {(raceSkillsData as any).raceSkills.map((skill: any) => (
                       <div
                         key={skill.id}
-                        className='flex items-center justify-between p-2 bg-gray-50 rounded'
+                        className='flex items-center justify-between p-2 bg-muted rounded'
                       >
                         <div>
                           <div className='font-medium text-sm'>
                             {skill.skillName}
                           </div>
-                          <div className='text-xs text-gray-500'>
+                          <div className='text-xs text-muted-foreground'>
                             {skill.category}
                           </div>
                         </div>
                         {skill.bonus > 0 && (
-                          <span className='text-xs bg-green-100 text-green-700 px-2 py-1 rounded'>
+                          <span className='text-xs bg-green-950/30 text-green-400 px-2 py-1 rounded'>
                             +{skill.bonus} bonus
                           </span>
                         )}
@@ -690,7 +692,7 @@ export default function RacesPage() {
                     ))}
                   </div>
                 ) : (
-                  <p className='text-sm text-gray-500'>
+                  <p className='text-sm text-muted-foreground'>
                     No abilities or spells assigned
                   </p>
                 )}

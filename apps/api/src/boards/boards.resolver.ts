@@ -1,13 +1,5 @@
 import { UseGuards } from '@nestjs/common';
-import {
-  Args,
-  Int,
-  Mutation,
-  Parent,
-  Query,
-  ResolveField,
-  Resolver,
-} from '@nestjs/graphql';
+import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { Prisma } from '@prisma/client';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
@@ -128,11 +120,6 @@ export class BoardsResolver {
   ): Promise<BoardDto> {
     const board = await this.boardsService.deleteBoard(id);
     return this.mapBoard(board as BoardWithCount);
-  }
-
-  @ResolveField(() => Int)
-  messageCount(@Parent() board: BoardWithCount): number {
-    return board._count?.messages ?? board.messages?.length ?? 0;
   }
 
   private mapBoard(board: BoardWithCount): BoardDto {

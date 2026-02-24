@@ -188,11 +188,23 @@ export class ShopsResolver {
   @Mutation(() => ShopDto)
   @UseGuards(JwtAuthGuard)
   async createShop(@Args('data') data: CreateShopInput): Promise<ShopDto> {
-    const { zoneId, ...shopData } = data;
     const shop = await this.shopsService.create({
-      ...shopData,
-      zones: {
-        connect: { id: zoneId },
+      id: data.id,
+      buyProfit: data.buyProfit ?? 1.0,
+      sellProfit: data.sellProfit ?? 1.0,
+      temper: data.temper ?? 0,
+      flags: data.flags ?? [],
+      tradesWithFlags: data.tradesWithFlags ?? [],
+      noSuchItemMessages: data.noSuchItemMessages ?? [],
+      doNotBuyMessages: data.doNotBuyMessages ?? [],
+      missingCashMessages: data.missingCashMessages ?? [],
+      buyMessages: data.buyMessages ?? [],
+      sellMessages: data.sellMessages ?? [],
+      zones: { connect: { id: data.zoneId } },
+      mobs: {
+        connect: {
+          zoneId_id: { zoneId: data.keeperZoneId, id: data.keeperId },
+        },
       },
     });
     return this.mapShopToDto(shop);

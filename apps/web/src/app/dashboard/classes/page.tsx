@@ -484,18 +484,18 @@ export default function ClassesPage() {
       {/* Main Content */}
       <div className='flex-1 flex flex-col overflow-hidden'>
         {successMessage && (
-          <Alert className='mx-6 mt-4 bg-green-50 border-green-200'>
-            <CheckCircle className='h-4 w-4 text-green-600' />
-            <AlertDescription className='text-green-800'>
+          <Alert className='mx-6 mt-4 bg-green-950/20 border-green-800/30'>
+            <CheckCircle className='h-4 w-4 text-green-500' />
+            <AlertDescription className='text-green-400'>
               {successMessage}
             </AlertDescription>
           </Alert>
         )}
 
         {errorMessage && (
-          <Alert className='mx-6 mt-4 bg-red-50 border-red-200'>
-            <XCircle className='h-4 w-4 text-red-600' />
-            <AlertDescription className='text-red-800'>
+          <Alert className='mx-6 mt-4 bg-destructive/10 border-destructive/30'>
+            <XCircle className='h-4 w-4 text-destructive' />
+            <AlertDescription className='text-destructive'>
               {errorMessage}
             </AlertDescription>
           </Alert>
@@ -806,7 +806,7 @@ export default function ClassesPage() {
                                         })
                                       }
                                     >
-                                      <Trash2 className='h-4 w-4 text-red-600' />
+                                      <Trash2 className='h-4 w-4 text-destructive' />
                                     </Button>
                                   </TableCell>
                                 )}
@@ -955,7 +955,7 @@ export default function ClassesPage() {
                                             })
                                           }
                                         >
-                                          <Trash2 className='h-4 w-4 text-red-600' />
+                                          <Trash2 className='h-4 w-4 text-destructive' />
                                         </Button>
                                       </TableCell>
                                     )}
@@ -991,7 +991,7 @@ export default function ClassesPage() {
 
                                           {addingSpellToCircle ===
                                             String(circle.id) && (
-                                            <div className='border rounded-lg p-3 mb-3 bg-white space-y-2'>
+                                            <div className='border rounded-lg p-3 mb-3 bg-card space-y-2'>
                                               <div className='grid grid-cols-3 gap-2'>
                                                 <div className='grid gap-1'>
                                                   <Label className='text-xs'>
@@ -1103,7 +1103,7 @@ export default function ClassesPage() {
                                                 (spell: CircleSpell) => (
                                                   <div
                                                     key={spell.id}
-                                                    className='flex items-center justify-between p-2 bg-white rounded border'
+                                                    className='flex items-center justify-between p-2 bg-card rounded border'
                                                   >
                                                     <div className='flex-1'>
                                                       <span className='text-sm'>

@@ -155,7 +155,7 @@ export default function AccountStoragePage() {
                   </div>
                   <div className='p-4 bg-muted rounded-lg'>
                     <div className='text-sm text-muted-foreground'>Silver</div>
-                    <div className='text-2xl font-bold text-gray-400'>
+                    <div className='text-2xl font-bold text-muted-foreground'>
                       {wealthDisplay.silver.toLocaleString()}
                     </div>
                   </div>

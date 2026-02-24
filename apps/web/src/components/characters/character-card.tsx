@@ -114,7 +114,7 @@ const CharacterCardComponent = ({
   const getAlignmentColor = (alignment: number) => {
     if (alignment > 200) return 'text-blue-600';
     if (alignment > 50) return 'text-green-600';
-    if (alignment > -50) return 'text-gray-600';
+    if (alignment > -50) return 'text-muted-foreground';
     if (alignment > -200) return 'text-orange-600';
     return 'text-red-600';
   };
@@ -139,7 +139,8 @@ const CharacterCardComponent = ({
             <CardDescription className='mt-1'>
               Level {character.level}
               {character.raceType && ` ${formatRace(character.raceType)}`}
-              {character.playerClass && ` ${formatClass(character.playerClass)}`}
+              {character.playerClass &&
+                ` ${formatClass(character.playerClass)}`}
             </CardDescription>
             {character.title && (
               <div className='text-xs text-muted-foreground italic mt-1'>
@@ -171,11 +172,13 @@ const CharacterCardComponent = ({
           <>
             {/* Core Stats */}
             <div className='space-y-2'>
-              <h4 className='text-sm font-medium text-gray-700'>Core Stats</h4>
+              <h4 className='text-sm font-medium text-muted-foreground'>
+                Core Stats
+              </h4>
               <div className='grid grid-cols-2 gap-2 text-xs'>
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>STR</span>
                       <span>{character.strength}</span>
                     </TooltipTrigger>
@@ -189,7 +192,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>INT</span>
                       <span>{character.intelligence}</span>
                     </TooltipTrigger>
@@ -201,7 +204,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>WIS</span>
                       <span>{character.wisdom}</span>
                     </TooltipTrigger>
@@ -213,7 +216,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>DEX</span>
                       <span>{character.dexterity}</span>
                     </TooltipTrigger>
@@ -225,7 +228,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>CON</span>
                       <span>{character.constitution}</span>
                     </TooltipTrigger>
@@ -239,7 +242,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>CHA</span>
                       <span>{character.charisma}</span>
                     </TooltipTrigger>
@@ -253,7 +256,7 @@ const CharacterCardComponent = ({
 
                 <TooltipProvider>
                   <Tooltip>
-                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-gray-50'>
+                    <TooltipTrigger className='flex justify-between p-1 rounded hover:bg-accent'>
                       <span>LCK</span>
                       <span>{character.luck}</span>
                     </TooltipTrigger>

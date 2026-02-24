@@ -1282,8 +1282,8 @@ model Shops {
   missingCashMessages String[]         @default([]) @map("missing_cash_messages")
   buyMessages         String[]         @default([]) @map("buy_messages")
   sellMessages        String[]         @default([]) @map("sell_messages")
-  keeperZoneId        Int?             @map("keeper_zone_id")
-  keeperId            Int?             @map("keeper_id")
+  keeperZoneId        Int              @map("keeper_zone_id")
+  keeperId            Int              @map("keeper_id")
   zoneId              Int              @map("zone_id")
   createdAt           DateTime         @default(now()) @map("created_at")
   updatedAt           DateTime         @updatedAt @map("updated_at")
@@ -1297,7 +1297,7 @@ model Shops {
   shopMobs            ShopMobs[]
   shopRooms           ShopRooms[]
   shopAbilities       ShopAbilities[]
-  mobs                Mobs?            @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
+  mobs                Mobs             @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
   zones               Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@id([zoneId, id])

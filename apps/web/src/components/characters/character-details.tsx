@@ -206,7 +206,7 @@ export function CharacterDetails({
   const getAlignmentColor = (alignment: number) => {
     if (alignment > 200) return 'text-blue-600';
     if (alignment > 50) return 'text-green-600';
-    if (alignment > -50) return 'text-gray-600';
+    if (alignment > -50) return 'text-muted-foreground';
     if (alignment > -200) return 'text-orange-600';
     return 'text-red-600';
   };
@@ -353,7 +353,7 @@ export function CharacterDetails({
                 </div>
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
-                    <Shield className='h-4 w-4 text-gray-500' />
+                    <Shield className='h-4 w-4 text-muted-foreground' />
                     <span>Armor Class</span>
                   </div>
                   <span className='font-mono'>{character.armorClass}</span>
@@ -422,31 +422,31 @@ export function CharacterDetails({
               </CardHeader>
               <CardContent>
                 <div className='grid grid-cols-2 gap-4'>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Strength</span>
                     <span className='font-mono'>{character.strength}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Intelligence</span>
                     <span className='font-mono'>{character.intelligence}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Wisdom</span>
                     <span className='font-mono'>{character.wisdom}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Dexterity</span>
                     <span className='font-mono'>{character.dexterity}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Constitution</span>
                     <span className='font-mono'>{character.constitution}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Charisma</span>
                     <span className='font-mono'>{character.charisma}</span>
                   </div>
-                  <div className='flex justify-between p-2 rounded hover:bg-gray-50'>
+                  <div className='flex justify-between p-2 rounded hover:bg-accent'>
                     <span>Luck</span>
                     <span className='font-mono'>{character.luck}</span>
                   </div>

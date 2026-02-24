@@ -1,4 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
+import { IsArray, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { Type } from 'class-transformer';
 
 @InputType()
 export class RoomReferenceInput {
@@ -11,18 +13,45 @@ export class RoomReferenceInput {
 
 @InputType()
 export class UpdatePreferencesInput {
-  @Field({ nullable: true, description: 'Theme preference: light, dark, or system' })
+  @Field({
+    nullable: true,
+    description: 'Theme preference: light, dark, or system',
+  })
+  @IsOptional()
+  @IsString()
   theme?: string;
 
-  @Field({ nullable: true, description: 'View mode preference: player or admin' })
+  @Field({
+    nullable: true,
+    description: 'View mode preference: player or admin',
+  })
+  @IsOptional()
+  @IsString()
   viewMode?: string;
 
-  @Field(() => [Int], { nullable: true, description: 'List of favorite zone IDs' })
+  @Field(() => [Int], {
+    nullable: true,
+    description: 'List of favorite zone IDs',
+  })
+  @IsOptional()
+  @IsArray()
   favoriteZones?: number[];
 
-  @Field(() => [Int], { nullable: true, description: 'Recently visited zone IDs' })
+  @Field(() => [Int], {
+    nullable: true,
+    description: 'Recently visited zone IDs',
+  })
+  @IsOptional()
+  @IsArray()
   recentZones?: number[];
 
-  @Field(() => [RoomReferenceInput], { nullable: true, description: 'Recently visited rooms' })
+  @Field(() => [RoomReferenceInput], {
+    nullable: true,
+    description: 'Recently visited rooms',
+  })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => RoomReferenceInput)
   recentRooms?: RoomReferenceInput[];
 }

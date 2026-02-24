@@ -40,24 +40,30 @@ export default function LoginPage() {
   if (loading) {
     return (
       <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
-        <Loader2 className='h-8 w-8 animate-spin' />
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
       </div>
     );
   }
 
   return (
-    <div className='min-h-screen flex items-center justify-center bg-background py-12 px-4 sm:px-6 lg:px-8 text-foreground'>
-      <div className='max-w-md w-full space-y-8'>
-        <div>
-          <h2 className='mt-6 text-center text-3xl font-extrabold text-foreground'>
-            Sign in to Muditor
+    <div className='min-h-screen flex items-center justify-center bg-background text-foreground relative overflow-hidden'>
+      {/* Ambient gradient */}
+      <div className='absolute inset-0 bg-[radial-gradient(ellipse_at_center,hsl(var(--gold)/0.06)_0%,transparent_70%)]' />
+
+      <div className='relative max-w-md w-full px-4 animate-fade-in'>
+        <div className='text-center mb-8'>
+          <Link href='/'>
+            <h1 className='text-3xl font-display font-bold text-foreground tracking-wider mb-1'>
+              MUDITOR
+            </h1>
+          </Link>
+          <div className='w-16 h-px bg-gradient-to-r from-transparent via-primary/50 to-transparent mx-auto mb-3' />
+          <h2 className='text-xl font-display text-foreground/80'>
+            Enter the Realm
           </h2>
-          <p className='mt-2 text-center text-sm text-muted-foreground'>
-            World building and administration tool
-          </p>
         </div>
 
-        <Card>
+        <Card className='border-border/50 shadow-xl backdrop-blur-sm bg-card/95'>
           <CardHeader>
             <CardTitle>Login</CardTitle>
             <CardDescription>
@@ -82,6 +88,7 @@ export default function LoginPage() {
                   required
                   disabled={isLoading}
                   placeholder='Enter your username or email'
+                  className='focus-visible:ring-primary'
                 />
               </div>
 
@@ -95,6 +102,7 @@ export default function LoginPage() {
                   required
                   disabled={isLoading}
                   placeholder='Enter your password'
+                  className='focus-visible:ring-primary'
                 />
               </div>
 
@@ -116,7 +124,7 @@ export default function LoginPage() {
               </span>
               <Link
                 href='/register'
-                className='font-medium text-primary hover:text-primary-foreground'
+                className='font-medium text-primary hover:text-primary/80'
               >
                 Sign up
               </Link>
@@ -125,7 +133,7 @@ export default function LoginPage() {
             <div className='mt-2 text-center text-sm'>
               <Link
                 href='/forgot-password'
-                className='font-medium text-primary hover:text-primary-foreground'
+                className='font-medium text-muted-foreground hover:text-foreground'
               >
                 Forgot your password?
               </Link>

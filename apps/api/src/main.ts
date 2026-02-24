@@ -132,7 +132,7 @@ async function bootstrap() {
 
   Logger.log(`🚀 API is running on: http://${host}:${port}/${globalPrefix}`);
   Logger.log(`📊 GraphQL Playground: http://${host}:${port}/graphql`);
-  Logger.log(`📝 Error logs will be saved to: logs/error.log`);
+  Logger.log(`📝 Logs directory: ${loggingService.logDir}`);
 
   await loggingService.logInfo(
     'Application started successfully',

@@ -98,7 +98,9 @@ function ZonesContent() {
     <div>
       <div className='flex items-center justify-between mb-6'>
         <div>
-          <h1 className='text-3xl font-bold text-foreground'>Zones</h1>
+          <h1 className='text-3xl font-bold font-display text-foreground'>
+            Zones
+          </h1>
           <p className='text-muted-foreground mt-1'>
             {filteredZones.length} of {zones.length} zones,{' '}
             {roomsCount.toLocaleString()} rooms total
@@ -133,7 +135,7 @@ function ZonesContent() {
               type='text'
               id='search'
               placeholder='Search by name or ID...'
-              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+              className='w-full px-3 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
               value={searchTerm}
               onChange={e => setSearchTerm(e.target.value)}
             />
@@ -147,7 +149,7 @@ function ZonesContent() {
             </label>
             <select
               id='climate'
-              className='w-full px-3 py-2 border border-border rounded-md focus:outline-none focus:ring-2 focus:ring-primary'
+              className='w-full px-3 py-2 border border-border rounded-md bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary'
               value={selectedClimate}
               onChange={e => setSelectedClimate(e.target.value)}
             >
@@ -167,7 +169,7 @@ function ZonesContent() {
           <Link
             key={zone.id}
             href={`/dashboard/zones/${zone.id}`}
-            className='bg-card rounded-lg shadow hover:shadow-md transition-shadow p-4'
+            className='bg-card rounded-lg shadow border border-border hover:border-primary/30 hover:shadow-md hover:shadow-primary/5 transition-all p-4'
           >
             <div className='flex items-start justify-between'>
               <div className='flex-1'>

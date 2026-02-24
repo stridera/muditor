@@ -14,12 +14,12 @@ export interface LogEntry {
 @Injectable()
 export class LoggingService {
   private readonly logger = new Logger(LoggingService.name);
-  private readonly logDir: string;
+  readonly logDir: string;
   private readonly maxLogFiles = 10;
   private readonly maxLogSize = 10 * 1024 * 1024; // 10MB
 
   constructor() {
-    this.logDir = path.join(process.cwd(), 'logs');
+    this.logDir = process.env.LOG_DIR || path.join(process.cwd(), 'logs');
     this.ensureLogDirectory();
   }
 
