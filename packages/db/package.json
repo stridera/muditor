@@ -6,7 +6,7 @@
   "types": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate --generator client",
-    "push": "prisma db push && pnpm generate",
+    "push": "prisma db push --skip-generate && pnpm generate",
     "studio": "prisma studio",
     "migrate:dev": "prisma migrate dev && pnpm generate",
     "migrate:reset": "prisma migrate reset && pnpm generate",

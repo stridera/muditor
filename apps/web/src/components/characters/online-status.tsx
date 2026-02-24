@@ -164,7 +164,7 @@ interface CharacterStatusCardProps {
     user?: {
       username: string;
       role: string;
-    };
+    } | null;
   };
   showUser?: boolean;
   showActions?: boolean;
