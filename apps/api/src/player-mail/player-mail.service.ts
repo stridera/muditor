@@ -3,6 +3,7 @@ import {
   ForbiddenException,
   NotFoundException,
 } from '@nestjs/common';
+import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   PlayerMailFilterInput,
@@ -25,7 +26,7 @@ export class PlayerMailService {
     skip?: number,
     take?: number
   ) {
-    const where: any = {};
+    const where: Prisma.PlayerMailWhereInput = {};
 
     if (filter) {
       if (filter.senderCharacterId) {
@@ -78,7 +79,7 @@ export class PlayerMailService {
   }
 
   async countPlayerMail(filter?: PlayerMailFilterInput) {
-    const where: any = {};
+    const where: Prisma.PlayerMailWhereInput = {};
 
     if (filter) {
       if (filter.senderCharacterId) {
@@ -287,7 +288,7 @@ export class PlayerMailService {
     skip?: number,
     take?: number
   ) {
-    const where: any = {};
+    const where: Prisma.AccountMailWhereInput = {};
 
     if (filter) {
       if (filter.senderUserId) {

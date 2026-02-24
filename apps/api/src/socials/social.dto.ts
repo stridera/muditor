@@ -1,4 +1,4 @@
-import { ObjectType, Field, ID, Int, registerEnumType } from '@nestjs/graphql';
+import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
 import { Position } from '@muditor/db';
 
 // Register Position enum for GraphQL (may already be registered elsewhere)

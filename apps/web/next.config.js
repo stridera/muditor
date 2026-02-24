@@ -1,5 +1,9 @@
+// eslint-disable-next-line @typescript-eslint/no-require-imports -- Next config runs in CJS
+const path = require('path');
+
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  outputFileTracingRoot: path.resolve(__dirname, '../..'),
   eslint: {
     // Only run ESLint on these directories during `next build` and `next lint`
     dirs: ['src'],

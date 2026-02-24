@@ -30,6 +30,7 @@ export class EquipmentSetsService {
 
   async findOne(id: string) {
     // TODO: Fix table name
+    void id;
     return null;
     // return this.database.equipmentSet.findUnique({
     //   where: { id },
@@ -45,36 +46,44 @@ export class EquipmentSetsService {
 
   async create(data: CreateEquipmentSetInput) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void data;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async update(id: string, data: UpdateEquipmentSetInput) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void id;
+    void data;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async delete(id: string) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void id;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async createEquipmentSetItem(data: CreateEquipmentSetItemStandaloneInput) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void data;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async deleteEquipmentSetItem(id: string) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void id;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async createMobEquipmentSet(data: CreateMobEquipmentSetInput) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void data;
     throw new Error('Equipment sets not yet implemented');
   }
 
   async deleteMobEquipmentSet(id: string) {
     // TODO: Fix - equipment tables not in Prisma schema
+    void id;
     throw new Error('Equipment sets not yet implemented');
   }
 }

@@ -2,6 +2,7 @@ import { Field, InputType, Int } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import {
   Position,
+  Prisma,
   TargetType,
   TargetScope,
   SaveType,
@@ -146,7 +147,7 @@ export class CreateAbilityEffectInput {
   effectId: number;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  overrideParams?: any;
+  overrideParams?: Prisma.InputJsonValue;
 
   @Field(() => Int, { defaultValue: 0 })
   order: number;
@@ -167,7 +168,7 @@ export class AbilityEffectItemInput {
   effectId: number;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  overrideParams?: any;
+  overrideParams?: Prisma.InputJsonValue;
 
   @Field(() => Int)
   order: number;
@@ -245,7 +246,7 @@ export class CreateAbilitySavingThrowInput {
   dcFormula: string;
 
   @Field(() => GraphQLJSON, { defaultValue: 'NEGATE' })
-  onSaveAction: any;
+  onSaveAction: Prisma.InputJsonValue;
 }
 
 @InputType()
@@ -357,10 +358,10 @@ export class CreateEffectInput {
   tags?: string[];
 
   @Field(() => GraphQLJSON, { nullable: true })
-  defaultParams?: any;
+  defaultParams?: Prisma.InputJsonValue;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: any;
+  paramSchema?: Prisma.InputJsonValue;
 }
 
 @InputType()
@@ -378,8 +379,8 @@ export class UpdateEffectInput {
   tags?: string[];
 
   @Field(() => GraphQLJSON, { nullable: true })
-  defaultParams?: any;
+  defaultParams?: Prisma.InputJsonValue;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: any;
+  paramSchema?: Prisma.InputJsonValue;
 }

@@ -101,9 +101,13 @@ export class GlobalExceptionFilter
   private getErrorMessage(exception: unknown): string {
     if (exception instanceof HttpException) {
       const response = exception.getResponse();
-      return typeof response === 'string'
-        ? response
-        : (response as any).message || exception.message;
+      if (typeof response === 'string') {
+        return response;
+      }
+      return (
+        ((response as Record<string, unknown>).message as string) ||
+        exception.message
+      );
     }
     if (exception instanceof Error) {
       return exception.message;
@@ -118,8 +122,10 @@ export class GlobalExceptionFilter
     return undefined;
   }
 
-  private sanitizeHeaders(headers: any): any {
-    const sanitized = { ...headers };
+  private sanitizeHeaders(
+    headers: Record<string, unknown>
+  ): Record<string, unknown> {
+    const sanitized: Record<string, unknown> = { ...headers };
     const sensitiveHeaders = [
       'authorization',
       'cookie',
@@ -136,12 +142,14 @@ export class GlobalExceptionFilter
     return sanitized;
   }
 
-  private sanitizeBody(body: any): any {
+  private sanitizeBody(body: unknown): unknown {
     if (!body || typeof body !== 'object') {
       return body;
     }
 
-    const sanitized = { ...body };
+    const sanitized: Record<string, unknown> = {
+      ...(body as Record<string, unknown>),
+    };
     const sensitiveFields = ['password', 'token', 'secret', 'apiKey', 'key'];
 
     sensitiveFields.forEach(field => {
@@ -153,11 +161,11 @@ export class GlobalExceptionFilter
     return sanitized;
   }
 
-  private sanitizeVariables(variables: any): any {
+  private sanitizeVariables(variables: unknown): unknown {
     return this.sanitizeBody(variables);
   }
 
-  private logError(errorContext: any) {
+  private logError(errorContext: Record<string, unknown>) {
     const { type, message, stack, timestamp, ...context } = errorContext;
 
     // Create a structured log entry

@@ -225,7 +225,7 @@ export class CharacterItemDto {
   customLongDesc?: string;
 
   @Field(() => GraphQLJSON)
-  customValues: any;
+  customValues: Record<string, unknown>;
 
   @Field()
   createdAt: Date;
@@ -268,7 +268,7 @@ export class CharacterEffectDto {
   strength: number;
 
   @Field(() => GraphQLJSON)
-  modifierData: any;
+  modifierData: Record<string, unknown>;
 
   @Field({ nullable: true })
   sourceType?: string;

@@ -12,7 +12,12 @@ import {
   CreateLoginMessageInput,
   UpdateLoginMessageInput,
 } from './settings.input';
-import { LoginStage, CommandCategory } from '@muditor/db';
+import {
+  LoginStage,
+  CommandCategory,
+  Prisma,
+  SystemTextCategory,
+} from '@muditor/db';
 
 @Injectable()
 export class SettingsService {
@@ -194,7 +199,7 @@ export class SettingsService {
 
     return this.db.levelDefinition.update({
       where: { level },
-      data: data as any,
+      data: data as Prisma.LevelDefinitionUpdateInput,
     });
   }
 
@@ -216,7 +221,7 @@ export class SettingsService {
    */
   async findSystemTextByCategory(category: string) {
     return this.db.systemText.findMany({
-      where: { category: category as any },
+      where: { category: category as SystemTextCategory },
       orderBy: { key: 'asc' },
     });
   }

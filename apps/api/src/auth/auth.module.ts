@@ -6,7 +6,6 @@ import { AuthResolver } from './auth.resolver';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
-import { MinimumRoleGuard } from './guards/minimum-role.guard';
 import { ZonePermissionGuard } from './guards/zone-permission.guard';
 import { UsersModule } from '../users/users.module';
 import { EmailModule } from '../email/email.module';

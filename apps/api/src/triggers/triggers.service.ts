@@ -290,15 +290,17 @@ export class TriggersService {
     if (data.commands !== undefined) updateData.commands = data.commands;
     if (userId !== undefined) updateData.updatedBy = userId;
     if (data.argList) {
-      updateData.argList = {
+      const argListUpdate: Prisma.TriggersUpdateargListInput = {
         set: data.argList,
-      } as Prisma.TriggersUpdateargListInput;
+      };
+      updateData.argList = argListUpdate;
       updateData.numArgs = data.argList.length;
     }
     if (data.flags) {
-      updateData.flags = {
-        set: data.flags,
-      } as Prisma.TriggersUpdateflagsInput;
+      const flagsUpdate: Prisma.TriggersUpdateflagsInput = {
+        set: data.flags as TriggerFlag[],
+      };
+      updateData.flags = flagsUpdate;
     }
     if (data.variables) {
       updateData.variables = JSON.parse(data.variables);

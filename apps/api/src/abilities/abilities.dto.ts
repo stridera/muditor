@@ -2,6 +2,7 @@ import { Field, ObjectType, ID, Int, registerEnumType } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
 import {
   Position,
+  Prisma,
   SaveType,
   TargetType,
   TargetScope,
@@ -48,10 +49,10 @@ export class Effect {
   tags: string[];
 
   @Field(() => GraphQLJSON)
-  defaultParams: any;
+  defaultParams: Prisma.JsonValue;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: any;
+  paramSchema?: Prisma.JsonValue;
 }
 
 @ObjectType()
@@ -66,7 +67,7 @@ export class AbilityEffect {
   effect: Effect;
 
   @Field(() => GraphQLJSON, { nullable: true })
-  overrideParams?: any;
+  overrideParams?: Prisma.JsonValue;
 
   @Field(() => Int)
   order: number;
@@ -105,7 +106,7 @@ export class AbilityTargeting {
 @ObjectType()
 export class AbilityRestrictions {
   @Field(() => [GraphQLJSON])
-  requirements: any[];
+  requirements: Prisma.JsonValue[];
 
   @Field({ nullable: true })
   customRequirementLua?: string;
@@ -123,7 +124,7 @@ export class AbilitySavingThrow {
   dcFormula: string;
 
   @Field(() => GraphQLJSON)
-  onSaveAction: any;
+  onSaveAction: Prisma.JsonValue;
 }
 
 @ObjectType()

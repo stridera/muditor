@@ -35,6 +35,9 @@ function createExtendedPrismaClient() {
     ],
   });
 
+  // Prisma $extends query callbacks require `any` for the destructured { args, query } parameter
+  // because the exact types are deeply generic, model-specific, and inferred by Prisma at the call site.
+  /* eslint-disable @typescript-eslint/no-explicit-any */
   return prisma.$extends({
     query: {
       mobs: {
@@ -191,6 +194,7 @@ function createExtendedPrismaClient() {
       },
     },
   });
+  /* eslint-enable @typescript-eslint/no-explicit-any */
 }
 
 type ExtendedPrismaClient = ReturnType<typeof createExtendedPrismaClient>;
@@ -462,15 +466,18 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   $queryRaw<T = unknown>(
     query: TemplateStringsArray | Prisma.Sql,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches Prisma's $queryRaw signature which uses any[]
     ...values: any[]
   ): Promise<T> {
     return this.client.$queryRaw(query, ...values) as Promise<T>;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches Prisma's $queryRawUnsafe signature which uses any[]
   $queryRawUnsafe<T = unknown>(query: string, ...values: any[]): Promise<T> {
     return this.client.$queryRawUnsafe(query, ...values) as Promise<T>;
   }
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- matches Prisma's $executeRaw signature which uses any[]
   $executeRaw(query: TemplateStringsArray | Prisma.Sql, ...values: any[]) {
     return this.client.$executeRaw(query, ...values);
   }
@@ -488,6 +495,7 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
       >
     ) => Promise<R>
   ): Promise<R>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma $transaction accepts both PrismaPromise<any>[] and function forms
   $transaction<R>(arg: any): Promise<R> {
     return this.client.$transaction(arg) as Promise<R>;
   }

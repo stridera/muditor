@@ -1,4 +1,4 @@
-import type { Effect as PrismaEffect } from '@muditor/db';
+import { Prisma, type Effect as PrismaEffect } from '@muditor/db';
 import { Effect } from '../../abilities/abilities.dto';
 import { ObjectDto } from '../../objects/object.dto';
 import type { ObjectMapperSource } from './types';
@@ -55,7 +55,7 @@ export function mapObject(db: ObjectMapperSource): ObjectDto {
     decomposeTimer: db.decomposeTimer,
     level: db.level,
     concealment: db.concealment,
-    values: db.values as unknown as Record<string, unknown>,
+    values: (db.values ?? {}) as Prisma.JsonValue,
     zoneId: db.zoneId,
     grantedEffects: (db.grantedEffects ?? []).map(ge => ({
       id: ge.id,

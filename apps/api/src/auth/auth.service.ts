@@ -12,6 +12,7 @@ import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
 import { EmailService } from '../email/email.service';
 import type { User } from '../users/entities/user.entity';
+import type { UserPreferences } from '../users/entities/user-preferences.entity';
 import { AuthPayload } from './dto/auth.payload';
 import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
@@ -122,12 +123,16 @@ export class AuthService {
       failedLoginAttempts: _fla,
       lockedUntil: _lu,
       lastFailedLogin: _lfl,
+      preferences,
       ...rest
     } = user as Users;
-    const authUser = {
+    const authUser: SanitizedUser = {
       ...rest,
+      ...(preferences != null
+        ? { preferences: preferences as unknown as UserPreferences }
+        : {}),
       isBanned: false,
-    } as SanitizedUser;
+    };
     if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;
     return { accessToken, user: authUser };
   }
@@ -163,12 +168,16 @@ export class AuthService {
       failedLoginAttempts: _fla2,
       lockedUntil: _lu2,
       lastFailedLogin: _lfl2,
+      preferences: loginPreferences,
       ...rest2
     } = user as Users;
-    const authUser = {
+    const authUser: SanitizedUser = {
       ...rest2,
+      ...(loginPreferences != null
+        ? { preferences: loginPreferences as unknown as UserPreferences }
+        : {}),
       isBanned: false,
-    } as SanitizedUser;
+    };
     if (user.lastLoginAt) authUser.lastLoginAt = user.lastLoginAt;
     return { accessToken, user: authUser };
   }

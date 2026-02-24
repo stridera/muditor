@@ -148,10 +148,11 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
       case 'PLAYER_DEATH':
         announcement = `**${playerName}** has been slain!`;
         break;
-      case 'PLAYER_LEVEL_UP':
+      case 'PLAYER_LEVEL_UP': {
         const { newLevel } = event.data as LevelUpEventData;
         announcement = `**${playerName}** has reached level ${newLevel}!`;
         break;
+      }
     }
 
     if (announcement) {

@@ -1,6 +1,6 @@
 import { InputType, Field, ID } from '@nestjs/graphql';
 import { UserRole } from '@muditor/db';
-import { IsEnum, IsOptional, IsEmail, IsInt, Min, Max } from 'class-validator';
+import { IsEnum, IsOptional, IsEmail } from 'class-validator';
 
 @InputType()
 export class UpdateUserInput {

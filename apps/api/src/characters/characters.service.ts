@@ -1,14 +1,17 @@
 import {
   BadRequestException,
   Injectable,
+  Logger,
   NotFoundException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import crypt from 'unix-crypt-td-js';
+import type { ItemInstanceFlag, Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
 import {
+  type CharacterFilterInput,
   CreateCharacterEffectInput,
   CreateCharacterInput,
   CreateCharacterItemInput,
@@ -19,14 +22,20 @@ import {
 
 @Injectable()
 export class CharactersService {
+  private readonly logger = new Logger(CharactersService.name);
+
   constructor(
     private readonly db: DatabaseService,
     private readonly roleCalculator: RoleCalculatorService
   ) {}
 
   // Character operations
-  async findAllCharacters(skip?: number, take?: number, filter?: any) {
-    const where: any = {};
+  async findAllCharacters(
+    skip?: number,
+    take?: number,
+    filter?: CharacterFilterInput
+  ) {
+    const where: Prisma.CharactersWhereInput = {};
 
     // Build filter conditions
     if (filter?.name) {
@@ -48,7 +57,7 @@ export class CharactersService {
       where.isOnline = filter.isOnline;
     }
 
-    const query: any = {
+    return this.db.characters.findMany({
       where,
       include: {
         characterItems: {
@@ -63,12 +72,9 @@ export class CharactersService {
         characterEffects: true,
       },
       orderBy: { name: 'asc' },
-    };
-
-    if (skip !== undefined) query.skip = skip;
-    if (take !== undefined) query.take = take;
-
-    return this.db.characters.findMany(query);
+      ...(skip !== undefined && { skip }),
+      ...(take !== undefined && { take }),
+    });
   }
 
   async findCharacterById(id: string) {
@@ -122,8 +128,8 @@ export class CharactersService {
     });
   }
 
-  async getCharactersCount(filter?: any) {
-    const where: any = {};
+  async getCharactersCount(filter?: CharacterFilterInput) {
+    const where: Prisma.CharactersWhereInput = {};
 
     // Build filter conditions (same as findAllCharacters)
     if (filter?.name) {
@@ -207,7 +213,7 @@ export class CharactersService {
 
     return this.db.characters.update({
       where: { id },
-      data: data as any,
+      data: data as Prisma.CharactersUpdateInput,
       include: {
         characterItems: {
           include: {
@@ -311,7 +317,7 @@ export class CharactersService {
       equippedLocation: data.equippedLocation ?? null,
       condition: data.condition,
       charges: data.charges,
-      instanceFlags: data.instanceFlags as any,
+      instanceFlags: data.instanceFlags as ItemInstanceFlag[],
       customName: data.customShortDesc ?? null,
       customExamineDescription: data.customLongDesc ?? null,
       customValues: {},
@@ -353,7 +359,7 @@ export class CharactersService {
 
     return this.db.characterItems.update({
       where: { id },
-      data: data as any,
+      data: data as Prisma.CharacterItemsUpdateInput,
       include: {
         characters: true,
         objects: {
@@ -410,7 +416,9 @@ export class CharactersService {
     await this.findCharacterById(data.characterId);
 
     // Duration is stored and expiration is calculated on-the-fly
-    const effectCreateData = {
+    const effectCreateData: Parameters<
+      typeof this.db.characterEffects.create
+    >[0]['data'] = {
       characterId: data.characterId,
       effectId: parseInt(data.effectName, 10),
       duration: data.duration ?? null,
@@ -418,7 +426,7 @@ export class CharactersService {
       sourceType: data.sourceType ?? null,
       sourceId: data.sourceId ?? null,
       appliedAt: new Date(),
-    } as Parameters<typeof this.db.characterEffects.create>[0]['data'];
+    };
     return this.db.characterEffects.create({
       data: effectCreateData,
       include: {
@@ -668,7 +676,7 @@ export class CharactersService {
           where: { id: character.id },
           data: { passwordHash: bcryptHash },
         });
-        console.log(
+        this.logger.log(
           `Upgraded legacy password to bcrypt for character: ${character.name}`
         );
       }
@@ -803,7 +811,7 @@ export class CharactersService {
           where: { id: character.id },
           data: { passwordHash: bcryptHash },
         });
-        console.log(
+        this.logger.log(
           `Upgraded legacy password to bcrypt for character: ${character.name}`
         );
       }

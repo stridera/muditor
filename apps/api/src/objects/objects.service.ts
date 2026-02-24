@@ -1,5 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { type Objects, ObjectType, Prisma } from '@muditor/db';
+import {
+  type Objects,
+  ObjectType,
+  Prisma,
+  ElementType,
+  WearFlag,
+} from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -205,7 +211,7 @@ export class ObjectsService {
     effects: Array<{
       effectId: number;
       strength?: number;
-      modifierData?: any;
+      modifierData?: Prisma.JsonValue;
       wearLocation?: string;
     }>
   ) {
@@ -221,7 +227,7 @@ export class ObjectsService {
             effectId: e.effectId,
             strength: e.strength ?? 1,
             modifierData: e.modifierData ?? {},
-            ...(e.wearLocation && { wearLocation: e.wearLocation as any }),
+            ...(e.wearLocation && { wearLocation: e.wearLocation as WearFlag }),
           })),
         });
       }
@@ -247,7 +253,7 @@ export class ObjectsService {
           data: resistances.map(r => ({
             objectZoneId: zoneId,
             objectId: id,
-            element: r.element as any,
+            element: r.element as ElementType,
             value: r.value,
             allowAbsorption: r.allowAbsorption ?? false,
           })),

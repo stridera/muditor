@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
+import type { Request } from 'express';
 import { DatabaseService } from '../../database/database.service';
 
 @Injectable()
@@ -46,12 +47,12 @@ export class GraphQLJwtAuthGuard {
       // Attach user to request for use in resolvers
       req.user = user;
       return true;
-    } catch (error) {
+    } catch {
       throw new UnauthorizedException('Invalid token');
     }
   }
 
-  private extractTokenFromHeader(request: any): string | undefined {
+  private extractTokenFromHeader(request: Request): string | undefined {
     const [type, token] = request.headers?.authorization?.split(' ') ?? [];
     return type === 'Bearer' ? token : undefined;
   }

@@ -8,6 +8,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
+import { Direction, ExitFlag, ExitState } from '@muditor/db';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 // Import from barrel to ensure mapper files are included in program graph for tooling
 import { mapRoom } from '../common/mappers';
@@ -185,34 +186,42 @@ export class RoomsResolver {
     @Args('data') data: CreateRoomExitInput
   ): Promise<RoomExitDto> {
     const exit = await this.roomsService.createExit(data);
-    const mapped: RoomExitDto = {
-      ...exit,
+    const exitDto: RoomExitDto = {
       id: String(exit.id),
-      defaultState: exit.defaultState as any,
-      description: exit.description ?? undefined,
-      key: exit.key ?? undefined,
-      toZoneId: exit.toZoneId ?? undefined,
-      toRoomId: exit.toRoomId ?? undefined,
-      hitPoints: exit.hitPoints ?? undefined,
-    } as RoomExitDto;
-    return mapped;
+      direction: exit.direction as Direction,
+      keywords: exit.keywords ?? [],
+      flags: (exit.flags ?? []) as ExitFlag[],
+      defaultState: exit.defaultState as ExitState,
+      roomZoneId: exit.roomZoneId,
+      roomId: exit.roomId,
+      ...(exit.description != null ? { description: exit.description } : {}),
+      ...(exit.key != null ? { key: exit.key } : {}),
+      ...(exit.toZoneId != null ? { toZoneId: exit.toZoneId } : {}),
+      ...(exit.toRoomId != null ? { toRoomId: exit.toRoomId } : {}),
+      ...(exit.hitPoints != null ? { hitPoints: exit.hitPoints } : {}),
+    };
+    return exitDto;
   }
 
   @Mutation(() => RoomExitDto)
   @UseGuards(GraphQLJwtAuthGuard)
   async deleteRoomExit(@Args('exitId') exitId: number): Promise<RoomExitDto> {
     const exit = await this.roomsService.deleteExit(exitId);
-    const mapped: RoomExitDto = {
-      ...exit,
+    const exitDto: RoomExitDto = {
       id: String(exit.id),
-      defaultState: exit.defaultState as any,
-      description: exit.description ?? undefined,
-      key: exit.key ?? undefined,
-      toZoneId: exit.toZoneId ?? undefined,
-      toRoomId: exit.toRoomId ?? undefined,
-      hitPoints: exit.hitPoints ?? undefined,
-    } as RoomExitDto;
-    return mapped;
+      direction: exit.direction as Direction,
+      keywords: exit.keywords ?? [],
+      flags: (exit.flags ?? []) as ExitFlag[],
+      defaultState: exit.defaultState as ExitState,
+      roomZoneId: exit.roomZoneId,
+      roomId: exit.roomId,
+      ...(exit.description != null ? { description: exit.description } : {}),
+      ...(exit.key != null ? { key: exit.key } : {}),
+      ...(exit.toZoneId != null ? { toZoneId: exit.toZoneId } : {}),
+      ...(exit.toRoomId != null ? { toRoomId: exit.toRoomId } : {}),
+      ...(exit.hitPoints != null ? { hitPoints: exit.hitPoints } : {}),
+    };
+    return exitDto;
   }
 
   @Mutation(() => RoomDto)

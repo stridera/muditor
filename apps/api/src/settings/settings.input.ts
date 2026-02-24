@@ -11,7 +11,7 @@ import {
   MaxLength,
   IsArray,
 } from 'class-validator';
-import { ConfigValueType, SystemTextCategory, LoginStage } from '@muditor/db';
+import { SystemTextCategory, LoginStage } from '@muditor/db';
 
 // ============================================
 // GameConfig Inputs

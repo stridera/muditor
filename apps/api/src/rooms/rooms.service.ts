@@ -58,8 +58,12 @@ interface RoomServiceResultBase {
   allowsSummon: boolean;
   allowsTeleport: boolean;
   isDeathTrap: boolean;
-  mobResets?: any[]; // Populated for GraphQL field resolvers
-  objectResets?: any[]; // Populated for GraphQL field resolvers
+  mobResets?: Array<{
+    mobs?: { id: number; zoneId: number; name: string; keywords?: string[] };
+  }>; // Populated for GraphQL field resolvers
+  objectResets?: Array<{
+    objects?: { id: number; zoneId: number; name: string; keywords?: string[] };
+  }>; // Populated for GraphQL field resolvers
 }
 
 type RoomServiceResult = RoomServiceResultBase;
@@ -96,8 +100,17 @@ export class RoomsService {
       keywords: string[];
       description: string;
     }>;
-    mobResets?: any[];
-    objectResets?: any[];
+    mobResets?: Array<{
+      mobs?: { id: number; zoneId: number; name: string; keywords?: string[] };
+    }>;
+    objectResets?: Array<{
+      objects?: {
+        id: number;
+        zoneId: number;
+        name: string;
+        keywords?: string[];
+      };
+    }>;
     createdAt: Date;
     updatedAt: Date;
     createdBy?: string | null;

@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 // Import enum only AFTER GraphQL enums have been registered in object.dto (registration side-effect)
-import { ObjectType as ObjectTypeEnum } from '@muditor/db';
+import { ObjectType as ObjectTypeEnum, Prisma } from '@muditor/db';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';
@@ -75,13 +75,17 @@ export class ObjectsResolver {
   async createObject(
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
-    const { zoneId, ...objectData } = data;
-    const created = await this.objectsService.create({
+    const { zoneId, values, ...objectData } = data;
+    const valuesInput =
+      values === null ? Prisma.JsonNull : (values ?? undefined);
+    const createData: Prisma.ObjectsCreateInput = {
       ...objectData,
+      ...(valuesInput !== undefined ? { values: valuesInput } : {}),
       zones: {
         connect: { id: zoneId },
       },
-    });
+    };
+    const created = await this.objectsService.create(createData);
     return mapObject(created);
   }
 
@@ -92,7 +96,14 @@ export class ObjectsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateObjectInput
   ): Promise<ObjectDto> {
-    const updated = await this.objectsService.update(zoneId, id, data);
+    const { values, ...rest } = data;
+    const valuesInput =
+      values === null ? Prisma.JsonNull : (values ?? undefined);
+    const updateData: Prisma.ObjectsUpdateInput = {
+      ...rest,
+      ...(valuesInput !== undefined ? { values: valuesInput } : {}),
+    };
+    const updated = await this.objectsService.update(zoneId, id, updateData);
     return mapObject(updated);
   }
 

@@ -15,7 +15,7 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       direction: e.direction,
       keywords: e.keywords || [],
       flags: e.flags || [],
-      defaultState: (e as any).defaultState ?? 'OPEN',
+      defaultState: e.defaultState ?? 'OPEN',
       roomZoneId: e.roomZoneId,
       roomId: e.roomId,
       ...(e.description ? { description: e.description } : {}),
@@ -27,9 +27,7 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       ...(e.toRoomId !== null && e.toRoomId !== undefined
         ? { toRoomId: e.toRoomId }
         : {}),
-      ...((e as any).hitPoints != null
-        ? { hitPoints: (e as any).hitPoints }
-        : {}),
+      ...(e.hitPoints != null ? { hitPoints: e.hitPoints } : {}),
     };
     return exit;
   });
@@ -77,8 +75,8 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     }),
     // Pass through mobResets and objectResets for GraphQL field resolvers
     // These will be undefined for rooms loaded without these relations
-    ...((db as any).mobResets && { mobResets: (db as any).mobResets }),
-    ...((db as any).objectResets && { objectResets: (db as any).objectResets }),
+    ...(db['mobResets'] ? { mobResets: db['mobResets'] } : {}),
+    ...(db['objectResets'] ? { objectResets: db['objectResets'] } : {}),
   };
   return dto;
 }

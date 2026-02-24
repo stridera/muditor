@@ -25,12 +25,11 @@ export class ClassesService {
    * Find all classes
    */
   async findAll(skip?: number, take?: number) {
-    const args: Prisma.CharacterClassFindManyArgs = {
+    return this.db.characterClass.findMany({
       orderBy: { name: 'asc' },
-    };
-    if (skip !== undefined) (args as any).skip = skip;
-    if (take !== undefined) (args as any).take = take;
-    return this.db.characterClass.findMany(args);
+      ...(skip !== undefined && { skip }),
+      ...(take !== undefined && { take }),
+    });
   }
 
   /**
@@ -83,9 +82,8 @@ export class ClassesService {
     const createData: Prisma.CharacterClassCreateInput = {
       name: data.name,
       plainName: plainName,
+      ...(data.description !== undefined && { description: data.description }),
     };
-    if (data.description !== undefined)
-      (createData as any).description = data.description;
     return this.db.characterClass.create({ data: createData });
   }
 
@@ -107,14 +105,14 @@ export class ClassesService {
       }
     }
 
-    const updateData: Prisma.CharacterClassUpdateInput = {};
-    if (data.name !== undefined) {
-      (updateData as any).name = data.name;
-      // Middleware will auto-generate plainName, but we can set it explicitly
-      (updateData as any).plainName = stripMarkup(data.name);
-    }
-    if (data.description !== undefined)
-      (updateData as any).description = data.description;
+    const updateData: Prisma.CharacterClassUpdateInput = {
+      ...(data.name !== undefined && {
+        name: data.name,
+        // Middleware will auto-generate plainName, but we can set it explicitly
+        plainName: stripMarkup(data.name),
+      }),
+      ...(data.description !== undefined && { description: data.description }),
+    };
     return this.db.characterClass.update({ where: { id }, data: updateData });
   }
 
