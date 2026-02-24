@@ -30,7 +30,7 @@ import { RoomsService } from './rooms.service';
 
 // Narrow mapper input to the actual shape returned by RoomsService (RoomServiceResult) plus relation arrays.
 // Use flexible mapper source type (optional relation arrays) matching `mapRoom` requirements.
-import { RoomMapperSource } from '../common/mappers/types';
+import type { RoomMapperSource } from '../common/mappers/types';
 type RoomsMapperInput = RoomMapperSource;
 
 // Internal lightweight types used for field resolution to avoid `any`

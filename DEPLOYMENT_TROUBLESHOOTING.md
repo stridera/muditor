@@ -172,7 +172,7 @@ ssh galactica "cd /volume1/docker/muditor && docker compose logs postgres"
 ssh galactica "cd /volume1/docker/muditor && docker compose exec postgres createdb -U muditor muditor"
 
 # Run migrations
-ssh galactica "cd /volume1/docker/muditor && docker compose exec api pnpm db:migrate deploy"
+ssh galactica "cd /volume1/docker/muditor && docker compose exec api bun run db:migrate deploy"
 ```
 
 ### Issue: "password authentication failed"
@@ -206,13 +206,13 @@ ssh galactica "cd /volume1/docker/muditor && docker compose logs api"
 
 # Common issues:
 # 1. Prisma client not generated
-ssh galactica "cd /volume1/docker/muditor && docker compose exec api pnpm db:generate"
+ssh galactica "cd /volume1/docker/muditor && docker compose exec api bun run db:generate"
 
 # 2. Missing environment variables
 ssh galactica "cd /volume1/docker/muditor && docker compose exec api env | grep -E '(DATABASE|JWT|REDIS)'"
 
 # 3. Database connection failed
-ssh galactica "cd /volume1/docker/muditor && docker compose exec api pnpm db:migrate status"
+ssh galactica "cd /volume1/docker/muditor && docker compose exec api bun run db:migrate status"
 ```
 
 ### Issue: Web UI shows "Failed to fetch"
@@ -380,7 +380,7 @@ curl http://galactica:4000/graphql -H "Content-Type: application/json" -d '{"que
 curl -I http://galactica:3002
 
 # 8. Database connected
-ssh galactica "cd /volume1/docker/muditor && docker compose exec api pnpm prisma db execute --stdin <<< 'SELECT 1;'"
+ssh galactica "cd /volume1/docker/muditor && docker compose exec api bunx prisma db execute --stdin <<< 'SELECT 1;'"
 ```
 
 ### Get Detailed Status

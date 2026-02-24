@@ -1,7 +1,7 @@
-import { Effect as PrismaEffect } from '@prisma/client';
+import type { Effect as PrismaEffect } from '@prisma/client';
 import { Effect } from '../../abilities/abilities.dto';
 import { MobDto } from '../../mobs/mob.dto';
-import { MobMapperSource } from './types';
+import type { MobMapperSource } from './types';
 
 function mapEffect(e: PrismaEffect): Effect {
   return {

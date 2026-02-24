@@ -9,6 +9,7 @@ import {
   Int,
   Float,
 } from '@nestjs/graphql';
+import { GraphQLISODateTime } from '@nestjs/graphql';
 import { UserRole } from '@prisma/client';
 import type { Users } from '@prisma/client';
 import { GameAdminService } from './game-admin.service';
@@ -18,6 +19,9 @@ import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { RateLimitGuard, RateLimit, AdminRateLimits } from './rate-limit.guard';
 import { AuditService } from './audit.service';
+import { DatabaseService } from '../database/database.service';
+import { UsersService } from '../users/users.service';
+import { BanUserInput } from '../users/dto/ban-user.input';
 
 /**
  * GraphQL type for online player
@@ -38,6 +42,9 @@ class OnlinePlayerType {
 
   @Field(() => Int)
   roomId!: number;
+
+  @Field(() => Int)
+  roomZoneId!: number;
 
   @Field(() => Int)
   godLevel!: number;
@@ -146,6 +153,30 @@ class KickResultType {
 }
 
 /**
+ * GraphQL type for ban player result
+ */
+@ObjectType({ description: 'Result of banning a player' })
+class BanPlayerResultType {
+  @Field()
+  success!: boolean;
+
+  @Field()
+  message!: string;
+
+  @Field()
+  playerName!: string;
+
+  @Field()
+  reason!: string;
+
+  @Field(() => GraphQLISODateTime, { nullable: true })
+  expiresAt: Date | null | undefined;
+
+  @Field()
+  kicked!: boolean;
+}
+
+/**
  * GraphQL type for broadcast result
  */
 @ObjectType({ description: 'Result of broadcasting a message' })
@@ -174,7 +205,9 @@ class BroadcastResultType {
 export class GameAdminResolver {
   constructor(
     private readonly gameAdminService: GameAdminService,
-    private readonly auditService: AuditService
+    private readonly auditService: AuditService,
+    private readonly databaseService: DatabaseService,
+    private readonly usersService: UsersService
   ) {}
 
   /**
@@ -302,5 +335,96 @@ export class GameAdminResolver {
     );
 
     return result;
+  }
+
+  /**
+   * Ban a player by character name
+   * Looks up the character's linked user account and creates a ban record.
+   * Also kicks the player from the game server if they are online.
+   * Requires GOD role
+   * Rate limit: 5 bans per minute
+   * Audit logged
+   */
+  @Mutation(() => BanPlayerResultType, {
+    description: 'Ban a player by character name - kicks and prevents login',
+  })
+  @MinimumRole(UserRole.GOD)
+  @RateLimit(AdminRateLimits.BAN)
+  async banPlayer(
+    @CurrentUser() user: Users,
+    @Args('playerName') playerName: string,
+    @Args('reason') reason: string,
+    @Args('expiresAt', { nullable: true }) expiresAt?: string
+  ): Promise<BanPlayerResultType> {
+    // Look up the character by name to find the linked user account
+    const character = await this.databaseService.characters.findUnique({
+      where: { name: playerName },
+      select: { userId: true },
+    });
+
+    if (!character) {
+      return {
+        success: false,
+        message: `Character '${playerName}' not found`,
+        playerName,
+        reason,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        kicked: false,
+      };
+    }
+
+    if (!character.userId) {
+      return {
+        success: false,
+        message: `Character '${playerName}' has no linked user account`,
+        playerName,
+        reason,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        kicked: false,
+      };
+    }
+
+    // Create the ban record via UsersService
+    try {
+      await this.usersService.banUser(
+        { userId: character.userId, reason, expiresAt } as BanUserInput,
+        user.id
+      );
+    } catch (error) {
+      const message =
+        error instanceof Error ? error.message : 'Failed to create ban record';
+      return {
+        success: false,
+        message,
+        playerName,
+        reason,
+        expiresAt: expiresAt ? new Date(expiresAt) : null,
+        kicked: false,
+      };
+    }
+
+    // Kick the player from the game server if they are online
+    let kicked = false;
+    try {
+      const kickResult = await this.gameAdminService.kickPlayer(
+        playerName,
+        `Banned: ${reason}`
+      );
+      kicked = kickResult.success;
+    } catch {
+      // Player may not be online - that's fine
+    }
+
+    // Audit log the ban
+    await this.auditService.logBan(user.id, playerName, reason, expiresAt);
+
+    return {
+      success: true,
+      message: `Player '${playerName}' has been banned${kicked ? ' and kicked from the server' : ''}`,
+      playerName,
+      reason,
+      expiresAt: expiresAt ? new Date(expiresAt) : null,
+      kicked,
+    };
   }
 }

@@ -8,51 +8,51 @@
   },
   "license": "MIT",
   "private": true,
-  "packageManager": "pnpm@10.26.0",
-  "engines": {
-    "node": ">=18.0.0",
-    "pnpm": ">=8.0.0"
-  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
-    "dev": "pnpm run --parallel dev",
-    "dev:web": "pnpm --filter @muditor/web dev",
-    "dev:api": "pnpm --filter @muditor/api dev",
-    "build": "pnpm run --filter='./packages/*' build && pnpm run --filter='./apps/*' build",
-    "build:web": "pnpm --filter @muditor/web build",
-    "build:api": "pnpm --filter @muditor/api build",
-    "start": "pnpm run --parallel start",
-    "start:web": "pnpm --filter @muditor/web start",
-    "start:api": "pnpm --filter @muditor/api start",
-    "test": "pnpm run --recursive test",
-    "test:watch": "pnpm run --recursive test:watch",
+    "dev": "bun run --filter '*' dev",
+    "dev:web": "bun run --filter @muditor/web dev",
+    "dev:api": "bun run --filter @muditor/api dev",
+    "build": "bun run --filter './packages/*' build && bun run --filter './apps/*' build",
+    "build:web": "bun run --filter @muditor/web build",
+    "build:api": "bun run --filter @muditor/api build",
+    "start": "bun run --filter '*' start",
+    "start:web": "bun run --filter @muditor/web start",
+    "start:api": "bun run --filter @muditor/api start",
+    "test": "bun run --filter '*' test",
+    "test:watch": "bun run --filter '*' test:watch",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
     "test:e2e:headed": "playwright test --headed",
     "test:e2e:debug": "playwright test --debug",
     "test:e2e:report": "playwright show-report test-results/html",
-    "lint": "pnpm run --recursive lint",
-    "lint:fix": "pnpm run --recursive lint:fix",
+    "lint": "bun run --filter '*' lint",
+    "lint:fix": "bun run --filter '*' lint:fix",
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
-    "type-check": "pnpm run --recursive type-check",
-    "db:generate": "pnpm --filter @muditor/db generate",
-    "db:push": "pnpm --filter @muditor/db push",
-    "db:migrate": "pnpm --filter @muditor/db migrate:dev",
-    "db:migrate:reset": "pnpm --filter @muditor/db migrate:reset",
-    "db:studio": "pnpm --filter @muditor/db studio",
-    "db:seed": "pnpm --filter @muditor/db seed",
-    "db:setup": "pnpm db:generate && pnpm db:migrate && pnpm db:seed",
+    "type-check": "bun run --filter '*' type-check",
+    "type-check:native": "tsgo --noEmit -p apps/api/tsconfig.json && tsgo --noEmit -p apps/web/tsconfig.json && tsgo --noEmit -p packages/db/tsconfig.json && tsgo --noEmit -p packages/types/tsconfig.json && tsgo --noEmit -p packages/ui/tsconfig.json",
+    "db:generate": "bun run --filter @muditor/db generate",
+    "db:push": "bun run --filter @muditor/db push",
+    "db:migrate": "bun run --filter @muditor/db migrate:dev",
+    "db:migrate:reset": "bun run --filter @muditor/db migrate:reset",
+    "db:studio": "bun run --filter @muditor/db studio",
+    "db:seed": "bun run --filter @muditor/db seed",
+    "db:setup": "bun run db:generate && bun run db:migrate && bun run db:seed",
     "codegen": "graphql-codegen --config codegen.ts",
     "codegen:watch": "graphql-codegen --config codegen.ts --watch",
-    "clean": "pnpm run --recursive clean && rm -rf node_modules",
+    "clean": "bun run --filter '*' clean && rm -rf node_modules",
     "prepare": "husky",
     "system:start": "./scripts/start-system.sh",
     "system:stop": "./scripts/stop-system.sh",
     "system:status": "./scripts/check-system.sh",
     "system:restart": "./scripts/stop-system.sh && ./scripts/start-system.sh",
-    "check:gql-args": "tsx scripts/check-graphql-args.ts",
-    "build:schema": "tsx apps/api/scripts/build-graphql-schema.ts",
-    "preflight": "pnpm build:schema && pnpm type-check && pnpm lint && node scripts/validate-graphql.js && pnpm check:gql-args"
+    "check:gql-args": "bun scripts/check-graphql-args.ts",
+    "build:schema": "bun apps/api/scripts/build-graphql-schema.ts",
+    "preflight": "bun run build:schema && bun run type-check && bun run lint && bun scripts/validate-graphql.js && bun run check:gql-args"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.0",
@@ -69,6 +69,7 @@
     "@types/react-dom": "19.2.1",
     "@typescript-eslint/eslint-plugin": "^8.46.2",
     "@typescript-eslint/parser": "^8.46.2",
+    "@typescript/native-preview": "^7.0.0-dev.20260223.1",
     "eslint": "^9.39.0",
     "eslint-config-prettier": "^10.1.8",
     "eslint-import-resolver-typescript": "^4.4.4",
@@ -82,10 +83,13 @@
     "lint-staged": "^16.2.6",
     "prettier": "^3.6.2",
     "prisma": "^6.16.1",
-    "tsx": "^4.20.6",
     "turbo": "^2.6.0",
-    "typescript": "5.9.3",
+    "typescript": "6.0.0-beta",
     "typescript-eslint": "^8.46.2"
+  },
+  "overrides": {
+    "axios": "^1.12.0",
+    "@types/node": "24.9.2"
   },
   "lint-staged": {
     "*.{ts,tsx,js,jsx}": [
@@ -107,13 +111,19 @@
     "nextjs",
     "nestjs"
   ],
-  "pnpm": {
-    "overrides": {
-      "axios": "^1.12.0",
-      "@types/node": "24.9.2"
-    }
-  },
   "dependencies": {
     "unix-crypt-td-js": "^1.1.4"
-  }
+  },
+  "trustedDependencies": [
+    "@apollo/protobufjs",
+    "@nestjs/core",
+    "@prisma/client",
+    "@prisma/engines",
+    "@tailwindcss/oxide",
+    "bcrypt",
+    "esbuild",
+    "prisma",
+    "sharp",
+    "unrs-resolver"
+  ]
 }

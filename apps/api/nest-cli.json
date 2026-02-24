@@ -5,6 +5,7 @@
     "assets": ["**/*.graphql"],
     "watchAssets": true,
     "deleteOutDir": true,
-    "webpack": true
+    "webpack": false,
+    "builder": "tsc"
   }
 }

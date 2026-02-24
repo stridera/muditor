@@ -6,12 +6,12 @@
   "types": "./src/index.ts",
   "scripts": {
     "generate": "prisma generate --generator client",
-    "push": "prisma db push --skip-generate && pnpm generate",
+    "push": "prisma db push --skip-generate && bun run generate",
     "studio": "prisma studio",
-    "migrate:dev": "prisma migrate dev && pnpm generate",
-    "migrate:reset": "prisma migrate reset && pnpm generate",
-    "migrate:deploy": "prisma migrate deploy && pnpm generate",
-    "seed": "tsx src/seed/index.ts",
+    "migrate:dev": "prisma migrate dev && bun run generate",
+    "migrate:reset": "prisma migrate reset && bun run generate",
+    "migrate:deploy": "prisma migrate deploy && bun run generate",
+    "seed": "bun src/seed/index.ts",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf node_modules/.prisma"
   },
@@ -31,7 +31,6 @@
     "dotenv": "^17.2.2",
     "husky": "^9.1.7",
     "prisma": "^6.16.1",
-    "tsx": "^4.20.5",
-    "typescript": "^5.9.2"
+    "typescript": "6.0.0-beta"
   }
 }

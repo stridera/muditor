@@ -3,14 +3,14 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "npm run validate:graphql && next build",
-    "build:skip-validation": "next build",
-    "start": "next start",
+    "dev": "bun --bun next dev",
+    "build": "bun run validate:graphql && bun --bun next build",
+    "build:skip-validation": "bun --bun next build",
+    "start": "bun --bun next start",
     "lint": "next lint --quiet",
     "lint:fix": "next lint --fix",
     "type-check": "tsc --noEmit",
-    "validate:graphql": "node ../../scripts/validate-graphql.js",
+    "validate:graphql": "bun ../../scripts/validate-graphql.js",
     "test": "jest",
     "test:watch": "jest --watch",
     "test:ci": "jest --ci --coverage --passWithNoTests",
@@ -36,6 +36,7 @@
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "graphql": "^16.11.0",
+    "graphql-ws": "^6.0.7",
     "lucide-react": "^0.542.0",
     "monaco-editor": "^0.53.0",
     "next": "^15.5.2",
@@ -68,6 +69,6 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.13",
     "ts-jest": "^29.1.1",
-    "typescript": "^5.9.2"
+    "typescript": "6.0.0-beta"
   }
 }

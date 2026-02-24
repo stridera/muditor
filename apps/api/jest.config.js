@@ -1,13 +1,19 @@
-module.exports = {
+export default {
   displayName: 'api',
-  preset: 'ts-jest',
+  preset: 'ts-jest/presets/default-esm',
   testEnvironment: 'node',
+  extensionsToTreatAsEsm: ['.ts'],
   moduleFileExtensions: ['js', 'json', 'ts'],
-  // Keep rootDir at project root so coverage paths & mappers resolve cleanly.
   rootDir: '.',
   testMatch: ['<rootDir>/src/**/*.(test|spec).ts'],
   transform: {
-    '^.+\\.(t|j)s$': 'ts-jest',
+    '^.+\\.ts$': [
+      'ts-jest',
+      {
+        useESM: true,
+        tsconfig: 'tsconfig.json',
+      },
+    ],
   },
   collectCoverageFrom: [
     '<rootDir>/src/**/*.(t|j)s',
@@ -18,8 +24,7 @@ module.exports = {
   coverageDirectory: '<rootDir>/coverage',
   moduleNameMapper: {
     '^@muditor/(.*)$': '<rootDir>/../../packages/$1/src',
+    '^~/(.*)$': '<rootDir>/src/$1',
   },
-  setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
-  // For quicker feedback loops in editors.
   testTimeout: 30000,
 };

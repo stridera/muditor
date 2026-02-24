@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { UserRole, Users } from '@prisma/client';
+import { UserRole, type Users } from '@prisma/client';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
 import { BanUserInput } from './dto/ban-user.input';

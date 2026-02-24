@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole, Users } from '@prisma/client';
+import { UserRole, type Users } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
@@ -15,7 +15,7 @@ import type { User } from '../users/entities/user.entity';
 import { AuthPayload } from './dto/auth.payload';
 import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
-import { JwtPayload } from './interfaces/jwt-payload.interface';
+import type { JwtPayload } from './interfaces/jwt-payload.interface';
 
 // Sanitized user returned by auth operations (no password or reset tokens)
 interface SanitizedUser

@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { Board, BoardMessage, BoardMessageEdit, Prisma } from '@prisma/client';
+import {
+  type Board,
+  type BoardMessage,
+  type BoardMessageEdit,
+  Prisma,
+} from '@prisma/client';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()

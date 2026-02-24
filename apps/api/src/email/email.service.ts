@@ -100,7 +100,7 @@ export class EmailService {
         ...(options.html ? { html: options.html } : {}),
       };
 
-      await sgMail.send(msg as sgMail.MailDataRequired);
+      await sgMail.send(msg as Parameters<typeof sgMail.send>[0]);
       this.logger.log(`Email sent successfully via SendGrid to: ${options.to}`);
       return true;
     } catch (error) {

@@ -20,7 +20,7 @@ start_server() {
 
     # Start the server in background
     cd "$(dirname "$0")"
-    PORT=$API_PORT pnpm --filter @muditor/api dev > "$API_LOGFILE" 2>&1 &
+    PORT=$API_PORT bun run --filter @muditor/api dev > "$API_LOGFILE" 2>&1 &
     echo $! > "$API_PIDFILE"
 
     echo "⏳ Waiting for server to start..."

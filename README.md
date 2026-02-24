@@ -43,20 +43,21 @@ Muditor transforms legacy MUD world building from text-based file editing to a v
 
 ## Technology Stack
 
-- **Frontend**: Next.js, React, TypeScript, Tailwind CSS, shadcn/ui, React Flow
-- **Backend**: NestJS, GraphQL, Prisma ORM, PostgreSQL, Redis
+- **Frontend**: Next.js 15, React 19, TypeScript 6/7, Tailwind CSS v4, shadcn/ui, React Flow
+- **Backend**: NestJS 11, GraphQL (Apollo Server 5), Prisma ORM, PostgreSQL, Redis
+- **Runtime**: Bun (package manager + runtime)
+- **TypeScript**: 6.0-beta (tsc) + 7.0 native preview (tsgo — Go-based, ~10x faster)
 - **Authentication**: JWT with role-based permissions
 - **Scripting**: Lua with sandboxed execution
-- **Testing**: Playwright for E2E testing
+- **Testing**: Playwright for E2E testing, Jest for unit tests
 - **Deployment**: Docker, Docker Compose
 
 ## Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ (LTS recommended)
+- [Bun](https://bun.sh/) (package manager + runtime)
 - Docker and Docker Compose
-- pnpm (recommended) or npm/yarn
 
 ### Development Setup
 
@@ -68,7 +69,7 @@ git clone <repository-url>
 cd muditor
 
 # Install dependencies
-pnpm install
+bun install
 
 # Start entire system with automated scripts
 ./scripts/start-system.sh
@@ -92,23 +93,23 @@ To disable hooks temporarily, set `HUSKY=0` in your environment.
 docker compose up -d
 
 # Start GraphQL API server
-pnpm dev:api &
+bun run dev:api &
 
 # Start Next.js web application
-pnpm dev:web
+bun run dev:web
 ````
 
 ### Database Setup
 
 ```bash
 # Generate Prisma client
-pnpm prisma generate
+bun run db:generate
 
 # Apply database migrations
-pnpm prisma migrate dev
+bun run db:migrate
 
 # Import sample world data (optional)
-pnpm seed
+bun run db:seed
 ```
 
 ### System Management Scripts
@@ -177,20 +178,21 @@ muditor/
 
 ```bash
 # Database operations
-pnpm prisma studio          # Open database GUI
-pnpm prisma migrate reset   # Reset database
-pnpm prisma generate        # Regenerate client
+bun run db:studio           # Open database GUI
+bun run db:migrate:reset    # Reset database
+bun run db:generate         # Regenerate client
 
 # Development
-pnpm dev:api                # Start API server only
-pnpm dev:web                # Start web app only
-pnpm build                  # Build all applications
-pnpm type-check             # Check TypeScript
+bun run dev:api             # Start API server only
+bun run dev:web             # Start web app only
+bun run build               # Build all applications
+bun run type-check          # Check TypeScript (tsc)
+bun run type-check:native   # Check TypeScript (tsgo — ~10x faster)
 
 # Testing
-pnpm test:e2e               # Run E2E tests
-pnpm test:e2e:ui           # Interactive test runner
-pnpm test:e2e:debug        # Debug tests
+bun run test:e2e            # Run E2E tests
+bun run test:e2e:ui         # Interactive test runner
+bun run test:e2e:debug      # Debug tests
 ```
 
 ### Role Hierarchy
@@ -303,16 +305,16 @@ Muditor manages complex MUD world data including:
 
 ```bash
 # Run all tests
-pnpm test:e2e
+bun run test:e2e
 
 # Run specific test suite
-pnpm test:e2e tests/dashboard.spec.ts
+bun run test:e2e tests/dashboard.spec.ts
 
 # Interactive test runner
-pnpm test:e2e:ui
+bun run test:e2e:ui
 
 # Generate test report
-pnpm test:e2e:report
+bun run test:e2e:report
 ```
 
 ### Test Coverage
@@ -323,13 +325,13 @@ To surface common GraphQL / type reflection problems (e.g. `UndefinedTypeError` 
 
 ```bash
 # Run schema build test + type/lint + GraphQL query validation + @Args audit
-pnpm preflight
+bun run preflight
 
 # (CI tip) Run only the fast schema build test early in the pipeline
-pnpm --filter @muditor/api test -- --testPathPatterns=schema-build
+bun run --filter @muditor/api test -- --testPathPatterns=schema-build
 
 # Stand‑alone heuristic scan for missing explicit enum/scalar @Args types
-pnpm check:gql-args
+bun run check:gql-args
 ```
 
 What it does:

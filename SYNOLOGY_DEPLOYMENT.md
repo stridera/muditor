@@ -108,7 +108,7 @@ This guide covers deploying Muditor to a Synology NAS using Docker Compose.
 6. **Run database migrations**
 
    ```bash
-   docker compose exec api sh -c 'pnpm db:migrate deploy'
+   docker compose exec api sh -c 'bun run db:migrate deploy'
    ```
 
 7. **Import legacy data** (optional, using FieryLib)
@@ -289,7 +289,7 @@ docker stats
 2. **Verify Prisma client is generated**:
 
    ```bash
-   docker compose exec api sh -c 'pnpm db:generate'
+   docker compose exec api sh -c 'bun run db:generate'
    ```
 
 3. **Rebuild API container**:
@@ -313,7 +313,7 @@ docker stats
 
 3. **Clear Next.js cache and rebuild**:
    ```bash
-   docker compose exec web sh -c 'rm -rf .next && pnpm --filter @muditor/web build'
+   docker compose exec web sh -c 'rm -rf .next && bun run --filter @muditor/web build'
    ```
 
 ### Out of Memory

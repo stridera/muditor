@@ -3,20 +3,20 @@
 # Fast safety gates (keep lightweight to avoid dev friction)
 # 0. Format & fix only STAGED files (prettier + eslint) via lint-staged for atomic commits
 echo "▶ Running lint-staged (format + eslint on staged files)"
-pnpm exec lint-staged || {
+bun run lint-staged || {
   echo "❌ lint-staged failed"; exit 1;
 }
 
 # 1. Type check API & shared packages (fail fast on types). Skip full web type-check for speed.
 echo "▶ Type checking core packages"
-pnpm --filter @muditor/api type-check || exit 1
-pnpm --filter @muditor/db type-check || exit 1
-pnpm --filter @muditor/types type-check || exit 1
+bun run --filter @muditor/api type-check || exit 1
+bun run --filter @muditor/db type-check || exit 1
+bun run --filter @muditor/types type-check || exit 1
 
 # 2. Optional full repo lint (only if env variable set to reduce slowdown)
 if [ "$MEDITOR_STRICT_PRECOMMIT" = "1" ]; then
   echo "▶ Strict mode lint"
-  pnpm lint || exit 1
+  bun run lint || exit 1
 fi
 
 echo "✅ Pre-commit checks passed (export MEDITOR_STRICT_PRECOMMIT=1 for full lint)."

@@ -9,7 +9,7 @@ import {
   Stance,
 } from '@prisma/client';
 import { mapMob } from '../mob.mapper';
-import { MobMapperSource } from '../types';
+import type { MobMapperSource } from '../types';
 
 function base(): MobMapperSource {
   return {

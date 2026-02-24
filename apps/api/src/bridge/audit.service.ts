@@ -10,6 +10,7 @@ export enum AdminActionType {
   EXECUTE_COMMAND = 'ADMIN_EXECUTE_COMMAND',
   BROADCAST_MESSAGE = 'ADMIN_BROADCAST_MESSAGE',
   KICK_PLAYER = 'ADMIN_KICK_PLAYER',
+  BAN_PLAYER = 'ADMIN_BAN_PLAYER',
   VIEW_PLAYERS = 'ADMIN_VIEW_PLAYERS',
   VIEW_STATS = 'ADMIN_VIEW_STATS',
   DISCORD_GOSSIP = 'DISCORD_GOSSIP',
@@ -42,20 +43,27 @@ export class AuditService {
    */
   async logAction(entry: AuditLogEntry): Promise<void> {
     try {
-      await this.databaseService.auditLogs.create({
-        data: {
-          id: randomUUID(),
-          action: entry.action,
-          entityType: entry.entityType,
-          entityId: entry.entityId,
-          userId: entry.userId,
-          oldValues: entry.oldValues ?? Prisma.JsonNull,
-          newValues: entry.newValues ?? Prisma.JsonNull,
-        },
-      });
+      const [, user] = await Promise.all([
+        this.databaseService.auditLogs.create({
+          data: {
+            id: randomUUID(),
+            action: entry.action,
+            entityType: entry.entityType,
+            entityId: entry.entityId,
+            userId: entry.userId,
+            oldValues: entry.oldValues ?? Prisma.JsonNull,
+            newValues: entry.newValues ?? Prisma.JsonNull,
+          },
+        }),
+        this.databaseService.users.findUnique({
+          where: { id: entry.userId },
+          select: { username: true },
+        }),
+      ]);
 
+      const displayName = user?.username ?? entry.userId;
       this.logger.debug(
-        `Audit: ${entry.action} by user ${entry.userId} on ${entry.entityType}:${entry.entityId}`
+        `Audit: ${entry.action} by ${displayName} on ${entry.entityType}:${entry.entityId}`
       );
     } catch (error) {
       // Don't fail the operation if audit logging fails
@@ -128,6 +136,29 @@ export class AuditService {
         playerName,
         reason,
         success,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  /**
+   * Log a player ban
+   */
+  async logBan(
+    userId: string,
+    playerName: string,
+    reason: string,
+    expiresAt?: string
+  ): Promise<void> {
+    await this.logAction({
+      action: AdminActionType.BAN_PLAYER,
+      entityType: 'player',
+      entityId: playerName,
+      userId,
+      newValues: {
+        playerName,
+        reason,
+        expiresAt,
         timestamp: new Date().toISOString(),
       },
     });

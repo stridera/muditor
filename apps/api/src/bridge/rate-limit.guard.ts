@@ -1,7 +1,7 @@
 import {
   Injectable,
-  CanActivate,
-  ExecutionContext,
+  type CanActivate,
+  type ExecutionContext,
   HttpException,
   HttpStatus,
   SetMetadata,
@@ -145,6 +145,8 @@ export const AdminRateLimits = {
   BROADCAST: { limit: 10, windowSeconds: 60, keyPrefix: 'admin:broadcast' },
   /** Kicks: 5 per minute */
   KICK: { limit: 5, windowSeconds: 60, keyPrefix: 'admin:kick' },
+  /** Bans: 5 per minute */
+  BAN: { limit: 5, windowSeconds: 60, keyPrefix: 'admin:ban' },
   /** Stats queries: 30 per minute */
   STATS: { limit: 30, windowSeconds: 60, keyPrefix: 'admin:stats' },
   /** Player list: 30 per minute */

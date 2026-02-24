@@ -16,7 +16,10 @@ import { EmailModule } from '../email/email.module';
     PassportModule.register({ session: false }),
     JwtModule.register({
       secret: process.env.JWT_SECRET || 'fallback-secret-key',
-      signOptions: { expiresIn: process.env.JWT_EXPIRES_IN || '7d' },
+      signOptions: {
+        expiresIn: (process.env.JWT_EXPIRES_IN ||
+          '7d') as `${number}${'s' | 'm' | 'h' | 'd'}`,
+      },
       global: true,
     }),
     forwardRef(() => UsersModule),

@@ -99,7 +99,10 @@ export class PlayerMailDto {
 
   // Computed display fields
   @Field()
-  senderName: string; // Character name or "<deleted>"
+  senderName: string; // Character name or "Deleted User #<id>" or "<deleted>"
+
+  @Field()
+  recipientName: string; // Character name or "Deleted User #<id>" or "<deleted>"
 
   @Field(() => String, { nullable: true })
   wealthRetrievalInfo?: string; // "Retrieved by CharName" or null

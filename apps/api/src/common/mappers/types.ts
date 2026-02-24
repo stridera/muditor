@@ -3,18 +3,18 @@
 // lightweight raw query results and partial selections.
 
 import {
-  Effect,
+  type Effect,
   ExitState,
   MagicAffinity,
-  Mobs,
-  MobDefaultEffects,
-  Objects,
-  ObjectEffects,
-  ObjectResistance,
-  ConsumableEffect,
+  type Mobs,
+  type MobDefaultEffects,
+  type Objects,
+  type ObjectEffects,
+  type ObjectResistance,
+  type ConsumableEffect,
   PositionMechanic,
-  RoomExit as PrismaRoomExit,
-  RoomExtraDescriptions,
+  type RoomExit as PrismaRoomExit,
+  type RoomExtraDescriptions,
   Sector,
 } from '@prisma/client';
 

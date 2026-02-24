@@ -1,13 +1,13 @@
 import {
-  ExceptionFilter,
+  type ExceptionFilter,
   Catch,
-  ArgumentsHost,
+  type ArgumentsHost,
   HttpException,
   HttpStatus,
   Logger,
 } from '@nestjs/common';
-import { Request, Response } from 'express';
-import { GqlArgumentsHost, GqlExceptionFilter } from '@nestjs/graphql';
+import type { Request, Response } from 'express';
+import { GqlArgumentsHost, type GqlExceptionFilter } from '@nestjs/graphql';
 
 @Catch()
 export class GlobalExceptionFilter

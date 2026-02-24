@@ -1,4 +1,8 @@
-import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
+import {
+  Injectable,
+  type CanActivate,
+  type ExecutionContext,
+} from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { UserRole, GrantResourceType, GrantPermission } from '@prisma/client';
 import { DatabaseService } from '../../database/database.service';

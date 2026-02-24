@@ -1,6 +1,6 @@
 import { ObjectType } from '@prisma/client';
 import { mapObject } from '../object.mapper';
-import { ObjectMapperSource } from '../types';
+import type { ObjectMapperSource } from '../types';
 
 function base(): ObjectMapperSource {
   // Use full shape expected from Prisma Objects including nullable fields.

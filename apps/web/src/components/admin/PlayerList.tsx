@@ -39,6 +39,7 @@ import {
   type OnlinePlayer,
 } from '@/hooks/use-game-admin';
 import {
+  Ban,
   Crown,
   RefreshCw,
   Shield,
@@ -54,31 +55,41 @@ interface PlayerListProps {
   onPlayerSelect?: (playerName: string) => void;
 }
 
+// god_level mapping: 0=mortal, 1=Immortal, 2=Builder, 3=Coder, 4=God, 5=Implementor
 function getGodLevelBadge(godLevel: number) {
-  if (godLevel >= 60)
+  if (godLevel >= 5)
     return {
       icon: Crown,
       label: 'Implementor',
       variant: 'destructive' as const,
     };
-  if (godLevel >= 53)
+  if (godLevel >= 4)
     return { icon: Shield, label: 'God', variant: 'default' as const };
-  if (godLevel >= 52)
+  if (godLevel >= 3)
     return { icon: Shield, label: 'Coder', variant: 'secondary' as const };
-  if (godLevel >= 51)
+  if (godLevel >= 2)
     return { icon: Shield, label: 'Builder', variant: 'outline' as const };
+  if (godLevel >= 1)
+    return { icon: Shield, label: 'Immortal', variant: 'outline' as const };
   return null;
 }
 
 export function PlayerList({ onPlayerSelect }: PlayerListProps) {
   const { players, loading, error, refetch } = useOnlinePlayers();
-  const { kickPlayer, kickLoading } = useGameAdminMutations();
+  const { kickPlayer, kickLoading, banPlayer, banLoading } =
+    useGameAdminMutations();
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [kickDialog, setKickDialog] = useState<{
     open: boolean;
     player: OnlinePlayer | null;
   }>({ open: false, player: null });
   const [kickReason, setKickReason] = useState('');
+  const [banDialog, setBanDialog] = useState<{
+    open: boolean;
+    player: OnlinePlayer | null;
+  }>({ open: false, player: null });
+  const [banReason, setBanReason] = useState('');
+  const [banDuration, setBanDuration] = useState('permanent');
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
@@ -106,6 +117,36 @@ export function PlayerList({ onPlayerSelect }: PlayerListProps) {
     }
   };
 
+  const handleBan = async () => {
+    if (!banDialog.player || !banReason) return;
+
+    let expiresAt: string | undefined;
+    if (banDuration !== 'permanent') {
+      const now = new Date();
+      const hours = parseInt(banDuration, 10);
+      now.setHours(now.getHours() + hours);
+      expiresAt = now.toISOString();
+    }
+
+    try {
+      const result = await banPlayer(
+        banDialog.player.name,
+        banReason,
+        expiresAt
+      );
+      if (result.success) {
+        setBanDialog({ open: false, player: null });
+        setBanReason('');
+        setBanDuration('permanent');
+        await refetch();
+      } else {
+        console.error('Ban failed:', result.message);
+      }
+    } catch (error) {
+      console.error('Failed to ban player:', error);
+    }
+  };
+
   if (error) {
     return (
       <Card>
@@ -124,8 +165,8 @@ export function PlayerList({ onPlayerSelect }: PlayerListProps) {
     );
   }
 
-  const mortals = players.filter(p => p.godLevel < 51);
-  const immortals = players.filter(p => p.godLevel >= 51);
+  const mortals = players.filter(p => p.godLevel < 1);
+  const immortals = players.filter(p => p.godLevel >= 1);
 
   return (
     <TooltipProvider>
@@ -197,6 +238,7 @@ export function PlayerList({ onPlayerSelect }: PlayerListProps) {
                           player={player}
                           onSelect={onPlayerSelect}
                           onKick={() => setKickDialog({ open: true, player })}
+                          onBan={() => setBanDialog({ open: true, player })}
                         />
                       ))}
                     </TableBody>
@@ -228,6 +270,7 @@ export function PlayerList({ onPlayerSelect }: PlayerListProps) {
                           player={player}
                           onSelect={onPlayerSelect}
                           onKick={() => setKickDialog({ open: true, player })}
+                          onBan={() => setBanDialog({ open: true, player })}
                         />
                       ))}
                     </TableBody>
@@ -282,6 +325,65 @@ export function PlayerList({ onPlayerSelect }: PlayerListProps) {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      {/* Ban Confirmation Dialog */}
+      <Dialog
+        open={banDialog.open}
+        onOpenChange={open =>
+          setBanDialog({ open, player: open ? banDialog.player : null })
+        }
+      >
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Ban Player</DialogTitle>
+            <DialogDescription>
+              Ban {banDialog.player?.name} from the game. This will also kick
+              them if they are currently online.
+            </DialogDescription>
+          </DialogHeader>
+          <div className='space-y-4'>
+            <div>
+              <Label htmlFor='ban-reason'>Reason (required)</Label>
+              <Input
+                id='ban-reason'
+                placeholder='Enter reason for ban...'
+                value={banReason}
+                onChange={e => setBanReason(e.target.value)}
+              />
+            </div>
+            <div>
+              <Label htmlFor='ban-duration'>Duration</Label>
+              <select
+                id='ban-duration'
+                className='flex h-9 w-full rounded-md border border-input bg-transparent px-3 py-1 text-sm shadow-sm transition-colors placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring'
+                value={banDuration}
+                onChange={e => setBanDuration(e.target.value)}
+              >
+                <option value='1'>1 hour</option>
+                <option value='24'>24 hours</option>
+                <option value='168'>1 week</option>
+                <option value='720'>30 days</option>
+                <option value='permanent'>Permanent</option>
+              </select>
+            </div>
+          </div>
+          <DialogFooter>
+            <Button
+              variant='outline'
+              onClick={() => setBanDialog({ open: false, player: null })}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant='destructive'
+              onClick={handleBan}
+              disabled={banLoading || !banReason}
+            >
+              {banLoading ? 'Banning...' : 'Ban Player'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 }
@@ -290,9 +392,10 @@ interface PlayerRowProps {
   player: OnlinePlayer;
   onSelect?: ((playerName: string) => void) | undefined;
   onKick: () => void;
+  onBan: () => void;
 }
 
-function PlayerRow({ player, onSelect, onKick }: PlayerRowProps) {
+function PlayerRow({ player, onSelect, onKick, onBan }: PlayerRowProps) {
   const godBadge = getGodLevelBadge(player.godLevel);
 
   return (
@@ -323,7 +426,7 @@ function PlayerRow({ player, onSelect, onKick }: PlayerRowProps) {
       </TableCell>
       <TableCell>
         <Badge variant='outline' className='font-mono'>
-          #{player.roomId}
+          {player.roomZoneId}:{player.roomId}
         </Badge>
       </TableCell>
       {godBadge && (
@@ -335,21 +438,38 @@ function PlayerRow({ player, onSelect, onKick }: PlayerRowProps) {
         </TableCell>
       )}
       <TableCell className='text-right'>
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant='ghost'
-              size='sm'
-              onClick={e => {
-                e.stopPropagation();
-                onKick();
-              }}
-            >
-              <UserMinus className='h-4 w-4 text-red-500' />
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>Kick Player</TooltipContent>
-        </Tooltip>
+        <div className='flex items-center justify-end gap-1'>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={e => {
+                  e.stopPropagation();
+                  onKick();
+                }}
+              >
+                <UserMinus className='h-4 w-4 text-red-500' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Kick Player</TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <Button
+                variant='ghost'
+                size='sm'
+                onClick={e => {
+                  e.stopPropagation();
+                  onBan();
+                }}
+              >
+                <Ban className='h-4 w-4 text-red-700' />
+              </Button>
+            </TooltipTrigger>
+            <TooltipContent>Ban Player</TooltipContent>
+          </Tooltip>
+        </div>
       </TableCell>
     </TableRow>
   );

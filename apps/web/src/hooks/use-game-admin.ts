@@ -12,6 +12,7 @@ export const ONLINE_PLAYERS_QUERY = gql`
       class
       race
       roomId
+      roomZoneId
       godLevel
       isLinkdead
     }
@@ -77,6 +78,23 @@ export const KICK_PLAYER_MUTATION = gql`
       success
       message
       reason
+    }
+  }
+`;
+
+export const BAN_PLAYER_MUTATION = gql`
+  mutation BanPlayer(
+    $playerName: String!
+    $reason: String!
+    $expiresAt: String
+  ) {
+    banPlayer(playerName: $playerName, reason: $reason, expiresAt: $expiresAt) {
+      success
+      message
+      playerName
+      reason
+      expiresAt
+      kicked
     }
   }
 `;
@@ -153,6 +171,7 @@ export interface OnlinePlayer {
   class: string;
   race: string;
   roomId: number;
+  roomZoneId: number;
   godLevel: number;
   isLinkdead: boolean;
 }
@@ -199,6 +218,15 @@ export interface KickResult {
   success: boolean;
   message: string;
   reason: string;
+}
+
+export interface BanPlayerResult {
+  success: boolean;
+  message: string;
+  playerName: string;
+  reason: string;
+  expiresAt?: string;
+  kicked: boolean;
 }
 
 export interface GameEvent {
@@ -288,6 +316,10 @@ export function useGameAdminMutations() {
     kickPlayer: KickResult;
   }>(KICK_PLAYER_MUTATION);
 
+  const [banPlayerMutation, { loading: banLoading }] = useMutation<{
+    banPlayer: BanPlayerResult;
+  }>(BAN_PLAYER_MUTATION);
+
   const executeCommand = async (
     command: string,
     executor?: string
@@ -351,13 +383,40 @@ export function useGameAdminMutations() {
     }
   };
 
+  const banPlayer = async (
+    playerName: string,
+    reason: string,
+    expiresAt?: string
+  ): Promise<BanPlayerResult> => {
+    try {
+      const result = await banPlayerMutation({
+        variables: { playerName, reason, expiresAt },
+        refetchQueries: [{ query: ONLINE_PLAYERS_QUERY }],
+      });
+      return (
+        result.data?.banPlayer || {
+          success: false,
+          message: 'No response from server',
+          playerName,
+          reason,
+          kicked: false,
+        }
+      );
+    } catch (error) {
+      console.error('Failed to ban player:', error);
+      throw error;
+    }
+  };
+
   return {
     executeCommand,
     broadcastMessage,
     kickPlayer,
+    banPlayer,
     commandLoading,
     broadcastLoading,
     kickLoading,
+    banLoading,
   };
 }
 
