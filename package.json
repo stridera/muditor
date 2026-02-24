@@ -62,7 +62,6 @@
     "@graphql-codegen/typescript-operations": "^5.0.2",
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@playwright/test": "^1.56.1",
-    "@prisma/client": "^7.0.0",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.13",
     "@types/react": "19.2.14",
@@ -119,8 +118,6 @@
   "trustedDependencies": [
     "@apollo/protobufjs",
     "@nestjs/core",
-    "@prisma/client",
-    "@prisma/engines",
     "@tailwindcss/oxide",
     "bcrypt",
     "esbuild",
