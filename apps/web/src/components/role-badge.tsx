@@ -1,7 +1,13 @@
 import { Badge } from '@/components/ui/badge';
 import { Shield, User, Hammer, Code, Crown, Star } from 'lucide-react';
 
-type Role = 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'HEAD_BUILDER' | 'CODER' | 'GOD';
+type Role =
+  | 'PLAYER'
+  | 'IMMORTAL'
+  | 'BUILDER'
+  | 'HEAD_BUILDER'
+  | 'CODER'
+  | 'GOD';
 
 interface RoleBadgeProps {
   role: Role;
@@ -48,7 +54,11 @@ const roleConfig = {
   },
 };
 
-export function RoleBadge({ role, showIcon = true, size = 'md' }: RoleBadgeProps) {
+export function RoleBadge({
+  role,
+  showIcon = true,
+  size = 'md',
+}: RoleBadgeProps) {
   const config = roleConfig[role];
   const Icon = config.icon;
 

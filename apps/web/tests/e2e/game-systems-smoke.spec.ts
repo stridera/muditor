@@ -7,7 +7,9 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Game Systems Editors - Smoke Tests', () => {
   test('Skills editor page compiles and responds', async ({ request }) => {
-    const response = await request.get('http://localhost:3000/dashboard/skills');
+    const response = await request.get(
+      'http://localhost:3000/dashboard/skills'
+    );
 
     // Page should return 200 or 307 (redirect to login)
     expect([200, 307]).toContain(response.status());
@@ -20,7 +22,9 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
   });
 
   test('Spells editor page compiles and responds', async ({ request }) => {
-    const response = await request.get('http://localhost:3000/dashboard/spells');
+    const response = await request.get(
+      'http://localhost:3000/dashboard/spells'
+    );
 
     expect([200, 307]).toContain(response.status());
 
@@ -31,7 +35,9 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
   });
 
   test('Classes editor page compiles and responds', async ({ request }) => {
-    const response = await request.get('http://localhost:3000/dashboard/classes');
+    const response = await request.get(
+      'http://localhost:3000/dashboard/classes'
+    );
 
     expect([200, 307]).toContain(response.status());
 
@@ -52,11 +58,13 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
     }
   });
 
-  test('All editor pages should not have JavaScript errors', async ({ page }) => {
+  test('All editor pages should not have JavaScript errors', async ({
+    page,
+  }) => {
     const jsErrors: string[] = [];
 
     // Capture console errors
-    page.on('pageerror', (error) => {
+    page.on('pageerror', error => {
       jsErrors.push(error.message);
     });
 
@@ -80,7 +88,7 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
 
     // Check no critical JavaScript errors occurred
     const criticalErrors = jsErrors.filter(
-      (err) =>
+      err =>
         !err.includes('404') && // Ignore 404s
         !err.includes('Failed to fetch') && // Ignore network errors
         !err.includes('NetworkError') // Ignore network errors

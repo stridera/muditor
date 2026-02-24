@@ -1,10 +1,4 @@
-import {
-  ObjectType,
-  Field,
-  Int,
-  InputType,
-  Float,
-} from '@nestjs/graphql';
+import { ObjectType, Field, Int, InputType, Float } from '@nestjs/graphql';
 import {
   IsOptional,
   IsString,

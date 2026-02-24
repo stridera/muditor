@@ -7,7 +7,12 @@ import { AuthModule } from '../auth/auth.module';
 
 @Module({
   imports: [forwardRef(() => AuthModule)],
-  providers: [UsersService, UsersResolver, RoleCalculatorService, MinimumRoleGuard],
+  providers: [
+    UsersService,
+    UsersResolver,
+    RoleCalculatorService,
+    MinimumRoleGuard,
+  ],
   exports: [UsersService, RoleCalculatorService, MinimumRoleGuard],
 })
 export class UsersModule {}

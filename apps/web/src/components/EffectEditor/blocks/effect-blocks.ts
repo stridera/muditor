@@ -1276,7 +1276,7 @@ export function registerEffectBlocks(): void {
       this.setNextStatement(true, 'effect');
       this.setColour('#f4511e');
       this.setTooltip(
-        "Target is dazed and unable to act. Unlike knockdown, target remains standing. Used by shield bash, pommel strike."
+        'Target is dazed and unable to act. Unlike knockdown, target remains standing. Used by shield bash, pommel strike.'
       );
       this.setHelpUrl('');
     },
@@ -1434,7 +1434,5 @@ export function registerEffectBlocks(): void {
     },
   };
 
-  console.log(
-    'Effect blocks registered successfully (27 effects + gates)'
-  );
+  console.log('Effect blocks registered successfully (27 effects + gates)');
 }

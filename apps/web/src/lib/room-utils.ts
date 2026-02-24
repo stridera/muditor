@@ -37,13 +37,11 @@ export interface RoomExitWithDestination {
  * Validates both toZoneId and toRoomId are present
  * Allows 0 for both zone and room IDs
  */
-export function hasValidDestination(
-  exit: {
-    toZoneId?: number | null;
-    toRoomId?: number | null;
-    [key: string]: any;
-  }
-): exit is RoomExitWithDestination {
+export function hasValidDestination(exit: {
+  toZoneId?: number | null;
+  toRoomId?: number | null;
+  [key: string]: any;
+}): exit is RoomExitWithDestination {
   return isValidZoneId(exit.toZoneId) && isValidRoomId(exit.toRoomId);
 }
 

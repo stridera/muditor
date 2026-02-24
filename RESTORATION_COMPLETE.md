@@ -19,6 +19,7 @@ model RaceAbilities {
 ```
 
 **Purpose**: Racial ability bonuses
+
 - Elves get +15 to Archery, +10 to Stealth
 - Dwarves get +20 to Mining, +15 to Smithing
 - Category system: PRIMARY, SECONDARY, RESTRICTED, FORBIDDEN
@@ -41,6 +42,7 @@ model ObjectAbilities {
 ```
 
 **Purpose**: Magical items that cast abilities
+
 - Scrolls: Cast spell once
 - Wands: Multiple charges
 - Potions: Single use consumables
@@ -49,6 +51,7 @@ model ObjectAbilities {
 ### 3. ✅ Updated Ability Relationships (lines 49-50)
 
 Added two new relationships to the Ability model:
+
 ```prisma
 raceAbilities      RaceAbilities[]
 objectAbilities    ObjectAbilities[]
@@ -57,6 +60,7 @@ objectAbilities    ObjectAbilities[]
 ### 4. ✅ Updated Races Relationship (line 662)
 
 Added relationship to Races model:
+
 ```prisma
 raceAbilities      RaceAbilities[]
 ```
@@ -64,6 +68,7 @@ raceAbilities      RaceAbilities[]
 ### 5. ✅ Updated Objects Relationship (line 614)
 
 Added relationship to Objects model:
+
 ```prisma
 objectAbilities    ObjectAbilities[]
 ```
@@ -78,12 +83,14 @@ objectAbilities    ObjectAbilities[]
 ## Next Steps
 
 1. **Create migration**:
+
    ```bash
    cd /home/strider/Code/mud/muditor/packages/db
    pnpm db:migrate
    ```
 
 2. **Generate Prisma clients**:
+
    ```bash
    pnpm db:generate
    ```
@@ -93,12 +100,14 @@ objectAbilities    ObjectAbilities[]
 ## Design Rationale Confirmed
 
 ### Auras as Effects ✅
+
 - No separate Auras table needed
 - Effect model with JSON params handles persistent buffs/debuffs
 - Fireball = damage effect + burning DOT effect
 - Cleaner and more flexible for seed data
 
 ### Proficiency-Only Progression ✅
+
 - Single `proficiency` field (0-100)
 - Direct increments on ability use
 - Capped by character level

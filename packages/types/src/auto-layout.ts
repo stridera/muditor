@@ -339,8 +339,8 @@ function calculateLayoutQuality(
 
       const distance = Math.sqrt(
         Math.pow(destPos.x - roomPos.x, 2) +
-        Math.pow(destPos.y - roomPos.y, 2) +
-        Math.pow((destPos.z || 0) - (roomPos.z || 0), 2)
+          Math.pow(destPos.y - roomPos.y, 2) +
+          Math.pow((destPos.z || 0) - (roomPos.z || 0), 2)
       );
       totalPathLength += distance;
       pathCount++;
@@ -705,7 +705,7 @@ export function detectOneWayExits(rooms: AutoLayoutRoom[]): Array<{
         returnExit =>
           returnExit.toRoomId === room.id &&
           returnExit.direction.toLowerCase() ===
-          expectedReturnDirection.toLowerCase()
+            expectedReturnDirection.toLowerCase()
       );
 
       oneWayExits.push({
