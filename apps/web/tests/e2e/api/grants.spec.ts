@@ -4,7 +4,6 @@ const API_URL = 'http://localhost:3001/graphql';
 
 test.describe('Grants System', () => {
   let godToken: string;
-  let godUserId: string;
   let builderToken: string;
   let builderUserId: string;
 
@@ -24,7 +23,6 @@ test.describe('Grants System', () => {
     });
     const godData = await godLogin.json();
     godToken = godData.data.login.accessToken;
-    godUserId = godData.data.login.user.id;
 
     // Login as BUILDER user
     const builderLogin = await request.post(API_URL, {
@@ -45,6 +43,18 @@ test.describe('Grants System', () => {
   });
 
   test('HEAD_BUILDER+ should grant zone access', async ({ request }) => {
+    // Clean up any existing zone 30 grant from previous test runs
+    await request.post(API_URL, {
+      headers: { Authorization: `Bearer ${godToken}` },
+      data: {
+        query: `
+          mutation {
+            revokeZoneAccess(userId: "${builderUserId}", zoneId: 30)
+          }
+        `,
+      },
+    });
+
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${godToken}` },
       data: {
@@ -79,7 +89,7 @@ test.describe('Grants System', () => {
       data: {
         query: `
           query {
-            userGrants(userId: "${builderUserId}") {
+            grants(userId: "${builderUserId}") {
               id
               resourceType
               resourceId
@@ -91,28 +101,33 @@ test.describe('Grants System', () => {
     });
     const data = await response.json();
     expect(data.errors).toBeUndefined();
-    expect(data.data.userGrants).toBeTruthy();
-    expect(Array.isArray(data.data.userGrants)).toBe(true);
+    expect(data.data.grants).toBeTruthy();
+    expect(Array.isArray(data.data.grants)).toBe(true);
   });
 
-  test('should check zone permission', async ({ request }) => {
+  test('should check zone permission via grants', async ({ request }) => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${godToken}` },
       data: {
         query: `
           query {
-            checkZonePermission(
-              userId: "${builderUserId}",
-              zoneId: 30,
-              permission: WRITE
-            )
+            userZoneGrants(userId: "${builderUserId}") {
+              zoneId
+              permissions
+            }
           }
         `,
       },
     });
     const data = await response.json();
     expect(data.errors).toBeUndefined();
-    expect(data.data.checkZonePermission).toBe(true);
+
+    const zoneGrants = data.data.userZoneGrants;
+    const zone30Grant = zoneGrants.find(
+      (g: { zoneId: string }) => g.zoneId === '30'
+    );
+    expect(zone30Grant).toBeTruthy();
+    expect(zone30Grant.permissions).toContain('WRITE');
   });
 
   test('should revoke grant', async ({ request }) => {
@@ -122,7 +137,7 @@ test.describe('Grants System', () => {
       data: {
         query: `
           query {
-            userGrants(userId: "${builderUserId}") {
+            grants(userId: "${builderUserId}") {
               id
               resourceType
               resourceId
@@ -133,27 +148,27 @@ test.describe('Grants System', () => {
     });
     const listData = await listResponse.json();
 
-    if (listData.data.userGrants.length === 0) {
+    if (listData.data.grants.length === 0) {
       test.skip();
       return;
     }
 
-    const grantId = listData.data.userGrants[0].id;
+    const grantId = listData.data.grants[0].id;
 
-    // Now revoke it
-    const revokeResponse = await request.post(API_URL, {
+    // Now delete it (pass ID as integer, not string)
+    const deleteResponse = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${godToken}` },
       data: {
         query: `
           mutation {
-            revokeGrant(id: ${grantId})
+            deleteGrant(id: ${grantId})
           }
         `,
       },
     });
-    const revokeData = await revokeResponse.json();
-    expect(revokeData.errors).toBeUndefined();
-    expect(revokeData.data.revokeGrant).toBe(true);
+    const deleteData = await deleteResponse.json();
+    expect(deleteData.errors).toBeUndefined();
+    expect(deleteData.data.deleteGrant).toBe(true);
   });
 
   test('BUILDER should not grant zone access', async ({ request }) => {

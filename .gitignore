@@ -14,6 +14,7 @@ coverage/
 dist-types/
 apps/web/tests/e2e/**/*.d.ts
 apps/web/tests/e2e/**/*.d.ts.map
+apps/web/tests/e2e/**/*.js
 apps/web/tests/e2e/**/*.js.map
 apps/web/src/**/*.d.ts
 apps/web/src/**/*.d.ts.map

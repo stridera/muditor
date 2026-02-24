@@ -72,8 +72,7 @@ test.describe('Authentication and Role System', () => {
       data: {
         query: `
           query {
-            skills(take: 3) { id name }
-            spells(take: 3) { id name }
+            abilities(take: 3) { id name }
             races { race name }
             classes(take: 3) { id name }
           }
@@ -82,8 +81,7 @@ test.describe('Authentication and Role System', () => {
     });
     const data = await response.json();
     expect(data.errors).toBeUndefined();
-    expect(data.data.skills).toHaveLength(3);
-    expect(data.data.spells).toHaveLength(3);
+    expect(data.data.abilities).toHaveLength(3);
     expect(data.data.races.length).toBeGreaterThan(0);
     expect(data.data.classes).toHaveLength(3);
   });
@@ -95,20 +93,20 @@ test.describe('Authentication and Role System', () => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${builderToken}` },
       data: {
-        query: `query { skills(take: 3) { id name } }`,
+        query: `query { abilities(take: 3) { id name } }`,
       },
     });
     const data = await response.json();
     // BUILDER should be allowed to view since BUILDER > IMMORTAL in hierarchy
     expect(data.errors).toBeUndefined();
-    expect(data.data.skills).toBeTruthy();
+    expect(data.data.abilities).toBeTruthy();
   });
 
   test('PLAYER role should be denied access', async ({ request }) => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${playerToken}` },
       data: {
-        query: `query { skills(take: 3) { id name } }`,
+        query: `query { abilities(take: 3) { id name } }`,
       },
     });
     const data = await response.json();
@@ -119,7 +117,7 @@ test.describe('Authentication and Role System', () => {
   test('unauthenticated requests should be rejected', async ({ request }) => {
     const response = await request.post(API_URL, {
       data: {
-        query: `query { skills(take: 3) { id name } }`,
+        query: `query { abilities(take: 3) { id name } }`,
       },
     });
     const data = await response.json();

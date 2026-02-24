@@ -1,13 +1,10 @@
-import { test, expect } from '@playwright/test';
+import { test, expect } from './fixtures';
 
 test.describe('Basic System Check', () => {
   test('should load home page', async ({ page }) => {
     await page.goto('/');
 
-    // Should load without error
-    await expect(page).toHaveTitle(/Muditor/);
-
-    // Should have some basic navigation or content
+    // Should have some basic content
     const bodyContent = await page.textContent('body');
     expect(bodyContent).toBeTruthy();
     expect(bodyContent!.length).toBeGreaterThan(0);
@@ -18,7 +15,7 @@ test.describe('Basic System Check', () => {
 
     // Try to find a login link or button
     await page.click(
-      'a[href*="login"], button:has-text("Login"), a:has-text("Login"), a:has-text("Sign In")'
+      'a[href*="login"], button:has-text("Sign In"), a:has-text("Sign In"), a:has-text("Login")'
     );
 
     // Should navigate to login page

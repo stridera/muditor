@@ -19,7 +19,6 @@ const API_URL = 'http://localhost:3001/graphql';
 
 test.describe('Character Linking and Role Recalculation', () => {
   let userToken: string;
-  let userId: string;
   let userEmail: string;
   let testCharacterId: string;
 
@@ -51,7 +50,6 @@ test.describe('Character Linking and Role Recalculation', () => {
     expect(registerData.data.register.user.role).toBe('PLAYER');
 
     userToken = registerData.data.register.accessToken;
-    userId = registerData.data.register.user.id;
   });
 
   test('should start with PLAYER role for new user', async ({ request }) => {
@@ -95,10 +93,7 @@ test.describe('Character Linking and Role Recalculation', () => {
 
     // Should fail if character doesn't exist or is already linked
     if (linkData.errors) {
-      console.log(
-        'Note: Character linking failed (expected if TestGodChar does not exist or is already linked)'
-      );
-      console.log('Error:', linkData.errors[0].message);
+      // Character linking failed (expected if TestGodChar does not exist or is already linked)
       test.skip();
       return;
     }
@@ -123,7 +118,7 @@ test.describe('Character Linking and Role Recalculation', () => {
     request,
   }) => {
     if (!testCharacterId) {
-      console.log('Skipping: No character was linked');
+      // No character was linked in previous test
       test.skip();
       return;
     }
@@ -183,8 +178,7 @@ test.describe('Role Hierarchy Tests', () => {
       data: {
         query: `
           query {
-            skillsCount
-            spellsCount
+            abilitiesCount
             racesCount
             classesCount
           }
@@ -194,8 +188,7 @@ test.describe('Role Hierarchy Tests', () => {
 
     const data = await response.json();
     expect(data.errors).toBeUndefined();
-    expect(data.data.skillsCount).toBeGreaterThan(0);
-    expect(data.data.spellsCount).toBeGreaterThan(0);
+    expect(data.data.abilitiesCount).toBeGreaterThan(0);
     expect(data.data.racesCount).toBeGreaterThan(0);
     expect(data.data.classesCount).toBeGreaterThan(0);
   });
@@ -223,13 +216,13 @@ test.describe('Role Hierarchy Tests', () => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${builderToken}` },
       data: {
-        query: `query { skillsCount }`,
+        query: `query { abilitiesCount }`,
       },
     });
 
     const data = await response.json();
     expect(data.errors).toBeUndefined();
-    expect(data.data.skillsCount).toBeGreaterThan(0);
+    expect(data.data.abilitiesCount).toBeGreaterThan(0);
   });
 
   test('PLAYER role should be denied access to game system queries', async ({
@@ -255,7 +248,7 @@ test.describe('Role Hierarchy Tests', () => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${playerToken}` },
       data: {
-        query: `query { skillsCount }`,
+        query: `query { abilitiesCount }`,
       },
     });
 

@@ -41,8 +41,8 @@ export class GrantsResolver {
   // Query single grant by ID
   @Query(() => UserGrantDto, { name: 'grant' })
   @MinimumRole(UserRole.HEAD_BUILDER)
-  async findOneGrant(@Args('id', { type: () => ID }) id: number) {
-    return this.grantsService.findOne(id);
+  async findOneGrant(@Args('id', { type: () => ID }) id: number | string) {
+    return this.grantsService.findOne(Number(id));
   }
 
   // Query user's zone grants
@@ -73,17 +73,17 @@ export class GrantsResolver {
   @Mutation(() => UserGrantDto)
   @MinimumRole(UserRole.HEAD_BUILDER)
   async updateGrant(
-    @Args('id', { type: () => ID }) id: number,
+    @Args('id', { type: () => ID }) id: number | string,
     @Args('data') data: UpdateGrantInput
   ) {
-    return this.grantsService.update(id, data);
+    return this.grantsService.update(Number(id), data);
   }
 
   // Delete a grant (HEAD_BUILDER+)
   @Mutation(() => Boolean)
   @MinimumRole(UserRole.HEAD_BUILDER)
-  async deleteGrant(@Args('id', { type: () => ID }) id: number) {
-    await this.grantsService.remove(id);
+  async deleteGrant(@Args('id', { type: () => ID }) id: number | string) {
+    await this.grantsService.remove(Number(id));
     return true;
   }
 
