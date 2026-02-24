@@ -4,12 +4,17 @@ import {
   type OnModuleDestroy,
   type OnModuleInit,
 } from '@nestjs/common';
-import { Prisma, PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { Prisma, PrismaClient } from '@muditor/db';
 import { stripMarkup } from '../common/text-utils';
 
 // Create extended Prisma client with plaintext field middleware
 function createExtendedPrismaClient() {
+  const adapter = new PrismaPg({
+    connectionString: process.env.DATABASE_URL!,
+  });
   const prisma = new PrismaClient({
+    adapter,
     log: [
       {
         emit: 'event',

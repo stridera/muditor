@@ -1,6 +1,6 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { WearFlag } from '@prisma/client';
+import { WearFlag } from '@muditor/db';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateMobResetInput,

@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, Int, registerEnumType } from '@nestjs/graphql';
-import { SystemTextCategory } from '@prisma/client';
+import { SystemTextCategory } from '@muditor/db';
 
 registerEnumType(SystemTextCategory, {
   name: 'SystemTextCategory',

@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole, type Users } from '@prisma/client';
+import { UserRole, type Users } from '@muditor/db';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
@@ -18,16 +18,15 @@ import { RegisterInput } from './dto/register.input';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 
 // Sanitized user returned by auth operations (no password or reset tokens)
-interface SanitizedUser
-  extends Omit<
-    User,
-    | 'passwordHash'
-    | 'resetToken'
-    | 'resetTokenExpiry'
-    | 'failedLoginAttempts'
-    | 'lockedUntil'
-    | 'lastFailedLogin'
-  > {
+interface SanitizedUser extends Omit<
+  User,
+  | 'passwordHash'
+  | 'resetToken'
+  | 'resetTokenExpiry'
+  | 'failedLoginAttempts'
+  | 'lockedUntil'
+  | 'lastFailedLogin'
+> {
   passwordHash?: never;
   resetToken?: never;
   resetTokenExpiry?: never;

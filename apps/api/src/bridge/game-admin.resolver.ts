@@ -10,8 +10,8 @@ import {
   Float,
 } from '@nestjs/graphql';
 import { GraphQLISODateTime } from '@nestjs/graphql';
-import { UserRole } from '@prisma/client';
-import type { Users } from '@prisma/client';
+import { UserRole } from '@muditor/db';
+import type { Users } from '@muditor/db';
 import { GameAdminService } from './game-admin.service';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';

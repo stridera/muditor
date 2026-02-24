@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ObjectType } from '@prisma/client';
+import { ObjectType } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { ObjectsService } from './objects.service';
 

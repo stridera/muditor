@@ -5,7 +5,7 @@ import {
   DeploymentStatus,
   Prisma,
   ChangeType,
-} from '@prisma/client';
+} from '@muditor/db';
 import { createHash } from 'crypto';
 
 interface DeploymentConfig {

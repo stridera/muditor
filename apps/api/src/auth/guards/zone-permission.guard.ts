@@ -4,7 +4,7 @@ import {
   type ExecutionContext,
 } from '@nestjs/common';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserRole, GrantResourceType, GrantPermission } from '@prisma/client';
+import { UserRole, GrantResourceType, GrantPermission } from '@muditor/db';
 import { DatabaseService } from '../../database/database.service';
 
 /**

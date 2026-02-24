@@ -1,8 +1,12 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaPg } from '@prisma/adapter-pg';
+import { PrismaClient } from '@muditor/db';
 import { seedGameSystem } from './game-system';
 import { seedCharacters } from './characters';
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({
+  connectionString: process.env.DATABASE_URL!,
+});
+const prisma = new PrismaClient({ adapter });
 
 /**
  * Game System Seeding
@@ -38,7 +42,9 @@ async function main() {
     const userCount = await prisma.users.count();
 
     if (userCount === 0) {
-      console.log('⚠️  No users found. Please run FieryLib to seed users first:');
+      console.log(
+        '⚠️  No users found. Please run FieryLib to seed users first:'
+      );
       console.log('   cd ../../fierylib');
       console.log('   poetry run fierylib seed users');
       console.log('');
@@ -57,9 +63,15 @@ async function main() {
     console.log('');
     console.log('⚔️ Seeding test characters...');
     const users = {
-      admin: await prisma.users.findUnique({ where: { email: 'admin@muditor.dev' } }),
-      builder: await prisma.users.findUnique({ where: { email: 'builder@muditor.dev' } }),
-      player: await prisma.users.findUnique({ where: { email: 'player@muditor.dev' } }),
+      admin: await prisma.users.findUnique({
+        where: { email: 'admin@muditor.dev' },
+      }),
+      builder: await prisma.users.findUnique({
+        where: { email: 'builder@muditor.dev' },
+      }),
+      player: await prisma.users.findUnique({
+        where: { email: 'player@muditor.dev' },
+      }),
     };
     await seedCharacters(prisma, users as any);
 

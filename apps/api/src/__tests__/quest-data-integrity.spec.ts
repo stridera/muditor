@@ -23,7 +23,11 @@ describe('Quest Data Integrity Tests', () => {
     app = moduleFixture.createNestApplication();
     await app.init();
 
-    prisma = new PrismaClient();
+    const { PrismaPg } = await import('@prisma/adapter-pg');
+    const adapter = new PrismaPg({
+      connectionString: process.env.DATABASE_URL!,
+    });
+    prisma = new PrismaClient({ adapter });
 
     // Ensure test zone exists for foreign key relations
     await prisma.zones.upsert({

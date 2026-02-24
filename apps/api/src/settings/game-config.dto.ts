@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { ConfigValueType } from '@prisma/client';
+import { ConfigValueType } from '@muditor/db';
 
 registerEnumType(ConfigValueType, {
   name: 'ConfigValueType',

@@ -12,7 +12,7 @@ import {
   MagicAffinity,
   PositionMechanic,
   Sector,
-} from '@prisma/client';
+} from '@muditor/db';
 import {
   IsArray,
   IsBoolean,

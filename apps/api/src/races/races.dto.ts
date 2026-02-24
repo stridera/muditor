@@ -6,7 +6,7 @@ import {
   LifeForce,
   Composition,
   SkillCategory,
-} from '@prisma/client';
+} from '@muditor/db';
 
 // Register enums for GraphQL
 registerEnumType(Race, { name: 'Race' });

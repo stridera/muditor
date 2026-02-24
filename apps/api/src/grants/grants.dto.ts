@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { GrantResourceType, GrantPermission } from '@prisma/client';
+import { GrantResourceType, GrantPermission } from '@muditor/db';
 
 // Register enums with GraphQL
 registerEnumType(GrantResourceType, {

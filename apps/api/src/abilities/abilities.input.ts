@@ -7,7 +7,7 @@ import {
   SaveType,
   SpellSphere,
   ElementType,
-} from '@prisma/client';
+} from '@muditor/db';
 
 @InputType()
 export class CreateAbilityInput {

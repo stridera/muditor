@@ -1,5 +1,5 @@
 import { ItemType, SectorType, TriggerFlag } from '@muditor/types';
-import { MobFlag, PrismaClient, Race } from '@prisma/client';
+import { MobFlag, PrismaClient, Race } from '@muditor/db';
 
 describe('Seeded Data Integrity', () => {
   let prisma: PrismaClient;

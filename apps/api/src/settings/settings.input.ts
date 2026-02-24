@@ -11,11 +11,7 @@ import {
   MaxLength,
   IsArray,
 } from 'class-validator';
-import {
-  ConfigValueType,
-  SystemTextCategory,
-  LoginStage,
-} from '@prisma/client';
+import { ConfigValueType, SystemTextCategory, LoginStage } from '@muditor/db';
 
 // ============================================
 // GameConfig Inputs

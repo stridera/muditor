@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Mutation, Query, Resolver } from '@nestjs/graphql';
-import type { Users } from '@prisma/client';
-import { GrantResourceType, UserRole } from '@prisma/client';
+import type { Users } from '@muditor/db';
+import { GrantResourceType, UserRole } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';

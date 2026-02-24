@@ -5,7 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { ScriptType } from '@prisma/client';
+import { ScriptType } from '@muditor/db';
 import {
   IsArray,
   IsEnum,

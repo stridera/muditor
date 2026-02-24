@@ -1,5 +1,5 @@
 import { InputType, Field } from '@nestjs/graphql';
-import { GrantResourceType, GrantPermission } from '@prisma/client';
+import { GrantResourceType, GrantPermission } from '@muditor/db';
 
 @InputType()
 export class CreateGrantInput {

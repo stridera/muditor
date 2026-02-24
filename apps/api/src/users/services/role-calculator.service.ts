@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import { DatabaseService } from '../../database/database.service';
 
 /**

@@ -3,7 +3,7 @@ import {
   NotFoundException,
   BadRequestException,
 } from '@nestjs/common';
-import { Race } from '@prisma/client';
+import { Race } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateRaceInput,
@@ -129,7 +129,7 @@ export class RacesService {
       orderBy: { abilityId: 'asc' },
     });
 
-    return abilities.map((ability) => ({
+    return abilities.map(ability => ({
       ...ability,
       raceName: ability.raceData.name,
       abilityName: ability.ability.name,

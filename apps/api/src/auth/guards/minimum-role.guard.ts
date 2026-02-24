@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import { RoleCalculatorService } from '../../users/services/role-calculator.service';
 
 export const MINIMUM_ROLE_KEY = 'minimumRole';

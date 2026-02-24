@@ -1,5 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { ObjectType as ObjectTypeEnum } from '@prisma/client';
+import { ObjectType as ObjectTypeEnum } from '@muditor/db';
 import 'reflect-metadata';
 import '../../objects/object.dto';
 import { ObjectsResolver } from '../../objects/objects.resolver';

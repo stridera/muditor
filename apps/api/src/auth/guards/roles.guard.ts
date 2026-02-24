@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
-import { UserRole } from '@prisma/client';
+import { UserRole } from '@muditor/db';
 import { ROLES_KEY } from '../decorators/roles.decorator';
 
 @Injectable()

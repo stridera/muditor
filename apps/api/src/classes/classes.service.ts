@@ -3,7 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import type { Prisma } from '@prisma/client';
+import type { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { stripMarkup } from '../common/text-utils';
 import {

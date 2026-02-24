@@ -29,7 +29,7 @@ import {
   MagicAffinity,
   PositionMechanic,
   Sector,
-} from '@prisma/client';
+} from '@muditor/db';
 
 interface RoomServiceResultBase {
   id: number;

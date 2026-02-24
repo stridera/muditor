@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 
 type ShopWithRelations = Prisma.ShopsGetPayload<{

@@ -6,7 +6,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { ShopFlag, ShopTradesWith } from '@prisma/client';
+import { ShopFlag, ShopTradesWith } from '@muditor/db';
 import {
   IsArray,
   IsEnum,

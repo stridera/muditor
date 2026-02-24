@@ -1,5 +1,5 @@
-import type { Position } from '@prisma/client';
-import { PrismaClient } from '@prisma/client';
+import type { Position } from '@muditor/db';
+import { PrismaClient } from '@muditor/db';
 
 export async function seedGameSystem(prisma: PrismaClient) {
   console.log('🎮 Seeding game system data...');

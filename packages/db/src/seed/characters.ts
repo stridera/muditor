@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient } from '@muditor/db';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 

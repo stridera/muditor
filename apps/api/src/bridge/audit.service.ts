@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { randomUUID } from 'crypto';
 
@@ -51,8 +51,10 @@ export class AuditService {
             entityType: entry.entityType,
             entityId: entry.entityId,
             userId: entry.userId,
-            oldValues: entry.oldValues ?? Prisma.JsonNull,
-            newValues: entry.newValues ?? Prisma.JsonNull,
+            oldValues: (entry.oldValues ??
+              Prisma.JsonNull) as Prisma.InputJsonValue,
+            newValues: (entry.newValues ??
+              Prisma.JsonNull) as Prisma.InputJsonValue,
           },
         }),
         this.databaseService.users.findUnique({

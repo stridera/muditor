@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, Int, registerEnumType } from '@nestjs/graphql';
-import { Position } from '@prisma/client';
+import { Position } from '@muditor/db';
 
 // Register Position enum for GraphQL (may already be registered elsewhere)
 registerEnumType(Position, { name: 'Position' });
