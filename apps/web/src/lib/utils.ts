@@ -11,23 +11,24 @@ export function cn(...inputs: ClassValue[]) {
 export function formatRace(raceType?: string | null): string {
   if (!raceType) return '';
 
-  // Handle special cases
+  // Handle special cases (lookup by underscore-stripped lowercase)
   const raceMap: Record<string, string> = {
     halfelf: 'Half-Elf',
     halforc: 'Half-Orc',
     darkknight: 'Dark Knight',
-    // Add more special cases as needed
   };
 
-  const normalizedRace = raceType.toLowerCase().trim();
+  const normalizedRace = raceType.toLowerCase().replace(/_/g, '').trim();
 
-  // Check if it's a special case
   if (raceMap[normalizedRace]) {
     return raceMap[normalizedRace];
   }
 
-  // Default: capitalize first letter
-  return raceType.charAt(0).toUpperCase() + raceType.slice(1).toLowerCase();
+  // Default: split on underscores, capitalize each word
+  return raceType
+    .split('_')
+    .map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase())
+    .join(' ');
 }
 
 /**
@@ -50,5 +51,7 @@ export function formatClass(playerClass?: string | null): string {
   }
 
   // Default: capitalize first letter, lowercase rest
-  return playerClass.charAt(0).toUpperCase() + playerClass.slice(1).toLowerCase();
+  return (
+    playerClass.charAt(0).toUpperCase() + playerClass.slice(1).toLowerCase()
+  );
 }

@@ -135,6 +135,11 @@ export class CreateTriggerInput {
   @IsOptional()
   @IsString()
   variables?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  flags?: string[];
 }
 
 @InputType()
@@ -188,6 +193,11 @@ export class UpdateTriggerInput {
   @IsOptional()
   @IsString()
   variables?: string;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  flags?: string[];
 }
 
 @InputType()

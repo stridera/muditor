@@ -1170,6 +1170,7 @@ input CreateTriggerInput {
   argList: [String!]! = []
   attachType: ScriptType!
   commands: String!
+  flags: [String!]
   id: Int
   mobId: Int
   mobZoneId: Int
@@ -2187,7 +2188,7 @@ type OnlineCharacterDto {
   name: String!
   playerClass: String
   raceType: String
-  user: UserSummaryDto!
+  user: UserSummaryDto
 }
 
 """Information about an online player in FieryMUD"""
@@ -3741,6 +3742,7 @@ input UpdateTriggerInput {
   argList: [String!]
   attachType: ScriptType
   commands: String
+  flags: [String!]
   mobId: Int
   mobZoneId: Int
   name: String

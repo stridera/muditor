@@ -162,6 +162,7 @@ const toolboxCategories = {
         { kind: 'block', type: 'effect_cleanse' }, // Remove conditions (poison, curse, etc.)
         { kind: 'block', type: 'effect_dispel' }, // Remove magical effects
         { kind: 'block', type: 'effect_reveal' }, // Show hidden creatures/objects
+        { kind: 'block', type: 'effect_inspect' }, // Identify item properties
       ],
     },
     {
@@ -171,7 +172,10 @@ const toolboxCategories = {
       contents: [
         { kind: 'block', type: 'effect_teleport' }, // Move to location
         { kind: 'block', type: 'effect_move' }, // Forced movement: knockback, pull, swap
+        { kind: 'block', type: 'effect_drag' }, // Force target to move with you
         { kind: 'block', type: 'effect_extract' }, // Remove mob/object from game
+        { kind: 'block', type: 'effect_dismount' }, // Force off mount
+        { kind: 'block', type: 'effect_stop_combat' }, // End combat / disengage
       ],
     },
     {
@@ -180,6 +184,10 @@ const toolboxCategories = {
       colour: '#1e88e5',
       contents: [
         { kind: 'block', type: 'effect_interrupt' }, // Stop casting/channeling
+        { kind: 'block', type: 'effect_stun' }, // Daze, unable to act
+        { kind: 'block', type: 'effect_knockdown' }, // Knock to ground
+        { kind: 'block', type: 'effect_intercept' }, // Bodyguard / redirect attacks
+        { kind: 'block', type: 'effect_redirect' }, // Reflect damage
         { kind: 'block', type: 'effect_transform' }, // Shapechange
       ],
     },
@@ -191,6 +199,7 @@ const toolboxCategories = {
         { kind: 'block', type: 'effect_summon' }, // Create creature
         { kind: 'block', type: 'effect_create' }, // Create object
         { kind: 'block', type: 'effect_enchant' }, // Apply effect to object
+        { kind: 'block', type: 'effect_conceal_item' }, // Hide item from detection
       ],
     },
     {

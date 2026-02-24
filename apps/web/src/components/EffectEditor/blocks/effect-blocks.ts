@@ -62,7 +62,6 @@ const MODIFY_TARGETS: MenuOption[] = [
   ['Ward', 'ward'],
   // Resources (max values)
   ['Max HP', 'max_hp'],
-  ['Max Mana', 'max_mana'],
   ['Max Move', 'max_move'],
   // Saving throws
   ['Save vs Spell', 'save_spell'],
@@ -75,7 +74,6 @@ const MODIFY_TARGETS: MenuOption[] = [
   ['Size', 'size'],
   ['Speed', 'speed'],
   ['HP Regen', 'regen_hp'],
-  ['Mana Regen', 'regen_mana'],
   ['Move Regen', 'regen_move'],
 ];
 
@@ -133,7 +131,6 @@ const STATUS_FLAGS: MenuOption[] = [
  */
 const RESOURCE_OPTIONS: MenuOption[] = [
   ['HP', 'hp'],
-  ['Mana', 'mana'],
   ['Move', 'move'],
 ];
 
@@ -275,7 +272,6 @@ export function registerEffectBlocks(): void {
         .appendField(
           new Blockly.FieldDropdown([
             ['HP (default)', 'hp'],
-            ['Mana', 'mana'],
             ['Move', 'move'],
           ] as MenuOption[]),
           'resource'
@@ -329,7 +325,7 @@ export function registerEffectBlocks(): void {
       this.setPreviousStatement(true, 'effect');
       this.setNextStatement(true, 'effect');
       this.setColour('#43a047');
-      this.setTooltip('Restore a resource (HP, mana, move)');
+      this.setTooltip('Restore a resource (HP, move)');
       this.setHelpUrl('');
     },
   };
@@ -1033,6 +1029,287 @@ export function registerEffectBlocks(): void {
   };
 
   // ============================================
+  // 21. CONCEAL ITEM BLOCK
+  // ============================================
+  Blockly.Blocks['effect_conceal_item'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Conceal Item');
+      this.appendDummyInput()
+        .appendField('Duration')
+        .appendField(new Blockly.FieldTextInput('level * 10'), 'duration');
+      this.appendDummyInput()
+        .appendField('Contested By')
+        .appendField(new Blockly.FieldTextInput(''), 'contestedBy');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#5e35b1');
+      this.setTooltip(
+        'Hide an item from casual detection. Detect magic or similar reveals it.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 22. DISMOUNT BLOCK
+  // ============================================
+  Blockly.Blocks['effect_dismount'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Dismount');
+      this.appendDummyInput()
+        .appendField('Fall Damage')
+        .appendField(new Blockly.FieldTextInput('0'), 'damage');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#f4511e');
+      this.setTooltip(
+        'Force target off their mount. No effect if not mounted. Often combined with knockdown.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 23. DRAG BLOCK
+  // ============================================
+  Blockly.Blocks['effect_drag'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Drag');
+      this.appendDummyInput()
+        .appendField('Duration (moves)')
+        .appendField(new Blockly.FieldNumber(1, 1, 10), 'duration');
+      this.appendDummyInput()
+        .appendField('Resistable')
+        .appendField(new Blockly.FieldCheckbox('TRUE'), 'resistable');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#00897b');
+      this.setTooltip(
+        'Force target to move with you. Target is pulled along when caster moves.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 24. INSPECT BLOCK
+  // ============================================
+  Blockly.Blocks['effect_inspect'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Inspect');
+      this.appendDummyInput()
+        .appendField('Depth')
+        .appendField(
+          new Blockly.FieldDropdown([
+            ['Basic', 'basic'],
+            ['Detailed', 'detailed'],
+            ['Full', 'full'],
+          ] as MenuOption[]),
+          'depth'
+        );
+      this.appendDummyInput()
+        .appendField('Reveal Curse')
+        .appendField(new Blockly.FieldCheckbox('TRUE'), 'revealCurse');
+      this.appendDummyInput()
+        .appendField('Reveal History')
+        .appendField(new Blockly.FieldCheckbox('FALSE'), 'revealHistory');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#5e35b1');
+      this.setTooltip(
+        'Analyze a targeted item to reveal its properties, stats, and effects. Different from reveal which finds hidden things in an area.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 25. INTERCEPT BLOCK
+  // ============================================
+  Blockly.Blocks['effect_intercept'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Intercept');
+      this.appendDummyInput()
+        .appendField('Target')
+        .appendField(
+          new Blockly.FieldDropdown([
+            ['Group Leader', 'leader'],
+            ['Lowest HP', 'lowest_hp'],
+            ['Specific Ally', 'ally'],
+          ] as MenuOption[]),
+          'target'
+        );
+      this.appendDummyInput()
+        .appendField('Duration')
+        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+      this.appendDummyInput()
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chance');
+      this.appendDummyInput()
+        .appendField('Max Interceptions (0=unlimited)')
+        .appendField(new Blockly.FieldNumber(0, 0, 100), 'maxInterceptions');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#1e88e5');
+      this.setTooltip(
+        'Bodyguard effect. Redirect attacks meant for an ally to yourself.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 26. KNOCKDOWN BLOCK
+  // ============================================
+  Blockly.Blocks['effect_knockdown'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Knockdown');
+      this.appendDummyInput()
+        .appendField('Duration (rounds)')
+        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration');
+      this.appendDummyInput()
+        .appendField('Break On Damage')
+        .appendField(new Blockly.FieldCheckbox('FALSE'), 'breakOnDamage');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#f4511e');
+      this.setTooltip(
+        'Knock target to the ground. Target loses next action and cannot move. Used by bash, trip, charge.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 27. REDIRECT BLOCK
+  // ============================================
+  Blockly.Blocks['effect_redirect'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Redirect Damage');
+      this.appendDummyInput()
+        .appendField('Target')
+        .appendField(
+          new Blockly.FieldDropdown([
+            ['Attacker', 'attacker'],
+            ['Random Enemy', 'random_enemy'],
+          ] as MenuOption[]),
+          'target'
+        );
+      this.appendDummyInput()
+        .appendField('Percent')
+        .appendField(new Blockly.FieldNumber(50, 1, 100), 'percent');
+      this.appendDummyInput()
+        .appendField('Duration')
+        .appendField(new Blockly.FieldTextInput('level'), 'duration');
+      this.appendDummyInput()
+        .appendField('Damage Type Filter')
+        .appendField(
+          new Blockly.FieldDropdown([
+            ['All Types', ''],
+            ...DAMAGE_TYPES,
+          ] as MenuOption[]),
+          'type'
+        );
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#1e88e5');
+      this.setTooltip(
+        'Redirect a portion of incoming damage elsewhere. Different from resist which reduces damage.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 28. STUN BLOCK
+  // ============================================
+  Blockly.Blocks['effect_stun'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Stun');
+      this.appendDummyInput()
+        .appendField('Duration (rounds)')
+        .appendField(new Blockly.FieldNumber(2, 1, 10), 'duration');
+      this.appendDummyInput()
+        .appendField('Break On Damage')
+        .appendField(new Blockly.FieldCheckbox('FALSE'), 'breakOnDamage');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#f4511e');
+      this.setTooltip(
+        "Target is dazed and unable to act. Unlike knockdown, target remains standing. Used by shield bash, pommel strike."
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
+  // 29. STOP COMBAT BLOCK
+  // ============================================
+  Blockly.Blocks['effect_stop_combat'] = {
+    init: function (this: Blockly.Block) {
+      this.appendDummyInput().appendField('Stop Combat');
+      this.appendDummyInput()
+        .appendField('Affects Group')
+        .appendField(new Blockly.FieldCheckbox('FALSE'), 'affectsGroup');
+      this.appendDummyInput()
+        .appendField('Prevent Re-engage (rounds)')
+        .appendField(new Blockly.FieldNumber(0, 0, 10), 'preventReengage');
+      this.appendDummyInput()
+        .appendField('Trigger')
+        .appendField(new Blockly.FieldDropdown(TRIGGER_OPTIONS), 'trigger')
+        .appendField('Chance %')
+        .appendField(new Blockly.FieldNumber(100, 0, 100), 'chancePct');
+      this.setPreviousStatement(true, 'effect');
+      this.setNextStatement(true, 'effect');
+      this.setColour('#00897b');
+      this.setTooltip(
+        'End combat for the target. Used by disengage, retreat, and pacify. Does not affect opponent.'
+      );
+      this.setHelpUrl('');
+    },
+  };
+
+  // ============================================
   // GATE BLOCKS (Conditional Execution)
   // ============================================
 
@@ -1158,6 +1435,6 @@ export function registerEffectBlocks(): void {
   };
 
   console.log(
-    'Effect blocks registered successfully (18 consolidated effects + gates)'
+    'Effect blocks registered successfully (27 effects + gates)'
   );
 }
