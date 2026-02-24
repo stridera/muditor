@@ -2,9 +2,8 @@ import { test, expect } from '@playwright/test';
 
 const API_URL = 'http://localhost:3001/graphql';
 
-test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
+test.describe('Game Systems (Abilities, Races, Classes)', () => {
   let godToken: string;
-  let immortalToken: string;
 
   test.beforeAll(async ({ request }) => {
     // Login as GOD user
@@ -23,19 +22,17 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
     godToken = godData.data.login.accessToken;
   });
 
-  test.describe('Skills Module', () => {
-    test('should list skills with IMMORTAL+ role', async ({ request }) => {
+  test.describe('Abilities Module', () => {
+    test('should list abilities with IMMORTAL+ role', async ({ request }) => {
       const response = await request.post(API_URL, {
         headers: { Authorization: `Bearer ${godToken}` },
         data: {
           query: `
             query {
-              skills(take: 5) {
+              abilities(take: 5) {
                 id
                 name
-                type
-                category
-                maxLevel
+                abilityType
               }
             }
           `,
@@ -43,22 +40,21 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
       });
       const data = await response.json();
       expect(data.errors).toBeUndefined();
-      expect(data.data.skills).toBeTruthy();
-      expect(data.data.skills.length).toBeGreaterThan(0);
-      expect(data.data.skills.length).toBeLessThanOrEqual(5);
+      expect(data.data.abilities).toBeTruthy();
+      expect(data.data.abilities.length).toBeGreaterThan(0);
+      expect(data.data.abilities.length).toBeLessThanOrEqual(5);
     });
 
-    test('should get single skill by id', async ({ request }) => {
+    test('should get single ability by id', async ({ request }) => {
       const response = await request.post(API_URL, {
         headers: { Authorization: `Bearer ${godToken}` },
         data: {
           query: `
             query {
-              skill(id: 1) {
+              ability(id: 1) {
                 id
                 name
-                type
-                category
+                abilityType
               }
             }
           `,
@@ -66,77 +62,20 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
       });
       const data = await response.json();
       expect(data.errors).toBeUndefined();
-      expect(data.data.skill).toBeTruthy();
-      expect(data.data.skill.id).toBe('1');
+      expect(data.data.ability).toBeTruthy();
+      expect(data.data.ability.id).toBe('1');
     });
 
-    test('should count skills', async ({ request }) => {
+    test('should count abilities', async ({ request }) => {
       const response = await request.post(API_URL, {
         headers: { Authorization: `Bearer ${godToken}` },
         data: {
-          query: `query { skillsCount }`,
+          query: `query { abilitiesCount }`,
         },
       });
       const data = await response.json();
       expect(data.errors).toBeUndefined();
-      expect(data.data.skillsCount).toBeGreaterThan(0);
-    });
-  });
-
-  test.describe('Spells Module', () => {
-    test('should list spells with IMMORTAL+ role', async ({ request }) => {
-      const response = await request.post(API_URL, {
-        headers: { Authorization: `Bearer ${godToken}` },
-        data: {
-          query: `
-            query {
-              spells(take: 5) {
-                id
-                name
-                type
-                manaCost
-              }
-            }
-          `,
-        },
-      });
-      const data = await response.json();
-      expect(data.errors).toBeUndefined();
-      expect(data.data.spells).toBeTruthy();
-      expect(data.data.spells.length).toBeGreaterThan(0);
-    });
-
-    test('should get single spell by id', async ({ request }) => {
-      const response = await request.post(API_URL, {
-        headers: { Authorization: `Bearer ${godToken}` },
-        data: {
-          query: `
-            query {
-              spell(id: 1) {
-                id
-                name
-                type
-                manaCost
-              }
-            }
-          `,
-        },
-      });
-      const data = await response.json();
-      expect(data.errors).toBeUndefined();
-      expect(data.data.spell).toBeTruthy();
-    });
-
-    test('should count spells', async ({ request }) => {
-      const response = await request.post(API_URL, {
-        headers: { Authorization: `Bearer ${godToken}` },
-        data: {
-          query: `query { spellsCount }`,
-        },
-      });
-      const data = await response.json();
-      expect(data.errors).toBeUndefined();
-      expect(data.data.spellsCount).toBeGreaterThan(0);
+      expect(data.data.abilitiesCount).toBeGreaterThan(0);
     });
   });
 
@@ -147,10 +86,10 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
         data: {
           query: `
             query {
-              races(take: 5) {
+              races {
                 race
                 name
-                displayName
+                plainName
                 playable
               }
             }
@@ -169,7 +108,7 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
         data: {
           query: `
             query {
-              raceByName(name: "HUMAN") {
+              race(race: HUMAN) {
                 race
                 name
                 playable
@@ -180,8 +119,8 @@ test.describe('Game Systems (Skills, Spells, Races, Classes)', () => {
       });
       const data = await response.json();
       expect(data.errors).toBeUndefined();
-      expect(data.data.raceByName).toBeTruthy();
-      expect(data.data.raceByName.name).toBe('HUMAN');
+      expect(data.data.race).toBeTruthy();
+      expect(data.data.race.race).toBe('HUMAN');
     });
   });
 

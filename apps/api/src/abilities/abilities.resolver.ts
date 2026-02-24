@@ -1,7 +1,8 @@
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { UserRole } from '@muditor/db';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import {
   Ability,
@@ -26,7 +27,7 @@ import {
 import { AbilitiesService } from './abilities.service';
 
 @Resolver(() => Ability)
-@UseGuards(JwtAuthGuard)
+@UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
 export class AbilitiesResolver {
   constructor(private abilitiesService: AbilitiesService) {}
 
@@ -42,6 +43,7 @@ export class AbilitiesResolver {
   }
 
   @Query(() => [Ability], { name: 'abilities' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getAbilities(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
@@ -54,6 +56,7 @@ export class AbilitiesResolver {
   }
 
   @Query(() => Int, { name: 'abilitiesCount' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getAbilitiesCount(
     @Args('abilityType', { type: () => String, nullable: true })
     abilityType?: string,
@@ -64,6 +67,7 @@ export class AbilitiesResolver {
   }
 
   @Query(() => Ability, { name: 'ability' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getAbility(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.findOne(this.coerceNumericId(id));
   }
@@ -180,17 +184,20 @@ export class AbilitiesResolver {
 
   // Schools queries
   @Query(() => [AbilitySchool], { name: 'abilitySchools' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getAbilitySchools() {
     return this.abilitiesService.findAllSchools();
   }
 
   @Query(() => AbilitySchool, { name: 'abilitySchool' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getAbilitySchool(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.findSchool(this.coerceNumericId(id));
   }
 
   // Effects queries
   @Query(() => [Effect], { name: 'effects' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getEffects(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
@@ -200,6 +207,7 @@ export class AbilitiesResolver {
   }
 
   @Query(() => Int, { name: 'effectsCount' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getEffectsCount(
     @Args('search', { type: () => String, nullable: true }) search?: string
   ) {
@@ -207,6 +215,7 @@ export class AbilitiesResolver {
   }
 
   @Query(() => Effect, { name: 'effect' })
+  @MinimumRole(UserRole.IMMORTAL)
   async getEffect(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.findEffect(this.coerceNumericId(id));
   }
