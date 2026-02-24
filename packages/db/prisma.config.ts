@@ -1,7 +1,7 @@
 import dotenv from 'dotenv';
 import fs from 'node:fs';
 import path from 'node:path';
-import { defineConfig, env } from 'prisma/config';
+import { defineConfig } from 'prisma/config';
 
 // Load env first so PRISMA_SCHEMA_PATH is available
 // packages/db -> repo root (two levels up)
@@ -22,6 +22,10 @@ export default defineConfig({
     seed: 'bun ./src/seed/index.ts',
   },
   datasource: {
-    url: env('DATABASE_URL') ?? 'postgresql://dummy:dummy@localhost:5432/dummy',
+    // Use process.env directly — Prisma's env() throws if missing, but we need
+    // a dummy fallback for generate-only CI jobs that have no database.
+    url:
+      process.env.DATABASE_URL ??
+      'postgresql://dummy:dummy@localhost:5432/dummy',
   },
 });
