@@ -1,11 +1,15 @@
 import {
   BadRequestException,
+  HttpException,
+  HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
+import Redis from 'ioredis';
 import crypt from 'unix-crypt-td-js';
 import type { ItemInstanceFlag, Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
@@ -20,14 +24,91 @@ import {
   UpdateCharacterItemInput,
 } from './character.input';
 
+/** Max failed password attempts before lockout */
+const LOCKOUT_MAX_ATTEMPTS = 5;
+/** Lockout duration in seconds (15 minutes) */
+const LOCKOUT_WINDOW_SECONDS = 900;
+
 @Injectable()
 export class CharactersService {
   private readonly logger = new Logger(CharactersService.name);
+  private redis: Redis | null = null;
 
   constructor(
     private readonly db: DatabaseService,
-    private readonly roleCalculator: RoleCalculatorService
-  ) {}
+    private readonly roleCalculator: RoleCalculatorService,
+    private readonly configService: ConfigService
+  ) {
+    const redisUrl =
+      this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
+    this.redis = new Redis(redisUrl, {
+      lazyConnect: true,
+      maxRetriesPerRequest: 3,
+    });
+    this.redis.connect().catch(() => {
+      this.logger.warn(
+        'Redis unavailable — character linking lockout protection disabled'
+      );
+      this.redis = null;
+    });
+  }
+
+  /**
+   * Check if a character is locked out from linking attempts.
+   * Returns the remaining lockout time in seconds, or 0 if not locked out.
+   */
+  private async getLockoutRemaining(characterName: string): Promise<number> {
+    if (!this.redis) return 0;
+    const key = `charlink:lockout:${characterName.toLowerCase()}`;
+    try {
+      const attempts = await this.redis.get(key);
+      if (attempts && parseInt(attempts, 10) >= LOCKOUT_MAX_ATTEMPTS) {
+        const ttl = await this.redis.ttl(key);
+        return ttl > 0 ? ttl : 0;
+      }
+    } catch {
+      // Redis error — fail open
+    }
+    return 0;
+  }
+
+  /**
+   * Record a failed password attempt for a character.
+   * Returns the new attempt count.
+   */
+  private async recordFailedAttempt(characterName: string): Promise<number> {
+    if (!this.redis) return 0;
+    const key = `charlink:lockout:${characterName.toLowerCase()}`;
+    try {
+      const count = await this.redis.incr(key);
+      // Set/refresh TTL on first attempt or when reaching lockout threshold
+      if (count === 1 || count === LOCKOUT_MAX_ATTEMPTS) {
+        await this.redis.expire(key, LOCKOUT_WINDOW_SECONDS);
+      }
+      return count;
+    } catch {
+      return 0;
+    }
+  }
+
+  /**
+   * Clear failed attempt counter for a character (on successful link).
+   */
+  private async clearFailedAttempts(characterName: string): Promise<void> {
+    if (!this.redis) return;
+    const key = `charlink:lockout:${characterName.toLowerCase()}`;
+    try {
+      await this.redis.del(key);
+    } catch {
+      // Redis error — non-critical
+    }
+  }
+
+  async onModuleDestroy() {
+    if (this.redis) {
+      await this.redis.quit();
+    }
+  }
 
   // Character operations
   async findAllCharacters(
@@ -631,14 +712,30 @@ export class CharactersService {
 
   // Character linking methods
   /**
-   * Link an existing game character to a user account
-   * Validates character password and recalculates user role
+   * Link an existing game character to a user account.
+   * Validates character password, enforces per-character lockout,
+   * and recalculates user role on success.
    */
   async linkCharacterToUser(
     userId: string,
     characterName: string,
     characterPassword: string
   ) {
+    // Check lockout BEFORE doing any expensive work
+    const lockoutRemaining = await this.getLockoutRemaining(characterName);
+    if (lockoutRemaining > 0) {
+      const minutes = Math.ceil(lockoutRemaining / 60);
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          message: `Too many failed attempts for this character. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`,
+          error: 'Too Many Requests',
+          retryAfter: lockoutRemaining,
+        },
+        HttpStatus.TOO_MANY_REQUESTS
+      );
+    }
+
     // Find character by name (case-insensitive)
     const character = await this.db.characters.findFirst({
       where: {
@@ -689,8 +786,32 @@ export class CharactersService {
     }
 
     if (!isPasswordValid) {
-      throw new BadRequestException('Invalid character password');
+      const attempts = await this.recordFailedAttempt(characterName);
+      const remaining = LOCKOUT_MAX_ATTEMPTS - attempts;
+      this.logger.warn(
+        `Failed character link attempt for '${characterName}' (${attempts}/${LOCKOUT_MAX_ATTEMPTS})`
+      );
+
+      if (remaining <= 0) {
+        const minutes = Math.ceil(LOCKOUT_WINDOW_SECONDS / 60);
+        throw new HttpException(
+          {
+            statusCode: HttpStatus.TOO_MANY_REQUESTS,
+            message: `Too many failed attempts. This character is locked for ${minutes} minutes.`,
+            error: 'Too Many Requests',
+            retryAfter: LOCKOUT_WINDOW_SECONDS,
+          },
+          HttpStatus.TOO_MANY_REQUESTS
+        );
+      }
+
+      throw new BadRequestException(
+        `Invalid character password. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`
+      );
     }
+
+    // Password valid — clear any failed attempts
+    await this.clearFailedAttempts(characterName);
 
     // Link character to user
     await this.db.characters.update({
@@ -765,58 +886,6 @@ export class CharactersService {
       isLinked: !!character.userId,
       hasPassword: !!character.passwordHash,
     };
-  }
-
-  /**
-   * Validate character password for linking
-   */
-  async validateCharacterPassword(
-    characterName: string,
-    password: string
-  ): Promise<boolean> {
-    const character = await this.db.characters.findFirst({
-      where: {
-        name: {
-          equals: characterName,
-          mode: 'insensitive',
-        },
-      },
-      select: {
-        id: true,
-        name: true,
-        passwordHash: true,
-      },
-    });
-
-    if (!character || !character.passwordHash) {
-      return false;
-    }
-
-    // Supports bcrypt ($2a$/$2b$) and legacy DES crypt (10 chars)
-    let isPasswordValid = false;
-
-    if (character.passwordHash.startsWith('$2')) {
-      // Modern bcrypt hash
-      isPasswordValid = await bcrypt.compare(password, character.passwordHash);
-    } else if (character.passwordHash.length === 10) {
-      // Legacy DES crypt - validate and upgrade to bcrypt
-      const hashedPassword = crypt(password, character.passwordHash);
-      isPasswordValid =
-        hashedPassword.substring(0, 10) === character.passwordHash;
-
-      if (isPasswordValid) {
-        const bcryptHash = await bcrypt.hash(password, 10);
-        await this.db.characters.update({
-          where: { id: character.id },
-          data: { passwordHash: bcryptHash },
-        });
-        this.logger.log(
-          `Upgraded legacy password to bcrypt for character: ${character.name}`
-        );
-      }
-    }
-
-    return isPasswordValid;
   }
 
   async getCharacterLinkingInfo(characterName: string) {

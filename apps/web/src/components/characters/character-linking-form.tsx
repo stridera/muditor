@@ -58,18 +58,6 @@ const LINK_CHARACTER_MUTATION = gql`
   }
 `;
 
-const VALIDATE_CHARACTER_PASSWORD = gql`
-  query ValidateCharacterPasswordInline(
-    $characterName: String!
-    $password: String!
-  ) {
-    validateCharacterPassword(
-      characterName: $characterName
-      password: $password
-    )
-  }
-`;
-
 interface CharacterLinkingInfo {
   id: string;
   name: string;
@@ -97,10 +85,6 @@ interface LinkCharacterMutationResult {
   };
 }
 
-interface ValidatePasswordQueryResult {
-  validateCharacterPassword: boolean;
-}
-
 interface CharacterLinkingFormProps {
   onCharacterLinked: () => void;
 }
@@ -118,9 +102,6 @@ export function CharacterLinkingForm({
 
   const [getCharacterInfo, { data: characterData, loading: searchLoading }] =
     useLazyQuery<CharacterLinkingInfoQueryResult>(GET_CHARACTER_LINKING_INFO);
-
-  const [validatePassword, { loading: validatingPassword }] =
-    useLazyQuery<ValidatePasswordQueryResult>(VALIDATE_CHARACTER_PASSWORD);
 
   const [linkCharacter, { loading: linkingCharacter }] =
     useMutation<LinkCharacterMutationResult>(LINK_CHARACTER_MUTATION);
@@ -190,20 +171,6 @@ export function CharacterLinkingForm({
     setError(null);
 
     try {
-      // First validate the password
-      const validation = await validatePassword({
-        variables: {
-          characterName: character.name,
-          password: password.trim(),
-        },
-      });
-
-      if (!validation.data?.validateCharacterPassword) {
-        setError('Invalid password for this character');
-        return;
-      }
-
-      // Password is valid, now link the character
       await linkCharacter({
         variables: {
           data: {
@@ -462,7 +429,7 @@ export function CharacterLinkingForm({
                   value={password}
                   onChange={e => setPassword(e.target.value)}
                   onKeyPress={e => e.key === 'Enter' && handlePasswordSubmit()}
-                  disabled={validatingPassword || linkingCharacter}
+                  disabled={linkingCharacter}
                 />
               </div>
 
@@ -483,12 +450,10 @@ export function CharacterLinkingForm({
                 </Button>
                 <Button
                   onClick={handlePasswordSubmit}
-                  disabled={
-                    validatingPassword || linkingCharacter || !password.trim()
-                  }
+                  disabled={linkingCharacter || !password.trim()}
                   className='flex-1'
                 >
-                  {validatingPassword || linkingCharacter ? (
+                  {linkingCharacter ? (
                     <Loader2 className='h-4 w-4 animate-spin mr-2' />
                   ) : (
                     <Link className='h-4 w-4 mr-2' />

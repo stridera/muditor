@@ -3186,7 +3186,6 @@ export type Query = {
   users: Array<User>;
   /** Get validation reports for all zones */
   validateAllZones: Array<ValidationReportType>;
-  validateCharacterPassword: Scalars['Boolean']['output'];
   /** Get validation report for a specific zone */
   validateZone: ValidationReportType;
   zone: ZoneDto;
@@ -3621,11 +3620,6 @@ export type QueryUserPermissionsArgs = {
 
 export type QueryUserZoneGrantsArgs = {
   userId: Scalars['String']['input'];
-};
-
-export type QueryValidateCharacterPasswordArgs = {
-  characterName: Scalars['String']['input'];
-  password: Scalars['String']['input'];
 };
 
 export type QueryValidateZoneArgs = {
@@ -6471,16 +6465,6 @@ export type LinkCharacterInlineMutation = {
   };
 };
 
-export type ValidateCharacterPasswordInlineQueryVariables = Exact<{
-  characterName: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-}>;
-
-export type ValidateCharacterPasswordInlineQuery = {
-  __typename?: 'Query';
-  validateCharacterPassword: boolean;
-};
-
 export type GetCharacterSessionInfoPollingQueryVariables = Exact<{
   characterId: Scalars['ID']['input'];
 }>;
@@ -7654,16 +7638,6 @@ export type LinkCharacterMutation = {
     name: string;
     level: number;
   };
-};
-
-export type ValidateCharacterPasswordQueryVariables = Exact<{
-  characterName: Scalars['String']['input'];
-  password: Scalars['String']['input'];
-}>;
-
-export type ValidateCharacterPasswordQuery = {
-  __typename?: 'Query';
-  validateCharacterPassword: boolean;
 };
 
 export type UpdateCharacterMutationVariables = Exact<{
@@ -16243,76 +16217,6 @@ export const LinkCharacterInlineDocument = {
   LinkCharacterInlineMutation,
   LinkCharacterInlineMutationVariables
 >;
-export const ValidateCharacterPasswordInlineDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'ValidateCharacterPasswordInline' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'characterName' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'String' },
-            },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'password' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'String' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'validateCharacterPassword' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'characterName' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'characterName' },
-                },
-              },
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'password' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'password' },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  ValidateCharacterPasswordInlineQuery,
-  ValidateCharacterPasswordInlineQueryVariables
->;
 export const GetCharacterSessionInfoPollingDocument = {
   kind: 'Document',
   definitions: [
@@ -20373,76 +20277,6 @@ export const LinkCharacterDocument = {
 } as unknown as DocumentNode<
   LinkCharacterMutation,
   LinkCharacterMutationVariables
->;
-export const ValidateCharacterPasswordDocument = {
-  kind: 'Document',
-  definitions: [
-    {
-      kind: 'OperationDefinition',
-      operation: 'query',
-      name: { kind: 'Name', value: 'ValidateCharacterPassword' },
-      variableDefinitions: [
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'characterName' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'String' },
-            },
-          },
-        },
-        {
-          kind: 'VariableDefinition',
-          variable: {
-            kind: 'Variable',
-            name: { kind: 'Name', value: 'password' },
-          },
-          type: {
-            kind: 'NonNullType',
-            type: {
-              kind: 'NamedType',
-              name: { kind: 'Name', value: 'String' },
-            },
-          },
-        },
-      ],
-      selectionSet: {
-        kind: 'SelectionSet',
-        selections: [
-          {
-            kind: 'Field',
-            name: { kind: 'Name', value: 'validateCharacterPassword' },
-            arguments: [
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'characterName' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'characterName' },
-                },
-              },
-              {
-                kind: 'Argument',
-                name: { kind: 'Name', value: 'password' },
-                value: {
-                  kind: 'Variable',
-                  name: { kind: 'Name', value: 'password' },
-                },
-              },
-            ],
-          },
-        ],
-      },
-    },
-  ],
-} as unknown as DocumentNode<
-  ValidateCharacterPasswordQuery,
-  ValidateCharacterPasswordQueryVariables
 >;
 export const UpdateCharacterDocument = {
   kind: 'Document',
