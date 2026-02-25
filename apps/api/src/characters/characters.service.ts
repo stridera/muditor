@@ -581,7 +581,11 @@ export class CharactersService {
       isOnline: c.isOnline,
       raceType: c.race ?? undefined,
       playerClass: c.characterClass?.plainName ?? undefined,
-      user: c.users,
+      user: c.users ?? {
+        id: c.id,
+        displayName: c.name,
+        role: this.roleCalculator.calculateRoleFromLevel(c.level),
+      },
     }));
   }
 
