@@ -59,8 +59,8 @@ interface AccountMailRaw {
   readAt?: Date | null;
   isDeleted: boolean;
   createdAt: Date;
-  sender?: { id: string; username: string; email: string } | null;
-  recipient?: { id: string; username: string; email: string } | null;
+  sender?: { id: string; displayName: string; email: string } | null;
+  recipient?: { id: string; displayName: string; email: string } | null;
 }
 
 // Helper to map database result to DTO with computed fields
@@ -164,7 +164,7 @@ function mapAccountMail(mail: AccountMailRaw): AccountMailDto {
     sentAt: mail.sentAt,
     isDeleted: mail.isDeleted,
     createdAt: mail.createdAt,
-    senderName: mail.sender?.username ?? mail.sender?.email ?? '<unknown>',
+    senderName: mail.sender?.displayName ?? mail.sender?.email ?? '<unknown>',
     ...(mail.recipientUserId != null
       ? { recipientUserId: mail.recipientUserId }
       : {}),

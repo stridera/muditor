@@ -211,7 +211,7 @@ export class AccountMailUserDto {
   id: string;
 
   @Field()
-  username: string;
+  displayName: string;
 
   @Field()
   email: string;
@@ -251,7 +251,7 @@ export class AccountMailDto {
 
   // Computed display fields
   @Field()
-  senderName: string; // Account username/email
+  senderName: string; // Account display name/email
 
   // Nested relations
   @Field(() => AccountMailUserDto, { nullable: true })

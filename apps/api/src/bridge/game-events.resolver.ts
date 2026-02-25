@@ -7,8 +7,82 @@ import {
   ObjectType,
   Field,
 } from '@nestjs/graphql';
+import type { Observable } from 'rxjs';
 import { BridgeService } from './bridge.service';
 import { GameEvent, GameEventType, GameEventCategory } from './game-event.dto';
+
+/**
+ * Convert an RxJS Observable into an AsyncIterableIterator
+ * required by GraphQL subscription resolvers.
+ */
+function toAsyncIterable<T>(
+  observable: Observable<T>
+): AsyncIterableIterator<T> {
+  const pullQueue: Array<{
+    resolve: (result: IteratorResult<T>) => void;
+    reject: (error: unknown) => void;
+  }> = [];
+  const pushQueue: T[] = [];
+  let done = false;
+  let error: unknown = null;
+
+  const subscription = observable.subscribe({
+    next(value: T) {
+      if (pullQueue.length > 0) {
+        pullQueue.shift()!.resolve({ value, done: false });
+      } else {
+        pushQueue.push(value);
+      }
+    },
+    error(err: unknown) {
+      error = err;
+      done = true;
+      for (const waiter of pullQueue.splice(0)) {
+        waiter.reject(err);
+      }
+    },
+    complete() {
+      done = true;
+      for (const waiter of pullQueue.splice(0)) {
+        waiter.resolve({ value: undefined as unknown as T, done: true });
+      }
+    },
+  });
+
+  return {
+    next(): Promise<IteratorResult<T>> {
+      if (pushQueue.length > 0) {
+        return Promise.resolve({ value: pushQueue.shift()!, done: false });
+      }
+      if (done) {
+        if (error) return Promise.reject(error);
+        return Promise.resolve({
+          value: undefined as unknown as T,
+          done: true,
+        });
+      }
+      return new Promise((resolve, reject) => {
+        pullQueue.push({ resolve, reject });
+      });
+    },
+    return(): Promise<IteratorResult<T>> {
+      subscription.unsubscribe();
+      done = true;
+      for (const waiter of pullQueue.splice(0)) {
+        waiter.resolve({ value: undefined as unknown as T, done: true });
+      }
+      return Promise.resolve({ value: undefined as unknown as T, done: true });
+    },
+    throw(err: unknown): Promise<IteratorResult<T>> {
+      subscription.unsubscribe();
+      done = true;
+      return Promise.reject(err);
+    },
+    [Symbol.asyncIterator]() {
+      return this;
+    },
+  };
+}
 
 /**
  * Bridge connection status
@@ -44,9 +118,10 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to all game events from FieryMUD',
+    resolve: (payload: GameEvent) => payload,
   })
   gameEvents() {
-    return this.bridgeService.getAllEvents();
+    return toAsyncIterable(this.bridgeService.getAllEvents());
   }
 
   /**
@@ -54,11 +129,12 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to specific types of game events',
+    resolve: (payload: GameEvent) => payload,
   })
   gameEventsByTypes(
     @Args('types', { type: () => [GameEventType] }) types: GameEventType[]
   ) {
-    return this.bridgeService.getEventsByTypes(types);
+    return toAsyncIterable(this.bridgeService.getEventsByTypes(types));
   }
 
   /**
@@ -67,12 +143,13 @@ export class GameEventsResolver {
   @Subscription(() => GameEvent, {
     description:
       'Subscribe to game events by category (player, chat, admin, world)',
+    resolve: (payload: GameEvent) => payload,
   })
   gameEventsByCategory(
     @Args('category', { type: () => GameEventCategory })
     category: GameEventCategory
   ) {
-    return this.bridgeService.getEventsByCategory(category);
+    return toAsyncIterable(this.bridgeService.getEventsByCategory(category));
   }
 
   /**
@@ -80,9 +157,12 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to all chat messages (gossip, shout, say, etc.)',
+    resolve: (payload: GameEvent) => payload,
   })
   chatMessages() {
-    return this.bridgeService.getEventsByCategory(GameEventCategory.CHAT);
+    return toAsyncIterable(
+      this.bridgeService.getEventsByCategory(GameEventCategory.CHAT)
+    );
   }
 
   /**
@@ -91,9 +171,12 @@ export class GameEventsResolver {
   @Subscription(() => GameEvent, {
     description:
       'Subscribe to player activity events (login, logout, death, level up)',
+    resolve: (payload: GameEvent) => payload,
   })
   playerActivity() {
-    return this.bridgeService.getEventsByCategory(GameEventCategory.PLAYER);
+    return toAsyncIterable(
+      this.bridgeService.getEventsByCategory(GameEventCategory.PLAYER)
+    );
   }
 
   /**
@@ -101,9 +184,12 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to admin alerts and system events',
+    resolve: (payload: GameEvent) => payload,
   })
   adminAlerts() {
-    return this.bridgeService.getEventsByCategory(GameEventCategory.ADMIN);
+    return toAsyncIterable(
+      this.bridgeService.getEventsByCategory(GameEventCategory.ADMIN)
+    );
   }
 
   /**
@@ -111,9 +197,12 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to world events (zone loads, resets, boss spawns)',
+    resolve: (payload: GameEvent) => payload,
   })
   worldEvents() {
-    return this.bridgeService.getEventsByCategory(GameEventCategory.WORLD);
+    return toAsyncIterable(
+      this.bridgeService.getEventsByCategory(GameEventCategory.WORLD)
+    );
   }
 
   /**
@@ -121,9 +210,10 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to events involving a specific player',
+    resolve: (payload: GameEvent) => payload,
   })
   playerEvents(@Args('playerName') playerName: string) {
-    return this.bridgeService.getPlayerEvents(playerName);
+    return toAsyncIterable(this.bridgeService.getPlayerEvents(playerName));
   }
 
   /**
@@ -131,8 +221,9 @@ export class GameEventsResolver {
    */
   @Subscription(() => GameEvent, {
     description: 'Subscribe to events in a specific zone',
+    resolve: (payload: GameEvent) => payload,
   })
   zoneEvents(@Args('zoneId', { type: () => Int }) zoneId: number) {
-    return this.bridgeService.getZoneEvents(zoneId);
+    return toAsyncIterable(this.bridgeService.getZoneEvents(zoneId));
   }
 }

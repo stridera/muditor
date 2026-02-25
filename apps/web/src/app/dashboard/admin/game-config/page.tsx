@@ -1052,7 +1052,7 @@ function LoginMessagesTab() {
 
   const stageDescription: Record<string, string> = {
     WELCOME_BANNER: 'Initial welcome screen shown on connection',
-    USERNAME_PROMPT: 'Prompt for username/email',
+    USERNAME_PROMPT: 'Prompt for email',
     PASSWORD_PROMPT: 'Prompt for password',
     INVALID_LOGIN: 'Message shown on failed login',
     TOO_MANY_ATTEMPTS: 'Message shown after too many failed attempts',

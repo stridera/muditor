@@ -347,7 +347,7 @@ export class UserSummaryDto {
   id: string;
 
   @Field()
-  username: string;
+  displayName: string;
 
   @Field()
   role: string;

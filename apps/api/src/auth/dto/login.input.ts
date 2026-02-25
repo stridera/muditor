@@ -6,7 +6,7 @@ export class LoginInput {
   @Field()
   @IsString()
   @MinLength(1, { message: 'Identifier is required' })
-  identifier: string; // Can be email or username
+  identifier: string; // Email address
 
   @Field()
   @IsString()

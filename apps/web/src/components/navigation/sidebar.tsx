@@ -476,13 +476,13 @@ export function Sidebar() {
           >
             <div className='h-8 w-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0'>
               <span className='text-primary-foreground text-sm font-medium'>
-                {user.username.charAt(0).toUpperCase()}
+                {user.displayName.charAt(0).toUpperCase()}
               </span>
             </div>
             {!collapsed && (
               <div className='flex-1 min-w-0'>
                 <div className='text-sm font-medium truncate'>
-                  {user.username}
+                  {user.displayName}
                 </div>
                 <Badge variant='outline' className='text-[10px] h-4 px-1'>
                   {user.role}

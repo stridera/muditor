@@ -8,7 +8,7 @@ import type { User } from '../../users/entities/user.entity';
 export class LocalStrategy extends PassportStrategy(Strategy) {
   constructor(private readonly authService: AuthService) {
     super({
-      usernameField: 'identifier', // Allow login with email or username
+      usernameField: 'identifier', // Login with email
     });
   }
 

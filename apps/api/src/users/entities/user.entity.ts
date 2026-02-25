@@ -27,7 +27,7 @@ export class User {
   email: string;
 
   @Field()
-  username: string;
+  displayName: string;
 
   // Don't expose password hash
   passwordHash?: string | null;

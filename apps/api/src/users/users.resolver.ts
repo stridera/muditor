@@ -25,7 +25,7 @@ import { UsersService } from './users.service';
 
 interface CurrentUserContext {
   id: string;
-  username?: string;
+  displayName?: string;
   role?: UserRole;
 }
 

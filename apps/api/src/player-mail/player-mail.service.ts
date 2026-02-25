@@ -319,8 +319,8 @@ export class PlayerMailService {
       ...(take !== undefined && { take }),
       orderBy: { sentAt: 'desc' },
       include: {
-        sender: { select: { id: true, username: true, email: true } },
-        recipient: { select: { id: true, username: true, email: true } },
+        sender: { select: { id: true, displayName: true, email: true } },
+        recipient: { select: { id: true, displayName: true, email: true } },
       },
     });
   }
@@ -336,8 +336,8 @@ export class PlayerMailService {
       ...(take !== undefined && { take }),
       orderBy: { sentAt: 'desc' },
       include: {
-        sender: { select: { id: true, username: true, email: true } },
-        recipient: { select: { id: true, username: true, email: true } },
+        sender: { select: { id: true, displayName: true, email: true } },
+        recipient: { select: { id: true, displayName: true, email: true } },
       },
     });
   }
@@ -370,8 +370,8 @@ export class PlayerMailService {
         isBroadcast: false,
       },
       include: {
-        sender: { select: { id: true, username: true, email: true } },
-        recipient: { select: { id: true, username: true, email: true } },
+        sender: { select: { id: true, displayName: true, email: true } },
+        recipient: { select: { id: true, displayName: true, email: true } },
       },
     });
   }
@@ -412,8 +412,8 @@ export class PlayerMailService {
       where: { id },
       data: { readAt: new Date() },
       include: {
-        sender: { select: { id: true, username: true, email: true } },
-        recipient: { select: { id: true, username: true, email: true } },
+        sender: { select: { id: true, displayName: true, email: true } },
+        recipient: { select: { id: true, displayName: true, email: true } },
       },
     });
   }
@@ -423,7 +423,7 @@ export class PlayerMailService {
       where: { id },
       data: { isDeleted: true },
       include: {
-        sender: { select: { id: true, username: true, email: true } },
+        sender: { select: { id: true, displayName: true, email: true } },
       },
     });
   }

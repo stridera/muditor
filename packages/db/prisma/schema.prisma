@@ -1405,8 +1405,8 @@ model ScriptErrorLog {
 model Users {
   id                  String         @id
   email               String         @unique
-  username            String         @unique
-  passwordHash        String         @map("password_hash")
+  displayName         String         @unique @map("display_name")
+  passwordHash        String?        @map("password_hash")
   role                UserRole       @default(PLAYER)
   createdAt           DateTime       @default(now()) @map("created_at")
   updatedAt           DateTime       @updatedAt @map("updated_at")
@@ -1429,6 +1429,8 @@ model Users {
   accountMailSent     AccountMail[]  @relation("accountMailSent")
   accountMailReceived AccountMail[]  @relation("accountMailReceived")
   discordLink         DiscordLink?
+  googleLink          GoogleLink?
+  loginRequests       LoginRequests[]
   // Soft delete support
   deletedAt           DateTime?      @map("deleted_at")
   deletionReason      String?        @map("deletion_reason")
@@ -2245,6 +2247,28 @@ enum UserRole {
   GOD
 }
 
+enum LoginRequestStatus {
+  PENDING
+  APPROVED
+  DENIED
+  EXPIRED
+}
+
+model LoginRequests {
+  id         String             @id @default(uuid())
+  userId     String             @map("user_id")
+  status     LoginRequestStatus @default(PENDING)
+  ipAddress  String?            @map("ip_address")
+  expiresAt  DateTime           @map("expires_at")
+  createdAt  DateTime           @default(now()) @map("created_at")
+  resolvedAt DateTime?          @map("resolved_at")
+  user       Users              @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, status])
+  @@index([expiresAt])
+  @@map("login_requests")
+}
+
 enum GrantResourceType {
   ZONE
   MOB
@@ -2646,7 +2670,7 @@ enum SystemTextCategory {
 
 enum LoginStage {
   WELCOME_BANNER // Initial connection banner
-  USERNAME_PROMPT // "Enter username:"
+  EMAIL_PROMPT // "Enter email:"
   PASSWORD_PROMPT // "Password:"
   INVALID_LOGIN // Login failed message
   TOO_MANY_ATTEMPTS // Lockout message
@@ -2658,6 +2682,10 @@ enum LoginStage {
   SELECT_RACE // Race selection prompt
   CREATION_COMPLETE // Character created message
   RECONNECT_MESSAGE // Reconnecting to existing session
+  LOGIN_APPROVAL_PENDING // Waiting for Muditor approval
+  LOGIN_APPROVAL_APPROVED // Login approved via Muditor
+  LOGIN_APPROVAL_DENIED // Login denied via Muditor
+  LOGIN_APPROVAL_EXPIRED // Login request expired
 }
 
 // ============================================================================
@@ -2735,6 +2763,21 @@ model DiscordLink {
   user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("discord_links")
+}
+
+// Links Google accounts to Muditor user accounts
+model GoogleLink {
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  googleId    String   @unique @map("google_id")
+  googleEmail String   @map("google_email")
+  googleName  String?  @map("google_name")
+  avatarUrl   String?  @map("avatar_url")
+  linkedAt    DateTime @default(now()) @map("linked_at")
+
+  user Users @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("google_links")
 }
 
 // Discord bot configuration for the guild

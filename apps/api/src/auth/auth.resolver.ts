@@ -104,4 +104,24 @@ export class AuthResolver {
         : 'Failed to change password',
     };
   }
+
+  @Mutation(() => AuthPayload)
+  async completeGoogleRegistration(
+    @Args('token') token: string,
+    @Args('displayName') displayName: string
+  ): Promise<AuthPayload> {
+    return this.authService.completeGoogleRegistration(token, displayName);
+  }
+
+  @Mutation(() => Boolean)
+  @UseGuards(GraphQLJwtAuthGuard)
+  async unlinkGoogle(@CurrentUser('id') userId: string): Promise<boolean> {
+    return this.authService.unlinkGoogle(userId);
+  }
+
+  @Query(() => Boolean)
+  @UseGuards(GraphQLJwtAuthGuard)
+  async hasGoogleLink(@CurrentUser('id') userId: string): Promise<boolean> {
+    return this.authService.hasGoogleLink(userId);
+  }
 }

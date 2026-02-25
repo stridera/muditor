@@ -3,7 +3,7 @@
 # Fragments
 fragment AccountMailUserFields on AccountMailUserDto {
   id
-  username
+  displayName
   email
 }
 

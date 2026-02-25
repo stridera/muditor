@@ -162,7 +162,7 @@ interface CharacterStatusCardProps {
     raceType?: string;
     playerClass?: string;
     user?: {
-      username: string;
+      displayName: string;
       role: string;
     } | null;
   };
@@ -216,7 +216,7 @@ export function CharacterStatusCard({
             {showUser && character.user && (
               <div className='flex items-center gap-1 text-xs'>
                 <User className='h-3 w-3' />
-                <span>{character.user.username}</span>
+                <span>{character.user.displayName}</span>
                 <Badge variant='outline' className='text-xs'>
                   {character.user.role}
                 </Badge>

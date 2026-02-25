@@ -119,14 +119,12 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
     // Only forward gossip messages to Discord
     if (event.type !== 'CHAT_GOSSIP') return;
 
-    const { playerName, message } = event.data as ChatEventData;
-
     // Don't echo back messages from Discord
-    if (message?.startsWith('[Discord]')) return;
+    if (event.message?.startsWith('[Discord]')) return;
 
     await this.discordService.sendGossipToDiscord(
-      playerName ?? 'Unknown',
-      message ?? ''
+      event.playerName ?? 'Unknown',
+      event.message ?? ''
     );
   }
 
@@ -134,8 +132,7 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
     const config = await this.databaseService.discordConfig.findFirst();
     if (!config?.announcementChannelId) return;
 
-    const { playerName } = event.data as PlayerEventData;
-
+    const playerName = event.playerName ?? 'Unknown';
     let announcement: string | null = null;
 
     switch (event.type) {
@@ -149,7 +146,7 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
         announcement = `**${playerName}** has been slain!`;
         break;
       case 'PLAYER_LEVEL_UP': {
-        const { newLevel } = event.data as LevelUpEventData;
+        const newLevel = event.metadata?.newLevel;
         announcement = `**${playerName}** has reached level ${newLevel}!`;
         break;
       }
@@ -164,40 +161,26 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
   }
 
   private async handleAdminEvent(event: GameEvent) {
-    const { message, severity } = event.data as AdminEventData;
+    const severity = event.metadata?.severity as string | undefined;
 
     // Only forward warnings and critical alerts
     if (severity === 'info') return;
 
     const prefix = severity === 'critical' ? '@here ' : '';
-    await this.discordService.sendAdminAlert(`${prefix}${message}`);
+    await this.discordService.sendAdminAlert(`${prefix}${event.message ?? ''}`);
   }
 }
 
-// Event type definitions
+/**
+ * Event type matching C++ EventPublisher::to_json() output:
+ * { type, timestamp, message, playerName?, zoneId?, roomId?, metadata? }
+ */
 interface GameEvent {
   type: string;
-  timestamp: string;
-  data: Record<string, unknown>;
-}
-
-interface ChatEventData {
-  playerName?: string;
+  timestamp: number;
   message?: string;
-  channel?: string;
-}
-
-interface PlayerEventData {
   playerName?: string;
-  playerId?: string;
-}
-
-interface LevelUpEventData extends PlayerEventData {
-  oldLevel?: number;
-  newLevel?: number;
-}
-
-interface AdminEventData {
-  message?: string;
-  severity?: 'info' | 'warning' | 'critical';
+  zoneId?: number;
+  roomId?: string;
+  metadata?: Record<string, unknown>;
 }

@@ -13,6 +13,7 @@ import {
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { useAuth } from '@/contexts/auth-context';
+import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
 import { useLazyQuery, useMutation } from '@apollo/client/react';
 import { formatDistanceToNow } from 'date-fns';
@@ -108,6 +109,7 @@ export function CharacterLinkingForm({
   onCharacterLinked,
 }: CharacterLinkingFormProps) {
   const { refetchUser } = useAuth();
+  const { refetch: refetchPermissions } = usePermissions();
   const [step, setStep] = useState<'search' | 'verify' | 'password'>('search');
   const [characterName, setCharacterName] = useState('');
   const [password, setPassword] = useState('');
@@ -218,6 +220,7 @@ export function CharacterLinkingForm({
       setCharacterName('');
       setPassword('');
       await refetchUser(); // Refresh user role
+      await refetchPermissions(); // Refresh permissions (e.g. admin tab visibility)
       onCharacterLinked();
     } catch (err: any) {
       // Provide user-friendly error messages

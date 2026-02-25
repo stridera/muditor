@@ -194,9 +194,9 @@ export type AccountMailFilterInput = {
 
 export type AccountMailUserDto = {
   __typename?: 'AccountMailUserDto';
+  displayName: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['String']['output'];
-  username: Scalars['String']['output'];
 };
 
 export type AccountStorageDto = {
@@ -207,9 +207,9 @@ export type AccountStorageDto = {
 
 export type AdminUser = {
   __typename?: 'AdminUser';
+  displayName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   role: UserRole;
-  username: Scalars['String']['output'];
 };
 
 export type Alignment = 'EVIL' | 'GOOD' | 'NEUTRAL';
@@ -1116,6 +1116,7 @@ export type CreateRoomInput = {
   magicAffinity?: InputMaybe<MagicAffinity>;
   name: Scalars['String']['input'];
   requiredMechanic?: InputMaybe<PositionMechanic>;
+  /** @deprecated Use description instead */
   roomDescription?: InputMaybe<Scalars['String']['input']>;
   sector?: Sector;
   zoneId: Scalars['Int']['input'];
@@ -1370,6 +1371,7 @@ export type GameEventType =
   | 'ADMIN_SHUTDOWN'
   | 'ADMIN_WARNING'
   | 'ADMIN_ZONE_RESET'
+  | 'AUTH_LOGIN_REQUEST'
   | 'BOSS_SPAWN'
   | 'CHAT_CLAN'
   | 'CHAT_EMOTE'
@@ -1516,6 +1518,20 @@ export type LoginMessageDto = {
   /** Message variant (default, or for A/B testing) */
   variant: Scalars['String']['output'];
 };
+
+export type LoginRequestDto = {
+  __typename?: 'LoginRequestDto';
+  createdAt: Scalars['DateTime']['output'];
+  expiresAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  ipAddress?: Maybe<Scalars['String']['output']>;
+  resolvedAt?: Maybe<Scalars['DateTime']['output']>;
+  status: LoginRequestStatus;
+  userId: Scalars['String']['output'];
+};
+
+/** Status of a passwordless login request */
+export type LoginRequestStatus = 'APPROVED' | 'DENIED' | 'EXPIRED' | 'PENDING';
 
 /** Stage in the login/character creation flow */
 export type LoginStage =
@@ -1749,6 +1765,7 @@ export type MovementMode =
 export type Mutation = {
   __typename?: 'Mutation';
   addMobResetEquipment: MobResetDto;
+  approveLoginRequest: LoginRequestDto;
   /** Assign a skill to a class */
   assignSkillToClass: ClassSkillDto;
   /** Assign a skill to a race */
@@ -1761,6 +1778,7 @@ export type Mutation = {
   /** Broadcast a message to all online players */
   broadcastMessage: BroadcastResultType;
   changePassword: PasswordResetResponse;
+  completeGoogleRegistration: AuthPayload;
   createAbility: Ability;
   createAbilityMessages: AbilityMessages;
   createAbilitySavingThrow: AbilitySavingThrow;
@@ -1845,6 +1863,7 @@ export type Mutation = {
   deleteSystemText: Scalars['Boolean']['output'];
   deleteTrigger: TriggerDto;
   deleteZone: ZoneDto;
+  denyLoginRequest: LoginRequestDto;
   depositItem: AccountItemDto;
   depositWealth: Scalars['BigInt']['output'];
   detachTrigger: TriggerDto;
@@ -1881,6 +1900,7 @@ export type Mutation = {
   unbanUser: BanRecord;
   /** Unlink a character from your user account */
   unlinkCharacter: Scalars['Boolean']['output'];
+  unlinkGoogle: Scalars['Boolean']['output'];
   updateAbility: Ability;
   updateAbilityEffects: Ability;
   updateAbilityMessages: AbilityMessages;
@@ -1948,6 +1968,10 @@ export type MutationAddMobResetEquipmentArgs = {
   wearLocation?: InputMaybe<WearFlag>;
 };
 
+export type MutationApproveLoginRequestArgs = {
+  requestId: Scalars['String']['input'];
+};
+
 export type MutationAssignSkillToClassArgs = {
   data: AssignSkillToClassInput;
 };
@@ -1981,6 +2005,11 @@ export type MutationBroadcastMessageArgs = {
 
 export type MutationChangePasswordArgs = {
   input: ChangePasswordInput;
+};
+
+export type MutationCompleteGoogleRegistrationArgs = {
+  displayName: Scalars['String']['input'];
+  token: Scalars['String']['input'];
 };
 
 export type MutationCreateAbilityArgs = {
@@ -2296,6 +2325,10 @@ export type MutationDeleteTriggerArgs = {
 
 export type MutationDeleteZoneArgs = {
   id: Scalars['Int']['input'];
+};
+
+export type MutationDenyLoginRequestArgs = {
+  requestId: Scalars['String']['input'];
 };
 
 export type MutationDepositItemArgs = {
@@ -3027,6 +3060,7 @@ export type Query = {
   getValidationSummary: ValidationSummaryType;
   grant: UserGrantDto;
   grants: Array<UserGrantDto>;
+  hasGoogleLink: Scalars['Boolean']['output'];
   /** Get a help entry by keyword */
   helpByKeyword: HelpEntryDto;
   /** Get all distinct help entry categories */
@@ -3082,6 +3116,7 @@ export type Query = {
   onlineCharacters: Array<OnlineCharacterDto>;
   /** Get list of online players in FieryMUD */
   onlinePlayers: Array<OnlinePlayerType>;
+  pendingLoginRequests: Array<LoginRequestDto>;
   playerMail?: Maybe<PlayerMailDto>;
   playerMailCount: Scalars['Int']['output'];
   playerMails: Array<PlayerMailDto>;
@@ -3817,9 +3852,9 @@ export type RaceSkillDto = {
 };
 
 export type RegisterInput = {
+  displayName: Scalars['String']['input'];
   email: Scalars['String']['input'];
   password: Scalars['String']['input'];
-  username: Scalars['String']['input'];
 };
 
 export type RequestPasswordResetInput = {
@@ -4157,6 +4192,8 @@ export type Subscription = {
   gameEventsByCategory: GameEvent;
   /** Subscribe to specific types of game events */
   gameEventsByTypes: GameEvent;
+  /** Subscribe to new login request events for the current user */
+  loginRequestCreated: LoginRequestDto;
   /** Subscribe to player activity events (login, logout, death, level up) */
   playerActivity: GameEvent;
   /** Subscribe to events involving a specific player */
@@ -4703,6 +4740,7 @@ export type UpdateRoomInput = {
   magicAffinity?: InputMaybe<MagicAffinity>;
   name?: InputMaybe<Scalars['String']['input']>;
   requiredMechanic?: InputMaybe<PositionMechanic>;
+  /** @deprecated Use description instead */
   roomDescription?: InputMaybe<Scalars['String']['input']>;
   sector?: InputMaybe<Sector>;
 };
@@ -4808,6 +4846,7 @@ export type User = {
   /** Ban records for this user */
   banRecords?: Maybe<Array<BanRecord>>;
   createdAt: Scalars['DateTime']['output'];
+  displayName: Scalars['String']['output'];
   email: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   /** Whether the user is currently banned */
@@ -4817,24 +4856,23 @@ export type User = {
   preferences?: Maybe<UserPreferences>;
   role: UserRole;
   updatedAt: Scalars['DateTime']['output'];
-  username: Scalars['String']['output'];
 };
 
 export type UserGrantDto = {
   __typename?: 'UserGrantDto';
+  /** Display name of the person who received the grant */
+  displayName: Scalars['String']['output'];
   expiresAt?: Maybe<Scalars['DateTime']['output']>;
   grantedAt: Scalars['DateTime']['output'];
   grantedBy: Scalars['String']['output'];
-  /** Username of the person who granted access */
-  grantedByUsername: Scalars['String']['output'];
+  /** Display name of the person who granted access */
+  grantedByDisplayName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   notes?: Maybe<Scalars['String']['output']>;
   permissions: Array<GrantPermission>;
   resourceId: Scalars['String']['output'];
   resourceType: GrantResourceType;
   userId: Scalars['String']['output'];
-  /** Username of the person who received the grant */
-  username: Scalars['String']['output'];
 };
 
 export type UserPermissions = {
@@ -4876,9 +4914,9 @@ export type UserRole =
 
 export type UserSummaryDto = {
   __typename?: 'UserSummaryDto';
+  displayName: Scalars['String']['output'];
   id: Scalars['ID']['output'];
   role: Scalars['String']['output'];
-  username: Scalars['String']['output'];
 };
 
 /** The category of validation issue */
@@ -4998,6 +5036,27 @@ export type ZoneRoomDto = {
   id: Scalars['Int']['output'];
   name: Scalars['String']['output'];
   sector: Scalars['String']['output'];
+};
+
+export type CompleteGoogleRegistrationMutationVariables = Exact<{
+  token: Scalars['String']['input'];
+  displayName: Scalars['String']['input'];
+}>;
+
+export type CompleteGoogleRegistrationMutation = {
+  __typename?: 'Mutation';
+  completeGoogleRegistration: {
+    __typename?: 'AuthPayload';
+    accessToken: string;
+    user: {
+      __typename?: 'User';
+      id: string;
+      displayName: string;
+      email: string;
+      role: UserRole;
+      createdAt: any;
+    };
+  };
 };
 
 export type GetGameConfigsQueryVariables = Exact<{ [key: string]: never }>;
@@ -5824,7 +5883,7 @@ export type UsersInlineQuery = {
   users: Array<{
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
     role: UserRole;
     isBanned: boolean;
@@ -5836,7 +5895,7 @@ export type UsersInlineQuery = {
       reason: string;
       bannedAt: any;
       expiresAt?: any | null;
-      admin?: { __typename?: 'AdminUser'; username: string } | null;
+      admin?: { __typename?: 'AdminUser'; displayName: string } | null;
     }> | null;
   }>;
 };
@@ -5850,7 +5909,7 @@ export type UpdateUserInlineMutation = {
   updateUser: {
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
     role: UserRole;
   };
@@ -5933,7 +5992,7 @@ export type UpdateProfileInlineMutation = {
   updateProfile: {
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
     role: UserRole;
     createdAt: any;
@@ -6094,6 +6153,68 @@ export type DetachTriggerInlineMutation = {
     id: number;
     zoneId: number;
     name: string;
+  };
+};
+
+export type PendingLoginRequestsQueryVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type PendingLoginRequestsQuery = {
+  __typename?: 'Query';
+  pendingLoginRequests: Array<{
+    __typename?: 'LoginRequestDto';
+    id: string;
+    userId: string;
+    status: LoginRequestStatus;
+    ipAddress?: string | null;
+    expiresAt: any;
+    createdAt: any;
+  }>;
+};
+
+export type ApproveLoginRequestMutationVariables = Exact<{
+  requestId: Scalars['String']['input'];
+}>;
+
+export type ApproveLoginRequestMutation = {
+  __typename?: 'Mutation';
+  approveLoginRequest: {
+    __typename?: 'LoginRequestDto';
+    id: string;
+    status: LoginRequestStatus;
+    resolvedAt?: any | null;
+  };
+};
+
+export type DenyLoginRequestMutationVariables = Exact<{
+  requestId: Scalars['String']['input'];
+}>;
+
+export type DenyLoginRequestMutation = {
+  __typename?: 'Mutation';
+  denyLoginRequest: {
+    __typename?: 'LoginRequestDto';
+    id: string;
+    status: LoginRequestStatus;
+    resolvedAt?: any | null;
+  };
+};
+
+export type OnLoginRequestCreatedSubscriptionVariables = Exact<{
+  [key: string]: never;
+}>;
+
+export type OnLoginRequestCreatedSubscription = {
+  __typename?: 'Subscription';
+  loginRequestCreated: {
+    __typename?: 'LoginRequestDto';
+    id: string;
+    userId: string;
+    status: LoginRequestStatus;
+    ipAddress?: string | null;
+    expiresAt: any;
+    createdAt: any;
   };
 };
 
@@ -6683,7 +6804,7 @@ export type LoginMutation = {
     user: {
       __typename?: 'User';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
       role: UserRole;
       createdAt: any;
@@ -6703,7 +6824,7 @@ export type RegisterMutation = {
     user: {
       __typename?: 'User';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
       role: UserRole;
       createdAt: any;
@@ -6718,7 +6839,7 @@ export type MeQuery = {
   me: {
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
     role: UserRole;
     createdAt: any;
@@ -6958,7 +7079,7 @@ export type UpdateAbilityMessagesMutation = {
 export type AccountMailUserFieldsFragment = {
   __typename?: 'AccountMailUserDto';
   id: string;
-  username: string;
+  displayName: string;
   email: string;
 };
 
@@ -6978,13 +7099,13 @@ export type AccountMailFieldsFragment = {
   sender?: {
     __typename?: 'AccountMailUserDto';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
   } | null;
   recipient?: {
     __typename?: 'AccountMailUserDto';
     id: string;
-    username: string;
+    displayName: string;
     email: string;
   } | null;
 };
@@ -7012,13 +7133,13 @@ export type GetMyAccountMailQuery = {
     sender?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
     recipient?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
   }>;
@@ -7057,13 +7178,13 @@ export type GetAllAccountMailQuery = {
     sender?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
     recipient?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
   }>;
@@ -7091,13 +7212,13 @@ export type SendAccountMailMutation = {
     sender?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
     recipient?: {
       __typename?: 'AccountMailUserDto';
       id: string;
-      username: string;
+      displayName: string;
       email: string;
     } | null;
   };
@@ -7357,7 +7478,7 @@ export type UpdateProfileMutation = {
     __typename?: 'User';
     id: string;
     email: string;
-    username: string;
+    displayName: string;
   };
 };
 
@@ -10253,7 +10374,7 @@ export type UsersQuery = {
   users: Array<{
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     role: UserRole;
     lastLoginAt?: any | null;
     isBanned: boolean;
@@ -10277,7 +10398,7 @@ export type UpdateUserMutation = {
   updateUser: {
     __typename?: 'User';
     id: string;
-    username: string;
+    displayName: string;
     role: UserRole;
   };
 };
@@ -10393,7 +10514,7 @@ export type OnlineCharactersQuery = {
     user?: {
       __typename?: 'UserSummaryDto';
       id: string;
-      username: string;
+      displayName: string;
       role: string;
     } | null;
   }>;
@@ -10415,7 +10536,7 @@ export type MyOnlineCharactersQuery = {
     user?: {
       __typename?: 'UserSummaryDto';
       id: string;
-      username: string;
+      displayName: string;
       role: string;
     } | null;
   }>;
@@ -10534,7 +10655,7 @@ export const AccountMailUserFieldsFragmentDoc = {
         kind: 'SelectionSet',
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
           { kind: 'Field', name: { kind: 'Name', value: 'email' } },
         ],
       },
@@ -10605,7 +10726,7 @@ export const AccountMailFieldsFragmentDoc = {
         kind: 'SelectionSet',
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
           { kind: 'Field', name: { kind: 'Name', value: 'email' } },
         ],
       },
@@ -11315,6 +11436,102 @@ export const TriggerFieldsFragmentDoc = {
     },
   ],
 } as unknown as DocumentNode<TriggerFieldsFragment, unknown>;
+export const CompleteGoogleRegistrationDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CompleteGoogleRegistration' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'token' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'displayName' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'completeGoogleRegistration' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'token' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'token' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'displayName' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'displayName' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'accessToken' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'user' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'displayName' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'email' } },
+                      { kind: 'Field', name: { kind: 'Name', value: 'role' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'createdAt' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CompleteGoogleRegistrationMutation,
+  CompleteGoogleRegistrationMutationVariables
+>;
 export const GetGameConfigsDocument = {
   kind: 'Document',
   definitions: [
@@ -14091,7 +14308,7 @@ export const UsersInlineDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'isBanned' } },
@@ -14124,7 +14341,7 @@ export const UsersInlineDocument = {
                           selections: [
                             {
                               kind: 'Field',
-                              name: { kind: 'Name', value: 'username' },
+                              name: { kind: 'Name', value: 'displayName' },
                             },
                           ],
                         },
@@ -14183,7 +14400,7 @@ export const UpdateUserInlineDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
               ],
@@ -14494,7 +14711,7 @@ export const UpdateProfileInlineDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
@@ -15096,6 +15313,184 @@ export const DetachTriggerInlineDocument = {
 } as unknown as DocumentNode<
   DetachTriggerInlineMutation,
   DetachTriggerInlineMutationVariables
+>;
+export const PendingLoginRequestsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'PendingLoginRequests' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'pendingLoginRequests' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'userId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'ipAddress' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'expiresAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  PendingLoginRequestsQuery,
+  PendingLoginRequestsQueryVariables
+>;
+export const ApproveLoginRequestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'ApproveLoginRequest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'requestId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'approveLoginRequest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'requestId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'requestId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'resolvedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  ApproveLoginRequestMutation,
+  ApproveLoginRequestMutationVariables
+>;
+export const DenyLoginRequestDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DenyLoginRequest' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'requestId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'denyLoginRequest' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'requestId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'requestId' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'resolvedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DenyLoginRequestMutation,
+  DenyLoginRequestMutationVariables
+>;
+export const OnLoginRequestCreatedDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'subscription',
+      name: { kind: 'Name', value: 'OnLoginRequestCreated' },
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'loginRequestCreated' },
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'userId' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'ipAddress' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'expiresAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  OnLoginRequestCreatedSubscription,
+  OnLoginRequestCreatedSubscriptionVariables
 >;
 export const GetAllCharactersInlineDocument = {
   kind: 'Document',
@@ -17271,7 +17666,7 @@ export const LoginDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'username' },
+                        name: { kind: 'Name', value: 'displayName' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
@@ -17342,7 +17737,7 @@ export const RegisterDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'username' },
+                        name: { kind: 'Name', value: 'displayName' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
@@ -17378,7 +17773,7 @@ export const MeDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
@@ -18340,7 +18735,7 @@ export const GetMyAccountMailDocument = {
         kind: 'SelectionSet',
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
           { kind: 'Field', name: { kind: 'Name', value: 'email' } },
         ],
       },
@@ -18508,7 +18903,7 @@ export const GetAllAccountMailDocument = {
         kind: 'SelectionSet',
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
           { kind: 'Field', name: { kind: 'Name', value: 'email' } },
         ],
       },
@@ -18628,7 +19023,7 @@ export const SendAccountMailDocument = {
         kind: 'SelectionSet',
         selections: [
           { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-          { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+          { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
           { kind: 'Field', name: { kind: 'Name', value: 'email' } },
         ],
       },
@@ -19566,7 +19961,7 @@ export const UpdateProfileDocument = {
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'email' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
               ],
             },
           },
@@ -29584,7 +29979,7 @@ export const UsersDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'lastLoginAt' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'isBanned' } },
@@ -29674,7 +30069,7 @@ export const UpdateUserDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'username' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'displayName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'role' } },
               ],
             },
@@ -30076,7 +30471,7 @@ export const OnlineCharactersDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'username' },
+                        name: { kind: 'Name', value: 'displayName' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                     ],
@@ -30125,7 +30520,7 @@ export const MyOnlineCharactersDocument = {
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
                       {
                         kind: 'Field',
-                        name: { kind: 'Name', value: 'username' },
+                        name: { kind: 'Name', value: 'displayName' },
                       },
                       { kind: 'Field', name: { kind: 'Name', value: 'role' } },
                     ],

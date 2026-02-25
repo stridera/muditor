@@ -42,6 +42,7 @@ export interface UsePermissionsResult {
   permissions: UserPermissions | null;
   loading: boolean;
   error: any;
+  refetch: () => Promise<void>;
   canEditZone: (zoneId?: number) => boolean;
   canManageCharacters: (characterOwnerId?: string) => boolean;
   isPlayer: boolean;
@@ -53,13 +54,15 @@ export interface UsePermissionsResult {
 
 export function usePermissions(): UsePermissionsResult {
   const { user } = useAuth();
-  const { data, loading, error } = useQuery<MyPermissionsQueryResult>(
-    MY_PERMISSIONS_QUERY,
-    {
-      skip: !user,
-      errorPolicy: 'all',
-    }
-  );
+  const {
+    data,
+    loading,
+    error,
+    refetch: apolloRefetch,
+  } = useQuery<MyPermissionsQueryResult>(MY_PERMISSIONS_QUERY, {
+    skip: !user,
+    errorPolicy: 'all',
+  });
 
   const permissions = data?.myPermissions || null;
 
@@ -80,10 +83,17 @@ export function usePermissions(): UsePermissionsResult {
     return false;
   };
 
+  const refetch = async () => {
+    if (user) {
+      await apolloRefetch();
+    }
+  };
+
   return {
     permissions,
     loading,
     error,
+    refetch,
     canEditZone,
     canManageCharacters,
     isPlayer: permissions?.isPlayer || false,

@@ -35,7 +35,7 @@ const UPDATE_PROFILE_MUTATION = gql`
   mutation UpdateProfileInline($input: UpdateProfileInput!) {
     updateProfile(input: $input) {
       id
-      username
+      displayName
       email
       role
       createdAt
@@ -194,10 +194,10 @@ function ProfileContent() {
                 <CardHeader className='text-center'>
                   <div className='mx-auto h-20 w-20 bg-primary rounded-full flex items-center justify-center mb-4'>
                     <span className='text-primary-foreground text-2xl font-bold'>
-                      {user.username.charAt(0).toUpperCase()}
+                      {user.displayName.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <CardTitle>{user.username}</CardTitle>
+                  <CardTitle>{user.displayName}</CardTitle>
                   <CardDescription>{user.email}</CardDescription>
                 </CardHeader>
                 <CardContent className='space-y-4'>
@@ -286,15 +286,15 @@ function ProfileContent() {
                     <form onSubmit={handleProfileSubmit} className='space-y-4'>
                       <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
                         <div className='space-y-2'>
-                          <Label htmlFor='username'>Username</Label>
+                          <Label htmlFor='displayName'>Display Name</Label>
                           <Input
-                            id='username'
-                            value={user.username}
+                            id='displayName'
+                            value={user.displayName}
                             disabled
                             className='bg-card'
                           />
                           <p className='text-xs text-muted-foreground'>
-                            Username cannot be changed
+                            Display name cannot be changed
                           </p>
                         </div>
 

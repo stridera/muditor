@@ -59,7 +59,7 @@ describe('AuthService', () => {
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      username: 'testuser',
+      displayName: 'testuser',
       passwordHash: 'hashedpassword',
       role: UserRole.PLAYER,
     };
@@ -75,16 +75,11 @@ describe('AuthService', () => {
       expect(result).toEqual({
         id: 'user-id',
         email: 'test@example.com',
-        username: 'testuser',
+        displayName: 'testuser',
         role: UserRole.PLAYER,
       });
       expect(databaseService.users.findFirst).toHaveBeenCalledWith({
-        where: {
-          OR: [
-            { username: { equals: 'testuser', mode: 'insensitive' } },
-            { email: { equals: 'testuser', mode: 'insensitive' } },
-          ],
-        },
+        where: { email: { equals: 'testuser', mode: 'insensitive' } },
       });
     });
 
@@ -110,7 +105,7 @@ describe('AuthService', () => {
 
   describe('register', () => {
     const registerInput = {
-      username: 'newuser',
+      displayName: 'newuser',
       email: 'new@example.com',
       password: 'password123',
     };
@@ -118,7 +113,7 @@ describe('AuthService', () => {
     const mockCreatedUser = {
       id: 'new-user-id',
       email: 'new@example.com',
-      username: 'newuser',
+      displayName: 'newuser',
       passwordHash: 'hashedpassword',
       role: UserRole.PLAYER,
       createdAt: new Date(),
@@ -144,7 +139,7 @@ describe('AuthService', () => {
         user: {
           id: mockCreatedUser.id,
           email: mockCreatedUser.email,
-          username: mockCreatedUser.username,
+          displayName: mockCreatedUser.displayName,
           role: mockCreatedUser.role,
           createdAt: mockCreatedUser.createdAt,
           updatedAt: mockCreatedUser.updatedAt,
@@ -154,7 +149,7 @@ describe('AuthService', () => {
       expect(databaseService.users.create).toHaveBeenCalledWith(
         expect.objectContaining({
           data: expect.objectContaining({
-            username: 'newuser',
+            displayName: 'newuser',
             email: 'new@example.com',
             passwordHash: 'hashedpassword',
             role: UserRole.PLAYER,
@@ -167,22 +162,22 @@ describe('AuthService', () => {
       );
     });
 
-    it('should throw ConflictException when username already exists', async () => {
+    it('should throw ConflictException when display name already exists', async () => {
       (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
         id: 'existing-id',
-        username: 'newuser',
+        displayName: 'newuser',
         email: 'other@example.com',
       });
 
       await expect(service.register(registerInput)).rejects.toThrow(
-        new ConflictException('Username already exists')
+        new ConflictException('Display name already exists')
       );
     });
 
     it('should throw ConflictException when email already exists', async () => {
       (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
         id: 'existing-id',
-        username: 'otheruser',
+        displayName: 'otheruser',
         email: 'new@example.com',
       });
 
@@ -207,7 +202,7 @@ describe('AuthService', () => {
         user: {
           id: mockCreatedUser.id,
           email: mockCreatedUser.email,
-          username: mockCreatedUser.username,
+          displayName: mockCreatedUser.displayName,
           role: mockCreatedUser.role,
           createdAt: mockCreatedUser.createdAt,
           updatedAt: mockCreatedUser.updatedAt,
@@ -226,7 +221,7 @@ describe('AuthService', () => {
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      username: 'testuser',
+      displayName: 'testuser',
       passwordHash: 'hash',
       role: UserRole.PLAYER,
       createdAt: new Date(),
@@ -261,7 +256,7 @@ describe('AuthService', () => {
         user: expect.objectContaining({
           id: mockUser.id,
           email: mockUser.email,
-          username: mockUser.username,
+          displayName: mockUser.displayName,
           role: mockUser.role,
           createdAt: mockUser.createdAt,
           updatedAt: mockUser.updatedAt,
@@ -314,7 +309,7 @@ describe('AuthService', () => {
         user: expect.objectContaining({
           id: mockUser.id,
           email: mockUser.email,
-          username: mockUser.username,
+          displayName: mockUser.displayName,
           role: mockUser.role,
           createdAt: mockUser.createdAt,
           updatedAt: mockUser.updatedAt,
@@ -383,7 +378,7 @@ describe('AuthService', () => {
     const mockUser = {
       id: 'user-id',
       email: 'test@example.com',
-      username: 'testuser',
+      displayName: 'testuser',
     };
 
     it('should generate reset token and send email for existing user', async () => {
