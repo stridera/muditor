@@ -1540,13 +1540,17 @@ export type LoginStage =
   | 'CREATE_NAME_PROMPT'
   | 'CREATE_PASSWORD'
   | 'CREATION_COMPLETE'
+  | 'EMAIL_PROMPT'
   | 'INVALID_LOGIN'
+  | 'LOGIN_APPROVAL_APPROVED'
+  | 'LOGIN_APPROVAL_DENIED'
+  | 'LOGIN_APPROVAL_EXPIRED'
+  | 'LOGIN_APPROVAL_PENDING'
   | 'PASSWORD_PROMPT'
   | 'RECONNECT_MESSAGE'
   | 'SELECT_CLASS'
   | 'SELECT_RACE'
   | 'TOO_MANY_ATTEMPTS'
-  | 'USERNAME_PROMPT'
   | 'WELCOME_BANNER';
 
 export type MagicAffinity =
@@ -1894,6 +1898,8 @@ export type Mutation = {
   revokeZoneAccess: Scalars['Boolean']['output'];
   sendAccountMail: AccountMailDto;
   sendBroadcast: Scalars['Int']['output'];
+  /** Send a chat message in-game as a linked character */
+  sendGameChat: CommandResultType;
   sendMail: PlayerMailDto;
   setCharacterOffline: Scalars['Boolean']['output'];
   setCharacterOnline: Scalars['Boolean']['output'];
@@ -2433,6 +2439,12 @@ export type MutationSendAccountMailArgs = {
 
 export type MutationSendBroadcastArgs = {
   data: SendBroadcastInput;
+};
+
+export type MutationSendGameChatArgs = {
+  channel: Scalars['String']['input'];
+  characterName: Scalars['String']['input'];
+  message: Scalars['String']['input'];
 };
 
 export type MutationSendMailArgs = {
@@ -8160,6 +8172,23 @@ export type WorldEventsSubscription = {
     roomVnum?: number | null;
     message: string;
     metadata?: any | null;
+  };
+};
+
+export type SendGameChatMutationVariables = Exact<{
+  characterName: Scalars['String']['input'];
+  channel: Scalars['String']['input'];
+  message: Scalars['String']['input'];
+}>;
+
+export type SendGameChatMutation = {
+  __typename?: 'Mutation';
+  sendGameChat: {
+    __typename?: 'CommandResultType';
+    success: boolean;
+    message: string;
+    executor?: string | null;
+    note?: string | null;
   };
 };
 
@@ -22152,6 +22181,107 @@ export const WorldEventsDocument = {
 } as unknown as DocumentNode<
   WorldEventsSubscription,
   WorldEventsSubscriptionVariables
+>;
+export const SendGameChatDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'SendGameChat' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'characterName' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'channel' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'message' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'String' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'sendGameChat' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'characterName' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'characterName' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'channel' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'channel' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'message' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'message' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'success' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'message' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'executor' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'note' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  SendGameChatMutation,
+  SendGameChatMutationVariables
 >;
 export const UpdateMobDocument = {
   kind: 'Document',

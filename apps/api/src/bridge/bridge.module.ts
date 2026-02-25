@@ -7,6 +7,7 @@ import { BridgeService } from './bridge.service';
 import { GameEventsResolver } from './game-events.resolver';
 import { GameAdminService } from './game-admin.service';
 import { GameAdminResolver } from './game-admin.resolver';
+import { GameChatResolver } from './game-chat.resolver';
 import { RateLimitGuard } from './rate-limit.guard';
 import { AuditService } from './audit.service';
 
@@ -55,6 +56,7 @@ import { AuditService } from './audit.service';
     GameEventsResolver,
     GameAdminService,
     GameAdminResolver,
+    GameChatResolver,
     RateLimitGuard,
     AuditService,
   ],
