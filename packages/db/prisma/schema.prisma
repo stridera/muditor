@@ -1174,6 +1174,7 @@ model Room {
   // Quest system relations
   questObjectives       QuestObjectives[]
   questTriggerRoom      Quests[]                @relation("questTriggerRoom")
+  roomTriggers          RoomTriggers[]
 
   @@id([zoneId, id])
   @@index([plainRoomDescription])
@@ -1352,6 +1353,7 @@ model Triggers {
   // Many-to-many junction tables (for shared triggers)
   mobTriggers    MobTriggers[]
   objectTriggers ObjectTriggers[]
+  roomTriggers   RoomTriggers[]
 
   // Error logging for debugging
   errorLogs ScriptErrorLog[]
@@ -1388,6 +1390,21 @@ model ObjectTriggers {
   trigger Triggers @relation(fields: [triggerZoneId, triggerId], references: [zoneId, id], onDelete: Cascade)
 
   @@id([objectZoneId, objectId, triggerZoneId, triggerId])
+  @@index([triggerZoneId, triggerId])
+}
+
+/// Junction table for Room-Trigger many-to-many relationship
+model RoomTriggers {
+  roomZoneId    Int      @map("room_zone_id")
+  roomId        Int      @map("room_id")
+  triggerZoneId Int      @map("trigger_zone_id")
+  triggerId     Int      @map("trigger_id")
+  createdAt     DateTime @default(now()) @map("created_at")
+
+  room    Room     @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  trigger Triggers @relation(fields: [triggerZoneId, triggerId], references: [zoneId, id], onDelete: Cascade)
+
+  @@id([roomZoneId, roomId, triggerZoneId, triggerId])
   @@index([triggerZoneId, triggerId])
 }
 
