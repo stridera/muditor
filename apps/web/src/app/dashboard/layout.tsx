@@ -1,6 +1,7 @@
 'use client';
 
 import { LoginApprovalNotification } from '@/components/auth/login-approval-notification';
+import { ChatContainer } from '@/components/chat';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Sidebar } from '@/components/navigation/sidebar';
@@ -29,6 +30,9 @@ export default function DashboardLayout({
           </main>
         </div>
       </div>
+
+      {/* Game chat bubble */}
+      <ChatContainer />
 
       {/* Login approval notification */}
       <LoginApprovalNotification />

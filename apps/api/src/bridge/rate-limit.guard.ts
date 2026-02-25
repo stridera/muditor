@@ -151,4 +151,6 @@ export const AdminRateLimits = {
   STATS: { limit: 30, windowSeconds: 60, keyPrefix: 'admin:stats' },
   /** Player list: 30 per minute */
   PLAYERS: { limit: 30, windowSeconds: 60, keyPrefix: 'admin:players' },
+  /** Chat messages: 30 per minute */
+  CHAT: { limit: 30, windowSeconds: 60, keyPrefix: 'chat' },
 } as const;

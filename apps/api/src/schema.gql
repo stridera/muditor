@@ -1985,6 +1985,9 @@ type Mutation {
   revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
   sendAccountMail(data: SendAccountMailInput!): AccountMailDto!
   sendBroadcast(data: SendBroadcastInput!): Int!
+
+  """Send a chat message in-game as a linked character"""
+  sendGameChat(channel: String!, characterName: String!, message: String!): CommandResultType!
   sendMail(data: SendPlayerMailInput!): PlayerMailDto!
   setCharacterOffline(characterId: ID!): Boolean!
   setCharacterOnline(characterId: ID!): Boolean!

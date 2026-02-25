@@ -15,6 +15,7 @@ export enum AdminActionType {
   VIEW_STATS = 'ADMIN_VIEW_STATS',
   DISCORD_GOSSIP = 'DISCORD_GOSSIP',
   DISCORD_LINK = 'DISCORD_LINK',
+  SEND_CHAT = 'SEND_CHAT',
 }
 
 export interface AuditLogEntry {
@@ -161,6 +162,29 @@ export class AuditService {
         playerName,
         reason,
         expiresAt,
+        timestamp: new Date().toISOString(),
+      },
+    });
+  }
+
+  /**
+   * Log a chat message sent via the web editor
+   */
+  async logChat(
+    userId: string,
+    characterName: string,
+    channel: string,
+    message: string
+  ): Promise<void> {
+    await this.logAction({
+      action: AdminActionType.SEND_CHAT,
+      entityType: 'game_chat',
+      entityId: characterName,
+      userId,
+      newValues: {
+        characterName,
+        channel,
+        message,
         timestamp: new Date().toISOString(),
       },
     });

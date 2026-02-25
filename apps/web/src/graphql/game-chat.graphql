@@ -1,0 +1,8 @@
+mutation SendGameChat($characterName: String!, $channel: String!, $message: String!) {
+  sendGameChat(characterName: $characterName, channel: $channel, message: $message) {
+    success
+    message
+    executor
+    note
+  }
+}

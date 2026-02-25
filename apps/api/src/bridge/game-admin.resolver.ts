@@ -123,7 +123,7 @@ class ServerStatusType {
  * GraphQL type for command result
  */
 @ObjectType({ description: 'Result of executing a game command' })
-class CommandResultType {
+export class CommandResultType {
   @Field()
   success!: boolean;
 
