@@ -1152,6 +1152,14 @@ model Room {
   allowsSummon  Boolean @default(true) @map("allows_summon") // Summon spell works
   allowsTeleport Boolean @default(true) @map("allows_teleport") // Teleport works
   isDeathTrap   Boolean @default(false) @map("is_death_trap") // Instant death room
+  isIndoors      Boolean @default(false) @map("is_indoors")      // Weather/time-of-day affects room
+  isSoundproof   Boolean @default(false) @map("is_soundproof")   // Blocks shouts/gossip
+  isArena        Boolean @default(false) @map("is_arena")        // Safe PK zone
+  isGuildhall    Boolean @default(false) @map("is_guildhall")    // Guild hall room
+  allowsMobs     Boolean @default(true)  @map("allows_mobs")     // Mobs can enter
+  allowsTracking Boolean @default(true)  @map("allows_tracking") // Track spell works
+  allowsPortals  Boolean @default(true)  @map("allows_portals")  // Moonwell/portal spells work
+  allowsScanning Boolean @default(true)  @map("allows_scanning") // Scan spell works
 
   layoutX               Int?                    @map("layout_x")
   layoutY               Int?                    @map("layout_y")
