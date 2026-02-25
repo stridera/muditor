@@ -8,7 +8,7 @@ import { Menu } from 'lucide-react';
 
 export function TopBar() {
   return (
-    <header className='h-12 flex items-center gap-4 px-4 border-b border-border bg-background/80 backdrop-blur-sm flex-shrink-0'>
+    <header className='h-12 flex items-center gap-4 px-4 border-b border-border bg-background/80 backdrop-blur-sm flex-shrink-0 relative z-10'>
       {/* Mobile hamburger */}
       <Button
         variant='ghost'

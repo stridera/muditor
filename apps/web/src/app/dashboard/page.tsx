@@ -305,9 +305,9 @@ export default function DashboardPage() {
                 </h4>
                 <div className='space-y-1'>
                   {[
-                    { zone: 511, name: 'Test Zone' },
-                    { zone: 1000, name: 'Starting Area' },
-                    { zone: 1, name: 'Main Area' },
+                    { zone: 12, name: 'The Heavens' },
+                    { zone: 30, name: 'Mielikki' },
+                    { zone: 489, name: 'Doom' },
                   ].map(z => (
                     <Link
                       key={z.zone}
