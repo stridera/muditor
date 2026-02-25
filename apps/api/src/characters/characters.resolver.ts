@@ -12,6 +12,7 @@ import {
 import type { Characters, Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { RateLimit, RateLimitGuard } from '../bridge/rate-limit.guard';
 import {
   CharacterDto,
   CharacterEffectDto,
@@ -250,6 +251,8 @@ export class CharactersResolver {
 
   // Character linking operations
   @Query(() => CharacterLinkingInfoDto, { name: 'characterLinkingInfo' })
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 30, windowSeconds: 60, keyPrefix: 'charlink:info' })
   async getCharacterLinkingInfo(@Args('characterName') characterName: string) {
     return this.charactersService.getCharacterLinkingInfo(characterName);
   }
@@ -257,7 +260,8 @@ export class CharactersResolver {
   @Mutation(() => CharacterDto, {
     description: 'Link an existing game character to your user account',
   })
-  @UseGuards(GraphQLJwtAuthGuard)
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 5, windowSeconds: 60, keyPrefix: 'charlink:link' })
   async linkCharacter(
     @Args('data') data: LinkCharacterInput,
     @CurrentUser() user: Users
@@ -282,17 +286,6 @@ export class CharactersResolver {
       user.id
     );
     return true;
-  }
-
-  @Query(() => Boolean, { name: 'validateCharacterPassword' })
-  async validateCharacterPassword(
-    @Args('characterName') characterName: string,
-    @Args('password') password: string
-  ) {
-    return this.charactersService.validateCharacterPassword(
-      characterName,
-      password
-    );
   }
 
   // Character online status queries

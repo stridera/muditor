@@ -2544,7 +2544,6 @@ type Query {
 
   """Get validation reports for all zones"""
   validateAllZones: [ValidationReportType!]!
-  validateCharacterPassword(characterName: String!, password: String!): Boolean!
 
   """Get validation report for a specific zone"""
   validateZone(zoneId: Int!): ValidationReportType!

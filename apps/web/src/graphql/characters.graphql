@@ -101,10 +101,6 @@ mutation LinkCharacter($data: LinkCharacterInput!) {
   }
 }
 
-query ValidateCharacterPassword($characterName: String!, $password: String!) {
-  validateCharacterPassword(characterName: $characterName, password: $password)
-}
-
 mutation UpdateCharacter($id: ID!, $data: UpdateCharacterInput!) {
   updateCharacter(id: $id, data: $data) {
     id
