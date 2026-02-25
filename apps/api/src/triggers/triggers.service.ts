@@ -1,5 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ScriptType, TriggerFlag } from '@muditor/db';
+import { lintLua } from '@muditor/types';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -249,6 +250,11 @@ export class TriggersService {
       triggerData.objectId = data.objectId;
     }
 
+    // Lint the script commands on create
+    const lintResult = this.lintCommands(data.commands);
+    triggerData.syntaxError = lintResult.syntaxError;
+    triggerData.needsReview = lintResult.needsReview;
+
     return this.prisma.triggers.create({
       data: triggerData,
       include: {
@@ -315,6 +321,13 @@ export class TriggersService {
       updateData.objectId = data.objectId;
       updateData.mobZoneId = null;
       updateData.mobId = null;
+    }
+
+    // Re-lint when commands are updated
+    if (data.commands !== undefined) {
+      const lintResult = this.lintCommands(data.commands);
+      updateData.syntaxError = lintResult.syntaxError;
+      updateData.needsReview = lintResult.needsReview;
     }
 
     return this.prisma.triggers.update({
@@ -440,6 +453,21 @@ export class TriggersService {
         },
       },
     });
+  }
+
+  /** Run linter on script commands and return lint fields for the DB record. */
+  private lintCommands(commands: string): {
+    syntaxError: string | null;
+    needsReview: boolean;
+  } {
+    const issues = lintLua(commands);
+    const firstError = issues.find(i => i.severity === 'error');
+    return {
+      syntaxError: firstError
+        ? `Line ${firstError.line}: ${firstError.message}`
+        : null,
+      needsReview: !!firstError,
+    };
   }
 
   private buildWhereClauseForAttachment(

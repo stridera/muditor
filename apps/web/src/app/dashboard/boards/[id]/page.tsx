@@ -227,7 +227,7 @@ export default function BoardDetailPage() {
       variables: {
         data: {
           boardId,
-          poster: user?.username || 'Anonymous',
+          poster: user?.displayName || 'Anonymous',
           posterLevel: 100, // TODO: Get actual character level
           subject,
           content,
@@ -244,7 +244,7 @@ export default function BoardDetailPage() {
       variables: {
         id: selectedMessage.id,
         data: { subject, content, sticky },
-        editor: user?.username || 'Editor',
+        editor: user?.displayName || 'Editor',
       },
     });
   };
@@ -270,7 +270,7 @@ export default function BoardDetailPage() {
   const canPost = isBuilder || isGod;
   const canEdit = (message: BoardMessage) => {
     if (isGod) return true;
-    if (isBuilder && message.poster === user?.username) return true;
+    if (isBuilder && message.poster === user?.displayName) return true;
     return false;
   };
 

@@ -565,7 +565,7 @@ export class CharactersService {
         users: {
           select: {
             id: true,
-            username: true,
+            displayName: true,
             role: true,
           },
         },
@@ -657,20 +657,22 @@ export class CharactersService {
     }
 
     // Validate character password
-    // Supports both legacy Unix crypt() hashes (10 chars) and modern bcrypt hashes
-    const isLegacyHash = character.passwordHash.length === 10;
+    // Supports bcrypt ($2a$/$2b$) and legacy DES crypt (10 chars)
     let isPasswordValid = false;
 
-    if (isLegacyHash) {
-      // Legacy Unix crypt() hash - validate and upgrade to bcrypt
-      // unix-crypt-td-js imported at top of file
+    if (character.passwordHash.startsWith('$2')) {
+      // Modern bcrypt hash
+      isPasswordValid = await bcrypt.compare(
+        characterPassword,
+        character.passwordHash
+      );
+    } else if (character.passwordHash.length === 10) {
+      // Legacy DES crypt - validate and upgrade to bcrypt
       const hashedPassword = crypt(characterPassword, character.passwordHash);
-      // Compare only first 10 characters (legacy system truncated to 10 chars)
       isPasswordValid =
         hashedPassword.substring(0, 10) === character.passwordHash;
 
       if (isPasswordValid) {
-        // Upgrade to bcrypt for future logins
         const bcryptHash = await bcrypt.hash(characterPassword, 10);
         await this.db.characters.update({
           where: { id: character.id },
@@ -680,12 +682,6 @@ export class CharactersService {
           `Upgraded legacy password to bcrypt for character: ${character.name}`
         );
       }
-    } else {
-      // Modern bcrypt hash
-      isPasswordValid = await bcrypt.compare(
-        characterPassword,
-        character.passwordHash
-      );
     }
 
     if (!isPasswordValid) {
@@ -792,20 +788,19 @@ export class CharactersService {
       return false;
     }
 
-    // Supports both legacy Unix crypt() hashes (10 chars) and modern bcrypt hashes
-    const isLegacyHash = character.passwordHash.length === 10;
+    // Supports bcrypt ($2a$/$2b$) and legacy DES crypt (10 chars)
     let isPasswordValid = false;
 
-    if (isLegacyHash) {
-      // Legacy Unix crypt() hash
-      // unix-crypt-td-js imported at top of file
+    if (character.passwordHash.startsWith('$2')) {
+      // Modern bcrypt hash
+      isPasswordValid = await bcrypt.compare(password, character.passwordHash);
+    } else if (character.passwordHash.length === 10) {
+      // Legacy DES crypt - validate and upgrade to bcrypt
       const hashedPassword = crypt(password, character.passwordHash);
-      // Compare only first 10 characters (legacy system truncated to 10 chars)
       isPasswordValid =
         hashedPassword.substring(0, 10) === character.passwordHash;
 
       if (isPasswordValid) {
-        // Upgrade to bcrypt for future logins
         const bcryptHash = await bcrypt.hash(password, 10);
         await this.db.characters.update({
           where: { id: character.id },
@@ -815,9 +810,6 @@ export class CharactersService {
           `Upgraded legacy password to bcrypt for character: ${character.name}`
         );
       }
-    } else {
-      // Modern bcrypt hash
-      isPasswordValid = await bcrypt.compare(password, character.passwordHash);
     }
 
     return isPasswordValid;
@@ -841,6 +833,9 @@ export class CharactersService {
         lastLogin: true,
         timePlayed: true,
         isOnline: true,
+        characterClass: {
+          select: { plainName: true },
+        },
       },
     });
 
@@ -848,12 +843,18 @@ export class CharactersService {
       throw new NotFoundException(`Character '${characterName}' not found`);
     }
 
+    // Look up pretty race name from Races table
+    const raceData = await this.db.races.findUnique({
+      where: { race: character.race },
+      select: { plainName: true },
+    });
+
     return {
       id: character.id,
       name: character.name,
       level: character.level,
-      race: character.race,
-      class: character.classId,
+      race: raceData?.plainName ?? character.race,
+      class: character.characterClass?.plainName ?? undefined,
       lastLogin: character.lastLogin,
       timePlayed: character.timePlayed,
       isOnline: character.isOnline,

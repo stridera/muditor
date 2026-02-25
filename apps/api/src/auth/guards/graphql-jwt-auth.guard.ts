@@ -32,7 +32,7 @@ export class GraphQLJwtAuthGuard {
         where: { id: payload.sub },
         select: {
           id: true,
-          username: true,
+          displayName: true,
           email: true,
           role: true,
           createdAt: true,

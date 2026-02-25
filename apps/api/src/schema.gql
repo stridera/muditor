@@ -149,9 +149,9 @@ input AccountMailFilterInput {
 }
 
 type AccountMailUserDto {
+  displayName: String!
   email: String!
   id: String!
-  username: String!
 }
 
 type AccountStorageDto {
@@ -160,9 +160,9 @@ type AccountStorageDto {
 }
 
 type AdminUser {
+  displayName: String!
   id: ID!
   role: UserRole!
-  username: String!
 }
 
 enum Alignment {
@@ -1388,6 +1388,7 @@ enum GameEventType {
   ADMIN_SHUTDOWN
   ADMIN_WARNING
   ADMIN_ZONE_RESET
+  AUTH_LOGIN_REQUEST
   BOSS_SPAWN
   CHAT_CLAN
   CHAT_EMOTE
@@ -1579,6 +1580,24 @@ type LoginMessageDto {
   variant: String!
 }
 
+type LoginRequestDto {
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  id: ID!
+  ipAddress: String
+  resolvedAt: DateTime
+  status: LoginRequestStatus!
+  userId: String!
+}
+
+"""Status of a passwordless login request"""
+enum LoginRequestStatus {
+  APPROVED
+  DENIED
+  EXPIRED
+  PENDING
+}
+
 """Stage in the login/character creation flow"""
 enum LoginStage {
   CHARACTER_SELECT
@@ -1586,13 +1605,17 @@ enum LoginStage {
   CREATE_NAME_PROMPT
   CREATE_PASSWORD
   CREATION_COMPLETE
+  EMAIL_PROMPT
   INVALID_LOGIN
+  LOGIN_APPROVAL_APPROVED
+  LOGIN_APPROVAL_DENIED
+  LOGIN_APPROVAL_EXPIRED
+  LOGIN_APPROVAL_PENDING
   PASSWORD_PROMPT
   RECONNECT_MESSAGE
   SELECT_CLASS
   SELECT_RACE
   TOO_MANY_ATTEMPTS
-  USERNAME_PROMPT
   WELCOME_BANNER
 }
 
@@ -1815,6 +1838,7 @@ enum MovementMode {
 
 type Mutation {
   addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
+  approveLoginRequest(requestId: String!): LoginRequestDto!
 
   """Assign a skill to a class"""
   assignSkillToClass(data: AssignSkillToClassInput!): ClassSkillDto!
@@ -1831,6 +1855,7 @@ type Mutation {
   """Broadcast a message to all online players"""
   broadcastMessage(message: String!, sender: String): BroadcastResultType!
   changePassword(input: ChangePasswordInput!): PasswordResetResponse!
+  completeGoogleRegistration(displayName: String!, token: String!): AuthPayload!
   createAbility(data: CreateAbilityInput!): Ability!
   createAbilityMessages(data: CreateAbilityMessagesInput!): AbilityMessages!
   createAbilitySavingThrow(data: CreateAbilitySavingThrowInput!): AbilitySavingThrow!
@@ -1923,6 +1948,7 @@ type Mutation {
   deleteSystemText(id: ID!): Boolean!
   deleteTrigger(id: Int!, zoneId: Int!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
+  denyLoginRequest(requestId: String!): LoginRequestDto!
   depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
   depositWealth(amount: BigInt!, characterId: String!): BigInt!
   detachTrigger(id: Int!, zoneId: Int!): TriggerDto!
@@ -1966,6 +1992,7 @@ type Mutation {
 
   """Unlink a character from your user account"""
   unlinkCharacter(data: UnlinkCharacterInput!): Boolean!
+  unlinkGoogle: Boolean!
   updateAbility(data: UpdateAbilityInput!, id: ID!): Ability!
   updateAbilityEffects(abilityId: Int!, data: UpdateAbilityEffectsInput!): Ability!
   updateAbilityMessages(abilityId: Int!, data: UpdateAbilityMessagesInput!): AbilityMessages!
@@ -2373,6 +2400,7 @@ type Query {
   getValidationSummary: ValidationSummaryType!
   grant(id: ID!): UserGrantDto!
   grants(resourceType: GrantResourceType, userId: String): [UserGrantDto!]!
+  hasGoogleLink: Boolean!
 
   """Get a help entry by keyword"""
   helpByKeyword(keyword: String!): HelpEntryDto!
@@ -2442,6 +2470,7 @@ type Query {
 
   """Get list of online players in FieryMUD"""
   onlinePlayers: [OnlinePlayerType!]!
+  pendingLoginRequests: [LoginRequestDto!]!
   playerMail(id: Int!): PlayerMailDto
   playerMailCount(filter: PlayerMailFilterInput): Int!
   playerMails(filter: PlayerMailFilterInput, skip: Int, take: Int): [PlayerMailDto!]!
@@ -2747,9 +2776,9 @@ type RaceSkillDto {
 }
 
 input RegisterInput {
+  displayName: String!
   email: String!
   password: String!
-  username: String!
 }
 
 input RequestPasswordResetInput {
@@ -3103,6 +3132,9 @@ type Subscription {
 
   """Subscribe to specific types of game events"""
   gameEventsByTypes(types: [GameEventType!]!): GameEvent!
+
+  """Subscribe to new login request events for the current user"""
+  loginRequestCreated: LoginRequestDto!
 
   """Subscribe to player activity events (login, logout, death, level up)"""
   playerActivity: GameEvent!
@@ -3786,6 +3818,7 @@ type User {
   """Ban records for this user"""
   banRecords: [BanRecord!]
   createdAt: DateTime!
+  displayName: String!
   email: String!
   id: ID!
 
@@ -3797,25 +3830,23 @@ type User {
   preferences: UserPreferences
   role: UserRole!
   updatedAt: DateTime!
-  username: String!
 }
 
 type UserGrantDto {
+  """Display name of the person who received the grant"""
+  displayName: String!
   expiresAt: DateTime
   grantedAt: DateTime!
   grantedBy: String!
 
-  """Username of the person who granted access"""
-  grantedByUsername: String!
+  """Display name of the person who granted access"""
+  grantedByDisplayName: String!
   id: ID!
   notes: String
   permissions: [GrantPermission!]!
   resourceId: String!
   resourceType: GrantResourceType!
   userId: String!
-
-  """Username of the person who received the grant"""
-  username: String!
 }
 
 type UserPermissions {
@@ -3859,9 +3890,9 @@ enum UserRole {
 }
 
 type UserSummaryDto {
+  displayName: String!
   id: ID!
   role: String!
-  username: String!
 }
 
 """The category of validation issue"""

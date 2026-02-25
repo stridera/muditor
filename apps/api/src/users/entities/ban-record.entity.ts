@@ -7,7 +7,7 @@ export class AdminUser {
   id: string;
 
   @Field()
-  username: string;
+  displayName: string;
 
   @Field(() => UserRole)
   role: UserRole;
@@ -45,7 +45,7 @@ export class BanRecord {
   // User field handled by resolver, not exposed directly (partial view)
   user?: {
     id: string;
-    username: string;
+    displayName: string;
     email: string;
     role: UserRole;
     isBanned: boolean;

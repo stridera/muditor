@@ -1,0 +1,52 @@
+import { Injectable } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
+import { PassportStrategy } from '@nestjs/passport';
+import {
+  Strategy,
+  type Profile,
+  type VerifyCallback,
+} from 'passport-google-oauth20';
+
+export interface GoogleProfile {
+  googleId: string;
+  email: string;
+  displayName: string;
+  avatarUrl?: string;
+}
+
+@Injectable()
+export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
+  constructor(configService: ConfigService) {
+    super({
+      clientID:
+        configService.get<string>('GOOGLE_CLIENT_ID') || 'not-configured',
+      clientSecret:
+        configService.get<string>('GOOGLE_CLIENT_SECRET') || 'not-configured',
+      callbackURL: configService.get<string>(
+        'GOOGLE_CALLBACK_URL',
+        'http://localhost:3001/api/auth/google/callback'
+      ),
+      scope: ['email', 'profile'],
+    });
+  }
+
+  validate(
+    _accessToken: string,
+    _refreshToken: string,
+    profile: Profile,
+    done: VerifyCallback
+  ): void {
+    const email = profile.emails?.[0]?.value;
+    if (!email) {
+      return done(new Error('No email found in Google profile'), undefined);
+    }
+    const avatarUrl = profile.photos?.[0]?.value;
+    const googleProfile: GoogleProfile = {
+      googleId: profile.id,
+      email,
+      displayName: profile.displayName,
+      ...(avatarUrl != null && { avatarUrl }),
+    };
+    done(null, googleProfile);
+  }
+}

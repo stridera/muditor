@@ -15,7 +15,7 @@ export const ONLINE_CHARACTERS_QUERY = gql`
       playerClass
       user {
         id
-        username
+        displayName
         role
       }
     }
@@ -34,7 +34,7 @@ export const MY_ONLINE_CHARACTERS_QUERY = gql`
       playerClass
       user {
         id
-        username
+        displayName
         role
       }
     }
@@ -82,7 +82,7 @@ export interface OnlineCharacter {
   playerClass?: string;
   user?: {
     id: string;
-    username: string;
+    displayName: string;
     role: string;
   } | null;
 }

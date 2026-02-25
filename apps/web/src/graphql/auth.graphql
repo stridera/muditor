@@ -27,6 +27,6 @@ mutation UpdateProfile($email: String) {
   updateProfile(input: { email: $email }) {
     id
     email
-    username
+    displayName
   }
 }

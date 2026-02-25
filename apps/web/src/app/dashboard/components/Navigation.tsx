@@ -347,7 +347,7 @@ export function Navigation() {
                   <Button variant='ghost' className='h-9 w-9 rounded-full p-0'>
                     <div className='h-9 w-9 bg-primary rounded-full flex items-center justify-center'>
                       <span className='text-primary-foreground text-sm font-medium'>
-                        {user.username.charAt(0).toUpperCase()}
+                        {user.displayName.charAt(0).toUpperCase()}
                       </span>
                     </div>
                   </Button>
@@ -355,7 +355,7 @@ export function Navigation() {
                 <DropdownMenuContent align='end' className='w-56'>
                   <DropdownMenuLabel>
                     <div className='flex flex-col gap-1'>
-                      <span className='font-medium'>{user.username}</span>
+                      <span className='font-medium'>{user.displayName}</span>
                       <Badge variant='outline' className='w-fit text-xs'>
                         {user.role}
                       </Badge>

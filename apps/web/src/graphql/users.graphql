@@ -3,7 +3,7 @@
 query Users {
   users {
     id
-    username
+    displayName
     role
     lastLoginAt
     isBanned
@@ -19,7 +19,7 @@ query Users {
 mutation UpdateUser($id: ID!, $role: UserRole) {
   updateUser(input: { id: $id, role: $role }) {
     id
-    username
+    displayName
     role
   }
 }

@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 import Editor from '@monaco-editor/react';
 import type { editor } from 'monaco-editor';
 import { useTheme } from 'next-themes';
 import { ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
+import { lintLua, type LuaLintIssue } from '@muditor/types';
 
 export interface Script {
   id: string;
@@ -589,6 +590,8 @@ export default function ScriptEditor({
   const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [showSidebar, setShowSidebar] = useState(true);
   const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null);
+  const monacoRef = useRef<typeof import('monaco-editor') | null>(null);
+  const lintTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const { resolvedTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -659,6 +662,7 @@ export default function ScriptEditor({
     const model = editor.getModel();
     if (model && typeof window !== 'undefined') {
       import('monaco-editor').then(monaco => {
+        monacoRef.current = monaco;
         monaco.editor.setModelLanguage(model, 'lua');
       });
     }
@@ -673,6 +677,47 @@ export default function ScriptEditor({
       });
     }
   }, [resolvedTheme, mounted]);
+
+  const updateMarkers = useCallback((issues: LuaLintIssue[]) => {
+    const monaco = monacoRef.current;
+    const model = editorRef.current?.getModel();
+    if (!monaco || !model) return;
+
+    const markers = issues.map(issue => ({
+      severity:
+        issue.severity === 'error'
+          ? monaco.MarkerSeverity.Error
+          : monaco.MarkerSeverity.Warning,
+      message: issue.message,
+      startLineNumber: issue.line,
+      startColumn: issue.column,
+      endLineNumber: issue.line,
+      endColumn: issue.endColumn,
+      source: 'lua-lint',
+    }));
+
+    monaco.editor.setModelMarkers(model, 'lua-lint', markers);
+  }, []);
+
+  // Debounced lint on code changes — real-time inline squiggly underlines
+  useEffect(() => {
+    if (!mounted) return;
+
+    if (lintTimerRef.current) {
+      clearTimeout(lintTimerRef.current);
+    }
+
+    lintTimerRef.current = setTimeout(() => {
+      const issues = lintLua(code);
+      updateMarkers(issues);
+    }, 500);
+
+    return () => {
+      if (lintTimerRef.current) {
+        clearTimeout(lintTimerRef.current);
+      }
+    };
+  }, [code, mounted, updateMarkers]);
 
   const handleCodeChange = (value: string | undefined) => {
     const newCode = value || '';
@@ -690,6 +735,7 @@ export default function ScriptEditor({
       const errors: string[] = [];
       const lines = code.split('\n');
 
+      // Existing basic checks
       lines.forEach((line, index) => {
         const trimmed = line.trim();
         if (!trimmed || trimmed.startsWith('--')) return;
@@ -720,6 +766,16 @@ export default function ScriptEditor({
       if (openParens !== closeParens) {
         errors.push('Unbalanced parentheses');
       }
+
+      // Run linter and merge results
+      const lintIssues = lintLua(code);
+      for (const issue of lintIssues) {
+        const severity = issue.severity === 'error' ? 'Error' : 'Warning';
+        errors.push(`Line ${issue.line} [${severity}]: ${issue.message}`);
+      }
+
+      // Update Monaco markers immediately
+      updateMarkers(lintIssues);
 
       setValidationErrors(errors);
     } catch (err) {
@@ -1099,13 +1155,29 @@ export default function ScriptEditor({
       {validationErrors.length > 0 && (
         <div className='bg-destructive/10 border-t border-destructive/20 p-3'>
           <h4 className='text-sm font-medium text-destructive mb-2'>
-            Validation Errors:
+            Validation Issues ({validationErrors.length}):
           </h4>
-          <ul className='text-sm text-destructive/90 space-y-1'>
+          <ul className='text-sm space-y-1'>
             {validationErrors.map((error, index) => (
               <li key={index} className='flex items-start gap-2'>
-                <span className='text-destructive'>•</span>
-                <span>{error}</span>
+                <span
+                  className={
+                    error.includes('[Warning]')
+                      ? 'text-yellow-500'
+                      : 'text-destructive'
+                  }
+                >
+                  {error.includes('[Warning]') ? '!' : '×'}
+                </span>
+                <span
+                  className={
+                    error.includes('[Warning]')
+                      ? 'text-yellow-600 dark:text-yellow-400'
+                      : 'text-destructive/90'
+                  }
+                >
+                  {error}
+                </span>
               </li>
             ))}
           </ul>

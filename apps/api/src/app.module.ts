@@ -30,6 +30,8 @@ import { AccountStorageModule } from './account-storage/account-storage.module';
 import { BoardsModule } from './boards/boards.module';
 import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
+import { LoginRequestsModule } from './login-requests/login-requests.module';
+import * as jwt from 'jsonwebtoken';
 
 @Module({
   imports: [
@@ -59,6 +61,25 @@ import { DiscordModule } from './discord/discord.module';
             >;
             const auth = (params['Authorization'] ||
               params['authorization']) as string | undefined;
+            if (auth) {
+              try {
+                const token = auth.replace('Bearer ', '');
+                const decoded = jwt.verify(
+                  token,
+                  process.env.JWT_SECRET!
+                ) as jwt.JwtPayload;
+                return {
+                  req: {
+                    headers: {
+                      authorization: auth,
+                      userId: decoded.sub,
+                    },
+                  },
+                };
+              } catch {
+                // Invalid token — fall through with auth header only
+              }
+            }
             return { req: { headers: { authorization: auth } } };
           },
         },
@@ -89,6 +110,7 @@ import { DiscordModule } from './discord/discord.module';
     BoardsModule,
     BridgeModule,
     DiscordModule,
+    LoginRequestsModule,
   ],
 })
 export class AppModule {}

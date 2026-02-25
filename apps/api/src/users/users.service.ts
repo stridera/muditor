@@ -38,9 +38,9 @@ export class UsersService {
     });
   }
 
-  async findByUsername(username: string) {
+  async findByDisplayName(displayName: string) {
     return this.databaseService.users.findUnique({
-      where: { username },
+      where: { displayName },
     });
   }
 
@@ -145,12 +145,12 @@ export class UsersService {
       admin: banRecord.bannedByUser
         ? {
             id: banRecord.bannedByUser.id,
-            username: banRecord.bannedByUser.username,
+            displayName: banRecord.bannedByUser.displayName,
             role: banRecord.bannedByUser.role,
           }
         : {
             id: '',
-            username: '',
+            displayName: '',
             role: UserRole.PLAYER,
           },
     } as const;
@@ -195,12 +195,12 @@ export class UsersService {
       admin: updatedBanRecord.bannedByUser
         ? {
             id: updatedBanRecord.bannedByUser.id,
-            username: updatedBanRecord.bannedByUser.username,
+            displayName: updatedBanRecord.bannedByUser.displayName,
             role: updatedBanRecord.bannedByUser.role,
           }
         : {
             id: '',
-            username: '',
+            displayName: '',
             role: UserRole.PLAYER,
           },
     } as const;
@@ -227,7 +227,7 @@ export class UsersService {
             bannedByUser: {
               select: {
                 id: true,
-                username: true,
+                displayName: true,
                 role: true,
               },
             },
@@ -259,7 +259,7 @@ export class UsersService {
             bannedByUser: {
               select: {
                 id: true,
-                username: true,
+                displayName: true,
                 role: true,
               },
             },
@@ -286,7 +286,7 @@ export class UsersService {
         bannedByUser: {
           select: {
             id: true,
-            username: true,
+            displayName: true,
             role: true,
           },
         },
@@ -306,7 +306,7 @@ export class UsersService {
       admin: record.bannedByUser
         ? {
             id: record.bannedByUser.id,
-            username: record.bannedByUser.username,
+            displayName: record.bannedByUser.displayName,
             role: record.bannedByUser.role,
           }
         : null,

@@ -49,12 +49,12 @@ export class GrantsService {
       include: {
         user: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
         grantedByUser: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
       },
@@ -80,12 +80,12 @@ export class GrantsService {
       include: {
         user: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
         grantedByUser: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
       },
@@ -104,12 +104,12 @@ export class GrantsService {
       include: {
         user: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
         grantedByUser: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
       },
@@ -144,12 +144,12 @@ export class GrantsService {
       include: {
         user: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
         grantedByUser: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
       },
@@ -217,7 +217,7 @@ export class GrantsService {
       include: {
         grantedByUser: {
           select: {
-            username: true,
+            displayName: true,
           },
         },
       },

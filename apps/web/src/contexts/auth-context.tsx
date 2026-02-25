@@ -12,7 +12,7 @@ const LOGIN_MUTATION = gql`
       accessToken
       user {
         id
-        username
+        displayName
         email
         role
         createdAt
@@ -27,7 +27,7 @@ const REGISTER_MUTATION = gql`
       accessToken
       user {
         id
-        username
+        displayName
         email
         role
         createdAt
@@ -40,7 +40,7 @@ const ME_QUERY = gql`
   query Me {
     me {
       id
-      username
+      displayName
       email
       role
       createdAt
@@ -50,7 +50,7 @@ const ME_QUERY = gql`
 
 export interface User {
   id: string;
-  username: string;
+  displayName: string;
   email: string;
   role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD';
   createdAt: string;
@@ -60,8 +60,9 @@ export interface AuthContextType {
   user: User | null;
   loading: boolean;
   login: (identifier: string, password: string) => Promise<void>;
+  loginWithToken: (token: string) => Promise<void>;
   register: (
-    username: string,
+    displayName: string,
     email: string,
     password: string
   ) => Promise<void>;
@@ -144,8 +145,27 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const loginWithToken = async (token: string) => {
+    setStoredToken(token);
+    try {
+      const result = await apolloClient.query({
+        query: ME_QUERY,
+        fetchPolicy: 'network-only',
+      });
+      if ((result.data as any)?.me) {
+        setUser((result.data as any).me);
+        setStoredUser((result.data as any).me);
+        router.push('/dashboard');
+      }
+    } catch {
+      removeStoredToken();
+      removeStoredUser();
+      throw new Error('Failed to authenticate with token');
+    }
+  };
+
   const register = async (
-    username: string,
+    displayName: string,
     email: string,
     password: string
   ) => {
@@ -153,7 +173,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const result = await apolloClient.mutate({
         mutation: REGISTER_MUTATION,
         variables: {
-          input: { username, email, password },
+          input: { displayName, email, password },
         },
       });
 
@@ -206,6 +226,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         user,
         loading,
         login,
+        loginWithToken,
         register,
         logout,
         refetchUser,

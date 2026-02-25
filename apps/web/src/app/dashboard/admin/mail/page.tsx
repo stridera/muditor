@@ -366,7 +366,8 @@ function AdminMailContent() {
                         <TableCell>
                           {mail.isBroadcast
                             ? 'All Users'
-                            : mail.recipient?.username || mail.recipientUserId}
+                            : mail.recipient?.displayName ||
+                              mail.recipientUserId}
                         </TableCell>
                         <TableCell className='max-w-xs truncate'>
                           {mail.subject}
@@ -550,7 +551,7 @@ function MailViewDialog({ mail }: { mail: PlayerMail | AccountMail }) {
                 ? (mail as PlayerMail).recipientName
                 : (mail as AccountMail).isBroadcast
                   ? 'All Users (Broadcast)'
-                  : (mail as AccountMail).recipient?.username ||
+                  : (mail as AccountMail).recipient?.displayName ||
                     (mail as AccountMail).recipientUserId}
             </p>
           </div>

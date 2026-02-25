@@ -70,7 +70,7 @@ const USERS_QUERY = gql`
   query UsersInline {
     users {
       id
-      username
+      displayName
       email
       role
       isBanned
@@ -82,7 +82,7 @@ const USERS_QUERY = gql`
         bannedAt
         expiresAt
         admin {
-          username
+          displayName
         }
       }
     }
@@ -93,7 +93,7 @@ const UPDATE_USER_MUTATION = gql`
   mutation UpdateUserInline($input: UpdateUserInput!) {
     updateUser(input: $input) {
       id
-      username
+      displayName
       email
       role
     }
@@ -123,7 +123,7 @@ const UNBAN_USER_MUTATION = gql`
 
 interface User {
   id: string;
-  username: string;
+  displayName: string;
   email: string;
   role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD';
   isBanned: boolean;
@@ -135,7 +135,7 @@ interface User {
     bannedAt: string;
     expiresAt?: string;
     admin: {
-      username: string;
+      displayName: string;
     };
   }[];
 }
@@ -254,7 +254,7 @@ function UsersContent() {
               <TableRow key={user.id}>
                 <TableCell>
                   <div>
-                    <div className='font-medium'>{user.username}</div>
+                    <div className='font-medium'>{user.displayName}</div>
                     <div className='text-sm text-gray-500'>{user.email}</div>
                   </div>
                 </TableCell>
@@ -322,7 +322,7 @@ function UsersContent() {
                           <AlertDialogHeader>
                             <AlertDialogTitle>Unban User</AlertDialogTitle>
                             <AlertDialogDescription>
-                              Are you sure you want to unban {user.username}?
+                              Are you sure you want to unban {user.displayName}?
                               They will regain access to the system.
                             </AlertDialogDescription>
                           </AlertDialogHeader>
@@ -409,7 +409,7 @@ function EditUserDialog({
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Edit User: {user.username}</DialogTitle>
+        <DialogTitle>Edit User: {user.displayName}</DialogTitle>
         <DialogDescription>
           Update user information and permissions
         </DialogDescription>
@@ -479,7 +479,7 @@ function BanUserDialog({
   return (
     <DialogContent>
       <DialogHeader>
-        <DialogTitle>Ban User: {user.username}</DialogTitle>
+        <DialogTitle>Ban User: {user.displayName}</DialogTitle>
         <DialogDescription>
           Restrict user access to the system
         </DialogDescription>

@@ -177,11 +177,11 @@ If you didn't request this password reset, you can safely ignore this email.
     });
   }
 
-  async sendWelcomeEmail(email: string, username: string): Promise<boolean> {
+  async sendWelcomeEmail(email: string, displayName: string): Promise<boolean> {
     const html = `
       <div style="max-width: 600px; margin: 0 auto; padding: 20px; font-family: Arial, sans-serif;">
         <h1 style="color: #333; text-align: center;">Welcome to Muditor!</h1>
-        <p>Hi ${username},</p>
+        <p>Hi ${displayName},</p>
         <p>Welcome to Muditor, the modern MUD world editor and administration tool!</p>
         <p>You can now:</p>
         <ul>

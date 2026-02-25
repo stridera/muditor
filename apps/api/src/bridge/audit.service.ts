@@ -59,11 +59,11 @@ export class AuditService {
         }),
         this.databaseService.users.findUnique({
           where: { id: entry.userId },
-          select: { username: true },
+          select: { displayName: true },
         }),
       ]);
 
-      const displayName = user?.username ?? entry.userId;
+      const displayName = user?.displayName ?? entry.userId;
       this.logger.debug(
         `Audit: ${entry.action} by ${displayName} on ${entry.entityType}:${entry.entityId}`
       );

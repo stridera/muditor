@@ -30,6 +30,9 @@ export enum GameEventType {
   ADMIN_SHUTDOWN = 'ADMIN_SHUTDOWN',
   ADMIN_BROADCAST = 'ADMIN_BROADCAST',
 
+  // Auth events
+  AUTH_LOGIN_REQUEST = 'AUTH_LOGIN_REQUEST',
+
   // World events
   ZONE_LOADED = 'ZONE_LOADED',
   ZONE_RESET = 'ZONE_RESET',
@@ -112,6 +115,7 @@ export class GameEventFilter {
 export function getEventCategory(type: GameEventType): GameEventCategory {
   if (type.startsWith('PLAYER_')) return GameEventCategory.PLAYER;
   if (type.startsWith('CHAT_')) return GameEventCategory.CHAT;
-  if (type.startsWith('ADMIN_')) return GameEventCategory.ADMIN;
+  if (type.startsWith('ADMIN_') || type.startsWith('AUTH_'))
+    return GameEventCategory.ADMIN;
   return GameEventCategory.WORLD;
 }

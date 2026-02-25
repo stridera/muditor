@@ -98,10 +98,10 @@ export class BridgeService implements OnModuleInit, OnModuleDestroy {
         type: this.parseEventType(rawEvent.type),
         timestamp: new Date(rawEvent.timestamp),
         message: rawEvent.message || '',
-        playerName: rawEvent.player_name,
-        zoneId: rawEvent.zone_id,
-        roomVnum: rawEvent.room_vnum,
-        targetPlayer: rawEvent.target_player,
+        playerName: rawEvent.playerName ?? rawEvent.player_name,
+        zoneId: rawEvent.zoneId ?? rawEvent.zone_id,
+        roomVnum: rawEvent.roomId ?? rawEvent.room_vnum,
+        targetPlayer: rawEvent.metadata?.target ?? rawEvent.target_player,
         metadata: rawEvent.metadata,
       };
 
@@ -129,6 +129,15 @@ export class BridgeService implements OnModuleInit, OnModuleDestroy {
       `Unknown event type: ${typeString}, defaulting to ADMIN_WARNING`
     );
     return GameEventType.ADMIN_WARNING;
+  }
+
+  /**
+   * Publish a local event (not from Redis) into the event stream.
+   * Used when the API itself detects something that should trigger
+   * a GraphQL subscription (e.g. DB-only changes from the game server).
+   */
+  publishLocalEvent(event: GameEvent): void {
+    this.eventSubject.next(event);
   }
 
   /**

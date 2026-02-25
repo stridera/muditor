@@ -255,13 +255,13 @@ export class DiscordService implements OnModuleInit, OnModuleDestroy {
     try {
       // Send gossip message to game server
       const result = await this.gameAdminService.executeCommand(
-        `gossip [Discord] ${link.user.username}: ${message}`,
+        `gossip [Discord] ${link.user.displayName}: ${message}`,
         'DiscordBot'
       );
 
       if (result.success) {
         await interaction.editReply(
-          `Sent to gossip: **${link.user.username}**: ${message}`
+          `Sent to gossip: **${link.user.displayName}**: ${message}`
         );
       } else {
         await interaction.editReply(`Failed to send gossip: ${result.message}`);
@@ -328,11 +328,11 @@ export class DiscordService implements OnModuleInit, OnModuleDestroy {
       });
 
       await interaction.editReply(
-        `Successfully linked to Muditor account **${user.username}**! You can now use /gossip to chat in-game.`
+        `Successfully linked to Muditor account **${user.displayName}**! You can now use /gossip to chat in-game.`
       );
 
       this.logger.log(
-        `Discord user ${discordName} linked to Muditor user ${user.username}`
+        `Discord user ${discordName} linked to Muditor user ${user.displayName}`
       );
     } catch (error) {
       this.logger.error('Error linking Discord account', error);

@@ -59,7 +59,7 @@ export default function AdminConsolePage() {
           </TabsContent>
 
           <TabsContent value='console' className='space-y-4'>
-            <CommandConsole defaultExecutor={user?.username} />
+            <CommandConsole defaultExecutor={user?.displayName} />
           </TabsContent>
 
           <TabsContent value='events' className='min-h-[600px]'>
