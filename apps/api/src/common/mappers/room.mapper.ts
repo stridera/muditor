@@ -1,9 +1,24 @@
+import type { Effect as PrismaEffect } from '@muditor/db';
+import { Effect } from '../../abilities/abilities.dto';
 import {
   RoomDto,
   RoomExitDto,
   RoomExtraDescriptionDto,
 } from '../../rooms/room.dto';
+import { RoomEnvironmentalEffectDto } from '../../rooms/room-effects.dto';
 import type { RoomMapperSource } from './types';
+
+function mapEffect(e: PrismaEffect): Effect {
+  return {
+    id: e.id,
+    name: e.name,
+    ...(e.description != null && { description: e.description }),
+    effectType: e.effectType,
+    tags: e.tags,
+    defaultParams: e.defaultParams,
+    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
+  };
+}
 
 export function mapRoom(db: RoomMapperSource): RoomDto {
   const exitsSource = db.exits || [];
@@ -39,6 +54,13 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     description: ed.description || '',
   }));
 
+  const environmentalEffects: RoomEnvironmentalEffectDto[] = (
+    db.environmentalEffects ?? []
+  ).map(re => ({
+    effectId: re.effectId,
+    effect: mapEffect(re.effect),
+  }));
+
   const dto: RoomDto = {
     id: db.id,
     name: db.name,
@@ -48,6 +70,7 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
     zoneId: db.zoneId,
     exits,
     extraDescs,
+    environmentalEffects,
     createdAt: db.createdAt,
     updatedAt: db.updatedAt,
     baseLightLevel: db.baseLightLevel ?? 0,

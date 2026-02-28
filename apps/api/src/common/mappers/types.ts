@@ -13,6 +13,7 @@ import {
   type ObjectResistance,
   type ConsumableEffect,
   PositionMechanic,
+  type RoomEnvironmentalEffect,
   type RoomExit as PrismaRoomExit,
   type RoomExtraDescriptions,
   Sector,
@@ -48,6 +49,7 @@ export interface RoomMapperSource {
     hitPoints?: number | null;
   })[];
   roomExtraDescriptions?: RoomExtraDescriptions[];
+  environmentalEffects?: (RoomEnvironmentalEffect & { effect: Effect })[];
   deletedAt?: Date | null;
   [key: string]: unknown;
 }
