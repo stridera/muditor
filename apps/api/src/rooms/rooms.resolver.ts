@@ -27,6 +27,7 @@ import {
   UpdateRoomInput,
   UpdateRoomPositionInput,
 } from './room.dto';
+import { RoomEnvironmentalEffectInput } from './room-effects.dto';
 import { RoomsService } from './rooms.service';
 
 // Narrow mapper input to the actual shape returned by RoomsService (RoomServiceResult) plus relation arrays.
@@ -245,6 +246,22 @@ export class RoomsResolver {
     @Args('input') input: BatchUpdateRoomPositionsInput
   ): Promise<BatchUpdateResult> {
     return this.roomsService.batchUpdatePositions(input.updates);
+  }
+
+  @Mutation(() => RoomDto)
+  @UseGuards(GraphQLJwtAuthGuard)
+  async updateRoomEnvironmentalEffects(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @Args('id', { type: () => Int }) id: number,
+    @Args('effects', { type: () => [RoomEnvironmentalEffectInput] })
+    effects: RoomEnvironmentalEffectInput[]
+  ): Promise<RoomDto> {
+    const room = await this.roomsService.updateRoomEnvironmentalEffects(
+      zoneId,
+      id,
+      effects
+    );
+    return mapRoom(room as unknown as RoomsMapperInput);
   }
 
   @ResolveField(() => [MobDto])

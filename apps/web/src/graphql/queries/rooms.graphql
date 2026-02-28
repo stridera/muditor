@@ -38,5 +38,13 @@ query GetRoom($zoneId: Int!, $id: Int!) {
       roomZoneId
       roomId
     }
+    environmentalEffects {
+      effectId
+      effect {
+        id
+        name
+        effectType
+      }
+    }
   }
 }

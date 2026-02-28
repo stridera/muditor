@@ -58,6 +58,17 @@ interface RoomServiceResultBase {
   allowsSummon: boolean;
   allowsTeleport: boolean;
   isDeathTrap: boolean;
+  environmentalEffects: Array<{
+    effectId: number;
+    effect: {
+      id: number;
+      name: string;
+      effectType: string;
+      tags: string[];
+      defaultParams: unknown;
+      paramSchema?: unknown;
+    };
+  }>;
   mobResets?: Array<{
     mobs?: { id: number; zoneId: number; name: string; keywords?: string[] };
   }>; // Populated for GraphQL field resolvers
@@ -75,6 +86,11 @@ export class RoomsService {
   private readonly includeFull = {
     exits: true,
     roomExtraDescriptions: true,
+    environmentalEffects: {
+      include: {
+        effect: true,
+      },
+    },
     mobResets: {
       include: {
         mobs: true,
@@ -99,6 +115,17 @@ export class RoomsService {
       id: number;
       keywords: string[];
       description: string;
+    }>;
+    environmentalEffects?: Array<{
+      effectId: number;
+      effect: {
+        id: number;
+        name: string;
+        effectType: string;
+        tags: string[];
+        defaultParams: unknown;
+        paramSchema?: unknown;
+      };
     }>;
     mobResets?: Array<{
       mobs?: { id: number; zoneId: number; name: string; keywords?: string[] };
@@ -139,6 +166,7 @@ export class RoomsService {
       sector: room.sector,
       exits: room.exits ?? [],
       extraDescs: room.roomExtraDescriptions ?? [],
+      environmentalEffects: room.environmentalEffects ?? [],
       mobResets: room.mobResets ?? [],
       objectResets: room.objectResets ?? [],
       createdAt: room.createdAt,
@@ -461,6 +489,27 @@ export class RoomsService {
       return { updatedCount: 0, errors: [`Transaction failed: ${msg}`] };
     }
     return errors.length ? { updatedCount, errors } : { updatedCount };
+  }
+  async updateRoomEnvironmentalEffects(
+    zoneId: number,
+    id: number,
+    effects: Array<{ effectId: number }>
+  ) {
+    await this.db.$transaction(async tx => {
+      await tx.roomEnvironmentalEffect.deleteMany({
+        where: { roomZoneId: zoneId, roomId: id },
+      });
+      if (effects.length > 0) {
+        await tx.roomEnvironmentalEffect.createMany({
+          data: effects.map(e => ({
+            roomZoneId: zoneId,
+            roomId: id,
+            effectId: e.effectId,
+          })),
+        });
+      }
+    });
+    return this.findOne(zoneId, id);
   }
 }
 // CLEAN REWRITE END ---------------------------------------------------------

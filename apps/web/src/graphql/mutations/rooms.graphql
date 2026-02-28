@@ -1,0 +1,22 @@
+mutation UpdateRoomEnvironmentalEffects(
+  $zoneId: Int!
+  $id: Int!
+  $effects: [RoomEnvironmentalEffectInput!]!
+) {
+  updateRoomEnvironmentalEffects(
+    zoneId: $zoneId
+    id: $id
+    effects: $effects
+  ) {
+    id
+    zoneId
+    environmentalEffects {
+      effectId
+      effect {
+        id
+        name
+        effectType
+      }
+    }
+  }
+}

@@ -26,6 +26,7 @@ import {
 } from 'class-validator';
 import { MobDto } from '../mobs/mob.dto';
 import { ObjectDto } from '../objects/object.dto';
+import { RoomEnvironmentalEffectDto } from './room-effects.dto';
 import { ShopDto } from '../shops/shop.dto';
 
 // Register GraphQL enums
@@ -175,6 +176,10 @@ export class RoomDto {
 
   @Field({ defaultValue: false })
   isDeathTrap: boolean;
+
+  // Environmental effects attached to this room
+  @Field(() => [RoomEnvironmentalEffectDto], { defaultValue: [] })
+  environmentalEffects: RoomEnvironmentalEffectDto[];
 
   // Related entities (populated by GraphQL field resolvers)
   @Field(() => [MobDto], { defaultValue: [] })
