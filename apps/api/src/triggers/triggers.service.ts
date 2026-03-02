@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { Prisma, ScriptType, TriggerFlag } from '@muditor/db';
-import { lintLua } from '@muditor/types';
+import { lintLua, lintLuaWithEntities } from '@muditor/types';
+import type { EntityDatabase } from '@muditor/types';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -10,6 +11,10 @@ import {
 
 @Injectable()
 export class TriggersService {
+  private entityDbCache: EntityDatabase | null = null;
+  private entityDbCacheTime = 0;
+  private static readonly ENTITY_CACHE_TTL_MS = 60_000; // 1 minute
+
   constructor(private prisma: DatabaseService) {}
 
   async findAll() {
@@ -251,7 +256,7 @@ export class TriggersService {
     }
 
     // Lint the script commands on create
-    const lintResult = this.lintCommands(data.commands);
+    const lintResult = await this.lintCommands(data.commands);
     triggerData.syntaxError = lintResult.syntaxError;
     triggerData.needsReview = lintResult.needsReview;
 
@@ -325,7 +330,7 @@ export class TriggersService {
 
     // Re-lint when commands are updated
     if (data.commands !== undefined) {
-      const lintResult = this.lintCommands(data.commands);
+      const lintResult = await this.lintCommands(data.commands);
       updateData.syntaxError = lintResult.syntaxError;
       updateData.needsReview = lintResult.needsReview;
     }
@@ -456,18 +461,61 @@ export class TriggersService {
   }
 
   /** Run linter on script commands and return lint fields for the DB record. */
-  private lintCommands(commands: string): {
+  private async lintCommands(commands: string): Promise<{
     syntaxError: string | null;
     needsReview: boolean;
-  } {
+  }> {
     const issues = lintLua(commands);
+
+    // Also run entity validation
+    const entityDb = await this.loadEntityDatabase();
+    const entityIssues = lintLuaWithEntities(commands, entityDb);
+    issues.push(...entityIssues);
+
     const firstError = issues.find(i => i.severity === 'error');
+    const firstWarning = !firstError
+      ? issues.find(i => i.rule === 'entity-not-found')
+      : undefined;
+    const topIssue = firstError ?? firstWarning;
     return {
-      syntaxError: firstError
-        ? `Line ${firstError.line}: ${firstError.message}`
+      syntaxError: topIssue
+        ? `Line ${topIssue.line}: ${topIssue.message}`
         : null,
       needsReview: !!firstError,
     };
+  }
+
+  /** Load entity IDs from the database (cached for 1 minute). */
+  private async loadEntityDatabase(): Promise<EntityDatabase> {
+    const now = Date.now();
+    if (
+      this.entityDbCache &&
+      now - this.entityDbCacheTime < TriggersService.ENTITY_CACHE_TTL_MS
+    ) {
+      return this.entityDbCache;
+    }
+
+    const [rooms, mobs, objects] = await Promise.all([
+      this.prisma.room.findMany({ select: { zoneId: true, id: true } }),
+      this.prisma.mobs.findMany({ select: { zoneId: true, id: true } }),
+      this.prisma.objects.findMany({ select: { zoneId: true, id: true } }),
+    ]);
+
+    this.entityDbCache = {
+      rooms: new Set(
+        rooms.map((r: { zoneId: number; id: number }) => `${r.zoneId}:${r.id}`)
+      ),
+      mobs: new Set(
+        mobs.map((m: { zoneId: number; id: number }) => `${m.zoneId}:${m.id}`)
+      ),
+      objects: new Set(
+        objects.map(
+          (o: { zoneId: number; id: number }) => `${o.zoneId}:${o.id}`
+        )
+      ),
+    };
+    this.entityDbCacheTime = now;
+    return this.entityDbCache;
   }
 
   private buildWhereClauseForAttachment(

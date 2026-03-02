@@ -41,6 +41,7 @@
     "node_modules",
     "src/__tests__/**/*",
     "dist-types",
-    "src/components/ZoneEditor/EnhancedZoneEditor.tsx"
+    "src/components/ZoneEditor/EnhancedZoneEditor.tsx",
+    "../../packages/types/src/__tests__/**/*"
   ]
 }
