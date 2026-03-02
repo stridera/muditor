@@ -5,3 +5,4 @@ export * from './user';
 export * from './api';
 export * from './auto-layout';
 export * from './lua-linter';
+export * from './lua-api-surface';
