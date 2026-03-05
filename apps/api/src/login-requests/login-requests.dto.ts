@@ -17,7 +17,7 @@ export class LoginRequestDto {
   @Field(() => LoginRequestStatus)
   status: LoginRequestStatus;
 
-  @Field({ nullable: true })
+  @Field(() => String, { nullable: true })
   ipAddress: string | null;
 
   @Field()
@@ -26,6 +26,6 @@ export class LoginRequestDto {
   @Field()
   createdAt: Date;
 
-  @Field({ nullable: true })
+  @Field(() => Date, { nullable: true })
   resolvedAt: Date | null;
 }

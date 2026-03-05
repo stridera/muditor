@@ -32,7 +32,7 @@ export class SettingsResolver {
     name: 'gameConfigs',
     description: 'Get all game configuration entries',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findAllConfigs() {
     return this.settingsService.findAllConfigs();
   }
@@ -41,7 +41,7 @@ export class SettingsResolver {
     name: 'gameConfigsByCategory',
     description: 'Get configuration entries by category',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findConfigsByCategory(@Args('category') category: string) {
     return this.settingsService.findConfigsByCategory(category);
   }
@@ -50,7 +50,7 @@ export class SettingsResolver {
     name: 'gameConfig',
     description: 'Get a single configuration entry',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findConfig(
     @Args('category') category: string,
     @Args('key') key: string
@@ -62,7 +62,7 @@ export class SettingsResolver {
     name: 'gameConfigCategories',
     description: 'Get all distinct configuration categories',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async getConfigCategories() {
     return this.settingsService.getConfigCategories();
   }
@@ -71,7 +71,7 @@ export class SettingsResolver {
     name: 'updateGameConfig',
     description: 'Update a game configuration value',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async updateConfig(
     @Args('category') category: string,
     @Args('key') key: string,
@@ -88,7 +88,7 @@ export class SettingsResolver {
     name: 'levelDefinitions',
     description: 'Get all level definitions',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findAllLevels() {
     return this.settingsService.findAllLevels();
   }
@@ -97,7 +97,7 @@ export class SettingsResolver {
     name: 'mortalLevels',
     description: 'Get mortal level definitions (1-99)',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findMortalLevels() {
     return this.settingsService.findMortalLevels();
   }
@@ -106,7 +106,7 @@ export class SettingsResolver {
     name: 'immortalLevels',
     description: 'Get immortal level definitions (100+)',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findImmortalLevels() {
     return this.settingsService.findImmortalLevels();
   }
@@ -115,7 +115,7 @@ export class SettingsResolver {
     name: 'levelDefinition',
     description: 'Get a single level definition',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findLevel(@Args('level', { type: () => Int }) level: number) {
     return this.settingsService.findLevel(level);
   }
@@ -124,7 +124,7 @@ export class SettingsResolver {
     name: 'updateLevelDefinition',
     description: 'Update a level definition',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async updateLevel(
     @Args('level', { type: () => Int }) level: number,
     @Args('data') data: UpdateLevelDefinitionInput
@@ -140,7 +140,7 @@ export class SettingsResolver {
     name: 'systemTexts',
     description: 'Get all system text entries',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findAllSystemText() {
     return this.settingsService.findAllSystemText();
   }
@@ -149,7 +149,7 @@ export class SettingsResolver {
     name: 'systemTextsByCategory',
     description: 'Get system text entries by category',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findSystemTextByCategory(@Args('category') category: string) {
     return this.settingsService.findSystemTextByCategory(category);
   }
@@ -158,7 +158,7 @@ export class SettingsResolver {
     name: 'systemText',
     description: 'Get a single system text entry by ID',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findSystemText(@Args('id', { type: () => ID }) id: string | number) {
     return this.settingsService.findSystemText(Number(id));
   }
@@ -167,7 +167,7 @@ export class SettingsResolver {
     name: 'systemTextByKey',
     description: 'Get system text by key',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findSystemTextByKey(@Args('key') key: string) {
     return this.settingsService.findSystemTextByKey(key);
   }
@@ -176,7 +176,7 @@ export class SettingsResolver {
     name: 'createSystemText',
     description: 'Create a new system text entry',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async createSystemText(@Args('data') data: CreateSystemTextInput) {
     return this.settingsService.createSystemText(data);
   }
@@ -185,7 +185,7 @@ export class SettingsResolver {
     name: 'updateSystemText',
     description: 'Update a system text entry',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async updateSystemText(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateSystemTextInput
@@ -197,7 +197,7 @@ export class SettingsResolver {
     name: 'deleteSystemText',
     description: 'Delete a system text entry',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async deleteSystemText(@Args('id', { type: () => ID }) id: string | number) {
     await this.settingsService.deleteSystemText(Number(id));
     return true;
@@ -211,7 +211,7 @@ export class SettingsResolver {
     name: 'loginMessages',
     description: 'Get all login messages',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findAllLoginMessages() {
     return this.settingsService.findAllLoginMessages();
   }
@@ -220,7 +220,7 @@ export class SettingsResolver {
     name: 'loginMessagesByStage',
     description: 'Get login messages by stage',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findLoginMessagesByStage(
     @Args('stage', { type: () => LoginStage }) stage: LoginStage
   ) {
@@ -231,7 +231,7 @@ export class SettingsResolver {
     name: 'loginMessage',
     description: 'Get a single login message',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findLoginMessage(@Args('id', { type: () => ID }) id: string | number) {
     return this.settingsService.findLoginMessage(Number(id));
   }
@@ -240,7 +240,7 @@ export class SettingsResolver {
     name: 'createLoginMessage',
     description: 'Create a new login message',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async createLoginMessage(@Args('data') data: CreateLoginMessageInput) {
     return this.settingsService.createLoginMessage(data);
   }
@@ -249,7 +249,7 @@ export class SettingsResolver {
     name: 'updateLoginMessage',
     description: 'Update a login message',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async updateLoginMessage(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateLoginMessageInput
@@ -261,7 +261,7 @@ export class SettingsResolver {
     name: 'deleteLoginMessage',
     description: 'Delete a login message',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async deleteLoginMessage(
     @Args('id', { type: () => ID }) id: string | number
   ) {
@@ -277,7 +277,7 @@ export class SettingsResolver {
     name: 'commands',
     description: 'Get all command definitions',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findAllCommands() {
     return this.settingsService.findAllCommands();
   }
@@ -286,7 +286,7 @@ export class SettingsResolver {
     name: 'commandsByCategory',
     description: 'Get commands by category',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findCommandsByCategory(
     @Args('category', { type: () => CommandCategory }) category: CommandCategory
   ) {
@@ -297,7 +297,7 @@ export class SettingsResolver {
     name: 'immortalCommands',
     description: 'Get all immortal-only commands',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findImmortalCommands() {
     return this.settingsService.findImmortalCommands();
   }
@@ -306,7 +306,7 @@ export class SettingsResolver {
     name: 'command',
     description: 'Get a single command by name',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async findCommand(@Args('name') name: string) {
     return this.settingsService.findCommand(name);
   }
@@ -315,7 +315,7 @@ export class SettingsResolver {
     name: 'availablePermissions',
     description: 'Get all unique permission flags used across commands',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async getAvailablePermissions() {
     return this.settingsService.getAvailablePermissions();
   }
@@ -324,7 +324,7 @@ export class SettingsResolver {
     name: 'commandCategories',
     description: 'Get all command categories',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   getCommandCategories() {
     return this.settingsService.getCommandCategories();
   }

@@ -1038,7 +1038,27 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
             </div>
           )}
           {entity.kind === 'shop' && (
-            <div className='opacity-60'>Shop flags not implemented.</div>
+            <>
+              {(entity.data as { flags?: string[] }).flags?.length ? (
+                <div>
+                  <h5 className='text-xs uppercase tracking-wide font-semibold mb-2'>
+                    Shop Flags
+                  </h5>
+                  <div className='flex flex-wrap gap-1'>
+                    {(entity.data as { flags?: string[] }).flags!.map(f => (
+                      <span
+                        key={f}
+                        className='px-1 py-0.5 text-xs rounded bg-amber-100 dark:bg-amber-900 dark:text-amber-200'
+                      >
+                        {f}
+                      </span>
+                    ))}
+                  </div>
+                </div>
+              ) : (
+                <div className='opacity-60'>No shop flags set.</div>
+              )}
+            </>
           )}
         </section>
         {/* Raw JSON (edit mode only) */}

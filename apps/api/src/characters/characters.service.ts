@@ -373,8 +373,16 @@ export class CharactersService {
     // Ensure character exists
     await this.findCharacterById(data.characterId);
 
-    // TODO: Fix object prototype lookup to use composite key (zoneId, id)
-    // The input DTO needs to be updated to include objectZoneId
+    // Verify object prototype exists
+    const objectPrototype = await this.db.objects.findUnique({
+      where: { zoneId_id: { zoneId: data.objectZoneId, id: data.objectId } },
+      select: { id: true },
+    });
+    if (!objectPrototype) {
+      throw new NotFoundException(
+        `Object prototype (zone ${data.objectZoneId}, id ${data.objectId}) not found`
+      );
+    }
 
     // If containerId is specified, ensure it exists and belongs to same character
     if (data.containerId) {
@@ -392,8 +400,8 @@ export class CharactersService {
       typeof this.db.characterItems.create
     >[0]['data'] = {
       characterId: data.characterId,
-      objectZoneId: 0, // TODO: derive zone id from prototype
-      objectId: data.objectPrototypeId,
+      objectZoneId: data.objectZoneId,
+      objectId: data.objectId,
       containerId: data.containerId ?? null,
       equippedLocation: data.equippedLocation ?? null,
       condition: data.condition,

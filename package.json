@@ -62,6 +62,9 @@
     "@graphql-codegen/typescript-operations": "^5.0.2",
     "@graphql-codegen/typescript-react-apollo": "^4.3.3",
     "@playwright/test": "^1.56.1",
+    "@swc-node/register": "^1.11.1",
+    "@swc/cli": "^0.8.0",
+    "@swc/core": "^1.15.18",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.10.13",
     "@types/react": "19.2.14",
@@ -111,6 +114,7 @@
     "nestjs"
   ],
   "dependencies": {
+    "dotenv": "^17.3.1",
     "lucide-react": "^0.575.0",
     "monaco-editor": "^0.55.1",
     "unix-crypt-td-js": "^1.1.4"

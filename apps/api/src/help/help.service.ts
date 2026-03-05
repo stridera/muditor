@@ -191,7 +191,7 @@ export class HelpService {
 
   /**
    * Delete a help entry
-   * Requires GOD role (enforced by resolver guard)
+   * Requires CODER role (enforced by resolver guard)
    */
   async remove(id: number) {
     await this.findOne(id); // Ensure entry exists

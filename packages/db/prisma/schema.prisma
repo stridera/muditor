@@ -70,6 +70,8 @@ model Ability {
   questTriggerAbility Quests[]                 @relation("questTriggerAbility")
   // Shop system relations
   shopAbilities       ShopAbilities[]
+  // Shapechange system relations
+  abilityShapechangeForms AbilityShapechangeForm[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -325,6 +327,12 @@ model CharacterClass {
   hitDice     String  @default("1d8") @map("hit_dice")
   primaryStat String? @map("primary_stat")
 
+  // Subclass hierarchy
+  isSubclass    Boolean          @default(false) @map("is_subclass")
+  parentClassId Int?             @map("parent_class_id")
+  parentClass   CharacterClass?  @relation("SubclassHierarchy", fields: [parentClassId], references: [id])
+  subclasses    CharacterClass[] @relation("SubclassHierarchy")
+
   // Combat modifiers - class-based bonuses
   bonusHitroll  Int   @default(0) @map("bonus_hitroll")
   bonusDamroll  Int   @default(0) @map("bonus_damroll")
@@ -563,6 +571,7 @@ model Characters {
   thirst                Int                  @default(0)
   description           String?
   title                 String?
+  wizTitle              String?              @map("wiz_title")
   prompt                String               @default("<%%h/%%Hhp %%v/%%Vmv>")
   pageLength            Int                  @default(25) @map("page_length")
   playerFlags           PlayerFlag[]         @default([]) @map("player_flags")
@@ -596,8 +605,13 @@ model Characters {
   mailReceived          PlayerMail[]         @relation("mailReceived")
   mailWealthRetrievedBy PlayerMail[]         @relation("mailWealthRetrievedBy")
   mailObjectRetrievedBy PlayerMail[]         @relation("mailObjectRetrievedBy")
+  // Kill tracking (XP diminishing returns + zone diversity bonus)
+  killTrackingData      Json?                @map("kill_tracking_data")
   // Quest progress tracking
   characterQuests       CharacterQuests[]
+  // Player housing
+  playerHouse           PlayerHouse?
+  houseGuestEntries     PlayerHouseGuest[]
 }
 
 model CharacterAliases {
@@ -614,17 +628,17 @@ model CharacterPets {
   id                 String   @id @default(uuid())
   characterId        String   @map("character_id")
   mobPrototypeZoneId Int      @map("mob_prototype_zone_id")
-  mobPrototypeVnum   Int      @map("mob_prototype_vnum")
+  mobPrototypeId     Int      @map("mob_prototype_id")
   name               String // Pet's current name (can be customized)
   customDescription  String?  @map("custom_description") @db.Text
   createdAt          DateTime @default(now()) @map("created_at")
 
   // Relationships
   character    Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  mobPrototype Mobs       @relation(fields: [mobPrototypeZoneId, mobPrototypeVnum], references: [zoneId, id], onDelete: Cascade)
+  mobPrototype Mobs       @relation(fields: [mobPrototypeZoneId, mobPrototypeId], references: [zoneId, id], onDelete: Cascade)
 
   @@index([characterId])
-  @@index([mobPrototypeZoneId, mobPrototypeVnum])
+  @@index([mobPrototypeZoneId, mobPrototypeId])
 }
 
 model EquipmentSetItems {
@@ -981,6 +995,7 @@ model Objects {
   objectiveTargetObject   QuestObjectives[]         @relation("objectiveTargetObject")
   questTriggerItem        Quests[]                  @relation("questTriggerItem")
   Triggers                Triggers[]
+  playerHouseItems        PlayerHouseItem[]
 
   @@id([zoneId, id])
   @@index([name])
@@ -1363,7 +1378,7 @@ model Triggers {
 
 /// Junction table for Mob-Trigger many-to-many relationship
 /// In DG Scripts, triggers are shared - a single trigger can be attached to multiple mobs
-/// via "T <trigger_vnum>" lines in mob files
+/// via "T <trigger_id>" lines in mob files
 model MobTriggers {
   mobZoneId     Int      @map("mob_zone_id")
   mobId         Int      @map("mob_id")
@@ -1425,6 +1440,23 @@ model ScriptErrorLog {
   @@index([triggerZoneId, triggerId])
   @@index([occurredAt])
   @@map("script_error_log")
+}
+
+/// Persistent key-value storage for entity variables set by Lua triggers.
+/// Variables survive server restarts and are scoped per entity type + composite key.
+model EntityVariables {
+  entityType EntityType @map("entity_type")
+  zoneId     Int        @map("zone_id")
+  entityId   Int        @map("entity_id")
+  key        String
+  value      Json
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@id([entityType, zoneId, entityId, key])
+  @@index([entityType, zoneId, entityId])
+  @@map("entity_variables")
 }
 
 model Users {
@@ -2047,6 +2079,12 @@ enum ScriptType {
   WORLD
 }
 
+enum EntityType {
+  MOB
+  OBJECT
+  ROOM
+}
+
 enum Sector {
   STRUCTURE
   CITY
@@ -2269,7 +2307,7 @@ enum UserRole {
   BUILDER
   HEAD_BUILDER
   CODER
-  GOD
+  IMPLEMENTOR
 }
 
 enum LoginRequestStatus {
@@ -2912,6 +2950,7 @@ enum QuestRewardType {
   GOLD // Currency reward
   ABILITY // Learn spell/skill
   SKILL_POINTS // Skill points
+  HOUSING // Unlocks player housing
 }
 
 enum QuestStatus {
@@ -3397,4 +3436,182 @@ model ConsumableEffect {
   @@unique([liquidId, effectId])
   @@unique([objectZoneId, objectId, effectId])
   @@map("ConsumableEffects")
+}
+
+// ============================================================================
+// Player Housing
+// ============================================================================
+
+// One house per character. Tracks ownership, entrance location, and return point.
+model PlayerHouse {
+  id                 Int      @id @default(autoincrement())
+  characterId        String   @unique @map("character_id")
+
+  // Where to return the player on exit or crash recovery
+  returnRoomZoneId   Int?     @map("return_room_zone_id")
+  returnRoomId       Int?     @map("return_room_id")
+
+  // Physical entrance location (in the player's race starting zone)
+  entranceRoomZoneId Int      @map("entrance_room_zone_id")
+  entranceRoomId     Int      @map("entrance_room_id")
+
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  character Characters          @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  rooms     PlayerHouseRoom[]
+  guests    PlayerHouseGuest[]
+
+  @@map("player_houses")
+}
+
+// Individual rooms within a player's house.
+// localIndex 0 is always the foyer (entry room with account chest).
+model PlayerHouseRoom {
+  id             Int     @id @default(autoincrement())
+  houseId        Int     @map("house_id")
+  localIndex     Int     @map("local_index")
+  name           String  @default("An Empty Room")
+  description    String  @default("This room is bare and unfurnished.") @db.Text
+
+  sector         Sector  @default(STRUCTURE)
+  isPeaceful     Boolean @default(true) @map("is_peaceful")
+  baseLightLevel Int     @default(5) @map("base_light_level")
+  capacity       Int     @default(10)
+
+  createdAt      DateTime @default(now()) @map("created_at")
+  updatedAt      DateTime @updatedAt @map("updated_at")
+
+  house     PlayerHouse       @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  items     PlayerHouseItem[]
+  exitsFrom PlayerHouseExit[] @relation("exitFrom")
+  exitsTo   PlayerHouseExit[] @relation("exitTo")
+
+  @@unique([houseId, localIndex])
+  @@map("player_house_rooms")
+}
+
+// Directional connections between rooms within the same house.
+model PlayerHouseExit {
+  id         Int       @id @default(autoincrement())
+  fromRoomId Int       @map("from_room_id")
+  toRoomId   Int       @map("to_room_id")
+  direction  Direction
+
+  fromRoom PlayerHouseRoom @relation("exitFrom", fields: [fromRoomId], references: [id], onDelete: Cascade)
+  toRoom   PlayerHouseRoom @relation("exitTo", fields: [toRoomId], references: [id], onDelete: Cascade)
+
+  @@unique([fromRoomId, direction])
+  @@map("player_house_exits")
+}
+
+// Decorative items placed in a house room. These persist across server restarts.
+model PlayerHouseItem {
+  id           Int    @id @default(autoincrement())
+  roomId       Int    @map("room_id")
+  objectZoneId Int    @map("object_zone_id")
+  objectId     Int    @map("object_id")
+
+  condition    Int    @default(100)
+  customValues Json   @default("{}") @map("custom_values")
+
+  placedAt     DateTime @default(now()) @map("placed_at")
+
+  room   PlayerHouseRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  object Objects         @relation(fields: [objectZoneId, objectId], references: [zoneId, id])
+
+  @@map("player_house_items")
+}
+
+// Guest access list for a player's house.
+model PlayerHouseGuest {
+  id          Int     @id @default(autoincrement())
+  houseId     Int     @map("house_id")
+  characterId String  @map("character_id")
+  canPlace    Boolean @default(false) @map("can_place")
+
+  house     PlayerHouse @relation(fields: [houseId], references: [id], onDelete: Cascade)
+  character Characters  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@unique([houseId, characterId])
+  @@map("player_house_guests")
+}
+
+// ============================================================================
+// SHAPECHANGE SYSTEM
+// ============================================================================
+
+model ShapechangeForm {
+  id            Int     @id @default(autoincrement())
+  name          String  @unique // "wolf", "bear", "eagle"
+  displayName   String  @map("display_name") // "a gray wolf"
+  description   String?
+  statModifiers Json    @default("{}") @map("stat_modifiers") // {"strength": 5, "dexterity": -2}
+  durationTicks Int     @default(100) @map("duration_ticks")
+  canFly        Boolean @default(false) @map("can_fly")
+
+  abilityForms AbilityShapechangeForm[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("ShapechangeForm")
+}
+
+model AbilityShapechangeForm {
+  id        Int @id @default(autoincrement())
+  abilityId Int @map("ability_id")
+  formId    Int @map("form_id")
+  minLevel  Int @default(1) @map("min_level")
+
+  ability Ability         @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+  form    ShapechangeForm @relation(fields: [formId], references: [id], onDelete: Cascade)
+
+  @@unique([abilityId, formId])
+  @@map("AbilityShapechangeForm")
+}
+
+// ============================================================================
+// DEPLOYMENT SYSTEM
+// ============================================================================
+
+enum DeploymentStatus {
+  PENDING
+  READY
+  DEPLOYING
+  DEPLOYED
+  FAILED
+  ROLLED_BACK
+}
+
+model DeploymentPackage {
+  id           String           @id @default(uuid())
+  name         String
+  description  String?
+  status       DeploymentStatus @default(PENDING)
+  zoneIds      Int[]            @map("zone_ids")
+  createdBy    String           @map("created_by")
+  deployedAt   DateTime?        @map("deployed_at")
+  snapshotData Json?            @map("snapshot_data")
+
+  changes DeploymentChange[]
+
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
+
+  @@map("DeploymentPackage")
+}
+
+model DeploymentChange {
+  id             Int               @id @default(autoincrement())
+  packageId      String            @map("package_id")
+  entityType     String            @map("entity_type") // "Room", "Mob", "Object"
+  entityKey      String            @map("entity_key") // "30:5" composite key
+  changeType     String            @map("change_type") // "CREATE", "UPDATE", "DELETE"
+  beforeSnapshot Json?             @map("before_snapshot")
+  afterSnapshot  Json?             @map("after_snapshot")
+
+  package DeploymentPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
+
+  @@map("DeploymentChange")
 }

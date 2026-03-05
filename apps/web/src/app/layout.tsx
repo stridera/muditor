@@ -28,6 +28,9 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en' suppressHydrationWarning>
+      <head>
+        <title>Muditor</title>
+      </head>
       <body
         className={`${cinzel.variable} ${jakarta.variable} bg-background text-foreground`}
         suppressHydrationWarning

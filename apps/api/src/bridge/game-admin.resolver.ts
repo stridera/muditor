@@ -310,14 +310,14 @@ export class GameAdminResolver {
 
   /**
    * Kick a player from the game server
-   * Requires GOD role
+   * Requires CODER role
    * Rate limit: 5 kicks per minute
    * Audit logged
    */
   @Mutation(() => KickResultType, {
     description: 'Disconnect a player from FieryMUD',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   @RateLimit(AdminRateLimits.KICK)
   async kickPlayer(
     @CurrentUser() user: Users,
@@ -341,14 +341,14 @@ export class GameAdminResolver {
    * Ban a player by character name
    * Looks up the character's linked user account and creates a ban record.
    * Also kicks the player from the game server if they are online.
-   * Requires GOD role
+   * Requires CODER role
    * Rate limit: 5 bans per minute
    * Audit logged
    */
   @Mutation(() => BanPlayerResultType, {
     description: 'Ban a player by character name - kicks and prevents login',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   @RateLimit(AdminRateLimits.BAN)
   async banPlayer(
     @CurrentUser() user: Users,

@@ -99,7 +99,7 @@ type RaceFormData = {
 };
 
 export default function RacesPage() {
-  const { isBuilder, isCoder, isGod } = usePermissions();
+  const { isBuilder, isCoder } = usePermissions();
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [isDetailsOpen, setIsDetailsOpen] = useState(false);
@@ -197,7 +197,7 @@ export default function RacesPage() {
     });
   };
 
-  const canEdit = isBuilder || isCoder || isGod;
+  const canEdit = isBuilder || isCoder;
 
   const filteredRaces = (data as any)?.races?.filter((race: any) =>
     race.plainName.toLowerCase().includes(searchQuery.toLowerCase())

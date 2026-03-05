@@ -30,6 +30,7 @@ import { AccountStorageModule } from './account-storage/account-storage.module';
 import { BoardsModule } from './boards/boards.module';
 import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
+import { DeploymentsModule } from './deployments/deployments.module';
 import { LoginRequestsModule } from './login-requests/login-requests.module';
 import * as jwt from 'jsonwebtoken';
 
@@ -111,6 +112,7 @@ import * as jwt from 'jsonwebtoken';
     BridgeModule,
     DiscordModule,
     LoginRequestsModule,
+    DeploymentsModule,
   ],
 })
 export class AppModule {}

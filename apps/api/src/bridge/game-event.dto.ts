@@ -79,7 +79,7 @@ export class GameEvent {
   zoneId?: number;
 
   @Field(() => Int, { nullable: true })
-  roomVnum?: number;
+  roomId?: number;
 
   @Field()
   message!: string;

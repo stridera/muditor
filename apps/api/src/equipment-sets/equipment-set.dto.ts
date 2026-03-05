@@ -15,6 +15,9 @@ export class EquipmentSetItemDto {
   id: string;
 
   @Field(() => Int)
+  objectZoneId: number;
+
+  @Field(() => Int)
   objectId: number;
 
   @Field({ nullable: true })
@@ -103,6 +106,10 @@ export class UpdateEquipmentSetInput {
 export class CreateEquipmentSetItemInput {
   @Field(() => Int)
   @IsNumber()
+  objectZoneId: number;
+
+  @Field(() => Int)
+  @IsNumber()
   objectId: number;
 
   @Field({ nullable: true })
@@ -129,6 +136,10 @@ export class CreateEquipmentSetItemStandaloneInput {
   @Field()
   @IsString()
   equipmentSetId: string;
+
+  @Field(() => Int)
+  @IsNumber()
+  objectZoneId: number;
 
   @Field(() => Int)
   @IsNumber()

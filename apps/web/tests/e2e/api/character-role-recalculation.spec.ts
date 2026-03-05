@@ -14,7 +14,7 @@ const API_URL = 'http://localhost:3001/graphql';
  * - 101-102: BUILDER
  * - 103: HEAD_BUILDER
  * - 104: CODER
- * - 105+: GOD
+ * - 105+: IMPLEMENTOR
  */
 
 test.describe('Character Linking and Role Recalculation', () => {
@@ -65,7 +65,7 @@ test.describe('Character Linking and Role Recalculation', () => {
     expect(data.data.me.role).toBe('PLAYER');
   });
 
-  test('should update role to GOD after linking level 105 character', async ({
+  test('should update role to IMPLEMENTOR after linking level 105 character', async ({
     request,
   }) => {
     // Note: This test requires a character named 'TestGodChar' with level 105
@@ -101,7 +101,7 @@ test.describe('Character Linking and Role Recalculation', () => {
     expect(linkData.data.linkCharacter.level).toBe(105);
     testCharacterId = linkData.data.linkCharacter.id;
 
-    // Verify role was automatically updated to GOD
+    // Verify role was automatically updated to IMPLEMENTOR
     const meResponse = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${userToken}` },
       data: {
@@ -111,7 +111,7 @@ test.describe('Character Linking and Role Recalculation', () => {
 
     const meData = await meResponse.json();
     expect(meData.errors).toBeUndefined();
-    expect(meData.data.me.role).toBe('GOD');
+    expect(meData.data.me.role).toBe('IMPLEMENTOR');
   });
 
   test('should update role back when unlinking character', async ({
@@ -153,10 +153,10 @@ test.describe('Character Linking and Role Recalculation', () => {
 });
 
 test.describe('Role Hierarchy Tests', () => {
-  test('GOD role should have access to all game systems', async ({
+  test('IMPLEMENTOR role should have access to all game systems', async ({
     request,
   }) => {
-    // Login as GOD user
+    // Login as IMPLEMENTOR user
     const loginResponse = await request.post(API_URL, {
       data: {
         query: `

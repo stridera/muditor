@@ -55,7 +55,9 @@ interface ContentZone {
 }
 
 type ZoneShopsForConsistency = Prisma.ZonesGetPayload<{
-  select: { shops: { select: { id: true; keeperId: true } } };
+  select: {
+    shops: { select: { id: true; keeperZoneId: true; keeperId: true } };
+  };
 }>['shops'];
 type ZoneMobsForConsistency = Prisma.ZonesGetPayload<{
   select: { mobs: { select: { id: true } } };
@@ -124,7 +126,11 @@ export class ValidationService {
     // World Consistency Checks
     issues.push(
       ...(await this.checkWorldConsistency({
-        shops: zone.shops.map(s => ({ id: s.id, keeperId: s.keeperId })),
+        shops: zone.shops.map(s => ({
+          id: s.id,
+          keeperZoneId: s.keeperZoneId,
+          keeperId: s.keeperId,
+        })),
         mobs: zone.mobs.map(m => ({ id: m.id })),
         rooms: zone.rooms.map(r => ({ id: r.id })),
       }))
@@ -155,7 +161,8 @@ export class ValidationService {
       description?: string | null;
       exits: Array<{
         direction: string;
-        destination?: number | null;
+        toZoneId?: number | null;
+        toRoomId?: number | null;
       }>;
     }>;
   }): Promise<ValidationIssue[]> {
@@ -165,8 +172,8 @@ export class ValidationService {
     const roomsWithIncomingExits = new Set<number>();
     zone.rooms.forEach(room => {
       room.exits.forEach(exit => {
-        if (exit.destination) {
-          roomsWithIncomingExits.add(exit.destination);
+        if (exit.toZoneId === zone.id && exit.toRoomId != null) {
+          roomsWithIncomingExits.add(exit.toRoomId);
         }
       });
     });
@@ -195,14 +202,19 @@ export class ValidationService {
 
       // Check for one-way exits
       for (const exit of room.exits) {
-        if (exit.destination) {
-          const destinationRoom = zone.rooms.find(
-            r => r.id === exit.destination
-          );
+        if (exit.toZoneId != null && exit.toRoomId != null) {
+          const isIntraZone = exit.toZoneId === zone.id;
+          const destinationRoom = isIntraZone
+            ? zone.rooms.find(r => r.id === exit.toRoomId)
+            : undefined;
+
           if (destinationRoom) {
             const reverseDirection = this.getReverseDirection(exit.direction);
             const reverseExit = destinationRoom.exits.find(
-              e => e.direction === reverseDirection && e.destination === room.id
+              e =>
+                e.direction === reverseDirection &&
+                e.toZoneId === zone.id &&
+                e.toRoomId === room.id
             );
 
             if (!reverseExit) {
@@ -213,32 +225,34 @@ export class ValidationService {
                 entity: 'room',
                 entityId: room.id,
                 title: 'One-way Exit',
-                description: `Exit ${exit.direction} from room ${room.id} to ${exit.destination} has no return path.`,
+                description: `Exit ${exit.direction} from room ${room.id} to zone ${exit.toZoneId} room ${exit.toRoomId} has no return path.`,
                 suggestion:
                   'Consider adding a return exit if bidirectional travel is intended.',
                 severity: 'low',
               });
             }
           } else {
-            // Exit leads to room outside this zone or non-existent room
-            // TODO: Fix composite key lookup
-            // const externalRoom = await this.prisma.room.findUnique({
-            //   where: { zoneId_id: { zoneId, id } },
-            // });
-            // if (!externalRoom) {
-            //   issues.push({
-            //     id: `broken-exit-${room.id}-${exit.direction}`,
-            //     type: 'error',
-            //     category: 'integrity',
-            //     entity: 'room',
-            //     entityId: room.id,
-            //     title: 'Broken Exit',
-            //     description: `Exit ${exit.direction} from room ${room.id} leads to non-existent room ${exit.destination}.`,
-            //     suggestion:
-            //       'Update the exit destination to a valid room ID or remove the exit.',
-            //     severity: 'critical',
-            //   });
-            // }
+            // Exit leads to room outside this zone — verify it exists
+            const externalRoom = await this.prisma.room.findUnique({
+              where: {
+                zoneId_id: { zoneId: exit.toZoneId, id: exit.toRoomId },
+              },
+              select: { id: true },
+            });
+            if (!externalRoom) {
+              issues.push({
+                id: `broken-exit-${room.id}-${exit.direction}`,
+                type: 'error',
+                category: 'integrity',
+                entity: 'room',
+                entityId: room.id,
+                title: 'Broken Exit',
+                description: `Exit ${exit.direction} from room ${room.id} leads to non-existent room (zone ${exit.toZoneId}, id ${exit.toRoomId}).`,
+                suggestion:
+                  'Update the exit destination to a valid room ID or remove the exit.',
+                severity: 'critical',
+              });
+            }
           }
         }
       }
@@ -346,28 +360,30 @@ export class ValidationService {
 
     // Check shop consistency
     for (const shop of zone.shops) {
-      if (shop.keeperId) {
+      if (shop.keeperId != null) {
         const keeperMob = zone.mobs.find(m => m.id === shop.keeperId);
         if (!keeperMob) {
           // Check if keeper is in another zone
-          // TODO: Fix composite key lookup
-          // const externalKeeper = await this.prisma.mob.findUnique({
-          //   where: { zoneId_id: { zoneId, id } },
-          // });
-          // if (!externalKeeper) {
-          //   issues.push({
-          //     id: `missing-shop-keeper-${shop.id}`,
-          //     type: 'error',
-          //     category: 'consistency',
-          //     entity: 'shop',
-          //     entityId: shop.id,
-          //     title: 'Missing Shop Keeper',
-          //     description: `Shop ${shop.id} references non-existent keeper mob ${shop.keeperMobId}.`,
-          //     suggestion:
-          //       'Create the keeper mob or update the shop to reference an existing mob.',
-          //     severity: 'high',
-          //   });
-          // }
+          const externalKeeper = await this.prisma.mobs.findUnique({
+            where: {
+              zoneId_id: { zoneId: shop.keeperZoneId, id: shop.keeperId },
+            },
+            select: { id: true },
+          });
+          if (!externalKeeper) {
+            issues.push({
+              id: `missing-shop-keeper-${shop.id}`,
+              type: 'error',
+              category: 'consistency',
+              entity: 'shop',
+              entityId: shop.id,
+              title: 'Missing Shop Keeper',
+              description: `Shop ${shop.id} references non-existent keeper mob (zone ${shop.keeperZoneId}, id ${shop.keeperId}).`,
+              suggestion:
+                'Create the keeper mob or update the shop to reference an existing mob.',
+              severity: 'high',
+            });
+          }
         }
       }
 

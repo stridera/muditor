@@ -6,7 +6,7 @@ export class RoomReference {
   zoneId: number;
 
   @Field(() => Int)
-  vnum: number;
+  localId: number;
 }
 
 @ObjectType()

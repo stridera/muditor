@@ -62,6 +62,7 @@ describe('EquipmentSetsResolver', () => {
         description: 'Test description',
         items: [
           {
+            objectZoneId: 0,
             objectId: 1,
             slot: 'wield',
             quantity: 1,
@@ -99,6 +100,7 @@ describe('EquipmentSetsResolver', () => {
     it('should create equipment set item successfully', async () => {
       const input: CreateEquipmentSetItemStandaloneInput = {
         equipmentSetId: 'set-id',
+        objectZoneId: 0,
         objectId: 1,
         slot: 'wear',
         quantity: 2,

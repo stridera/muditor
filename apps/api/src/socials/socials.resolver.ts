@@ -60,12 +60,12 @@ export class SocialsResolver {
     return this.socialsService.search(query);
   }
 
-  // Mutations - GOD only (system-level changes)
+  // Mutations - CODER+ only (system-level changes)
 
   @Mutation(() => SocialDto, {
     description: 'Create a new social command',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async createSocial(@Args('data') data: CreateSocialInput) {
     return this.socialsService.create(data);
   }
@@ -73,7 +73,7 @@ export class SocialsResolver {
   @Mutation(() => SocialDto, {
     description: 'Update an existing social command',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async updateSocial(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateSocialInput
@@ -84,7 +84,7 @@ export class SocialsResolver {
   @Mutation(() => Boolean, {
     description: 'Delete a social command',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async deleteSocial(@Args('id', { type: () => ID }) id: string | number) {
     await this.socialsService.remove(Number(id));
     return true;

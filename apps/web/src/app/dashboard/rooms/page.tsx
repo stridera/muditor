@@ -90,8 +90,6 @@ function RoomsContent() {
   useEffect(() => {
     const fetchRooms = async () => {
       try {
-        // TODO: replace with injected LoggingService once available in this component scope
-        // LoggingService.error('Failed to fetch room details (GraphQL errors):', result.errors);
         const query = selectedZone
           ? `
               query GetRoomsByZone($zoneId: Int!) {

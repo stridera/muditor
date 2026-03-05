@@ -4,6 +4,8 @@
     "composite": true,
     "noEmit": false,
     "rootDir": "./src",
+    "baseUrl": ".",
+    "ignoreDeprecations": "6.0",
     "module": "esnext",
     "moduleResolution": "bundler",
     "verbatimModuleSyntax": true,

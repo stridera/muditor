@@ -2,6 +2,7 @@
 
 import { isValidRoomId, isValidZoneId } from '@/lib/room-utils';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import React, {
   useCallback,
   useEffect,
@@ -107,6 +108,13 @@ interface Room {
     description?: string | null;
   }[];
   objects?: { id: number; name: string; description?: string | null }[];
+  shops?: {
+    id: number;
+    buyProfit: number;
+    sellProfit: number;
+    keeperId: number;
+    flags?: string[];
+  }[];
 }
 
 // Mirror of PropertyPanel's Room shape (not exported there) for structural typing
@@ -660,7 +668,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 exits{ id direction toZoneId toRoomId description keywords key flags defaultState hitPoints }
                 mobs{ id name level roomDescription }
                 objects{ id name roomDescription }
-                shops{ id buyProfit sellProfit keeperId }
+                shops{ id buyProfit sellProfit keeperId flags }
               }
             }`,
             variables: { zoneId: activeZoneId, lightweight: false },
@@ -696,6 +704,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             buyProfit: number;
             sellProfit: number;
             keeperId: number;
+            flags?: string[] | null;
           };
           type RawRoom = {
             id: number;
@@ -770,6 +779,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 id: o.id,
                 name: o.name,
                 description: o.roomDescription ?? null,
+              })),
+              shops: (r.shops || []).map(s => ({
+                id: s.id,
+                buyProfit: s.buyProfit,
+                sellProfit: s.sellProfit,
+                keeperId: s.keeperId,
+                flags: s.flags ?? [],
               })),
             })
           );
@@ -2337,8 +2353,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             newPosition: { x: snappedX, y: snappedY },
           });
         }
-      } catch {
-        // TODO: surface persistence error via UI toast mechanism
+      } catch (err) {
+        toast.error('Failed to save room position');
       }
     },
     [rooms, setNodes, addToUndoHistory, authenticatedFetch, isEditing]

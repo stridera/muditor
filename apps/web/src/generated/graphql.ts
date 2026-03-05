@@ -756,7 +756,8 @@ export type CreateCharacterItemInput = {
   customShortDesc?: InputMaybe<Scalars['String']['input']>;
   equippedLocation?: InputMaybe<Scalars['String']['input']>;
   instanceFlags?: Array<Scalars['String']['input']>;
-  objectPrototypeId: Scalars['Int']['input'];
+  objectId: Scalars['Int']['input'];
+  objectZoneId: Scalars['Int']['input'];
 };
 
 export type CreateClassCircleInput = {
@@ -770,6 +771,12 @@ export type CreateClassInput = {
   hitDice?: Scalars['String']['input'];
   name: Scalars['String']['input'];
   primaryStat?: InputMaybe<Scalars['String']['input']>;
+};
+
+export type CreateDeploymentInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name: Scalars['String']['input'];
+  zoneIds: Array<Scalars['Int']['input']>;
 };
 
 export type CreateEffectInput = {
@@ -789,6 +796,7 @@ export type CreateEquipmentSetInput = {
 
 export type CreateEquipmentSetItemInput = {
   objectId: Scalars['Int']['input'];
+  objectZoneId: Scalars['Int']['input'];
   probability?: Scalars['Float']['input'];
   quantity?: Scalars['Int']['input'];
   slot?: InputMaybe<Scalars['String']['input']>;
@@ -797,6 +805,7 @@ export type CreateEquipmentSetItemInput = {
 export type CreateEquipmentSetItemStandaloneInput = {
   equipmentSetId: Scalars['String']['input'];
   objectId: Scalars['Int']['input'];
+  objectZoneId: Scalars['Int']['input'];
   probability?: Scalars['Float']['input'];
   quantity?: Scalars['Int']['input'];
   slot?: InputMaybe<Scalars['String']['input']>;
@@ -1233,6 +1242,41 @@ export type DamageType =
   | 'WATER'
   | 'WHIP';
 
+export type DeploymentChangeDto = {
+  __typename?: 'DeploymentChangeDto';
+  afterSnapshot?: Maybe<Scalars['JSON']['output']>;
+  beforeSnapshot?: Maybe<Scalars['JSON']['output']>;
+  changeType: Scalars['String']['output'];
+  entityKey: Scalars['String']['output'];
+  entityType: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  packageId: Scalars['String']['output'];
+};
+
+export type DeploymentPackageDto = {
+  __typename?: 'DeploymentPackageDto';
+  changes: Array<DeploymentChangeDto>;
+  createdAt: Scalars['DateTime']['output'];
+  createdBy: Scalars['String']['output'];
+  deployedAt?: Maybe<Scalars['DateTime']['output']>;
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  name: Scalars['String']['output'];
+  snapshotData?: Maybe<Scalars['JSON']['output']>;
+  status: DeploymentStatus;
+  updatedAt: Scalars['DateTime']['output'];
+  zoneIds: Array<Scalars['Int']['output']>;
+};
+
+/** Status of a deployment package */
+export type DeploymentStatus =
+  | 'DEPLOYED'
+  | 'DEPLOYING'
+  | 'FAILED'
+  | 'PENDING'
+  | 'READY'
+  | 'ROLLED_BACK';
+
 export type DialogueMatchType =
   | 'ANY_OF'
   | 'ANY_RESPONSE'
@@ -1308,6 +1352,7 @@ export type EquipmentSetItemDto = {
   id: Scalars['String']['output'];
   object: ObjectDto;
   objectId: Scalars['Int']['output'];
+  objectZoneId: Scalars['Int']['output'];
   probability: Scalars['Float']['output'];
   quantity: Scalars['Int']['output'];
   slot?: Maybe<Scalars['String']['output']>;
@@ -1354,7 +1399,7 @@ export type GameEvent = {
   message: Scalars['String']['output'];
   metadata?: Maybe<Scalars['JSON']['output']>;
   playerName?: Maybe<Scalars['String']['output']>;
-  roomVnum?: Maybe<Scalars['Int']['output']>;
+  roomId?: Maybe<Scalars['Int']['output']>;
   targetPlayer?: Maybe<Scalars['String']['output']>;
   timestamp: Scalars['DateTime']['output'];
   type: GameEventType;
@@ -1710,6 +1755,7 @@ export type MobResetDto = {
   __typename?: 'MobResetDto';
   comment?: Maybe<Scalars['String']['output']>;
   equipment: Array<MobResetEquipmentDto>;
+  equipmentSets: Array<MobResetEquipmentSetDto>;
   id: Scalars['ID']['output'];
   maxInstances: Scalars['Int']['output'];
   mob?: Maybe<MobSummaryDto>;
@@ -1732,6 +1778,13 @@ export type MobResetEquipmentDto = {
   objectZoneId: Scalars['Int']['output'];
   probability: Scalars['Float']['output'];
   wearLocation?: Maybe<WearFlag>;
+};
+
+export type MobResetEquipmentSetDto = {
+  __typename?: 'MobResetEquipmentSetDto';
+  equipmentSet: EquipmentSetDto;
+  id: Scalars['ID']['output'];
+  probability: Scalars['Float']['output'];
 };
 
 export type MobRole =
@@ -1794,6 +1847,7 @@ export type Mutation = {
   createCharacterItem: CharacterItemDto;
   createClass: ClassDto;
   createClassCircle: ClassCircleDto;
+  createDeployment: DeploymentPackageDto;
   createEffect: Effect;
   createEquipmentSet: EquipmentSetDto;
   createEquipmentSetItem: EquipmentSetItemDto;
@@ -1868,6 +1922,7 @@ export type Mutation = {
   deleteTrigger: TriggerDto;
   deleteZone: ZoneDto;
   denyLoginRequest: LoginRequestDto;
+  deployPackage: DeploymentPackageDto;
   depositItem: AccountItemDto;
   depositWealth: Scalars['BigInt']['output'];
   detachTrigger: TriggerDto;
@@ -1881,6 +1936,7 @@ export type Mutation = {
   linkCharacter: CharacterDto;
   login: AuthPayload;
   markAccountMailRead: AccountMailDto;
+  markDeploymentReady: DeploymentPackageDto;
   markMailRead: PlayerMailDto;
   markObjectRetrieved: PlayerMailDto;
   markTriggerReviewed: TriggerDto;
@@ -1896,6 +1952,7 @@ export type Mutation = {
   resetPassword: PasswordResetResponse;
   /** Revoke zone access from a user */
   revokeZoneAccess: Scalars['Boolean']['output'];
+  rollbackDeployment: DeploymentPackageDto;
   sendAccountMail: AccountMailDto;
   sendBroadcast: Scalars['Int']['output'];
   /** Send a chat message in-game as a linked character */
@@ -1949,6 +2006,7 @@ export type Mutation = {
   updateRace: RaceDto;
   updateRaceSkill: RaceSkillDto;
   updateRoom: RoomDto;
+  updateRoomEnvironmentalEffects: RoomDto;
   updateRoomPosition: RoomDto;
   updateShop: ShopDto;
   updateShopHours: ShopDto;
@@ -2060,6 +2118,10 @@ export type MutationCreateClassArgs = {
 
 export type MutationCreateClassCircleArgs = {
   data: CreateClassCircleInput;
+};
+
+export type MutationCreateDeploymentArgs = {
+  input: CreateDeploymentInput;
 };
 
 export type MutationCreateEffectArgs = {
@@ -2337,6 +2399,10 @@ export type MutationDenyLoginRequestArgs = {
   requestId: Scalars['String']['input'];
 };
 
+export type MutationDeployPackageArgs = {
+  id: Scalars['ID']['input'];
+};
+
 export type MutationDepositItemArgs = {
   characterId: Scalars['String']['input'];
   objectId: Scalars['Int']['input'];
@@ -2378,6 +2444,10 @@ export type MutationLoginArgs = {
 
 export type MutationMarkAccountMailReadArgs = {
   id: Scalars['Int']['input'];
+};
+
+export type MutationMarkDeploymentReadyArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type MutationMarkMailReadArgs = {
@@ -2431,6 +2501,10 @@ export type MutationResetPasswordArgs = {
 export type MutationRevokeZoneAccessArgs = {
   userId: Scalars['String']['input'];
   zoneId: Scalars['Float']['input'];
+};
+
+export type MutationRollbackDeploymentArgs = {
+  id: Scalars['ID']['input'];
 };
 
 export type MutationSendAccountMailArgs = {
@@ -2668,6 +2742,12 @@ export type MutationUpdateRaceSkillArgs = {
 
 export type MutationUpdateRoomArgs = {
   data: UpdateRoomInput;
+  id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+export type MutationUpdateRoomEnvironmentalEffectsArgs = {
+  effects: Array<RoomEnvironmentalEffectInput>;
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 };
@@ -3053,6 +3133,8 @@ export type Query = {
   commands: Array<CommandDto>;
   /** Get commands by category */
   commandsByCategory: Array<CommandDto>;
+  deploymentPackage?: Maybe<DeploymentPackageDto>;
+  deploymentPackages: Array<DeploymentPackageDto>;
   effect: Effect;
   effects: Array<Effect>;
   effectsCount: Scalars['Int']['output'];
@@ -3326,6 +3408,14 @@ export type QueryCommandArgs = {
 
 export type QueryCommandsByCategoryArgs = {
   category: CommandCategory;
+};
+
+export type QueryDeploymentPackageArgs = {
+  id: Scalars['ID']['input'];
+};
+
+export type QueryDeploymentPackagesArgs = {
+  status?: InputMaybe<DeploymentStatus>;
 };
 
 export type QueryEffectArgs = {
@@ -3754,6 +3844,7 @@ export type QuestRewardType =
   | 'ABILITY'
   | 'EXPERIENCE'
   | 'GOLD'
+  | 'HOUSING'
   | 'ITEM'
   | 'SKILL_POINTS';
 
@@ -3886,6 +3977,7 @@ export type RoomDto = {
   createdBy?: Maybe<Scalars['String']['output']>;
   description: Scalars['String']['output'];
   entryRestriction?: Maybe<Scalars['String']['output']>;
+  environmentalEffects: Array<RoomEnvironmentalEffectDto>;
   exits: Array<RoomExitDto>;
   extraDescs: Array<RoomExtraDescriptionDto>;
   id: Scalars['Int']['output'];
@@ -3906,6 +3998,16 @@ export type RoomDto = {
   updatedAt: Scalars['DateTime']['output'];
   updatedBy?: Maybe<Scalars['String']['output']>;
   zoneId: Scalars['Int']['output'];
+};
+
+export type RoomEnvironmentalEffectDto = {
+  __typename?: 'RoomEnvironmentalEffectDto';
+  effect: Effect;
+  effectId: Scalars['Int']['output'];
+};
+
+export type RoomEnvironmentalEffectInput = {
+  effectId: Scalars['Int']['input'];
 };
 
 export type RoomExitDto = {
@@ -3935,12 +4037,12 @@ export type RoomExtraDescriptionDto = {
 
 export type RoomReference = {
   __typename?: 'RoomReference';
-  vnum: Scalars['Int']['output'];
+  localId: Scalars['Int']['output'];
   zoneId: Scalars['Int']['output'];
 };
 
 export type RoomReferenceInput = {
-  vnum: Scalars['Int']['input'];
+  localId: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 };
 
@@ -4888,8 +4990,8 @@ export type UserPermissions = {
   canViewValidation: Scalars['Boolean']['output'];
   isBuilder: Scalars['Boolean']['output'];
   isCoder: Scalars['Boolean']['output'];
-  isGod: Scalars['Boolean']['output'];
   isImmortal: Scalars['Boolean']['output'];
+  isImplementor: Scalars['Boolean']['output'];
   isPlayer: Scalars['Boolean']['output'];
   maxCharacterLevel: Scalars['Float']['output'];
   role: UserRole;
@@ -4913,9 +5015,9 @@ export type UserPreferences = {
 export type UserRole =
   | 'BUILDER'
   | 'CODER'
-  | 'GOD'
   | 'HEAD_BUILDER'
   | 'IMMORTAL'
+  | 'IMPLEMENTOR'
   | 'PLAYER';
 
 export type UserSummaryDto = {
@@ -5296,6 +5398,87 @@ export type UpdateViewModeMutation = {
       __typename?: 'UserPreferences';
       viewMode?: string | null;
     } | null;
+  };
+};
+
+export type GetDeploymentsQueryVariables = Exact<{
+  status?: InputMaybe<DeploymentStatus>;
+}>;
+
+export type GetDeploymentsQuery = {
+  __typename?: 'Query';
+  deploymentPackages: Array<{
+    __typename?: 'DeploymentPackageDto';
+    id: string;
+    name: string;
+    description?: string | null;
+    status: DeploymentStatus;
+    zoneIds: Array<number>;
+    createdBy: string;
+    deployedAt?: any | null;
+    createdAt: any;
+    updatedAt: any;
+    changes: Array<{
+      __typename?: 'DeploymentChangeDto';
+      id: number;
+      entityType: string;
+      entityKey: string;
+      changeType: string;
+    }>;
+  }>;
+};
+
+export type CreateDeploymentMutationVariables = Exact<{
+  input: CreateDeploymentInput;
+}>;
+
+export type CreateDeploymentMutation = {
+  __typename?: 'Mutation';
+  createDeployment: {
+    __typename?: 'DeploymentPackageDto';
+    id: string;
+    name: string;
+    status: DeploymentStatus;
+  };
+};
+
+export type MarkDeploymentReadyMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type MarkDeploymentReadyMutation = {
+  __typename?: 'Mutation';
+  markDeploymentReady: {
+    __typename?: 'DeploymentPackageDto';
+    id: string;
+    status: DeploymentStatus;
+  };
+};
+
+export type DeployPackageMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type DeployPackageMutation = {
+  __typename?: 'Mutation';
+  deployPackage: {
+    __typename?: 'DeploymentPackageDto';
+    id: string;
+    status: DeploymentStatus;
+    deployedAt?: any | null;
+  };
+};
+
+export type RollbackDeploymentMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+export type RollbackDeploymentMutation = {
+  __typename?: 'Mutation';
+  rollbackDeployment: {
+    __typename?: 'DeploymentPackageDto';
+    id: string;
+    status: DeploymentStatus;
   };
 };
 
@@ -6496,11 +6679,14 @@ export type GetEquipmentSetsQuery = {
     items: Array<{
       __typename?: 'EquipmentSetItemDto';
       id: string;
+      objectZoneId: number;
+      objectId: number;
       slot?: string | null;
       probability: number;
       object: {
         __typename?: 'ObjectDto';
         id: number;
+        zoneId: number;
         name: string;
         type: ObjectType;
         keywords: Array<string>;
@@ -6519,6 +6705,7 @@ export type GetObjectsForEquipmentSetQuery = {
   objects: Array<{
     __typename?: 'ObjectDto';
     id: number;
+    zoneId: number;
     name: string;
     type: ObjectType;
     keywords: Array<string>;
@@ -6575,6 +6762,8 @@ export type AddEquipmentSetItemMutation = {
   createEquipmentSetItem: {
     __typename?: 'EquipmentSetItemDto';
     id: string;
+    objectZoneId: number;
+    objectId: number;
     slot?: string | null;
     probability: number;
   };
@@ -6623,6 +6812,30 @@ export type GetMobResetsForMobQuery = {
         zoneId: number;
         name: string;
         type: string;
+      };
+    }>;
+    equipmentSets: Array<{
+      __typename?: 'MobResetEquipmentSetDto';
+      id: string;
+      probability: number;
+      equipmentSet: {
+        __typename?: 'EquipmentSetDto';
+        id: string;
+        name: string;
+        description?: string | null;
+        items: Array<{
+          __typename?: 'EquipmentSetItemDto';
+          id: string;
+          slot?: string | null;
+          probability: number;
+          object: {
+            __typename?: 'ObjectDto';
+            id: number;
+            zoneId: number;
+            name: string;
+            type: ObjectType;
+          };
+        }>;
       };
     }>;
   }>;
@@ -8083,7 +8296,7 @@ export type GameEventsSubscription = {
     timestamp: any;
     playerName?: string | null;
     zoneId?: number | null;
-    roomVnum?: number | null;
+    roomId?: number | null;
     message: string;
     targetPlayer?: string | null;
     metadata?: any | null;
@@ -8143,7 +8356,7 @@ export type WorldEventsSubscription = {
     type: GameEventType;
     timestamp: any;
     zoneId?: number | null;
-    roomVnum?: number | null;
+    roomId?: number | null;
     message: string;
     metadata?: any | null;
   };
@@ -8292,6 +8505,31 @@ export type UpdateMobDefaultEffectsMutation = {
       effectId: number;
       strength: number;
       modifierData: any;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
+  };
+};
+
+export type UpdateRoomEnvironmentalEffectsMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  id: Scalars['Int']['input'];
+  effects: Array<RoomEnvironmentalEffectInput> | RoomEnvironmentalEffectInput;
+}>;
+
+export type UpdateRoomEnvironmentalEffectsMutation = {
+  __typename?: 'Mutation';
+  updateRoomEnvironmentalEffects: {
+    __typename?: 'RoomDto';
+    id: number;
+    zoneId: number;
+    environmentalEffects: Array<{
+      __typename?: 'RoomEnvironmentalEffectDto';
+      effectId: number;
       effect: {
         __typename?: 'Effect';
         id: string;
@@ -9670,6 +9908,16 @@ export type GetRoomQuery = {
       roomZoneId: number;
       roomId: number;
     }>;
+    environmentalEffects: Array<{
+      __typename?: 'RoomEnvironmentalEffectDto';
+      effectId: number;
+      effect: {
+        __typename?: 'Effect';
+        id: string;
+        name: string;
+        effectType: string;
+      };
+    }>;
   };
 };
 
@@ -10384,7 +10632,7 @@ export type UsersQuery = {
   }>;
   myPermissions: {
     __typename?: 'UserPermissions';
-    isGod: boolean;
+    isImplementor: boolean;
     isCoder: boolean;
     isBuilder: boolean;
     canManageUsers: boolean;
@@ -10635,7 +10883,7 @@ export type MyPermissionsQuery = {
     isImmortal: boolean;
     isBuilder: boolean;
     isCoder: boolean;
-    isGod: boolean;
+    isImplementor: boolean;
     canAccessDashboard: boolean;
     canManageUsers: boolean;
     canViewValidation: boolean;
@@ -12378,6 +12626,288 @@ export const UpdateViewModeDocument = {
 } as unknown as DocumentNode<
   UpdateViewModeMutation,
   UpdateViewModeMutationVariables
+>;
+export const GetDeploymentsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: { kind: 'Name', value: 'GetDeployments' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'status' },
+          },
+          type: {
+            kind: 'NamedType',
+            name: { kind: 'Name', value: 'DeploymentStatus' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deploymentPackages' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'status' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'status' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'description' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneIds' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdBy' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'deployedAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'createdAt' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'updatedAt' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'changes' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'entityType' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'entityKey' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'changeType' },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<GetDeploymentsQuery, GetDeploymentsQueryVariables>;
+export const CreateDeploymentDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'CreateDeployment' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'input' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name', value: 'CreateDeploymentInput' },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'createDeployment' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'input' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'input' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'name' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  CreateDeploymentMutation,
+  CreateDeploymentMutationVariables
+>;
+export const MarkDeploymentReadyDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'MarkDeploymentReady' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'markDeploymentReady' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  MarkDeploymentReadyMutation,
+  MarkDeploymentReadyMutationVariables
+>;
+export const DeployPackageDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'DeployPackage' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'deployPackage' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'deployedAt' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  DeployPackageMutation,
+  DeployPackageMutationVariables
+>;
+export const RollbackDeploymentDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'RollbackDeployment' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'ID' } },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'rollbackDeployment' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'status' } },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  RollbackDeploymentMutation,
+  RollbackDeploymentMutationVariables
 >;
 export const GetHelpEntriesPageDocument = {
   kind: 'Document',
@@ -16307,6 +16837,14 @@ export const GetEquipmentSetsDocument = {
                     kind: 'SelectionSet',
                     selections: [
                       { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectZoneId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'objectId' },
+                      },
                       { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
                       {
                         kind: 'Field',
@@ -16321,6 +16859,10 @@ export const GetEquipmentSetsDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'zoneId' },
                             },
                             {
                               kind: 'Field',
@@ -16398,6 +16940,7 @@ export const GetObjectsForEquipmentSetDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'name' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'keywords' } },
@@ -16622,6 +17165,11 @@ export const AddEquipmentSetItemDocument = {
               kind: 'SelectionSet',
               selections: [
                 { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'objectZoneId' },
+                },
+                { kind: 'Field', name: { kind: 'Name', value: 'objectId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'slot' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'probability' } },
               ],
@@ -16806,6 +17354,93 @@ export const GetMobResetsForMobDocument = {
                             {
                               kind: 'Field',
                               name: { kind: 'Name', value: 'type' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'equipmentSets' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'probability' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'equipmentSet' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'description' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'items' },
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'id' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'slot' },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: {
+                                      kind: 'Name',
+                                      value: 'probability',
+                                    },
+                                  },
+                                  {
+                                    kind: 'Field',
+                                    name: { kind: 'Name', value: 'object' },
+                                    selectionSet: {
+                                      kind: 'SelectionSet',
+                                      selections: [
+                                        {
+                                          kind: 'Field',
+                                          name: { kind: 'Name', value: 'id' },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: {
+                                            kind: 'Name',
+                                            value: 'zoneId',
+                                          },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: { kind: 'Name', value: 'name' },
+                                        },
+                                        {
+                                          kind: 'Field',
+                                          name: { kind: 'Name', value: 'type' },
+                                        },
+                                      ],
+                                    },
+                                  },
+                                ],
+                              },
                             },
                           ],
                         },
@@ -21869,7 +22504,7 @@ export const GameEventsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'playerName' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'roomVnum' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'roomId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 {
                   kind: 'Field',
@@ -22002,7 +22637,7 @@ export const WorldEventsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'type' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'timestamp' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'roomVnum' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'roomId' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'message' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'metadata' } },
               ],
@@ -22583,6 +23218,136 @@ export const UpdateMobDefaultEffectsDocument = {
 } as unknown as DocumentNode<
   UpdateMobDefaultEffectsMutation,
   UpdateMobDefaultEffectsMutationVariables
+>;
+export const UpdateRoomEnvironmentalEffectsDocument = {
+  kind: 'Document',
+  definitions: [
+    {
+      kind: 'OperationDefinition',
+      operation: 'mutation',
+      name: { kind: 'Name', value: 'UpdateRoomEnvironmentalEffects' },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'zoneId' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: { kind: 'Variable', name: { kind: 'Name', value: 'id' } },
+          type: {
+            kind: 'NonNullType',
+            type: { kind: 'NamedType', name: { kind: 'Name', value: 'Int' } },
+          },
+        },
+        {
+          kind: 'VariableDefinition',
+          variable: {
+            kind: 'Variable',
+            name: { kind: 'Name', value: 'effects' },
+          },
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'ListType',
+              type: {
+                kind: 'NonNullType',
+                type: {
+                  kind: 'NamedType',
+                  name: { kind: 'Name', value: 'RoomEnvironmentalEffectInput' },
+                },
+              },
+            },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: { kind: 'Name', value: 'updateRoomEnvironmentalEffects' },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'zoneId' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'zoneId' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'id' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'id' },
+                },
+              },
+              {
+                kind: 'Argument',
+                name: { kind: 'Name', value: 'effects' },
+                value: {
+                  kind: 'Variable',
+                  name: { kind: 'Name', value: 'effects' },
+                },
+              },
+            ],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                { kind: 'Field', name: { kind: 'Name', value: 'id' } },
+                { kind: 'Field', name: { kind: 'Name', value: 'zoneId' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'environmentalEffects' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effect' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectType' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    },
+  ],
+} as unknown as DocumentNode<
+  UpdateRoomEnvironmentalEffectsMutation,
+  UpdateRoomEnvironmentalEffectsMutationVariables
 >;
 export const GetObjectsDocument = {
   kind: 'Document',
@@ -27460,6 +28225,40 @@ export const GetRoomDocument = {
                     ],
                   },
                 },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'environmentalEffects' },
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effectId' },
+                      },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'effect' },
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'id' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'name' },
+                            },
+                            {
+                              kind: 'Field',
+                              name: { kind: 'Name', value: 'effectType' },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
               ],
             },
           },
@@ -29956,7 +30755,10 @@ export const UsersDocument = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
-                { kind: 'Field', name: { kind: 'Name', value: 'isGod' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'isImplementor' },
+                },
                 { kind: 'Field', name: { kind: 'Name', value: 'isCoder' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'isBuilder' } },
                 {
@@ -30847,7 +31649,10 @@ export const MyPermissionsDocument = {
                 { kind: 'Field', name: { kind: 'Name', value: 'isImmortal' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'isBuilder' } },
                 { kind: 'Field', name: { kind: 'Name', value: 'isCoder' } },
-                { kind: 'Field', name: { kind: 'Name', value: 'isGod' } },
+                {
+                  kind: 'Field',
+                  name: { kind: 'Name', value: 'isImplementor' },
+                },
                 {
                   kind: 'Field',
                   name: { kind: 'Name', value: 'canAccessDashboard' },

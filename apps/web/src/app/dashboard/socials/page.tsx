@@ -144,7 +144,7 @@ const defaultFormData: SocialFormData = {
 };
 
 export default function SocialsPage() {
-  const { isGod } = usePermissions();
+  const { isCoder } = usePermissions();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -289,7 +289,7 @@ export default function SocialsPage() {
     });
   };
 
-  const canEdit = isGod;
+  const canEdit = isCoder;
 
   if (loading) {
     return (

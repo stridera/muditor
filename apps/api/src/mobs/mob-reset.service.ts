@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import {
   type MobResetEquipment,
   type MobResets,
+  type MobEquipmentSets,
   Prisma,
   WearFlag,
 } from '@muditor/db';
@@ -25,6 +26,32 @@ interface MobResetWithRelations extends MobResets {
       };
     }
   >;
+  mobEquipmentSets: Array<
+    MobEquipmentSets & {
+      equipment_sets: {
+        id: number;
+        name: string;
+        description: string | null;
+        createdAt: Date;
+        updatedAt: Date;
+        equipmentSetItems: Array<{
+          id: number;
+          objectZoneId: number;
+          objectId: number;
+          slot: string | null;
+          quantity: number;
+          probability: number;
+          objects: {
+            id: number;
+            zoneId: number;
+            name: string;
+            type: string;
+            keywords: string[];
+          };
+        }>;
+      };
+    }
+  >;
   mobs?: { id: number; zoneId: number; name: string } | null;
   rooms?: { id: number; zoneId: number; name: string } | null;
 }
@@ -45,6 +72,27 @@ export class MobResetService {
                 zoneId: true,
                 name: true,
                 type: true,
+              },
+            },
+          },
+        },
+        mobEquipmentSets: {
+          include: {
+            equipment_sets: {
+              include: {
+                equipmentSetItems: {
+                  include: {
+                    objects: {
+                      select: {
+                        id: true,
+                        zoneId: true,
+                        name: true,
+                        type: true,
+                        keywords: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -81,6 +129,27 @@ export class MobResetService {
                 zoneId: true,
                 name: true,
                 type: true,
+              },
+            },
+          },
+        },
+        mobEquipmentSets: {
+          include: {
+            equipment_sets: {
+              include: {
+                equipmentSetItems: {
+                  include: {
+                    objects: {
+                      select: {
+                        id: true,
+                        zoneId: true,
+                        name: true,
+                        type: true,
+                        keywords: true,
+                      },
+                    },
+                  },
+                },
               },
             },
           },
@@ -140,6 +209,27 @@ export class MobResetService {
           include: {
             objects: {
               select: { id: true, zoneId: true, name: true, type: true },
+            },
+          },
+        },
+        mobEquipmentSets: {
+          include: {
+            equipment_sets: {
+              include: {
+                equipmentSetItems: {
+                  include: {
+                    objects: {
+                      select: {
+                        id: true,
+                        zoneId: true,
+                        name: true,
+                        type: true,
+                        keywords: true,
+                      },
+                    },
+                  },
+                },
+              },
             },
           },
         },
@@ -310,6 +400,35 @@ export class MobResetService {
           type: eq.objects.type,
         },
       })) as MobResetEquipmentDto[],
+      equipmentSets: (reset.mobEquipmentSets || []).map(mes => {
+        const setDto: Record<string, unknown> = {
+          id: String(mes.equipment_sets.id),
+          name: mes.equipment_sets.name,
+          createdAt: mes.equipment_sets.createdAt,
+          updatedAt: mes.equipment_sets.updatedAt,
+          items: mes.equipment_sets.equipmentSetItems.map(item => {
+            const itemDto: Record<string, unknown> = {
+              id: String(item.id),
+              objectZoneId: item.objectZoneId,
+              objectId: item.objectId,
+              quantity: item.quantity,
+              probability: item.probability,
+              object: item.objects,
+            };
+            if (item.slot !== null) itemDto.slot = item.slot;
+            return itemDto;
+          }),
+        };
+        if (mes.equipment_sets.description !== null) {
+          setDto.description = mes.equipment_sets.description;
+        }
+        return {
+          id: mes.id,
+          probability: mes.probability,
+          equipmentSet: setDto,
+        };
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      }) as any,
     };
     if (reset.mobs) {
       dto.mob = {

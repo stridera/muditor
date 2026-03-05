@@ -11,7 +11,7 @@ import { MINIMUM_ROLE_KEY } from '../guards/minimum-role.guard';
  * async createSkill(@Args('data') data: CreateSkillInput) { ... }
  *
  * Role hierarchy (ascending):
- * PLAYER < IMMORTAL < BUILDER < HEAD_BUILDER < CODER < GOD
+ * PLAYER < IMMORTAL < BUILDER < HEAD_BUILDER < CODER < IMPLEMENTOR
  */
 export const MinimumRole = (role: UserRole) =>
   SetMetadata(MINIMUM_ROLE_KEY, role);

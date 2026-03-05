@@ -65,6 +65,7 @@ interface ShopEntity {
   keeperId: number;
   buyProfit: number;
   sellProfit: number;
+  flags?: string[];
 }
 
 export type EntityDetail =
@@ -496,9 +497,27 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
                 </div>
               )}
               {entity.kind === 'shop' && (
-                <div className='text-xs opacity-70'>
-                  Shop flags not implemented.
-                </div>
+                <>
+                  {(entity.data as ShopEntity).flags?.length ? (
+                    <div>
+                      <h5 className='text-xs uppercase tracking-wide font-semibold mb-2'>
+                        Shop Flags
+                      </h5>
+                      <div className='flex flex-wrap gap-1'>
+                        {(entity.data as ShopEntity).flags!.map(f => (
+                          <span
+                            key={f}
+                            className='px-1 py-0.5 text-xs rounded bg-amber-100 dark:bg-amber-900 dark:text-amber-200'
+                          >
+                            {f}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  ) : (
+                    <div className='text-xs opacity-70'>No shop flags set.</div>
+                  )}
+                </>
               )}
             </div>
           )}

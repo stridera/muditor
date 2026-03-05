@@ -236,11 +236,11 @@ export default function AbilitiesPage() {
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
 
-  const { isCoder, isBuilder, isGod } = usePermissions();
+  const { isCoder, isBuilder } = usePermissions();
 
-  const canCreate = isCoder || isGod;
-  const canEdit = isBuilder || isCoder || isGod;
-  const canDelete = isBuilder || isCoder || isGod;
+  const canCreate = isCoder;
+  const canEdit = isBuilder || isCoder;
+  const canDelete = isBuilder || isCoder;
 
   const { data, loading, error, refetch } = useQuery<
     GetAbilitiesQuery,

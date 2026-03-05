@@ -1152,7 +1152,7 @@ function LoginMessagesTab() {
 // ============================================
 
 export default function SettingsPage() {
-  const { isGod, loading: permLoading } = usePermissions();
+  const { isCoder, loading: permLoading } = usePermissions();
 
   if (permLoading) {
     return (
@@ -1162,14 +1162,14 @@ export default function SettingsPage() {
     );
   }
 
-  if (!isGod) {
+  if (!isCoder) {
     return (
       <div className='p-6'>
         <Alert variant='destructive'>
           <AlertTriangle className='h-4 w-4' />
           <AlertDescription>
-            You do not have permission to access game settings. GOD-level access
-            required.
+            You do not have permission to access game settings. CODER-level
+            access required.
           </AlertDescription>
         </Alert>
       </div>

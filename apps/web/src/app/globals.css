@@ -185,6 +185,391 @@
   font-family: var(--font-jakarta), ui-sans-serif, system-ui, sans-serif;
 }
 
+/* ============================================
+   Landing Page — Dark Cartographer's Forge
+   ============================================ */
+
+/* ── Root ── */
+.landing-root {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: hsl(var(--background));
+  color: hsl(var(--foreground));
+  overflow: hidden;
+}
+
+/* ── Atmosphere ── */
+.landing-vignette {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(
+    ellipse 80% 70% at 30% 50%,
+    transparent 0%,
+    hsl(var(--background) / 0.6) 100%
+  );
+  pointer-events: none;
+}
+
+.landing-glow {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 50% 60% at 25% 45%, hsl(var(--gold) / 0.07) 0%, transparent 70%),
+    radial-gradient(ellipse 40% 50% at 75% 55%, hsl(var(--copper) / 0.05) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+/* ── Floating embers ── */
+.landing-embers {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.landing-ember {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  border-radius: 50%;
+  background: hsl(var(--gold));
+  opacity: 0;
+  animation: ember-float linear infinite;
+}
+
+/* stagger the 18 embers across the viewport */
+.landing-ember:nth-child(1)  { left: 5%;  animation-duration: 8s;  animation-delay: 0s;   }
+.landing-ember:nth-child(2)  { left: 12%; animation-duration: 10s; animation-delay: 1.2s; }
+.landing-ember:nth-child(3)  { left: 20%; animation-duration: 7s;  animation-delay: 3s;   }
+.landing-ember:nth-child(4)  { left: 28%; animation-duration: 9s;  animation-delay: 0.5s; }
+.landing-ember:nth-child(5)  { left: 35%; animation-duration: 11s; animation-delay: 2.8s; }
+.landing-ember:nth-child(6)  { left: 42%; animation-duration: 8.5s;animation-delay: 4s;   }
+.landing-ember:nth-child(7)  { left: 48%; animation-duration: 9.5s;animation-delay: 1s;   }
+.landing-ember:nth-child(8)  { left: 55%; animation-duration: 7.5s;animation-delay: 3.5s; }
+.landing-ember:nth-child(9)  { left: 62%; animation-duration: 10s; animation-delay: 0.8s; }
+.landing-ember:nth-child(10) { left: 68%; animation-duration: 8s;  animation-delay: 2s;   }
+.landing-ember:nth-child(11) { left: 74%; animation-duration: 9s;  animation-delay: 4.5s; }
+.landing-ember:nth-child(12) { left: 80%; animation-duration: 11s; animation-delay: 1.5s; }
+.landing-ember:nth-child(13) { left: 86%; animation-duration: 7s;  animation-delay: 3.2s; }
+.landing-ember:nth-child(14) { left: 91%; animation-duration: 10s; animation-delay: 0.3s; }
+.landing-ember:nth-child(15) { left: 15%; animation-duration: 12s; animation-delay: 5s;   }
+.landing-ember:nth-child(16) { left: 38%; animation-duration: 8s;  animation-delay: 6s;   }
+.landing-ember:nth-child(17) { left: 58%; animation-duration: 9s;  animation-delay: 5.5s; }
+.landing-ember:nth-child(18) { left: 78%; animation-duration: 10s; animation-delay: 7s;   }
+
+@keyframes ember-float {
+  0%   { bottom: -4px; opacity: 0; transform: translateX(0) scale(1); }
+  10%  { opacity: 0.8; }
+  50%  { opacity: 0.4; transform: translateX(20px) scale(0.7); }
+  90%  { opacity: 0.15; }
+  100% { bottom: 105%; opacity: 0; transform: translateX(-10px) scale(0.3); }
+}
+
+/* ── Compass rose ── */
+.landing-compass {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  bottom: 2rem;
+  right: 2rem;
+  animation: compass-spin 120s linear infinite;
+}
+
+@keyframes compass-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+
+/* ── Split layout ── */
+.landing-split {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  max-width: 1100px;
+  width: 100%;
+  padding: 2rem;
+  align-items: center;
+}
+
+@media (max-width: 860px) {
+  .landing-split {
+    grid-template-columns: 1fr;
+    gap: 2.5rem;
+    max-width: 480px;
+    padding: 2rem 1.5rem;
+  }
+  .landing-compass { display: none; }
+}
+
+/* ── Hero side ── */
+.landing-hero {
+  position: relative;
+}
+
+.landing-hero-content {
+  position: relative;
+  padding: 2rem 0;
+}
+
+/* corner accents */
+.landing-corner {
+  position: absolute;
+  width: 40px;
+  height: 40px;
+}
+.landing-corner--tl {
+  top: 0; left: -1rem;
+  border-top: 2px solid hsl(var(--gold) / 0.25);
+  border-left: 2px solid hsl(var(--gold) / 0.25);
+}
+.landing-corner--br {
+  bottom: 0; right: -1rem;
+  border-bottom: 2px solid hsl(var(--gold) / 0.25);
+  border-right: 2px solid hsl(var(--gold) / 0.25);
+}
+
+.landing-title {
+  font-family: var(--font-cinzel), ui-serif, Georgia, serif;
+  font-weight: 700;
+  letter-spacing: 0.18em;
+  line-height: 1;
+  margin-bottom: 0.75rem;
+  animation: title-reveal 0.8s ease-out both;
+}
+
+.landing-title-text {
+  font-size: clamp(3.5rem, 6vw, 5.5rem);
+  background: linear-gradient(
+    180deg,
+    hsl(var(--foreground)) 0%,
+    hsl(var(--foreground)) 40%,
+    hsl(var(--gold) / 0.7) 100%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+@keyframes title-reveal {
+  from { opacity: 0; transform: translateY(16px); letter-spacing: 0.3em; }
+  to   { opacity: 1; transform: translateY(0);    letter-spacing: 0.18em; }
+}
+
+.landing-rule {
+  width: 80px;
+  height: 1px;
+  background: linear-gradient(90deg, hsl(var(--gold) / 0.6), transparent);
+  margin-bottom: 1rem;
+  animation: fade-in 0.6s 0.3s ease-out both;
+}
+
+.landing-tagline {
+  font-family: var(--font-cinzel), ui-serif, Georgia, serif;
+  font-size: 1.25rem;
+  color: hsl(var(--muted-foreground));
+  letter-spacing: 0.12em;
+  margin-bottom: 1rem;
+  animation: fade-in 0.5s 0.4s ease-out both;
+}
+
+.landing-subtitle {
+  font-size: 0.9rem;
+  line-height: 1.6;
+  color: hsl(var(--muted-foreground));
+  max-width: 380px;
+  margin-bottom: 2rem;
+  animation: fade-in 0.5s 0.5s ease-out both;
+}
+
+/* ── Feature list ── */
+.landing-features {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: fade-in 0.5s 0.65s ease-out both;
+}
+
+.landing-feature {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.5rem 0;
+}
+
+.landing-feature-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  border: 1px solid hsl(var(--gold) / 0.2);
+  background: hsl(var(--gold) / 0.06);
+  color: hsl(var(--gold));
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.landing-feature-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+}
+
+.landing-feature-desc {
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* ── Auth panel ── */
+.landing-auth {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: auth-slide-in 0.6s 0.3s ease-out both;
+}
+
+@keyframes auth-slide-in {
+  from { opacity: 0; transform: translateY(12px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.landing-auth-panel {
+  width: 100%;
+  max-width: 380px;
+  padding: 1.75rem;
+  border-radius: 12px;
+  border: 1px solid hsl(var(--border) / 0.6);
+  background: hsl(var(--card) / 0.85);
+  backdrop-filter: blur(16px);
+  box-shadow:
+    0 4px 24px hsl(var(--background) / 0.5),
+    0 0 0 1px hsl(var(--gold) / 0.04) inset;
+}
+
+/* ── Tabs ── */
+.landing-tabs {
+  display: flex;
+  gap: 0;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+.landing-tab {
+  flex: 1;
+  padding: 0.5rem 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  cursor: pointer;
+  transition: color 0.2s, border-color 0.2s;
+  font-family: var(--font-cinzel), ui-serif, Georgia, serif;
+}
+
+.landing-tab:hover {
+  color: hsl(var(--foreground));
+}
+
+.landing-tab--active {
+  color: hsl(var(--gold));
+  border-bottom-color: hsl(var(--gold));
+}
+
+/* ── Form ── */
+.landing-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.875rem;
+}
+
+.landing-input {
+  background: hsl(var(--background) / 0.6) !important;
+  border-color: hsl(var(--border) / 0.5) !important;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.landing-input:focus-visible {
+  border-color: hsl(var(--gold) / 0.5) !important;
+  box-shadow: 0 0 0 2px hsl(var(--gold) / 0.15) !important;
+}
+
+.landing-btn-primary {
+  margin-top: 0.25rem;
+  font-family: var(--font-cinzel), ui-serif, Georgia, serif;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  font-size: 0.85rem;
+  background: hsl(var(--gold)) !important;
+  color: hsl(20 14% 6%) !important;
+  border: none;
+  transition: filter 0.2s, box-shadow 0.2s;
+}
+
+.landing-btn-primary:hover:not(:disabled) {
+  filter: brightness(1.1);
+  box-shadow: 0 0 20px hsl(var(--gold) / 0.3);
+}
+
+.landing-btn-google {
+  border-color: hsl(var(--border) / 0.5) !important;
+  background: hsl(var(--background) / 0.4) !important;
+}
+
+.landing-btn-google:hover {
+  background: hsl(var(--accent)) !important;
+}
+
+/* ── Divider ── */
+.landing-divider {
+  position: relative;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.landing-divider::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: hsl(var(--border));
+}
+
+.landing-divider span {
+  position: relative;
+  padding: 0 0.75rem;
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: hsl(var(--muted-foreground));
+  background: hsl(var(--card) / 0.85);
+}
+
+/* ── Footer ── */
+.landing-footer {
+  position: absolute;
+  bottom: 1rem;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  color: hsl(var(--muted-foreground) / 0.5);
+  z-index: 1;
+}
+
 /* React Flow Z-level layering fix */
 /* Ensure edges render above nodes from other floors by using CSS transform */
 .react-flow__edges {

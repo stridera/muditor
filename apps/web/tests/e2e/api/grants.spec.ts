@@ -8,7 +8,7 @@ test.describe('Grants System', () => {
   let builderUserId: string;
 
   test.beforeAll(async ({ request }) => {
-    // Login as GOD user
+    // Login as IMPLEMENTOR user
     const godLogin = await request.post(API_URL, {
       data: {
         query: `

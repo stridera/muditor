@@ -15,7 +15,7 @@ export const MINIMUM_ROLE_KEY = 'minimumRole';
  * Used with @MinimumRole decorator
  *
  * Role hierarchy (ascending):
- * PLAYER < IMMORTAL < BUILDER < HEAD_BUILDER < CODER < GOD
+ * PLAYER < IMMORTAL < BUILDER < HEAD_BUILDER < CODER < IMPLEMENTOR
  */
 @Injectable()
 export class MinimumRoleGuard implements CanActivate {

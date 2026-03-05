@@ -138,7 +138,7 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { isImmortal, isCoder, isGod } = usePermissions();
+  const { isImmortal, isCoder } = usePermissions();
   const { isInZoneContext } = useZoneContext();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
@@ -259,7 +259,7 @@ export function Navigation() {
   ];
 
   const quickLinks = showPlayerView ? playerQuickLinks : adminQuickLinks;
-  const canAccessGameSystems = isCoder || isGod;
+  const canAccessGameSystems = isCoder;
 
   return (
     <nav className='bg-background/95 backdrop-blur-md border-b border-border shadow-sm sticky top-0 z-50'>
@@ -402,7 +402,7 @@ export function Navigation() {
                           Abilities
                         </Link>
                       </DropdownMenuItem>
-                      {isGod && (
+                      {isCoder && (
                         <DropdownMenuItem asChild>
                           <Link href='/dashboard/socials'>
                             <MessageCircle className='mr-2 h-4 w-4' />
@@ -422,7 +422,7 @@ export function Navigation() {
                           Help Entries
                         </Link>
                       </DropdownMenuItem>
-                      {isGod && (
+                      {isCoder && (
                         <DropdownMenuItem asChild>
                           <Link href='/dashboard/admin/game-config'>
                             <Settings className='mr-2 h-4 w-4' />

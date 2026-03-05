@@ -60,7 +60,7 @@ subscription GameEvents {
     timestamp
     playerName
     zoneId
-    roomVnum
+    roomId
     message
     targetPlayer
     metadata
@@ -102,7 +102,7 @@ subscription WorldEvents {
     type
     timestamp
     zoneId
-    roomVnum
+    roomId
     message
     metadata
   }

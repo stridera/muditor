@@ -327,15 +327,15 @@ export class UsersService {
   }
 
   isCoder(user: Users): boolean {
-    return user.role === UserRole.CODER || this.isGod(user);
+    return user.role === UserRole.CODER || this.isImplementor(user);
   }
 
-  isGod(user: Users): boolean {
-    return user.role === UserRole.GOD;
+  isImplementor(user: Users): boolean {
+    return user.role === UserRole.IMPLEMENTOR;
   }
 
   isHigherThanImmortal(user: Users): boolean {
-    return user.role === UserRole.CODER || user.role === UserRole.GOD;
+    return user.role === UserRole.CODER || user.role === UserRole.IMPLEMENTOR;
   }
 
   canAccessDashboard(user: Users): boolean {
@@ -343,11 +343,11 @@ export class UsersService {
   }
 
   canManageUsers(user: Users): boolean {
-    return this.isGod(user) || this.isCoder(user);
+    return this.isImplementor(user) || this.isCoder(user);
   }
 
   canEditZone(user: Users, zoneId?: number): boolean {
-    if (this.isGod(user)) return true;
+    if (this.isImplementor(user)) return true;
     if (this.isCoder(user)) return true;
 
     // Check if immortal has specific zone permissions
@@ -361,8 +361,8 @@ export class UsersService {
   }
 
   canManageCharacters(user: Users, characterOwnerId?: string): boolean {
-    // Gods can manage any character
-    if (this.isGod(user)) return true;
+    // Implementors can manage any character
+    if (this.isImplementor(user)) return true;
 
     // Users can manage their own characters
     if (characterOwnerId && user.id === characterOwnerId) return true;
@@ -394,7 +394,7 @@ export class UsersService {
       isImmortal: this.isImmortal(user),
       isBuilder: this.isBuilder(user),
       isCoder: this.isCoder(user),
-      isGod: this.isGod(user),
+      isImplementor: this.isImplementor(user),
       canAccessDashboard: this.canAccessDashboard(user),
       canManageUsers: this.canManageUsers(user),
       canViewValidation: this.canViewValidation(user),

@@ -24,6 +24,7 @@ import {
   Menu,
   MessageCircle,
   Monitor,
+  Package,
   ScrollText,
   Settings,
   Shield,
@@ -70,7 +71,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { isImmortal, isCoder, isGod } = usePermissions();
+  const { isImmortal, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
   // Collapse state
@@ -166,7 +167,7 @@ export function Sidebar() {
 
   const canSwitchViews = isImmortal;
   const showAdminMode = viewMode === 'admin' && isImmortal;
-  const canAccessGameSystems = isCoder || isGod;
+  const canAccessGameSystems = isCoder;
 
   // Dashboard — always visible at top
   const dashboardItem: NavItem = {
@@ -261,7 +262,7 @@ export function Sidebar() {
     },
   ];
 
-  if (isGod) {
+  if (isCoder) {
     gameSystemsItems.push({
       name: 'Socials',
       href: '/dashboard/socials',
@@ -288,7 +289,7 @@ export function Sidebar() {
   };
 
   const adminItems: NavItem[] = [];
-  if (isGod) {
+  if (isCoder) {
     adminItems.push({
       name: 'Game Config',
       href: '/dashboard/admin/game-config',
@@ -296,18 +297,25 @@ export function Sidebar() {
     });
   }
   if (isCoder) {
-    adminItems.push({
-      name: 'Mail Admin',
-      href: '/dashboard/admin/mail',
-      icon: <Mail className='h-4 w-4' />,
-    });
+    adminItems.push(
+      {
+        name: 'Mail Admin',
+        href: '/dashboard/admin/mail',
+        icon: <Mail className='h-4 w-4' />,
+      },
+      {
+        name: 'Deployments',
+        href: '/dashboard/deployments',
+        icon: <Package className='h-4 w-4' />,
+      }
+    );
   }
   adminItems.push({
     name: 'Console',
     href: '/dashboard/admin/console',
     icon: <Terminal className='h-4 w-4' />,
   });
-  if (isGod) {
+  if (isCoder) {
     adminItems.push({
       name: 'Users',
       href: '/dashboard/users',

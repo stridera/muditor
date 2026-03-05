@@ -100,7 +100,7 @@ export class BridgeService implements OnModuleInit, OnModuleDestroy {
         message: rawEvent.message || '',
         playerName: rawEvent.playerName ?? rawEvent.player_name,
         zoneId: rawEvent.zoneId ?? rawEvent.zone_id,
-        roomVnum: rawEvent.roomId ?? rawEvent.room_vnum,
+        roomId: rawEvent.roomId ?? rawEvent.room_vnum ?? rawEvent.room_id,
         targetPlayer: rawEvent.metadata?.target ?? rawEvent.target_player,
         metadata: rawEvent.metadata,
       };

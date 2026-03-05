@@ -44,7 +44,7 @@ export class UserPermissions {
   isCoder: boolean;
 
   @Field()
-  isGod: boolean;
+  isImplementor: boolean;
 
   @Field()
   canAccessDashboard: boolean;
@@ -67,7 +67,7 @@ export class UsersResolver {
   constructor(private readonly usersService: UsersService) {}
 
   @Query(() => [User])
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async users(): Promise<User[]> {
     return this.usersService.getAllUsersWithBanStatus();
@@ -79,7 +79,7 @@ export class UsersResolver {
   }
 
   @Query(() => [BanRecord])
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async banHistory(
     @Args('userId', { type: () => ID }) userId: string
@@ -88,14 +88,14 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  @Roles(UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async updateUser(@Args('input') input: UpdateUserInput): Promise<User> {
     return this.usersService.updateUser(input);
   }
 
   @Mutation(() => BanRecord)
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async banUser(
     @Args('input') input: BanUserInput,
@@ -105,7 +105,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => BanRecord)
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async unbanUser(
     @Args('input') input: UnbanUserInput,
@@ -129,7 +129,7 @@ export class UsersResolver {
   }
 
   @Query(() => UserPermissions, { name: 'userPermissions' })
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.GOD)
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async getUserPermissions(
     @Args('userId', { type: () => ID }) userId: string

@@ -2,9 +2,8 @@
   "name": "@muditor/api",
   "version": "0.1.0",
   "private": true,
-  "type": "module",
   "scripts": {
-    "dev": "mkdir -p logs && bun --watch src/main.ts 2>&1 | tee logs/dev.log",
+    "dev": "node -r @swc-node/register src/main.ts",
     "build": "nest build",
     "start": "bun src/main.ts",
     "start:prod": "bun dist/main.js",

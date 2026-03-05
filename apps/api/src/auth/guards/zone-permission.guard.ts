@@ -11,7 +11,7 @@ import { DatabaseService } from '../../database/database.service';
  * Guard that checks zone-based permissions using UserGrants
  *
  * Permission hierarchy:
- * - GOD, CODER, HEAD_BUILDER: Bypass grants (full access)
+ * - IMPLEMENTOR, CODER, HEAD_BUILDER: Bypass grants (full access)
  * - IMMORTAL: View-only access to all zones
  * - BUILDER: Must have grants with WRITE permission for specific zones
  * - PLAYER: No zone access
@@ -37,16 +37,18 @@ export class ZonePermissionGuard implements CanActivate {
     if (!zoneId) {
       // No zone specified - allow if user has minimum role
       return [
-        UserRole.GOD,
+        UserRole.IMPLEMENTOR,
         UserRole.CODER,
         UserRole.HEAD_BUILDER,
         UserRole.IMMORTAL,
       ].includes(user.role);
     }
 
-    // GOD, CODER, HEAD_BUILDER bypass grants system
+    // IMPLEMENTOR, CODER, HEAD_BUILDER bypass grants system
     if (
-      [UserRole.GOD, UserRole.CODER, UserRole.HEAD_BUILDER].includes(user.role)
+      [UserRole.IMPLEMENTOR, UserRole.CODER, UserRole.HEAD_BUILDER].includes(
+        user.role
+      )
     ) {
       return true;
     }
