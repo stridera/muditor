@@ -338,6 +338,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.mobResetEquipment;
   }
 
+  get mobEquipmentSets() {
+    return this.client.mobEquipmentSets;
+  }
+
   get raceAbilities() {
     return this.client.raceAbilities;
   }
@@ -461,6 +465,14 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   get dialogueResponses() {
     return this.client.dialogueResponses;
+  }
+
+  get deploymentPackage() {
+    return this.client.deploymentPackage;
+  }
+
+  get deploymentChange() {
+    return this.client.deploymentChange;
   }
 
   // Pass-through Prisma client methods

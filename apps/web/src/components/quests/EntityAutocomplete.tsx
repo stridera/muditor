@@ -39,11 +39,11 @@ interface EntityAutocompleteProps {
 function parseSearchInput(input: string): {
   zoneId: number | null;
   searchTerm: string;
-  isDirectVnum: boolean;
+  isDirectId: boolean;
 } {
   const colonIndex = input.indexOf(':');
   if (colonIndex === -1) {
-    return { zoneId: null, searchTerm: input, isDirectVnum: false };
+    return { zoneId: null, searchTerm: input, isDirectId: false };
   }
 
   const zoneStr = input.substring(0, colonIndex);
@@ -51,16 +51,16 @@ function parseSearchInput(input: string): {
   const zoneId = parseInt(zoneStr, 10);
 
   if (isNaN(zoneId)) {
-    return { zoneId: null, searchTerm: input, isDirectVnum: false };
+    return { zoneId: null, searchTerm: input, isDirectId: false };
   }
 
-  // Check if afterColon is a number (direct vnum lookup)
-  const possibleVnum = parseInt(afterColon, 10);
-  if (!isNaN(possibleVnum) && afterColon.match(/^\d+$/)) {
-    return { zoneId, searchTerm: afterColon, isDirectVnum: true };
+  // Check if afterColon is a number (direct ID lookup)
+  const possibleId = parseInt(afterColon, 10);
+  if (!isNaN(possibleId) && afterColon.match(/^\d+$/)) {
+    return { zoneId, searchTerm: afterColon, isDirectId: true };
   }
 
-  return { zoneId, searchTerm: afterColon, isDirectVnum: false };
+  return { zoneId, searchTerm: afterColon, isDirectId: false };
 }
 
 export function EntityAutocomplete({
@@ -183,7 +183,7 @@ export function EntityAutocomplete({
       // Client-side filtering for rooms
       return roomData.roomsByZone
         .filter(room => {
-          if (parsed.isDirectVnum) {
+          if (parsed.isDirectId) {
             return room.id === parseInt(parsed.searchTerm, 10);
           }
           const name = room.name?.toLowerCase() || '';

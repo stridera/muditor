@@ -161,7 +161,10 @@ export class CreateCharacterItemInput {
   characterId: string;
 
   @Field(() => Int)
-  objectPrototypeId: number;
+  objectZoneId: number;
+
+  @Field(() => Int)
+  objectId: number;
 
   @Field(() => Int, { nullable: true })
   containerId?: number;

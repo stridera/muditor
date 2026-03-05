@@ -125,7 +125,7 @@ interface User {
   id: string;
   displayName: string;
   email: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD';
+  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR';
   isBanned: boolean;
   createdAt: string;
   lastLoginAt?: string;
@@ -439,7 +439,7 @@ function EditUserDialog({
               <SelectItem value='IMMORTAL'>Immortal</SelectItem>
               <SelectItem value='BUILDER'>Builder</SelectItem>
               <SelectItem value='CODER'>Coder</SelectItem>
-              <SelectItem value='GOD'>God</SelectItem>
+              <SelectItem value='IMPLEMENTOR'>Implementor</SelectItem>
             </SelectContent>
           </Select>
         </div>

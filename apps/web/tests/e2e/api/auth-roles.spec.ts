@@ -8,7 +8,7 @@ test.describe('Authentication and Role System', () => {
   let playerToken: string;
 
   test.beforeAll(async ({ request }) => {
-    // Login as admin (GOD role)
+    // Login as admin (IMPLEMENTOR role)
     const adminLogin = await request.post(API_URL, {
       data: {
         query: `
@@ -22,7 +22,7 @@ test.describe('Authentication and Role System', () => {
       },
     });
     const adminData = await adminLogin.json();
-    expect(adminData.data.login.user.role).toBe('GOD');
+    expect(adminData.data.login.user.role).toBe('IMPLEMENTOR');
     adminToken = adminData.data.login.accessToken;
 
     // Login as builder (BUILDER role)
@@ -66,7 +66,7 @@ test.describe('Authentication and Role System', () => {
     expect(playerToken).toBeTruthy();
   });
 
-  test('GOD role should access all queries', async ({ request }) => {
+  test('IMPLEMENTOR role should access all queries', async ({ request }) => {
     const response = await request.post(API_URL, {
       headers: { Authorization: `Bearer ${adminToken}` },
       data: {

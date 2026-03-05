@@ -73,7 +73,7 @@ export class SocialsService {
 
   /**
    * Create a new social
-   * Requires GOD role (enforced by resolver guard)
+   * Requires CODER role (enforced by resolver guard)
    */
   async create(data: CreateSocialInput) {
     // Check if social with this name already exists
@@ -92,7 +92,7 @@ export class SocialsService {
 
   /**
    * Update an existing social
-   * Requires GOD role (enforced by resolver guard)
+   * Requires CODER role (enforced by resolver guard)
    */
   async update(id: number, data: UpdateSocialInput) {
     await this.findOne(id); // Ensure social exists
@@ -105,7 +105,7 @@ export class SocialsService {
 
   /**
    * Delete a social
-   * Requires GOD role (enforced by resolver guard)
+   * Requires CODER role (enforced by resolver guard)
    */
   async remove(id: number) {
     await this.findOne(id); // Ensure social exists

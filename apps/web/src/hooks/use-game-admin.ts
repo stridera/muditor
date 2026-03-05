@@ -107,7 +107,7 @@ export const GAME_EVENTS_SUBSCRIPTION = gql`
       timestamp
       playerName
       zoneId
-      roomVnum
+      roomId
       message
       targetPlayer
       metadata
@@ -157,7 +157,7 @@ export const WORLD_EVENTS_SUBSCRIPTION = gql`
       type
       timestamp
       zoneId
-      roomVnum
+      roomId
       message
       metadata
     }
@@ -234,7 +234,7 @@ export interface GameEvent {
   timestamp: string;
   playerName?: string;
   zoneId?: number;
-  roomVnum?: number;
+  roomId?: number;
   message: string;
   targetPlayer?: string;
   metadata?: Record<string, unknown>;

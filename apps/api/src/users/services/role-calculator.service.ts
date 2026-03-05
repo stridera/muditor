@@ -11,7 +11,7 @@ import { DatabaseService } from '../../database/database.service';
  * - BUILDER: 101-102
  * - HEAD_BUILDER: 103
  * - CODER: 104
- * - GOD: 105+
+ * - IMPLEMENTOR: 105+
  */
 @Injectable()
 export class RoleCalculatorService {
@@ -26,7 +26,7 @@ export class RoleCalculatorService {
     if (level >= 101 && level <= 102) return UserRole.BUILDER;
     if (level === 103) return UserRole.HEAD_BUILDER;
     if (level === 104) return UserRole.CODER;
-    if (level >= 105) return UserRole.GOD;
+    if (level >= 105) return UserRole.IMPLEMENTOR;
 
     // Fallback (should never reach here)
     return UserRole.PLAYER;
@@ -76,7 +76,7 @@ export class RoleCalculatorService {
       [UserRole.BUILDER]: 2,
       [UserRole.HEAD_BUILDER]: 3,
       [UserRole.CODER]: 4,
-      [UserRole.GOD]: 5,
+      [UserRole.IMPLEMENTOR]: 5,
     };
 
     return roleHierarchy[userRole] >= roleHierarchy[requiredRole];

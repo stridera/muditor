@@ -262,7 +262,7 @@ function HelpContent({
 }
 
 export default function HelpPage() {
-  const { isBuilder, isGod } = usePermissions();
+  const { isBuilder, isCoder } = usePermissions();
 
   const [isCreateOpen, setIsCreateOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
@@ -484,8 +484,8 @@ export default function HelpPage() {
     }
   };
 
-  const canEdit = isBuilder || isGod;
-  const canDelete = isGod;
+  const canEdit = isBuilder || isCoder;
+  const canDelete = isCoder;
 
   if (loading) {
     return (

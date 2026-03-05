@@ -149,13 +149,13 @@ const zone = searchParams.get('zone_id'); // Wrong parameter name
 
 ## 4. Composite Primary Keys
 
-### ✅ ALWAYS Use Composite Keys (zone, vnum) for Entities
+### ✅ ALWAYS Use Composite Keys (zone, id) for Entities
 
 **Rule:** When specifying rooms, mobs, objects, or shops, always use the composite key format and validation helpers.
 
 **Why:**
 
-- Database uses composite primary keys `(zoneId, vnum)` for performance
+- Database uses composite primary keys `(zoneId, id)` for performance
 - `room=0` is valid (room 0 exists in many zones)
 - `Boolean(0)` is `false`, causing bugs if used as truthy check
 - Validation helpers prevent invalid room references

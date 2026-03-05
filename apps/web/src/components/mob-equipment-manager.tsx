@@ -33,6 +33,26 @@ const GET_MOB_RESETS = gql`
           type
         }
       }
+      equipmentSets {
+        id
+        probability
+        equipmentSet {
+          id
+          name
+          description
+          items {
+            id
+            slot
+            probability
+            object {
+              id
+              zoneId
+              name
+              type
+            }
+          }
+        }
+      }
     }
   }
 `;

@@ -7,7 +7,7 @@ type Role =
   | 'BUILDER'
   | 'HEAD_BUILDER'
   | 'CODER'
-  | 'GOD';
+  | 'IMPLEMENTOR';
 
 interface RoleBadgeProps {
   role: Role;
@@ -46,8 +46,8 @@ const roleConfig = {
     variant: 'default' as const,
     className: 'bg-purple-100 text-purple-700 hover:bg-purple-200',
   },
-  GOD: {
-    label: 'God',
+  IMPLEMENTOR: {
+    label: 'Implementor',
     icon: Crown,
     variant: 'default' as const,
     className: 'bg-amber-100 text-amber-700 hover:bg-amber-200',

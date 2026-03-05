@@ -11,7 +11,7 @@ export const MY_PERMISSIONS_QUERY = gql`
       isImmortal
       isBuilder
       isCoder
-      isGod
+      isImplementor
       canAccessDashboard
       canManageUsers
       canViewValidation
@@ -26,7 +26,7 @@ export interface UserPermissions {
   isImmortal: boolean;
   isBuilder: boolean;
   isCoder: boolean;
-  isGod: boolean;
+  isImplementor: boolean;
   canAccessDashboard: boolean;
   canManageUsers: boolean;
   canViewValidation: boolean;
@@ -49,7 +49,7 @@ export interface UsePermissionsResult {
   isImmortal: boolean;
   isBuilder: boolean;
   isCoder: boolean;
-  isGod: boolean;
+  isImplementor: boolean;
 }
 
 export function usePermissions(): UsePermissionsResult {
@@ -69,7 +69,7 @@ export function usePermissions(): UsePermissionsResult {
   // Helper functions based on backend permission logic
   const canEditZone = (zoneId?: number): boolean => {
     if (!permissions) return false;
-    if (permissions.isGod) return true;
+    if (permissions.isImplementor) return true;
     if (permissions.isCoder) return true;
     if (permissions.isBuilder) return true;
     return false;
@@ -77,7 +77,7 @@ export function usePermissions(): UsePermissionsResult {
 
   const canManageCharacters = (characterOwnerId?: string): boolean => {
     if (!permissions || !user) return false;
-    if (permissions.isGod) return true;
+    if (permissions.isImplementor) return true;
     if (characterOwnerId && user.id === characterOwnerId) return true;
     if (permissions.isCoder) return true;
     return false;
@@ -100,6 +100,6 @@ export function usePermissions(): UsePermissionsResult {
     isImmortal: permissions?.isImmortal || false,
     isBuilder: permissions?.isBuilder || false,
     isCoder: permissions?.isCoder || false,
-    isGod: permissions?.isGod || false,
+    isImplementor: permissions?.isImplementor || false,
   };
 }

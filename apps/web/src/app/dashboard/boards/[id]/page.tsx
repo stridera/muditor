@@ -122,11 +122,19 @@ interface GetBoardQueryResult {
   board: Board | null;
 }
 
+const ROLE_TO_LEVEL: Record<string, number> = {
+  PLAYER: 1,
+  IMMORTAL: 100,
+  BUILDER: 102,
+  CODER: 104,
+  GOD: 105,
+};
+
 export default function BoardDetailPage() {
   const params = useParams();
   const boardId = parseInt(params.id as string, 10);
   const { user } = useAuth();
-  const { isGod, isBuilder } = usePermissions();
+  const { isCoder, isBuilder } = usePermissions();
 
   const [selectedMessage, setSelectedMessage] = useState<BoardMessage | null>(
     null
@@ -228,7 +236,7 @@ export default function BoardDetailPage() {
         data: {
           boardId,
           poster: user?.displayName || 'Anonymous',
-          posterLevel: 100, // TODO: Get actual character level
+          posterLevel: user?.role ? ROLE_TO_LEVEL[user.role] : 1,
           subject,
           content,
           sticky,
@@ -267,9 +275,9 @@ export default function BoardDetailPage() {
     });
   };
 
-  const canPost = isBuilder || isGod;
+  const canPost = isBuilder || isCoder;
   const canEdit = (message: BoardMessage) => {
-    if (isGod) return true;
+    if (isCoder) return true;
     if (isBuilder && message.poster === user?.displayName) return true;
     return false;
   };
@@ -460,7 +468,7 @@ export default function BoardDetailPage() {
                 />
               </div>
 
-              {isGod && (
+              {isCoder && (
                 <div className='flex items-center gap-2'>
                   <input
                     type='checkbox'
@@ -526,7 +534,7 @@ export default function BoardDetailPage() {
                 />
               </div>
 
-              {isGod && (
+              {isCoder && (
                 <div className='flex items-center gap-2'>
                   <input
                     type='checkbox'

@@ -16,10 +16,13 @@ const GET_EQUIPMENT_SETS = gql`
       updatedAt
       items {
         id
+        objectZoneId
+        objectId
         slot
         probability
         object {
           id
+          zoneId
           name
           type
           keywords
@@ -33,6 +36,7 @@ const GET_OBJECTS = gql`
   query GetObjectsForEquipmentSet($skip: Int, $take: Int) {
     objects(skip: $skip, take: $take) {
       id
+      zoneId
       name
       type
       keywords
@@ -73,6 +77,8 @@ const ADD_EQUIPMENT_SET_ITEM = gql`
   mutation AddEquipmentSetItem($data: CreateEquipmentSetItemStandaloneInput!) {
     createEquipmentSetItem(data: $data) {
       id
+      objectZoneId
+      objectId
       slot
       probability
     }
@@ -93,6 +99,7 @@ interface EquipmentSetManagerProps {
 
 interface GameObject {
   id: number;
+  zoneId: number;
   name: string;
   type: string;
   keywords: string;
@@ -101,10 +108,13 @@ interface GameObject {
 
 interface EquipmentSetItem {
   id: string;
+  objectZoneId: number;
+  objectId: number;
   slot: string;
   probability: number;
   object: {
     id: number;
+    zoneId: number;
     name: string;
     type: string;
     keywords: string;
@@ -165,7 +175,7 @@ export default function EquipmentSetManager({
     refetch: refetchEquipmentSets,
   } = useQuery(GET_EQUIPMENT_SETS);
 
-  const { data: objectsData, loading: objectsLoading } = useQuery(GET_OBJECTS, {
+  const { data: objectsData } = useQuery(GET_OBJECTS, {
     variables: { skip: 0, take: 200 },
   });
 
@@ -266,6 +276,7 @@ export default function EquipmentSetManager({
 
   const handleAddItem = async (
     setId: string,
+    objectZoneId: number,
     objectId: number,
     slot: string
   ) => {
@@ -274,6 +285,7 @@ export default function EquipmentSetManager({
         variables: {
           data: {
             equipmentSetId: setId,
+            objectZoneId,
             objectId,
             slot,
             probability: 1.0,
@@ -462,7 +474,8 @@ export default function EquipmentSetManager({
                             <ColoredTextInline markup={item.object.name} />
                           </div>
                           <div className='text-xs text-muted-foreground'>
-                            {item.slot} • {item.object.type} •{' '}
+                            {item.slot} • {item.object.zoneId}:{item.object.id}{' '}
+                            • {item.object.type} •{' '}
                             {(item.probability * 100).toFixed(0)}% chance
                           </div>
                         </div>
@@ -534,9 +547,14 @@ export default function EquipmentSetManager({
                           <div className='max-h-32 overflow-y-auto border border-border rounded'>
                             {filteredObjects.slice(0, 10).map(obj => (
                               <button
-                                key={obj.id}
+                                key={`${obj.zoneId}:${obj.id}`}
                                 onClick={() =>
-                                  handleAddItem(set.id, obj.id, selectedSlot)
+                                  handleAddItem(
+                                    set.id,
+                                    obj.zoneId,
+                                    obj.id,
+                                    selectedSlot
+                                  )
                                 }
                                 className='w-full p-2 text-left hover:bg-muted border-b border-border last:border-b-0'
                               >
@@ -544,7 +562,8 @@ export default function EquipmentSetManager({
                                   <ColoredTextInline markup={obj.name} />
                                 </div>
                                 <div className='text-xs text-muted-foreground'>
-                                  {obj.type} • {obj.keywords}
+                                  {obj.zoneId}:{obj.id} • {obj.type} •{' '}
+                                  {obj.keywords}
                                 </div>
                               </button>
                             ))}

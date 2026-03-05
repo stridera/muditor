@@ -9,6 +9,7 @@ import {
 } from '@nestjs/graphql';
 import { Prisma, WearFlag } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
+import { EquipmentSetDto } from '../equipment-sets/equipment-set.dto';
 
 // Register WearFlag enum for GraphQL
 registerEnumType(WearFlag, {
@@ -112,6 +113,18 @@ export class MobResetEquipmentDto {
 }
 
 @ObjectType()
+export class MobResetEquipmentSetDto {
+  @Field(() => ID)
+  id: number;
+
+  @Field(() => Float)
+  probability: number;
+
+  @Field(() => EquipmentSetDto)
+  equipmentSet: EquipmentSetDto;
+}
+
+@ObjectType()
 export class MobResetDto {
   @Field(() => ID)
   id: number;
@@ -142,6 +155,9 @@ export class MobResetDto {
 
   @Field(() => [MobResetEquipmentDto])
   equipment: MobResetEquipmentDto[];
+
+  @Field(() => [MobResetEquipmentSetDto])
+  equipmentSets: MobResetEquipmentSetDto[];
 
   @Field(() => MobSummaryDto, { nullable: true })
   mob?: MobSummaryDto;

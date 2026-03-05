@@ -9,7 +9,7 @@ query Users {
     isBanned
   }
   myPermissions {
-    isGod
+    isImplementor
     isCoder
     isBuilder
     canManageUsers

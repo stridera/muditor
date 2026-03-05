@@ -95,7 +95,7 @@ type ClassCircle = GetClassCirclesQuery['classCirclesList'][number];
 type CircleSpell = NonNullable<ClassCircle['spells']>[number];
 
 export default function ClassesPage() {
-  const { isBuilder, isCoder, isGod } = usePermissions();
+  const { isBuilder, isCoder } = usePermissions();
   const apolloClient = useApolloClient();
 
   const [selectedClass, setSelectedClass] = useState<ClassData | null>(null);
@@ -434,7 +434,7 @@ export default function ClassesPage() {
     [classesData, searchQuery]
   );
 
-  const canEdit = isBuilder || isCoder || isGod;
+  const canEdit = isBuilder || isCoder;
 
   if (classesLoading) {
     return (

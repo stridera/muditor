@@ -3,7 +3,7 @@ export interface User {
   id: string;
   email: string;
   username: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'CODER' | 'GOD';
+  role: 'PLAYER' | 'IMMORTAL' | 'CODER' | 'IMPLEMENTOR';
   createdAt: Date;
   updatedAt: Date;
 }

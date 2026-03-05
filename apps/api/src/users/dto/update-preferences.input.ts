@@ -8,7 +8,7 @@ export class RoomReferenceInput {
   zoneId: number;
 
   @Field(() => Int)
-  vnum: number;
+  localId: number;
 }
 
 @InputType()

@@ -7,8 +7,8 @@ import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireRole?: ('PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD')[];
-  requiredRole?: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD'; // Legacy support
+  requireRole?: ('PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR')[];
+  requiredRole?: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR'; // Legacy support
 }
 
 export function ProtectedRoute({

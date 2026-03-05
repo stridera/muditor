@@ -716,7 +716,8 @@ input CreateCharacterItemInput {
   customShortDesc: String
   equippedLocation: String
   instanceFlags: [String!]! = []
-  objectPrototypeId: Int!
+  objectId: Int!
+  objectZoneId: Int!
 }
 
 input CreateClassCircleInput {
@@ -730,6 +731,12 @@ input CreateClassInput {
   hitDice: String! = "1d8"
   name: String!
   primaryStat: String
+}
+
+input CreateDeploymentInput {
+  description: String
+  name: String!
+  zoneIds: [Int!]!
 }
 
 input CreateEffectInput {
@@ -749,6 +756,7 @@ input CreateEquipmentSetInput {
 
 input CreateEquipmentSetItemInput {
   objectId: Int!
+  objectZoneId: Int!
   probability: Float! = 1
   quantity: Int! = 1
   slot: String
@@ -757,6 +765,7 @@ input CreateEquipmentSetItemInput {
 input CreateEquipmentSetItemStandaloneInput {
   equipmentSetId: String!
   objectId: Int!
+  objectZoneId: Int!
   probability: Float! = 1
   quantity: Int! = 1
   slot: String
@@ -1234,6 +1243,40 @@ A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date
 """
 scalar DateTime
 
+type DeploymentChangeDto {
+  afterSnapshot: JSON
+  beforeSnapshot: JSON
+  changeType: String!
+  entityKey: String!
+  entityType: String!
+  id: Int!
+  packageId: String!
+}
+
+type DeploymentPackageDto {
+  changes: [DeploymentChangeDto!]!
+  createdAt: DateTime!
+  createdBy: String!
+  deployedAt: DateTime
+  description: String
+  id: ID!
+  name: String!
+  snapshotData: JSON
+  status: DeploymentStatus!
+  updatedAt: DateTime!
+  zoneIds: [Int!]!
+}
+
+"""Status of a deployment package"""
+enum DeploymentStatus {
+  DEPLOYED
+  DEPLOYING
+  FAILED
+  PENDING
+  READY
+  ROLLED_BACK
+}
+
 enum DialogueMatchType {
   ANY_OF
   ANY_RESPONSE
@@ -1309,6 +1352,7 @@ type EquipmentSetItemDto {
   id: String!
   object: ObjectDto!
   objectId: Int!
+  objectZoneId: Int!
   probability: Float!
   quantity: Int!
   slot: String
@@ -1366,7 +1410,7 @@ type GameEvent {
   message: String!
   metadata: JSON
   playerName: String
-  roomVnum: Int
+  roomId: Int
   targetPlayer: String
   timestamp: DateTime!
   type: GameEventType!
@@ -1778,6 +1822,7 @@ enum MobProfession {
 type MobResetDto {
   comment: String
   equipment: [MobResetEquipmentDto!]!
+  equipmentSets: [MobResetEquipmentSetDto!]!
   id: ID!
   maxInstances: Int!
   mob: MobSummaryDto
@@ -1800,6 +1845,12 @@ type MobResetEquipmentDto {
   objectZoneId: Int!
   probability: Float!
   wearLocation: WearFlag
+}
+
+type MobResetEquipmentSetDto {
+  equipmentSet: EquipmentSetDto!
+  id: ID!
+  probability: Float!
 }
 
 enum MobRole {
@@ -1867,6 +1918,7 @@ type Mutation {
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createClass(data: CreateClassInput!): ClassDto!
   createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
+  createDeployment(input: CreateDeploymentInput!): DeploymentPackageDto!
   createEffect(data: CreateEffectInput!): Effect!
   createEquipmentSet(data: CreateEquipmentSetInput!): EquipmentSetDto!
   createEquipmentSetItem(data: CreateEquipmentSetItemStandaloneInput!): EquipmentSetItemDto!
@@ -1949,6 +2001,7 @@ type Mutation {
   deleteTrigger(id: Int!, zoneId: Int!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
   denyLoginRequest(requestId: String!): LoginRequestDto!
+  deployPackage(id: ID!): DeploymentPackageDto!
   depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
   depositWealth(amount: BigInt!, characterId: String!): BigInt!
   detachTrigger(id: Int!, zoneId: Int!): TriggerDto!
@@ -1966,6 +2019,7 @@ type Mutation {
   linkCharacter(data: LinkCharacterInput!): CharacterDto!
   login(input: LoginInput!): AuthPayload!
   markAccountMailRead(id: Int!): AccountMailDto!
+  markDeploymentReady(id: ID!): DeploymentPackageDto!
   markMailRead(id: Int!): PlayerMailDto!
   markObjectRetrieved(characterId: String!, id: Int!, movedToAccountStorage: Boolean! = false): PlayerMailDto!
   markTriggerReviewed(id: Int!, zoneId: Int!): TriggerDto!
@@ -1983,6 +2037,7 @@ type Mutation {
 
   """Revoke zone access from a user"""
   revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
+  rollbackDeployment(id: ID!): DeploymentPackageDto!
   sendAccountMail(data: SendAccountMailInput!): AccountMailDto!
   sendBroadcast(data: SendBroadcastInput!): Int!
 
@@ -2042,6 +2097,7 @@ type Mutation {
   updateRace(data: UpdateRaceInput!, race: Race!): RaceDto!
   updateRaceSkill(data: UpdateRaceSkillInput!, id: ID!): RaceSkillDto!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
+  updateRoomEnvironmentalEffects(effects: [RoomEnvironmentalEffectInput!]!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopHours(data: UpdateShopHoursInput!, id: Int!, zoneId: Int!): ShopDto!
@@ -2378,6 +2434,8 @@ type Query {
 
   """Get commands by category"""
   commandsByCategory(category: CommandCategory!): [CommandDto!]!
+  deploymentPackage(id: ID!): DeploymentPackageDto
+  deploymentPackages(status: DeploymentStatus): [DeploymentPackageDto!]!
   effect(id: ID!): Effect!
   effects(search: String, skip: Int, take: Int): [Effect!]!
   effectsCount(search: String): Int!
@@ -2666,6 +2724,7 @@ enum QuestRewardType {
   ABILITY
   EXPERIENCE
   GOLD
+  HOUSING
   ITEM
   SKILL_POINTS
 }
@@ -2809,6 +2868,7 @@ type RoomDto {
   createdBy: String
   description: String!
   entryRestriction: String
+  environmentalEffects: [RoomEnvironmentalEffectDto!]!
   exits: [RoomExitDto!]!
   extraDescs: [RoomExtraDescriptionDto!]!
   id: Int!
@@ -2828,6 +2888,15 @@ type RoomDto {
   updatedAt: DateTime!
   updatedBy: String
   zoneId: Int!
+}
+
+type RoomEnvironmentalEffectDto {
+  effect: Effect!
+  effectId: Int!
+}
+
+input RoomEnvironmentalEffectInput {
+  effectId: Int!
 }
 
 type RoomExitDto {
@@ -2853,12 +2922,12 @@ type RoomExtraDescriptionDto {
 }
 
 type RoomReference {
-  vnum: Int!
+  localId: Int!
   zoneId: Int!
 }
 
 input RoomReferenceInput {
-  vnum: Int!
+  localId: Int!
   zoneId: Int!
 }
 
@@ -3857,8 +3926,8 @@ type UserPermissions {
   canViewValidation: Boolean!
   isBuilder: Boolean!
   isCoder: Boolean!
-  isGod: Boolean!
   isImmortal: Boolean!
+  isImplementor: Boolean!
   isPlayer: Boolean!
   maxCharacterLevel: Float!
   role: UserRole!
@@ -3885,9 +3954,9 @@ type UserPreferences {
 enum UserRole {
   BUILDER
   CODER
-  GOD
   HEAD_BUILDER
   IMMORTAL
+  IMPLEMENTOR
   PLAYER
 }
 

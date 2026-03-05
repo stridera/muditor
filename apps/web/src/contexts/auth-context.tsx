@@ -52,7 +52,7 @@ export interface User {
   id: string;
   displayName: string;
   email: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'GOD';
+  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR';
   createdAt: string;
 }
 

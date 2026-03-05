@@ -80,7 +80,7 @@ export class HelpResolver {
     return this.helpService.search(query, filter);
   }
 
-  // Mutations - BUILDER+ can create/update, GOD can delete
+  // Mutations - BUILDER+ can create/update, CODER+ can delete
 
   @Mutation(() => HelpEntryDto, {
     description: 'Create a new help entry',
@@ -104,7 +104,7 @@ export class HelpResolver {
   @Mutation(() => Boolean, {
     description: 'Delete a help entry',
   })
-  @MinimumRole(UserRole.GOD)
+  @MinimumRole(UserRole.CODER)
   async deleteHelpEntry(@Args('id', { type: () => ID }) id: string | number) {
     await this.helpService.remove(Number(id));
     return true;
