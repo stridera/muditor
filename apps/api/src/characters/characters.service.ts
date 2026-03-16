@@ -10,7 +10,10 @@ import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import Redis from 'ioredis';
-import crypt from 'unix-crypt-td-js';
+// SWC CJS interop: import * gives the function directly at runtime,
+// but tsc sees it as { default: fn }. Cast to reconcile.
+import * as _crypt from 'unix-crypt-td-js';
+const crypt = _crypt as unknown as (password: string, salt: string) => string;
 import type { ItemInstanceFlag, Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
