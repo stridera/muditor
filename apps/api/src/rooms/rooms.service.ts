@@ -18,7 +18,8 @@ interface RoomExitResult {
   keywords: string[];
   toZoneId: number | null;
   toRoomId: number | null;
-  key: string | null;
+  keyZoneId: number | null;
+  keyId: number | null;
   flags: string[];
   defaultState: string;
   hitPoints: number | null;
@@ -273,7 +274,8 @@ export class RoomsService {
           keywords: [],
           toZoneId: exit.toZoneId,
           toRoomId: exit.toRoomId,
-          key: null,
+          keyZoneId: null,
+          keyId: null,
           flags: [],
           defaultState: 'OPEN',
           hitPoints: null,
@@ -421,7 +423,8 @@ export class RoomsService {
         keywords,
         toZoneId,
         toRoomId,
-        key: data.key ?? null,
+        keyZoneId: data.keyZoneId ?? null,
+        keyId: data.keyId ?? null,
         flags: [],
         defaultState: data.defaultState ?? ('OPEN' as ExitState),
         hitPoints: data.hitPoints ?? null,

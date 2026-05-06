@@ -64,8 +64,11 @@ export class RoomExitDto {
   @Field(() => Int, { nullable: true })
   hitPoints?: number;
 
-  @Field({ nullable: true })
-  key?: string;
+  @Field(() => Int, { nullable: true })
+  keyZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  keyId?: number;
 
   @Field(() => Int, { nullable: true })
   toZoneId?: number;
@@ -460,10 +463,15 @@ export class CreateRoomExitInput {
   @IsString({ each: true })
   keywords?: string[];
 
-  @Field({ nullable: true })
+  @Field(() => Int, { nullable: true })
   @IsOptional()
-  @IsString()
-  key?: string;
+  @IsNumber()
+  keyZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  keyId?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

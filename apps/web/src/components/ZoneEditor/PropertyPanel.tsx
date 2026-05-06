@@ -62,7 +62,8 @@ interface RoomExit {
   toRoomId?: number | null;
   description?: string;
   keywords?: string[];
-  key?: string;
+  keyZoneId?: number | null;
+  keyId?: number | null;
   flags?: string[];
   defaultState?: string;
   hitPoints?: number | null;
@@ -208,7 +209,8 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
     setEditExitData({
       description: exit.description || '',
       keywords: exit.keywords || [],
-      key: exit.key || '',
+      keyZoneId: exit.keyZoneId ?? null,
+      keyId: exit.keyId ?? null,
       flags: exit.flags || [],
     });
   };
@@ -482,7 +484,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           exit.defaultState !== 'OPEN' ||
                           exit.hitPoints ||
                           exit.keywords?.length ||
-                          exit.key) && (
+                          exit.keyId != null) && (
                           <div className='mt-2 flex flex-wrap gap-1'>
                             {exit.flags?.includes('IS_DOOR') && (
                               <span className='px-2 py-0.5 text-[10px] rounded-full bg-gray-100 text-gray-700 border border-gray-300'>
@@ -509,7 +511,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 HP: {exit.hitPoints}
                               </span>
                             )}
-                            {exit.key && (
+                            {exit.keyId != null && (
                               <span className='px-2 py-0.5 text-[10px] rounded-full bg-blue-100 text-blue-700 border border-blue-300'>
                                 Key
                               </span>
@@ -863,7 +865,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           exit.defaultState !== 'OPEN' ||
                           exit.hitPoints ||
                           exit.keywords?.length ||
-                          exit.key) && (
+                          exit.keyId != null) && (
                           <div className='flex flex-wrap gap-1 mt-2'>
                             {exit.flags?.includes('IS_DOOR') && (
                               <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
@@ -903,9 +905,9 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 🔑 {keyword}
                               </span>
                             ))}
-                            {exit.key && (
+                            {exit.keyId != null && (
                               <span className='inline-flex items-center gap-1 text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full border border-amber-300'>
-                                🗝️ Key: {exit.key}
+                                🗝️ Key: {exit.keyZoneId}:{exit.keyId}
                               </span>
                             )}
                           </div>

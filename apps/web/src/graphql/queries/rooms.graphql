@@ -29,7 +29,8 @@ query GetRoom($zoneId: Int!, $id: Int!) {
       direction
       description
       keywords
-      key
+      keyZoneId
+      keyId
       flags
       defaultState
       hitPoints

@@ -35,7 +35,10 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       roomId: e.roomId,
       ...(e.description ? { description: e.description } : {}),
       ...(singleKeyword ? { keyword: singleKeyword } : {}),
-      ...(e.key ? { key: e.key } : {}),
+      ...(e.keyZoneId !== null && e.keyZoneId !== undefined
+        ? { keyZoneId: e.keyZoneId }
+        : {}),
+      ...(e.keyId !== null && e.keyId !== undefined ? { keyId: e.keyId } : {}),
       ...(e.toZoneId !== null && e.toZoneId !== undefined
         ? { toZoneId: e.toZoneId }
         : {}),

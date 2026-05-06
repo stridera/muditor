@@ -31,6 +31,15 @@ model Ability {
   inCombatOnly   Boolean  @default(false) @map("in_combat_only")
   combatOk       Boolean  @default(true) @map("combat_ok") // Can be used during combat
   isArea         Boolean  @default(false) @map("is_area")
+  // Drives AOE dispatch in fierymud-rs's invoke_ability_with.
+  // SINGLE = single-target; ROOM_* fan out to room occupants.
+  // See docs/design/abilities.md (locked review pass 1, 2026-05-03).
+  targetScope    TargetScope @default(SINGLE) @map("target_scope")
+  // Gates magical mitigation (Ward) in combat pipeline step 5.
+  // True for SPELL/CHANT/SONG and magical-flavor SKILLs (sphere-
+  // of-X); false for mundane physical actions. See
+  // docs/design/combat.md "Armor vs ward — independent axes".
+  isMagical      Boolean  @default(true) @map("is_magical")
   isToggle       Boolean  @default(false) @map("is_toggle") // Toggle ability (on/off state)
   notes          String?
   tags           String[] @default([])
@@ -569,10 +578,11 @@ model Characters {
   isOnline              Boolean              @default(false) @map("is_online")
   hunger                Int                  @default(0)
   thirst                Int                  @default(0)
+  drunkenness           Int                  @default(0)
   description           String?
   title                 String?
   wizTitle              String?              @map("wiz_title")
-  prompt                String               @default("<%%h/%%Hhp %%v/%%Vmv>")
+  prompt                String               @default("<%h/%Hhp %v/%Vmv>")
   pageLength            Int                  @default(25) @map("page_length")
   playerFlags           PlayerFlag[]         @default([]) @map("player_flags")
   permissions           Permission[]         @default([]) @map("permissions") // Direct permission grants beyond level
@@ -580,7 +590,23 @@ model Characters {
   invisLevel            Int                  @default(0) @map("invis_level")
   wimpyThreshold        Int                  @default(0) @map("wimpy_threshold")
   freezeLevel           Int?                 @map("freeze_level")
+  staffNotes            String?              @map("staff_notes")
   autoInvisLevel        Int                  @default(0) @map("auto_invis_level")
+  // Custom arrival / departure messages used on staff `goto`-style
+  // teleports. Either NULL → fall back to the generic
+  // "$n appears" / "$n vanishes". Set via the `poofin`/`poofout`
+  // commands; round-trips with the `Poofs` runtime component.
+  poofIn                String?              @map("poof_in")
+  poofOut               String?              @map("poof_out")
+  // Per-character runtime script vars. Keyed by trigger-author-
+  // chosen names; values are scalar strings. Round-trips the
+  // `ScriptVars` component so quest progress + per-player flags
+  // survive disconnect.
+  scriptVars            Json?                @map("script_vars")
+  // Recent-kills ring buffer driving the trophy XP modifier.
+  // Round-trips the `Trophy` component (cap = TROPHY_LENGTH = 21).
+  // JSON shape: { entries: [{ kind, key, amount, name, ts }, ...] }
+  trophyData            Json?                @map("trophy_data")
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
@@ -612,6 +638,12 @@ model Characters {
   // Player housing
   playerHouse           PlayerHouse?
   houseGuestEntries     PlayerHouseGuest[]
+  // Tells received (persists across disconnect/restart for `lasttells`)
+  tellsReceived         TellMessage[]
+  // Clan membership (one clan per character)
+  clanMembership        ClanMember?
+  // Achievements unlocked
+  achievements          CharacterAchievement[]
 }
 
 model CharacterAliases {
@@ -805,6 +837,9 @@ model Mobs {
   composition     Composition  @default(FLESH)
   stance          Stance       @default(ALERT)
   damageType      DamageType   @default(HIT)
+  // Drives "kill the wrong target" alignment penalties (Section 21).
+  // NORMAL = no alignment hit; INNOCENT/SHOPKEEPER/QUEST_NPC = scaled hit toward EVIL when killed.
+  protectedKind   ProtectedKind @default(NORMAL) @map("protected_kind")
 
   // FLAG REORGANIZATION FIELDS (NEW)
   // Organized flag system - replaces monolithic mobFlags
@@ -996,6 +1031,7 @@ model Objects {
   questTriggerItem        Quests[]                  @relation("questTriggerItem")
   Triggers                Triggers[]
   playerHouseItems        PlayerHouseItem[]
+  roomExitKeys            RoomExit[]                @relation("roomExitKey")
 
   @@id([zoneId, id])
   @@index([name])
@@ -1091,7 +1127,8 @@ model RoomExit {
   direction   Direction
   description String?
   keywords    String[]   @default([])
-  key         String?
+  keyZoneId   Int?       @map("key_zone_id")
+  keyId       Int?       @map("key_id")
   toZoneId    Int?       @map("to_zone_id")
   toRoomId    Int?       @map("to_room_id")
   roomZoneId  Int        @map("room_zone_id")
@@ -1104,8 +1141,9 @@ model RoomExit {
   // For bashable doors - hit points before destroyed
   hitPoints    Int?      @map("hit_points")
 
-  sourceRoom      Room  @relation("roomExits", fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
-  destinationRoom Room? @relation("roomEntrances", fields: [toZoneId, toRoomId], references: [zoneId, id])
+  sourceRoom      Room     @relation("roomExits", fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  destinationRoom Room?    @relation("roomEntrances", fields: [toZoneId, toRoomId], references: [zoneId, id])
+  keyObject       Objects? @relation("roomExitKey", fields: [keyZoneId, keyId], references: [zoneId, id])
 
   @@unique([roomZoneId, roomId, direction])
 }
@@ -1735,6 +1773,15 @@ enum MobRole {
   RAID_BOSS
 }
 
+// "Kill the wrong target" alignment-penalty marker. Most mobs are NORMAL (no penalty).
+// INNOCENT/SHOPKEEPER/QUEST_NPC apply graduated alignment hits when the killer is a player.
+enum ProtectedKind {
+  NORMAL
+  INNOCENT
+  SHOPKEEPER
+  QUEST_NPC
+}
+
 // ============================================================================
 // FLAG REORGANIZATION ENUMS (NEW)
 // ============================================================================
@@ -2189,6 +2236,16 @@ enum TargetScope {
   CONE
   LINE
   SELF
+  // Locked in docs/design/abilities.md (review pass 1, 2026-05-03).
+  // The new shape — ROOM_ALLIES / ROOM_ENEMIES / ROOM_ALL /
+  // ROOM_ENVIRONMENT — drives generic AOE dispatch in the runtime
+  // (invoke_ability_aoe). Legacy values above are kept for the
+  // existing rows that haven't been re-tagged yet; future
+  // migrations will reshape them.
+  ROOM_ALLIES
+  ROOM_ENEMIES
+  ROOM_ALL
+  ROOM_ENVIRONMENT
 }
 
 enum TargetType {
@@ -2416,6 +2473,9 @@ enum PlayerFlag {
   // Immortal preferences
   HOLY_LIGHT // See everything (invisible, dark, hidden, etc.)
   SHOW_IDS // Show entity IDs on mobs/objects/rooms
+
+  // Admin sanction
+  MUTED // Silenced on global channels (gossip / shout / quest channel)
 }
 
 // Permission flags for commands and staff abilities
@@ -2569,6 +2629,111 @@ model AccountMail {
   @@index([isBroadcast])
   @@index([sentAt])
   @@map("AccountMail")
+}
+
+// ============================================================================
+// TELLS / CLANS
+// ============================================================================
+
+// Persisted `tell` messages, so a player can review messages received
+// while offline or after a disconnect. Backs the `lasttells` command.
+// Sender stored by name (not FK) so deleted-character tells survive.
+model TellMessage {
+  id          Int      @id @default(autoincrement())
+  recipientId String   @map("recipient_id")
+  senderName  String   @map("sender_name")
+  body        String   @db.Text
+  sentAt      DateTime @default(now()) @map("sent_at")
+
+  recipient Characters @relation(fields: [recipientId], references: [id], onDelete: Cascade)
+
+  @@index([recipientId, sentAt])
+  @@map("tell_message")
+}
+
+// Persistent player guild. Distinct from the session-scoped follower/group system.
+// `abbrev` shows in the `who` list as the [Abbr] tag.
+model Clan {
+  id        Int          @id @default(autoincrement())
+  name      String       @unique
+  abbrev    String       @unique
+  motd      String?      @db.Text
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
+
+  members ClanMember[]
+
+  @@map("clan")
+}
+
+// One row per character; characters belong to at most one clan.
+model ClanMember {
+  characterId String   @id @map("character_id")
+  clanId      Int      @map("clan_id")
+  rank        ClanRank @default(MEMBER)
+  joinedAt    DateTime @default(now()) @map("joined_at")
+
+  clan      Clan       @relation(fields: [clanId], references: [id], onDelete: Cascade)
+  character Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@index([clanId])
+  @@map("clan_member")
+}
+
+enum ClanRank {
+  LEADER
+  OFFICER
+  MEMBER
+  APPLICANT
+}
+
+// ============================================================================
+// ACHIEVEMENTS
+// ============================================================================
+
+enum AchievementCategory {
+  COMBAT
+  EXPLORATION
+  SOCIAL
+  CRAFTING
+  MISC
+}
+
+// Authored achievement catalog. Runtime references by `code` in event hooks
+// (e.g. grant_achievement(player, "zone_30_cleared")), so codes are immutable
+// once shipped.
+model Achievement {
+  id          Int                 @id @default(autoincrement())
+  code        String              @unique
+  title       String
+  description String              @db.Text
+  category    AchievementCategory @default(MISC)
+  hidden      Boolean             @default(false)
+  sortOrder   Int                 @default(0) @map("sort_order")
+  createdAt   DateTime            @default(now()) @map("created_at")
+  updatedAt   DateTime            @updatedAt @map("updated_at")
+
+  characters CharacterAchievement[]
+
+  @@index([category, sortOrder])
+  @@map("achievement")
+}
+
+// One row per (character, achievement) once unlocked.
+// `progress` Json holds multi-step state for partial-completion achievements
+// (visited rooms set, kill counts, etc). Null for simple unlock-on-trigger.
+model CharacterAchievement {
+  characterId   String   @map("character_id")
+  achievementId Int      @map("achievement_id")
+  unlockedAt    DateTime @default(now()) @map("unlocked_at")
+  progress      Json?
+
+  character   Characters  @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  achievement Achievement @relation(fields: [achievementId], references: [id], onDelete: Cascade)
+
+  @@id([characterId, achievementId])
+  @@index([characterId])
+  @@map("character_achievement")
 }
 
 // ============================================================================
@@ -2944,6 +3109,12 @@ enum QuestObjectiveType {
   CUSTOM_LUA // Custom Lua expression
 }
 
+// Whether an objective progresses solo or shares progress across the party.
+enum QuestObjectiveScope {
+  SOLO // Only the holder's actions count.
+  PARTY // Any party member's action bumps the holder.
+}
+
 enum QuestRewardType {
   EXPERIENCE // XP reward
   ITEM // Object reward
@@ -3147,7 +3318,10 @@ model QuestObjectives {
   phaseId     Int @map("phase_id")
   id          Int
 
-  objectiveType QuestObjectiveType @map("objective_type")
+  objectiveType QuestObjectiveType  @map("objective_type")
+  // SOLO = only the holder's actions count. PARTY = any party member's action
+  // bumps the holder's progress. Default SOLO so existing content keeps current behavior.
+  scope         QuestObjectiveScope @default(SOLO)
 
   // Player-facing description (builder writes this)
   playerDescription String  @map("player_description") // "Kill the furry varmints"

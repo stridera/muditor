@@ -1083,7 +1083,8 @@ input CreateRoomExitInput {
   description: String
   direction: Direction!
   hitPoints: Int
-  key: String
+  keyId: Int
+  keyZoneId: Int
   keywords: [String!]
   roomId: Int!
   roomZoneId: Int!
@@ -2906,7 +2907,8 @@ type RoomExitDto {
   flags: [ExitFlag!]!
   hitPoints: Int
   id: String!
-  key: String
+  keyId: Int
+  keyZoneId: Int
   keyword: String @deprecated(reason: "Use keywords array instead")
   keywords: [String!]!
   roomId: Int!

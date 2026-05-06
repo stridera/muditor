@@ -15,7 +15,8 @@ interface RoomExit {
   direction: string;
   description?: string;
   keywords?: string[];
-  key?: string;
+  keyZoneId?: number | null;
+  keyId?: number | null;
   toZoneId?: number;
   toRoomId?: number;
   flags?: string[];
@@ -488,9 +489,9 @@ function RoomsContent() {
                                     Keywords: {exit.keywords.join(', ')}
                                   </div>
                                 )}
-                                {exit.key && (
+                                {exit.keyId != null && (
                                   <div className='text-accent mt-1'>
-                                    Key Required: {exit.key}
+                                    Key Required: {exit.keyZoneId}:{exit.keyId}
                                   </div>
                                 )}
                               </div>

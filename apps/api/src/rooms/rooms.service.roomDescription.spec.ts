@@ -62,8 +62,9 @@ describe('RoomsService (description canonical + deprecated roomDescription)', ()
       roomId: 10,
       toZoneId: 6,
       toRoomId: 1,
-      key: undefined,
-    } as unknown as CreateRoomExitInput; // allow optional key
+      keyZoneId: undefined,
+      keyId: undefined,
+    } as unknown as CreateRoomExitInput; // allow optional key fields
     const exit = await service.createExit(exitInput);
     expect(db.roomExit.create).toHaveBeenCalled();
     const call = db.roomExit.create.mock.calls[0][0];

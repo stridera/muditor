@@ -20,7 +20,8 @@ describe('mapRoom', () => {
         roomId: 55,
         keywords: ['door'],
         description: 'A sturdy wooden door',
-        key: null,
+        keyZoneId: null,
+        keyId: null,
         toZoneId: null,
         toRoomId: null,
       },
@@ -34,7 +35,8 @@ describe('mapRoom', () => {
         roomId: 55,
         keywords: [],
         description: null,
-        key: '777',
+        keyZoneId: 7,
+        keyId: 77,
         toZoneId: 10,
         toRoomId: 77,
       },
@@ -64,11 +66,13 @@ describe('mapRoom', () => {
     const north = dto.exits.find(e => e.direction === Direction.NORTH)!;
     expect(north.description).toBe('A sturdy wooden door');
     expect(north.defaultState).toBe(ExitState.CLOSED);
-    expect(north).not.toHaveProperty('key');
+    expect(north).not.toHaveProperty('keyZoneId');
+    expect(north).not.toHaveProperty('keyId');
     expect(north).not.toHaveProperty('toRoomId');
     expect(north).not.toHaveProperty('hitPoints');
     const south = dto.exits.find(e => e.direction === Direction.SOUTH)!;
-    expect(south.key).toBe('777');
+    expect(south.keyZoneId).toBe(7);
+    expect(south.keyId).toBe(77);
     expect(south.toRoomId).toBe(77);
     expect(south.toZoneId).toBe(10);
     expect(south.defaultState).toBe(ExitState.OPEN);

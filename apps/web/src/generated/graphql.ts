@@ -1102,7 +1102,8 @@ export type CreateRoomExitInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   direction: Direction;
   hitPoints?: InputMaybe<Scalars['Int']['input']>;
-  key?: InputMaybe<Scalars['String']['input']>;
+  keyId?: InputMaybe<Scalars['Int']['input']>;
+  keyZoneId?: InputMaybe<Scalars['Int']['input']>;
   keywords?: InputMaybe<Array<Scalars['String']['input']>>;
   roomId: Scalars['Int']['input'];
   roomZoneId: Scalars['Int']['input'];
@@ -4018,7 +4019,8 @@ export type RoomExitDto = {
   flags: Array<ExitFlag>;
   hitPoints?: Maybe<Scalars['Int']['output']>;
   id: Scalars['String']['output'];
-  key?: Maybe<Scalars['String']['output']>;
+  keyId?: Maybe<Scalars['Int']['output']>;
+  keyZoneId?: Maybe<Scalars['Int']['output']>;
   /** @deprecated Use keywords array instead */
   keyword?: Maybe<Scalars['String']['output']>;
   keywords: Array<Scalars['String']['output']>;
@@ -9899,7 +9901,8 @@ export type GetRoomQuery = {
       direction: Direction;
       description?: string | null;
       keywords: Array<string>;
-      key?: string | null;
+      keyZoneId?: number | null;
+      keyId?: number | null;
       flags: Array<ExitFlag>;
       defaultState: ExitState;
       hitPoints?: number | null;
@@ -28196,7 +28199,11 @@ export const GetRoomDocument = {
                         kind: 'Field',
                         name: { kind: 'Name', value: 'keywords' },
                       },
-                      { kind: 'Field', name: { kind: 'Name', value: 'key' } },
+                      {
+                        kind: 'Field',
+                        name: { kind: 'Name', value: 'keyZoneId' },
+                      },
+                      { kind: 'Field', name: { kind: 'Name', value: 'keyId' } },
                       { kind: 'Field', name: { kind: 'Name', value: 'flags' } },
                       {
                         kind: 'Field',
