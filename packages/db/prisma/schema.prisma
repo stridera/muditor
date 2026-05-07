@@ -613,6 +613,11 @@ model Characters {
   // disconnect — players don't get a free reset by relogging.
   // JSON shape: { in_flight: [{ circle, secs_remaining, total_secs }, ...] }
   spellCooldowns        Json?                @map("spell_cooldowns")
+  // Per-ability cooldowns currently in flight. Round-trips the
+  // `Cooldowns` runtime component as wall-clock unix seconds (Instant
+  // can't serialize). JSON shape: { "<ability_id>": <unix_secs_ready_at> }.
+  // Already-expired entries are dropped on load.
+  cooldowns             Json?
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
