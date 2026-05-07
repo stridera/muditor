@@ -618,6 +618,11 @@ model Characters {
   // can't serialize). JSON shape: { "<ability_id>": <unix_secs_ready_at> }.
   // Already-expired entries are dropped on load.
   cooldowns             Json?
+  // Tell/socials ignore list — names of characters this player has
+  // explicitly silenced. JSON shape: ["lowercased_name", ...].
+  // Round-trips the `IgnoreList` runtime component so a harassing
+  // player can't resume contact after the target reconnects.
+  ignoreList            Json?                @map("ignore_list")
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
