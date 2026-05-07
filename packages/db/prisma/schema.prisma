@@ -607,6 +607,12 @@ model Characters {
   // Round-trips the `Trophy` component (cap = TROPHY_LENGTH = 21).
   // JSON shape: { entries: [{ kind, key, amount, name, ts }, ...] }
   trophyData            Json?                @map("trophy_data")
+  // Spell-slot cooldowns currently in flight (slot model: legacy
+  // `SpellCast{circle, recover_time}` list). Round-trips the
+  // `SpellSlots` runtime component so circle-pool cooldowns survive
+  // disconnect — players don't get a free reset by relogging.
+  // JSON shape: { in_flight: [{ circle, secs_remaining, total_secs }, ...] }
+  spellCooldowns        Json?                @map("spell_cooldowns")
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
