@@ -630,6 +630,16 @@ model Characters {
   // exceeded 1 hour; Admin-source effects (staff-applied rewards)
   // restore regardless of elapsed time.
   effectInstances       Json?                @map("effect_instances")
+  // Hired / charmed pets (mob followers tagged with `PersistentPet`)
+  // at save time. Same 1h disconnect-cap rule as effects: pets
+  // survive a network drop or short logout, despawn after a longer
+  // offline window. JSON shape:
+  //   { saved_at_unix: <secs>,
+  //     pets: [{ proto_zone_id, proto_id, name, hp, max_hp }, ...] }
+  // Respawned next to the player; the pet's saved location is
+  // discarded since "the pet was with you" matches player
+  // expectations and avoids zone-not-loaded edge cases.
+  pets                  Json?
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
