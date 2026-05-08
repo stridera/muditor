@@ -623,6 +623,13 @@ model Characters {
   // Round-trips the `IgnoreList` runtime component so a harassing
   // player can't resume contact after the target reconnects.
   ignoreList            Json?                @map("ignore_list")
+  // Active EffectInstances on this character at save time. JSON shape:
+  // { saved_at_unix: <secs>, effects: [{ kind, name, strength,
+  // remaining_secs, source, ability_id, modify_delta? }, ...] }.
+  // On load, non-Admin entries are dropped if the disconnect window
+  // exceeded 1 hour; Admin-source effects (staff-applied rewards)
+  // restore regardless of elapsed time.
+  effectInstances       Json?                @map("effect_instances")
   birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
