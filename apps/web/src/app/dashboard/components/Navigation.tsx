@@ -117,14 +117,6 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
     name: 'Game Config',
     icon: <Settings className='h-5 w-5' />,
   },
-  '/dashboard/admin/mail': {
-    name: 'Mail Admin',
-    icon: <Mail className='h-5 w-5' />,
-  },
-  '/dashboard/player/mailbox': {
-    name: 'Mailbox',
-    icon: <Inbox className='h-5 w-5' />,
-  },
   '/dashboard/player/storage': {
     name: 'Account Storage',
     icon: <Vault className='h-5 w-5' />,
@@ -202,11 +194,6 @@ export function Navigation() {
       name: 'My Characters',
       href: '/dashboard/player/characters',
       icon: <Users className='h-4 w-4' />,
-    },
-    {
-      name: 'Mailbox',
-      href: '/dashboard/player/mailbox',
-      icon: <Inbox className='h-4 w-4' />,
     },
     {
       name: 'Storage',
@@ -427,14 +414,6 @@ export function Navigation() {
                           <Link href='/dashboard/admin/game-config'>
                             <Settings className='mr-2 h-4 w-4' />
                             Game Config
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
-                      {isCoder && (
-                        <DropdownMenuItem asChild>
-                          <Link href='/dashboard/admin/mail'>
-                            <Mail className='mr-2 h-4 w-4' />
-                            Mail Admin
                           </Link>
                         </DropdownMenuItem>
                       )}

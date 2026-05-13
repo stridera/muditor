@@ -138,7 +138,7 @@ function getSetHit(
 }
 
 /**
- * Calculate mob base damroll (from legacy get_set_hd)
+ * Calculate mob base damage bonus (from legacy get_set_hd)
  */
 function getSetHd(
   level: number,
@@ -147,7 +147,7 @@ function getSetHd(
 ): number {
   let dam = 0;
 
-  // Tier-based base damroll
+  // Tier-based base damage bonus
   if (level < 10) {
     dam = level / 4.0;
   } else if (level < 20) {
@@ -235,13 +235,13 @@ function calculateDamageDiceModern(
   classFactor: number = 100,
   isBoss: boolean = false
 ): [number, number, number] {
-  // Get base damroll from legacy formula
-  const baseDamroll = getSetHd(level, raceFactor, classFactor);
+  // Get base damage bonus from legacy formula
+  const baseBonus = getSetHd(level, raceFactor, classFactor);
 
   // Variable split ratio
   const splitRatio = level < 50 ? 0.15 : 0.05;
-  const fixedBonus = Math.floor(baseDamroll * splitRatio);
-  const dicePortion = baseDamroll - fixedBonus;
+  const fixedBonus = Math.floor(baseBonus * splitRatio);
+  const dicePortion = baseBonus - fixedBonus;
 
   // Dice size by tier
   let diceSize = 4;
@@ -264,33 +264,27 @@ function calculateDamageDiceModern(
 
   // Recalculate bonus to match target damage
   const actualDiceAvg = numDice * avgPerDie;
-  const finalBonus = baseDamroll - Math.floor(actualDiceAvg);
+  const finalBonus = baseBonus - Math.floor(actualDiceAvg);
 
   return [numDice, diceSize, finalBonus];
 }
 
 /**
- * Convert legacy stats to modern combat system
+ * Compute default modern combat stats based on level only.
+ *
+ * Provides reasonable level-scaled defaults for accuracy/evasion/armor
+ * that callers can override with explicit values.
  */
-function convertLegacyToModernStats(
-  level: number,
-  legacyHitroll: number,
-  legacyAc: number
-): {
+function computeDefaultDefenseStats(level: number): {
   accuracy: number;
   evasion: number;
   armorRating: number;
   damageReductionPercent: number;
 } {
-  // accuracy = legacy hitRoll (1:1 conversion)
-  const accuracy = legacyHitroll;
-
-  // evasion = derived from AC
-  const baselineAc = 100 - level * 2;
-  const evasion = Math.floor((baselineAc - legacyAc) / 2);
-
-  // armorRating from AC
-  const armorRating = Math.max(0, -legacyAc);
+  // Modest level-scaled defaults
+  const accuracy = level;
+  const evasion = Math.max(0, Math.floor(level / 2));
+  const armorRating = Math.max(0, Math.floor(level / 2));
 
   // Calculate damageReductionPercent from armorRating
   let kConstant = 50;
@@ -601,9 +595,7 @@ export function generateMobStats(
   mobClass: MobClass = 'WARRIOR',
   race: string = 'HUMAN',
   lifeforce: Lifeforce = 'LIFE',
-  composition: Composition = 'FLESH',
-  legacyHitroll: number = 0,
-  legacyAc: number = 0
+  composition: Composition = 'FLESH'
 ): MobStats {
   const isBoss = ['BOSS', 'RAID_BOSS', 'MINIBOSS'].includes(role);
 
@@ -619,9 +611,9 @@ export function generateMobStats(
   const [damageDiceNum, damageDiceSize, damageDiceBonus] =
     calculateDamageDiceModern(level, 100, 100, isBoss);
 
-  // Convert legacy stats
+  // Compute level-scaled defaults for offense/defense
   const { accuracy, evasion, armorRating, damageReductionPercent } =
-    convertLegacyToModernStats(level, legacyHitroll, legacyAc);
+    computeDefaultDefenseStats(level);
 
   // Calculate placeholder stats
   const placeholderStats = calculatePlaceholderStats(

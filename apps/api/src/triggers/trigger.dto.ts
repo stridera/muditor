@@ -40,21 +40,6 @@ export class TriggerDto {
   @Field()
   commands: string;
 
-  @Field(() => Int, { nullable: true })
-  mobZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  mobId?: number;
-
-  @Field(() => Int, { nullable: true })
-  objectZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  objectId?: number;
-
-  @Field(() => String)
-  variables: string; // JSON stringified
-
   @Field(() => Date)
   createdAt: Date;
 
@@ -111,31 +96,6 @@ export class CreateTriggerInput {
   @IsString()
   commands: string;
 
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  mobZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  mobId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  objectZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  objectId?: number;
-
-  @Field({ defaultValue: '{}' })
-  @IsOptional()
-  @IsString()
-  variables?: string;
-
   @Field(() => [String], { nullable: true })
   @IsOptional()
   @IsArray()
@@ -168,31 +128,6 @@ export class UpdateTriggerInput {
   @IsOptional()
   @IsString()
   commands?: string;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  mobZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  mobId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  objectZoneId?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  objectId?: number;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  variables?: string;
 
   @Field(() => [String], { nullable: true })
   @IsOptional()

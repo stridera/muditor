@@ -124,7 +124,7 @@ const STAT_TYPES = [
   'wis',
   'cha',
   'acc',
-  'damroll',
+  'ap',
   'eva',
   'ward',
   'focus',

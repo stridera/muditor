@@ -3,18 +3,6 @@ import { IsOptional, IsString, IsNumber, Min, Max } from 'class-validator';
 import { ObjectDto } from '../objects/object.dto';
 
 @ObjectType()
-export class SpawnConditionDto {
-  @Field()
-  id: string;
-
-  @Field()
-  type: string;
-
-  @Field()
-  parameters: string; // JSON string for GraphQL compatibility
-}
-
-@ObjectType()
 export class ObjectResetDto {
   @Field()
   id: string;
@@ -39,9 +27,6 @@ export class ObjectResetDto {
 
   @Field(() => ObjectDto)
   object: ObjectDto;
-
-  @Field(() => [SpawnConditionDto])
-  conditions: SpawnConditionDto[];
 }
 
 @InputType()
@@ -98,23 +83,3 @@ export class UpdateObjectResetInput {
   probability?: number;
 }
 
-@InputType()
-export class CreateSpawnConditionInput {
-  @Field()
-  @IsString()
-  type: string;
-
-  @Field()
-  @IsString()
-  parameters: string; // JSON string
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  mobResetId?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  objectResetId?: string;
-}

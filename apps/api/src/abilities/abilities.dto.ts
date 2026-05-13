@@ -50,9 +50,6 @@ export class Effect {
 
   @Field(() => GraphQLJSON)
   defaultParams: Prisma.JsonValue;
-
-  @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: Prisma.JsonValue;
 }
 
 @ObjectType()

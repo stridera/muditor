@@ -13,9 +13,6 @@ interface MobFormData {
   mobClass: string;
   race: string;
   lifeForce: string;
-  composition: string;
-  armorClass: number;
-  hitRoll: number;
   accuracy: number;
   attackPower: number;
   spellPower: number;
@@ -354,38 +351,6 @@ export function MobCombatStatsTab({
               <p className='text-xs text-muted-foreground mt-1'>Resistances</p>
             </div>
 
-            <div>
-              <label
-                htmlFor='composition'
-                className='block text-sm font-medium text-card-foreground mb-1'
-              >
-                Composition
-              </label>
-              <select
-                id='composition'
-                value={formData.composition}
-                onChange={e =>
-                  onFieldChange('composition' as any, e.target.value as any)
-                }
-                className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm h-[38px]'
-              >
-                <option value='FLESH'>Flesh</option>
-                <option value='BONE'>Bone</option>
-                <option value='STONE'>Stone</option>
-                <option value='METAL'>Metal</option>
-                <option value='CRYSTAL'>Crystal</option>
-                <option value='GAS'>Gas</option>
-                <option value='LIQUID'>Liquid</option>
-                <option value='PLANT'>Plant</option>
-                <option value='WATER'>Water</option>
-                <option value='FIRE'>Fire</option>
-                <option value='AIR'>Air</option>
-                <option value='EARTH'>Earth</option>
-              </select>
-              <p className='text-xs text-muted-foreground mt-1'>
-                Soak/hardness
-              </p>
-            </div>
           </div>
 
           {/* Generation Button Row */}
@@ -440,9 +405,8 @@ export function MobCombatStatsTab({
                           distributions
                         </li>
                         <li>
-                          • <strong>Offense/Defense</strong>: Derived from
-                          legacy AC/hitroll with modern accuracy, evasion, and
-                          armor rating
+                          • <strong>Offense/Defense</strong>: Accuracy,
+                          evasion, and armor rating scaled by level and role
                         </li>
                         <li>
                           • <strong>Resistances</strong>: Based on race (e.g.,
@@ -585,27 +549,6 @@ export function MobCombatStatsTab({
             </div>
           </div>
 
-          {/* Legacy Stats */}
-          <div className='bg-card shadow rounded-lg p-6'>
-            <h3 className='text-lg font-medium text-card-foreground mb-4'>
-              Legacy Stats (Deprecated)
-            </h3>
-            <div className='grid grid-cols-2 gap-4'>
-              <NumberSpinner
-                label='Armor Class (Legacy)'
-                value={formData.armorClass}
-                onChange={v => onFieldChange('armorClass', v)}
-                helpText='Old AC system'
-              />
-
-              <NumberSpinner
-                label='Hit Roll (Legacy)'
-                value={formData.hitRoll}
-                onChange={v => onFieldChange('hitRoll', v)}
-                helpText='Old hit bonus'
-              />
-            </div>
-          </div>
         </div>
 
         {/* Right Column */}

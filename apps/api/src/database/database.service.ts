@@ -246,10 +246,6 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.roomExtraDescriptions;
   }
 
-  get mobCarrying() {
-    return this.client.mobCarrying;
-  }
-
   get mobResets() {
     return this.client.mobResets;
   }
@@ -262,20 +258,24 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.triggers;
   }
 
+  get mobTriggers() {
+    return this.client.mobTriggers;
+  }
+
+  get objectTriggers() {
+    return this.client.objectTriggers;
+  }
+
+  get roomTriggers() {
+    return this.client.roomTriggers;
+  }
+
   get races() {
     return this.client.races;
   }
 
   get userGrants() {
     return this.client.userGrants;
-  }
-
-  get equipmentSets() {
-    return this.client.equipmentSets;
-  }
-
-  get equipmentSetItems() {
-    return this.client.equipmentSetItems;
   }
 
   get characterItems() {
@@ -338,16 +338,8 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.mobResetEquipment;
   }
 
-  get mobEquipmentSets() {
-    return this.client.mobEquipmentSets;
-  }
-
   get raceAbilities() {
     return this.client.raceAbilities;
-  }
-
-  get shopHours() {
-    return this.client.shopHours;
   }
 
   get shopItems() {
@@ -380,10 +372,6 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   get command() {
     return this.client.command;
-  }
-
-  get playerMail() {
-    return this.client.playerMail;
   }
 
   get accountMail() {
@@ -465,14 +453,6 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
 
   get dialogueResponses() {
     return this.client.dialogueResponses;
-  }
-
-  get deploymentPackage() {
-    return this.client.deploymentPackage;
-  }
-
-  get deploymentChange() {
-    return this.client.deploymentChange;
   }
 
   // Pass-through Prisma client methods

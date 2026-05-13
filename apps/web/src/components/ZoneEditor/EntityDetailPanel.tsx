@@ -18,8 +18,6 @@ interface MobEntity {
   examineDescription?: string;
   hpDice?: string;
   damageDice?: string;
-  armorClass?: number;
-  hitRoll?: number;
   wealth?: number;
   gender?: string;
   size?: string;
@@ -406,18 +404,6 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
                   Combat Stats
                 </h5>
                 <div className='text-xs space-y-1'>
-                  {(entity.data as MobEntity).hitRoll !== undefined && (
-                    <div className='flex justify-between'>
-                      <span>Hit Roll:</span>
-                      <span>{(entity.data as MobEntity).hitRoll}</span>
-                    </div>
-                  )}
-                  {(entity.data as MobEntity).armorClass !== undefined && (
-                    <div className='flex justify-between'>
-                      <span>Armor Class:</span>
-                      <span>{(entity.data as MobEntity).armorClass}</span>
-                    </div>
-                  )}
                   {(entity.data as MobEntity).position && (
                     <div className='flex justify-between'>
                       <span>Position:</span>

@@ -194,18 +194,6 @@ function MobViewContent() {
             </div>
             <div>
               <dt className='text-sm font-medium text-muted-foreground'>
-                Hit Roll
-              </dt>
-              <dd className='text-base'>{mob.hitRoll}</dd>
-            </div>
-            <div>
-              <dt className='text-sm font-medium text-muted-foreground'>
-                Armor Class
-              </dt>
-              <dd className='text-base'>{mob.armorClass}</dd>
-            </div>
-            <div>
-              <dt className='text-sm font-medium text-muted-foreground'>
                 Alignment
               </dt>
               <dd className='text-base'>{mob.alignment}</dd>

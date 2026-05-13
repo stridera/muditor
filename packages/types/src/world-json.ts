@@ -75,8 +75,6 @@ export interface MobJson {
   level: number;
   hp_dice: DiceExpression;
   move: number;
-  ac: number;
-  hit_roll: number;
   damage_dice: DiceExpression;
   money: Currency;
   position: Position;

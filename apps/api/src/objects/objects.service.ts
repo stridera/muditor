@@ -44,7 +44,7 @@ export class ObjectsService {
         },
         objectExtraDescriptions: true,
         objectAffects: true,
-        Triggers: true,
+        objectTriggers: { include: { trigger: true } },
         grantedEffects: { include: { effect: true } },
         objectResistances: true,
         consumableEffects: { include: { effect: true } },

@@ -18,9 +18,6 @@ export interface TestMobData {
   mana: number;
   movePointsMax: number;
   movePoints: number;
-  armorClass: number;
-  hitRoll: number;
-  damageRoll: string;
   experiencePoints: number;
   gold: number;
   mobFlags: MobFlag[];
@@ -42,8 +39,6 @@ export interface TestObjectData {
   numDamageDice?: number;
   sizeDamageDice?: number;
   damageType?: string;
-  hitRollModifier?: number;
-  damageRollModifier?: number;
   capacity?: number;
   zoneId: number;
   roomId: number;
@@ -115,9 +110,6 @@ export const TestFixtures = {
       mana: 50,
       movePointsMax: 150,
       movePoints: 150,
-      armorClass: -2,
-      hitRoll: 8,
-      damageRoll: '2d6+4',
       experiencePoints: 2000,
       gold: 100,
       mobFlags: ['AGGRESSIVE', 'AWARE', 'ISNPC'] as MobFlag[],
@@ -139,9 +131,6 @@ export const TestFixtures = {
       mana: 500,
       movePointsMax: 200,
       movePoints: 200,
-      armorClass: 5,
-      hitRoll: 5,
-      damageRoll: '1d4+1',
       experiencePoints: 3000,
       gold: 500,
       mobFlags: ['ISNPC', 'MEMORY'] as MobFlag[],
@@ -163,9 +152,6 @@ export const TestFixtures = {
       mana: 100,
       movePointsMax: 100,
       movePoints: 100,
-      armorClass: -5,
-      hitRoll: 12,
-      damageRoll: '3d6+6',
       experiencePoints: 0,
       gold: 10000,
       mobFlags: ['ISNPC', 'SENTINEL', 'PROTECTED'] as MobFlag[],
@@ -191,8 +177,6 @@ export const TestFixtures = {
       numDamageDice: 2,
       sizeDamageDice: 6,
       damageType: 'SLASH',
-      hitRollModifier: 1,
-      damageRollModifier: 2,
       zoneId: 1000,
       roomId: 1001,
     } as TestObjectData,

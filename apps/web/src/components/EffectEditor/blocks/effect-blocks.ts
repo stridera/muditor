@@ -52,9 +52,6 @@ const MODIFY_TARGETS: MenuOption[] = [
   ['Wisdom', 'wis'],
   ['Charisma', 'cha'],
   // Combat stats
-  ['Hitroll', 'hitroll'],
-  ['Damroll', 'damroll'],
-  ['AC (Armor Class)', 'ac'],
   ['AP (Attack Power)', 'ap'],
   ['Focus', 'focus'],
   ['Accuracy', 'acc'],

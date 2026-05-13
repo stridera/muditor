@@ -9,14 +9,7 @@ import {
   Min,
   Max,
 } from 'class-validator';
-import {
-  Race,
-  RaceAlign,
-  Size,
-  LifeForce,
-  Composition,
-  SkillCategory,
-} from '@muditor/db';
+import { Race, RaceAlign, Size, LifeForce, SkillCategory } from '@muditor/db';
 
 @InputType()
 export class CreateRaceInput {
@@ -73,14 +66,6 @@ export class CreateRaceInput {
   @IsInt()
   defaultAlignment: number;
 
-  @Field(() => Int, { defaultValue: 0 })
-  @IsInt()
-  bonusDamroll: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsInt()
-  bonusHitroll: number;
-
   @Field(() => Int, { defaultValue: 100 })
   @IsInt()
   @Min(1)
@@ -89,10 +74,6 @@ export class CreateRaceInput {
   @Field(() => LifeForce, { defaultValue: LifeForce.LIFE })
   @IsEnum(LifeForce)
   defaultLifeforce: LifeForce;
-
-  @Field(() => Composition, { defaultValue: Composition.FLESH })
-  @IsEnum(Composition)
-  defaultComposition: Composition;
 
   @Field(() => Int, { defaultValue: 76 })
   @IsInt()
@@ -202,16 +183,6 @@ export class UpdateRaceInput {
 
   @Field(() => Int, { nullable: true })
   @IsInt()
-  @IsOptional()
-  bonusDamroll?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsInt()
-  @IsOptional()
-  bonusHitroll?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsInt()
   @Min(1)
   @IsOptional()
   focusBonus?: number;
@@ -220,11 +191,6 @@ export class UpdateRaceInput {
   @IsEnum(LifeForce)
   @IsOptional()
   defaultLifeforce?: LifeForce;
-
-  @Field(() => Composition, { nullable: true })
-  @IsEnum(Composition)
-  @IsOptional()
-  defaultComposition?: Composition;
 
   @Field(() => Int, { nullable: true })
   @IsInt()

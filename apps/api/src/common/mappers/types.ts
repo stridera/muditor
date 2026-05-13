@@ -5,14 +5,12 @@
 import {
   type Effect,
   ExitState,
-  MagicAffinity,
   type Mobs,
   type MobDefaultEffects,
   type Objects,
   type ObjectEffects,
   type ObjectResistance,
   type ConsumableEffect,
-  PositionMechanic,
   type RoomEnvironmentalEffect,
   type RoomExit as PrismaRoomExit,
   type RoomExtraDescriptions,
@@ -35,8 +33,6 @@ export interface RoomMapperSource {
   layoutZ?: number | null;
   baseLightLevel?: number;
   capacity?: number;
-  magicAffinity?: MagicAffinity | null;
-  requiredMechanic?: PositionMechanic | null;
   entryRestriction?: string | null;
   isPeaceful?: boolean;
   allowsMagic?: boolean;

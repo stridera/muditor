@@ -72,8 +72,6 @@ describeOrSkip('Data Integrity Tests', () => {
         examineDescription:
           'This is a test goblin warrior mob for data integrity testing.',
         level: 15,
-        armorClass: -2,
-        hitRoll: 8,
         hpDice: '8d8+100',
         damageDice: '2d8+4',
         // wealth is not a direct input property (removed from CreateMobInput)
@@ -93,8 +91,6 @@ describeOrSkip('Data Integrity Tests', () => {
                 roomDescription
                 examineDescription
                 level
-                armorClass
-                hitRoll
                 hpDice
                 damageDice
               }
@@ -138,8 +134,6 @@ describeOrSkip('Data Integrity Tests', () => {
                 roomDescription
                 examineDescription
                 level
-                armorClass
-                hitRoll
                 hpDice
                 damageDice
               }

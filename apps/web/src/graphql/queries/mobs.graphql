@@ -9,8 +9,6 @@ query GetMob($id: Int!, $zoneId: Int!) {
     level
     role
     alignment
-    hitRoll
-    armorClass
     accuracy
     attackPower
     spellPower
@@ -82,8 +80,6 @@ query GetMobs($skip: Int, $take: Int) {
     level
     alignment
     race
-    hitRoll
-    armorClass
     damageType
     strength
     intelligence
@@ -111,8 +107,6 @@ query GetMobsByZone($zoneId: Int!) {
     level
     alignment
     race
-    hitRoll
-    armorClass
     damageType
     strength
     intelligence

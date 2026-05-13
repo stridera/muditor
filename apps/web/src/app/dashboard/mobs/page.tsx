@@ -52,8 +52,6 @@ interface Mob {
   race?: string;
   lifeForce?: string;
   damageType?: string;
-  hitRoll?: number;
-  armorClass?: number;
   strength?: number;
   intelligence?: number;
   wisdom?: number;
@@ -300,8 +298,6 @@ function MobsContent() {
             race
             lifeForce
             damageType
-            hitRoll
-            armorClass
             strength
             intelligence
             wisdom
@@ -357,8 +353,6 @@ function MobsContent() {
         race: originalMob.race,
         lifeForce: originalMob.lifeForce,
         damageType: originalMob.damageType,
-        hitRoll: originalMob.hitRoll,
-        armorClass: originalMob.armorClass,
         strength: originalMob.strength,
         intelligence: originalMob.intelligence,
         wisdom: originalMob.wisdom,
@@ -474,8 +468,6 @@ function MobsContent() {
                 damageType
                 position
                 defaultPosition
-                hitRoll
-                armorClass
                 move
                 strength
                 intelligence
@@ -817,18 +809,6 @@ function MobsContent() {
                                   Damage:
                                 </span>{' '}
                                 {mob.damageDice}
-                              </div>
-                              <div>
-                                <span className='text-muted-foreground'>
-                                  AC:
-                                </span>{' '}
-                                {mob.armorClass || 0}
-                              </div>
-                              <div>
-                                <span className='text-muted-foreground'>
-                                  Hit Roll:
-                                </span>{' '}
-                                {mob.hitRoll || 0}
                               </div>
                               <div>
                                 <span className='text-muted-foreground'>

@@ -26,7 +26,6 @@ type ShopWithRelations = Prisma.ShopsGetPayload<{
       };
     };
     shopAccepts: true;
-    shopHours: true;
   };
 }>;
 
@@ -59,7 +58,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
       orderBy: args?.orderBy ? { ...args.orderBy } : { id: 'asc' },
     };
@@ -103,7 +101,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -136,7 +133,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -173,7 +169,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -210,7 +205,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -251,7 +245,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -287,7 +280,6 @@ export class ShopsService {
           },
         },
         shopAccepts: true,
-        shopHours: true,
       },
     });
   }
@@ -315,24 +307,4 @@ export class ShopsService {
     return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
   }
 
-  async replaceHours(
-    zoneId: number,
-    id: number,
-    hours: Array<{ open: number; close: number }>
-  ): Promise<ShopWithRelations> {
-    await this.database.shopHours.deleteMany({
-      where: { shopZoneId: zoneId, shopId: id },
-    });
-    if (hours.length) {
-      await this.database.shopHours.createMany({
-        data: hours.map(h => ({
-          shopZoneId: zoneId,
-          shopId: id,
-          open: h.open,
-          close: h.close,
-        })),
-      });
-    }
-    return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
-  }
 }

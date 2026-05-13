@@ -5,14 +5,7 @@ import {
   ObjectType,
   registerEnumType,
 } from '@nestjs/graphql';
-import {
-  Direction,
-  ExitFlag,
-  ExitState,
-  MagicAffinity,
-  PositionMechanic,
-  Sector,
-} from '@muditor/db';
+import { Direction, ExitFlag, ExitState, Sector } from '@muditor/db';
 import {
   IsArray,
   IsBoolean,
@@ -34,8 +27,6 @@ registerEnumType(Sector, { name: 'Sector' });
 registerEnumType(Direction, { name: 'Direction' });
 registerEnumType(ExitFlag, { name: 'ExitFlag' });
 registerEnumType(ExitState, { name: 'ExitState' });
-registerEnumType(MagicAffinity, { name: 'MagicAffinity' });
-registerEnumType(PositionMechanic, { name: 'PositionMechanic' });
 
 @ObjectType()
 export class RoomExitDto {
@@ -152,12 +143,6 @@ export class RoomDto {
   @Field(() => Int, { defaultValue: 10 })
   capacity: number;
 
-  @Field(() => MagicAffinity, { nullable: true })
-  magicAffinity?: MagicAffinity;
-
-  @Field(() => PositionMechanic, { nullable: true })
-  requiredMechanic?: PositionMechanic;
-
   @Field({ nullable: true })
   entryRestriction?: string;
 
@@ -233,16 +218,6 @@ export class CreateRoomInput {
   @IsOptional()
   @IsInt()
   capacity?: number;
-
-  @Field(() => MagicAffinity, { nullable: true })
-  @IsOptional()
-  @IsEnum(MagicAffinity)
-  magicAffinity?: MagicAffinity;
-
-  @Field(() => PositionMechanic, { nullable: true })
-  @IsOptional()
-  @IsEnum(PositionMechanic)
-  requiredMechanic?: PositionMechanic;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -327,16 +302,6 @@ export class UpdateRoomInput {
   @IsOptional()
   @IsInt()
   capacity?: number;
-
-  @Field(() => MagicAffinity, { nullable: true })
-  @IsOptional()
-  @IsEnum(MagicAffinity)
-  magicAffinity?: MagicAffinity;
-
-  @Field(() => PositionMechanic, { nullable: true })
-  @IsOptional()
-  @IsEnum(PositionMechanic)
-  requiredMechanic?: PositionMechanic;
 
   @Field({ nullable: true })
   @IsOptional()

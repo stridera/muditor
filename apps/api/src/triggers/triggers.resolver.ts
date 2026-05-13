@@ -19,28 +19,19 @@ export class TriggersResolver {
   @Query(() => [TriggerDto], { name: 'triggers' })
   async findAll() {
     const triggers = await this.triggersService.findAll();
-    return triggers.map(trigger => ({
-      ...trigger,
-      variables: '{}',
-    }));
+    return triggers;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByZone' })
   async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number) {
     const triggers = await this.triggersService.findByZone(zoneId);
-    return triggers.map(trigger => ({
-      ...trigger,
-      variables: '{}',
-    }));
+    return triggers;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersNeedingReview' })
   async findNeedingReview() {
     const triggers = await this.triggersService.findNeedingReview();
-    return triggers.map(trigger => ({
-      ...trigger,
-      variables: '{}',
-    }));
+    return triggers;
   }
 
   @Query(() => Int, { name: 'triggersNeedingReviewCount' })
@@ -54,10 +45,7 @@ export class TriggersResolver {
     @Args('id', { type: () => Int }) id: number
   ) {
     const trigger = await this.triggersService.findOne(zoneId, id);
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })
@@ -71,10 +59,7 @@ export class TriggersResolver {
       zoneId,
       entityId
     );
-    return triggers.map(trigger => ({
-      ...trigger,
-      variables: '{}',
-    }));
+    return triggers;
   }
 
   @Mutation(() => TriggerDto)
@@ -84,10 +69,7 @@ export class TriggersResolver {
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.create(input, user.id);
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Mutation(() => TriggerDto)
@@ -104,10 +86,7 @@ export class TriggersResolver {
       input,
       user.id
     );
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Mutation(() => TriggerDto)
@@ -117,10 +96,7 @@ export class TriggersResolver {
     @Args('id', { type: () => Int }) id: number
   ) {
     const trigger = await this.triggersService.delete(zoneId, id);
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Mutation(() => TriggerDto)
@@ -130,10 +106,7 @@ export class TriggersResolver {
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.attachToEntity(input, user.id);
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Mutation(() => TriggerDto)
@@ -148,10 +121,7 @@ export class TriggersResolver {
       id,
       user.id
     );
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 
   @Mutation(() => TriggerDto)
@@ -166,9 +136,6 @@ export class TriggersResolver {
       id,
       user.id
     );
-    return {
-      ...trigger,
-      variables: '{}',
-    };
+    return trigger;
   }
 }

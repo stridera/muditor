@@ -13,8 +13,6 @@ const mockMobData = {
   examineDescription: 'You see a test mob here.',
   level: 10,
   race: 'HUMAN',
-  hitRoll: 20,
-  armorClass: 5,
   damageDice: '2d6+3',
   hpDice: '3d8+10',
   alignment: 100,
@@ -60,8 +58,6 @@ function MobDisplayTest({ mob }: { mob: typeof mockMobData }) {
     <div data-testid='mob-display'>
       <h3>{mob.name}</h3>
       <div data-testid='race'>Race: {mob.race || 'N/A'}</div>
-      <div data-testid='hit-roll'>Hit Roll: {mob.hitRoll || 0}</div>
-      <div data-testid='armor-class'>AC: {mob.armorClass || 0}</div>
       <div data-testid='damage'>
         Damage: {damage.num || 0}d{damage.size || 0}
         {(damage.bonus || 0) >= 0 ? '+' : ''}
@@ -88,22 +84,6 @@ describe('Mob Data Display', () => {
     const raceElement = screen.getByTestId('race');
     expect(raceElement).toHaveTextContent('Race: HUMAN');
     expect(raceElement).not.toHaveTextContent('N/A');
-  });
-
-  it('should display hit roll correctly (not 0)', () => {
-    render(<MobDisplayTest mob={mockMobData} />);
-
-    const hitRollElement = screen.getByTestId('hit-roll');
-    expect(hitRollElement).toHaveTextContent('Hit Roll: 20');
-    expect(hitRollElement).not.toHaveTextContent('Hit Roll: 0');
-  });
-
-  it('should display armor class correctly (not 0)', () => {
-    render(<MobDisplayTest mob={mockMobData} />);
-
-    const armorClassElement = screen.getByTestId('armor-class');
-    expect(armorClassElement).toHaveTextContent('AC: 5');
-    expect(armorClassElement).not.toHaveTextContent('AC: 0');
   });
 
   it('should display damage dice correctly (not 0d0+0)', () => {
@@ -144,16 +124,12 @@ describe('Mob Data Display', () => {
     const incompleteMob: typeof mockMobData = {
       ...mockMobData,
       race: '', // empty string to trigger N/A fallback
-      hitRoll: 0,
-      armorClass: 0,
     };
 
     render(<MobDisplayTest mob={incompleteMob} />);
 
     // Should show fallback values for missing data
     expect(screen.getByTestId('race')).toHaveTextContent('Race: N/A');
-    expect(screen.getByTestId('hit-roll')).toHaveTextContent('Hit Roll: 0');
-    expect(screen.getByTestId('armor-class')).toHaveTextContent('AC: 0');
   });
 
   it('should verify GraphQL query includes all necessary fields', () => {
@@ -167,8 +143,6 @@ describe('Mob Data Display', () => {
       'level',
       'zoneId',
       'race',
-      'hitRoll',
-      'armorClass',
       'alignment',
       'mobClass',
       'hpDice',

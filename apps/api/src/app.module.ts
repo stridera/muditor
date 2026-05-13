@@ -10,7 +10,6 @@ import { CharactersModule } from './characters/characters.module';
 import { ClassesModule } from './classes/classes.module';
 import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
-import { EquipmentSetsModule } from './equipment-sets/equipment-sets.module';
 import { GrantsModule } from './grants/grants.module';
 import { HelpModule } from './help/help.module';
 import { MobsModule } from './mobs/mobs.module';
@@ -25,12 +24,10 @@ import { TriggersModule } from './triggers/triggers.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
 import { ZonesModule } from './zones/zones.module';
-import { PlayerMailModule } from './player-mail/player-mail.module';
 import { AccountStorageModule } from './account-storage/account-storage.module';
 import { BoardsModule } from './boards/boards.module';
 import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
-import { DeploymentsModule } from './deployments/deployments.module';
 import { LoginRequestsModule } from './login-requests/login-requests.module';
 import * as jwt from 'jsonwebtoken';
 
@@ -98,7 +95,6 @@ import * as jwt from 'jsonwebtoken';
     TriggersModule,
     ValidationModule,
     CharactersModule,
-    EquipmentSetsModule,
     GrantsModule,
     AbilitiesModule,
     RacesModule,
@@ -106,13 +102,11 @@ import * as jwt from 'jsonwebtoken';
     SocialsModule,
     HelpModule,
     SettingsModule,
-    PlayerMailModule,
     AccountStorageModule,
     BoardsModule,
     BridgeModule,
     DiscordModule,
     LoginRequestsModule,
-    DeploymentsModule,
   ],
 })
 export class AppModule {}

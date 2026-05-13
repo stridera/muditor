@@ -6,9 +6,7 @@ import {
   KeeperDto,
   ShopAcceptDto,
   ShopDto,
-  ShopHourDto,
   ShopItemDto,
-  UpdateShopHoursInput,
   UpdateShopInput,
   UpdateShopInventoryInput,
 } from './shop.dto';
@@ -54,7 +52,6 @@ export class ShopsResolver {
       } | null;
     }>;
     shopAccepts?: Array<{ id: number; type: string; keywords: string[] }>;
-    shopHours?: Array<{ id: number; open: number; close: number }>;
   }): ShopDto {
     const keeper: KeeperDto | undefined = shop.mobs
       ? {
@@ -105,11 +102,6 @@ export class ShopsResolver {
       }
       return base;
     });
-    const hours: ShopHourDto[] = (shop.shopHours || []).map(h => ({
-      id: String(h.id),
-      open: h.open,
-      close: h.close,
-    }));
     // Build result without optional keeperId unless it exists; with exactOptionalPropertyTypes we must omit the property instead of setting undefined
     const result: Omit<ShopDto, 'keeperId' | 'keeper'> & {
       keeperId?: number;
@@ -131,7 +123,6 @@ export class ShopsResolver {
       updatedAt: shop.updatedAt,
       items,
       accepts,
-      hours,
     };
     if (shop.keeperId != null) {
       (result as { keeperId?: number }).keeperId = shop.keeperId;
@@ -246,14 +237,4 @@ export class ShopsResolver {
     return this.mapShopToDto(shop);
   }
 
-  @Mutation(() => ShopDto)
-  @UseGuards(JwtAuthGuard)
-  async updateShopHours(
-    @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateShopHoursInput
-  ): Promise<ShopDto> {
-    const shop = await this.shopsService.replaceHours(zoneId, id, data.hours);
-    return this.mapShopToDto(shop);
-  }
 }

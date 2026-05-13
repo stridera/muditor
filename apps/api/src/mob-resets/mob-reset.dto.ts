@@ -8,8 +8,6 @@ import {
   Max,
 } from 'class-validator';
 import { MobDto } from '../mobs/mob.dto';
-import { MobEquipmentSetDto } from '../equipment-sets/equipment-set.dto';
-import { SpawnConditionDto } from '../object-resets/object-reset.dto';
 
 @ObjectType()
 export class MobResetDto {
@@ -36,12 +34,6 @@ export class MobResetDto {
 
   @Field(() => MobDto)
   mob: MobDto;
-
-  @Field(() => [MobEquipmentSetDto])
-  equipmentSets: MobEquipmentSetDto[];
-
-  @Field(() => [SpawnConditionDto])
-  conditions: SpawnConditionDto[];
 }
 
 @InputType()

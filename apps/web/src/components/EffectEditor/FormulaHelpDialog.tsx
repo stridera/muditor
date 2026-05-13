@@ -104,8 +104,8 @@ export function FormulaHelpDialog({ trigger }: FormulaHelpDialogProps) {
                       <span className='text-green-500'>acc</span> - Accuracy
                     </div>
                     <div>
-                      <span className='text-green-500'>damroll</span> - Damage
-                      bonus
+                      <span className='text-green-500'>ap</span> - Attack
+                      Power
                     </div>
                     <div>
                       <span className='text-green-500'>eva</span> - Evasion

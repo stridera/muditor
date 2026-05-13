@@ -1,12 +1,10 @@
 import {
-  Composition,
   DamageType,
   Gender,
   LifeForce,
   Position,
   Race,
   Size,
-  Stance,
 } from '@muditor/db';
 import { mapMob } from '../mob.mapper';
 import type { MobMapperSource } from '../types';
@@ -22,8 +20,6 @@ function base(): MobMapperSource {
     examineDescription: 'It looks angry',
     level: 3,
     alignment: 0,
-    hitRoll: 1,
-    armorClass: 10,
     hpDiceNum: 2,
     hpDiceSize: 6,
     hpDiceBonus: 5,
@@ -44,12 +40,10 @@ function base(): MobMapperSource {
     gender: Gender.MALE,
     size: Size.MEDIUM,
     lifeForce: LifeForce.LIFE,
-    composition: Composition.FLESH,
     traits: [],
     behaviors: [],
     professions: [],
-    position: Position.STANDING,
-    stance: Stance.ALERT,
+    defaultPosition: Position.STANDING,
     classId: null,
     createdAt: new Date(),
     updatedAt: new Date(),

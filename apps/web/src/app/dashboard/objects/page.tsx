@@ -940,19 +940,6 @@ function ObjectsContent() {
                                           {fullObject.values['Damage Type']}
                                         </span>
                                       </div>
-                                      {fullObject.values.HitRoll !== 0 && (
-                                        <div className='flex justify-between'>
-                                          <span className='text-muted-foreground'>
-                                            Hit Bonus:
-                                          </span>
-                                          <span>
-                                            {fullObject.values.HitRoll >= 0
-                                              ? '+'
-                                              : ''}
-                                            {fullObject.values.HitRoll}
-                                          </span>
-                                        </div>
-                                      )}
                                     </>
                                   )}
 

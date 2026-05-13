@@ -11,7 +11,6 @@ function mapEffect(e: PrismaEffect): Effect {
     effectType: e.effectType,
     tags: e.tags,
     defaultParams: e.defaultParams,
-    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
   };
 }
 
@@ -44,8 +43,6 @@ export function mapMob(db: MobMapperSource): MobDto {
     plainExamineDescription: db.plainExamineDescription,
     level: db.level,
     alignment: db.alignment,
-    hitRoll: db.hitRoll,
-    armorClass: db.armorClass,
     accuracy: db.accuracy,
     attackPower: db.attackPower,
     spellPower: db.spellPower,
@@ -83,7 +80,6 @@ export function mapMob(db: MobMapperSource): MobDto {
     gender: db.gender,
     size: db.size,
     lifeForce: db.lifeForce,
-    composition: db.composition,
     traits: db.traits ?? [],
     behaviors: db.behaviors ?? [],
     professions: db.professions ?? [],
@@ -96,11 +92,9 @@ export function mapMob(db: MobMapperSource): MobDto {
         activityRestrictions: db.activityRestrictions,
       }),
     resistances: (resistances as Record<string, number>) ?? {},
-    position: db.position,
     defaultPosition: db.defaultPosition,
     movementMode: db.movementMode,
     defaultMovementMode: db.defaultMovementMode,
-    stance: db.stance,
     ...(db.riderPresenceMessage !== null &&
       db.riderPresenceMessage !== undefined && {
         riderPresenceMessage: db.riderPresenceMessage,

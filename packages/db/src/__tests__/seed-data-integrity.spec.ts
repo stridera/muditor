@@ -91,24 +91,6 @@ describe('Seeded Data Integrity', () => {
       });
     });
 
-    it('should have consistent damage roll formats', async () => {
-      const mobsWithDamage = await prisma.mobs.findMany({
-        where: {
-          damageRoll: {
-            not: null,
-          },
-        },
-        take: 30,
-      });
-
-      const damageRollPattern = /^\d+d\d+[\+\-]?\d*$/;
-
-      mobsWithDamage.forEach(mob => {
-        if (mob.damageRoll) {
-          expect(mob.damageRoll).toMatch(damageRollPattern);
-        }
-      });
-    });
   });
 
   describe('Object Data Validation', () => {

@@ -154,8 +154,6 @@ const mockSchema = buildSchema(`
     professions: [MobProfession!]!
     alignment: Int!
     level: Int!
-    armorClass: Int!
-    hitRoll: Int!
     move: Int!
     hpDice: String!
     damageDice: String!
@@ -210,7 +208,6 @@ const mobQueries = {
         mobClass
         lifeForce
         damageType
-        armorClass
         strength
         intelligence
         wisdom

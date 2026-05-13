@@ -77,10 +77,6 @@ model Ability {
   questRewards        QuestRewards[]
   questObjectives     QuestObjectives[]
   questTriggerAbility Quests[]                 @relation("questTriggerAbility")
-  // Shop system relations
-  shopAbilities       ShopAbilities[]
-  // Shapechange system relations
-  abilityShapechangeForms AbilityShapechangeForm[]
 
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
@@ -103,7 +99,6 @@ model Effect {
   effectType    String // e.g., "damage", "heal", "status", "crowd_control"
   tags          String[] // e.g., ["damage", "elemental", "fire"] for filtering
   defaultParams Json               @default("{}") @map("default_params")
-  paramSchema   Json?              @map("param_schema") // JSON Schema for validation
   categoryId    Int?               @map("category_id")
   category      ToolboxCategory?   @relation(fields: [categoryId], references: [id])
   abilities     AbilityEffect[]
@@ -342,13 +337,7 @@ model CharacterClass {
   parentClass   CharacterClass?  @relation("SubclassHierarchy", fields: [parentClassId], references: [id])
   subclasses    CharacterClass[] @relation("SubclassHierarchy")
 
-  // Combat modifiers - class-based bonuses
-  bonusHitroll  Int   @default(0) @map("bonus_hitroll")
-  bonusDamroll  Int   @default(0) @map("bonus_damroll")
-  baseAc        Int   @default(100) @map("base_ac") // Base armor class (100 = standard)
-  hpPerLevel    Int   @default(10) @map("hp_per_level")
-  thac0Base     Int   @default(20) @map("thac0_base") // THAC0 at level 1
-  thac0PerLevel Float @default(1.0) @map("thac0_per_level") // THAC0 improvement per level
+  hpPerLevel Int @default(10) @map("hp_per_level")
 
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
@@ -381,7 +370,6 @@ model HelpEntry {
   usage    String? // Usage syntax
   duration String? // Duration description
   sphere   String? // Spell sphere (fire, water, healing, etc.)
-  classes  Json? // Class/circle requirements as JSON (e.g., {"Pyromancer": 7, "Sorcerer": 3})
 
   // Tracking
   createdAt  DateTime @default(now()) @map("created_at")
@@ -489,7 +477,10 @@ model ObjectEffects {
   object       Objects  @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   effect       Effect   @relation(fields: [effectId], references: [id], onDelete: Cascade)
 
-  @@unique([objectZoneId, objectId, effectId])
+  // Note: no unique on (object, effect) — an object can carry multiple
+  // "modify" effect rows (e.g. STR+2 AND DEX+3), each with its own
+  // modifier_data.target/amount payload. Uniqueness for spell-like
+  // grants is enforced at the editor / authoring layer instead.
   @@index([objectZoneId, objectId])
   @@index([effectId])
 }
@@ -552,46 +543,54 @@ model Characters {
   stamina               Int                  @default(100)
   hitPointsMax          Int                  @default(100) @map("hit_points_max")
   staminaMax            Int                  @default(100) @map("stamina_max")
+
+  // OFFENSIVE STATS (new combat redesign)
+  accuracy           Int @default(0)
+  attackPower        Int @default(0) @map("attack_power")
+  spellPower         Int @default(0) @map("spell_power")
+  penetrationFlat    Int @default(0) @map("penetration_flat")
+  penetrationPercent Int @default(0) @map("penetration_percent")
+
+  // DEFENSIVE STATS (new combat redesign)
+  evasion                Int @default(0)
+  armorRating            Int @default(0) @map("armor_rating")
+  damageReductionPercent Int @default(0) @map("damage_reduction_percent")
+  soak                   Int @default(0)
+  hardness               Int @default(0)
+  wardPercent            Int @default(0) @map("ward_percent")
+
+  perception  Int @default(0)
+  concealment Int @default(0)
+
+  // RESISTANCES — same shape/semantics as Mobs.resistances
+  // JSON object mapping damage types and effect names to resistance percentages.
+  // Scale: -100 = absorb (heals), 0 = immune, 100 = normal damage, 200 = double damage
+  resistances Json @default("{}")
   wealth                BigInt               @default(0) // Stored in copper units
   bankWealth            BigInt               @default(0) @map("bank_wealth") // Bank balance in copper
-  averageStats          Int                  @default(13) @map("average_stats")
   passwordHash          String               @default("") @map("password_hash")
-  raceType              String               @default("human") @map("race_type")
   race                  Race                 @default(HUMAN)
   gender                String               @default("neutral")
-  playerClass           String?              @map("player_class")
   height                Int?
   weight                Int?
-  baseHeight            Int?                 @map("base_height")
-  baseWeight            Int?                 @map("base_weight")
-  baseSize              Int                  @default(0) @map("base_size")
-  currentSize           Int                  @default(0) @map("current_size")
-  hitRoll               Int                  @default(0) @map("hit_roll")
-  damageRoll            Int                  @default(0) @map("damage_roll")
-  armorClass            Int                  @default(10) @map("armor_class")
   currentRoomZoneId     Int?                 @map("current_room_zone_id")
   currentRoomId         Int?                 @map("current_room_id")
   recallRoomZoneId      Int?                 @map("recall_room_zone_id")
   recallRoomId          Int?                 @map("recall_room_id")
   lastLogin             DateTime?            @map("last_login")
   timePlayed            Int                  @default(0) @map("time_played")
-  isOnline              Boolean              @default(false) @map("is_online")
   hunger                Int                  @default(0)
   thirst                Int                  @default(0)
   drunkenness           Int                  @default(0)
   description           String?
   title                 String?
-  wizTitle              String?              @map("wiz_title")
   prompt                String               @default("<%h/%Hhp %v/%Vmv>")
-  pageLength            Int                  @default(25) @map("page_length")
   playerFlags           PlayerFlag[]         @default([]) @map("player_flags")
   permissions           Permission[]         @default([]) @map("permissions") // Direct permission grants beyond level
-  olcZones              Int[]                @default([]) @map("olc_zones")
   invisLevel            Int                  @default(0) @map("invis_level")
   wimpyThreshold        Int                  @default(0) @map("wimpy_threshold")
   freezeLevel           Int?                 @map("freeze_level")
   staffNotes            String?              @map("staff_notes")
-  autoInvisLevel        Int                  @default(0) @map("auto_invis_level")
   // Custom arrival / departure messages used on staff `goto`-style
   // teleports. Either NULL → fall back to the generic
   // "$n appears" / "$n vanishes". Set via the `poofin`/`poofout`
@@ -640,13 +639,19 @@ model Characters {
   // discarded since "the pet was with you" matches player
   // expectations and avoids zone-not-loaded edge cases.
   pets                  Json?
-  birthTime             DateTime             @default(now()) @map("birth_time")
   userId                String?              @map("user_id")
   createdAt             DateTime             @default(now()) @map("created_at")
   updatedAt             DateTime             @updatedAt @map("updated_at")
   // Soft delete support
   deletedAt             DateTime?            @map("deleted_at")
   deletionReason        String?              @map("deletion_reason")
+  // Name-approval gate. Defaults to `true` so existing characters
+  // (and any new char created while `social.name_approval_required`
+  // is OFF) stay approved automatically. When the runtime toggle is
+  // ON, fresh characters are inserted at `false` and the player can
+  // play but is silenced on every social channel until staff runs
+  // `approve_name <character>` or `reject_name <character> <new>`.
+  nameApproved          Boolean              @default(true) @map("name_approved")
   classId               Int?                 @map("class_id")
   experience            Int                  @default(0)
   skillPoints           Int                  @default(0) @map("skill_points")
@@ -660,10 +665,6 @@ model Characters {
   characterClass        CharacterClass?      @relation(fields: [classId], references: [id])
   users                 Users?               @relation(fields: [userId], references: [id], onDelete: SetNull)
   accountItemsStored    AccountItems[] // Items this character deposited to account storage
-  mailSent              PlayerMail[]         @relation("mailSent")
-  mailReceived          PlayerMail[]         @relation("mailReceived")
-  mailWealthRetrievedBy PlayerMail[]         @relation("mailWealthRetrievedBy")
-  mailObjectRetrievedBy PlayerMail[]         @relation("mailObjectRetrievedBy")
   // Kill tracking (XP diminishing returns + zone diversity bonus)
   killTrackingData      Json?                @map("kill_tracking_data")
   // Quest progress tracking
@@ -706,53 +707,6 @@ model CharacterPets {
   @@index([mobPrototypeZoneId, mobPrototypeId])
 }
 
-model EquipmentSetItems {
-  id             Int           @id @default(autoincrement())
-  equipmentSetId Int           @map("equipment_set_id")
-  objectZoneId   Int           @map("object_zone_id")
-  objectId       Int           @map("object_id")
-  slot           String?
-  quantity       Int           @default(1)
-  probability    Float         @default(1.0)
-  equipment_sets EquipmentSets @relation(fields: [equipmentSetId], references: [id], onDelete: Cascade)
-  objects        Objects       @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-}
-
-model EquipmentSets {
-  id                Int                 @id @default(autoincrement())
-  name              String
-  description       String?
-  createdAt         DateTime            @default(now()) @map("created_at")
-  updatedAt         DateTime            @updatedAt @map("updated_at")
-  equipmentSetItems EquipmentSetItems[]
-  mobEquipmentSets  MobEquipmentSets[]
-}
-
-model MobCarrying {
-  id           Int       @id @default(autoincrement())
-  max          Int       @default(1)
-  name         String?
-  objectZoneId Int       @map("object_zone_id")
-  objectId     Int       @map("object_id")
-  resetId      Int       @map("reset_id")
-  // When true, item is decorative only - cannot be looted from corpse or stolen
-  // Different from TEMPORARY object flag (which IS lootable but doesn't persist through logout)
-  decorative   Boolean   @default(false)
-  objects      Objects   @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  mob_resets   MobResets @relation(fields: [resetId], references: [id], onDelete: Cascade)
-}
-
-model MobEquipmentSets {
-  id             Int           @id @default(autoincrement())
-  mobResetId     Int           @map("mob_reset_id")
-  equipmentSetId Int           @map("equipment_set_id")
-  probability    Float         @default(1.0)
-  equipment_sets EquipmentSets @relation(fields: [equipmentSetId], references: [id], onDelete: Cascade)
-  mob_resets     MobResets     @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
-
-  @@unique([mobResetId, equipmentSetId])
-}
-
 model MobResetEquipment {
   id           Int       @id @default(autoincrement())
   maxInstances Int       @default(1) @map("max_instances")
@@ -780,13 +734,10 @@ model MobResets {
   zoneId            Int                 @map("zone_id")
   probability       Float               @default(1.0)
   resetBehavior     String              @default("PERSISTENT") @map("reset_behavior")
-  mobCarrying       MobCarrying[]
-  mobEquipmentSets  MobEquipmentSets[]
   mobResetEquipment MobResetEquipment[]
   mobs              Mobs                @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
   rooms             Room                @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
   zones             Zones               @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  spawnConditions   SpawnConditions[]
 }
 
 model Mobs {
@@ -807,18 +758,14 @@ model Mobs {
   // MOB ROLE CLASSIFICATION
   role MobRole @default(TRASH)
 
-  // LEGACY COMBAT STATS (to be removed after migration)
-  armorClass Int @default(0) @map("armor_class")
-  hitRoll    Int @default(0) @map("hit_roll")
-
-  // NEW OFFENSIVE STATS
+  // OFFENSIVE STATS
   accuracy           Int @default(0)
   attackPower        Int @default(0) @map("attack_power")
   spellPower         Int @default(0) @map("spell_power")
   penetrationFlat    Int @default(0) @map("penetration_flat")
   penetrationPercent Int @default(0) @map("penetration_percent")
 
-  // NEW DEFENSIVE STATS
+  // DEFENSIVE STATS
   evasion                Int @default(0)
   armorRating            Int @default(0) @map("armor_rating")
   damageReductionPercent Int @default(0) @map("damage_reduction_percent")
@@ -841,9 +788,6 @@ model Mobs {
   damageDiceSize  Int          @default(0) @map("damage_dice_size")
   damageDiceBonus Int          @default(0) @map("damage_dice_bonus")
   wealth          BigInt       @default(0) // Stored in copper units
-  raceAlign       Int          @default(0) @map("race_align")
-  averageStats    Int          @default(13) @map("average_stats")
-  estimatedHp     Int          @default(0) @map("estimated_hp")
   strength        Int          @default(13)
   intelligence    Int          @default(13)
   wisdom          Int          @default(13)
@@ -860,15 +804,12 @@ model Mobs {
   updatedBy       String?      @map("updated_by")
   classId         Int?         @map("class_id")
   race            Race         @default(HUMANOID)
-  position        Position     @default(STANDING)
   defaultPosition     Position     @default(STANDING)
   movementMode        MovementMode @default(NORMAL) @map("movement_mode")
   defaultMovementMode MovementMode @default(NORMAL) @map("default_movement_mode")
   gender              Gender       @default(NEUTRAL)
   size            Size         @default(MEDIUM)
   lifeForce       LifeForce    @default(LIFE)
-  composition     Composition  @default(FLESH)
-  stance          Stance       @default(ALERT)
   damageType      DamageType   @default(HIT)
   // Drives "kill the wrong target" alignment penalties (Section 21).
   // NORMAL = no alignment hit; INNOCENT/SHOPKEEPER/QUEST_NPC = scaled hit toward EVIL when killed.
@@ -905,7 +846,6 @@ model Mobs {
   questsAsTrigger    Quests[]          @relation("questTriggerMob") // MOB trigger type quests
   objectiveTargetMob QuestObjectives[] @relation("objectiveTargetMob")
   objectiveDeliverTo QuestObjectives[] @relation("objectiveDeliverTo")
-  Triggers           Triggers[]
 
   @@id([zoneId, id])
   @@index([name])
@@ -913,15 +853,6 @@ model Mobs {
   @@index([plainName])
   @@index([plainRoomDescription])
   @@index([plainExamineDescription])
-}
-
-model ObjectAffects {
-  id           Int     @id @default(autoincrement())
-  location     String
-  modifier     Int
-  objectZoneId Int     @map("object_zone_id")
-  objectId     Int     @map("object_id")
-  objects      Objects @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
 }
 
 model ObjectExtraDescriptions {
@@ -963,7 +894,6 @@ model ObjectResets {
   objects         Objects               @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   rooms           Room                  @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
   zones           Zones                 @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  spawnConditions SpawnConditions[]
   contents        ObjectResetContents[] // Objects that spawn inside this container
 }
 
@@ -1042,10 +972,7 @@ model Objects {
   presenceOverride String? @map("presence_override")
 
   characterItems          CharacterItems[]
-  equipmentSetItems       EquipmentSetItems[]
-  mobCarrying             MobCarrying[]
   mobResetEquipment       MobResetEquipment[]
-  objectAffects           ObjectAffects[]
   objectExtraDescriptions ObjectExtraDescriptions[]
   objectResets            ObjectResets[]
   objectResetContents     ObjectResetContents[]
@@ -1057,12 +984,10 @@ model Objects {
   objectAbilities         ObjectAbilities[] // Cast spells (quaff potion → cast spell)
   consumableEffects       ConsumableEffect[] // Direct effects (eat food → apply effect)
   accountItems            AccountItems[]
-  mailAttachments         PlayerMail[] // Objects attached to mail messages
   // Quest system relations
   questRewards            QuestRewards[]
   objectiveTargetObject   QuestObjectives[]         @relation("objectiveTargetObject")
   questTriggerItem        Quests[]                  @relation("questTriggerItem")
-  Triggers                Triggers[]
   playerHouseItems        PlayerHouseItem[]
   roomExitKeys            RoomExit[]                @relation("roomExitKey")
 
@@ -1085,11 +1010,8 @@ model Races {
   raceAlign          RaceAlign    @default(GOOD) @map("race_align")
   defaultSize        Size         @default(MEDIUM) @map("default_size")
   defaultAlignment   Int          @default(0) @map("default_alignment")
-  bonusDamroll       Int          @default(0) @map("bonus_damroll")
-  bonusHitroll       Int          @default(0) @map("bonus_hitroll")
   focusBonus         Int          @default(100) @map("focus_bonus")
   defaultLifeforce   LifeForce    @default(LIFE) @map("default_lifeforce")
-  defaultComposition Composition  @default(FLESH) @map("default_composition")
   maleWeightLow      Int          @default(0) @map("male_weight_low")
   maleWeightHigh     Int          @default(0) @map("male_weight_high")
   maleHeightLow      Int          @default(0) @map("male_height_low")
@@ -1109,7 +1031,6 @@ model Races {
   hitDamageFactor    Int          @default(100) @map("hit_damage_factor")
   damageDiceFactor   Int          @default(100) @map("damage_dice_factor")
   copperFactor       Int          @default(75) @map("copper_factor")
-  acFactor           Int          @default(100) @map("ac_factor")
   enterVerb          String?      @map("enter_verb")
   leaveVerb          String?      @map("leave_verb")
   // Elemental resistances: JSON object { "FIRE": 25, "COLD": -25, "HOLY": 100 }
@@ -1211,12 +1132,7 @@ model Room {
   // FLAG REORGANIZATION FIELDS
   // Replaces size flags (LARGE, MEDIUM, etc.) with numeric capacity
   capacity      Int            @default(10) // Max occupants for combat (0 = unlimited)
-  // Replaces elemental flags (EARTH, AIR, FIRE, WATER) with magic affinity
-  magicAffinity MagicAffinity? @map("magic_affinity")
 
-  // Position/effect system integration
-  // What position mechanic is required to be in this room (null = ground OK)
-  requiredMechanic     PositionMechanic? @map("required_mechanic")
   // Environmental effects applied to all occupants (e.g., TOXIC_GAS, EXTREME_COLD)
   environmentalEffects RoomEnvironmentalEffect[]
 
@@ -1288,15 +1204,6 @@ model ShopAccepts {
   shops      Shops    @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
 }
 
-model ShopHours {
-  id         Int   @id @default(autoincrement())
-  open       Int
-  close      Int
-  shopZoneId Int   @map("shop_zone_id")
-  shopId     Int   @map("shop_id")
-  shops      Shops @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
-}
-
 model ShopItems {
   id           Int @id @default(autoincrement())
   amount       Int @default(0)
@@ -1338,35 +1245,6 @@ model ShopMobs {
   @@unique([shopZoneId, shopId, mobZoneId, mobId])
 }
 
-// Abilities/spells for sale at trainer/healer shops
-model ShopAbilities {
-  id         Int @id @default(autoincrement())
-  price      Int @default(0) @map("price") // Price in copper (0 = use ability circle * 1000)
-  shopZoneId Int @map("shop_zone_id")
-  shopId     Int @map("shop_id")
-  abilityId  Int @map("ability_id")
-
-  // Spawn and availability controls
-  spawnChance           Float   @default(1.0) @map("spawn_chance") // 0.0-1.0 probability
-  visibilityRequirement String? @map("visibility_requirement") // Lua expr: when shown in list
-  purchaseRequirement   String? @map("purchase_requirement") // Lua expr: when can buy
-
-  ability Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
-  shops   Shops   @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
-
-  @@unique([shopZoneId, shopId, abilityId])
-}
-
-model ShopRooms {
-  id         Int   @id @default(autoincrement())
-  roomId     Int   @map("room_id")
-  shopZoneId Int   @map("shop_zone_id")
-  shopId     Int   @map("shop_id")
-  shops      Shops @relation(fields: [shopZoneId, shopId], references: [zoneId, id], onDelete: Cascade)
-
-  @@unique([shopZoneId, shopId, roomId])
-}
-
 model Shops {
   id                  Int
   buyProfit           Float            @default(1.0) @map("buy_profit")
@@ -1387,25 +1265,12 @@ model Shops {
   flags               ShopFlag[]
   tradesWithFlags     ShopTradesWith[]
   shopAccepts         ShopAccepts[]
-  shopHours           ShopHours[]
   shopItems           ShopItems[]
   shopMobs            ShopMobs[]
-  shopRooms           ShopRooms[]
-  shopAbilities       ShopAbilities[]
   mobs                Mobs             @relation(fields: [keeperZoneId, keeperId], references: [zoneId, id])
   zones               Zones            @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   @@id([zoneId, id])
-}
-
-model SpawnConditions {
-  id            Int           @id @default(autoincrement())
-  type          String
-  parameters    Json          @default("{}")
-  mobResetId    Int?          @map("mob_reset_id")
-  objectResetId Int?          @map("object_reset_id")
-  mobResets     MobResets?    @relation(fields: [mobResetId], references: [id], onDelete: Cascade)
-  objectResets  ObjectResets? @relation(fields: [objectResetId], references: [id], onDelete: Cascade)
 }
 
 model Triggers {
@@ -1416,11 +1281,6 @@ model Triggers {
   numArgs      Int           @default(0) @map("num_args")
   argList      String[]      @default([]) @map("arg_list")
   commands     String
-  mobZoneId    Int?          @map("mob_zone_id")
-  mobId        Int?          @map("mob_id")
-  objectZoneId Int?          @map("object_zone_id")
-  objectId     Int?          @map("object_id")
-  variables    Json          @default("{}")
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   createdBy    String?       @map("created_by")
@@ -1431,9 +1291,6 @@ model Triggers {
   needsReview Boolean @default(false) @map("needs_review")
   syntaxError String? @map("syntax_error")
 
-  // Direct FK relations (for triggers attached to a single entity)
-  mobs    Mobs?    @relation(fields: [mobZoneId, mobId], references: [zoneId, id], onDelete: Cascade)
-  objects Objects? @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
   zones   Zones    @relation(fields: [zoneId], references: [id], onDelete: Cascade)
 
   // Many-to-many junction tables (for shared triggers)
@@ -1558,7 +1415,6 @@ model Users {
   accountMailReceived AccountMail[]  @relation("accountMailReceived")
   discordLink         DiscordLink?
   googleLink          GoogleLink?
-  loginRequests       LoginRequests[]
   // Soft delete support
   deletedAt           DateTime?      @map("deleted_at")
   deletionReason      String?        @map("deletion_reason")
@@ -1714,22 +1570,6 @@ enum Climate {
   ALPINE
 }
 
-enum Composition {
-  FLESH
-  EARTH
-  AIR
-  FIRE
-  WATER
-  ICE
-  MIST
-  ETHER
-  METAL
-  STONE
-  BONE
-  LAVA
-  PLANT
-}
-
 enum DamageType {
   HIT
   STING
@@ -1863,25 +1703,6 @@ enum MobBehavior {
 }
 
 // Room magic affinity - affects spell power and creature comfort
-enum MagicAffinity {
-  // Elemental
-  FIRE // Fire spells +%, cold -%, fire elementals comfortable
-  WATER // Water spells +%, aquatic creatures thrive
-  COLD // Cold/ice spells +%, fire -%, frozen terrain
-  EARTH // Earth spells +%, stone creatures empowered
-  AIR // Air/lightning spells +%, flying creatures benefit
-  // Divine/Planar
-  HOLY // Holy spells +%, unholy -%, undead weakened
-  UNHOLY // Unholy spells +%, holy -%, undead empowered
-  SHADOW // Shadow spells +%, radiant -%, darkness persists
-  DEATH // Necromancy +%, not evil - just close to death
-  ASTRAL // Summoning/teleport +%, planar barriers weak
-  // Other
-  NATURE // Nature/druid spells +%, fey welcome
-  ARCANE // All magic +% or spell regen bonus
-  CHAOS // Wild magic - unpredictable side effects
-}
-
 // Mob profession - special NPC roles that provide services
 // A mob can have multiple professions (e.g., banker + receptionist)
 enum MobProfession {
@@ -2123,9 +1944,20 @@ enum SaveType {
 }
 
 enum ApplyType {
-  AC
-  HITROLL
-  DAMROLL
+  // Offense
+  ACCURACY
+  ATTACK_POWER
+  SPELL_POWER
+  PENETRATION_FLAT
+  PENETRATION_PERCENT
+  // Defense
+  EVASION
+  ARMOR_RATING
+  DAMAGE_REDUCTION_PERCENT
+  SOAK
+  HARDNESS
+  WARD_PERCENT
+  // Attributes
   STR
   DEX
   INT
@@ -2247,17 +2079,6 @@ enum StackingRule {
   STACK
   IGNORE
   MAX_ONLY
-}
-
-enum Stance {
-  DEAD
-  MORT
-  INCAPACITATED
-  STUNNED
-  SLEEPING
-  RESTING
-  ALERT
-  FIGHTING
 }
 
 enum TargetScope {
@@ -2398,28 +2219,6 @@ enum UserRole {
   HEAD_BUILDER
   CODER
   IMPLEMENTOR
-}
-
-enum LoginRequestStatus {
-  PENDING
-  APPROVED
-  DENIED
-  EXPIRED
-}
-
-model LoginRequests {
-  id         String             @id @default(uuid())
-  userId     String             @map("user_id")
-  status     LoginRequestStatus @default(PENDING)
-  ipAddress  String?            @map("ip_address")
-  expiresAt  DateTime           @map("expires_at")
-  createdAt  DateTime           @default(now()) @map("created_at")
-  resolvedAt DateTime?          @map("resolved_at")
-  user       Users              @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, status])
-  @@index([expiresAt])
-  @@map("login_requests")
 }
 
 enum GrantResourceType {
@@ -2566,67 +2365,8 @@ enum ItemInstanceFlag {
 }
 
 // ============================================================================
-// PLAYER MAIL SYSTEM
+// ACCOUNT MAIL SYSTEM
 // ============================================================================
-
-// Stores in-game mail messages between players
-// Character-to-character mail (retrieved via in-game postmaster)
-model PlayerMail {
-  id Int @id @default(autoincrement())
-
-  // Legacy IDs for import (numeric player IDs from CircleMUD)
-  // These are used during import and will be remapped to character IDs after character migration
-  legacySenderId    Int? @map("legacy_sender_id")
-  legacyRecipientId Int? @map("legacy_recipient_id")
-
-  // Character relationships (null = legacy mail not yet linked, or deleted sender)
-  senderCharacterId    String? @map("sender_character_id")
-  recipientCharacterId String? @map("recipient_character_id")
-
-  // Mail content
-  body String @db.Text
-
-  // Timestamps
-  sentAt DateTime  @map("sent_at")
-  readAt DateTime? @map("read_at")
-
-  // Wealth attachments (stored in individual coin types)
-  attachedCopper   Int @default(0) @map("attached_copper")
-  attachedSilver   Int @default(0) @map("attached_silver")
-  attachedGold     Int @default(0) @map("attached_gold")
-  attachedPlatinum Int @default(0) @map("attached_platinum")
-
-  // Object attachment (optional) - uses composite key
-  attachedObjectZoneId Int? @map("attached_object_zone_id")
-  attachedObjectId     Int? @map("attached_object_id")
-
-  // Retrieval tracking (for postmaster)
-  wealthRetrievedAt            DateTime? @map("wealth_retrieved_at")
-  wealthRetrievedByCharacterId String?   @map("wealth_retrieved_by_character_id")
-  objectRetrievedAt            DateTime? @map("object_retrieved_at")
-  objectRetrievedByCharacterId String?   @map("object_retrieved_by_character_id")
-  objectMovedToAccountStorage  Boolean   @default(false) @map("object_moved_to_account_storage")
-
-  // Status
-  isDeleted Boolean @default(false) @map("is_deleted")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  // Relationships
-  sender                     Characters? @relation("mailSent", fields: [senderCharacterId], references: [id], onDelete: SetNull)
-  recipient                  Characters? @relation("mailReceived", fields: [recipientCharacterId], references: [id], onDelete: Cascade)
-  attachedObject             Objects?    @relation(fields: [attachedObjectZoneId, attachedObjectId], references: [zoneId, id], onDelete: SetNull)
-  wealthRetrievedByCharacter Characters? @relation("mailWealthRetrievedBy", fields: [wealthRetrievedByCharacterId], references: [id], onDelete: SetNull)
-  objectRetrievedByCharacter Characters? @relation("mailObjectRetrievedBy", fields: [objectRetrievedByCharacterId], references: [id], onDelete: SetNull)
-
-  @@index([senderCharacterId])
-  @@index([recipientCharacterId])
-  @@index([legacySenderId])
-  @@index([legacyRecipientId])
-  @@index([sentAt])
-  @@map("PlayerMail")
-}
 
 // Account-to-account mail (viewable by any character on the account)
 model AccountMail {
@@ -2635,9 +2375,6 @@ model AccountMail {
   // Account relationships
   senderUserId    String  @map("sender_user_id")
   recipientUserId String? @map("recipient_user_id") // null for broadcast
-
-  // Broadcast flag
-  isBroadcast Boolean @default(false) @map("is_broadcast")
 
   // Mail content
   subject String
@@ -2659,7 +2396,6 @@ model AccountMail {
 
   @@index([senderUserId])
   @@index([recipientUserId])
-  @@index([isBroadcast])
   @@index([sentAt])
   @@map("AccountMail")
 }
@@ -2868,32 +2604,6 @@ model SystemText {
   @@map("SystemText")
 }
 
-// Player toggle definitions (brief, autoloot, etc.)
-// Defines available toggle options - players store their values in character flags
-model PlayerToggle {
-  id           Int            @id @default(autoincrement())
-  name         String         @unique // Internal name: "brief", "autoloot", "autogold"
-  displayName  String         @map("display_name") // UI name: "Brief Mode"
-  description  String // Help text: "Show brief room descriptions"
-  defaultValue Boolean        @default(false) @map("default_value")
-  minLevel     Int            @default(0) @map("min_level") // 0 = all, 100+ = immortal
-  category     ToggleCategory @default(DISPLAY)
-  sortOrder    Int            @default(0) @map("sort_order")
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@index([category])
-  @@map("PlayerToggle")
-}
-
-enum ToggleCategory {
-  DISPLAY // brief, compact, autoexit
-  COMBAT // autoloot, autogold, autosplit
-  SOCIAL // deaf, notell, afk
-  IMMORTAL // holylight, showids, roomflags
-}
-
 // Login/character creation messages
 // Allows customization of all login flow text
 model LoginMessage {
@@ -2943,10 +2653,6 @@ enum LoginStage {
   SELECT_RACE // Race selection prompt
   CREATION_COMPLETE // Character created message
   RECONNECT_MESSAGE // Reconnecting to existing session
-  LOGIN_APPROVAL_PENDING // Waiting for Muditor approval
-  LOGIN_APPROVAL_APPROVED // Login approved via Muditor
-  LOGIN_APPROVAL_DENIED // Login denied via Muditor
-  LOGIN_APPROVAL_EXPIRED // Login request expired
 }
 
 // ============================================================================
@@ -3744,81 +3450,3 @@ model PlayerHouseGuest {
   @@map("player_house_guests")
 }
 
-// ============================================================================
-// SHAPECHANGE SYSTEM
-// ============================================================================
-
-model ShapechangeForm {
-  id            Int     @id @default(autoincrement())
-  name          String  @unique // "wolf", "bear", "eagle"
-  displayName   String  @map("display_name") // "a gray wolf"
-  description   String?
-  statModifiers Json    @default("{}") @map("stat_modifiers") // {"strength": 5, "dexterity": -2}
-  durationTicks Int     @default(100) @map("duration_ticks")
-  canFly        Boolean @default(false) @map("can_fly")
-
-  abilityForms AbilityShapechangeForm[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("ShapechangeForm")
-}
-
-model AbilityShapechangeForm {
-  id        Int @id @default(autoincrement())
-  abilityId Int @map("ability_id")
-  formId    Int @map("form_id")
-  minLevel  Int @default(1) @map("min_level")
-
-  ability Ability         @relation(fields: [abilityId], references: [id], onDelete: Cascade)
-  form    ShapechangeForm @relation(fields: [formId], references: [id], onDelete: Cascade)
-
-  @@unique([abilityId, formId])
-  @@map("AbilityShapechangeForm")
-}
-
-// ============================================================================
-// DEPLOYMENT SYSTEM
-// ============================================================================
-
-enum DeploymentStatus {
-  PENDING
-  READY
-  DEPLOYING
-  DEPLOYED
-  FAILED
-  ROLLED_BACK
-}
-
-model DeploymentPackage {
-  id           String           @id @default(uuid())
-  name         String
-  description  String?
-  status       DeploymentStatus @default(PENDING)
-  zoneIds      Int[]            @map("zone_ids")
-  createdBy    String           @map("created_by")
-  deployedAt   DateTime?        @map("deployed_at")
-  snapshotData Json?            @map("snapshot_data")
-
-  changes DeploymentChange[]
-
-  createdAt DateTime @default(now()) @map("created_at")
-  updatedAt DateTime @updatedAt @map("updated_at")
-
-  @@map("DeploymentPackage")
-}
-
-model DeploymentChange {
-  id             Int               @id @default(autoincrement())
-  packageId      String            @map("package_id")
-  entityType     String            @map("entity_type") // "Room", "Mob", "Object"
-  entityKey      String            @map("entity_key") // "30:5" composite key
-  changeType     String            @map("change_type") // "CREATE", "UPDATE", "DELETE"
-  beforeSnapshot Json?             @map("before_snapshot")
-  afterSnapshot  Json?             @map("after_snapshot")
-
-  package DeploymentPackage @relation(fields: [packageId], references: [id], onDelete: Cascade)
-
-  @@map("DeploymentChange")
-}

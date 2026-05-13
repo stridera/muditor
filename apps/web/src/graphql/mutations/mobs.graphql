@@ -8,8 +8,6 @@ mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
     examineDescription
     level
     alignment
-    hitRoll
-    armorClass
     hpDice
     damageDice
     damageType
@@ -50,8 +48,6 @@ mutation CreateMob($data: CreateMobInput!) {
     examineDescription
     level
     alignment
-    hitRoll
-    armorClass
     hpDice
     damageDice
     damageType

@@ -24,8 +24,6 @@ export interface Mob {
   examineDescription?: string;
   hpDice?: string;
   damageDice?: string;
-  armorClass?: number;
-  hitRoll?: number;
   gender?: string;
   size?: string;
   lifeForce?: string;
@@ -900,18 +898,6 @@ export const EntityPanel: React.FC<EntityPanelProps> = ({
                 <div className='flex justify-between'>
                   <span>Concealment:</span>
                   <span>{(entity.data as Mob).concealment}</span>
-                </div>
-              )}
-              {(entity.data as Mob).armorClass !== undefined && (
-                <div className='flex justify-between'>
-                  <span>Armor Class:</span>
-                  <span>{(entity.data as Mob).armorClass}</span>
-                </div>
-              )}
-              {(entity.data as Mob).hitRoll !== undefined && (
-                <div className='flex justify-between'>
-                  <span>Hit Roll:</span>
-                  <span>{(entity.data as Mob).hitRoll}</span>
                 </div>
               )}
             </div>

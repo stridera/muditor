@@ -67,7 +67,6 @@ describe('API Integration Tests', () => {
             hpDice
             damageDice
             mobClass
-            armorClass
             strength
             intelligence
             wisdom
@@ -184,7 +183,6 @@ describe('API Integration Tests', () => {
         'damageDice',
         'zoneId',
         'mobClass',
-        'armorClass',
       ];
 
       const missingFields = requiredFields.filter(

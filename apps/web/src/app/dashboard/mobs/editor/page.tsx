@@ -12,7 +12,6 @@ import {
   GetMobDocument,
   UpdateMobDocument,
   UpdateMobDefaultEffectsDocument,
-  type Composition,
   type DamageType,
   type Gender,
   type GetMobQuery,
@@ -25,14 +24,12 @@ import {
   type Position,
   type Race,
   type Size,
-  type Stance,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
-import { ArrowLeft, Save, Sparkles } from 'lucide-react';
+import { ArrowLeft, Save } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
-import MobEquipmentManager from '../../../../components/mob-equipment-manager';
 import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
   useRealTimeValidation,
@@ -53,8 +50,6 @@ interface MobFormData {
   alignment: number;
   level: number;
   role: string;
-  armorClass: number;
-  hitRoll: number;
   accuracy: number;
   attackPower: number;
   spellPower: number;
@@ -92,13 +87,10 @@ interface MobFormData {
   concealment: number;
   zoneId: number;
   race: string;
-  position: string;
   defaultPosition: string;
   gender: string;
   size: string;
   lifeForce: string;
-  composition: string;
-  stance: string;
   damageType: string;
   traits: string[];
   behaviors: string[];
@@ -172,8 +164,6 @@ function MobEditorContent() {
     alignment: 0,
     level: 1,
     role: 'NORMAL',
-    armorClass: 0,
-    hitRoll: 0,
     accuracy: 0,
     attackPower: 0,
     spellPower: 0,
@@ -211,13 +201,10 @@ function MobEditorContent() {
     concealment: 0,
     zoneId: 511,
     race: 'HUMANOID',
-    position: 'STANDING',
     defaultPosition: 'STANDING',
     gender: 'NEUTRAL',
     size: 'MEDIUM',
     lifeForce: 'LIFE',
-    composition: 'FLESH',
-    stance: 'ALERT',
     damageType: 'HIT',
     traits: [],
     behaviors: [],
@@ -302,8 +289,6 @@ function MobEditorContent() {
         alignment: mob.alignment,
         level: mob.level,
         role: mob.role || 'NORMAL',
-        armorClass: mob.armorClass,
-        hitRoll: mob.hitRoll,
         accuracy: mob.accuracy || 0,
         attackPower: mob.attackPower || 0,
         spellPower: mob.spellPower || 0,
@@ -341,13 +326,10 @@ function MobEditorContent() {
         concealment: mob.concealment,
         zoneId: mob.zoneId,
         race: mob.race,
-        position: mob.position,
         defaultPosition: mob.defaultPosition || 'STANDING',
         gender: mob.gender,
         size: mob.size,
         lifeForce: mob.lifeForce,
-        composition: mob.composition,
-        stance: mob.stance,
         damageType: mob.damageType,
         traits: mob.traits || [],
         behaviors: mob.behaviors || [],
@@ -419,8 +401,6 @@ function MobEditorContent() {
         level: formData.level,
         role: formData.role as MobRole,
         alignment: formData.alignment,
-        hitRoll: formData.hitRoll,
-        armorClass: formData.armorClass,
         accuracy: formData.accuracy,
         attackPower: formData.attackPower,
         spellPower: formData.spellPower,
@@ -449,12 +429,9 @@ function MobEditorContent() {
         perception: formData.perception,
         concealment: formData.concealment,
         race: formData.race as Race,
-        position: formData.position as Position,
         gender: formData.gender as Gender,
         size: formData.size as Size,
         lifeForce: formData.lifeForce as LifeForce,
-        composition: formData.composition as Composition,
-        stance: formData.stance as Stance,
         traits: formData.traits as MobTrait[],
         behaviors: formData.behaviors as MobBehavior[],
         professions: formData.professions as MobProfession[],
@@ -519,10 +496,7 @@ function MobEditorContent() {
       formData.role as any, // Type assertion for role
       formData.mobClass.toUpperCase() as any, // Type assertion for class
       formData.race,
-      formData.lifeForce as any, // Type assertion for lifeforce
-      formData.composition as any, // Type assertion for composition
-      formData.hitRoll,
-      formData.armorClass
+      formData.lifeForce as any // Type assertion for lifeforce
     );
 
     return generatedStats;
@@ -1409,13 +1383,6 @@ function MobEditorContent() {
         {/* Equipment Tab */}
         {activeTab === 'equipment' && !isNew && (
           <div className='space-y-6'>
-            <div className='bg-card shadow rounded-lg p-6'>
-              <MobEquipmentManager
-                mobId={parseInt(mobId!)}
-                zoneId={formData.zoneId}
-              />
-            </div>
-
             <div className='bg-card shadow rounded-lg p-6'>
               <h3 className='text-lg font-medium text-card-foreground mb-4'>
                 Treasure

@@ -2012,23 +2012,6 @@ function ObjectEditorContent() {
                   <div className='grid grid-cols-2 gap-4'>
                     <div>
                       <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Armor Class Bonus
-                      </label>
-                      <input
-                        type='number'
-                        value={getValueSafe(formData.values, 'armorClass', 0)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'armorClass',
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='AC bonus (positive values)'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
                         Max Dex Bonus
                       </label>
                       <input

@@ -6,7 +6,6 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import {
-  Composition,
   DamageType,
   Gender,
   LifeForce,
@@ -18,7 +17,6 @@ import {
   Position,
   Race,
   Size,
-  Stance,
 } from '@muditor/db';
 import GraphQLJSON from 'graphql-type-json';
 import {
@@ -36,8 +34,6 @@ registerEnumType(Race, { name: 'Race' });
 registerEnumType(DamageType, { name: 'DamageType' });
 registerEnumType(Position, { name: 'Position' });
 registerEnumType(LifeForce, { name: 'LifeForce' });
-registerEnumType(Composition, { name: 'Composition' });
-registerEnumType(Stance, { name: 'Stance' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(MobRole, { name: 'MobRole' });
 registerEnumType(MobTrait, { name: 'MobTrait' });
@@ -83,12 +79,6 @@ export class MobDto {
 
   @Field(() => Int)
   alignment: number;
-
-  @Field(() => Int)
-  hitRoll: number;
-
-  @Field(() => Int)
-  armorClass: number;
 
   @Field(() => Int)
   accuracy: number;
@@ -186,9 +176,6 @@ export class MobDto {
   @Field(() => LifeForce)
   lifeForce: LifeForce;
 
-  @Field(() => Composition)
-  composition: Composition;
-
   @Field(() => [MobTrait])
   traits: MobTrait[];
 
@@ -216,9 +203,6 @@ export class MobDto {
   resistances: Record<string, number>;
 
   @Field(() => Position)
-  position: Position;
-
-  @Field(() => Position)
   defaultPosition: Position;
 
   @Field(() => MovementMode)
@@ -226,9 +210,6 @@ export class MobDto {
 
   @Field(() => MovementMode)
   defaultMovementMode: MovementMode;
-
-  @Field(() => Stance)
-  stance: Stance;
 
   @Field({
     nullable: true,
@@ -289,16 +270,6 @@ export class CreateMobInput {
   @IsOptional()
   @IsNumber()
   alignment?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  hitRoll?: number;
-
-  @Field(() => Int, { defaultValue: 0 })
-  @IsOptional()
-  @IsNumber()
-  armorClass?: number;
 
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
@@ -468,11 +439,6 @@ export class CreateMobInput {
   @IsEnum(LifeForce)
   lifeForce?: LifeForce;
 
-  @Field(() => Composition, { defaultValue: Composition.FLESH })
-  @IsOptional()
-  @IsEnum(Composition)
-  composition?: Composition;
-
   @Field(() => [MobTrait], { defaultValue: [] })
   @IsOptional()
   @IsArray()
@@ -517,11 +483,6 @@ export class CreateMobInput {
   @Field(() => Position, { defaultValue: Position.STANDING })
   @IsOptional()
   @IsEnum(Position)
-  position?: Position;
-
-  @Field(() => Position, { defaultValue: Position.STANDING })
-  @IsOptional()
-  @IsEnum(Position)
   defaultPosition?: Position;
 
   @Field(() => MovementMode, { defaultValue: MovementMode.NORMAL })
@@ -533,11 +494,6 @@ export class CreateMobInput {
   @IsOptional()
   @IsEnum(MovementMode)
   defaultMovementMode?: MovementMode;
-
-  @Field(() => Stance, { defaultValue: Stance.ALERT })
-  @IsOptional()
-  @IsEnum(Stance)
-  stance?: Stance;
 
   @Field({
     nullable: true,
@@ -616,16 +572,6 @@ export class UpdateMobInput {
   @IsOptional()
   @IsNumber()
   alignment?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  hitRoll?: number;
-
-  @Field(() => Int, { nullable: true })
-  @IsOptional()
-  @IsNumber()
-  armorClass?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -787,11 +733,6 @@ export class UpdateMobInput {
   @IsEnum(LifeForce)
   lifeForce?: LifeForce;
 
-  @Field(() => Composition, { nullable: true })
-  @IsOptional()
-  @IsEnum(Composition)
-  composition?: Composition;
-
   @Field(() => [MobTrait], { nullable: true })
   @IsOptional()
   @IsArray()
@@ -836,11 +777,6 @@ export class UpdateMobInput {
   @Field(() => Position, { nullable: true })
   @IsOptional()
   @IsEnum(Position)
-  position?: Position;
-
-  @Field(() => Position, { nullable: true })
-  @IsOptional()
-  @IsEnum(Position)
   defaultPosition?: Position;
 
   @Field(() => MovementMode, { nullable: true })
@@ -852,11 +788,6 @@ export class UpdateMobInput {
   @IsOptional()
   @IsEnum(MovementMode)
   defaultMovementMode?: MovementMode;
-
-  @Field(() => Stance, { nullable: true })
-  @IsOptional()
-  @IsEnum(Stance)
-  stance?: Stance;
 
   @Field({
     nullable: true,

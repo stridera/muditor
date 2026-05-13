@@ -77,14 +77,8 @@ export class CharacterDto {
   bankPlatinum: number;
 
   // Character identity
-  @Field({ nullable: true })
-  raceType?: string;
-
   @Field()
   gender: string;
-
-  @Field({ nullable: true })
-  playerClass?: string;
 
   // Physical attributes
   @Field(() => Int, { nullable: true })
@@ -92,22 +86,6 @@ export class CharacterDto {
 
   @Field(() => Int, { nullable: true })
   weight?: number;
-
-  @Field(() => Int)
-  baseSize: number;
-
-  @Field(() => Int)
-  currentSize: number;
-
-  // Combat stats
-  @Field(() => Int)
-  hitRoll: number;
-
-  @Field(() => Int)
-  damageRoll: number;
-
-  @Field(() => Int)
-  armorClass: number;
 
   // Location & session
   @Field(() => Int, { nullable: true })
@@ -124,9 +102,6 @@ export class CharacterDto {
 
   @Field(() => Int)
   timePlayed: number;
-
-  @Field()
-  isOnline: boolean;
 
   // Biological needs
   @Field(() => Int)
@@ -145,9 +120,6 @@ export class CharacterDto {
   @Field()
   prompt: string;
 
-  @Field(() => Int)
-  pageLength: number;
-
   // Flags
   @Field(() => [String], { nullable: true })
   playerFlags?: string[];
@@ -155,16 +127,8 @@ export class CharacterDto {
   @Field(() => [String], { nullable: true })
   privilegeFlags?: string[];
 
-  // Builder/God specific
-  @Field(() => [Int], { nullable: true })
-  olcZones?: number[];
-
   @Field(() => Int)
   invisLevel: number;
-
-  // Timestamps
-  @Field()
-  birthTime: Date;
 
   @Field({ nullable: true })
   userId?: string;
@@ -311,9 +275,6 @@ export class CharacterLinkingInfoDto {
   timePlayed: number;
 
   @Field()
-  isOnline: boolean;
-
-  @Field()
   isLinked: boolean;
 
   @Field()
@@ -327,9 +288,6 @@ export class CharacterSessionInfoDto {
 
   @Field()
   name: string;
-
-  @Field()
-  isOnline: boolean;
 
   @Field({ nullable: true })
   lastLogin?: Date;
@@ -367,14 +325,11 @@ export class OnlineCharacterDto {
   @Field({ nullable: true })
   lastLogin?: Date;
 
-  @Field()
-  isOnline: boolean;
+  @Field({ nullable: true })
+  race?: string;
 
   @Field({ nullable: true })
-  raceType?: string;
-
-  @Field({ nullable: true })
-  playerClass?: string;
+  class?: string;
 
   @Field(() => UserSummaryDto, { nullable: true })
   user?: UserSummaryDto;

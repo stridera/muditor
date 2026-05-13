@@ -1,5 +1,5 @@
 import { Field, ID, InputType, Int } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, IsOptional, IsBoolean } from 'class-validator';
+import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 @InputType()
 export class CreateCharacterInput {
@@ -35,14 +35,8 @@ export class CreateCharacterInput {
   luck: number;
 
   // Character identity
-  @Field({ defaultValue: 'human' })
-  raceType: string;
-
   @Field({ defaultValue: 'neutral' })
   gender: string;
-
-  @Field({ nullable: true })
-  playerClass?: string;
 
   @Field(() => Int, { defaultValue: 1 })
   raceId: number;
@@ -102,13 +96,7 @@ export class UpdateCharacterInput {
 
   // Character identity
   @Field({ nullable: true })
-  raceType?: string;
-
-  @Field({ nullable: true })
   gender?: string;
-
-  @Field({ nullable: true })
-  playerClass?: string;
 
   // Physical attributes
   @Field(() => Int, { nullable: true })
@@ -137,19 +125,12 @@ export class UpdateCharacterInput {
   @Field({ nullable: true })
   prompt?: string;
 
-  @Field(() => Int, { nullable: true })
-  pageLength?: number;
-
   // Flags
   @Field(() => [String], { nullable: true })
   playerFlags?: string[];
 
   @Field(() => [String], { nullable: true })
   privilegeFlags?: string[];
-
-  // Builder/God specific
-  @Field(() => [Int], { nullable: true })
-  olcZones?: number[];
 
   @Field(() => Int, { nullable: true })
   invisLevel?: number;
@@ -270,19 +251,4 @@ export class CharacterFilterInput {
   @IsOptional()
   @IsString()
   name?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  raceType?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsString()
-  playerClass?: string;
-
-  @Field({ nullable: true })
-  @IsOptional()
-  @IsBoolean()
-  isOnline?: boolean;
 }

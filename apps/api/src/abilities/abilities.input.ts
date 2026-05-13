@@ -359,9 +359,6 @@ export class CreateEffectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   defaultParams?: Prisma.InputJsonValue;
-
-  @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: Prisma.InputJsonValue;
 }
 
 @InputType()
@@ -380,7 +377,4 @@ export class UpdateEffectInput {
 
   @Field(() => GraphQLJSON, { nullable: true })
   defaultParams?: Prisma.InputJsonValue;
-
-  @Field(() => GraphQLJSON, { nullable: true })
-  paramSchema?: Prisma.InputJsonValue;
 }

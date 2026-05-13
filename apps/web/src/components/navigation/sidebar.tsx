@@ -186,11 +186,6 @@ export function Sidebar() {
         icon: <Gamepad2 className='h-4 w-4' />,
       },
       {
-        name: 'Mailbox',
-        href: '/dashboard/player/mailbox',
-        icon: <Inbox className='h-4 w-4' />,
-      },
-      {
         name: 'Storage',
         href: '/dashboard/player/storage',
         icon: <Vault className='h-4 w-4' />,
@@ -295,20 +290,6 @@ export function Sidebar() {
       href: '/dashboard/admin/game-config',
       icon: <Settings className='h-4 w-4' />,
     });
-  }
-  if (isCoder) {
-    adminItems.push(
-      {
-        name: 'Mail Admin',
-        href: '/dashboard/admin/mail',
-        icon: <Mail className='h-4 w-4' />,
-      },
-      {
-        name: 'Deployments',
-        href: '/dashboard/deployments',
-        icon: <Package className='h-4 w-4' />,
-      }
-    );
   }
   adminItems.push({
     name: 'Console',

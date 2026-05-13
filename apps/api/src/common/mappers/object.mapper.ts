@@ -11,7 +11,6 @@ function mapEffect(e: PrismaEffect): Effect {
     effectType: e.effectType,
     tags: e.tags,
     defaultParams: e.defaultParams,
-    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
   };
 }
 

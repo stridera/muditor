@@ -77,9 +77,6 @@ const GET_CHARACTER_DETAILS = gql`
       homeRoom
       hunger
       thirst
-      hitRoll
-      damageRoll
-      armorClass
       playerFlags
       privilegeFlags
       invisLevel
@@ -351,13 +348,6 @@ export function CharacterDetails({
                     {character.movement}/{character.movementMax}
                   </span>
                 </div>
-                <div className='flex items-center justify-between'>
-                  <div className='flex items-center gap-2'>
-                    <Shield className='h-4 w-4 text-muted-foreground' />
-                    <span>Armor Class</span>
-                  </div>
-                  <span className='font-mono'>{character.armorClass}</span>
-                </div>
               </CardContent>
             </Card>
 
@@ -460,14 +450,6 @@ export function CharacterDetails({
                 <CardTitle>Combat & Progress</CardTitle>
               </CardHeader>
               <CardContent className='space-y-4'>
-                <div className='flex justify-between'>
-                  <span>Hit Roll</span>
-                  <span className='font-mono'>+{character.hitRoll}</span>
-                </div>
-                <div className='flex justify-between'>
-                  <span>Damage Roll</span>
-                  <span className='font-mono'>+{character.damageRoll}</span>
-                </div>
                 <div className='flex justify-between'>
                   <span>Experience</span>
                   <span className='font-mono'>

@@ -16,7 +16,6 @@ function mapEffect(e: PrismaEffect): Effect {
     effectType: e.effectType,
     tags: e.tags,
     defaultParams: e.defaultParams,
-    ...(e.paramSchema != null && { paramSchema: e.paramSchema }),
   };
 }
 
@@ -92,10 +91,6 @@ export function mapRoom(db: RoomMapperSource): RoomDto {
       db.layoutY !== undefined && { layoutY: db.layoutY }),
     ...(db.layoutZ !== null &&
       db.layoutZ !== undefined && { layoutZ: db.layoutZ }),
-    ...(db.magicAffinity != null && { magicAffinity: db.magicAffinity }),
-    ...(db.requiredMechanic != null && {
-      requiredMechanic: db.requiredMechanic,
-    }),
     ...(db.entryRestriction != null && {
       entryRestriction: db.entryRestriction,
     }),

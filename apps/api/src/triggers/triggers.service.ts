@@ -20,20 +20,6 @@ export class TriggersService {
   async findAll() {
     return this.prisma.triggers.findMany({
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -49,20 +35,6 @@ export class TriggersService {
     return this.prisma.triggers.findMany({
       where: { zoneId },
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -80,20 +52,6 @@ export class TriggersService {
         needsReview: true,
       },
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -128,20 +86,6 @@ export class TriggersService {
     const trigger = await this.prisma.triggers.findUnique({
       where: { zoneId_id: { zoneId, id } },
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -196,20 +140,6 @@ export class TriggersService {
     return this.prisma.triggers.findMany({
       where: whereClause,
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -239,21 +169,8 @@ export class TriggersService {
       argList: data.argList || [],
       numArgs: (data.argList || []).length,
       createdBy: userId ?? null,
-      mobZoneId: null,
-      mobId: null,
-      objectZoneId: null,
-      objectId: null,
-      variables: {},
       flags: (data.flags ?? []) as TriggerFlag[],
     };
-
-    if (data.mobId && data.mobZoneId) {
-      triggerData.mobZoneId = data.mobZoneId;
-      triggerData.mobId = data.mobId;
-    } else if (data.objectId && data.objectZoneId) {
-      triggerData.objectZoneId = data.objectZoneId;
-      triggerData.objectId = data.objectId;
-    }
 
     // Lint the script commands on create
     const lintResult = await this.lintCommands(data.commands);
@@ -263,20 +180,6 @@ export class TriggersService {
     return this.prisma.triggers.create({
       data: triggerData,
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -313,20 +216,6 @@ export class TriggersService {
       };
       updateData.flags = flagsUpdate;
     }
-    if (data.variables) {
-      updateData.variables = JSON.parse(data.variables);
-    }
-    if (data.mobId !== undefined && data.mobZoneId !== undefined) {
-      updateData.mobZoneId = data.mobZoneId;
-      updateData.mobId = data.mobId;
-      updateData.objectZoneId = null;
-      updateData.objectId = null;
-    } else if (data.objectId !== undefined && data.objectZoneId !== undefined) {
-      updateData.objectZoneId = data.objectZoneId;
-      updateData.objectId = data.objectId;
-      updateData.mobZoneId = null;
-      updateData.mobId = null;
-    }
 
     // Re-lint when commands are updated
     if (data.commands !== undefined) {
@@ -339,20 +228,6 @@ export class TriggersService {
       where: { zoneId_id: { zoneId, id } },
       data: updateData,
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -374,46 +249,59 @@ export class TriggersService {
   }
 
   async attachToEntity(data: AttachTriggerInput, userId?: string) {
-    const updateData: Prisma.TriggersUncheckedUpdateInput = {
-      attachType: data.attachType,
-    };
-    if (userId !== undefined) updateData.updatedBy = userId;
-
-    updateData.mobZoneId = null;
-    updateData.mobId = null;
-    updateData.objectZoneId = null;
-    updateData.objectId = null;
-
+    // Triggers no longer carry direct mob/object FKs — attachments live in
+    // MobTriggers/ObjectTriggers junction tables. Create the link rows.
     if (data.mobId && data.mobZoneId && data.attachType === ScriptType.MOB) {
-      updateData.mobZoneId = data.mobZoneId;
-      updateData.mobId = data.mobId;
+      await this.prisma.mobTriggers.upsert({
+        where: {
+          mobZoneId_mobId_triggerZoneId_triggerId: {
+            mobZoneId: data.mobZoneId,
+            mobId: data.mobId,
+            triggerZoneId: data.triggerZoneId,
+            triggerId: data.triggerId,
+          },
+        },
+        create: {
+          mobZoneId: data.mobZoneId,
+          mobId: data.mobId,
+          triggerZoneId: data.triggerZoneId,
+          triggerId: data.triggerId,
+        },
+        update: {},
+      });
     } else if (
       data.objectId &&
       data.objectZoneId &&
       data.attachType === ScriptType.OBJECT
     ) {
-      updateData.objectZoneId = data.objectZoneId;
-      updateData.objectId = data.objectId;
+      await this.prisma.objectTriggers.upsert({
+        where: {
+          objectZoneId_objectId_triggerZoneId_triggerId: {
+            objectZoneId: data.objectZoneId,
+            objectId: data.objectId,
+            triggerZoneId: data.triggerZoneId,
+            triggerId: data.triggerId,
+          },
+        },
+        create: {
+          objectZoneId: data.objectZoneId,
+          objectId: data.objectId,
+          triggerZoneId: data.triggerZoneId,
+          triggerId: data.triggerId,
+        },
+        update: {},
+      });
     }
 
+    // Optionally bump attachType + updatedBy on the trigger row
+    const updateData: Prisma.TriggersUncheckedUpdateInput = {
+      attachType: data.attachType,
+    };
+    if (userId !== undefined) updateData.updatedBy = userId;
     return this.prisma.triggers.update({
       where: { zoneId_id: { zoneId: data.triggerZoneId, id: data.triggerId } },
       data: updateData,
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -425,31 +313,22 @@ export class TriggersService {
   }
 
   async detachFromEntity(zoneId: number, id: number, userId?: string) {
-    const data: Prisma.TriggersUncheckedUpdateInput = {
-      mobZoneId: null,
-      mobId: null,
-      objectZoneId: null,
-      objectId: null,
-    };
+    // Remove all junction rows for this trigger.
+    await Promise.all([
+      this.prisma.mobTriggers.deleteMany({
+        where: { triggerZoneId: zoneId, triggerId: id },
+      }),
+      this.prisma.objectTriggers.deleteMany({
+        where: { triggerZoneId: zoneId, triggerId: id },
+      }),
+    ]);
+
+    const data: Prisma.TriggersUncheckedUpdateInput = {};
     if (userId !== undefined) data.updatedBy = userId;
     return this.prisma.triggers.update({
       where: { zoneId_id: { zoneId, id } },
       data,
       include: {
-        mobs: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
-        objects: {
-          select: {
-            id: true,
-            zoneId: true,
-            name: true,
-          },
-        },
         zones: {
           select: {
             id: true,
@@ -522,19 +401,21 @@ export class TriggersService {
     attachType: ScriptType,
     zoneId: number,
     entityId: number
-  ) {
+  ): Prisma.TriggersWhereInput {
     switch (attachType) {
       case ScriptType.MOB:
         return {
           attachType: ScriptType.MOB,
-          mobZoneId: zoneId,
-          mobId: entityId,
+          mobTriggers: {
+            some: { mobZoneId: zoneId, mobId: entityId },
+          },
         };
       case ScriptType.OBJECT:
         return {
           attachType: ScriptType.OBJECT,
-          objectZoneId: zoneId,
-          objectId: entityId,
+          objectTriggers: {
+            some: { objectZoneId: zoneId, objectId: entityId },
+          },
         };
       case ScriptType.WORLD:
         return {

@@ -192,8 +192,8 @@ export function calculateDamageDice(
 }
 
 /**
- * Calculate base damage bonus (damroll) based on level and race/class factors.
- * Formula from legacy get_set_hd() in magic.cpp
+ * Calculate base damage bonus based on level and race/class factors.
+ * Formula derived from legacy get_set_hd() in magic.cpp
  *
  * @param level - Mob level (1-99)
  * @param raceFactor - Race dice factor (default 100)
@@ -208,9 +208,9 @@ export function calculateDamageBonus(
   const clampedLevel = Math.max(1, Math.min(99, level));
   const combinedFactor = getCombinedDiceFactor(raceFactor, classFactor);
 
-  // Base damroll formula from level
-  const baseDamroll = Math.floor(clampedLevel / 2.5 + 0.5);
-  return Math.floor((baseDamroll * combinedFactor) / 100);
+  // Base damage bonus formula from level
+  const baseBonus = Math.floor(clampedLevel / 2.5 + 0.5);
+  return Math.floor((baseBonus * combinedFactor) / 100);
 }
 
 /**

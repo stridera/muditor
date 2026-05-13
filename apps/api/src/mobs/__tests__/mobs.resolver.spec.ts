@@ -52,8 +52,6 @@ describe('MobsResolver', () => {
         professions: [],
         alignment: 0,
         level: 1,
-        armorClass: 10,
-        hitRoll: 20,
         move: 0,
         hpDiceNum: 1,
         hpDiceSize: 8,
@@ -62,9 +60,7 @@ describe('MobsResolver', () => {
         damageDiceSize: 4,
         damageDiceBonus: 0,
         damageType: DamageType.HIT,
-        position: 'STANDING',
         defaultPosition: 'STANDING',
-        stance: 'ALERT',
         gender: 'NEUTRAL',
         race: Race.HUMAN,
         size: 'MEDIUM',
@@ -77,15 +73,11 @@ describe('MobsResolver', () => {
         perception: 0,
         concealment: 0,
         lifeForce: 'LIFE',
-        composition: 'FLESH',
         copper: 0,
         silver: 0,
         gold: 0,
         platinum: 0,
-        raceAlign: 0,
         totalWealth: 0,
-        averageStats: 13,
-        estimatedHp: 0,
         wealth: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
@@ -104,8 +96,6 @@ describe('MobsResolver', () => {
           roomDescription: string;
           examineDescription: string;
           race: Race | null;
-          hitRoll: number;
-          armorClass: number;
           hpDiceNum?: number;
           hpDiceSize?: number;
           hpDiceBonus?: number;
@@ -120,8 +110,6 @@ describe('MobsResolver', () => {
 
       expect(result).toBeDefined();
       expect(result?.race).toBe(Race.HUMAN);
-      expect(result?.hitRoll).toBe(20);
-      expect(result?.armorClass).toBe(10);
       expect(result?.damageDice).toBe('1d4+0');
       expect(result?.hpDice).toBe('1d8+0');
     });
@@ -136,8 +124,6 @@ describe('MobsResolver', () => {
         examineDescription: 'Description',
         race: null,
         role: 'NORMAL',
-        hitRoll: 0,
-        armorClass: 0,
         hpDiceNum: 1,
         hpDiceSize: 8,
         hpDiceBonus: 0,
@@ -162,18 +148,12 @@ describe('MobsResolver', () => {
         concealment: 0,
         size: 'MEDIUM',
         lifeForce: 'LIFE',
-        composition: 'FLESH',
-        stance: 'ALERT',
-        position: 'STANDING',
         defaultPosition: 'STANDING',
         copper: 0,
         silver: 0,
         gold: 0,
         platinum: 0,
-        raceAlign: 0,
         totalWealth: 0,
-        averageStats: 13,
-        estimatedHp: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: null,
@@ -190,8 +170,6 @@ describe('MobsResolver', () => {
           roomDescription: string;
           examineDescription: string;
           race: Race | null;
-          hitRoll: number;
-          armorClass: number;
           hpDice?: string;
           damageDice?: string;
           damageType: DamageType | string;
@@ -216,8 +194,6 @@ describe('MobsResolver', () => {
         roomDescription: 'Description',
         examineDescription: 'Details',
         race: Race.ELF,
-        hitRoll: 25,
-        armorClass: 5,
         hpDice: '2d8+4',
         damageDice: '2d6+3',
         damageType: 'SLASH',
@@ -245,16 +221,11 @@ describe('MobsResolver', () => {
         silver: 0,
         gold: 0,
         platinum: 0,
-        raceAlign: 0,
         totalWealth: 0,
-        averageStats: 13,
-        estimatedHp: 0,
         gender: 'NEUTRAL',
         size: 'MEDIUM',
         lifeForce: 'LIFE',
-        composition: 'FLESH',
-        position: 'STANDING',
-        stance: 'ALERT',
+        defaultPosition: 'STANDING',
         createdAt: new Date(),
         updatedAt: new Date(),
         createdBy: null,
@@ -278,8 +249,6 @@ describe('MobsResolver', () => {
           roomDescription: string;
           examineDescription: string;
           race: Race;
-          hitRoll: number;
-          armorClass: number;
           hpDiceNum: number;
           hpDiceSize: number;
           hpDiceBonus: number;
@@ -304,9 +273,6 @@ describe('MobsResolver', () => {
           gender: string;
           size: string;
           lifeForce: string;
-          composition: string;
-          position: string;
-          stance: string;
           createdAt: Date;
           updatedAt: Date;
         }
@@ -321,8 +287,6 @@ describe('MobsResolver', () => {
           roomDescription: string;
           examineDescription: string;
           race: Race;
-          hitRoll: number;
-          armorClass: number;
           hpDice: string;
           damageDice: string;
           damageType: DamageType;
@@ -330,8 +294,6 @@ describe('MobsResolver', () => {
       );
 
       expect(result.race).toBe(Race.ELF);
-      expect(result.hitRoll).toBe(25);
-      expect(result.armorClass).toBe(5);
       expect(result.damageDice).toBe('2d6+3');
       expect(result.hpDice).toBe('2d8+4');
     });

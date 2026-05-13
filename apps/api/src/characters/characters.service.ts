@@ -129,18 +129,6 @@ export class CharactersService {
       };
     }
 
-    if (filter?.raceType) {
-      where.raceType = filter.raceType;
-    }
-
-    if (filter?.playerClass) {
-      where.playerClass = filter.playerClass;
-    }
-
-    if (filter?.isOnline !== undefined) {
-      where.isOnline = filter.isOnline;
-    }
-
     return this.db.characters.findMany({
       where,
       include: {
@@ -221,18 +209,6 @@ export class CharactersService {
         contains: filter.name,
         mode: 'insensitive',
       };
-    }
-
-    if (filter?.raceType) {
-      where.raceType = filter.raceType;
-    }
-
-    if (filter?.playerClass) {
-      where.playerClass = filter.playerClass;
-    }
-
-    if (filter?.isOnline !== undefined) {
-      where.isOnline = filter.isOnline;
     }
 
     return this.db.characters.count({ where });
@@ -589,14 +565,11 @@ export class CharactersService {
     });
   }
 
-  // Character online status tracking
+  // Character session tracking (online state is tracked by game server runtime, not DB)
   async setCharacterOnline(characterId: string): Promise<void> {
     await this.db.characters.update({
       where: { id: characterId },
-      data: {
-        isOnline: true,
-        lastLogin: new Date(),
-      },
+      data: { lastLogin: new Date() },
     });
   }
 
@@ -614,31 +587,16 @@ export class CharactersService {
       await this.db.characters.update({
         where: { id: characterId },
         data: {
-          isOnline: false,
-          timePlayed: {
-            increment: sessionTime,
-          },
-        },
-      });
-    } else {
-      await this.db.characters.update({
-        where: { id: characterId },
-        data: {
-          isOnline: false,
+          timePlayed: { increment: sessionTime },
         },
       });
     }
   }
 
   async getOnlineCharacters(userId?: string) {
-    const where = userId
-      ? {
-          isOnline: true,
-          userId,
-        }
-      : {
-          isOnline: true,
-        };
+    // No DB-side `isOnline` column anymore — game server tracks live sessions.
+    // Return recently-logged-in characters as a best-effort approximation.
+    const where = userId ? { userId } : {};
 
     const characters = await this.db.characters.findMany({
       where,
@@ -647,7 +605,6 @@ export class CharactersService {
         name: true,
         level: true,
         lastLogin: true,
-        isOnline: true,
         race: true,
         characterClass: {
           select: {
@@ -663,6 +620,7 @@ export class CharactersService {
         },
       },
       orderBy: { lastLogin: 'desc' },
+      take: 50,
     });
 
     return characters.map(c => ({
@@ -670,9 +628,8 @@ export class CharactersService {
       name: c.name,
       level: c.level,
       lastLogin: c.lastLogin,
-      isOnline: c.isOnline,
-      raceType: c.race ?? undefined,
-      playerClass: c.characterClass?.plainName ?? undefined,
+      race: c.race ?? undefined,
+      class: c.characterClass?.plainName ?? undefined,
       user: c.users ?? {
         id: c.id,
         displayName: c.name,
@@ -687,7 +644,6 @@ export class CharactersService {
       select: {
         id: true,
         name: true,
-        isOnline: true,
         lastLogin: true,
         timePlayed: true,
       },
@@ -697,16 +653,9 @@ export class CharactersService {
       throw new NotFoundException(`Character with ID ${characterId} not found`);
     }
 
-    let currentSessionTime = 0;
-    if (character.isOnline && character.lastLogin) {
-      currentSessionTime = Math.floor(
-        (Date.now() - character.lastLogin.getTime()) / 1000
-      );
-    }
-
     return {
       ...character,
-      currentSessionTime,
+      currentSessionTime: 0,
       totalTimePlayed: character.timePlayed,
     };
   }
@@ -916,7 +865,6 @@ export class CharactersService {
         userId: true,
         lastLogin: true,
         timePlayed: true,
-        isOnline: true,
         characterClass: {
           select: { plainName: true },
         },
@@ -941,7 +889,6 @@ export class CharactersService {
       class: character.characterClass?.plainName ?? undefined,
       lastLogin: character.lastLogin,
       timePlayed: character.timePlayed,
-      isOnline: character.isOnline,
       isLinked: !!character.userId,
       hasPassword: false, // Deprecated: passwords are now on User model
     };

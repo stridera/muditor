@@ -12,7 +12,6 @@ query GetEffectEditorOptions {
     id
     name
     effectType
-    paramSchema
   }
 
   # Mobs for summon blocks

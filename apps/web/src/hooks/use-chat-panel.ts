@@ -67,7 +67,7 @@ export function useChatPanel() {
     };
     const level = roleLevel[user?.role ?? ''] ?? 0;
     const chs = [{ value: 'gossip', label: 'gossip' }];
-    if (level >= roleLevel.IMMORTAL) {
+    if (level >= (roleLevel['IMMORTAL'] ?? 0)) {
       chs.push({ value: 'wiznet', label: 'wiznet' });
     }
     return chs;

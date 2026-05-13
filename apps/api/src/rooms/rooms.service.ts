@@ -25,12 +25,7 @@ interface RoomExitResult {
   hitPoints: number | null;
 }
 
-import {
-  ExitState,
-  MagicAffinity,
-  PositionMechanic,
-  Sector,
-} from '@muditor/db';
+import { ExitState, Sector } from '@muditor/db';
 
 interface RoomServiceResultBase {
   id: number;
@@ -50,8 +45,6 @@ interface RoomServiceResultBase {
   layoutZ: number | null;
   baseLightLevel: number;
   capacity: number;
-  magicAffinity: MagicAffinity | null;
-  requiredMechanic: PositionMechanic | null;
   entryRestriction: string | null;
   isPeaceful: boolean;
   allowsMagic: boolean;
@@ -67,7 +60,6 @@ interface RoomServiceResultBase {
       effectType: string;
       tags: string[];
       defaultParams: unknown;
-      paramSchema?: unknown;
     };
   }>;
   mobResets?: Array<{
@@ -125,7 +117,6 @@ export class RoomsService {
         effectType: string;
         tags: string[];
         defaultParams: unknown;
-        paramSchema?: unknown;
       };
     }>;
     mobResets?: Array<{
@@ -148,8 +139,6 @@ export class RoomsService {
     layoutZ?: number | null;
     baseLightLevel?: number;
     capacity?: number;
-    magicAffinity?: MagicAffinity | null;
-    requiredMechanic?: PositionMechanic | null;
     entryRestriction?: string | null;
     isPeaceful?: boolean;
     allowsMagic?: boolean;
@@ -179,8 +168,6 @@ export class RoomsService {
       layoutZ: room.layoutZ ?? null,
       baseLightLevel: room.baseLightLevel ?? 0,
       capacity: room.capacity ?? 10,
-      magicAffinity: room.magicAffinity ?? null,
-      requiredMechanic: room.requiredMechanic ?? null,
       entryRestriction: room.entryRestriction ?? null,
       isPeaceful: room.isPeaceful ?? false,
       allowsMagic: room.allowsMagic ?? true,
@@ -347,8 +334,6 @@ export class RoomsService {
         sector: data.sector || 'STRUCTURE',
         baseLightLevel: data.baseLightLevel ?? 0,
         capacity: data.capacity ?? 10,
-        magicAffinity: data.magicAffinity ?? null,
-        requiredMechanic: data.requiredMechanic ?? null,
         entryRestriction: data.entryRestriction ?? null,
         isPeaceful: data.isPeaceful ?? false,
         allowsMagic: data.allowsMagic ?? true,
@@ -377,10 +362,6 @@ export class RoomsService {
     if (data.baseLightLevel !== undefined)
       update.baseLightLevel = data.baseLightLevel;
     if (data.capacity !== undefined) update.capacity = data.capacity;
-    if (data.magicAffinity !== undefined)
-      update.magicAffinity = data.magicAffinity;
-    if (data.requiredMechanic !== undefined)
-      update.requiredMechanic = data.requiredMechanic;
     if (data.entryRestriction !== undefined)
       update.entryRestriction = data.entryRestriction;
     if (data.isPeaceful !== undefined) update.isPeaceful = data.isPeaceful;

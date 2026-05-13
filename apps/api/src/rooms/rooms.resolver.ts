@@ -76,13 +76,6 @@ interface RawShopAccept {
   shopZoneId: number;
   shopId: number;
 }
-interface RawShopHour {
-  id: number;
-  shopZoneId: number;
-  shopId: number;
-  open: number;
-  close: number;
-}
 interface RoomWithResets {
   mobResets?: MobReset[];
   mob_resets?: MobReset[];
@@ -372,12 +365,6 @@ export class RoomsResolver {
               id: String(accept.id),
               type: accept.type,
               keywords: accept.keywords?.join(' ') ?? '',
-            })) || [],
-          hours:
-            shop.shopHours?.map((hour: RawShopHour) => ({
-              id: String(hour.id),
-              open: hour.open,
-              close: hour.close,
             })) || [],
         };
         if (shop.mobs) {

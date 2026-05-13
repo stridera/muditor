@@ -24,11 +24,6 @@ interface ObjectResetWithRelations extends ObjectResets {
     zoneId: number;
     name: string;
   } | null;
-  spawnConditions: Array<{
-    id: number;
-    type: string;
-    parameters: Prisma.JsonValue;
-  }>;
   containedResets?: ObjectResetWithRelations[];
 }
 
@@ -58,13 +53,6 @@ export class ObjectResetService {
             name: true,
           },
         },
-        spawnConditions: {
-          select: {
-            id: true,
-            type: true,
-            parameters: true,
-          },
-        },
       },
     });
 
@@ -88,13 +76,6 @@ export class ObjectResetService {
             id: true,
             zoneId: true,
             name: true,
-          },
-        },
-        spawnConditions: {
-          select: {
-            id: true,
-            type: true,
-            parameters: true,
           },
         },
       },
@@ -122,13 +103,6 @@ export class ObjectResetService {
             name: true,
           },
         },
-        spawnConditions: {
-          select: {
-            id: true,
-            type: true,
-            parameters: true,
-          },
-        },
       },
     });
 
@@ -152,9 +126,6 @@ export class ObjectResetService {
         },
         rooms: {
           select: { id: true, zoneId: true, name: true },
-        },
-        spawnConditions: {
-          select: { id: true, type: true, parameters: true },
         },
       },
     });
@@ -231,11 +202,6 @@ export class ObjectResetService {
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-      conditions: reset.spawnConditions.map(cond => ({
-        id: String(cond.id),
-        type: cond.type,
-        parameters: JSON.stringify(cond.parameters),
-      })),
     };
 
     if (reset.comment) {

@@ -91,9 +91,6 @@ export class ShopDto {
 
   @Field(() => [ShopAcceptDto], { defaultValue: [] })
   accepts: ShopAcceptDto[];
-
-  @Field(() => [ShopHourDto], { defaultValue: [] })
-  hours: ShopHourDto[];
 }
 
 @InputType()
@@ -262,18 +259,6 @@ export class ShopAcceptDto {
   keywords?: string;
 }
 
-@ObjectType()
-export class ShopHourDto {
-  @Field()
-  id: string;
-
-  @Field(() => Int)
-  open: number;
-
-  @Field(() => Int)
-  close: number;
-}
-
 @InputType()
 export class ShopItemInput {
   @Field(() => Int)
@@ -291,28 +276,8 @@ export class ShopItemInput {
 }
 
 @InputType()
-export class ShopHourInput {
-  @Field(() => Int)
-  @IsInt()
-  @Min(0)
-  open: number;
-
-  @Field(() => Int)
-  @IsInt()
-  @Min(0)
-  close: number;
-}
-
-@InputType()
 export class UpdateShopInventoryInput {
   @Field(() => [ShopItemInput])
   @IsArray()
   items: ShopItemInput[];
-}
-
-@InputType()
-export class UpdateShopHoursInput {
-  @Field(() => [ShopHourInput])
-  @IsArray()
-  hours: ShopHourInput[];
 }

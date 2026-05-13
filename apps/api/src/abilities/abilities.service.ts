@@ -365,7 +365,6 @@ export class AbilitiesService {
         effectType: data.effectType,
         tags: data.tags ?? [],
         defaultParams: data.defaultParams ?? {},
-        paramSchema: data.paramSchema ?? Prisma.JsonNull,
       },
     });
   }
@@ -379,8 +378,6 @@ export class AbilitiesService {
     if (data.tags !== undefined) updateData.tags = data.tags;
     if (data.defaultParams !== undefined)
       updateData.defaultParams = data.defaultParams;
-    if (data.paramSchema !== undefined)
-      updateData.paramSchema = data.paramSchema;
 
     return this.prisma.effect.update({
       where: { id },
