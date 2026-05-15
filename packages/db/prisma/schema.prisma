@@ -934,8 +934,20 @@ model Objects {
   decomposeTimer          Int        @default(0) @map("decompose_timer")
   level                   Int        @default(1)
   concealment             Int        @default(0)
-  values                  Json       @default("{}")
+  values                  Json       @default("{}") // Type-specific niche values (portal dest, light fuel, food, spell, liquid). Combat-critical fields (armor_pct, weapon_*) live as typed columns below — JSONB is for fields the runtime reads rarely.
   zoneId                  Int        @map("zone_id")
+
+  // Typed combat-critical fields (May 2026 — migration off `values` JSONB).
+  // armorPct = legacy AC × 2 (combat-rebalance.md Step 3 §8 scale; legacy
+  //   "lower=better" sign is flipped at fierylib import time, so a
+  //   positive value here always means more mitigation).
+  // weapon* fields populated only for ObjectType.WEAPON; zero/null for
+  //   the rest of the object types.
+  armorPct         Int          @default(0) @map("armor_pct")
+  weaponDiceNum    Int          @default(0) @map("weapon_dice_num")
+  weaponDiceSize   Int          @default(0) @map("weapon_dice_size")
+  weaponDiceBonus  Int          @default(0) @map("weapon_dice_bonus")
+  weaponDamageType DamageType?  @map("weapon_damage_type")
 
   // Permanent fixture: If set, this object always exists in this room (no reset needed)
   // Use for fountains, signs, furniture, etc. that never move or despawn
