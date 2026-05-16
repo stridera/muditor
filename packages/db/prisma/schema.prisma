@@ -358,6 +358,13 @@ model CharacterClass {
   // casters +1/lvl. See combat_formulas.CLASS_ATTACK_POWER_PER_LEVEL.
   attackPowerPerLevel Float @default(2.0) @map("attack_power_per_level")
 
+  // Base crit chance percent (1-100). Per-tier defaults:
+  //   pure caster 3, mid 4, combat 5, martial 8, stealth 12.
+  // Stealth classes are crit-tier by design (backstab/throatcut/etc.);
+  // martial classes get a smaller crit edge for unarmed precision.
+  // Future: stack with weapon/gear crit modifiers from ObjectEffects.
+  baseCritChance Int @default(5) @map("base_crit_chance")
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")
@@ -569,6 +576,9 @@ model Characters {
   spellPower         Int @default(0) @map("spell_power")
   penetrationFlat    Int @default(0) @map("penetration_flat")
   penetrationPercent Int @default(0) @map("penetration_percent")
+  // Crit chance percent (1-100). Seeded from Class.baseCritChance at
+  // character create / import; gear & buffs stack via apply_modify_delta.
+  critChance         Int @default(5) @map("crit_chance")
 
   // DEFENSIVE STATS (new combat redesign)
   evasion                Int @default(0)
