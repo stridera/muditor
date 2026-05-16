@@ -339,6 +339,25 @@ model CharacterClass {
 
   hpPerLevel Int @default(10) @map("hp_per_level")
 
+  // Combat rates per class — data-driven so Muditor can tune
+  // class balance without code changes. Five-tier defaults:
+  //   pure caster (acc 1.5 / eva 0.5 / dexMult 0.5),
+  //   mid         (acc 2.0 / eva 1.0 / dexMult 1.0),
+  //   combat      (acc 2.7 / eva 2.0 / dexMult 1.5),
+  //   martial     (acc 3.5 / eva 2.5 / dexMult 2.0),
+  //   stealth     (acc 3.0 / eva 2.0 / dexMult 2.0).
+  // Used by fierylib at character creation / import to set the
+  // baked accuracy + evasion on the Characters row. Source of truth
+  // for the formulas in ``fierylib/combat_formulas.py``.
+  accuracyPerLevel Float @default(2.0) @map("accuracy_per_level")
+  evasionPerLevel  Float @default(2.0) @map("evasion_per_level")
+  dexEvasionMult   Float @default(1.0) @map("dex_evasion_mult")
+
+  // Per-class flat attack_power bump per level (Step 4 / Path C).
+  // Pairs with accuracyPerLevel; warriors get +5/lvl, mid +3/lvl,
+  // casters +1/lvl. See combat_formulas.CLASS_ATTACK_POWER_PER_LEVEL.
+  attackPowerPerLevel Float @default(2.0) @map("attack_power_per_level")
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")
@@ -2665,6 +2684,12 @@ enum LoginStage {
   SELECT_RACE // Race selection prompt
   CREATION_COMPLETE // Character created message
   RECONNECT_MESSAGE // Reconnecting to existing session
+  // Remote login-approval flow (Muditor dashboard sign-in handshake).
+  // text_seeder seeds default messages for each.
+  LOGIN_APPROVAL_PENDING // Approval request sent, waiting on user
+  LOGIN_APPROVAL_APPROVED // User approved on dashboard
+  LOGIN_APPROVAL_DENIED // User denied on dashboard
+  LOGIN_APPROVAL_EXPIRED // Approval window timed out
 }
 
 // ============================================================================
