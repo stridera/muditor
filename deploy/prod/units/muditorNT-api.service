@@ -1,0 +1,31 @@
+[Unit]
+Description=Muditor NEXT API
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fierymud
+Group=fierymud
+WorkingDirectory=/opt/NEXT/muditor/apps/api
+# The API also reads ../../.env (/opt/NEXT/muditor/.env -> /opt/NEXT/.env).
+EnvironmentFile=/opt/NEXT/env/muditor.env
+Environment=NODE_ENV=production
+Environment=PATH=/opt/NEXT/tools/bun/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/opt/NEXT/run
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+InaccessiblePaths=-/opt/PRODUCTION -/opt/TEST -/opt/DEV @BACKUP_PATHS@
+# src/ is writable because NestJS regenerates src/schema.gql at startup
+ReadWritePaths=/opt/NEXT/logs /opt/NEXT/run -/opt/NEXT/muditor/apps/api/src
+ExecStart=/opt/NEXT/tools/bun/bin/bun dist/main.js
+Restart=always
+RestartSec=15
+LimitNOFILE=65536
+TimeoutStopSec=15
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,29 @@
+[Unit]
+Description=Fiery NEXT Mud Server (Rust)
+After=network-online.target postgresql.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fierymud
+Group=fierymud
+WorkingDirectory=/opt/NEXT/fierymud-rs
+EnvironmentFile=/opt/NEXT/env/fierymud-rs.env
+Environment=PATH=/opt/NEXT/tools/bun/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/opt/NEXT/run
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+InaccessiblePaths=-/opt/PRODUCTION -/opt/TEST -/opt/DEV @BACKUP_PATHS@
+ReadWritePaths=/opt/NEXT/logs /opt/NEXT/run /opt/NEXT/fierymud-rs/state
+ExecStart=/opt/NEXT/fierymud-rs/target/release/mud-server
+Restart=always
+RestartSec=15
+# The server saves players on SIGTERM; give it time to finish.
+KillSignal=SIGTERM
+TimeoutStopSec=30
+LimitNOFILE=65536
+
+[Install]
+WantedBy=multi-user.target

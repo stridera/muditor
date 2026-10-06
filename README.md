@@ -4,6 +4,8 @@
 
 Muditor transforms legacy MUD world building from text-based file editing to a visual, collaborative web interface. Built with PostgreSQL, GraphQL, and React, it provides comprehensive tools for creating, editing, and managing MUD worlds with real-time collaboration and live server integration.
 
+Production: see [docs/PROD.md](docs/PROD.md).
+
 ## Features
 
 ### 🎮 Dual-Mode Interface

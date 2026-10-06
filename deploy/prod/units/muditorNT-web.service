@@ -1,0 +1,30 @@
+[Unit]
+Description=Muditor NEXT Web
+After=network-online.target postgresql.service muditorNT-api.service
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=fierymud
+Group=fierymud
+WorkingDirectory=/opt/NEXT/muditor/apps/web
+EnvironmentFile=/opt/NEXT/env/muditor.env
+Environment=NODE_ENV=production
+Environment=PATH=/opt/NEXT/tools/bun/bin:/usr/local/bin:/usr/bin:/bin
+Environment=HOME=/opt/NEXT/run
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+NoNewPrivileges=true
+InaccessiblePaths=-/opt/PRODUCTION -/opt/TEST -/opt/DEV @BACKUP_PATHS@
+Environment=NEXT_TELEMETRY_DISABLED=1
+ReadWritePaths=/opt/NEXT/logs /opt/NEXT/run -/opt/NEXT/muditor/apps/web/.next/cache
+ExecStart=/opt/NEXT/tools/bun/bin/bun --bun node_modules/.bin/next start -H 127.0.0.1 -p 3000
+Restart=always
+RestartSec=15
+LimitNOFILE=65536
+TimeoutStopSec=15
+KillMode=mixed
+
+[Install]
+WantedBy=multi-user.target
