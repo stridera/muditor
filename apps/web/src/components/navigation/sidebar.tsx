@@ -72,7 +72,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { isImmortal, isBuilder, isCoder } = usePermissions();
+  const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
   // Collapse state
@@ -300,7 +300,7 @@ export function Sidebar() {
       icon: <Settings className='h-4 w-4' />,
     });
   }
-  if (isCoder) {
+  if (isHeadBuilder) {
     adminItems.push({
       name: 'Zone Grants',
       href: '/dashboard/admin/grants',

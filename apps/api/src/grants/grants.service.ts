@@ -12,6 +12,17 @@ export class GrantsService {
   constructor(private readonly db: DatabaseService) {}
 
   /**
+   * Minimal user list for the zone grants picker.
+   */
+  async findGrantableUsers() {
+    return this.db.users.findMany({
+      where: { deletedAt: null },
+      select: { id: true, displayName: true, role: true },
+      orderBy: { displayName: 'asc' },
+    });
+  }
+
+  /**
    * Create a new grant
    */
   async create(data: CreateGrantInput, grantedBy: string) {

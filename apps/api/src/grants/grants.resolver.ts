@@ -7,7 +7,7 @@ import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 // UserRole re-imported above with runtime import to preserve decorator metadata
-import { UserGrantDto, ZoneGrantDto } from './grants.dto';
+import { GrantableUserDto, UserGrantDto, ZoneGrantDto } from './grants.dto';
 import {
   CreateGrantInput,
   GrantZoneAccessInput,
@@ -36,6 +36,13 @@ export class GrantsResolver {
 
     // HEAD_BUILDER+ can see all grants or filter by userId
     return this.grantsService.findAll(userId, resourceType);
+  }
+
+  // Users a HEAD_BUILDER may assign zones to (id, display name, role only)
+  @Query(() => [GrantableUserDto], { name: 'grantableUsers' })
+  @MinimumRole(UserRole.HEAD_BUILDER)
+  async findGrantableUsers() {
+    return this.grantsService.findGrantableUsers();
   }
 
   // Query single grant by ID

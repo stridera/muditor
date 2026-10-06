@@ -1,5 +1,5 @@
 import { ObjectType, Field, ID, registerEnumType } from '@nestjs/graphql';
-import { GrantResourceType, GrantPermission } from '@muditor/db';
+import { GrantResourceType, GrantPermission, UserRole } from '@muditor/db';
 
 // Register enums with GraphQL
 registerEnumType(GrantResourceType, {
@@ -46,6 +46,21 @@ export class UserGrantDto {
 
   @Field({ description: 'Display name of the person who received the grant' })
   displayName?: string;
+}
+
+@ObjectType({
+  description:
+    'Minimal user summary for the zone grants picker (no email, ban or auth data)',
+})
+export class GrantableUserDto {
+  @Field(() => ID)
+  id: string;
+
+  @Field()
+  displayName: string;
+
+  @Field(() => UserRole)
+  role: UserRole;
 }
 
 @ObjectType()

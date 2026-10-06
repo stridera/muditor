@@ -1,7 +1,7 @@
-# Zone grant administration (CODER / IMPLEMENTOR UI)
+# Zone grant administration (HEAD_BUILDER+ UI)
 
 query GrantsAdminUsers {
-  users {
+  users: grantableUsers {
     id
     displayName
     role

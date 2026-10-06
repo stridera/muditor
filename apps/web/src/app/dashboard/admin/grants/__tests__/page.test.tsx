@@ -14,7 +14,7 @@ import GrantsAdminPage from '../page';
 const mockCreateGrant = jest.fn();
 const mockDeleteGrant = jest.fn();
 const mockRefetch = jest.fn();
-let mockPerms = { isCoder: true, isImplementor: false, loading: false };
+let mockPerms = { isHeadBuilder: true, loading: false };
 
 jest.mock('@/hooks/use-permissions', () => ({
   usePermissions: () => mockPerms,
@@ -71,7 +71,7 @@ jest.mock('@apollo/client/react', () => ({
 describe('GrantsAdminPage', () => {
   beforeEach(() => {
     jest.clearAllMocks();
-    mockPerms = { isCoder: true, isImplementor: false, loading: false };
+    mockPerms = { isHeadBuilder: true, loading: false };
     mockCreateGrant.mockResolvedValue({ data: {} });
     mockDeleteGrant.mockResolvedValue({ data: {} });
   });
@@ -122,10 +122,17 @@ describe('GrantsAdminPage', () => {
     );
   });
 
-  it('denies access to non CODER/IMPLEMENTOR users', () => {
-    mockPerms = { isCoder: false, isImplementor: false, loading: false };
+  it('renders for a HEAD_BUILDER', () => {
+    mockPerms = { isHeadBuilder: true, loading: false };
     render(<GrantsAdminPage />);
-    expect(screen.getByText(/CODER-level access required/)).toBeVisible();
-    expect(screen.queryByText('Zone Grants')).toBeNull();
+    expect(screen.getByRole('cell', { name: 'BuilderChar' })).toBeVisible();
+    expect(screen.queryByText(/Head Builder role or higher/)).toBeNull();
+  });
+
+  it('denies access to a BUILDER (below HEAD_BUILDER)', () => {
+    mockPerms = { isHeadBuilder: false, loading: false };
+    render(<GrantsAdminPage />);
+    expect(screen.getByText(/Head Builder role or higher/)).toBeVisible();
+    expect(screen.queryByRole('cell', { name: 'BuilderChar' })).toBeNull();
   });
 });

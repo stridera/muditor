@@ -1450,6 +1450,15 @@ input GrantZoneAccessInput {
   zoneId: Float!
 }
 
+"""
+Minimal user summary for the zone grants picker (no email, ban or auth data)
+"""
+type GrantableUserDto {
+  displayName: String!
+  id: ID!
+  role: UserRole!
+}
+
 """Help entry for in-game documentation"""
 type HelpEntryDto {
   """Category (e.g., spell, skill, command, class, area)"""
@@ -2386,6 +2395,7 @@ type Query {
   """Get validation summary statistics"""
   getValidationSummary: ValidationSummaryType!
   grant(id: ID!): UserGrantDto!
+  grantableUsers: [GrantableUserDto!]!
   grants(resourceType: GrantResourceType, userId: String): [UserGrantDto!]!
   hasGoogleLink: Boolean!
 

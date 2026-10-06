@@ -139,7 +139,7 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { isImmortal, isBuilder, isCoder } = usePermissions();
+  const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
   const { isInZoneContext } = useZoneContext();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
@@ -434,14 +434,17 @@ export function Navigation() {
                           </Link>
                         </DropdownMenuItem>
                       )}
-                      {isCoder && (
-                        <DropdownMenuItem asChild>
-                          <Link href='/dashboard/admin/grants'>
-                            <Shield className='mr-2 h-4 w-4' />
-                            Zone Grants
-                          </Link>
-                        </DropdownMenuItem>
-                      )}
+                    </>
+                  )}
+                  {isHeadBuilder && (
+                    <>
+                      {!canAccessGameSystems && <DropdownMenuSeparator />}
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/admin/grants'>
+                          <Shield className='mr-2 h-4 w-4' />
+                          Zone Grants
+                        </Link>
+                      </DropdownMenuItem>
                     </>
                   )}
                   <DropdownMenuSeparator />

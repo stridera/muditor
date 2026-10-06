@@ -43,7 +43,7 @@ const SELECT_CLASS =
   'flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50';
 
 export default function GrantsAdminPage() {
-  const { isCoder, isImplementor, loading: permLoading } = usePermissions();
+  const { isHeadBuilder, loading: permLoading } = usePermissions();
 
   if (permLoading) {
     return (
@@ -53,14 +53,14 @@ export default function GrantsAdminPage() {
     );
   }
 
-  if (!isCoder && !isImplementor) {
+  if (!isHeadBuilder) {
     return (
       <div className='p-6'>
         <Alert variant='destructive'>
           <AlertTriangle className='h-4 w-4' />
           <AlertDescription>
-            You do not have permission to manage zone grants. CODER-level access
-            required.
+            You do not have permission to manage zone grants. Head Builder role
+            or higher required.
           </AlertDescription>
         </Alert>
       </div>
