@@ -11,6 +11,7 @@ import {
   AdminUnlinkCharacterDocument,
   AdminUsersListDocument,
 } from '@/generated/graphql';
+import { roleAtLeast } from '@/lib/roles';
 import AdminUsersPage from '../page';
 
 const mockSetRole = jest.fn();
@@ -27,9 +28,9 @@ type Perms = {
   permissions: { role: string } | null;
 };
 const perms = (role: string): Perms => ({
-  isImmortal: role !== 'PLAYER' && role !== 'BUILDER',
-  isCoder: role === 'CODER' || role === 'IMPLEMENTOR',
-  isImplementor: role === 'IMPLEMENTOR',
+  isImmortal: roleAtLeast(role, 'IMMORTAL'),
+  isCoder: roleAtLeast(role, 'CODER'),
+  isImplementor: roleAtLeast(role, 'IMPLEMENTOR'),
   loading: false,
   permissions: { role },
 });
@@ -102,8 +103,8 @@ describe('AdminUsersPage', () => {
     });
   });
 
-  it('denies players and builders', () => {
-    mockPerms = perms('BUILDER');
+  it('denies players (BUILDER and above are staff and pass)', () => {
+    mockPerms = perms('PLAYER');
     render(<AdminUsersPage />);
     expect(screen.getByText(/IMMORTAL-level access required/)).toBeVisible();
     expect(screen.queryByText('User Accounts')).toBeNull();

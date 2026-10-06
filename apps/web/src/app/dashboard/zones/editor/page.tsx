@@ -173,7 +173,7 @@ function ZoneEditorContent() {
 
 export default function ZoneEditorPage() {
   return (
-    <PermissionGuard requireImmortal={true}>
+    <PermissionGuard requireBuilder={true}>
       <Suspense fallback={<div className='p-6'>Loading zone editor...</div>}>
         <ZoneEditorContent />
       </Suspense>

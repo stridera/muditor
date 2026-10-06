@@ -5,6 +5,7 @@ import {
 } from '@nestjs/common';
 import { UserRole, type Users } from '@muditor/db';
 import * as crypto from 'crypto';
+import { roleAtLeast } from '../auth/role.util';
 import { DatabaseService } from '../database/database.service';
 import { BanUserInput } from './dto/ban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -318,24 +319,23 @@ export class UsersService {
     return user.role === UserRole.PLAYER;
   }
 
+  // All hierarchy checks are "at or above" (see auth/role.util.ts); never
+  // compare roles with === here or intermediate roles (BUILDER, HEAD_BUILDER)
+  // fall through the cracks.
   isImmortal(user: Users): boolean {
-    return user.role === UserRole.IMMORTAL || this.isHigherThanImmortal(user);
+    return roleAtLeast(user.role, UserRole.IMMORTAL);
   }
 
   isBuilder(user: Users): boolean {
-    return user.role === UserRole.BUILDER || this.isCoder(user);
+    return roleAtLeast(user.role, UserRole.BUILDER);
   }
 
   isCoder(user: Users): boolean {
-    return user.role === UserRole.CODER || this.isImplementor(user);
+    return roleAtLeast(user.role, UserRole.CODER);
   }
 
   isImplementor(user: Users): boolean {
     return user.role === UserRole.IMPLEMENTOR;
-  }
-
-  isHigherThanImmortal(user: Users): boolean {
-    return user.role === UserRole.CODER || user.role === UserRole.IMPLEMENTOR;
   }
 
   canAccessDashboard(user: Users): boolean {

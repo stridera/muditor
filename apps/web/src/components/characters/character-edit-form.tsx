@@ -23,6 +23,7 @@ import { useAuth } from '@/contexts/auth-context';
 import type { CharacterDto, Race } from '@/generated/graphql';
 import { useClasses } from '@/hooks/use-classes';
 import { useRaces } from '@/hooks/use-races';
+import { roleAtLeast } from '@/lib/roles';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import {
@@ -101,7 +102,7 @@ export function CharacterEditForm({
 }: CharacterEditFormProps) {
   const { user } = useAuth();
   // Race/class changes are staff-only on the API (IMMORTAL+).
-  const isStaff = !!user && user.role !== 'PLAYER';
+  const isStaff = !!user && roleAtLeast(user.role, 'IMMORTAL');
   const { races, loading: racesLoading } = useRaces();
   const { classes, loading: classesLoading } = useClasses();
   const [formData, setFormData] = useState<UpdateCharacterData>({

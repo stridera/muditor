@@ -52,6 +52,7 @@ import {
 } from '@/components/ui/table';
 import { Textarea } from '@/components/ui/textarea';
 import { useErrorHandler } from '@/lib/error-utils';
+import { USER_ROLES, type UserRole } from '@/lib/roles';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
@@ -125,7 +126,7 @@ interface User {
   id: string;
   displayName: string;
   email: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR';
+  role: UserRole;
   isBanned: boolean;
   createdAt: string;
   lastLoginAt?: string;
@@ -435,11 +436,14 @@ function EditUserDialog({
               <SelectValue placeholder='Select role' />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value='PLAYER'>Player</SelectItem>
-              <SelectItem value='IMMORTAL'>Immortal</SelectItem>
-              <SelectItem value='BUILDER'>Builder</SelectItem>
-              <SelectItem value='CODER'>Coder</SelectItem>
-              <SelectItem value='IMPLEMENTOR'>Implementor</SelectItem>
+              {USER_ROLES.map(r => (
+                <SelectItem key={r} value={r}>
+                  {r
+                    .split('_')
+                    .map(w => w[0] + w.slice(1).toLowerCase())
+                    .join(' ')}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

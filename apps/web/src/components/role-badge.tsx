@@ -1,13 +1,8 @@
 import { Badge } from '@/components/ui/badge';
+import type { UserRole } from '@/lib/roles';
 import { Shield, User, Hammer, Code, Crown, Star } from 'lucide-react';
 
-type Role =
-  | 'PLAYER'
-  | 'IMMORTAL'
-  | 'BUILDER'
-  | 'HEAD_BUILDER'
-  | 'CODER'
-  | 'IMPLEMENTOR';
+type Role = UserRole;
 
 interface RoleBadgeProps {
   role: Role;

@@ -1,6 +1,7 @@
 'use client';
 
 import { useAuth } from '@/contexts/auth-context';
+import { roleAtLeast, roleRank } from '@/lib/roles';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 
@@ -48,6 +49,7 @@ export interface UsePermissionsResult {
   isPlayer: boolean;
   isImmortal: boolean;
   isBuilder: boolean;
+  isHeadBuilder: boolean;
   isCoder: boolean;
   isImplementor: boolean;
 }
@@ -66,21 +68,25 @@ export function usePermissions(): UsePermissionsResult {
 
   const permissions = data?.myPermissions || null;
 
-  // Helper functions based on backend permission logic
-  const canEditZone = (zoneId?: number): boolean => {
+  // Every flag is derived from the role via lib/roles (never from the
+  // server's per-role booleans, never with === on a role).
+  const role = permissions?.role ?? user?.role;
+  const isPlayer = !!permissions && roleRank(role) === 0;
+  const isImmortal = roleAtLeast(role, 'IMMORTAL');
+  const isBuilder = roleAtLeast(role, 'BUILDER');
+  const isHeadBuilder = roleAtLeast(role, 'HEAD_BUILDER');
+  const isCoder = roleAtLeast(role, 'CODER');
+  const isImplementor = roleAtLeast(role, 'IMPLEMENTOR');
+
+  const canEditZone = (_zoneId?: number): boolean => {
     if (!permissions) return false;
-    if (permissions.isImplementor) return true;
-    if (permissions.isCoder) return true;
-    if (permissions.isBuilder) return true;
-    return false;
+    return isBuilder;
   };
 
   const canManageCharacters = (characterOwnerId?: string): boolean => {
     if (!permissions || !user) return false;
-    if (permissions.isImplementor) return true;
     if (characterOwnerId && user.id === characterOwnerId) return true;
-    if (permissions.isCoder) return true;
-    return false;
+    return isCoder;
   };
 
   const refetch = async () => {
@@ -96,10 +102,11 @@ export function usePermissions(): UsePermissionsResult {
     refetch,
     canEditZone,
     canManageCharacters,
-    isPlayer: permissions?.isPlayer || false,
-    isImmortal: permissions?.isImmortal || false,
-    isBuilder: permissions?.isBuilder || false,
-    isCoder: permissions?.isCoder || false,
-    isImplementor: permissions?.isImplementor || false,
+    isPlayer,
+    isImmortal,
+    isBuilder,
+    isHeadBuilder,
+    isCoder,
+    isImplementor,
   };
 }

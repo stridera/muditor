@@ -26,25 +26,17 @@ import {
   AdminUnlinkCharacterDocument,
   AdminUsersListDocument,
   type AdminUserAccountFieldsFragment,
-  type UserRole,
 } from '@/generated/graphql';
+import { roleAtLeast, roleRank, USER_ROLES, type UserRole } from '@/lib/roles';
 import { useAuth } from '@/contexts/auth-context';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { AlertTriangle, KeyRound, Loader2, Unlink } from 'lucide-react';
 import { useMemo, useState } from 'react';
 
-const ROLES: UserRole[] = [
-  'PLAYER',
-  'IMMORTAL',
-  'BUILDER',
-  'HEAD_BUILDER',
-  'CODER',
-  'IMPLEMENTOR',
-];
+const ROLES: readonly UserRole[] = USER_ROLES;
 
-const rank = (role: string | undefined | null) =>
-  ROLES.indexOf((role ?? 'PLAYER') as UserRole);
+const rank = (role: string | undefined | null) => roleRank(role ?? 'PLAYER');
 
 const SELECT_CLASS =
   'flex h-9 rounded-md border border-input bg-background px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50';
@@ -101,7 +93,7 @@ function AdminUsersContent() {
   } | null>(null);
 
   const myRole = permissions?.role ?? 'PLAYER';
-  const isImpl = myRole === 'IMPLEMENTOR';
+  const isImpl = roleAtLeast(myRole, 'IMPLEMENTOR');
   // IMPLEMENTOR may set any role; CODER only roles strictly below their own.
   const assignableRoles = ROLES.filter(r => isImpl || rank(r) < rank(myRole));
 
