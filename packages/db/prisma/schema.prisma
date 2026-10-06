@@ -135,6 +135,13 @@ model Effect {
   objectEffects      ObjectEffects[]      // Effects granted by objects when worn/held
   raceEffects        RaceEffects[]        // Permanent effects for races
 
+  // Wake Effect attachments (Rest / Repose system) — scheduled to attach
+  // to a character on the first XP gain after waking from an inn / camp /
+  // house RestSource. Refreshed Effect itself is spawned by name from
+  // fierymud-rs; per-room / per-object wake bonuses live in these tables.
+  roomWakeEffects    RoomWakeEffects[]
+  objectWakeEffects  ObjectWakeEffects[]
+
   @@index([effectType])
   @@index([categoryId])
 }
@@ -684,6 +691,16 @@ model Characters {
   classId               Int?                 @map("class_id")
   experience            Int                  @default(0)
   skillPoints           Int                  @default(0) @map("skill_points")
+
+  // Rest / Repose system. See /muditor/CONTEXT.md ("Resting and Repose")
+  // and /fierymud-rs/docs/design/rest-and-repose.md for full semantics.
+  // - repose: sticky bonus-XP pool, spent at XP-gain time; never decays.
+  // - restSource: the kind of prepaid rest awaiting consumption.
+  // - restTier: quality 0-3 of the prepaid rest; 0 for NONE/QUIT,
+  //   1-3 for CAMP/INN/HOUSE depending on quality.
+  repose                Int                  @default(0)
+  restSource            RestSource           @default(NONE) @map("rest_source")
+  restTier              Int                  @default(0) @map("rest_tier")
   // Position state (persisted so ghost state survives logout)
   position              Position             @default(STANDING)
   characterAliases      CharacterAliases[]
@@ -1012,6 +1029,12 @@ model Objects {
   // e.g., flying carpet: "{actor} soars through the air on a flying carpet."
   presenceOverride String? @map("presence_override")
 
+  // Rest / Repose system — camp kit. See /muditor/CONTEXT.md
+  // ("Resting and Repose") and /fierymud-rs/docs/design/rest-and-repose.md.
+  // If non-null, this Object is a consumable camp kit. 1 = basic, 2 = premium.
+  // Consumed by `camp <kit-name>`; bonus stacks into `restTier` per design.
+  campKitTier             Int?                      @map("camp_kit_tier")
+
   characterItems          CharacterItems[]
   mobResetEquipment       MobResetEquipment[]
   objectExtraDescriptions ObjectExtraDescriptions[]
@@ -1031,6 +1054,9 @@ model Objects {
   questTriggerItem        Quests[]                  @relation("questTriggerItem")
   playerHouseItems        PlayerHouseItem[]
   roomExitKeys            RoomExit[]                @relation("roomExitKey")
+  // Wake Effect attachments scheduled by this object (consumed camp kit, or
+  // bed in a HOUSE-owned room) at the first XP gain after waking.
+  wakeEffects             ObjectWakeEffects[]
 
   @@id([zoneId, id])
   @@index([name])
@@ -1207,6 +1233,16 @@ model Room {
   layoutX               Int?                    @map("layout_x")
   layoutY               Int?                    @map("layout_y")
   layoutZ               Int?                    @default(0) @map("layout_z")
+
+  // Rest / Repose system — inn rooms. See /muditor/CONTEXT.md
+  // ("Resting and Repose") and /fierymud-rs/docs/design/rest-and-repose.md.
+  // - isInn: this room sells rentable rest.
+  // - innName: display name (e.g. "The Rusty Boar").
+  // - innTiers: available tiers, JSON shape: [{name: string, tier: 1-3, fee: int}]
+  isInn                 Boolean                 @default(false) @map("is_inn")
+  innName               String?                 @map("inn_name")
+  innTiers              Json?                   @map("inn_tiers")
+
   mobResets             MobResets[]
   objectResets          ObjectResets[]
   exits                 RoomExit[]              @relation("roomExits")
@@ -1218,6 +1254,8 @@ model Room {
   questObjectives       QuestObjectives[]
   questTriggerRoom      Quests[]                @relation("questTriggerRoom")
   roomTriggers          RoomTriggers[]
+  // Wake Effect attachments scheduled by this room (when rented as an inn)
+  wakeEffects           RoomWakeEffects[]
 
   @@id([zoneId, id])
   @@index([plainRoomDescription])
@@ -1234,6 +1272,42 @@ model RoomEnvironmentalEffect {
 
   @@id([roomZoneId, roomId, effectId])
   @@map("RoomEnvironmentalEffect")
+}
+
+// Wake Effect attachment — scheduled to attach to a character on the first
+// XP gain after they wake from this inn. Resolved when `restSource = INN`.
+// See /muditor/CONTEXT.md ("Resting and Repose") / Wake Effect attachment.
+model RoomWakeEffects {
+  roomZoneId   Int     @map("room_zone_id")
+  roomId       Int     @map("room_id")
+  effectId     Int     @map("effect_id")
+  modifierData Json    @default("{}") @map("modifier_data")
+  duration     Int                                   // seconds the granted Effect lasts on the character
+  minTier      Int?    @map("min_tier")              // if set, attachment only applies when rented at this tier or higher
+
+  room         Room    @relation(fields: [roomZoneId, roomId], references: [zoneId, id], onDelete: Cascade)
+  effect       Effect  @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([roomZoneId, roomId, effectId])
+  @@map("RoomWakeEffects")
+}
+
+// Wake Effect attachment — scheduled to attach to a character on the first
+// XP gain after they wake. Resolved when `restSource = CAMP` (the consumed
+// kit Object) or `restSource = HOUSE` (the bed Object in the owned room).
+// See /muditor/CONTEXT.md ("Resting and Repose") / Wake Effect attachment.
+model ObjectWakeEffects {
+  objectZoneId Int     @map("object_zone_id")
+  objectId     Int     @map("object_id")
+  effectId     Int     @map("effect_id")
+  modifierData Json    @default("{}") @map("modifier_data")
+  duration     Int                                   // seconds the granted Effect lasts on the character
+
+  object       Objects @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  effect       Effect  @relation(fields: [effectId], references: [id], onDelete: Cascade)
+
+  @@id([objectZoneId, objectId, effectId])
+  @@map("ObjectWakeEffects")
 }
 
 model ShopAccepts {
@@ -1960,6 +2034,22 @@ enum ResetMode {
   NEVER
   EMPTY
   NORMAL
+}
+
+// Rest / Repose system — the kind of rest a character has prepaid for
+// their next wake. See /muditor/CONTEXT.md ("Resting and Repose") and
+// /fierymud-rs/docs/design/rest-and-repose.md.
+//   NONE  — no source; no Repose accrues while offline.
+//   QUIT  — passive quit anywhere; tier 0, no Refreshed Effect on wake.
+//   CAMP  — completed a `camp [<kit>]` action; tier from camp formula.
+//   INN   — rented at an isInn room; tier from the chosen innTiers entry.
+//   HOUSE — logged out from a HOUSE-owned room (housing schema deferred).
+enum RestSource {
+  NONE
+  QUIT
+  CAMP
+  INN
+  HOUSE
 }
 
 // RoomFlag enum REMOVED - replaced by:

@@ -21,8 +21,6 @@ interface Room {
   layoutZ?: number | null;
   baseLightLevel?: number;
   capacity?: number;
-  magicAffinity?: string | null;
-  requiredMechanic?: string | null;
   entryRestriction?: string | null;
   isPeaceful?: boolean;
   allowsMagic?: boolean;
@@ -1515,74 +1513,6 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                     </span>
                   </div>
                 </div>
-
-                {/* Magic Affinity */}
-                <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
-                  >
-                    Magic Affinity
-                  </label>
-                  <select
-                    value={room.magicAffinity || ''}
-                    onChange={e =>
-                      onRoomChange('magicAffinity', e.target.value || null)
-                    }
-                    className={`w-full px-2 py-1.5 text-xs border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
-                  >
-                    <option value=''>None</option>
-                    {[
-                      'FIRE',
-                      'WATER',
-                      'COLD',
-                      'EARTH',
-                      'AIR',
-                      'HOLY',
-                      'UNHOLY',
-                      'SHADOW',
-                      'DEATH',
-                      'ASTRAL',
-                      'NATURE',
-                      'ARCANE',
-                      'CHAOS',
-                    ].map(v => (
-                      <option key={v} value={v}>
-                        {v.charAt(0) + v.slice(1).toLowerCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-
-                {/* Required Mechanic */}
-                <div>
-                  <label
-                    className={`block text-xs font-medium mb-1 ${isDark ? 'text-gray-300' : 'text-gray-700'}`}
-                  >
-                    Required Position Mechanic
-                  </label>
-                  <select
-                    value={room.requiredMechanic || ''}
-                    onChange={e =>
-                      onRoomChange('requiredMechanic', e.target.value || null)
-                    }
-                    className={`w-full px-2 py-1.5 text-xs border rounded ${isDark ? 'bg-gray-600 border-gray-500 text-gray-200' : 'bg-white border-gray-300 text-gray-700'}`}
-                  >
-                    <option value=''>None (ground OK)</option>
-                    {[
-                      'GROUND',
-                      'AERIAL',
-                      'AQUATIC',
-                      'SUBMERGED',
-                      'ETHEREAL',
-                      'MOUNTED',
-                      'INCAPACITATED',
-                    ].map(v => (
-                      <option key={v} value={v}>
-                        {v.charAt(0) + v.slice(1).toLowerCase()}
-                      </option>
-                    ))}
-                  </select>
-                </div>
               </div>
             </div>
 
@@ -1754,10 +1684,6 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                 activeProps.push('No Summon');
               if (!room.allowsTeleport && room.allowsTeleport !== undefined)
                 activeProps.push('No Teleport');
-              if (room.magicAffinity)
-                activeProps.push(`Affinity: ${room.magicAffinity}`);
-              if (room.requiredMechanic)
-                activeProps.push(`Requires: ${room.requiredMechanic}`);
               if (room.entryRestriction)
                 activeProps.push('Has Entry Restriction');
               if ((room.baseLightLevel ?? 0) !== 0)

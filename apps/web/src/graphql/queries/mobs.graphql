@@ -41,18 +41,15 @@ query GetMob($id: Int!, $zoneId: Int!) {
     gender
     size
     lifeForce
-    composition
     traits
     behaviors
     professions
     aggressionFormula
     activityRestrictions
     riderPresenceMessage
-    position
     defaultPosition
     movementMode
     defaultMovementMode
-    stance
     defaultEffects {
       id
       effectId

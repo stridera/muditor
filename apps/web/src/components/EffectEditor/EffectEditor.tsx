@@ -271,11 +271,10 @@ export function EffectEditor({
             id: Number(e.id),
             name: e.name,
             effectType: e.effectType,
-            paramSchema: e.paramSchema as {
-              type: string;
-              properties?: Record<string, unknown>;
-              required?: string[];
-            } | null,
+            defaultParams: (e.defaultParams ?? null) as Record<
+              string,
+              unknown
+            > | null,
           })) ?? [],
         mobs:
           optionsData.mobs?.map(m => ({

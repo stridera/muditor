@@ -4,6 +4,11 @@ import 'reflect-metadata';
 import '../../objects/object.dto';
 import { ObjectsResolver } from '../../objects/objects.resolver';
 import { ObjectsService } from '../../objects/objects.service';
+import { GraphQLJwtAuthGuard } from '../../auth/guards/graphql-jwt-auth.guard';
+import { MinimumRoleGuard } from '../../auth/guards/minimum-role.guard';
+import { ZonePermissionGuard } from '../../auth/guards/zone-permission.guard';
+
+const allowAll = { canActivate: () => true };
 
 describe('ObjectsResolver empty path', () => {
   let resolver: ObjectsResolver;
@@ -17,7 +22,15 @@ describe('ObjectsResolver empty path', () => {
         ObjectsResolver,
         { provide: ObjectsService, useValue: mockService },
       ],
-    }).compile();
+    })
+      // Guards are covered by *.resolver.guards.spec.ts; stub them here.
+      .overrideGuard(GraphQLJwtAuthGuard)
+      .useValue(allowAll)
+      .overrideGuard(MinimumRoleGuard)
+      .useValue(allowAll)
+      .overrideGuard(ZonePermissionGuard)
+      .useValue(allowAll)
+      .compile();
     resolver = module.get(ObjectsResolver);
   });
 

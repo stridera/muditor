@@ -27,7 +27,6 @@ import {
   User,
 } from 'lucide-react';
 import { useState } from 'react';
-import { OnlineStatus } from './online-status';
 
 const GET_CHARACTER_LINKING_INFO = gql`
   query GetCharacterLinkingInfoInline($characterName: String!) {
@@ -39,7 +38,6 @@ const GET_CHARACTER_LINKING_INFO = gql`
       class
       lastLogin
       timePlayed
-      isOnline
       isLinked
       hasPassword
     }
@@ -52,8 +50,8 @@ const LINK_CHARACTER_MUTATION = gql`
       id
       name
       level
-      raceType
-      playerClass
+      race
+      class
     }
   }
 `;
@@ -66,7 +64,6 @@ interface CharacterLinkingInfo {
   class?: string;
   lastLogin?: Date;
   timePlayed: number;
-  isOnline: boolean;
   isLinked: boolean;
   hasPassword: boolean;
 }
@@ -80,8 +77,8 @@ interface LinkCharacterMutationResult {
     id: string;
     name: string;
     level: number;
-    raceType?: string;
-    playerClass?: string;
+    race?: string;
+    class?: string;
   };
 }
 
@@ -308,18 +305,6 @@ export function CharacterLinkingForm({
                 </div>
 
                 <div className='space-y-2'>
-                  <div className='flex justify-between items-center'>
-                    <span className='text-sm text-muted-foreground'>
-                      Status:
-                    </span>
-                    <OnlineStatus
-                      isOnline={character.isOnline}
-                      size='sm'
-                      {...(character.lastLogin
-                        ? { lastLogin: character.lastLogin }
-                        : {})}
-                    />
-                  </div>
                   <div className='flex justify-between'>
                     <span className='text-sm text-muted-foreground'>
                       Play Time:

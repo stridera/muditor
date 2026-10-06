@@ -1,7 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { Prisma } from '@muditor/db';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
+import { Prisma, UserRole, type Users } from '@muditor/db';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { isStaff, roleAtLeast } from '../auth/role.util';
 import {
   BoardDto,
   BoardMessageDto,
@@ -38,6 +41,12 @@ interface MessageWithEdits {
   updatedAt: Date;
   edits?: unknown[];
   board?: unknown;
+}
+
+function assertBuilder(user: Users): void {
+  if (!roleAtLeast(user.role, UserRole.BUILDER)) {
+    throw new ForbiddenException('Builder role or higher required');
+  }
 }
 
 @Resolver(() => BoardDto)
@@ -86,7 +95,11 @@ export class BoardsResolver {
 
   @Mutation(() => BoardDto)
   @UseGuards(JwtAuthGuard)
-  async createBoard(@Args('data') data: CreateBoardInput): Promise<BoardDto> {
+  async createBoard(
+    @Args('data') data: CreateBoardInput,
+    @CurrentUser() user: Users
+  ): Promise<BoardDto> {
+    assertBuilder(user);
     const createData: Prisma.BoardCreateInput = {
       alias: data.alias,
       title: data.title,
@@ -101,8 +114,10 @@ export class BoardsResolver {
   @UseGuards(JwtAuthGuard)
   async updateBoard(
     @Args('id', { type: () => Int }) id: number,
-    @Args('data') data: UpdateBoardInput
+    @Args('data') data: UpdateBoardInput,
+    @CurrentUser() user: Users
   ): Promise<BoardDto> {
+    assertBuilder(user);
     const updateData: Prisma.BoardUpdateInput = {};
     if (data.title !== undefined) updateData.title = data.title;
     if (data.locked !== undefined) updateData.locked = data.locked;
@@ -116,8 +131,10 @@ export class BoardsResolver {
   @Mutation(() => BoardDto)
   @UseGuards(JwtAuthGuard)
   async deleteBoard(
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user: Users
   ): Promise<BoardDto> {
+    assertBuilder(user);
     const board = await this.boardsService.deleteBoard(id);
     return this.mapBoard(board as BoardWithCount);
   }
@@ -159,6 +176,27 @@ export class BoardsResolver {
 export class BoardMessagesResolver {
   constructor(private readonly boardsService: BoardsService) {}
 
+  /** Message author (matched against the caller's identity) or IMMORTAL+. */
+  private async assertAuthorOrStaff(
+    messageId: number,
+    user: Users
+  ): Promise<void> {
+    const message = await this.boardsService.findMessageById(messageId);
+    if (!message) {
+      throw new NotFoundException(`Board message ${messageId} not found`);
+    }
+    if (isStaff(user.role)) return;
+    const identity = await this.boardsService.getPosterIdentity(user);
+    const isAuthor = identity.names.some(
+      n => n.toLowerCase() === message.poster.toLowerCase()
+    );
+    if (!isAuthor) {
+      throw new ForbiddenException(
+        'Only the author or staff may modify this message'
+      );
+    }
+  }
+
   @Query(() => [BoardMessageDto], { name: 'boardMessages' })
   async findMessages(
     @Args('boardId', { type: () => Int }) boardId: number,
@@ -194,12 +232,22 @@ export class BoardMessagesResolver {
   @Mutation(() => BoardMessageDto)
   @UseGuards(JwtAuthGuard)
   async createBoardMessage(
-    @Args('data') data: CreateBoardMessageInput
+    @Args('data') data: CreateBoardMessageInput,
+    @CurrentUser() user: Users
   ): Promise<BoardMessageDto> {
+    // Never trust client-supplied identity: poster must be the caller's own
+    // display name or one of their characters, and the level is derived server-side.
+    const identity = await this.boardsService.getPosterIdentity(user);
+    const poster = identity.names.find(
+      n => n.toLowerCase() === data.poster.toLowerCase()
+    );
+    if (!poster) {
+      throw new ForbiddenException('You can only post as yourself');
+    }
     const createData: Prisma.BoardMessageCreateInput = {
       board: { connect: { id: data.boardId } },
-      poster: data.poster,
-      posterLevel: data.posterLevel,
+      poster,
+      posterLevel: identity.level,
       postedAt: new Date(),
       subject: data.subject,
       content: data.content,
@@ -214,8 +262,16 @@ export class BoardMessagesResolver {
   async updateBoardMessage(
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateBoardMessageInput,
-    @Args('editor', { type: () => String, nullable: true }) editor?: string
+    @CurrentUser() user: Users,
+    @Args('editor', {
+      type: () => String,
+      nullable: true,
+      deprecationReason: 'Ignored: the editor is always the authenticated user',
+    })
+    _editor?: string
   ): Promise<BoardMessageDto> {
+    void _editor; // kept for schema compatibility; client-supplied editor is never trusted
+    await this.assertAuthorOrStaff(id, user);
     const updateData: Prisma.BoardMessageUpdateInput = {};
     if (data.subject !== undefined) updateData.subject = data.subject;
     if (data.content !== undefined) updateData.content = data.content;
@@ -224,7 +280,7 @@ export class BoardMessagesResolver {
     const message = await this.boardsService.updateMessage(
       id,
       updateData,
-      editor
+      user.displayName
     );
     return this.mapMessage(message as MessageWithEdits);
   }
@@ -232,8 +288,10 @@ export class BoardMessagesResolver {
   @Mutation(() => BoardMessageDto)
   @UseGuards(JwtAuthGuard)
   async deleteBoardMessage(
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user: Users
   ): Promise<BoardMessageDto> {
+    await this.assertAuthorOrStaff(id, user);
     const message = await this.boardsService.deleteMessage(id);
     return this.mapMessage(message as MessageWithEdits);
   }

@@ -1,6 +1,6 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { zoneLookups } from '../common/decorators/zone-lookups';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateObjectResetInput,
   ObjectResetDto,
@@ -35,7 +35,7 @@ export class ObjectResetResolver {
   }
 
   @Mutation(() => ObjectResetDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createObjectReset(
     @Args('data') data: CreateObjectResetInput
   ): Promise<ObjectResetDto> {
@@ -43,7 +43,7 @@ export class ObjectResetResolver {
   }
 
   @Mutation(() => ObjectResetDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.objectReset('id') })
   async updateObjectReset(
     @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateObjectResetInput
@@ -52,7 +52,7 @@ export class ObjectResetResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.objectReset('id') })
   async deleteObjectReset(
     @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {

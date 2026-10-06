@@ -12,7 +12,6 @@ import {
   GetShopEditorDocument,
   GetZonesEditorDocument,
   UpdateShopEditorDocument,
-  UpdateShopHoursEditorDocument,
   UpdateShopInventoryEditorDocument,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -37,8 +36,8 @@ interface ShopFormData {
   zoneId: number;
 }
 
-import type { ShopHour, ShopItem, ShopQueryResult } from '@/lib/shopMapping';
-import { mapShopHours, mapShopItems } from '@/lib/shopMapping';
+import type { ShopItem, ShopQueryResult } from '@/lib/shopMapping';
+import { mapShopItems } from '@/lib/shopMapping';
 import { buildShopSavePayload } from '@/lib/shopPayload';
 
 interface MessageListProps {
@@ -190,9 +189,6 @@ function ShopEditorContent() {
   ]);
 
   const [shopItems, setShopItems] = useState<ShopItem[]>([]);
-  const [shopHours, setShopHours] = useState<ShopHour[]>([
-    { openHour: 6, closeHour: 20 },
-  ]);
   const [acceptedTypes, setAcceptedTypes] = useState<string[]>([]);
   const [selectedFlags, setSelectedFlags] = useState<string[]>([]);
   const [selectedTradesWithFlags, setSelectedTradesWithFlags] = useState<
@@ -255,7 +251,6 @@ function ShopEditorContent() {
     CreateShopEditorDocument
   );
   const [updateInventory] = useMutation(UpdateShopInventoryEditorDocument);
-  const [updateHours] = useMutation(UpdateShopHoursEditorDocument);
 
   useEffect(() => {
     if (data?.shop) {
@@ -308,7 +303,6 @@ function ShopEditorContent() {
           : ['']
       );
       setShopItems(mapShopItems(shop as ShopQueryResult));
-      setShopHours(mapShopHours(shop as ShopQueryResult));
       setAcceptedTypes(
         Array.isArray(shop.accepts)
           ? shop.accepts
@@ -425,66 +419,6 @@ function ShopEditorContent() {
     );
   };
 
-  const addShopHour = () => {
-    setShopHours(prev => [...prev, { openHour: 6, closeHour: 20 }]);
-  };
-
-  const removeShopHour = (index: number) => {
-    setShopHours(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const updateShopHour = (
-    index: number,
-    field: keyof ShopHour,
-    value: number
-  ) => {
-    setShopHours(prev =>
-      prev.map((hour, i) => (i === index ? { ...hour, [field]: value } : hour))
-    );
-  };
-
-  // Validate hours: each (open < close), ranges within 0..23, non-overlapping, sorted by openHour
-  const validateHours = (): string[] => {
-    const errors: string[] = [];
-    if (!shopHours.length) return errors; // empty hours set is allowed
-    // Basic field validation
-    shopHours.forEach((h, idx) => {
-      if (h.openHour < 0 || h.openHour > 23)
-        errors.push(
-          `Hour ${idx + 1}: open hour ${h.openHour} out of range (0-23)`
-        );
-      if (h.closeHour < 0 || h.closeHour > 23)
-        errors.push(
-          `Hour ${idx + 1}: close hour ${h.closeHour} out of range (0-23)`
-        );
-      if (h.openHour === h.closeHour)
-        errors.push(`Hour ${idx + 1}: open and close cannot be the same`);
-      if (h.openHour > h.closeHour)
-        errors.push(`Hour ${idx + 1}: open hour must be before close hour`);
-    });
-    // Sort copy and check ordering overlaps
-    const sorted = [...shopHours].sort((a, b) => a.openHour - b.openHour);
-    for (let i = 1; i < sorted.length; i++) {
-      const prev = sorted[i - 1]!;
-      const curr = sorted[i]!;
-      if (curr.openHour < prev.closeHour) {
-        errors.push(
-          `Hours overlap: ${prev.openHour}-${prev.closeHour} overlaps with ${curr.openHour}-${curr.closeHour}`
-        );
-      }
-    }
-    // Ensure original array matches sorted order (strict increasing by openHour)
-    for (let i = 0; i < shopHours.length - 1; i++) {
-      const current = shopHours[i];
-      const next = shopHours[i + 1];
-      if (current && next && current.openHour > next.openHour) {
-        errors.push('Hours are not in ascending order by open time');
-        break;
-      }
-    }
-    return errors;
-  };
-
   const validateForm = (): boolean => {
     // Use the real-time validation for final form validation
     return validateAllFields(formData);
@@ -492,12 +426,6 @@ function ShopEditorContent() {
 
   const handleSave = async () => {
     if (!validateForm()) return;
-
-    const hoursErrors = validateHours();
-    if (hoursErrors.length) {
-      setGeneralError(hoursErrors.join('\n'));
-      return;
-    }
 
     try {
       const saveData = buildShopSavePayload(
@@ -558,30 +486,6 @@ function ShopEditorContent() {
             },
           });
         }
-        if (newId && shopHours.length) {
-          await updateHours({
-            variables: {
-              id: newId,
-              zoneId: formData.zoneId,
-              hours: shopHours.map(h => ({
-                open: h.openHour,
-                close: h.closeHour,
-              })),
-            },
-            optimisticResponse: {
-              updateShopHours: {
-                id: newId,
-                hours: shopHours.map((h, idx) => ({
-                  id: String(idx),
-                  open: h.openHour,
-                  close: h.closeHour,
-                  __typename: 'ShopHourDto',
-                })),
-                __typename: 'ShopDto',
-              },
-            },
-          });
-        }
       } else {
         const numericId = parseInt(shopId!);
         await updateShop({
@@ -612,29 +516,6 @@ function ShopEditorContent() {
                 objectZoneId: i.objectZoneId,
                 object: null,
                 __typename: 'ShopItemDto',
-              })),
-              __typename: 'ShopDto',
-            },
-          },
-        });
-        // Batch replace hours
-        await updateHours({
-          variables: {
-            id: numericId,
-            zoneId: formData.zoneId,
-            hours: shopHours.map(h => ({
-              open: h.openHour,
-              close: h.closeHour,
-            })),
-          },
-          optimisticResponse: {
-            updateShopHours: {
-              id: numericId,
-              hours: shopHours.map((h, idx) => ({
-                id: String(idx),
-                open: h.openHour,
-                close: h.closeHour,
-                __typename: 'ShopHourDto',
               })),
               __typename: 'ShopDto',
             },
@@ -902,66 +783,6 @@ function ShopEditorContent() {
                     }
                     className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
-                </div>
-              </div>
-
-              <div className='mt-6'>
-                <h4 className='text-sm font-medium text-foreground mb-3'>
-                  Operating Hours
-                </h4>
-                <div className='space-y-2'>
-                  {shopHours.map((hour, index) => (
-                    <div key={index} className='flex items-center gap-2'>
-                      <select
-                        value={hour.openHour}
-                        onChange={e =>
-                          updateShopHour(
-                            index,
-                            'openHour',
-                            parseInt(e.target.value)
-                          )
-                        }
-                        className='rounded-md border-input shadow-sm focus:ring-ring focus:border-ring text-sm'
-                      >
-                        {Array.from({ length: 24 }, (_, i) => (
-                          <option key={i} value={i}>
-                            {i}:00
-                          </option>
-                        ))}
-                      </select>
-                      <span className='text-sm text-muted-foreground'>to</span>
-                      <select
-                        value={hour.closeHour}
-                        onChange={e =>
-                          updateShopHour(
-                            index,
-                            'closeHour',
-                            parseInt(e.target.value)
-                          )
-                        }
-                        className='rounded-md border-input shadow-sm focus:ring-ring focus:border-ring text-sm'
-                      >
-                        {Array.from({ length: 24 }, (_, i) => (
-                          <option key={i} value={i}>
-                            {i}:00
-                          </option>
-                        ))}
-                      </select>
-                      <button
-                        onClick={() => removeShopHour(index)}
-                        className='text-destructive hover:text-destructive/90 p-1'
-                      >
-                        <Trash2 className='w-3 h-3' />
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={addShopHour}
-                    className='text-sm text-primary hover:text-primary/90 inline-flex items-center'
-                  >
-                    <Plus className='w-3 h-3 mr-1' />
-                    Add Hours
-                  </button>
                 </div>
               </div>
             </div>

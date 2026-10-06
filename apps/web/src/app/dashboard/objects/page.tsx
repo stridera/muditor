@@ -45,7 +45,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
   type SearchFilters,
@@ -58,7 +58,7 @@ import {
 
 // Inline queries removed; using unified generated documents & fragments.
 
-export default function ObjectsPage() {
+function ObjectsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
       <ObjectsContent />
@@ -78,7 +78,7 @@ function ObjectsContent() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchTerm: '',
   });
-  const [selectedObjects, setSelectedObjects] = useState<Set<number>>(
+  const [selectedObjects, setSelectedObjects] = useState<Set<string>>(
     new Set()
   );
   const [isDeleting, setIsDeleting] = useState(false);
@@ -255,18 +255,24 @@ function ObjectsContent() {
   const availableTypes = getUniqueValues(objects, 'type');
 
   // Bulk operations
-  const toggleObjectSelection = (objectId: number) => {
+  // Selection is keyed by composite (zoneId, id) so same-numbered objects in
+  // different zones are never conflated.
+  const objectKey = (obj: { zoneId: number; id: number }) =>
+    `${obj.zoneId}-${obj.id}`;
+
+  const toggleObjectSelection = (obj: { zoneId: number; id: number }) => {
+    const key = objectKey(obj);
     const newSelected = new Set(selectedObjects);
-    if (newSelected.has(objectId)) {
-      newSelected.delete(objectId);
+    if (newSelected.has(key)) {
+      newSelected.delete(key);
     } else {
-      newSelected.add(objectId);
+      newSelected.add(key);
     }
     setSelectedObjects(newSelected);
   };
 
   const selectAllObjects = () => {
-    setSelectedObjects(new Set(paginatedObjects.map(obj => obj.id!)));
+    setSelectedObjects(new Set(paginatedObjects.map(objectKey)));
   };
 
   const clearSelection = () => {
@@ -286,7 +292,14 @@ function ObjectsContent() {
 
     setIsDeleting(true);
     try {
-      await deleteObjects({ variables: { ids: Array.from(selectedObjects) } });
+      await deleteObjects({
+        variables: {
+          keys: Array.from(selectedObjects).map(key => {
+            const [zoneId, id] = key.split('-').map(Number) as [number, number];
+            return { zoneId, id };
+          }),
+        },
+      });
       await refetch();
       clearSelection();
     } catch (err) {
@@ -367,7 +380,7 @@ function ObjectsContent() {
     if (selectedObjects.size === 0) return;
 
     const selectedData = sortedDisplayObjects.filter(obj =>
-      selectedObjects.has(obj.id)
+      selectedObjects.has(objectKey(obj))
     );
     const jsonData = JSON.stringify(selectedData, null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
@@ -644,11 +657,11 @@ function ObjectsContent() {
                       <button
                         onClick={e => {
                           e.stopPropagation();
-                          toggleObjectSelection(fullObject.id);
+                          toggleObjectSelection(fullObject);
                         }}
                         className='mt-1 text-muted-foreground hover:text-primary'
                       >
-                        {selectedObjects.has(fullObject.id) ? (
+                        {selectedObjects.has(objectKey(fullObject)) ? (
                           <CheckSquare className='w-5 h-5 text-primary' />
                         ) : (
                           <Square className='w-5 h-5' />
@@ -1232,5 +1245,15 @@ function ObjectsContent() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ObjectsPage() {
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <ObjectsPageContent />
+    </Suspense>
   );
 }

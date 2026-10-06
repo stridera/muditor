@@ -19,6 +19,9 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { useClasses } from '@/hooks/use-classes';
+import { useRaces } from '@/hooks/use-races';
+import type { Race } from '@/generated/graphql';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import {
@@ -37,8 +40,6 @@ const CREATE_CHARACTER_MUTATION = gql`
       id
       name
       level
-      raceType
-      playerClass
       strength
       intelligence
       wisdom
@@ -59,8 +60,6 @@ interface CreateCharacterMutationResult {
     id: string;
     name: string;
     level: number;
-    raceType?: string;
-    playerClass?: string;
     strength: number;
     intelligence: number;
     wisdom: number;
@@ -73,9 +72,9 @@ interface CreateCharacterMutationResult {
 
 interface CreateCharacterData {
   name: string;
-  raceType: string;
-  playerClass: string;
   gender: string;
+  race: Race;
+  classId: number | null;
   description?: string;
   strength: number;
   intelligence: number;
@@ -91,9 +90,9 @@ export function CharacterCreationForm({
 }: CharacterCreationFormProps) {
   const [formData, setFormData] = useState<CreateCharacterData>({
     name: '',
-    raceType: 'human',
-    playerClass: 'fighter',
     gender: 'neutral',
+    race: 'HUMAN',
+    classId: null,
     description: '',
     strength: 13,
     intelligence: 13,
@@ -109,27 +108,9 @@ export function CharacterCreationForm({
   const [createCharacter, { loading }] =
     useMutation<CreateCharacterMutationResult>(CREATE_CHARACTER_MUTATION);
 
-  const races = [
-    { value: 'human', label: 'Human' },
-    { value: 'elf', label: 'Elf' },
-    { value: 'dwarf', label: 'Dwarf' },
-    { value: 'halfling', label: 'Halfling' },
-    { value: 'gnome', label: 'Gnome' },
-    { value: 'half-elf', label: 'Half-Elf' },
-    { value: 'orc', label: 'Orc' },
-    { value: 'troll', label: 'Troll' },
-  ];
-
-  const classes = [
-    { value: 'fighter', label: 'Fighter' },
-    { value: 'cleric', label: 'Cleric' },
-    { value: 'magic-user', label: 'Magic User' },
-    { value: 'thief', label: 'Thief' },
-    { value: 'ranger', label: 'Ranger' },
-    { value: 'paladin', label: 'Paladin' },
-    { value: 'barbarian', label: 'Barbarian' },
-    { value: 'sorcerer', label: 'Sorcerer' },
-  ];
+  const { races, loading: racesLoading } = useRaces();
+  const { classes, loading: classesLoading } = useClasses();
+  const playableRaces = races.filter(r => r.playable);
 
   const genders = [
     { value: 'male', label: 'Male' },
@@ -139,7 +120,7 @@ export function CharacterCreationForm({
 
   const handleInputChange = (
     field: keyof CreateCharacterData,
-    value: string | number
+    value: string | number | null
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -212,6 +193,11 @@ export function CharacterCreationForm({
       return;
     }
 
+    if (formData.classId === null) {
+      setError('Please choose a class');
+      return;
+    }
+
     try {
       const result = await createCharacter({
         variables: {
@@ -231,9 +217,9 @@ export function CharacterCreationForm({
         // Reset form
         setFormData({
           name: '',
-          raceType: 'human',
-          playerClass: 'fighter',
           gender: 'neutral',
+          race: 'HUMAN',
+          classId: null,
           description: '',
           strength: 13,
           intelligence: 13,
@@ -314,21 +300,23 @@ export function CharacterCreationForm({
                   </SelectContent>
                 </Select>
               </div>
+            </div>
 
+            <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
               <div className='space-y-2'>
                 <Label htmlFor='race'>Race</Label>
                 <Select
-                  value={formData.raceType}
-                  onValueChange={value => handleInputChange('raceType', value)}
-                  disabled={loading}
+                  value={formData.race}
+                  onValueChange={value => handleInputChange('race', value)}
+                  disabled={loading || racesLoading}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
+                  <SelectTrigger id='race'>
+                    <SelectValue placeholder='Select a race' />
                   </SelectTrigger>
                   <SelectContent>
-                    {races.map(race => (
-                      <SelectItem key={race.value} value={race.value}>
-                        {race.label}
+                    {playableRaces.map(race => (
+                      <SelectItem key={race.race} value={race.race}>
+                        {race.displayName}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -336,21 +324,23 @@ export function CharacterCreationForm({
               </div>
 
               <div className='space-y-2'>
-                <Label htmlFor='class'>Class</Label>
+                <Label htmlFor='class'>Class *</Label>
                 <Select
-                  value={formData.playerClass}
-                  onValueChange={value =>
-                    handleInputChange('playerClass', value)
+                  value={
+                    formData.classId === null ? '' : String(formData.classId)
                   }
-                  disabled={loading}
+                  onValueChange={value =>
+                    handleInputChange('classId', parseInt(value, 10))
+                  }
+                  disabled={loading || classesLoading}
                 >
-                  <SelectTrigger>
-                    <SelectValue />
+                  <SelectTrigger id='class'>
+                    <SelectValue placeholder='Select a class' />
                   </SelectTrigger>
                   <SelectContent>
                     {classes.map(cls => (
-                      <SelectItem key={cls.value} value={cls.value}>
-                        {cls.label}
+                      <SelectItem key={cls.id} value={cls.id}>
+                        {cls.plainName}
                       </SelectItem>
                     ))}
                   </SelectContent>

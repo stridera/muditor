@@ -1,6 +1,5 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateZoneInput, UpdateZoneInput, ZoneDto } from './zone.dto';
 import { ZonesService } from './zones.service';
 
@@ -32,13 +31,13 @@ export class ZonesResolver {
   }
 
   @Mutation(() => ZoneDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['id'] })
   async createZone(@Args('data') data: CreateZoneInput): Promise<ZoneDto> {
     return this.zonesService.create(data);
   }
 
   @Mutation(() => ZoneDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['id'] })
   async updateZone(
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateZoneInput
@@ -47,7 +46,7 @@ export class ZonesResolver {
   }
 
   @Mutation(() => ZoneDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['id'] })
   async deleteZone(
     @Args('id', { type: () => Int }) id: number
   ): Promise<ZoneDto> {

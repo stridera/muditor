@@ -46,8 +46,6 @@ interface UpdateRoomArgs {
     sector: string;
     baseLightLevel?: number;
     capacity?: number;
-    magicAffinity?: string | null;
-    requiredMechanic?: string | null;
     entryRestriction?: string | null;
     isPeaceful?: boolean;
     allowsMagic?: boolean;
@@ -73,8 +71,6 @@ export async function updateRoomMutation(
           sector
           baseLightLevel
           capacity
-          magicAffinity
-          requiredMechanic
           entryRestriction
           isPeaceful
           allowsMagic

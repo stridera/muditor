@@ -1,8 +1,4 @@
-import {
-  mapShopHours,
-  mapShopItems,
-  type ShopQueryResult,
-} from '../lib/shopMapping';
+import { mapShopItems, type ShopQueryResult } from '../lib/shopMapping';
 
 describe('shopMapping helpers', () => {
   test('mapShopItems omits undefined optional keys', () => {
@@ -37,28 +33,5 @@ describe('shopMapping helpers', () => {
     // Third item missing amount defaults to 0 and contains id only
     expect(third.id).toBe('def');
     expect(third.amount).toBe(0);
-  });
-
-  test('mapShopHours provides default when hours missing', () => {
-    const raw: ShopQueryResult = { id: 2 };
-    const mapped = mapShopHours(raw);
-    expect(mapped).toHaveLength(1);
-    const [only] = mapped as [(typeof mapped)[0]];
-    expect(only.openHour).toBe(6);
-    expect(only.closeHour).toBe(20);
-  });
-
-  test('mapShopHours omits undefined id', () => {
-    const raw: ShopQueryResult = {
-      id: 3,
-      hours: [
-        { open: 8, close: 18 },
-        { id: 'xyz', open: 0, close: 23 },
-      ],
-    };
-    const mapped = mapShopHours(raw);
-    const [first, second] = mapped as [(typeof mapped)[0], (typeof mapped)[0]];
-    expect(Object.prototype.hasOwnProperty.call(first, 'id')).toBe(false);
-    expect(second.id).toBe('xyz');
   });
 });

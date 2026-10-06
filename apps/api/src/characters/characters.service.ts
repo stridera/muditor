@@ -14,8 +14,15 @@ import Redis from 'ioredis';
 // but tsc sees it as { default: fn }. Cast to reconcile.
 import * as _crypt from 'unix-crypt-td-js';
 const crypt = _crypt as unknown as (password: string, salt: string) => string;
-import type { ItemInstanceFlag, Prisma } from '@muditor/db';
+import type {
+  ItemInstanceFlag,
+  Permission,
+  PlayerFlag,
+  Prisma,
+  Race,
+} from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
+import { RacesService } from '../races/races.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
 import {
   type CharacterFilterInput,
@@ -40,7 +47,8 @@ export class CharactersService {
   constructor(
     private readonly db: DatabaseService,
     private readonly roleCalculator: RoleCalculatorService,
-    private readonly configService: ConfigService
+    private readonly configService: ConfigService,
+    private readonly racesService: RacesService
   ) {
     const redisUrl =
       this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
@@ -178,6 +186,50 @@ export class CharactersService {
     return character;
   }
 
+  /** Class display name for a classId (null if unknown). */
+  async findClassName(classId: number): Promise<string | null> {
+    const cls = await this.db.characterClass.findUnique({
+      where: { id: classId },
+      select: { plainName: true },
+    });
+    return cls?.plainName ?? null;
+  }
+
+  /** Throws BadRequest unless a CharacterClass with this id exists. */
+  private async assertClassExists(classId: number): Promise<void> {
+    const cls = await this.db.characterClass.findUnique({
+      where: { id: classId },
+      select: { id: true },
+    });
+    if (!cls) {
+      throw new BadRequestException(`Class with ID ${classId} does not exist`);
+    }
+  }
+
+  /**
+   * Non-staff callers may only pick playable races; staff may set any race.
+   * Unknown races surface as NotFound from RacesService.
+   */
+  private async assertRaceAllowed(race: Race, isStaff: boolean): Promise<void> {
+    if (isStaff) return;
+    const raceData = await this.racesService.findOne(race);
+    if (!raceData.playable) {
+      throw new BadRequestException(`Race ${race} is not playable`);
+    }
+  }
+
+  /** Owning user id of a character (null if unlinked); NotFound when the character is missing. */
+  async findCharacterOwnerId(id: string): Promise<string | null> {
+    const character = await this.db.characters.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${id} not found`);
+    }
+    return character.userId ?? null;
+  }
+
   async findCharactersByUser(userId: string) {
     return this.db.characters.findMany({
       where: { userId },
@@ -214,7 +266,11 @@ export class CharactersService {
     return this.db.characters.count({ where });
   }
 
-  async createCharacter(data: CreateCharacterInput, userId: string) {
+  async createCharacter(
+    data: CreateCharacterInput,
+    userId: string,
+    options: { isStaff?: boolean } = {}
+  ) {
     // Check if character name already exists
     const existingCharacter = await this.db.characters.findUnique({
       where: { name: data.name },
@@ -226,16 +282,34 @@ export class CharactersService {
       );
     }
 
-    const createData: Parameters<typeof this.db.characters.create>[0]['data'] =
-      {
-        id: crypto.randomUUID(),
-        ...data,
-        users: { connect: { id: userId } },
-        hitPointsMax: Math.max(50, data.constitution * 5 + data.level * 10),
-        hitPoints: Math.max(50, data.constitution * 5 + data.level * 10),
-        staminaMax: Math.max(100, data.constitution * 8 + data.level * 5),
-        stamina: Math.max(100, data.constitution * 8 + data.level * 5),
-      };
+    await this.assertRaceAllowed(data.race, options.isStaff ?? false);
+    await this.assertClassExists(data.classId);
+
+    const hitPoints = Math.max(50, data.constitution * 5 + data.level * 10);
+    const stamina = Math.max(100, data.constitution * 8 + data.level * 5);
+    const createData: Prisma.CharactersCreateInput = {
+      id: crypto.randomUUID(),
+      name: data.name,
+      level: data.level,
+      alignment: data.alignment,
+      strength: data.strength,
+      intelligence: data.intelligence,
+      wisdom: data.wisdom,
+      dexterity: data.dexterity,
+      constitution: data.constitution,
+      charisma: data.charisma,
+      luck: data.luck,
+      gender: data.gender,
+      race: data.race,
+      description: data.description ?? null,
+      title: data.title ?? null,
+      users: { connect: { id: userId } },
+      characterClass: { connect: { id: data.classId } },
+      hitPointsMax: hitPoints,
+      hitPoints,
+      staminaMax: stamina,
+      stamina,
+    };
     return this.db.characters.create({
       data: createData,
       include: {
@@ -255,7 +329,11 @@ export class CharactersService {
     });
   }
 
-  async updateCharacter(id: string, data: UpdateCharacterInput) {
+  async updateCharacter(
+    id: string,
+    data: UpdateCharacterInput,
+    options: { isStaff?: boolean } = {}
+  ) {
     const character = await this.findCharacterById(id);
 
     // If name is being changed, check for duplicates
@@ -271,9 +349,63 @@ export class CharactersService {
       }
     }
 
+    if (data.race !== undefined) {
+      await this.assertRaceAllowed(data.race, options.isStaff ?? false);
+    }
+    if (data.classId !== undefined) {
+      await this.assertClassExists(data.classId);
+    }
+
+    // Explicit construction: GraphQL field names differ from Prisma columns
+    // (movement -> stamina, currentRoom -> currentRoomId, ...).
+    const updateData: Prisma.CharactersUpdateInput = {
+      ...(data.name !== undefined && { name: data.name }),
+      ...(data.level !== undefined && { level: data.level }),
+      ...(data.alignment !== undefined && { alignment: data.alignment }),
+      ...(data.strength !== undefined && { strength: data.strength }),
+      ...(data.intelligence !== undefined && {
+        intelligence: data.intelligence,
+      }),
+      ...(data.wisdom !== undefined && { wisdom: data.wisdom }),
+      ...(data.dexterity !== undefined && { dexterity: data.dexterity }),
+      ...(data.constitution !== undefined && {
+        constitution: data.constitution,
+      }),
+      ...(data.charisma !== undefined && { charisma: data.charisma }),
+      ...(data.luck !== undefined && { luck: data.luck }),
+      ...(data.hitPoints !== undefined && { hitPoints: data.hitPoints }),
+      ...(data.hitPointsMax !== undefined && {
+        hitPointsMax: data.hitPointsMax,
+      }),
+      ...(data.movement !== undefined && { stamina: data.movement }),
+      ...(data.movementMax !== undefined && { staminaMax: data.movementMax }),
+      ...(data.gender !== undefined && { gender: data.gender }),
+      ...(data.race !== undefined && { race: data.race }),
+      ...(data.classId !== undefined && {
+        characterClass: { connect: { id: data.classId } },
+      }),
+      ...(data.height !== undefined && { height: data.height }),
+      ...(data.weight !== undefined && { weight: data.weight }),
+      ...(data.currentRoom !== undefined && {
+        currentRoomId: data.currentRoom,
+      }),
+      ...(data.saveRoom !== undefined && { recallRoomId: data.saveRoom }),
+      ...(data.homeRoom !== undefined && { recallRoomId: data.homeRoom }),
+      ...(data.description !== undefined && { description: data.description }),
+      ...(data.title !== undefined && { title: data.title }),
+      ...(data.prompt !== undefined && { prompt: data.prompt }),
+      ...(data.playerFlags !== undefined && {
+        playerFlags: data.playerFlags as PlayerFlag[],
+      }),
+      ...(data.privilegeFlags !== undefined && {
+        permissions: data.privilegeFlags as Permission[],
+      }),
+      ...(data.invisLevel !== undefined && { invisLevel: data.invisLevel }),
+    };
+
     return this.db.characters.update({
       where: { id },
-      data: data as Prisma.CharactersUpdateInput,
+      data: updateData,
       include: {
         characterItems: {
           include: {

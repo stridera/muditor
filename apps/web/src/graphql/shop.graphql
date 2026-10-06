@@ -37,11 +37,6 @@ query GetShopEditor($id: Int!, $zoneId: Int!) {
       type
       keywords
     }
-    hours {
-      id
-      open
-      close
-    }
   }
 }
 
@@ -61,7 +56,7 @@ mutation CreateShopEditor($data: CreateShopInput!) {
   }
 }
 
-# New mutations for batch inventory and hours replacement
+# New mutation for batch inventory replacement
 mutation UpdateShopInventoryEditor(
   $zoneId: Int!
   $id: Int!
@@ -80,21 +75,6 @@ mutation UpdateShopInventoryEditor(
         type
         cost
       }
-    }
-  }
-}
-
-mutation UpdateShopHoursEditor(
-  $zoneId: Int!
-  $id: Int!
-  $hours: [ShopHourInput!]!
-) {
-  updateShopHours(zoneId: $zoneId, id: $id, data: { hours: $hours }) {
-    id
-    hours {
-      id
-      open
-      close
     }
   }
 }

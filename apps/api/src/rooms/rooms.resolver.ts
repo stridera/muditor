@@ -1,4 +1,5 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { zoneLookups } from '../common/decorators/zone-lookups';
 import {
   Args,
   Int,
@@ -9,7 +10,6 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { Direction, ExitFlag, ExitState } from '@muditor/db';
-import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 // Import from barrel to ensure mapper files are included in program graph for tooling
 import { mapRoom } from '../common/mappers';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
@@ -147,14 +147,14 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async createRoom(@Args('data') data: CreateRoomInput): Promise<RoomDto> {
     const created = await this.roomsService.create(data);
     return mapRoom(created as unknown as RoomsMapperInput);
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async updateRoom(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -165,7 +165,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async deleteRoom(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -175,7 +175,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomExitDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite({ keys: ['roomZoneId'] })
   async createRoomExit(
     @Args('data') data: CreateRoomExitInput
   ): Promise<RoomExitDto> {
@@ -199,7 +199,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomExitDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.roomExit('exitId') })
   async deleteRoomExit(@Args('exitId') exitId: number): Promise<RoomExitDto> {
     const exit = await this.roomsService.deleteExit(exitId);
     const exitDto: RoomExitDto = {
@@ -221,7 +221,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async updateRoomPosition(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -236,7 +236,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => BatchUpdateResult)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async batchUpdateRoomPositions(
     @Args('input') input: BatchUpdateRoomPositionsInput
   ): Promise<BatchUpdateResult> {
@@ -244,7 +244,7 @@ export class RoomsResolver {
   }
 
   @Mutation(() => RoomDto)
-  @UseGuards(GraphQLJwtAuthGuard)
+  @RequireZoneWrite()
   async updateRoomEnvironmentalEffects(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,

@@ -11,13 +11,6 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import { gql } from '@apollo/client';
 import { useQuery } from '@apollo/client/react';
 import { Filter, Loader2, Search, Users, X } from 'lucide-react';
@@ -33,10 +26,9 @@ const GET_ALL_CHARACTERS = gql`
       id
       name
       level
-      raceType
-      playerClass
+      race
+      class
       lastLogin
-      isOnline
       timePlayed
       hitPoints
       hitPointsMax
@@ -76,10 +68,9 @@ interface Character {
   id: string;
   name: string;
   level: number;
-  raceType?: string;
-  playerClass?: string;
+  race?: string;
+  class?: string;
   lastLogin?: string;
-  isOnline: boolean;
   timePlayed: number;
   hitPoints: number;
   hitPointsMax: number;
@@ -115,9 +106,6 @@ export function AdminCharactersList({
   onCharacterClick,
 }: AdminCharactersListProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRace, setFilterRace] = useState<string>('all');
-  const [filterClass, setFilterClass] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
   const [currentPage, setCurrentPage] = useState(1);
   const charactersPerPage = 12;
 
@@ -125,10 +113,6 @@ export function AdminCharactersList({
   const buildFilter = () => {
     const filter: any = {};
     if (searchTerm) filter.name = searchTerm;
-    if (filterRace !== 'all') filter.raceType = filterRace;
-    if (filterClass !== 'all') filter.playerClass = filterClass;
-    if (filterStatus === 'online') filter.isOnline = true;
-    if (filterStatus === 'offline') filter.isOnline = false;
     return Object.keys(filter).length > 0 ? filter : undefined;
   };
 
@@ -157,46 +141,15 @@ export function AdminCharactersList({
   // Reset to page 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, filterRace, filterClass, filterStatus]);
+  }, [searchTerm]);
 
   const totalPages = Math.ceil(totalCharacters / charactersPerPage);
 
   const clearFilters = () => {
     setSearchTerm('');
-    setFilterRace('all');
-    setFilterClass('all');
-    setFilterStatus('all');
   };
 
-  const hasActiveFilters =
-    searchTerm !== '' ||
-    filterRace !== 'all' ||
-    filterClass !== 'all' ||
-    filterStatus !== 'all';
-
-  const races = [
-    { value: 'all', label: 'All Races' },
-    { value: 'human', label: 'Human' },
-    { value: 'elf', label: 'Elf' },
-    { value: 'dwarf', label: 'Dwarf' },
-    { value: 'halfling', label: 'Halfling' },
-    { value: 'gnome', label: 'Gnome' },
-    { value: 'half-elf', label: 'Half-Elf' },
-    { value: 'orc', label: 'Orc' },
-    { value: 'troll', label: 'Troll' },
-  ];
-
-  const classes = [
-    { value: 'all', label: 'All Classes' },
-    { value: 'fighter', label: 'Fighter' },
-    { value: 'cleric', label: 'Cleric' },
-    { value: 'magic-user', label: 'Magic User' },
-    { value: 'thief', label: 'Thief' },
-    { value: 'ranger', label: 'Ranger' },
-    { value: 'paladin', label: 'Paladin' },
-    { value: 'barbarian', label: 'Barbarian' },
-    { value: 'sorcerer', label: 'Sorcerer' },
-  ];
+  const hasActiveFilters = searchTerm !== '';
 
   return (
     <div className='space-y-6'>
@@ -224,12 +177,10 @@ export function AdminCharactersList({
             <Filter className='h-5 w-5' />
             Search & Filter
           </CardTitle>
-          <CardDescription>
-            Find specific characters by name, race, class, or status
-          </CardDescription>
+          <CardDescription>Find specific characters by name</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className='grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4'>
+          <div className='grid grid-cols-1 gap-4 max-w-md'>
             {/* Search by name */}
             <div className='space-y-2'>
               <Label htmlFor='search'>Search Name</Label>
@@ -243,55 +194,6 @@ export function AdminCharactersList({
                   className='pl-10'
                 />
               </div>
-            </div>
-
-            {/* Filter by race */}
-            <div className='space-y-2'>
-              <Label htmlFor='race'>Race</Label>
-              <Select value={filterRace} onValueChange={setFilterRace}>
-                <SelectTrigger id='race'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {races.map(race => (
-                    <SelectItem key={race.value} value={race.value}>
-                      {race.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filter by class */}
-            <div className='space-y-2'>
-              <Label htmlFor='class'>Class</Label>
-              <Select value={filterClass} onValueChange={setFilterClass}>
-                <SelectTrigger id='class'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {classes.map(cls => (
-                    <SelectItem key={cls.value} value={cls.value}>
-                      {cls.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            {/* Filter by online status */}
-            <div className='space-y-2'>
-              <Label htmlFor='status'>Status</Label>
-              <Select value={filterStatus} onValueChange={setFilterStatus}>
-                <SelectTrigger id='status'>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value='all'>All Status</SelectItem>
-                  <SelectItem value='online'>Online</SelectItem>
-                  <SelectItem value='offline'>Offline</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 

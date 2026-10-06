@@ -48,10 +48,6 @@ const GET_TRIGGERS = gql(`
       numArgs
       argList
       commands
-      mobZoneId
-      mobId
-      objectZoneId
-      objectId
       flags
       needsReview
       syntaxError
@@ -71,8 +67,6 @@ const CREATE_TRIGGER = gql(`
       attachType
       commands
       zoneId
-      mobId
-      objectId
       flags
       needsReview
     }
@@ -87,10 +81,6 @@ const UPDATE_TRIGGER = gql(`
       name
       attachType
       commands
-      mobZoneId
-      mobId
-      objectZoneId
-      objectId
       flags
       needsReview
     }
@@ -124,10 +114,6 @@ interface TriggerData {
   numArgs: number;
   argList: string[];
   commands: string;
-  mobZoneId?: number | null;
-  mobId?: number | null;
-  objectZoneId?: number | null;
-  objectId?: number | null;
   flags: string[];
   needsReview: boolean;
   syntaxError?: string | null;
@@ -160,8 +146,6 @@ const convertTriggerToScript = (trigger: TriggerData): Script => {
     flags: trigger.flags,
   };
   if (trigger.zoneId != null) script.zoneId = trigger.zoneId;
-  if (trigger.mobId != null) script.mobId = trigger.mobId;
-  if (trigger.objectId != null) script.objectId = trigger.objectId;
   return script;
 };
 
@@ -170,10 +154,6 @@ function getLineCount(commands: string): number {
 }
 
 function getAttachmentLabel(trigger: TriggerData): string {
-  if (trigger.mobId)
-    return `Mob ${trigger.mobZoneId ?? trigger.zoneId}:${trigger.mobId}`;
-  if (trigger.objectId)
-    return `Obj ${trigger.objectZoneId ?? trigger.zoneId}:${trigger.objectId}`;
   return `Zone ${trigger.zoneId}`;
 }
 

@@ -45,3 +45,43 @@ describe('ObjectsService findByType', () => {
     });
   });
 });
+
+describe('ObjectsService.deleteMany', () => {
+  let service: ObjectsService;
+  const objects = { deleteMany: jest.fn() };
+
+  beforeEach(async () => {
+    jest.clearAllMocks();
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ObjectsService,
+        { provide: DatabaseService, useValue: { objects } },
+      ],
+    }).compile();
+    service = module.get(ObjectsService);
+  });
+
+  it('deletes by composite (zoneId, id), never by id alone', async () => {
+    objects.deleteMany.mockResolvedValue({ count: 2 });
+
+    const count = await service.deleteMany([
+      { zoneId: 30, id: 1 },
+      { zoneId: 31, id: 1 },
+    ]);
+
+    expect(count).toBe(2);
+    expect(objects.deleteMany).toHaveBeenCalledWith({
+      where: {
+        OR: [
+          { zoneId: 30, id: 1 },
+          { zoneId: 31, id: 1 },
+        ],
+      },
+    });
+  });
+
+  it('does not touch the database for an empty list', async () => {
+    expect(await service.deleteMany([])).toBe(0);
+    expect(objects.deleteMany).not.toHaveBeenCalled();
+  });
+});

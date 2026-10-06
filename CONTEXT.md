@@ -27,6 +27,24 @@ _Avoid_: "apply" (legacy CircleMUD term), "modifier delta", "stat bonus", "affec
 A set of alignment / class / race lists on a `Shops` row that name the actors a shopkeeper refuses to do business with. Three independent lists: `restrictedAlignments`, `restrictedClassIds`, `restrictedRaces`. Empty list = no restriction on that axis.
 _Avoid_: "trades-with flags", "SHOP_TRADES_WITH"
 
+### Resting and Repose
+
+**Repose**:
+A sticky pool of accumulated bonus-XP credit, stored as `Characters.repose Int`. Spent only on XP gain — while `repose > 0`, XP gained is multiplied (formula owned by fierymud-rs). Filled passively only while the character is logged off and has a non-NONE [[RestSource]]. Never decays, never expires; persists across deaths, logouts, and inactivity. **Never** affects combat power, regen, or any other axis — strictly an XP-rate accelerator. The fill cap and per-hour rate are looked up from `restTier` via a runtime table (not stored as columns).
+_Avoid_: "rested XP", "rested buff", "bonus pool", "buff"
+
+**RestSource**:
+The kind of rest the character has prepaid for their next sleep, stored as `Characters.restSource` enum: `NONE`, `QUIT`, `CAMP`, `INN`, `HOUSE`. The corresponding `Characters.restTier Int` (0-3) holds the quality level: 0 for NONE/QUIT, 1-3 for the others. Source is set when the player rents a room (`rent <tier name>` on an `isInn` Room), completes a `camp [<kit>]` action, or logs out from a room they own (HOUSE). The source survives logout and survives multiple login sessions; it is **consumed exactly once at the player's next XP gain**: server clears source and tier to (NONE, 0), spawns a [[Refreshed Effect]] on the character, and begins spending [[Repose]] on the triggering XP gain and subsequent gains. Time spent offline never costs the player anything — no nightly billing, no decay.
+_Avoid_: "lodging", "rest type", "inn flag", "rented-from", "rental subscription", "rest expiry"
+
+**Refreshed Effect**:
+A row in the `Effect` table with `effectType="status"`, attached to characters via `CharacterEffects` at the moment of [[RestSource]] consumption (first XP gain after acquiring a source). Grants a short window of elevated HP and stamina regen with `strength` set from the consumed `restTier`. Spawned for any source EXCEPT `QUIT` / `NONE`. Independent of [[Repose]] — Refreshed gives flat regen, Repose multiplies XP. Both fire on the same wake event.
+_Avoid_: "rested buff", "wake buff", "regen buff"
+
+**Wake Effect attachment**:
+A row in one of two junction tables — `RoomWakeEffects` (linked to a Room) or `ObjectWakeEffects` (linked to an Object) — that schedules an Effect to attach to a character at the moment of [[RestSource]] consumption. Resolution is source-kind keyed: `INN` source applies `RoomWakeEffects` on the rented room; `CAMP` source applies `ObjectWakeEffects` on the consumed kit; `HOUSE` source applies `ObjectWakeEffects` on the bed Object present in the room. Universal Refreshed always spawns alongside (except for `QUIT`/`NONE`). A Wake Effect attachment carries `effectId`, `modifierData Json`, `duration Int`, and an optional `minTier Int` (room-level only — restricts the attachment to higher tiers).
+_Avoid_: "rested buff", "extra buff", "wake buff", "special bed buff"
+
 ## Relationships
 
 - Every **Effect attachment** row has a `NOT NULL` `effect_id` pointing at an **Effect**. There are no rows-without-an-Effect.

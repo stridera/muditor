@@ -11,6 +11,24 @@ import { DatabaseService } from '../database/database.service';
 export class BoardsService {
   constructor(private readonly database: DatabaseService) {}
 
+  /**
+   * Names the user may post as (display name + linked character names) and the
+   * poster level (highest linked character level, minimum 1).
+   */
+  async getPosterIdentity(user: {
+    id: string;
+    displayName: string;
+  }): Promise<{ names: string[]; level: number }> {
+    const characters = await this.database.characters.findMany({
+      where: { userId: user.id },
+      select: { name: true, level: true },
+    });
+    return {
+      names: [user.displayName, ...characters.map(c => c.name)],
+      level: Math.max(1, ...characters.map(c => c.level)),
+    };
+  }
+
   // Board operations
   async findAllBoards(args?: {
     skip?: number;

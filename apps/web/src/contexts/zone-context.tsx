@@ -1,6 +1,12 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, {
+  createContext,
+  Suspense,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { useSearchParams } from 'next/navigation';
 
 export interface ZoneContextType {
@@ -22,8 +28,14 @@ interface ZoneProviderProps {
   children: React.ReactNode;
 }
 
-export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
-  const [selectedZone, setSelectedZoneState] = useState<number | null>(null);
+/**
+ * Syncs the selected zone from the URL (?zone=) or localStorage. Isolated in
+ * its own component so the useSearchParams() Suspense boundary does not force
+ * the whole app tree (rendered from the root layout) into client-side bailout.
+ */
+const ZoneUrlSync: React.FC<{
+  onZone: (zone: number) => void;
+}> = ({ onZone }) => {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -32,7 +44,7 @@ export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
     if (urlZone) {
       const zoneId = parseInt(urlZone);
       if (!isNaN(zoneId)) {
-        setSelectedZoneState(zoneId);
+        onZone(zoneId);
         // Update localStorage to match URL
         localStorage.setItem('muditor-selected-zone', zoneId.toString());
         return;
@@ -44,11 +56,16 @@ export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
     if (stored && stored !== 'null') {
       const zoneId = parseInt(stored);
       if (!isNaN(zoneId)) {
-        setSelectedZoneState(zoneId);
+        onZone(zoneId);
       }
     }
-  }, [searchParams]);
+  }, [searchParams, onZone]);
 
+  return null;
+};
+
+export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
+  const [selectedZone, setSelectedZoneState] = useState<number | null>(null);
   const setSelectedZone = (zone: number | null) => {
     setSelectedZoneState(zone);
     if (zone === null) {
@@ -65,6 +82,9 @@ export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
         setSelectedZone,
       }}
     >
+      <Suspense fallback={null}>
+        <ZoneUrlSync onZone={setSelectedZoneState} />
+      </Suspense>
       {children}
     </ZoneContext.Provider>
   );

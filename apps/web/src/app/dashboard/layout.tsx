@@ -1,6 +1,5 @@
 'use client';
 
-import { LoginApprovalNotification } from '@/components/auth/login-approval-notification';
 import { ChatContainer } from '@/components/chat';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -33,9 +32,6 @@ export default function DashboardLayout({
 
       {/* Game chat bubble */}
       <ChatContainer />
-
-      {/* Login approval notification */}
-      <LoginApprovalNotification />
 
       {/* Global help modal */}
       <HelpModal open={helpOpen} onOpenChange={setHelpOpen} context='global' />

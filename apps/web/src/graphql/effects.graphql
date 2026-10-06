@@ -8,7 +8,6 @@ query GetEffects($skip: Int, $take: Int, $search: String) {
     description
     tags
     defaultParams
-    paramSchema
   }
 }
 
@@ -24,7 +23,6 @@ query GetEffect($id: ID!) {
     description
     tags
     defaultParams
-    paramSchema
   }
 }
 
@@ -36,7 +34,6 @@ mutation CreateEffect($data: CreateEffectInput!) {
     description
     tags
     defaultParams
-    paramSchema
   }
 }
 
@@ -48,7 +45,6 @@ mutation UpdateEffect($id: ID!, $data: UpdateEffectInput!) {
     description
     tags
     defaultParams
-    paramSchema
   }
 }
 

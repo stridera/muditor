@@ -26,11 +26,11 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 
 type Quest = GetQuestsQuery['quests'][number];
 
-export default function QuestsPage() {
+function QuestsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
       <QuestsContent />
@@ -460,5 +460,15 @@ function QuestsContent() {
     >
       <div></div>
     </DualInterface>
+  );
+}
+
+export default function QuestsPage() {
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <QuestsPageContent />
+    </Suspense>
   );
 }

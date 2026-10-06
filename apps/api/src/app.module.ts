@@ -28,7 +28,8 @@ import { AccountStorageModule } from './account-storage/account-storage.module';
 import { BoardsModule } from './boards/boards.module';
 import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
-import { LoginRequestsModule } from './login-requests/login-requests.module';
+import { depthLimit, MAX_QUERY_DEPTH } from './common/depth-limit';
+import { getJwtSecret } from './auth/jwt-secret';
 import * as jwt from 'jsonwebtoken';
 
 @Module({
@@ -43,7 +44,9 @@ import * as jwt from 'jsonwebtoken';
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
       playground: process.env.GRAPHQL_PLAYGROUND === 'true',
-      introspection: true, // Required for Apollo Sandbox in Apollo Server 5
+      // Introspection (Apollo Sandbox) only outside production
+      introspection: process.env.NODE_ENV !== 'production',
+      validationRules: [depthLimit(MAX_QUERY_DEPTH)],
       debug: process.env.GRAPHQL_DEBUG === 'true',
       context: ({ req, res }: { req: Request; res: Response }) => ({
         req,
@@ -64,7 +67,7 @@ import * as jwt from 'jsonwebtoken';
                 const token = auth.replace('Bearer ', '');
                 const decoded = jwt.verify(
                   token,
-                  process.env.JWT_SECRET!
+                  getJwtSecret()
                 ) as jwt.JwtPayload;
                 return {
                   req: {
@@ -106,7 +109,6 @@ import * as jwt from 'jsonwebtoken';
     BoardsModule,
     BridgeModule,
     DiscordModule,
-    LoginRequestsModule,
   ],
 })
 export class AppModule {}

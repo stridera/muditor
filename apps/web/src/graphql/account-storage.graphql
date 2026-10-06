@@ -63,7 +63,12 @@ mutation DepositWealth($characterId: String!, $amount: BigInt!) {
   depositWealth(characterId: $characterId, amount: $amount)
 }
 
-mutation DepositItem($characterId: String!, $objectZoneId: Int!, $objectId: Int!, $quantity: Int!) {
+mutation DepositItem(
+  $characterId: String!
+  $objectZoneId: Int!
+  $objectId: Int!
+  $quantity: Int!
+) {
   depositItem(
     characterId: $characterId
     objectZoneId: $objectZoneId

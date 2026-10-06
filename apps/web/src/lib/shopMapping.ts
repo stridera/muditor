@@ -17,12 +17,6 @@ export interface ShopItem {
   object?: ShopObjectSummary;
 }
 
-export interface ShopHour {
-  id?: string;
-  openHour: number;
-  closeHour: number;
-}
-
 export interface ShopKeeperSummary {
   id: number;
   name?: string;
@@ -32,11 +26,6 @@ export interface ShopAcceptSummary {
   id: number;
   type?: string;
   keywords?: string;
-}
-export interface ShopHourSummary {
-  id?: string;
-  open?: number;
-  close?: number;
 }
 export interface ShopQueryResult {
   id: number;
@@ -58,7 +47,6 @@ export interface ShopQueryResult {
   accepts?: Array<
     ShopAcceptSummary | { id: string; type?: string; keywords?: string | null }
   >;
-  hours?: ShopHourSummary[];
 }
 
 export function mapShopItems(raw: ShopQueryResult): ShopItem[] {
@@ -78,18 +66,6 @@ export function mapShopItems(raw: ShopQueryResult): ShopItem[] {
       if (typeof obj.zoneId === 'number') built.zoneId = obj.zoneId;
       base.object = built;
     }
-    return base;
-  });
-}
-
-export function mapShopHours(raw: ShopQueryResult): ShopHour[] {
-  if (!Array.isArray(raw.hours)) return [{ openHour: 6, closeHour: 20 }];
-  return raw.hours.map(h => {
-    const base: ShopHour = {
-      openHour: typeof h.open === 'number' ? h.open : 6,
-      closeHour: typeof h.close === 'number' ? h.close : 20,
-    };
-    if (typeof h.id === 'string') base.id = h.id;
     return base;
   });
 }

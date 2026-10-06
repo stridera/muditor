@@ -3,7 +3,7 @@ module.exports = {
     service: {
       name: 'muditor-api',
       // Point to your local GraphQL endpoint
-      url: 'http://localhost:4000/graphql',
+      url: 'http://localhost:3001/graphql',
       // Alternative: use introspection from schema file
       // localSchemaFile: './apps/api/src/schema.gql',
     },

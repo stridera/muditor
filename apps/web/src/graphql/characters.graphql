@@ -5,10 +5,9 @@ fragment CharacterCardFields on CharacterDto {
   id
   name
   level
-  raceType
-  playerClass
+  race
+  class
   lastLogin
-  isOnline
   timePlayed
   hitPoints
   hitPointsMax
@@ -44,8 +43,8 @@ query GetCharacterDetails($id: ID!) {
     name
     level
     description
-    raceType
-    playerClass
+    race
+    class
     strength
     dexterity
     constitution
@@ -64,7 +63,6 @@ query GetCharacterSessionInfo($id: ID!) {
   characterSessionInfo(characterId: $id) {
     id
     name
-    isOnline
     currentSessionTime
     totalTimePlayed
     lastLogin
@@ -89,7 +87,7 @@ mutation CreateCharacter($data: CreateCharacterInput!) {
     id
     name
     level
-    raceType
+    race
   }
 }
 
@@ -106,8 +104,9 @@ mutation UpdateCharacter($id: ID!, $data: UpdateCharacterInput!) {
     id
     name
     level
-    raceType
-    playerClass
+    race
+    class
+    classId
     description
     title
     strength

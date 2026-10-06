@@ -406,10 +406,6 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.googleLink;
   }
 
-  get loginRequests() {
-    return this.client.loginRequests;
-  }
-
   // Quest system
   get quests() {
     return this.client.quests;

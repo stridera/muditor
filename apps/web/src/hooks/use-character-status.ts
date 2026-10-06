@@ -10,9 +10,8 @@ export const ONLINE_CHARACTERS_QUERY = gql`
       name
       level
       lastLogin
-      isOnline
-      raceType
-      playerClass
+      race
+      class
       user {
         id
         displayName
@@ -29,9 +28,8 @@ export const MY_ONLINE_CHARACTERS_QUERY = gql`
       name
       level
       lastLogin
-      isOnline
-      raceType
-      playerClass
+      race
+      class
       user {
         id
         displayName
@@ -46,7 +44,6 @@ export const CHARACTER_SESSION_INFO_QUERY = gql`
     characterSessionInfo(characterId: $characterId) {
       id
       name
-      isOnline
       lastLogin
       totalTimePlayed
       currentSessionTime
@@ -77,9 +74,8 @@ export interface OnlineCharacter {
   name: string;
   level: number;
   lastLogin?: Date;
-  isOnline: boolean;
-  raceType?: string;
-  playerClass?: string;
+  race?: string;
+  class?: string;
   user?: {
     id: string;
     displayName: string;
@@ -90,7 +86,6 @@ export interface OnlineCharacter {
 export interface CharacterSessionInfo {
   id: string;
   name: string;
-  isOnline: boolean;
   lastLogin?: Date;
   totalTimePlayed: number;
   currentSessionTime: number;

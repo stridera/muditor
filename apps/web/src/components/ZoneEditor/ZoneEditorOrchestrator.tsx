@@ -92,8 +92,6 @@ interface Room {
   layoutZ: number | null;
   baseLightLevel?: number;
   capacity?: number;
-  magicAffinity?: string | null;
-  requiredMechanic?: string | null;
   entryRestriction?: string | null;
   isPeaceful?: boolean;
   allowsMagic?: boolean;
@@ -143,8 +141,6 @@ interface PropertyPanelRoom {
   layoutZ?: number | null;
   baseLightLevel?: number;
   capacity?: number;
-  magicAffinity?: string | null;
-  requiredMechanic?: string | null;
   entryRestriction?: string | null;
   isPeaceful?: boolean;
   allowsMagic?: boolean;
@@ -665,7 +661,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               zones { id name climate }
               roomsByZone(zoneId: $zoneId, lightweight: $lightweight){
                 id zoneId name description roomDescription sector layoutX layoutY layoutZ
-                baseLightLevel capacity magicAffinity requiredMechanic entryRestriction
+                baseLightLevel capacity entryRestriction
                 isPeaceful allowsMagic allowsRecall allowsSummon allowsTeleport isDeathTrap
                 exits{ id direction toZoneId toRoomId description keywords keyZoneId keyId flags defaultState hitPoints }
                 mobs{ id name level roomDescription }
@@ -721,8 +717,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             layoutZ: number | null;
             baseLightLevel?: number;
             capacity?: number;
-            magicAffinity?: string | null;
-            requiredMechanic?: string | null;
             entryRestriction?: string | null;
             isPeaceful?: boolean;
             allowsMagic?: boolean;
@@ -751,8 +745,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutZ: r.layoutZ,
               baseLightLevel: r.baseLightLevel ?? 0,
               capacity: r.capacity ?? 10,
-              magicAffinity: r.magicAffinity ?? null,
-              requiredMechanic: r.requiredMechanic ?? null,
               entryRestriction: r.entryRestriction ?? null,
               isPeaceful: r.isPeaceful ?? false,
               allowsMagic: r.allowsMagic ?? true,
@@ -1638,10 +1630,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         updateInput.baseLightLevel = pendingRoomEdits.baseLightLevel;
       if (pendingRoomEdits.capacity !== undefined)
         updateInput.capacity = pendingRoomEdits.capacity;
-      if (pendingRoomEdits.magicAffinity !== undefined)
-        updateInput.magicAffinity = pendingRoomEdits.magicAffinity;
-      if (pendingRoomEdits.requiredMechanic !== undefined)
-        updateInput.requiredMechanic = pendingRoomEdits.requiredMechanic;
       if (pendingRoomEdits.entryRestriction !== undefined)
         updateInput.entryRestriction = pendingRoomEdits.entryRestriction;
       if (pendingRoomEdits.isPeaceful !== undefined)
@@ -1669,8 +1657,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                 sector
                 baseLightLevel
                 capacity
-                magicAffinity
-                requiredMechanic
                 entryRestriction
                 isPeaceful
                 allowsMagic
@@ -1704,8 +1690,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                   sector: updated.sector,
                   baseLightLevel: updated.baseLightLevel,
                   capacity: updated.capacity,
-                  magicAffinity: updated.magicAffinity,
-                  requiredMechanic: updated.requiredMechanic,
                   entryRestriction: updated.entryRestriction,
                   isPeaceful: updated.isPeaceful,
                   allowsMagic: updated.allowsMagic,
@@ -2852,8 +2836,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutZ: selectedRoom.layoutZ,
               baseLightLevel: selectedRoom.baseLightLevel ?? 0,
               capacity: selectedRoom.capacity ?? 10,
-              magicAffinity: selectedRoom.magicAffinity ?? null,
-              requiredMechanic: selectedRoom.requiredMechanic ?? null,
               entryRestriction: selectedRoom.entryRestriction ?? null,
               isPeaceful: selectedRoom.isPeaceful ?? false,
               allowsMagic: selectedRoom.allowsMagic ?? true,
@@ -2900,8 +2882,6 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               layoutZ: r.layoutZ,
               baseLightLevel: r.baseLightLevel ?? 0,
               capacity: r.capacity ?? 10,
-              magicAffinity: r.magicAffinity ?? null,
-              requiredMechanic: r.requiredMechanic ?? null,
               entryRestriction: r.entryRestriction ?? null,
               isPeaceful: r.isPeaceful ?? false,
               allowsMagic: r.allowsMagic ?? true,

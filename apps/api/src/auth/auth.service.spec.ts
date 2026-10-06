@@ -416,4 +416,66 @@ describe('AuthService', () => {
       expect(emailService.sendPasswordResetEmail).not.toHaveBeenCalled();
     });
   });
+
+  describe('ban enforcement on token use', () => {
+    const dbUser = {
+      id: 'user-id',
+      displayName: 'Tester',
+      role: UserRole.PLAYER,
+      passwordHash: 'hash',
+    };
+
+    it('validateJwtPayload rejects a banned user', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue({
+        id: 1,
+      });
+
+      await expect(
+        service.validateJwtPayload({
+          sub: 'user-id',
+          displayName: 'Tester',
+          role: UserRole.PLAYER,
+        })
+      ).rejects.toThrow('Account is banned');
+    });
+
+    it('validateJwtPayload accepts an unbanned user and strips passwordHash', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+
+      const result = await service.validateJwtPayload({
+        sub: 'user-id',
+        displayName: 'Tester',
+        role: UserRole.PLAYER,
+      });
+      expect(result).not.toHaveProperty('passwordHash');
+      expect(result.id).toBe('user-id');
+    });
+
+    it('refreshToken refuses to mint a token for a banned user', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue({
+        id: 1,
+      });
+      (jwtService.sign as jest.Mock).mockReturnValue('new-token');
+
+      await expect(service.refreshToken('user-id')).rejects.toThrow(
+        'Account is banned'
+      );
+      expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('refreshToken mints a token for an unbanned user', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      (jwtService.sign as jest.Mock).mockReturnValue('new-token');
+
+      await expect(service.refreshToken('user-id')).resolves.toBe('new-token');
+    });
+  });
 });

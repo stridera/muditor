@@ -8,7 +8,7 @@ import { stripMarkup } from '@/utils/xmlLiteParser';
 import { ChevronDown } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, Suspense } from 'react';
 
 interface RoomExit {
   id: string;
@@ -42,8 +42,6 @@ interface Room {
   allowsTeleport?: boolean;
   baseLightLevel?: number;
   capacity?: number;
-  magicAffinity?: string | null;
-  requiredMechanic?: string | null;
   entryRestriction?: string | null;
   exits?: RoomExit[];
   extraDescs?: RoomExtraDescription[];
@@ -56,7 +54,7 @@ interface Room {
   layoutZ?: number;
 }
 
-export default function RoomsPage() {
+function RoomsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
       <RoomsContent />
@@ -172,8 +170,6 @@ function RoomsContent() {
               zoneId
               baseLightLevel
               capacity
-              magicAffinity
-              requiredMechanic
               entryRestriction
               isPeaceful
               allowsMagic
@@ -590,10 +586,6 @@ function RoomsContent() {
                               props.push('No Summon');
                             if (room.allowsTeleport === false)
                               props.push('No Teleport');
-                            if (room.magicAffinity)
-                              props.push(`Affinity: ${room.magicAffinity}`);
-                            if (room.requiredMechanic)
-                              props.push(`Requires: ${room.requiredMechanic}`);
                             if ((room.baseLightLevel ?? 0) !== 0)
                               props.push(`Light: ${room.baseLightLevel}`);
                             if ((room.capacity ?? 10) !== 10)
@@ -644,5 +636,15 @@ function RoomsContent() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function RoomsPage() {
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <RoomsPageContent />
+    </Suspense>
   );
 }

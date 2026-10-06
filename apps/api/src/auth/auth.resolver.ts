@@ -15,6 +15,8 @@ import {
   UpdateProfileInput,
 } from './dto/password-reset.input';
 import { RegisterInput } from './dto/register.input';
+import { RateLimit } from '../bridge/rate-limit.guard';
+import { AuthRateLimitGuard } from './guards/auth-rate-limit.guard';
 import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
 
 @Resolver()
@@ -25,6 +27,8 @@ export class AuthResolver {
   ) {}
 
   @Mutation(() => AuthPayload)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60, keyPrefix: 'auth:register' })
   async register(
     @Args('input') registerInput: RegisterInput
   ): Promise<AuthPayload> {
@@ -32,6 +36,8 @@ export class AuthResolver {
   }
 
   @Mutation(() => AuthPayload)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60, keyPrefix: 'auth:login' })
   async login(@Args('input') loginInput: LoginInput): Promise<AuthPayload> {
     return this.authService.login(loginInput);
   }
@@ -49,6 +55,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => PasswordResetResponse)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({
+    limit: 10,
+    windowSeconds: 60,
+    keyPrefix: 'auth:requestPasswordReset',
+  })
   async requestPasswordReset(
     @Args('input') input: RequestPasswordResetInput
   ): Promise<PasswordResetResponse> {
@@ -62,6 +74,8 @@ export class AuthResolver {
   }
 
   @Mutation(() => PasswordResetResponse)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({ limit: 10, windowSeconds: 60, keyPrefix: 'auth:resetPassword' })
   async resetPassword(
     @Args('input') input: ResetPasswordInput
   ): Promise<PasswordResetResponse> {
@@ -106,6 +120,12 @@ export class AuthResolver {
   }
 
   @Mutation(() => AuthPayload)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({
+    limit: 10,
+    windowSeconds: 60,
+    keyPrefix: 'auth:completeGoogleRegistration',
+  })
   async completeGoogleRegistration(
     @Args('token') token: string,
     @Args('displayName') displayName: string

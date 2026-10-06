@@ -137,3 +137,7 @@ packages/db/src/generated/
 
 # Serena Memories
 .serena/
+
+# Environment templates with local values (only .env.example is tracked)
+.env.development
+.env.production

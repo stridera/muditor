@@ -113,23 +113,35 @@ mutation DeleteObject($id: Int!, $zoneId: Int!) {
   }
 }
 
-mutation DeleteObjects($ids: [Int!]!) {
-  deleteObjects(ids: $ids)
+mutation DeleteObjects($keys: [EntityKeyInput!]!) {
+  deleteObjects(keys: $keys)
 }
 
-mutation UpdateObjectEffects($zoneId: Int!, $id: Int!, $effects: [ObjectEffectInput!]!) {
+mutation UpdateObjectEffects(
+  $zoneId: Int!
+  $id: Int!
+  $effects: [ObjectEffectInput!]!
+) {
   updateObjectEffects(zoneId: $zoneId, id: $id, effects: $effects) {
     ...ObjectSummary
   }
 }
 
-mutation UpdateObjectResistances($zoneId: Int!, $id: Int!, $resistances: [ObjectResistanceInput!]!) {
+mutation UpdateObjectResistances(
+  $zoneId: Int!
+  $id: Int!
+  $resistances: [ObjectResistanceInput!]!
+) {
   updateObjectResistances(zoneId: $zoneId, id: $id, resistances: $resistances) {
     ...ObjectSummary
   }
 }
 
-mutation UpdateConsumableEffects($zoneId: Int!, $id: Int!, $effects: [ConsumableEffectInput!]!) {
+mutation UpdateConsumableEffects(
+  $zoneId: Int!
+  $id: Int!
+  $effects: [ConsumableEffectInput!]!
+) {
   updateConsumableEffects(zoneId: $zoneId, id: $id, effects: $effects) {
     ...ObjectSummary
   }

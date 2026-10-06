@@ -8,11 +8,6 @@ fragment TriggerFields on TriggerDto {
   numArgs
   argList
   commands
-  mobZoneId
-  mobId
-  objectZoneId
-  objectId
-  variables
   flags
   needsReview
   syntaxError
@@ -44,8 +39,16 @@ query GetTrigger($zoneId: Int!, $id: Int!) {
   }
 }
 
-query GetTriggersByAttachment($attachType: ScriptType!, $zoneId: Int!, $entityId: Int!) {
-  triggersByAttachment(attachType: $attachType, zoneId: $zoneId, entityId: $entityId) {
+query GetTriggersByAttachment(
+  $attachType: ScriptType!
+  $zoneId: Int!
+  $entityId: Int!
+) {
+  triggersByAttachment(
+    attachType: $attachType
+    zoneId: $zoneId
+    entityId: $entityId
+  ) {
     ...TriggerFields
   }
 }

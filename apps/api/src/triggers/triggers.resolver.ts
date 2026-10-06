@@ -1,9 +1,8 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import type { Users } from '@muditor/db';
 import { ScriptType } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   AttachTriggerInput,
   CreateTriggerInput,
@@ -63,7 +62,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createTrigger(
     @Args('input') input: CreateTriggerInput,
     @CurrentUser() user: Users
@@ -73,7 +72,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -90,7 +89,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -100,7 +99,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['mobZoneId', 'objectZoneId'] })
   async attachTrigger(
     @Args('input') input: AttachTriggerInput,
     @CurrentUser() user: Users
@@ -110,7 +109,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async detachTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -125,7 +124,7 @@ export class TriggersResolver {
   }
 
   @Mutation(() => TriggerDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async markTriggerReviewed(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,

@@ -179,14 +179,9 @@ export function OnlineStats({ showMyStats = false }: OnlineStatsProps) {
           </CardHeader>
           <CardContent>
             <div className='text-2xl font-bold'>
-              {
-                myOnlineCharacters.filter((c: OnlineCharacter) => c.isOnline)
-                  .length
-              }
+              {myOnlineCharacters.length}
             </div>
-            <p className='text-xs text-muted-foreground'>
-              of {myOnlineCharacters.length} characters online
-            </p>
+            <p className='text-xs text-muted-foreground'>characters online</p>
           </CardContent>
         </Card>
       </div>

@@ -8,7 +8,7 @@
  *
  * Usage:
  *   node scripts/validate-graphql.js
- *   API_URL=http://localhost:4000/graphql node scripts/validate-graphql.js
+ *   API_URL=http://localhost:3001/graphql node scripts/validate-graphql.js
  */
 
 import fs from 'node:fs';
@@ -20,7 +20,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 // Removed unused execSync import to satisfy lint
 
-const API_URL = process.env.API_URL || 'http://localhost:4000/graphql';
+const API_URL = process.env.API_URL || 'http://localhost:3001/graphql';
 const TIMEOUT_MS = 10000; // 10 seconds
 
 console.log('🔍 GraphQL Schema Validation');

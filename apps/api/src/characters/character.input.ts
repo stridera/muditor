@@ -1,4 +1,5 @@
 import { Field, ID, InputType, Int } from '@nestjs/graphql';
+import { Race } from '@muditor/db';
 import { IsString, IsNotEmpty, IsOptional } from 'class-validator';
 
 @InputType()
@@ -38,8 +39,12 @@ export class CreateCharacterInput {
   @Field({ defaultValue: 'neutral' })
   gender: string;
 
-  @Field(() => Int, { defaultValue: 1 })
-  raceId: number;
+  // GraphQL enum 'Race' is registered once in ../mobs/mob.dto
+  @Field(() => Race, { defaultValue: Race.HUMAN })
+  race: Race;
+
+  @Field(() => Int, { description: 'CharacterClass id' })
+  classId: number;
 
   @Field({ nullable: true })
   description?: string;
@@ -97,6 +102,12 @@ export class UpdateCharacterInput {
   // Character identity
   @Field({ nullable: true })
   gender?: string;
+
+  @Field(() => Race, { nullable: true })
+  race?: Race;
+
+  @Field(() => Int, { nullable: true, description: 'CharacterClass id' })
+  classId?: number;
 
   // Physical attributes
   @Field(() => Int, { nullable: true })

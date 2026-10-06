@@ -4,6 +4,11 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { DamageType, Race } from '@muditor/db';
 import { MobsResolver } from '../mobs.resolver';
 import { MobsService } from '../mobs.service';
+import { GraphQLJwtAuthGuard } from '../../auth/guards/graphql-jwt-auth.guard';
+import { MinimumRoleGuard } from '../../auth/guards/minimum-role.guard';
+import { ZonePermissionGuard } from '../../auth/guards/zone-permission.guard';
+
+const allowAll = { canActivate: () => true };
 
 describe('MobsResolver', () => {
   let resolver: MobsResolver;
@@ -27,7 +32,15 @@ describe('MobsResolver', () => {
           },
         },
       ],
-    }).compile();
+    })
+      // Guards are covered by *.resolver.guards.spec.ts; stub them here.
+      .overrideGuard(GraphQLJwtAuthGuard)
+      .useValue(allowAll)
+      .overrideGuard(MinimumRoleGuard)
+      .useValue(allowAll)
+      .overrideGuard(ZonePermissionGuard)
+      .useValue(allowAll)
+      .compile();
 
     resolver = module.get<MobsResolver>(MobsResolver);
     service = module.get<MobsService>(MobsService);

@@ -157,10 +157,9 @@ interface CharacterStatusCardProps {
     id: string;
     name: string;
     level: number;
-    isOnline: boolean;
     lastLogin?: Date | string;
-    raceType?: string;
-    playerClass?: string;
+    race?: string;
+    class?: string;
     user?: {
       displayName: string;
       role: string;
@@ -188,7 +187,7 @@ export function CharacterStatusCard({
           <div className='flex items-center gap-2 mb-2'>
             <h3 className='font-medium text-foreground'>{character.name}</h3>
             <OnlineStatus
-              isOnline={character.isOnline}
+              isOnline
               size='sm'
               {...(character.lastLogin
                 ? { lastLogin: character.lastLogin }
@@ -199,16 +198,16 @@ export function CharacterStatusCard({
           <div className='text-sm text-muted-foreground space-y-1'>
             <div className='flex items-center gap-2'>
               <span>Level {character.level}</span>
-              {character.raceType && (
+              {character.race && (
                 <>
                   <span>•</span>
-                  <span>{formatRace(character.raceType)}</span>
+                  <span>{formatRace(character.race)}</span>
                 </>
               )}
-              {character.playerClass && (
+              {character.class && (
                 <>
                   <span>•</span>
-                  <span>{formatClass(character.playerClass)}</span>
+                  <span>{formatClass(character.class)}</span>
                 </>
               )}
             </div>

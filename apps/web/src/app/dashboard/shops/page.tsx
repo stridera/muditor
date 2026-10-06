@@ -8,7 +8,7 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import { ChevronDown, Edit, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type SearchFilters,
 } from '../../../components/EnhancedSearch';
@@ -112,7 +112,7 @@ const DELETE_SHOP = gql`
   }
 `;
 
-export default function ShopsPage() {
+function ShopsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
       <ShopsContent />
@@ -697,5 +697,15 @@ function ShopsContent() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function ShopsPage() {
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <ShopsPageContent />
+    </Suspense>
   );
 }

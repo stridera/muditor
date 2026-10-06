@@ -8,17 +8,11 @@
 // Blockly menu option type: [displayText, value]
 type MenuOption = [string, string];
 
-export interface EffectParamSchema {
-  type: string;
-  properties?: Record<string, unknown>;
-  required?: string[];
-}
-
 export interface EffectOption {
   id: number;
   name: string;
   effectType: string;
-  paramSchema?: EffectParamSchema | null;
+  defaultParams?: Record<string, unknown> | null;
 }
 
 export interface MobOption {
@@ -369,8 +363,8 @@ export function hasEffectsLoaded(): boolean {
 }
 
 /**
- * Get field names for a block type from the effect's paramSchema
- * Falls back to empty array if effect not found or no schema
+ * Get field names for a block type from the effect's defaultParams keys
+ * Falls back to empty array if effect not found or it has no default params
  */
 export function getFieldNamesForEffect(blockType: string): string[] {
   // Extract effect name from block type (e.g., "effect_damage" -> "damage")
@@ -383,29 +377,9 @@ export function getFieldNamesForEffect(blockType: string): string[] {
     e => e.name.toLowerCase() === effectName
   );
 
-  if (!effect?.paramSchema?.properties) {
+  if (!effect?.defaultParams) {
     return [];
   }
 
-  // Return the property names from the schema
-  return Object.keys(effect.paramSchema.properties);
-}
-
-/**
- * Get the full param schema for a block type
- * Useful for field validation and enum options
- */
-export function getParamSchemaForEffect(
-  blockType: string
-): EffectParamSchema | null {
-  if (!blockType.startsWith('effect_')) {
-    return null;
-  }
-
-  const effectName = blockType.replace('effect_', '');
-  const effect = registryData.effects.find(
-    e => e.name.toLowerCase() === effectName
-  );
-
-  return effect?.paramSchema ?? null;
+  return Object.keys(effect.defaultParams);
 }

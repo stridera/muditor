@@ -1,6 +1,5 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateShopInput,
   KeeperDto,
@@ -177,7 +176,7 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createShop(@Args('data') data: CreateShopInput): Promise<ShopDto> {
     const shop = await this.shopsService.create({
       id: data.id,
@@ -202,7 +201,7 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateShop(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -213,7 +212,7 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteShop(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -223,7 +222,7 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateShopInventory(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -236,5 +235,4 @@ export class ShopsResolver {
     );
     return this.mapShopToDto(shop);
   }
-
 }

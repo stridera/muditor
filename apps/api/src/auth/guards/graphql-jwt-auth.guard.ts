@@ -7,6 +7,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 import { DatabaseService } from '../../database/database.service';
+import { hasActiveBan } from '../ban.util';
 
 @Injectable()
 export class GraphQLJwtAuthGuard {
@@ -45,9 +46,19 @@ export class GraphQLJwtAuthGuard {
       }
 
       // Attach user to request for use in resolvers
+      if (await hasActiveBan(this.databaseService, user.id)) {
+        throw new UnauthorizedException('Account is banned');
+      }
+
       req.user = user;
       return true;
-    } catch {
+    } catch (error) {
+      if (
+        error instanceof UnauthorizedException &&
+        error.message === 'Account is banned'
+      ) {
+        throw error;
+      }
       throw new UnauthorizedException('Invalid token');
     }
   }

@@ -1,3 +1,5 @@
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { zoneLookups } from '../common/decorators/zone-lookups';
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -90,13 +92,13 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createQuest(@Args('data') data: CreateQuestInput): Promise<QuestDto> {
     return this.questsService.createQuest(data) as Promise<QuestDto>;
   }
 
   @Mutation(() => QuestDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateQuest(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -110,7 +112,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteQuest(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -123,7 +125,7 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestPhaseDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async createQuestPhase(
     @Args('data') data: CreateQuestPhaseInput
   ): Promise<QuestPhaseDto> {
@@ -131,7 +133,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestPhaseDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async updateQuestPhase(
     @Args('questZoneId', { type: () => Int }) questZoneId: number,
     @Args('questId', { type: () => Int }) questId: number,
@@ -147,7 +149,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestPhaseDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async deleteQuestPhase(
     @Args('questZoneId', { type: () => Int }) questZoneId: number,
     @Args('questId', { type: () => Int }) questId: number,
@@ -165,7 +167,7 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestObjectiveDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async createQuestObjective(
     @Args('data') data: CreateQuestObjectiveInput
   ): Promise<QuestObjectiveDto> {
@@ -175,7 +177,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestObjectiveDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async updateQuestObjective(
     @Args('questZoneId', { type: () => Int }) questZoneId: number,
     @Args('questId', { type: () => Int }) questId: number,
@@ -193,7 +195,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestObjectiveDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async deleteQuestObjective(
     @Args('questZoneId', { type: () => Int }) questZoneId: number,
     @Args('questId', { type: () => Int }) questId: number,
@@ -213,7 +215,7 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestDialogueDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async createQuestDialogue(
     @Args('data') data: CreateQuestDialogueInput
   ): Promise<QuestDialogueDto> {
@@ -221,7 +223,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestDialogueDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.questDialogue('id') })
   async updateQuestDialogue(
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateQuestDialogueInput
@@ -233,7 +235,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestDialogueDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.questDialogue('id') })
   async deleteQuestDialogue(
     @Args('id', { type: () => Int }) id: number
   ): Promise<QuestDialogueDto> {
@@ -245,7 +247,7 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestRewardDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async createQuestReward(
     @Args('data') data: CreateQuestRewardInput
   ): Promise<QuestRewardDto> {
@@ -253,7 +255,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestRewardDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.questReward('id') })
   async updateQuestReward(
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateQuestRewardInput
@@ -262,7 +264,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestRewardDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.questReward('id') })
   async deleteQuestReward(
     @Args('id', { type: () => Int }) id: number
   ): Promise<QuestRewardDto> {
@@ -274,7 +276,7 @@ export class QuestsResolver {
   // ============================================================================
 
   @Mutation(() => QuestPrerequisiteDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ keys: ['questZoneId'] })
   async createQuestPrerequisite(
     @Args('data') data: CreateQuestPrerequisiteInput
   ): Promise<QuestPrerequisiteDto> {
@@ -284,7 +286,7 @@ export class QuestsResolver {
   }
 
   @Mutation(() => QuestPrerequisiteDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.questPrerequisite('id') })
   async deleteQuestPrerequisite(
     @Args('id', { type: () => Int }) id: number
   ): Promise<QuestPrerequisiteDto> {

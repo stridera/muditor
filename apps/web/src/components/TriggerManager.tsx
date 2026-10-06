@@ -42,11 +42,6 @@ const GET_TRIGGERS = gql`
       numArgs
       argList
       commands
-      variables
-      mobZoneId
-      mobId
-      objectZoneId
-      objectId
       createdAt
       updatedAt
     }
@@ -71,11 +66,6 @@ const GET_TRIGGERS_BY_ATTACHMENT = gql`
       numArgs
       argList
       commands
-      variables
-      mobZoneId
-      mobId
-      objectZoneId
-      objectId
       createdAt
       updatedAt
     }
@@ -86,10 +76,10 @@ const CREATE_TRIGGER = gql`
   mutation CreateTriggerInline($input: CreateTriggerInput!) {
     createTrigger(input: $input) {
       id
+      zoneId
       name
       attachType
       commands
-      variables
     }
   }
 `;
@@ -106,7 +96,6 @@ const UPDATE_TRIGGER = gql`
       name
       attachType
       commands
-      variables
     }
   }
 `;
@@ -125,8 +114,6 @@ const ATTACH_TRIGGER = gql`
     attachTrigger(input: $input) {
       id
       name
-      mobId
-      objectId
       zoneId
     }
   }
@@ -150,12 +137,7 @@ interface TriggerData {
   numArgs: number;
   argList?: string;
   commands: string;
-  variables: string;
   flags?: string[];
-  mobZoneId?: number;
-  mobId?: number;
-  objectZoneId?: number;
-  objectId?: number;
   createdAt: string;
   updatedAt: string;
 }
@@ -229,30 +211,45 @@ export default function TriggerManager({
         trigger.commands.toLowerCase().includes(searchTerm.toLowerCase()))
   );
 
+  // Triggers attach to entities via junction rows, so create first, then attach.
+  const createAndAttach = async (input: Record<string, unknown>) => {
+    const result = await createTrigger({ variables: { input } });
+    const created = (
+      result.data as
+        | { createTrigger?: { id: number; zoneId: number } }
+        | null
+        | undefined
+    )?.createTrigger;
+    if (created && (entityType === 'MOB' || entityType === 'OBJECT')) {
+      const attachInput: Record<string, unknown> = {
+        triggerZoneId: created.zoneId,
+        triggerId: created.id,
+        attachType: entityType,
+      };
+      if (entityType === 'MOB') {
+        attachInput.mobZoneId = entityZoneId;
+        attachInput.mobId = entityId;
+      } else {
+        attachInput.objectZoneId = entityZoneId;
+        attachInput.objectId = entityId;
+      }
+      await attachTrigger({ variables: { input: attachInput } });
+    }
+  };
+
   const handleCreateTrigger = async (script: Partial<Script>) => {
     try {
-      const variables = JSON.stringify(script.variables || {});
-
-      const input: any = {
+      const input = {
         zoneId: entityZoneId, // Use the entity's zone for new triggers
         name: script.name || 'New Trigger',
         attachType: entityType,
         commands: script.commands || '',
-        variables,
         numArgs: script.numArgs || 0,
         argList: script.argList,
       };
 
-      // Attach to current entity immediately
-      if (entityType === 'MOB') {
-        input.mobZoneId = entityZoneId;
-        input.mobId = entityId;
-      } else if (entityType === 'OBJECT') {
-        input.objectZoneId = entityZoneId;
-        input.objectId = entityId;
-      }
-
-      await createTrigger({ variables: { input } });
+      // Create, then attach to the current entity immediately
+      await createAndAttach(input);
       refetchAttached();
       refetchAll();
       setIsEditDialogOpen(false);
@@ -267,12 +264,9 @@ export default function TriggerManager({
     if (!selectedTrigger) return;
 
     try {
-      const variables = JSON.stringify(script.variables || {});
-
       const input = {
         name: script.name,
         commands: script.commands,
-        variables,
         numArgs: script.numArgs,
         argList: script.argList,
       };
@@ -350,28 +344,17 @@ export default function TriggerManager({
 
   const handleCopyTrigger = async (trigger: TriggerData) => {
     try {
-      const variables = JSON.stringify(trigger.variables || {});
-
-      const input: any = {
+      const input = {
         zoneId: entityZoneId, // Use the entity's zone for copied triggers
         name: `${trigger.name} (Copy)`,
         attachType: entityType,
         commands: trigger.commands,
-        variables,
         numArgs: trigger.numArgs || 0,
         argList: trigger.argList,
       };
 
-      // Attach to current entity immediately
-      if (entityType === 'MOB') {
-        input.mobZoneId = entityZoneId;
-        input.mobId = entityId;
-      } else if (entityType === 'OBJECT') {
-        input.objectZoneId = entityZoneId;
-        input.objectId = entityId;
-      }
-
-      await createTrigger({ variables: { input } });
+      // Create, then attach to the current entity immediately
+      await createAndAttach(input);
       refetchAttached();
       refetchAll();
       onTriggerChange?.();
@@ -404,11 +387,9 @@ export default function TriggerManager({
       attachType: trigger.attachType,
       numArgs: trigger.numArgs,
       commands: trigger.commands,
-      variables: JSON.parse(trigger.variables || '{}'),
+      variables: {},
     };
     if (trigger.zoneId != null) base.zoneId = trigger.zoneId;
-    if (trigger.mobId != null) base.mobId = trigger.mobId;
-    if (trigger.objectId != null) base.objectId = trigger.objectId;
     if (trigger.argList) base.argList = trigger.argList;
     return base as Script;
   };

@@ -29,7 +29,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
   type SearchFilters,
@@ -66,7 +66,7 @@ interface Mob {
   zoneId: number;
 }
 
-export default function MobsPage() {
+function MobsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
       <MobsContent />
@@ -85,7 +85,7 @@ function MobsContent() {
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({
     searchTerm: '',
   });
-  const [selectedMobs, setSelectedMobs] = useState<Set<number>>(new Set());
+  const [selectedMobs, setSelectedMobs] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [cloningId, setCloningId] = useState<number | null>(null);
   const [expandedMobs, setExpandedMobs] = useState<Set<number>>(new Set());
@@ -208,18 +208,29 @@ function MobsContent() {
   const endItem = Math.min(startIndex + itemsPerPage, totalCount);
 
   // Bulk operations
-  const toggleMobSelection = (mobId: number) => {
+  // Selection is keyed by composite (zoneId, id) so same-numbered mobs in
+  // different zones are never conflated.
+  const mobKey = (mob: { zoneId: number; id: number }) =>
+    `${mob.zoneId}-${mob.id}`;
+
+  const parseEntityKey = (key: string) => {
+    const [zoneId, id] = key.split('-').map(Number) as [number, number];
+    return { zoneId, id };
+  };
+
+  const toggleMobSelection = (mob: { zoneId: number; id: number }) => {
+    const key = mobKey(mob);
     const newSelected = new Set(selectedMobs);
-    if (newSelected.has(mobId)) {
-      newSelected.delete(mobId);
+    if (newSelected.has(key)) {
+      newSelected.delete(key);
     } else {
-      newSelected.add(mobId);
+      newSelected.add(key);
     }
     setSelectedMobs(newSelected);
   };
 
   const selectAllMobs = () => {
-    setSelectedMobs(new Set(filteredMobs.map(mob => mob.id)));
+    setSelectedMobs(new Set(filteredMobs.map(mobKey)));
   };
 
   const clearSelection = () => {
@@ -240,8 +251,8 @@ function MobsContent() {
     setIsDeleting(true);
     try {
       const mutation = `
-        mutation DeleteMobs($ids: [Int!]!) {
-          deleteMobs(ids: $ids)
+        mutation DeleteMobs($keys: [EntityKeyInput!]!) {
+          deleteMobs(keys: $keys)
         }
       `;
 
@@ -252,7 +263,9 @@ function MobsContent() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             query: mutation,
-            variables: { ids: Array.from(selectedMobs) },
+            variables: {
+              keys: Array.from(selectedMobs).map(parseEntityKey),
+            },
           }),
         }
       );
@@ -420,7 +433,9 @@ function MobsContent() {
   const exportSelectedMobs = () => {
     if (selectedMobs.size === 0) return;
 
-    const selectedData = filteredMobs.filter(mob => selectedMobs.has(mob.id));
+    const selectedData = filteredMobs.filter(mob =>
+      selectedMobs.has(mobKey(mob))
+    );
     const jsonData = JSON.stringify(selectedData, null, 2);
     const blob = new Blob([jsonData], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -702,11 +717,11 @@ function MobsContent() {
                   <button
                     onClick={e => {
                       e.stopPropagation();
-                      toggleMobSelection(mob.id);
+                      toggleMobSelection(mob);
                     }}
                     className='mt-1 text-muted-foreground hover:text-primary'
                   >
-                    {selectedMobs.has(mob.id) ? (
+                    {selectedMobs.has(mobKey(mob)) ? (
                       <CheckSquare className='w-5 h-5 text-primary' />
                     ) : (
                       <Square className='w-5 h-5' />
@@ -1094,5 +1109,15 @@ function MobsContent() {
     >
       <div></div>
     </DualInterface>
+  );
+}
+
+export default function MobsPage() {
+  return (
+    <Suspense
+      fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+    >
+      <MobsPageContent />
+    </Suspense>
   );
 }

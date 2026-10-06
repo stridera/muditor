@@ -49,10 +49,9 @@ const GET_MY_CHARACTERS = gql`
       id
       name
       level
-      raceType
-      playerClass
+      race
+      class
       lastLogin
-      isOnline
     }
   }
 `;

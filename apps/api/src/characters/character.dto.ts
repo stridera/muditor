@@ -142,6 +142,12 @@ export class CharacterDto {
   @Field(() => Int, { nullable: true })
   classId?: number;
 
+  @Field({ nullable: true, description: 'Race enum value (e.g. HUMAN)' })
+  race?: string;
+
+  @Field({ nullable: true, description: 'Class display name' })
+  class?: string;
+
   @Field(() => Int)
   experience: number;
 

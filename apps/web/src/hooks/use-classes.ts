@@ -6,6 +6,7 @@ import { useQuery } from '@apollo/client/react';
 export interface ClassOption {
   id: string;
   name: string;
+  plainName: string;
   description?: string | null;
   hitDice: string;
   primaryStat?: string | null;

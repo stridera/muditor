@@ -1,8 +1,8 @@
-import { UseGuards } from '@nestjs/common';
+import { EntityKeyInput } from '../common/dto/entity-key.input';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 // Import enum only AFTER GraphQL enums have been registered in object.dto (registration side-effect)
 import { ObjectType as ObjectTypeEnum, Prisma } from '@muditor/db';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';
 import {
@@ -71,7 +71,7 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createObject(
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
@@ -90,7 +90,7 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateObject(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -108,7 +108,7 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteObject(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -118,15 +118,15 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => Int, { name: 'deleteObjects' })
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteObjects(
-    @Args('ids', { type: () => [Int] }) ids: number[]
+    @Args('keys', { type: () => [EntityKeyInput] }) keys: EntityKeyInput[]
   ): Promise<number> {
-    return this.objectsService.deleteMany(ids);
+    return this.objectsService.deleteMany(keys);
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateObjectEffects(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -142,7 +142,7 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateObjectResistances(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -158,7 +158,7 @@ export class ObjectsResolver {
   }
 
   @Mutation(() => ObjectDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateConsumableEffects(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,

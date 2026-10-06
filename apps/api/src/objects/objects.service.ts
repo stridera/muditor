@@ -43,7 +43,6 @@ export class ObjectsService {
           },
         },
         objectExtraDescriptions: true,
-        objectAffects: true,
         objectTriggers: { include: { trigger: true } },
         grantedEffects: { include: { effect: true } },
         objectResistances: true,
@@ -198,9 +197,16 @@ export class ObjectsService {
     });
   }
 
-  async deleteMany(ids: number[]): Promise<number> {
+  /**
+   * Delete by composite key (zoneId, id). Matching on id alone would delete
+   * same-numbered entities in other zones.
+   */
+  async deleteMany(
+    keys: Array<{ zoneId: number; id: number }>
+  ): Promise<number> {
+    if (keys.length === 0) return 0;
     const result = await this.database.objects.deleteMany({
-      where: { id: { in: ids } },
+      where: { OR: keys.map(({ zoneId, id }) => ({ zoneId, id })) },
     });
     return result.count;
   }

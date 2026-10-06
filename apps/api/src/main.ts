@@ -3,6 +3,7 @@ import { NestFactory } from '@nestjs/core';
 import { GraphQLSchemaHost } from '@nestjs/graphql';
 import { AppModule } from './app.module';
 import { LoggingService } from './common/logging/logging.service';
+import { parseCorsOrigins } from './common/cors';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -13,9 +14,13 @@ async function bootstrap() {
   const globalPrefix = 'api';
   app.setGlobalPrefix(globalPrefix);
 
-  // Enable CORS for development
+  // Behind Caddy on loopback: trust X-Forwarded-For only from loopback peers so
+  // req.ip (used by the auth rate limiter) is the real client address.
+  app.getHttpAdapter().getInstance().set('trust proxy', 'loopback');
+
+  // CORS: explicit origin allowlist only (never reflect arbitrary origins with credentials)
   app.enableCors({
-    origin: process.env.NODE_ENV === 'production' ? false : true,
+    origin: parseCorsOrigins(process.env.CORS_ORIGINS),
     credentials: true,
   });
 

@@ -19,7 +19,10 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import type { CharacterDto } from '@/generated/graphql';
+import { useAuth } from '@/contexts/auth-context';
+import type { CharacterDto, Race } from '@/generated/graphql';
+import { useClasses } from '@/hooks/use-classes';
+import { useRaces } from '@/hooks/use-races';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
 import {
@@ -38,8 +41,8 @@ const UPDATE_CHARACTER_MUTATION = gql`
       id
       name
       level
-      raceType
-      playerClass
+      race
+      classId
       description
       title
       strength
@@ -71,8 +74,6 @@ interface UpdateCharacterMutationResult {
 interface UpdateCharacterData {
   name?: string;
   level?: number;
-  raceType?: string;
-  playerClass?: string;
   gender?: string;
   description?: string;
   title?: string;
@@ -88,6 +89,9 @@ interface UpdateCharacterData {
   movement?: number;
   movementMax?: number;
   alignment?: number;
+  // Staff-only (IMMORTAL+); owners never send these.
+  race?: string | undefined;
+  classId?: number | null;
 }
 
 export function CharacterEditForm({
@@ -95,11 +99,14 @@ export function CharacterEditForm({
   onCharacterUpdated,
   onCancel,
 }: CharacterEditFormProps) {
+  const { user } = useAuth();
+  // Race/class changes are staff-only on the API (IMMORTAL+).
+  const isStaff = !!user && user.role !== 'PLAYER';
+  const { races, loading: racesLoading } = useRaces();
+  const { classes, loading: classesLoading } = useClasses();
   const [formData, setFormData] = useState<UpdateCharacterData>({
     name: character.name,
     level: character.level,
-    raceType: character.raceType || 'human',
-    playerClass: character.playerClass || 'fighter',
     description: character.description || '',
     title: character.title || '',
     strength: character.strength,
@@ -114,6 +121,8 @@ export function CharacterEditForm({
     movement: character.movement,
     movementMax: character.movementMax,
     alignment: character.alignment,
+    race: character.race ?? undefined,
+    classId: character.classId ?? null,
   });
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
@@ -121,35 +130,11 @@ export function CharacterEditForm({
   const [updateCharacter, { loading }] =
     useMutation<UpdateCharacterMutationResult>(UPDATE_CHARACTER_MUTATION);
 
-  const races = [
-    { value: 'human', label: 'Human' },
-    { value: 'elf', label: 'Elf' },
-    { value: 'dwarf', label: 'Dwarf' },
-    { value: 'halfling', label: 'Halfling' },
-    { value: 'gnome', label: 'Gnome' },
-    { value: 'half-elf', label: 'Half-Elf' },
-    { value: 'orc', label: 'Orc' },
-    { value: 'troll', label: 'Troll' },
-  ];
-
-  const classes = [
-    { value: 'fighter', label: 'Fighter' },
-    { value: 'cleric', label: 'Cleric' },
-    { value: 'magic-user', label: 'Magic User' },
-    { value: 'thief', label: 'Thief' },
-    { value: 'ranger', label: 'Ranger' },
-    { value: 'paladin', label: 'Paladin' },
-    { value: 'barbarian', label: 'Barbarian' },
-    { value: 'sorcerer', label: 'Sorcerer' },
-  ];
-
   // Reset form when character changes
   useEffect(() => {
     setFormData({
       name: character.name,
       level: character.level,
-      raceType: character.raceType || 'human',
-      playerClass: character.playerClass || 'fighter',
       description: character.description || '',
       title: character.title || '',
       strength: character.strength,
@@ -164,12 +149,14 @@ export function CharacterEditForm({
       movement: character.movement,
       movementMax: character.movementMax,
       alignment: character.alignment,
+      race: character.race ?? undefined,
+      classId: character.classId ?? null,
     });
   }, [character]);
 
   const handleInputChange = (
     field: keyof UpdateCharacterData,
-    value: string | number
+    value: string | number | null
   ) => {
     setFormData(prev => ({
       ...prev,
@@ -222,17 +209,31 @@ export function CharacterEditForm({
       return;
     }
 
+    const name = formData.name
+      ? formData.name.charAt(0).toUpperCase() +
+        formData.name.slice(1).toLowerCase()
+      : undefined;
+    // Owners may only send the self-editable fields the API allows
+    // (SELF_EDITABLE_CHARACTER_FIELDS); everything else is staff-only.
+    const { race, classId, ...staffCommon } = formData;
+    const data: Record<string, unknown> = isStaff
+      ? {
+          ...staffCommon,
+          ...(race ? { race: race as Race } : {}),
+          ...(classId != null ? { classId } : {}),
+          name,
+        }
+      : {
+          name,
+          title: formData.title,
+          description: formData.description,
+        };
+
     try {
       const result = await updateCharacter({
         variables: {
           id: character.id,
-          data: {
-            ...formData,
-            name: formData.name
-              ? formData.name.charAt(0).toUpperCase() +
-                formData.name.slice(1).toLowerCase()
-              : undefined,
-          },
+          data,
         },
       });
 
@@ -294,63 +295,71 @@ export function CharacterEditForm({
                 </p>
               </div>
 
-              <div className='space-y-2'>
-                <Label htmlFor='level'>Level</Label>
-                <Input
-                  id='level'
-                  type='number'
-                  min='1'
-                  max='100'
-                  value={formData.level}
-                  onChange={e =>
-                    handleInputChange('level', parseInt(e.target.value) || 1)
-                  }
-                  disabled={loading}
-                />
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='race'>Race</Label>
-                <Select
-                  value={formData.raceType || ''}
-                  onValueChange={value => handleInputChange('raceType', value)}
-                  disabled={loading}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {races.map(race => (
-                      <SelectItem key={race.value} value={race.value}>
-                        {race.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className='space-y-2'>
-                <Label htmlFor='class'>Class</Label>
-                <Select
-                  value={formData.playerClass || ''}
-                  onValueChange={value =>
-                    handleInputChange('playerClass', value)
-                  }
-                  disabled={loading}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {classes.map(cls => (
-                      <SelectItem key={cls.value} value={cls.value}>
-                        {cls.label}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
+              {isStaff && (
+                <div className='space-y-2'>
+                  <Label htmlFor='level'>Level</Label>
+                  <Input
+                    id='level'
+                    type='number'
+                    min='1'
+                    max='100'
+                    value={formData.level}
+                    onChange={e =>
+                      handleInputChange('level', parseInt(e.target.value) || 1)
+                    }
+                    disabled={loading}
+                  />
+                </div>
+              )}
             </div>
+
+            {isStaff && (
+              <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='race'>Race</Label>
+                  <Select
+                    value={formData.race ?? ''}
+                    onValueChange={value => handleInputChange('race', value)}
+                    disabled={loading || racesLoading}
+                  >
+                    <SelectTrigger id='race'>
+                      <SelectValue placeholder='Select a race' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {races.map(race => (
+                        <SelectItem key={race.race} value={race.race}>
+                          {race.displayName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+
+                <div className='space-y-2'>
+                  <Label htmlFor='class'>Class</Label>
+                  <Select
+                    value={
+                      formData.classId == null ? '' : String(formData.classId)
+                    }
+                    onValueChange={value =>
+                      handleInputChange('classId', parseInt(value, 10))
+                    }
+                    disabled={loading || classesLoading}
+                  >
+                    <SelectTrigger id='class'>
+                      <SelectValue placeholder='Select a class' />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {classes.map(cls => (
+                        <SelectItem key={cls.id} value={cls.id}>
+                          {cls.plainName}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+            )}
 
             <div className='space-y-2'>
               <Label htmlFor='title'>Title (Optional)</Label>
@@ -380,158 +389,175 @@ export function CharacterEditForm({
               </p>
             </div>
 
-            <div className='space-y-2'>
-              <Label htmlFor='alignment'>Alignment</Label>
-              <Input
-                id='alignment'
-                type='number'
-                min='-1000'
-                max='1000'
-                value={formData.alignment}
-                onChange={e =>
-                  handleInputChange('alignment', parseInt(e.target.value) || 0)
-                }
-                disabled={loading}
-              />
-              <p className='text-xs text-muted-foreground'>
-                -1000 (Demonic) to 1000 (Saintly)
-              </p>
-            </div>
+            {isStaff && (
+              <div className='space-y-2'>
+                <Label htmlFor='alignment'>Alignment</Label>
+                <Input
+                  id='alignment'
+                  type='number'
+                  min='-1000'
+                  max='1000'
+                  value={formData.alignment}
+                  onChange={e =>
+                    handleInputChange(
+                      'alignment',
+                      parseInt(e.target.value) || 0
+                    )
+                  }
+                  disabled={loading}
+                />
+                <p className='text-xs text-muted-foreground'>
+                  -1000 (Demonic) to 1000 (Saintly)
+                </p>
+              </div>
+            )}
           </CardContent>
         </Card>
 
         {/* Character Stats */}
-        <Card>
-          <CardHeader>
-            <div className='flex items-center justify-between'>
-              <div>
-                <CardTitle className='flex items-center gap-2'>
-                  <Wand2 className='h-5 w-5' />
-                  Character Stats
-                </CardTitle>
-                <CardDescription>
-                  Update your character's core attributes (Total:{' '}
-                  {getTotalStatPoints()})
-                </CardDescription>
+        {isStaff && (
+          <Card>
+            <CardHeader>
+              <div className='flex items-center justify-between'>
+                <div>
+                  <CardTitle className='flex items-center gap-2'>
+                    <Wand2 className='h-5 w-5' />
+                    Character Stats
+                  </CardTitle>
+                  <CardDescription>
+                    Update your character's core attributes (Total:{' '}
+                    {getTotalStatPoints()})
+                  </CardDescription>
+                </div>
               </div>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-              {[
-                { key: 'strength', label: 'Strength (STR)' },
-                { key: 'intelligence', label: 'Intelligence (INT)' },
-                { key: 'wisdom', label: 'Wisdom (WIS)' },
-                { key: 'dexterity', label: 'Dexterity (DEX)' },
-                { key: 'constitution', label: 'Constitution (CON)' },
-                { key: 'charisma', label: 'Charisma (CHA)' },
-                { key: 'luck', label: 'Luck (LCK)' },
-              ].map(stat => (
-                <div key={stat.key} className='space-y-2'>
-                  <Label htmlFor={stat.key}>{stat.label}</Label>
+            </CardHeader>
+            <CardContent>
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                {[
+                  { key: 'strength', label: 'Strength (STR)' },
+                  { key: 'intelligence', label: 'Intelligence (INT)' },
+                  { key: 'wisdom', label: 'Wisdom (WIS)' },
+                  { key: 'dexterity', label: 'Dexterity (DEX)' },
+                  { key: 'constitution', label: 'Constitution (CON)' },
+                  { key: 'charisma', label: 'Charisma (CHA)' },
+                  { key: 'luck', label: 'Luck (LCK)' },
+                ].map(stat => (
+                  <div key={stat.key} className='space-y-2'>
+                    <Label htmlFor={stat.key}>{stat.label}</Label>
+                    <Input
+                      id={stat.key}
+                      type='number'
+                      min='1'
+                      max='25'
+                      value={
+                        formData[
+                          stat.key as keyof UpdateCharacterData
+                        ] as number
+                      }
+                      onChange={e =>
+                        handleStatChange(
+                          stat.key as keyof UpdateCharacterData,
+                          parseInt(e.target.value) || 1
+                        )
+                      }
+                      disabled={loading}
+                    />
+                  </div>
+                ))}
+              </div>
+              <div className='mt-4 text-sm text-muted-foreground'>
+                <p>
+                  Valid range: 1-25 for each stat. Higher values are better.
+                </p>
+                <p>
+                  Normal range: 1-18, values above 18 typically from magic
+                  items.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Health & Movement */}
+        {isStaff && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Health & Movement</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className='grid grid-cols-2 gap-4'>
+                <div className='space-y-2'>
+                  <Label htmlFor='hitPoints'>Current Hit Points</Label>
                   <Input
-                    id={stat.key}
+                    id='hitPoints'
+                    type='number'
+                    min='0'
+                    max={formData.hitPointsMax}
+                    value={formData.hitPoints}
+                    onChange={e =>
+                      handleInputChange(
+                        'hitPoints',
+                        parseInt(e.target.value) || 0
+                      )
+                    }
+                    disabled={loading}
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <Label htmlFor='hitPointsMax'>Max Hit Points</Label>
+                  <Input
+                    id='hitPointsMax'
                     type='number'
                     min='1'
-                    max='25'
-                    value={
-                      formData[stat.key as keyof UpdateCharacterData] as number
-                    }
+                    max='10000'
+                    value={formData.hitPointsMax}
                     onChange={e =>
-                      handleStatChange(
-                        stat.key as keyof UpdateCharacterData,
+                      handleInputChange(
+                        'hitPointsMax',
                         parseInt(e.target.value) || 1
                       )
                     }
                     disabled={loading}
                   />
                 </div>
-              ))}
-            </div>
-            <div className='mt-4 text-sm text-muted-foreground'>
-              <p>Valid range: 1-25 for each stat. Higher values are better.</p>
-              <p>
-                Normal range: 1-18, values above 18 typically from magic items.
-              </p>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Health & Movement */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Health & Movement</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-2 gap-4'>
-              <div className='space-y-2'>
-                <Label htmlFor='hitPoints'>Current Hit Points</Label>
-                <Input
-                  id='hitPoints'
-                  type='number'
-                  min='0'
-                  max={formData.hitPointsMax}
-                  value={formData.hitPoints}
-                  onChange={e =>
-                    handleInputChange(
-                      'hitPoints',
-                      parseInt(e.target.value) || 0
-                    )
-                  }
-                  disabled={loading}
-                />
+                <div className='space-y-2'>
+                  <Label htmlFor='movement'>Current Movement</Label>
+                  <Input
+                    id='movement'
+                    type='number'
+                    min='0'
+                    max={formData.movementMax}
+                    value={formData.movement}
+                    onChange={e =>
+                      handleInputChange(
+                        'movement',
+                        parseInt(e.target.value) || 0
+                      )
+                    }
+                    disabled={loading}
+                  />
+                </div>
+                <div className='space-y-2'>
+                  <Label htmlFor='movementMax'>Max Movement</Label>
+                  <Input
+                    id='movementMax'
+                    type='number'
+                    min='1'
+                    max='10000'
+                    value={formData.movementMax}
+                    onChange={e =>
+                      handleInputChange(
+                        'movementMax',
+                        parseInt(e.target.value) || 1
+                      )
+                    }
+                    disabled={loading}
+                  />
+                </div>
               </div>
-              <div className='space-y-2'>
-                <Label htmlFor='hitPointsMax'>Max Hit Points</Label>
-                <Input
-                  id='hitPointsMax'
-                  type='number'
-                  min='1'
-                  max='10000'
-                  value={formData.hitPointsMax}
-                  onChange={e =>
-                    handleInputChange(
-                      'hitPointsMax',
-                      parseInt(e.target.value) || 1
-                    )
-                  }
-                  disabled={loading}
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='movement'>Current Movement</Label>
-                <Input
-                  id='movement'
-                  type='number'
-                  min='0'
-                  max={formData.movementMax}
-                  value={formData.movement}
-                  onChange={e =>
-                    handleInputChange('movement', parseInt(e.target.value) || 0)
-                  }
-                  disabled={loading}
-                />
-              </div>
-              <div className='space-y-2'>
-                <Label htmlFor='movementMax'>Max Movement</Label>
-                <Input
-                  id='movementMax'
-                  type='number'
-                  min='1'
-                  max='10000'
-                  value={formData.movementMax}
-                  onChange={e =>
-                    handleInputChange(
-                      'movementMax',
-                      parseInt(e.target.value) || 1
-                    )
-                  }
-                  disabled={loading}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Submit */}
         <div className='flex gap-4'>

@@ -15,8 +15,6 @@ query GetRoom($zoneId: Int!, $id: Int!) {
     sector
     baseLightLevel
     capacity
-    magicAffinity
-    requiredMechanic
     entryRestriction
     isPeaceful
     allowsMagic

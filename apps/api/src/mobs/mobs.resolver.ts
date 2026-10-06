@@ -1,4 +1,5 @@
-import { UseGuards } from '@nestjs/common';
+import { EntityKeyInput } from '../common/dto/entity-key.input';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import {
   Args,
   Int,
@@ -9,7 +10,6 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { Prisma, Race } from '@muditor/db'; // all enums already registered in mob.dto
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { calculateMobCombatDefaults } from '../common/dice-formulas';
 import { mapMob } from '../common/mappers/mob.mapper';
 import {
@@ -102,7 +102,7 @@ export class MobsResolver {
   }
 
   @Mutation(() => MobDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
     // Exclude wealth from direct persistence; it's derived (totalWealth) in DB
     const { zoneId, race, hpDice, damageDice, wealth, classId, ...rest } = data;
@@ -161,7 +161,7 @@ export class MobsResolver {
   }
 
   @Mutation(() => MobDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateMob(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -177,7 +177,7 @@ export class MobsResolver {
   }
 
   @Mutation(() => MobDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteMob(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number
@@ -187,11 +187,11 @@ export class MobsResolver {
   }
 
   @Mutation(() => Int, { name: 'deleteMobs' })
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async deleteMobs(
-    @Args('ids', { type: () => [Int] }) ids: number[]
+    @Args('keys', { type: () => [EntityKeyInput] }) keys: EntityKeyInput[]
   ): Promise<number> {
-    return this.mobsService.deleteMany(ids);
+    return this.mobsService.deleteMany(keys);
   }
 
   // Note: hpDice and damageDice are computed directly in the mapper (mapMob)
@@ -206,7 +206,7 @@ export class MobsResolver {
   }
 
   @Mutation(() => MobDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async updateMobDefaultEffects(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,

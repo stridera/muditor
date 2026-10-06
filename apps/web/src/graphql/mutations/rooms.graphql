@@ -3,11 +3,7 @@ mutation UpdateRoomEnvironmentalEffects(
   $id: Int!
   $effects: [RoomEnvironmentalEffectInput!]!
 ) {
-  updateRoomEnvironmentalEffects(
-    zoneId: $zoneId
-    id: $id
-    effects: $effects
-  ) {
+  updateRoomEnvironmentalEffects(zoneId: $zoneId, id: $id, effects: $effects) {
     id
     zoneId
     environmentalEffects {

@@ -238,8 +238,18 @@ mutation CreateQuestPhase($data: CreateQuestPhaseInput!) {
   }
 }
 
-mutation UpdateQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!, $data: UpdateQuestPhaseInput!) {
-  updateQuestPhase(questZoneId: $questZoneId, questId: $questId, id: $id, data: $data) {
+mutation UpdateQuestPhase(
+  $questZoneId: Int!
+  $questId: Int!
+  $id: Int!
+  $data: UpdateQuestPhaseInput!
+) {
+  updateQuestPhase(
+    questZoneId: $questZoneId
+    questId: $questId
+    id: $id
+    data: $data
+  ) {
     id
     questZoneId
     questId
@@ -293,8 +303,18 @@ mutation UpdateQuestObjective(
   }
 }
 
-mutation DeleteQuestObjective($questZoneId: Int!, $questId: Int!, $phaseId: Int!, $id: Int!) {
-  deleteQuestObjective(questZoneId: $questZoneId, questId: $questId, phaseId: $phaseId, id: $id) {
+mutation DeleteQuestObjective(
+  $questZoneId: Int!
+  $questId: Int!
+  $phaseId: Int!
+  $id: Int!
+) {
+  deleteQuestObjective(
+    questZoneId: $questZoneId
+    questId: $questId
+    phaseId: $phaseId
+    id: $id
+  ) {
     id
   }
 }

@@ -30,7 +30,6 @@ import {
 } from 'lucide-react';
 import { memo } from 'react';
 import { formatRace, formatClass } from '@/lib/utils';
-import { OnlineStatus } from './online-status';
 
 // Use a narrowed subset of CharacterDto for display (all selected via fragment)
 type Character = Pick<
@@ -38,10 +37,9 @@ type Character = Pick<
   | 'id'
   | 'name'
   | 'level'
-  | 'raceType'
-  | 'playerClass'
+  | 'race'
+  | 'class'
   | 'lastLogin'
-  | 'isOnline'
   | 'timePlayed'
   | 'hitPoints'
   | 'hitPointsMax'
@@ -130,17 +128,11 @@ const CharacterCardComponent = ({
             <CardTitle className='flex items-center gap-2 text-lg'>
               <User className='h-4 w-4' />
               {character.name}
-              <OnlineStatus
-                isOnline={character.isOnline}
-                lastLogin={character.lastLogin}
-                size='sm'
-              />
             </CardTitle>
             <CardDescription className='mt-1'>
               Level {character.level}
-              {character.raceType && ` ${formatRace(character.raceType)}`}
-              {character.playerClass &&
-                ` ${formatClass(character.playerClass)}`}
+              {character.race && ` ${formatRace(character.race)}`}
+              {character.class && ` ${formatClass(character.class)}`}
             </CardDescription>
             {character.title && (
               <div className='text-xs text-muted-foreground italic mt-1'>
@@ -300,7 +292,7 @@ const CharacterCardComponent = ({
             <span>Played: {formatPlayTime(character.timePlayed)}</span>
           </div>
 
-          {character.lastLogin && !character.isOnline && (
+          {character.lastLogin && (
             <div className='text-xs text-muted-foreground'>
               Last seen{' '}
               {formatDistanceToNow(new Date(character.lastLogin), {
@@ -367,10 +359,9 @@ const arePropsEqual = (
     prev.id === next.id &&
     prev.name === next.name &&
     prev.level === next.level &&
-    prev.raceType === next.raceType &&
-    prev.playerClass === next.playerClass &&
+    prev.race === next.race &&
+    prev.class === next.class &&
     prev.lastLogin === next.lastLogin &&
-    prev.isOnline === next.isOnline &&
     prev.timePlayed === next.timePlayed &&
     prev.hitPoints === next.hitPoints &&
     prev.hitPointsMax === next.hitPointsMax &&

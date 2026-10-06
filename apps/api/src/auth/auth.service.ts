@@ -13,6 +13,7 @@ import { DatabaseService } from '../database/database.service';
 import { EmailService } from '../email/email.service';
 import type { User } from '../users/entities/user.entity';
 import type { UserPreferences } from '../users/entities/user-preferences.entity';
+import { hasActiveBan } from './ban.util';
 import { AuthPayload } from './dto/auth.payload';
 import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
@@ -201,6 +202,10 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    if (await this.checkBanStatus(user.id)) {
+      throw new UnauthorizedException('Account is banned');
+    }
+
     const { passwordHash, ...result } = user;
     return result as Users;
   }
@@ -212,6 +217,10 @@ export class AuthService {
 
     if (!user) {
       throw new UnauthorizedException('User not found');
+    }
+
+    if (await this.checkBanStatus(user.id)) {
+      throw new UnauthorizedException('Account is banned');
     }
 
     return this.generateToken(user.id, user.displayName, user.role);
@@ -622,18 +631,7 @@ export class AuthService {
   }
 
   private async checkBanStatus(userId: string): Promise<boolean> {
-    const activeBan = await this.databaseService.banRecords.findFirst({
-      where: {
-        userId,
-        active: true,
-        OR: [
-          { expiresAt: null }, // Permanent ban
-          { expiresAt: { gt: new Date() } }, // Temporary ban still active
-        ],
-      },
-    });
-
-    return !!activeBan;
+    return hasActiveBan(this.databaseService, userId);
   }
 
   private generateToken(

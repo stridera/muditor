@@ -72,13 +72,7 @@ import { useEffect, useState } from 'react';
 
 type EffectSummary = Pick<
   Effect,
-  | 'id'
-  | 'name'
-  | 'effectType'
-  | 'description'
-  | 'tags'
-  | 'defaultParams'
-  | 'paramSchema'
+  'id' | 'name' | 'effectType' | 'description' | 'tags' | 'defaultParams'
 >;
 
 interface EffectFormData {
@@ -87,7 +81,6 @@ interface EffectFormData {
   description: string;
   tags: string;
   defaultParams: string;
-  paramSchema: string;
 }
 
 const emptyFormData: EffectFormData = {
@@ -96,7 +89,6 @@ const emptyFormData: EffectFormData = {
   description: '',
   tags: '',
   defaultParams: '{}',
-  paramSchema: '',
 };
 
 export default function EffectsPage() {
@@ -276,9 +268,6 @@ export default function EffectsPage() {
       description: effect.description || '',
       tags: (effect.tags || []).join(', '),
       defaultParams: JSON.stringify(effect.defaultParams || {}, null, 2),
-      paramSchema: effect.paramSchema
-        ? JSON.stringify(effect.paramSchema, null, 2)
-        : '',
     });
     setFormError(null);
     setEditingEffect(effect);
@@ -302,7 +291,6 @@ export default function EffectsPage() {
     }
 
     let parsedDefaultParams: any = {};
-    let parsedParamSchema: any = null;
 
     try {
       if (formData.defaultParams.trim()) {
@@ -310,15 +298,6 @@ export default function EffectsPage() {
       }
     } catch (e) {
       setFormError('Default parameters must be valid JSON');
-      return;
-    }
-
-    try {
-      if (formData.paramSchema.trim()) {
-        parsedParamSchema = JSON.parse(formData.paramSchema);
-      }
-    } catch (e) {
-      setFormError('Parameter schema must be valid JSON');
       return;
     }
 
@@ -337,7 +316,6 @@ export default function EffectsPage() {
             description: formData.description.trim() || null,
             tags,
             defaultParams: parsedDefaultParams,
-            paramSchema: parsedParamSchema,
           },
         },
       });
@@ -350,7 +328,6 @@ export default function EffectsPage() {
             description: formData.description.trim() || undefined,
             tags,
             defaultParams: parsedDefaultParams,
-            paramSchema: parsedParamSchema,
           },
         },
       });
@@ -700,22 +677,6 @@ export default function EffectsPage() {
                     )}
                   </pre>
                 </div>
-
-                {/* Parameter Schema */}
-                {effectDetailsData.effect.paramSchema && (
-                  <div>
-                    <Label className='text-sm font-semibold'>
-                      Parameter Schema
-                    </Label>
-                    <pre className='mt-2 p-3 bg-muted rounded-lg text-xs overflow-x-auto'>
-                      {JSON.stringify(
-                        effectDetailsData.effect.paramSchema,
-                        null,
-                        2
-                      )}
-                    </pre>
-                  </div>
-                )}
               </div>
 
               <DialogFooter>
@@ -832,25 +793,6 @@ export default function EffectsPage() {
                   setFormData(prev => ({
                     ...prev,
                     defaultParams: e.target.value,
-                  }))
-                }
-                rows={4}
-                className='font-mono text-sm'
-              />
-            </div>
-
-            <div className='space-y-2'>
-              <Label htmlFor='paramSchema'>
-                Parameter Schema (JSON, optional)
-              </Label>
-              <Textarea
-                id='paramSchema'
-                placeholder='{"type": "object", "properties": {...}}'
-                value={formData.paramSchema}
-                onChange={e =>
-                  setFormData(prev => ({
-                    ...prev,
-                    paramSchema: e.target.value,
                   }))
                 }
                 rows={4}

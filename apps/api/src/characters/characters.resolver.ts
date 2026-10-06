@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   Args,
   ID,
@@ -10,6 +10,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import type { Characters, Users } from '@muditor/db';
+import { isStaff } from '../auth/role.util';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { RateLimit, RateLimitGuard } from '../bridge/rate-limit.guard';
@@ -34,10 +35,58 @@ import {
 } from './character.input';
 import { CharactersService } from './characters.service';
 
+/**
+ * Fields of UpdateCharacterInput that the owner of a character may change on
+ * their own character. Everything else (level, stats, resources, location,
+ * flags, privilegeFlags, invisLevel, race, classId, ...) is staff-only (IMMORTAL+). This is an
+ * allowlist so newly added input fields default to staff-only.
+ */
+export const SELF_EDITABLE_CHARACTER_FIELDS: ReadonlySet<string> = new Set([
+  'name',
+  'gender',
+  'description',
+  'title',
+  'prompt',
+  'height',
+  'weight',
+]);
+
 @Resolver(() => CharacterDto)
 @UseGuards(GraphQLJwtAuthGuard)
 export class CharactersResolver {
   constructor(private readonly charactersService: CharactersService) {}
+
+  /** Throws unless the caller is IMMORTAL+ or owns the character. */
+  private async assertOwnerOrStaff(
+    user: Users,
+    characterId: string
+  ): Promise<void> {
+    if (isStaff(user.role)) return;
+    const ownerId =
+      await this.charactersService.findCharacterOwnerId(characterId);
+    if (ownerId !== user.id) {
+      throw new ForbiddenException('You do not have access to this character');
+    }
+  }
+
+  private assertStaff(user: Users): void {
+    if (!isStaff(user.role)) {
+      throw new ForbiddenException('Immortal role or higher required');
+    }
+  }
+
+  // userId links a game character to a web account; only the owner and staff may see it
+  @ResolveField(() => String, { name: 'userId', nullable: true })
+  resolveUserId(
+    @Parent() character: Characters,
+    @CurrentUser() user: Users
+  ): string | null {
+    if (!user) return null;
+    if (isStaff(user.role) || character.userId === user.id) {
+      return character.userId ?? null;
+    }
+    return null;
+  }
 
   // Map Prisma's stamina/staminaMax to the GraphQL movement/movementMax fields
   @ResolveField(() => Int, { name: 'movement' })
@@ -98,6 +147,13 @@ export class CharactersResolver {
     return character.permissions ?? [];
   }
 
+  // Class display name, resolved from classId (CharacterClass.plainName)
+  @ResolveField(() => String, { name: 'class', nullable: true })
+  async resolveClass(@Parent() character: Characters): Promise<string | null> {
+    if (character.classId == null) return null;
+    return this.charactersService.findClassName(character.classId);
+  }
+
   // Map Prisma's currentRoomId to DTO's currentRoom
   @ResolveField(() => Int, { name: 'currentRoom', nullable: true })
   resolveCurrentRoom(@Parent() character: Characters): number | null {
@@ -148,19 +204,48 @@ export class CharactersResolver {
     @Args('data') data: CreateCharacterInput,
     @CurrentUser() user: Users
   ) {
-    return this.charactersService.createCharacter(data, user.id);
+    // Level drives the derived account role; players may only start at level 1.
+    if (!isStaff(user.role) && data.level !== 1) {
+      throw new ForbiddenException(
+        'Only staff may create characters above level 1'
+      );
+    }
+    return this.charactersService.createCharacter(data, user.id, {
+      isStaff: isStaff(user.role),
+    });
   }
 
   @Mutation(() => CharacterDto)
   async updateCharacter(
     @Args('id', { type: () => ID }) id: string,
-    @Args('data') data: UpdateCharacterInput
+    @Args('data') data: UpdateCharacterInput,
+    @CurrentUser() user: Users
   ) {
-    return this.charactersService.updateCharacter(id, data);
+    await this.assertOwnerOrStaff(user, id);
+    if (!isStaff(user.role)) {
+      const forbidden = Object.entries(data)
+        .filter(
+          ([key, value]) =>
+            value !== undefined && !SELF_EDITABLE_CHARACTER_FIELDS.has(key)
+        )
+        .map(([key]) => key);
+      if (forbidden.length > 0) {
+        throw new ForbiddenException(
+          `Only staff may change: ${forbidden.join(', ')}`
+        );
+      }
+    }
+    return this.charactersService.updateCharacter(id, data, {
+      isStaff: isStaff(user.role),
+    });
   }
 
   @Mutation(() => CharacterDto)
-  async deleteCharacter(@Args('id', { type: () => ID }) id: string) {
+  async deleteCharacter(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: Users
+  ) {
+    await this.assertOwnerOrStaff(user, id);
     return this.charactersService.deleteCharacter(id);
   }
 
@@ -179,20 +264,31 @@ export class CharactersResolver {
 
   // Character Item mutations
   @Mutation(() => CharacterItemDto)
-  async createCharacterItem(@Args('data') data: CreateCharacterItemInput) {
+  async createCharacterItem(
+    @Args('data') data: CreateCharacterItemInput,
+    @CurrentUser() user: Users
+  ) {
+    // Minting items from arbitrary object ids is staff-only, even on own characters.
+    this.assertStaff(user);
     return this.charactersService.createCharacterItem(data);
   }
 
   @Mutation(() => CharacterItemDto)
   async updateCharacterItem(
     @Args('id', { type: () => ID }) id: number,
-    @Args('data') data: UpdateCharacterItemInput
+    @Args('data') data: UpdateCharacterItemInput,
+    @CurrentUser() user: Users
   ) {
+    this.assertStaff(user);
     return this.charactersService.updateCharacterItem(id, data);
   }
 
   @Mutation(() => Boolean)
-  async deleteCharacterItem(@Args('id', { type: () => ID }) id: number) {
+  async deleteCharacterItem(
+    @Args('id', { type: () => ID }) id: number,
+    @CurrentUser() user: Users
+  ) {
+    this.assertStaff(user);
     await this.charactersService.deleteCharacterItem(id);
     return true;
   }
@@ -219,20 +315,30 @@ export class CharactersResolver {
 
   // Character Effect mutations
   @Mutation(() => CharacterEffectDto)
-  async createCharacterEffect(@Args('data') data: CreateCharacterEffectInput) {
+  async createCharacterEffect(
+    @Args('data') data: CreateCharacterEffectInput,
+    @CurrentUser() user: Users
+  ) {
+    this.assertStaff(user);
     return this.charactersService.createCharacterEffect(data);
   }
 
   @Mutation(() => CharacterEffectDto)
   async updateCharacterEffect(
     @Args('id', { type: () => ID }) id: number,
-    @Args('data') data: UpdateCharacterEffectInput
+    @Args('data') data: UpdateCharacterEffectInput,
+    @CurrentUser() user: Users
   ) {
+    this.assertStaff(user);
     return this.charactersService.updateCharacterEffect(id, data);
   }
 
   @Mutation(() => Boolean)
-  async deleteCharacterEffect(@Args('id', { type: () => ID }) id: number) {
+  async deleteCharacterEffect(
+    @Args('id', { type: () => ID }) id: number,
+    @CurrentUser() user: Users
+  ) {
+    this.assertStaff(user);
     await this.charactersService.deleteCharacterEffect(id);
     return true;
   }
@@ -242,8 +348,14 @@ export class CharactersResolver {
   })
   async removeExpiredEffects(
     @Args('characterId', { type: () => ID, nullable: true })
-    characterId?: string
+    characterId: string | undefined,
+    @CurrentUser() user: Users
   ) {
+    if (characterId) {
+      await this.assertOwnerOrStaff(user, characterId);
+    } else {
+      this.assertStaff(user);
+    }
     const result =
       await this.charactersService.removeExpiredEffects(characterId);
     return result.count;
@@ -291,8 +403,14 @@ export class CharactersResolver {
   // Character online status queries
   @Query(() => [OnlineCharacterDto], { name: 'onlineCharacters' })
   async getOnlineCharacters(
+    @CurrentUser() user: Users,
     @Args('userId', { type: () => ID, nullable: true }) userId?: string
   ) {
+    if (userId && userId !== user.id && !isStaff(user.role)) {
+      throw new ForbiddenException(
+        'You can only list your own online characters'
+      );
+    }
     return this.charactersService.getOnlineCharacters(userId);
   }
 
@@ -303,32 +421,40 @@ export class CharactersResolver {
 
   @Query(() => CharacterSessionInfoDto, { name: 'characterSessionInfo' })
   async getCharacterSessionInfo(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.charactersService.getCharacterSessionInfo(characterId);
   }
 
   // Character online status mutations
   @Mutation(() => Boolean, { name: 'setCharacterOnline' })
   async setCharacterOnline(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     await this.charactersService.setCharacterOnline(characterId);
     return true;
   }
 
   @Mutation(() => Boolean, { name: 'setCharacterOffline' })
   async setCharacterOffline(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     await this.charactersService.setCharacterOffline(characterId);
     return true;
   }
 
   @Mutation(() => Boolean, { name: 'updateCharacterActivity' })
   async updateCharacterActivity(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     await this.charactersService.updateCharacterActivity(characterId);
     return true;
   }

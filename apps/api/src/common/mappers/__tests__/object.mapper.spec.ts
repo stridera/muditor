@@ -38,6 +38,12 @@ function base(): ObjectMapperSource {
     decomposeTimer: 0,
     level: 1,
     concealment: 0,
+    armorPct: 0,
+    weaponDiceNum: 0,
+    weaponDiceSize: 0,
+    weaponDiceBonus: 0,
+    weaponDamageType: null,
+    campKitTier: null,
     values: {}, // empty object satisfies JsonValue for test purposes
     zoneId: 5,
     createdAt: new Date(),

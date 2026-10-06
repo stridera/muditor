@@ -12,12 +12,16 @@ import { useQuery } from '@apollo/client/react';
 import { Edit, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
 export default function ObjectViewPage() {
   return (
     <PermissionGuard requireImmortal={true}>
-      <ObjectViewContent />
+      <Suspense
+        fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+      >
+        <ObjectViewContent />
+      </Suspense>
     </PermissionGuard>
   );
 }

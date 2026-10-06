@@ -1,7 +1,7 @@
-import { UseGuards } from '@nestjs/common';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { zoneLookups } from '../common/decorators/zone-lookups';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { WearFlag } from '@muditor/db';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
   CreateMobResetInput,
   MobResetDto,
@@ -29,7 +29,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => MobResetDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite()
   async createMobReset(
     @Args('data') data: CreateMobResetInput
   ): Promise<MobResetDto> {
@@ -37,7 +37,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => MobResetDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.mobReset('id') })
   async updateMobReset(
     @Args('id', { type: () => ID }) id: number,
     @Args('data') data: UpdateMobResetInput
@@ -46,7 +46,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.mobReset('id') })
   async deleteMobReset(
     @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {
@@ -54,7 +54,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('id') })
   async deleteMobResetEquipment(
     @Args('id', { type: () => ID }) id: number
   ): Promise<boolean> {
@@ -62,7 +62,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => MobResetDto)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.mobReset('resetId') })
   async addMobResetEquipment(
     @Args('resetId', { type: () => ID }) resetId: number,
     @Args('objectZoneId', { type: () => Int }) objectZoneId: number,
@@ -91,7 +91,7 @@ export class MobResetResolver {
   }
 
   @Mutation(() => Boolean)
-  @UseGuards(JwtAuthGuard)
+  @RequireZoneWrite({ lookup: zoneLookups.mobResetEquipment('id') })
   async updateMobResetEquipment(
     @Args('id', { type: () => ID }) id: number,
     @Args('wearLocation', { type: () => WearFlag, nullable: true })

@@ -23,18 +23,15 @@ mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
     gender
     size
     lifeForce
-    composition
     traits
     behaviors
     professions
     aggressionFormula
     activityRestrictions
     riderPresenceMessage
-    position
     defaultPosition
     movementMode
     defaultMovementMode
-    stance
   }
 }
 
@@ -63,18 +60,15 @@ mutation CreateMob($data: CreateMobInput!) {
     gender
     size
     lifeForce
-    composition
     traits
     behaviors
     professions
     aggressionFormula
     activityRestrictions
     riderPresenceMessage
-    position
     defaultPosition
     movementMode
     defaultMovementMode
-    stance
   }
 }
 
@@ -85,7 +79,11 @@ mutation DeleteMob($zoneId: Int!, $id: Int!) {
   }
 }
 
-mutation UpdateMobDefaultEffects($zoneId: Int!, $id: Int!, $effects: [MobDefaultEffectInput!]!) {
+mutation UpdateMobDefaultEffects(
+  $zoneId: Int!
+  $id: Int!
+  $effects: [MobDefaultEffectInput!]!
+) {
   updateMobDefaultEffects(zoneId: $zoneId, id: $id, effects: $effects) {
     id
     zoneId

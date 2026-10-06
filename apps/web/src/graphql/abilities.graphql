@@ -1,7 +1,17 @@
 # Abilities-related operations for codegen
 
-query GetAbilities($skip: Int, $take: Int, $abilityType: String, $search: String) {
-  abilities(abilityType: $abilityType, skip: $skip, take: $take, search: $search) {
+query GetAbilities(
+  $skip: Int
+  $take: Int
+  $abilityType: String
+  $search: String
+) {
+  abilities(
+    abilityType: $abilityType
+    skip: $skip
+    take: $take
+    search: $search
+  ) {
     id
     name
     abilityType
@@ -136,7 +146,10 @@ mutation DeleteAbility($id: ID!) {
   deleteAbility(id: $id)
 }
 
-mutation UpdateAbilityEffects($abilityId: Int!, $data: UpdateAbilityEffectsInput!) {
+mutation UpdateAbilityEffects(
+  $abilityId: Int!
+  $data: UpdateAbilityEffectsInput!
+) {
   updateAbilityEffects(abilityId: $abilityId, data: $data) {
     id
     name
@@ -157,7 +170,10 @@ mutation UpdateAbilityEffects($abilityId: Int!, $data: UpdateAbilityEffectsInput
   }
 }
 
-mutation UpdateAbilityMessages($abilityId: Int!, $data: UpdateAbilityMessagesInput!) {
+mutation UpdateAbilityMessages(
+  $abilityId: Int!
+  $data: UpdateAbilityMessagesInput!
+) {
   updateAbilityMessages(abilityId: $abilityId, data: $data) {
     startToCaster
     startToRoom

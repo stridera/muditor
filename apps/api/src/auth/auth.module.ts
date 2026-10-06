@@ -8,19 +8,15 @@ import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
 import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
-import { ZonePermissionGuard } from './guards/zone-permission.guard';
+import { jwtModuleOptionsFactory } from './jwt-secret';
 import { UsersModule } from '../users/users.module';
 import { EmailModule } from '../email/email.module';
 
 @Module({
   imports: [
     PassportModule.register({ session: false }),
-    JwtModule.register({
-      secret: process.env.JWT_SECRET || 'fallback-secret-key',
-      signOptions: {
-        expiresIn: (process.env.JWT_EXPIRES_IN ||
-          '7d') as `${number}${'s' | 'm' | 'h' | 'd'}`,
-      },
+    JwtModule.registerAsync({
+      useFactory: jwtModuleOptionsFactory,
       global: true,
     }),
     forwardRef(() => UsersModule),
@@ -34,8 +30,7 @@ import { EmailModule } from '../email/email.module';
     JwtStrategy,
     LocalStrategy,
     GraphQLJwtAuthGuard,
-    ZonePermissionGuard,
   ],
-  exports: [AuthService, GraphQLJwtAuthGuard, ZonePermissionGuard],
+  exports: [AuthService, GraphQLJwtAuthGuard],
 })
 export class AuthModule {}

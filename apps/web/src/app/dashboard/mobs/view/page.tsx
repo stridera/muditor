@@ -12,12 +12,16 @@ import { useQuery } from '@apollo/client/react';
 import { Edit, ArrowLeft } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect } from 'react';
+import { Suspense, useEffect } from 'react';
 
 export default function MobViewPage() {
   return (
     <PermissionGuard requireImmortal={true}>
-      <MobViewContent />
+      <Suspense
+        fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+      >
+        <MobViewContent />
+      </Suspense>
     </PermissionGuard>
   );
 }
@@ -391,21 +395,9 @@ function MobViewContent() {
             </div>
             <div>
               <dt className='text-sm font-medium text-muted-foreground'>
-                Composition
+                Default Position
               </dt>
-              <dd className='text-base'>{mob.composition}</dd>
-            </div>
-            <div>
-              <dt className='text-sm font-medium text-muted-foreground'>
-                Position
-              </dt>
-              <dd className='text-base'>{mob.position}</dd>
-            </div>
-            <div>
-              <dt className='text-sm font-medium text-muted-foreground'>
-                Stance
-              </dt>
-              <dd className='text-base'>{mob.stance}</dd>
+              <dd className='text-base'>{mob.defaultPosition}</dd>
             </div>
             {mob.wealth != null && (
               <div>

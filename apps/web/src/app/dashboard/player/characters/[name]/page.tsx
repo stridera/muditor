@@ -7,16 +7,17 @@ import {
 } from '@/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import { useRouter } from 'next/navigation';
+import { use } from 'react';
 
 type MyCharactersQueryResult = GetMyCharactersQuery;
 
 export default function PlayerCharacterDetailsPage({
   params,
 }: {
-  params: { name: string };
+  params: Promise<{ name: string }>;
 }) {
   const router = useRouter();
-  const characterName = decodeURIComponent(params.name);
+  const characterName = decodeURIComponent(use(params).name);
 
   const { data, loading, error } = useQuery<MyCharactersQueryResult>(
     GetMyCharactersDocument,

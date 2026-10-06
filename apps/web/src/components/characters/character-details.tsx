@@ -33,7 +33,6 @@ import {
 import { useState } from 'react';
 import { CharacterDeleteDialog } from './character-delete-dialog';
 import { CharacterEditForm } from './character-edit-form';
-import { OnlineStatus } from './online-status';
 import { ColoredText } from '@/lib/color-codes';
 import { CharacterSessionInfo } from './character-session-info';
 
@@ -43,10 +42,10 @@ const GET_CHARACTER_DETAILS = gql`
       id
       name
       level
-      raceType
-      playerClass
+      race
+      class
+      classId
       lastLogin
-      isOnline
       timePlayed
       hitPoints
       hitPointsMax
@@ -80,7 +79,6 @@ const GET_CHARACTER_DETAILS = gql`
       playerFlags
       privilegeFlags
       invisLevel
-      birthTime
       characterItems {
         id
         equippedLocation
@@ -257,16 +255,11 @@ export function CharacterDetails({
             <h1 className='text-2xl font-bold flex items-center gap-2'>
               <User className='h-6 w-6' />
               {character.name}
-              <OnlineStatus
-                isOnline={character.isOnline}
-                lastLogin={character.lastLogin}
-              />
             </h1>
             <p className='text-muted-foreground flex items-center gap-2'>
               Level {character.level}
-              {character.raceType && ` ${formatRace(character.raceType)}`}
-              {character.playerClass &&
-                ` ${formatClass(character.playerClass)}`}
+              {character.race && ` ${formatRace(character.race)}`}
+              {character.class && ` ${formatClass(character.class)}`}
               {character.title && (
                 <>
                   <span className='ml-2'>•</span>
@@ -277,18 +270,13 @@ export function CharacterDetails({
           </div>
         </div>
         <div className='flex items-center gap-2'>
-          <Button
-            variant='outline'
-            onClick={() => setEditDialogOpen(true)}
-            disabled={character.isOnline}
-          >
+          <Button variant='outline' onClick={() => setEditDialogOpen(true)}>
             <Edit className='h-4 w-4 mr-2' />
             Edit Character
           </Button>
           <Button
             variant='destructive'
             onClick={() => setDeleteDialogOpen(true)}
-            disabled={character.isOnline}
           >
             <Trash2 className='h-4 w-4 mr-2' />
             Delete
@@ -298,13 +286,6 @@ export function CharacterDetails({
           </Badge>
         </div>
       </div>
-
-      {character.isOnline && (
-        <div className='bg-yellow-50 border border-yellow-200 rounded-lg p-3 text-sm text-yellow-800'>
-          ⚠️ This character is currently online. You cannot edit or delete while
-          the character is in the game.
-        </div>
-      )}
 
       <Tabs
         value={activeTab}
@@ -382,10 +363,7 @@ export function CharacterDetails({
             </Card>
 
             {/* Session Info */}
-            <CharacterSessionInfo
-              characterId={character.id}
-              isOnline={character.isOnline}
-            />
+            <CharacterSessionInfo characterId={character.id} />
           </div>
 
           {/* Character Description */}
