@@ -7,12 +7,16 @@ import {
   Logger,
   NotFoundException,
   type OnModuleDestroy,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import Redis from 'ioredis';
+import {
+  FallbackTtlCounter,
+  InMemoryTtlCounter,
+  type TtlCounter,
+} from '../common/ttl-counter';
 import { unixCrypt as crypt } from '../common/unix-crypt';
 import type {
   ItemInstanceFlag,
@@ -49,6 +53,14 @@ const LEGACY_PLACEHOLDER_EMAIL_SUFFIX = '@legacy.fierymud.local';
 export class CharactersService implements OnModuleDestroy {
   private readonly logger = new Logger(CharactersService.name);
   private redis: Redis | null = null;
+  private readonly lockoutCounter: TtlCounter = new FallbackTtlCounter(
+    () => this.redis,
+    new InMemoryTtlCounter(),
+    err =>
+      this.logger.warn(
+        `Redis error in link lockout, using in-memory store: ${err instanceof Error ? err.message : String(err)}`
+      )
+  );
 
   constructor(
     private readonly db: DatabaseService,
@@ -65,9 +77,7 @@ export class CharactersService implements OnModuleDestroy {
     });
     const client = this.redis;
     client.connect().catch(() => {
-      this.logger.warn(
-        'Redis unavailable — character linking lockout protection disabled'
-      );
+      this.logger.warn('link lockout using in-memory store (no Redis)');
       // Stop the reconnect loop so it cannot keep the event loop alive.
       client.disconnect();
       this.redis = null;
@@ -79,58 +89,34 @@ export class CharactersService implements OnModuleDestroy {
    * Returns the remaining lockout time in seconds, or 0 if not locked out.
    */
   async getLockoutRemaining(characterName: string): Promise<number> {
-    if (!this.redis) return 0;
-    const key = `charlink:lockout:${characterName.toLowerCase()}`;
-    try {
-      const attempts = await this.redis.get(key);
-      if (attempts && parseInt(attempts, 10) >= LOCKOUT_MAX_ATTEMPTS) {
-        const ttl = await this.redis.ttl(key);
-        return ttl > 0 ? ttl : 0;
-      }
-    } catch {
-      // Redis error — fail open
-    }
-    return 0;
+    const { count, ttlSeconds } = await this.lockoutCounter.peek(
+      this.lockoutKey(characterName)
+    );
+    return count >= LOCKOUT_MAX_ATTEMPTS ? ttlSeconds : 0;
   }
 
   /**
-   * Atomically count a link attempt for a character (INCR + TTL) BEFORE the
-   * password is compared. Fails closed: with Redis unavailable, linking is
-   * refused rather than proceeding without a lockout.
+   * Atomically count a link attempt for a character BEFORE the password is
+   * compared. Uses Redis when available, otherwise the in-memory store; never
+   * fails closed on missing infrastructure.
    */
-  private async countLinkAttempt(characterName: string): Promise<number> {
-    const redis = this.redis;
-    if (!redis) {
-      throw new ServiceUnavailableException(
-        'Character linking is temporarily unavailable'
-      );
-    }
-    const key = `charlink:lockout:${characterName.toLowerCase()}`;
-    try {
-      const count = await redis.incr(key);
-      // Set/refresh TTL on first attempt or when reaching lockout threshold
-      if (count === 1 || count === LOCKOUT_MAX_ATTEMPTS) {
-        await redis.expire(key, LOCKOUT_WINDOW_SECONDS);
-      }
-      return count;
-    } catch {
-      throw new ServiceUnavailableException(
-        'Character linking is temporarily unavailable'
-      );
-    }
+  private countLinkAttempt(characterName: string): Promise<number> {
+    return this.lockoutCounter.incr(
+      this.lockoutKey(characterName),
+      LOCKOUT_WINDOW_SECONDS,
+      LOCKOUT_MAX_ATTEMPTS
+    );
+  }
+
+  private lockoutKey(characterName: string): string {
+    return `charlink:lockout:${characterName.toLowerCase()}`;
   }
 
   /**
    * Clear failed attempt counter for a character (on successful link).
    */
   async clearFailedAttempts(characterName: string): Promise<void> {
-    if (!this.redis) return;
-    const key = `charlink:lockout:${characterName.toLowerCase()}`;
-    try {
-      await this.redis.del(key);
-    } catch {
-      // Redis error — non-critical
-    }
+    await this.lockoutCounter.reset(this.lockoutKey(characterName));
   }
 
   onModuleDestroy() {
@@ -847,7 +833,10 @@ export class CharactersService implements OnModuleDestroy {
    * Verify the game password of an unlinked character, enforcing the
    * per-character lockout (wrong passwords count toward it). Upgrades legacy
    * crypt(3) hashes to bcrypt on success. Resets the attempt counter on success; does NOT link;
-   * callers link once it succeeds. Returns `placeholderOwnerId` when the
+   * callers link once it succeeds. The lockout uses Redis when available and
+   * an in-memory store otherwise. Returns `alreadyLinked` (no password
+   * needed) when `callerUserId` already owns the character, and
+   * `placeholderOwnerId` when the
    * character belongs to a claimable legacy placeholder account and
    * `callerUserId` was given (the claim flow); otherwise an owned character is
    * rejected as already linked.
@@ -857,13 +846,6 @@ export class CharactersService implements OnModuleDestroy {
     characterPassword: string,
     callerUserId?: string
   ) {
-    // Fail closed without Redis: no lockout means unlimited guessing.
-    if (!this.redis) {
-      throw new ServiceUnavailableException(
-        'Character linking is temporarily unavailable'
-      );
-    }
-
     // Find character by name (case-insensitive)
     const character = await this.db.characters.findFirst({
       where: {
@@ -876,6 +858,12 @@ export class CharactersService implements OnModuleDestroy {
 
     if (!character) {
       throw new NotFoundException(`Character '${characterName}' not found`);
+    }
+
+    // Re-linking a character the caller already owns is a no-op: no password,
+    // no lockout counting, no role change.
+    if (callerUserId !== undefined && character.userId === callerUserId) {
+      return { character, placeholderOwnerId: null, alreadyLinked: true };
     }
 
     // Gods are never self-service linkable: claiming one must not raise the
@@ -988,7 +976,7 @@ export class CharactersService implements OnModuleDestroy {
     // Password valid: reset the attempt counter
     await this.clearFailedAttempts(characterName);
 
-    return { character, placeholderOwnerId };
+    return { character, placeholderOwnerId, alreadyLinked: false };
   }
 
   /** Recalculate the user's role after a character link has been committed. */
@@ -1001,20 +989,29 @@ export class CharactersService implements OnModuleDestroy {
   /**
    * Link an existing game character to a user account.
    * Verifies the character password via verifyCharacterPasswordForLink (god
-   * guard, Redis fail-closed, atomic lockout), then links or claims, and
-   * recalculates user role on success.
+   * guard, atomic lockout), then links or claims, and recalculates user role
+   * on success. Idempotent for the owner: re-linking a character the caller
+   * already owns returns success without touching anything.
    */
   async linkCharacterToUser(
     userId: string,
     characterName: string,
     characterPassword: string
   ) {
-    const { character, placeholderOwnerId } =
+    const { character, placeholderOwnerId, alreadyLinked } =
       await this.verifyCharacterPasswordForLink(
         characterName,
         characterPassword,
         userId
       );
+
+    if (alreadyLinked) {
+      return {
+        character,
+        alreadyLinked: true,
+        message: 'Character is already linked to your account',
+      };
+    }
 
     if (placeholderOwnerId) {
       // Claim: move every character of the placeholder to the caller and
@@ -1041,7 +1038,11 @@ export class CharactersService implements OnModuleDestroy {
 
     await this.refreshRoleAfterLink(userId);
 
-    return character;
+    return {
+      character,
+      alreadyLinked: false,
+      message: `Successfully linked ${character.name} to your account`,
+    };
   }
 
   /**

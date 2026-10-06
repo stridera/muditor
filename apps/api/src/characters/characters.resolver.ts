@@ -21,6 +21,7 @@ import {
   CharacterItemDto,
   CharacterLinkingInfoDto,
   CharacterSessionInfoDto,
+  LinkCharacterResultDto,
   OnlineCharacterDto,
 } from './character.dto';
 import {
@@ -390,8 +391,9 @@ export class CharactersResolver {
     return this.charactersService.getCharacterLinkingInfo(characterName);
   }
 
-  @Mutation(() => CharacterDto, {
-    description: 'Link an existing game character to your user account',
+  @Mutation(() => LinkCharacterResultDto, {
+    description:
+      'Link an existing game character to your user account (idempotent if you already own it)',
   })
   @UseGuards(RateLimitGuard)
   @RateLimit({ limit: 5, windowSeconds: 60, keyPrefix: 'charlink:link' })

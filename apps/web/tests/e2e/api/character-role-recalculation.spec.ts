@@ -80,9 +80,11 @@ test.describe('Character Linking and Role Recalculation', () => {
               characterName: "TestGodChar",
               characterPassword: "admin123"
             }) {
-              id
-              name
-              level
+              character {
+                id
+                name
+                level
+              }
             }
           }
         `,
@@ -98,8 +100,8 @@ test.describe('Character Linking and Role Recalculation', () => {
       return;
     }
 
-    expect(linkData.data.linkCharacter.level).toBe(105);
-    testCharacterId = linkData.data.linkCharacter.id;
+    expect(linkData.data.linkCharacter.character.level).toBe(105);
+    testCharacterId = linkData.data.linkCharacter.character.id;
 
     // Verify role was automatically updated to IMPLEMENTOR
     const meResponse = await request.post(API_URL, {

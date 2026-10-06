@@ -20,6 +20,7 @@ import { formatDistanceToNow } from 'date-fns';
 import {
   AlertCircle,
   CheckCircle,
+  Info,
   Link,
   Loader2,
   Search,
@@ -47,11 +48,15 @@ const GET_CHARACTER_LINKING_INFO = gql`
 const LINK_CHARACTER_MUTATION = gql`
   mutation LinkCharacterInline($data: LinkCharacterInput!) {
     linkCharacter(data: $data) {
-      id
-      name
-      level
-      race
-      class
+      alreadyLinked
+      message
+      character {
+        id
+        name
+        level
+        race
+        class
+      }
     }
   }
 `;
@@ -74,11 +79,15 @@ interface CharacterLinkingInfoQueryResult {
 
 interface LinkCharacterMutationResult {
   linkCharacter: {
-    id: string;
-    name: string;
-    level: number;
-    race?: string;
-    class?: string;
+    alreadyLinked: boolean;
+    message: string;
+    character: {
+      id: string;
+      name: string;
+      level: number;
+      race?: string;
+      class?: string;
+    };
   };
 }
 
@@ -96,6 +105,7 @@ export function CharacterLinkingForm({
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [info, setInfo] = useState<string | null>(null);
 
   const [getCharacterInfo, { data: characterData, loading: searchLoading }] =
     useLazyQuery<CharacterLinkingInfoQueryResult>(GET_CHARACTER_LINKING_INFO);
@@ -127,6 +137,7 @@ export function CharacterLinkingForm({
 
     setError(null);
     setSuccess(null);
+    setInfo(null);
 
     try {
       const result = await getCharacterInfo({
@@ -148,6 +159,7 @@ export function CharacterLinkingForm({
 
     setError(null);
     setSuccess(null);
+    setInfo(null);
 
     try {
       // All characters require password verification
@@ -166,9 +178,10 @@ export function CharacterLinkingForm({
     }
 
     setError(null);
+    setInfo(null);
 
     try {
-      await linkCharacter({
+      const { data } = await linkCharacter({
         variables: {
           data: {
             characterName: character.name,
@@ -177,9 +190,14 @@ export function CharacterLinkingForm({
         },
       });
 
-      setSuccess(
-        `Successfully linked ${character.name} to your account! Your role has been updated.`
-      );
+      if (data?.linkCharacter.alreadyLinked) {
+        // Re-linking your own character is a no-op: informational, not an error.
+        setInfo(`${character.name}: ${data.linkCharacter.message}.`);
+      } else {
+        setSuccess(
+          `Successfully linked ${character.name} to your account! Your role has been updated.`
+        );
+      }
       setStep('search');
       setCharacterName('');
       setPassword('');
@@ -199,6 +217,7 @@ export function CharacterLinkingForm({
     setPassword('');
     setError(null);
     setSuccess(null);
+    setInfo(null);
   };
 
   return (
@@ -207,6 +226,13 @@ export function CharacterLinkingForm({
         <Alert variant='destructive'>
           <AlertCircle className='h-4 w-4' />
           <AlertDescription>{error}</AlertDescription>
+        </Alert>
+      )}
+
+      {info && (
+        <Alert>
+          <Info className='h-4 w-4' />
+          <AlertDescription>{info}</AlertDescription>
         </Alert>
       )}
 

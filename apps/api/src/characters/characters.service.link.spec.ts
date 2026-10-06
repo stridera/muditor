@@ -1,8 +1,4 @@
-import {
-  BadRequestException,
-  ForbiddenException,
-  ServiceUnavailableException,
-} from '@nestjs/common';
+import { BadRequestException, ForbiddenException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { GameAdminService } from '../bridge/game-admin.service';
@@ -145,7 +141,7 @@ describe('CharactersService.linkCharacterToUser', () => {
     expect(db.characters.update).not.toHaveBeenCalled();
   });
 
-  it('rejects when the caller already owns the character', async () => {
+  it('is an idempotent no-op when the caller already owns the character', async () => {
     db.characters.findFirst.mockResolvedValue({
       id: 'c1',
       name: 'Venath',
@@ -154,11 +150,38 @@ describe('CharactersService.linkCharacterToUser', () => {
       passwordHash,
     });
 
+    const result = await service.linkCharacterToUser(
+      CALLER_ID,
+      'venath',
+      'not-even-checked'
+    );
+
+    expect(result.alreadyLinked).toBe(true);
+    expect(result.message).toBe('Character is already linked to your account');
+    expect(result.character.name).toBe('Venath');
+    expect(redis.incr).not.toHaveBeenCalled();
+    expect(db.users.findUnique).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
+    expect(db.characters.update).not.toHaveBeenCalled();
+    expect(roleCalculator.updateUserRole).not.toHaveBeenCalled();
+  });
+
+  it('still rejects a character owned by a different real account', async () => {
+    db.characters.findFirst.mockResolvedValue({
+      id: 'c1',
+      name: 'Venath',
+      level: 30,
+      userId: 'someone-else',
+      passwordHash,
+    });
+    db.users.findUnique.mockResolvedValue(
+      owner({ email: 'other@example.com' })
+    );
+
     await expect(
       service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
     ).rejects.toBeInstanceOf(BadRequestException);
-    expect(db.users.findUnique).not.toHaveBeenCalled();
-    expect(db.$transaction).not.toHaveBeenCalled();
+    expect(db.characters.update).not.toHaveBeenCalled();
   });
 
   it('rejects a wrong game password without changing anything', async () => {
@@ -198,13 +221,26 @@ describe('CharactersService.linkCharacterToUser', () => {
     expect(db.characters.update).not.toHaveBeenCalled();
   });
 
-  it('fails closed when Redis is unavailable, without claiming', async () => {
+  it('links without Redis (in-memory lockout), never failing closed', async () => {
     (service as unknown as { redis: unknown }).redis = null;
+    db.characters.findFirst.mockResolvedValue({
+      id: 'c1',
+      name: 'Venath',
+      level: 30,
+      userId: null,
+      passwordHash,
+    });
 
-    await expect(
-      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
-    ).rejects.toBeInstanceOf(ServiceUnavailableException);
-    expect(db.$transaction).not.toHaveBeenCalled();
-    expect(db.characters.update).not.toHaveBeenCalled();
+    const result = await service.linkCharacterToUser(
+      CALLER_ID,
+      'venath',
+      'gamepass'
+    );
+
+    expect(result.alreadyLinked).toBe(false);
+    expect(db.characters.update).toHaveBeenCalledWith({
+      where: { id: 'c1' },
+      data: { userId: CALLER_ID },
+    });
   });
 });

@@ -3,7 +3,6 @@ import {
   ForbiddenException,
   HttpException,
   NotFoundException,
-  ServiceUnavailableException,
 } from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import type { ConfigService } from '@nestjs/config';
@@ -325,13 +324,74 @@ describe('CharactersService race/class handling', () => {
       expect(compare).not.toHaveBeenCalled();
     });
 
-    it('fails closed when Redis is unavailable', async () => {
-      (service as unknown as { redis: unknown }).redis = null;
+    describe('without Redis (in-memory store)', () => {
+      beforeEach(() => {
+        (service as unknown as { redis: unknown }).redis = null;
+      });
+
+      it('still verifies the password', async () => {
+        compare.mockResolvedValue(true);
+        const result = await service.verifyCharacterPasswordForLink(
+          'Newbie',
+          'pw'
+        );
+        expect(result.character.name).toBe('Newbie');
+        expect(compare).toHaveBeenCalledTimes(1);
+      });
+
+      it('counts wrong attempts, then locks out without comparing', async () => {
+        compare.mockResolvedValue(false);
+        for (const remaining of [4, 3, 2, 1]) {
+          await expect(
+            service.verifyCharacterPasswordForLink('Newbie', 'bad')
+          ).rejects.toThrow(
+            `Invalid character password. ${remaining} attempt${remaining !== 1 ? 's' : ''} remaining.`
+          );
+        }
+        // 5th wrong attempt reaches the limit
+        const fifth = await service
+          .verifyCharacterPasswordForLink('Newbie', 'bad')
+          .catch((e: unknown) => e);
+        expect((fifth as HttpException).getStatus()).toBe(429);
+        expect(compare).toHaveBeenCalledTimes(5);
+
+        // Further attempts, even with the right password, are locked
+        compare.mockResolvedValue(true);
+        const locked = await service
+          .verifyCharacterPasswordForLink('newbie', 'pw')
+          .catch((e: unknown) => e);
+        expect((locked as HttpException).getStatus()).toBe(429);
+        expect(compare).toHaveBeenCalledTimes(5);
+        expect(await service.getLockoutRemaining('NEWBIE')).toBeGreaterThan(0);
+
+        // Clearing (success path / admin unlock) unlocks
+        await service.clearFailedAttempts('Newbie');
+        expect(await service.getLockoutRemaining('Newbie')).toBe(0);
+        await expect(
+          service.verifyCharacterPasswordForLink('Newbie', 'pw')
+        ).resolves.toBeDefined();
+      });
+
+      it('a successful verify resets the counter', async () => {
+        compare.mockResolvedValue(false);
+        await service
+          .verifyCharacterPasswordForLink('Newbie', 'bad')
+          .catch(() => undefined);
+        compare.mockResolvedValue(true);
+        await service.verifyCharacterPasswordForLink('Newbie', 'pw');
+        compare.mockResolvedValue(false);
+        await expect(
+          service.verifyCharacterPasswordForLink('Newbie', 'bad')
+        ).rejects.toThrow('4 attempts remaining');
+      });
+    });
+
+    it('falls back to the in-memory store when Redis errors', async () => {
+      redis.incr.mockRejectedValue(new Error('boom'));
+      compare.mockResolvedValue(false);
       await expect(
-        service.verifyCharacterPasswordForLink('Newbie', 'pw')
-      ).rejects.toThrow(ServiceUnavailableException);
-      expect(findFirst()).not.toHaveBeenCalled();
-      expect(compare).not.toHaveBeenCalled();
+        service.verifyCharacterPasswordForLink('Newbie', 'bad')
+      ).rejects.toThrow('Invalid character password. 4 attempts remaining.');
     });
 
     it('counts the attempt with INCR before comparing, then resets on success', async () => {

@@ -258,6 +258,21 @@ export class CharacterEffectDto {
 }
 
 @ObjectType()
+export class LinkCharacterResultDto {
+  @Field(() => CharacterDto)
+  character: CharacterDto;
+
+  @Field({
+    description:
+      'True when the character was already linked to the caller; nothing changed',
+  })
+  alreadyLinked: boolean;
+
+  @Field()
+  message: string;
+}
+
+@ObjectType()
 export class CharacterLinkingInfoDto {
   @Field(() => ID)
   id: string;

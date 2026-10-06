@@ -1565,6 +1565,15 @@ input LinkCharacterInput {
   characterPassword: String!
 }
 
+type LinkCharacterResultDto {
+  """
+  True when the character was already linked to the caller; nothing changed
+  """
+  alreadyLinked: Boolean!
+  character: CharacterDto!
+  message: String!
+}
+
 input LoginInput {
   identifier: String!
   password: String!
@@ -1952,8 +1961,10 @@ type Mutation {
   """Disconnect a player from FieryMUD"""
   kickPlayer(playerName: String!, reason: String): KickResultType!
 
-  """Link an existing game character to your user account"""
-  linkCharacter(data: LinkCharacterInput!): CharacterDto!
+  """
+  Link an existing game character to your user account (idempotent if you already own it)
+  """
+  linkCharacter(data: LinkCharacterInput!): LinkCharacterResultDto!
   login(input: LoginInput!): AuthPayload!
   markTriggerReviewed(id: Int!, zoneId: Int!): TriggerDto!
   refreshToken: String!

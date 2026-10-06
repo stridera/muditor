@@ -93,9 +93,13 @@ mutation CreateCharacter($data: CreateCharacterInput!) {
 
 mutation LinkCharacter($data: LinkCharacterInput!) {
   linkCharacter(data: $data) {
-    id
-    name
-    level
+    alreadyLinked
+    message
+    character {
+      id
+      name
+      level
+    }
   }
 }
 
