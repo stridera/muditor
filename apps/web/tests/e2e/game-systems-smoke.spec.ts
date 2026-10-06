@@ -5,11 +5,11 @@ import { test, expect } from '@playwright/test';
  * These tests don't require authentication - just verifying TypeScript compilation worked.
  */
 
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL ?? 'http://localhost:3000';
+
 test.describe('Game Systems Editors - Smoke Tests', () => {
   test('Abilities editor page compiles and responds', async ({ request }) => {
-    const response = await request.get(
-      'http://localhost:3000/dashboard/abilities'
-    );
+    const response = await request.get(`${BASE_URL}/dashboard/abilities`);
 
     // Page should return 200 or 307 (redirect to login)
     expect([200, 307]).toContain(response.status());
@@ -22,9 +22,7 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
   });
 
   test('Classes editor page compiles and responds', async ({ request }) => {
-    const response = await request.get(
-      'http://localhost:3000/dashboard/classes'
-    );
+    const response = await request.get(`${BASE_URL}/dashboard/classes`);
 
     expect([200, 307]).toContain(response.status());
 
@@ -35,7 +33,7 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
   });
 
   test('Races editor page compiles and responds', async ({ request }) => {
-    const response = await request.get('http://localhost:3000/dashboard/races');
+    const response = await request.get(`${BASE_URL}/dashboard/races`);
 
     expect([200, 307]).toContain(response.status());
 
@@ -63,7 +61,7 @@ test.describe('Game Systems Editors - Smoke Tests', () => {
     ];
 
     for (const pagePath of pages) {
-      await page.goto(`http://localhost:3000${pagePath}`, {
+      await page.goto(`${BASE_URL}${pagePath}`, {
         waitUntil: 'domcontentloaded',
         timeout: 10000,
       });

@@ -249,6 +249,16 @@ export class GrantsService {
   }
 
   /**
+   * Whether the user has at least one zone grant (of any permission).
+   */
+  async hasAnyZoneGrants(userId: string): Promise<boolean> {
+    const count = await this.db.userGrants.count({
+      where: { userId, resourceType: GrantResourceType.ZONE },
+    });
+    return count > 0;
+  }
+
+  /**
    * Check if a user has specific permission for a zone
    */
   async checkZonePermission(

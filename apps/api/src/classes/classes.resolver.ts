@@ -20,9 +20,8 @@ import { ClassesService } from './classes.service';
 export class ClassesResolver {
   constructor(private readonly classesService: ClassesService) {}
 
-  // Class Queries - IMMORTAL+ can view
+  // Class Queries - any authenticated user can read (needed by the player character-creation form)
   @Query(() => [ClassDto], { name: 'classes' })
-  @MinimumRole(UserRole.IMMORTAL)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
@@ -31,19 +30,16 @@ export class ClassesResolver {
   }
 
   @Query(() => ClassDto, { name: 'class' })
-  @MinimumRole(UserRole.IMMORTAL)
   async findOne(@Args('id', { type: () => ID }) id: string | number) {
     return this.classesService.findOne(Number(id));
   }
 
   @Query(() => ClassDto, { name: 'classByName', nullable: true })
-  @MinimumRole(UserRole.IMMORTAL)
   async findByName(@Args('name') name: string) {
     return this.classesService.findByName(name);
   }
 
   @Query(() => Int, { name: 'classesCount' })
-  @MinimumRole(UserRole.IMMORTAL)
   async count() {
     return this.classesService.count();
   }
@@ -78,7 +74,6 @@ export class ClassesResolver {
     name: 'classSkills',
     description: 'Get all skills for a class',
   })
-  @MinimumRole(UserRole.IMMORTAL)
   async getClassSkills(@Args('classId', { type: () => Int }) classId: number) {
     return this.classesService.getClassSkills(classId);
   }
@@ -113,7 +108,6 @@ export class ClassesResolver {
     name: 'classCirclesList',
     description: 'Get all spell circles for a class',
   })
-  @MinimumRole(UserRole.IMMORTAL)
   async getClassCircles(@Args('classId', { type: () => Int }) classId: number) {
     return this.classesService.getClassCircles(classId);
   }

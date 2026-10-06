@@ -8,6 +8,11 @@ interface RoomLike {
 import { useCallback, useState } from 'react';
 import type { Node } from 'reactflow';
 import { pixelsToGrid, pixelsToGridY } from '../editor-constants';
+import { graphqlRequestBody } from '@/lib/authenticated-fetch';
+import {
+  ZoneEditorBatchUpdateRoomPositionsDocument,
+  ZoneEditorUpdateRoomPositionDocument,
+} from '@/generated/graphql';
 
 // Generic minimal room shape; actual Room can extend this
 export interface BaseRoomShape {
@@ -15,7 +20,7 @@ export interface BaseRoomShape {
   layoutX?: number | null;
   layoutY?: number | null;
   layoutZ?: number | null;
-  zoneId?: number;
+  zoneId: number;
 }
 
 export interface UndoAction {
@@ -85,29 +90,19 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         const roomId = action.roomId;
         const prevPos = action.previousPosition;
         const currentRoom = rooms.find(r => r.id === roomId);
-        const currentZ = currentRoom?.layoutZ ?? 0;
+        if (!currentRoom) throw new Error(`Room ${roomId} not found`);
+        const currentZ = currentRoom.layoutZ ?? 0;
         const response = await authenticatedFetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
           {
             method: 'POST',
-            body: JSON.stringify({
-              query: `
-              mutation UpdateRoomPosition($id: Int!, $position: UpdateRoomPositionInput!) {
-                updateRoomPosition(id: $id, position: $position) {
-                  id
-                  layoutX
-                  layoutY
-                  layoutZ
-                }
-              }
-            `,
-              variables: {
-                id: roomId,
-                position: {
-                  layoutX: pixelsToGrid(prevPos.x),
-                  layoutY: pixelsToGridY(prevPos.y),
-                  layoutZ: currentZ,
-                },
+            body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+              zoneId: currentRoom.zoneId,
+              id: roomId,
+              position: {
+                layoutX: pixelsToGrid(prevPos.x),
+                layoutY: pixelsToGridY(prevPos.y),
+                layoutZ: currentZ,
               },
             }),
           }
@@ -147,17 +142,21 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         action.type === 'MOVE_MULTIPLE_ROOMS' &&
         action.previousPositions
       ) {
-        const updates = Object.entries(action.previousPositions).map(
+        const updates = Object.entries(action.previousPositions).flatMap(
           ([roomIdStr, prevPos]) => {
             const roomId = parseInt(roomIdStr);
             const currentRoom = rooms.find(r => r.id === roomId);
-            const currentZ = currentRoom?.layoutZ ?? 0;
-            return {
-              roomId,
-              layoutX: pixelsToGrid(prevPos.x),
-              layoutY: pixelsToGridY(prevPos.y),
-              layoutZ: currentZ,
-            };
+            if (!currentRoom) return [];
+            const currentZ = currentRoom.layoutZ ?? 0;
+            return [
+              {
+                roomId,
+                zoneId: currentRoom.zoneId,
+                layoutX: pixelsToGrid(prevPos.x),
+                layoutY: pixelsToGridY(prevPos.y),
+                layoutZ: currentZ,
+              },
+            ];
           }
         );
         const response = await authenticatedFetch(
@@ -165,17 +164,10 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
             'http://localhost:3001/graphql',
           {
             method: 'POST',
-            body: JSON.stringify({
-              query: `
-                mutation BatchUpdateRoomPositions($input: BatchUpdateRoomPositionsInput!) {
-                  batchUpdateRoomPositions(input: $input) {
-                    updatedCount
-                    errors
-                  }
-                }
-              `,
-              variables: { input: { updates } },
-            }),
+            body: graphqlRequestBody(
+              ZoneEditorBatchUpdateRoomPositionsDocument,
+              { input: { updates } }
+            ),
           }
         );
         if (response.ok) {
@@ -247,29 +239,19 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
         const roomId = action.roomId;
         const newPos = action.newPosition;
         const currentRoom = rooms.find(r => r.id === roomId);
-        const currentZ = currentRoom?.layoutZ ?? 0;
+        if (!currentRoom) throw new Error(`Room ${roomId} not found`);
+        const currentZ = currentRoom.layoutZ ?? 0;
         const response = await authenticatedFetch(
           process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
           {
             method: 'POST',
-            body: JSON.stringify({
-              query: `
-              mutation UpdateRoomPosition($id: Int!, $position: UpdateRoomPositionInput!) {
-                updateRoomPosition(id: $id, position: $position) {
-                  id
-                  layoutX
-                  layoutY
-                  layoutZ
-                }
-              }
-            `,
-              variables: {
-                id: roomId,
-                position: {
-                  layoutX: pixelsToGrid(newPos.x),
-                  layoutY: pixelsToGridY(newPos.y),
-                  layoutZ: currentZ,
-                },
+            body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+              zoneId: currentRoom.zoneId,
+              id: roomId,
+              position: {
+                layoutX: pixelsToGrid(newPos.x),
+                layoutY: pixelsToGridY(newPos.y),
+                layoutZ: currentZ,
               },
             }),
           }
@@ -306,17 +288,21 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
           log.error?.('HTTP error redo room', roomId, response.status);
         }
       } else if (action.type === 'MOVE_MULTIPLE_ROOMS' && action.newPositions) {
-        const updates = Object.entries(action.newPositions).map(
+        const updates = Object.entries(action.newPositions).flatMap(
           ([roomIdStr, newPos]) => {
             const roomId = parseInt(roomIdStr);
             const currentRoom = rooms.find(r => r.id === roomId);
-            const currentZ = currentRoom?.layoutZ ?? 0;
-            return {
-              roomId,
-              layoutX: pixelsToGrid(newPos.x),
-              layoutY: pixelsToGridY(newPos.y),
-              layoutZ: currentZ,
-            };
+            if (!currentRoom) return [];
+            const currentZ = currentRoom.layoutZ ?? 0;
+            return [
+              {
+                roomId,
+                zoneId: currentRoom.zoneId,
+                layoutX: pixelsToGrid(newPos.x),
+                layoutY: pixelsToGridY(newPos.y),
+                layoutZ: currentZ,
+              },
+            ];
           }
         );
         const response = await authenticatedFetch(
@@ -324,17 +310,10 @@ export const useUndoRedo = <TRoom extends BaseRoomShape>({
             'http://localhost:3001/graphql',
           {
             method: 'POST',
-            body: JSON.stringify({
-              query: `
-                mutation BatchUpdateRoomPositions($input: BatchUpdateRoomPositionsInput!) {
-                  batchUpdateRoomPositions(input: $input) {
-                    updatedCount
-                    errors
-                  }
-                }
-              `,
-              variables: { input: { updates } },
-            }),
+            body: graphqlRequestBody(
+              ZoneEditorBatchUpdateRoomPositionsDocument,
+              { input: { updates } }
+            ),
           }
         );
         if (response.ok) {

@@ -1,4 +1,9 @@
 import type { ZoneBounds, ZoneMapData } from './editor-types';
+import { graphqlRequestBody } from '@/lib/authenticated-fetch';
+import {
+  ZoneEditorAllRoomsDocument,
+  ZoneEditorAllZonesDocument,
+} from '@/generated/graphql';
 
 interface LightweightRoom {
   id: number;
@@ -52,9 +57,7 @@ export async function fetchAllZonesExternal(
       process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
       {
         method: 'POST',
-        body: JSON.stringify({
-          query: `query GetAllZones { zones { id name climate } }`,
-        }),
+        body: graphqlRequestBody(ZoneEditorAllZonesDocument),
       }
     );
     const zonesData = await zonesResponse.json();
@@ -68,9 +71,8 @@ export async function fetchAllZonesExternal(
       process.env.NEXT_PUBLIC_GRAPHQL_URL || '/graphql',
       {
         method: 'POST',
-        body: JSON.stringify({
-          query: `query GetAllRooms($lightweight: Boolean) { rooms(take: 15000, lightweight: $lightweight) { id name sector zoneId layoutX layoutY layoutZ exits { id direction toZoneId toRoomId } } }`,
-          variables: { lightweight: true },
+        body: graphqlRequestBody(ZoneEditorAllRoomsDocument, {
+          lightweight: true,
         }),
       }
     );

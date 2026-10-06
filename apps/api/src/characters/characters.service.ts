@@ -911,8 +911,9 @@ export class CharactersService {
       data: { userId },
     });
 
-    // Recalculate and update user role based on character level
-    await this.roleCalculator.updateUserRole(userId);
+    // Recalculate user role. Raising is allowed here only: the caller proved
+    // ownership with the character's password (legacy staff characters).
+    await this.roleCalculator.updateUserRole(userId, { allowRaise: true });
 
     return character;
   }
@@ -943,7 +944,8 @@ export class CharactersService {
       data: { userId: null },
     });
 
-    // Recalculate user role (may be downgraded if this was their highest-level character)
+    // Recalculate user role (may be downgraded if this was their highest-level
+    // character). Never promotes: allowRaise is intentionally not set.
     await this.roleCalculator.updateUserRole(userId);
   }
 

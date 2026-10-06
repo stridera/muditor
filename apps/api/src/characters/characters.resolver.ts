@@ -9,8 +9,9 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import type { Characters, Users } from '@muditor/db';
-import { isStaff } from '../auth/role.util';
+import { UserRole, type Characters, type Users } from '@muditor/db';
+import { isStaff, roleAtLeast } from '../auth/role.util';
+import { calculateRoleFromLevel } from '../users/services/role-calculator.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { RateLimit, RateLimitGuard } from '../bridge/rate-limit.guard';
@@ -66,6 +67,24 @@ export class CharactersResolver {
       await this.charactersService.findCharacterOwnerId(characterId);
     if (ownerId !== user.id) {
       throw new ForbiddenException('You do not have access to this character');
+    }
+  }
+
+  /**
+   * Role-escalation guard. A character's level drives its owner's account role,
+   * so a caller may never set a level that maps to a role above their own, and
+   * only IMPLEMENTOR may set any staff level (>= 100).
+   */
+  private assertMayAssignLevel(user: Users, level: number | undefined): void {
+    if (level === undefined || level === null) return;
+    const targetRole = calculateRoleFromLevel(level);
+    if (
+      !roleAtLeast(user.role, targetRole) ||
+      (level >= 100 && user.role !== UserRole.IMPLEMENTOR)
+    ) {
+      throw new ForbiddenException(
+        'You may not set a character level that grants a role above your own'
+      );
     }
   }
 
@@ -204,6 +223,7 @@ export class CharactersResolver {
     @Args('data') data: CreateCharacterInput,
     @CurrentUser() user: Users
   ) {
+    this.assertMayAssignLevel(user, data.level);
     // Level drives the derived account role; players may only start at level 1.
     if (!isStaff(user.role) && data.level !== 1) {
       throw new ForbiddenException(
@@ -222,6 +242,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     await this.assertOwnerOrStaff(user, id);
+    this.assertMayAssignLevel(user, data.level);
     if (!isStaff(user.role)) {
       const forbidden = Object.entries(data)
         .filter(

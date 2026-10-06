@@ -40,6 +40,17 @@ import { PortalNode } from './PortalNode';
 import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
+import { zoneEditorFetch } from './zone-editor-fetch';
+import { graphqlRequestBody } from '@/lib/authenticated-fetch';
+import {
+  ZoneEditorCreateRoomDocument,
+  ZoneEditorCreateRoomExitDocument,
+  ZoneEditorDeleteRoomExitDocument,
+  ZoneEditorGetRoomsDocument,
+  ZoneEditorUpdateRoomDocument,
+  ZoneEditorUpdateRoomPositionDocument,
+  ZoneEditorWorldMapDocument,
+} from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { EntityPanel, type Mob, type GameObject } from './EntityPanel';
 import type { EntityDetail } from './EntityDetailPanel';
@@ -594,47 +605,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     [isFullyInteractive]
   );
 
-  // Local authenticated fetch stub (replace with real implementation if available)
-  const authenticatedFetch = useCallback(
-    async (url: string, init?: RequestInit): Promise<Response> => {
-      // Prefer configurable base URL; fall back to localhost
-      const API_BASE =
-        process.env.NEXT_PUBLIC_API_URL || 'http://localhost:3001';
-      const fullUrl = url.startsWith('http') ? url : `${API_BASE}${url}`;
-      // Attempt CSRF token discovery from cookie (common names)
-      let csrfToken: string | undefined;
-      if (typeof document !== 'undefined') {
-        const match = document.cookie.match(
-          /(?:^|; )(_?csrf|XSRF-TOKEN)=([^;]+)/i
-        );
-        if (match) csrfToken = decodeURIComponent(match[2] ?? '');
-      }
-      const defaultHeaders: Record<string, string> = {
-        'Content-Type': 'application/json',
-        Accept: 'application/json',
-      };
-      if (csrfToken) {
-        // Support common header spellings; server can accept one
-        defaultHeaders['x-csrf-token'] = csrfToken;
-        defaultHeaders['X-XSRF-TOKEN'] = csrfToken;
-      }
-      const headersInit = init?.headers;
-      const mergedHeaders = {
-        ...defaultHeaders,
-        ...(headersInit && !(headersInit instanceof Headers)
-          ? (headersInit as Record<string, string>)
-          : {}),
-      };
-      const response: Response = await fetch(fullUrl, {
-        credentials: 'include',
-        mode: 'cors',
-        ...init,
-        headers: mergedHeaders,
-      });
-      return response;
-    },
-    []
-  );
+  // Authenticated fetch: attaches the Bearer token like the rest of the app
+  const authenticatedFetch = zoneEditorFetch;
 
   // Fetch zone rooms (full data) when in zone mode using activeZoneId
   useEffect(() => {
@@ -656,20 +628,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         const response: Response = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `query GetRooms($zoneId: Int!, $lightweight: Boolean){
-              zones { id name climate }
-              roomsByZone(zoneId: $zoneId, lightweight: $lightweight){
-                id zoneId name description roomDescription sector layoutX layoutY layoutZ
-                baseLightLevel capacity entryRestriction
-                isPeaceful allowsMagic allowsRecall allowsSummon allowsTeleport isDeathTrap
-                exits{ id direction toZoneId toRoomId description keywords keyZoneId keyId flags defaultState hitPoints }
-                mobs{ id name level roomDescription }
-                objects{ id name roomDescription }
-                shops{ id buyProfit sellProfit keeperId flags }
-              }
-            }`,
-            variables: { zoneId: activeZoneId, lightweight: false },
+          body: graphqlRequestBody(ZoneEditorGetRoomsDocument, {
+            zoneId: activeZoneId,
+            lightweight: false,
           }),
         });
         const data = await response.json();
@@ -813,12 +774,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         const response: Response = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `query WorldMap($take:Int){ 
-              zones { id name climate } 
-              rooms(lightweight:true, take:$take){ id name sector zoneId layoutX layoutY layoutZ exits { id direction toZoneId toRoomId } } 
-            }`,
-            variables: { take: 120000 },
+          body: graphqlRequestBody(ZoneEditorWorldMapDocument, {
+            take: 120000,
           }),
         });
         const data = await response.json();
@@ -1647,32 +1604,10 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
       const response = await authenticatedFetch('/graphql', {
         method: 'POST',
-        body: JSON.stringify({
-          query: `
-            mutation UpdateRoom($zoneId: Int!, $id: Int!, $data: UpdateRoomInput!) {
-              updateRoom(zoneId: $zoneId, id: $id, data: $data) {
-                id
-                name
-                description
-                sector
-                baseLightLevel
-                capacity
-                entryRestriction
-                isPeaceful
-                allowsMagic
-                allowsRecall
-                allowsSummon
-                allowsTeleport
-                isDeathTrap
-                zoneId
-              }
-            }
-          `,
-          variables: {
-            zoneId: activeZoneId,
-            id: selectedRoomId,
-            data: updateInput,
-          },
+        body: graphqlRequestBody(ZoneEditorUpdateRoomDocument, {
+          zoneId: activeZoneId,
+          id: selectedRoomId,
+          data: updateInput,
         }),
       });
 
@@ -1810,15 +1745,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation UpdateRoomPosition($id:Int!,$position:UpdateRoomPositionInput!){ updateRoomPosition(id:$id, position:$position){ id layoutX layoutY layoutZ } }`,
-            variables: {
-              id: selectedRoom.id,
-              position: {
-                layoutX: nextX,
-                layoutY: nextY,
-                layoutZ: nextZ,
-              },
+          body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+            zoneId: selectedRoom.zoneId,
+            id: selectedRoom.id,
+            position: {
+              layoutX: nextX,
+              layoutY: nextY,
+              layoutZ: nextZ,
             },
           }),
         });
@@ -1883,16 +1816,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         const createResponse = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation CreateRoom($data:CreateRoomInput!){ createRoom(data:$data){ id name roomDescription sector } }`,
-            variables: {
-              data: {
-                id: newId,
-                name: tempRoom.name,
-                description: tempRoom.roomDescription || '',
-                sector: tempRoom.sector,
-                zoneId: tempRoom.zoneId,
-              },
+          body: graphqlRequestBody(ZoneEditorCreateRoomDocument, {
+            data: {
+              id: newId,
+              name: tempRoom.name,
+              description: tempRoom.roomDescription || '',
+              sector: tempRoom.sector,
+              zoneId: tempRoom.zoneId,
             },
           }),
         });
@@ -1905,15 +1835,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         roomCreated = true;
         await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation UpdateRoomPosition($id:Int!,$position:UpdateRoomPositionInput!){ updateRoomPosition(id:$id, position:$position){ id layoutX layoutY layoutZ } }`,
-            variables: {
-              id: newId,
-              position: {
-                layoutX: targetX,
-                layoutY: targetY,
-                layoutZ: targetZ,
-              },
+          body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+            zoneId: tempRoom.zoneId,
+            id: newId,
+            position: {
+              layoutX: targetX,
+              layoutY: targetY,
+              layoutZ: targetZ,
             },
           }),
         });
@@ -1925,16 +1853,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         ) => {
           const response = await authenticatedFetch('/graphql', {
             method: 'POST',
-            body: JSON.stringify({
-              query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords keyZoneId keyId flags defaultState hitPoints } }`,
-              variables: {
-                data: {
-                  roomId: fromRoomId,
-                  roomZoneId: selectedRoom.zoneId,
-                  direction: directionName,
-                  toZoneId: selectedRoom.zoneId,
-                  toRoomId,
-                },
+            body: graphqlRequestBody(ZoneEditorCreateRoomExitDocument, {
+              data: {
+                roomId: fromRoomId,
+                roomZoneId: selectedRoom.zoneId,
+                direction: directionName,
+                toZoneId: selectedRoom.zoneId,
+                toRoomId,
               },
             }),
           });
@@ -2307,15 +2232,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation UpdateRoomPosition($id:Int!,$position:UpdateRoomPositionInput!){\n            updateRoomPosition(id:$id, position:$position){ id layoutX layoutY layoutZ }\n          }`,
-            variables: {
-              id: roomId,
-              position: {
-                layoutX: pixelsToGrid(snappedX),
-                layoutY: pixelsToGridY(snappedY),
-                layoutZ: room.layoutZ ?? 0,
-              },
+          body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+            zoneId: room.zoneId,
+            id: roomId,
+            position: {
+              layoutX: pixelsToGrid(snappedX),
+              layoutY: pixelsToGridY(snappedY),
+              layoutZ: room.layoutZ ?? 0,
             },
           }),
         });
@@ -2381,16 +2304,13 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords keyZoneId keyId flags defaultState hitPoints } }`,
-            variables: {
-              data: {
-                roomId: selectedRoom.id,
-                roomZoneId: selectedRoom.zoneId,
-                direction: exitData.direction,
-                toZoneId: exitData.toZoneId,
-                toRoomId: exitData.toRoomId,
-              },
+          body: graphqlRequestBody(ZoneEditorCreateRoomExitDocument, {
+            data: {
+              roomId: selectedRoom.id,
+              roomZoneId: selectedRoom.zoneId,
+              direction: exitData.direction,
+              toZoneId: exitData.toZoneId,
+              toRoomId: exitData.toRoomId,
             },
           }),
         });
@@ -2466,9 +2386,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       try {
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation DeleteRoomExit($exitId:Int!){ deleteRoomExit(exitId:$exitId){ id } }`,
-            variables: { exitId: numericId },
+          body: graphqlRequestBody(ZoneEditorDeleteRoomExitDocument, {
+            exitId: numericId,
           }),
         });
         const json = await response.json();
@@ -2500,30 +2419,25 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         const numericId = parseInt(exitId, 10);
         await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation DeleteRoomExit($exitId:Int!){ deleteRoomExit(exitId:$exitId){ id } }`,
-            variables: { exitId: numericId },
+          body: graphqlRequestBody(ZoneEditorDeleteRoomExitDocument, {
+            exitId: numericId,
           }),
         });
         // Create new exit with updated metadata
         const response = await authenticatedFetch('/graphql', {
           method: 'POST',
-          body: JSON.stringify({
-            query: `mutation CreateRoomExit($data:CreateRoomExitInput!){ createRoomExit(data:$data){ id direction toZoneId toRoomId description keywords keyZoneId keyId flags defaultState hitPoints } }`,
-            variables: {
-              data: {
-                roomId: room.id,
-                roomZoneId: room.zoneId,
-                direction: existing.direction,
-                toZoneId: existing.toZoneId ?? undefined,
-                toRoomId: existing.toRoomId ?? undefined,
-                description:
-                  exitPatch.description ?? existing.description ?? undefined,
-                keywords: exitPatch.keywords ?? existing.keywords ?? undefined,
-                keyZoneId:
-                  exitPatch.keyZoneId ?? existing.keyZoneId ?? undefined,
-                keyId: exitPatch.keyId ?? existing.keyId ?? undefined,
-              },
+          body: graphqlRequestBody(ZoneEditorCreateRoomExitDocument, {
+            data: {
+              roomId: room.id,
+              roomZoneId: room.zoneId,
+              direction: existing.direction,
+              toZoneId: existing.toZoneId ?? undefined,
+              toRoomId: existing.toRoomId ?? undefined,
+              description:
+                exitPatch.description ?? existing.description ?? undefined,
+              keywords: exitPatch.keywords ?? existing.keywords ?? undefined,
+              keyZoneId: exitPatch.keyZoneId ?? existing.keyZoneId ?? undefined,
+              keyId: exitPatch.keyId ?? existing.keyId ?? undefined,
             },
           }),
         });

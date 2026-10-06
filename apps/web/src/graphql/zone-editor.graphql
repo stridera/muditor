@@ -1,0 +1,243 @@
+# Operations used by the visual zone editor, world map and entity panels.
+# Keep these here (not as inline strings) so `bun run codegen` validates them
+# against the API schema.
+
+fragment ZoneEditorExit on RoomExitDto {
+  id
+  direction
+  toZoneId
+  toRoomId
+  description
+  keywords
+  keyZoneId
+  keyId
+  flags
+  defaultState
+  hitPoints
+}
+
+query ZoneEditorGetRooms($zoneId: Int!, $lightweight: Boolean) {
+  zones {
+    id
+    name
+    climate
+  }
+  roomsByZone(zoneId: $zoneId, lightweight: $lightweight) {
+    id
+    zoneId
+    name
+    description
+    roomDescription
+    sector
+    layoutX
+    layoutY
+    layoutZ
+    baseLightLevel
+    capacity
+    entryRestriction
+    isPeaceful
+    allowsMagic
+    allowsRecall
+    allowsSummon
+    allowsTeleport
+    isDeathTrap
+    exits {
+      ...ZoneEditorExit
+    }
+    mobs {
+      id
+      name
+      level
+      roomDescription
+    }
+    objects {
+      id
+      name
+      roomDescription
+    }
+    shops {
+      id
+      buyProfit
+      sellProfit
+      keeperId
+      flags
+    }
+  }
+}
+
+query ZoneEditorWorldMap($take: Int) {
+  zones {
+    id
+    name
+    climate
+  }
+  rooms(lightweight: true, take: $take) {
+    id
+    name
+    sector
+    zoneId
+    layoutX
+    layoutY
+    layoutZ
+    exits {
+      id
+      direction
+      toZoneId
+      toRoomId
+    }
+  }
+}
+
+query ZoneEditorAllZones {
+  zones {
+    id
+    name
+    climate
+  }
+}
+
+query ZoneEditorAllRooms($lightweight: Boolean) {
+  rooms(take: 15000, lightweight: $lightweight) {
+    id
+    name
+    sector
+    zoneId
+    layoutX
+    layoutY
+    layoutZ
+    exits {
+      id
+      direction
+      toZoneId
+      toRoomId
+    }
+  }
+}
+
+query WorldMapCanvasData($take: Int) {
+  zones {
+    id
+    name
+  }
+  rooms(lightweight: true, take: $take) {
+    id
+    zoneId
+    name
+    layoutX
+    layoutY
+    sector
+  }
+}
+
+query ZoneDetail($id: Int!) {
+  zone(id: $id) {
+    id
+    name
+    lifespan
+    climate
+    resetMode
+    hemisphere
+    _count {
+      rooms
+      mobs
+      objects
+      shops
+    }
+  }
+}
+
+mutation ZoneEditorUpdateRoom(
+  $zoneId: Int!
+  $id: Int!
+  $data: UpdateRoomInput!
+) {
+  updateRoom(zoneId: $zoneId, id: $id, data: $data) {
+    id
+    name
+    description
+    sector
+    baseLightLevel
+    capacity
+    entryRestriction
+    isPeaceful
+    allowsMagic
+    allowsRecall
+    allowsSummon
+    allowsTeleport
+    isDeathTrap
+    zoneId
+  }
+}
+
+mutation ZoneEditorUpdateRoomPosition(
+  $zoneId: Int!
+  $id: Int!
+  $position: UpdateRoomPositionInput!
+) {
+  updateRoomPosition(zoneId: $zoneId, id: $id, position: $position) {
+    id
+    zoneId
+    layoutX
+    layoutY
+    layoutZ
+  }
+}
+
+mutation ZoneEditorBatchUpdateRoomPositions(
+  $input: BatchUpdateRoomPositionsInput!
+) {
+  batchUpdateRoomPositions(input: $input) {
+    updatedCount
+    errors
+  }
+}
+
+mutation ZoneEditorCreateRoom($data: CreateRoomInput!) {
+  createRoom(data: $data) {
+    id
+    zoneId
+    name
+    roomDescription
+    sector
+  }
+}
+
+mutation ZoneEditorCreateRoomExit($data: CreateRoomExitInput!) {
+  createRoomExit(data: $data) {
+    ...ZoneEditorExit
+  }
+}
+
+mutation ZoneEditorDeleteRoomExit($exitId: Float!) {
+  deleteRoomExit(exitId: $exitId) {
+    id
+  }
+}
+
+mutation EntityPanelUpdateMob(
+  $id: Int!
+  $zoneId: Int!
+  $data: UpdateMobInput!
+) {
+  updateMob(id: $id, zoneId: $zoneId, data: $data) {
+    id
+    name
+    level
+    roomDescription
+    examineDescription
+  }
+}
+
+mutation EntityPanelUpdateObject(
+  $id: Int!
+  $zoneId: Int!
+  $data: UpdateObjectInput!
+) {
+  updateObject(id: $id, zoneId: $zoneId, data: $data) {
+    id
+    name
+    level
+    roomDescription
+    examineDescription
+  }
+}

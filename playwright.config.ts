@@ -52,20 +52,22 @@ export default defineConfig({
   ],
 
   /* Run your local dev servers before starting the tests */
-  webServer: [
-    {
-      command: 'bun run dev:api',
-      url: 'http://localhost:3001/graphql',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-    {
-      command: 'bun run dev:web',
-      url: 'http://localhost:3000',
-      reuseExistingServer: !process.env.CI,
-      timeout: 120 * 1000,
-    },
-  ],
+  webServer: process.env.E2E_NO_WEBSERVER
+    ? undefined
+    : [
+        {
+          command: 'bun run dev:api',
+          url: 'http://localhost:3001/graphql',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120 * 1000,
+        },
+        {
+          command: 'bun run dev:web',
+          url: 'http://localhost:3000',
+          reuseExistingServer: !process.env.CI,
+          timeout: 120 * 1000,
+        },
+      ],
 
   /* Global setup and teardown */
   // globalSetup: './tests/setup/global-setup.ts',

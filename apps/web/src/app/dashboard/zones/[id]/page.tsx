@@ -2,8 +2,13 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { ClimateBadge } from '@/components/ui/climate-badge';
+import {
+  authenticatedFetch,
+  graphqlRequestBody,
+} from '@/lib/authenticated-fetch';
 import { EditZoneModal } from '@/components/zones/edit-zone-modal';
 import {
+  ZoneDetailDocument,
   type Climate,
   type Hemisphere,
   type ResetMode,
@@ -45,31 +50,12 @@ function ZoneDetailContent() {
 
   const fetchZone = useCallback(async () => {
     try {
-      const response = await fetch(
+      const response = await authenticatedFetch(
         process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
         {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            query: `
-              query GetZone($id: Int!) {
-                zone(id: $id) {
-                  id
-                  name
-                  lifespan
-                  climate
-                  resetMode
-                  hemisphere
-                  _count {
-                    rooms
-                    mobs
-                    objects
-                    shops
-                  }
-                }
-              }
-            `,
-            variables: { id: parseInt(zoneId) },
+          body: graphqlRequestBody(ZoneDetailDocument, {
+            id: parseInt(zoneId),
           }),
         }
       );

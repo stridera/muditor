@@ -2,7 +2,11 @@ import 'reflect-metadata';
 import type { ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GrantPermission, UserRole } from '@muditor/db';
-import { ZONE_SCOPE_KEY, ZonePermissionGuard } from './zone-permission.guard';
+import {
+  NO_ZONE_GRANTS_MESSAGE,
+  ZONE_SCOPE_KEY,
+  ZonePermissionGuard,
+} from './zone-permission.guard';
 import type { ZoneScopeOptions } from './zone-permission.guard';
 
 describe('ZonePermissionGuard', () => {
@@ -12,6 +16,7 @@ describe('ZonePermissionGuard', () => {
       async (_userId: string, zoneId: number, _perm: GrantPermission) =>
         grantedZones.has(zoneId)
     ),
+    hasAnyZoneGrants: jest.fn(async (_userId: string) => true),
   };
   const db = {
     roomExit: { findUnique: jest.fn() },
@@ -70,6 +75,38 @@ describe('ZonePermissionGuard', () => {
       30,
       GrantPermission.WRITE
     );
+  });
+
+  it('gives an explicit error when a BUILDER has no zone grants at all', async () => {
+    grants.hasAnyZoneGrants.mockResolvedValueOnce(false);
+    await expect(
+      guard.canActivate(ctx(UserRole.BUILDER, { zoneId: 31 }))
+    ).rejects.toThrow(NO_ZONE_GRANTS_MESSAGE);
+    expect(NO_ZONE_GRANTS_MESSAGE).toBe(
+      'No zone grants assigned — ask an implementor'
+    );
+  });
+
+  it('checks every zone key (e.g. trigger zone plus target mob zone)', async () => {
+    const opts = { keys: ['triggerZoneId', 'mobZoneId', 'objectZoneId'] };
+    expect(
+      await guard.canActivate(
+        ctx(
+          UserRole.BUILDER,
+          { input: { triggerZoneId: 31, mobZoneId: 30, mobId: 1 } },
+          opts
+        )
+      )
+    ).toBe(false);
+    expect(
+      await guard.canActivate(
+        ctx(
+          UserRole.BUILDER,
+          { input: { triggerZoneId: 30, mobZoneId: 30, mobId: 1 } },
+          opts
+        )
+      )
+    ).toBe(true);
   });
 
   it('reads the zone from input objects (data.zoneId / input.zoneId)', async () => {

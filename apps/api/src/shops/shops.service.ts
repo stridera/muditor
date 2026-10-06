@@ -306,5 +306,4 @@ export class ShopsService {
     }
     return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
   }
-
 }

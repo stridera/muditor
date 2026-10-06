@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { authenticatedGraphQLFetch } from '@/lib/authenticated-fetch';
+import { WorldMapCanvasDataDocument } from '@/generated/graphql';
 import {
   gridToPixels,
   gridToPixelsY,
@@ -121,23 +122,10 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
       onLoadingChange(true);
       try {
         const result = await authenticatedGraphQLFetch(
-          `
-            query WorldMapData($take: Int) {
-              zones {
-                id
-                name
-              }
-              rooms(lightweight: true, take: $take) {
-                id
-                zoneId
-                name
-                layoutX
-                layoutY
-                sector
-              }
-            }
-          `,
-          { take: 120000 }
+          WorldMapCanvasDataDocument,
+          {
+            take: 120000,
+          }
         );
 
         console.log('GraphQL response:', result);

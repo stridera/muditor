@@ -1,0 +1,36 @@
+# Zone grant administration (CODER / IMPLEMENTOR UI)
+
+query GrantsAdminUsers {
+  users {
+    id
+    displayName
+    role
+  }
+}
+
+query GrantsAdminZoneGrants {
+  grants(resourceType: ZONE) {
+    id
+    userId
+    resourceId
+    permissions
+    displayName
+    grantedByDisplayName
+    grantedAt
+    expiresAt
+    notes
+  }
+}
+
+mutation CreateZoneGrant($data: CreateGrantInput!) {
+  createGrant(data: $data) {
+    id
+    userId
+    resourceId
+    permissions
+  }
+}
+
+mutation DeleteZoneGrant($id: ID!) {
+  deleteGrant(id: $id)
+}

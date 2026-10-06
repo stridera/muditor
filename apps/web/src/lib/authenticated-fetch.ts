@@ -1,3 +1,5 @@
+import { print, type DocumentNode } from 'graphql';
+
 export function getAuthHeaders(): HeadersInit {
   const token =
     typeof window !== 'undefined' ? localStorage.getItem('auth-token') : null;
@@ -23,18 +25,29 @@ export async function authenticatedFetch(
   });
 }
 
+/**
+ * Serialize a codegen-generated document (or raw string) plus variables into
+ * a GraphQL-over-HTTP JSON request body.
+ */
+export function graphqlRequestBody(
+  query: string | DocumentNode,
+  variables?: unknown
+): string {
+  return JSON.stringify({
+    query: typeof query === 'string' ? query : print(query),
+    variables,
+  });
+}
+
 export async function authenticatedGraphQLFetch(
-  query: string,
+  query: string | DocumentNode,
   variables?: any
 ): Promise<any> {
   const response = await authenticatedFetch(
     process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
     {
       method: 'POST',
-      body: JSON.stringify({
-        query,
-        variables,
-      }),
+      body: graphqlRequestBody(query, variables),
     }
   );
 

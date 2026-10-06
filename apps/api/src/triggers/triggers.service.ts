@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma, ScriptType, TriggerFlag } from '@muditor/db';
 import { lintLua, lintLuaWithEntities } from '@muditor/types';
 import type { EntityDatabase } from '@muditor/types';
@@ -312,16 +316,39 @@ export class TriggersService {
     });
   }
 
-  async detachFromEntity(zoneId: number, id: number, userId?: string) {
-    // Remove all junction rows for this trigger.
-    await Promise.all([
-      this.prisma.mobTriggers.deleteMany({
-        where: { triggerZoneId: zoneId, triggerId: id },
-      }),
-      this.prisma.objectTriggers.deleteMany({
-        where: { triggerZoneId: zoneId, triggerId: id },
-      }),
-    ]);
+  /**
+   * Detach a trigger from exactly one entity. The delete is scoped to the
+   * given mob or object key so the trigger stays attached everywhere else.
+   */
+  async detachFromEntity(
+    zoneId: number,
+    id: number,
+    entity: {
+      mobZoneId?: number | null | undefined;
+      mobId?: number | null | undefined;
+      objectZoneId?: number | null | undefined;
+      objectId?: number | null | undefined;
+    },
+    userId?: string
+  ) {
+    const { mobZoneId, mobId, objectZoneId, objectId } = entity;
+    const hasMob = mobZoneId != null && mobId != null;
+    const hasObject = objectZoneId != null && objectId != null;
+    if (hasMob === hasObject) {
+      throw new BadRequestException(
+        'Specify exactly one entity to detach from: mobZoneId+mobId or objectZoneId+objectId'
+      );
+    }
+
+    if (mobZoneId != null && mobId != null) {
+      await this.prisma.mobTriggers.deleteMany({
+        where: { triggerZoneId: zoneId, triggerId: id, mobZoneId, mobId },
+      });
+    } else if (objectZoneId != null && objectId != null) {
+      await this.prisma.objectTriggers.deleteMany({
+        where: { triggerZoneId: zoneId, triggerId: id, objectZoneId, objectId },
+      });
+    }
 
     const data: Prisma.TriggersUncheckedUpdateInput = {};
     if (userId !== undefined) data.updatedBy = userId;

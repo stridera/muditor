@@ -1,4 +1,11 @@
-import { authenticatedFetch } from '@/lib/authenticated-fetch';
+import {
+  authenticatedFetch,
+  graphqlRequestBody,
+} from '@/lib/authenticated-fetch';
+import {
+  EntityPanelUpdateMobDocument,
+  EntityPanelUpdateObjectDocument,
+} from '@/generated/graphql';
 
 interface UpdateMobInput {
   id: number;
@@ -44,9 +51,10 @@ export async function updateMob(input: UpdateMobInput) {
     process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
     {
       method: 'POST',
-      body: JSON.stringify({
-        query: `mutation UpdateMob($id: Int!, $zoneId: Int!, $data: UpdateMobInput!) {\n  updateMob(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
-        variables: { id, zoneId, data: gqlInput },
+      body: graphqlRequestBody(EntityPanelUpdateMobDocument, {
+        id,
+        zoneId,
+        data: gqlInput,
       }),
     }
   );
@@ -72,9 +80,10 @@ export async function updateObject(input: UpdateObjectInput) {
     process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
     {
       method: 'POST',
-      body: JSON.stringify({
-        query: `mutation UpdateObject($id: Int!, $zoneId: Int!, $data: UpdateObjectInput!) {\n  updateObject(id: $id, zoneId: $zoneId, data: $data) {\n    id\n    name\n    level\n    roomDescription\n    examineDescription\n  }\n}`,
-        variables: { id, zoneId, data: gqlInput },
+      body: graphqlRequestBody(EntityPanelUpdateObjectDocument, {
+        id,
+        zoneId,
+        data: gqlInput,
       }),
     }
   );

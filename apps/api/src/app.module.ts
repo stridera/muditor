@@ -36,18 +36,27 @@ import * as jwt from 'jsonwebtoken';
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: ['.env', '../../.env', '../../.env.development'],
+      // .env.development is a dev-only file: never load it in production
+      envFilePath:
+        process.env.NODE_ENV === 'production'
+          ? ['.env', '../../.env']
+          : ['.env', '../../.env', '../../.env.development'],
     }),
     CommonModule,
     GraphQLModule.forRoot<ApolloDriverConfig>({
       driver: ApolloDriver,
       autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
       sortSchema: true,
-      playground: process.env.GRAPHQL_PLAYGROUND === 'true',
+      // Never enabled in production, regardless of GRAPHQL_PLAYGROUND
+      playground:
+        process.env.NODE_ENV !== 'production' &&
+        process.env.GRAPHQL_PLAYGROUND === 'true',
       // Introspection (Apollo Sandbox) only outside production
       introspection: process.env.NODE_ENV !== 'production',
       validationRules: [depthLimit(MAX_QUERY_DEPTH)],
-      debug: process.env.GRAPHQL_DEBUG === 'true',
+      debug:
+        process.env.NODE_ENV !== 'production' &&
+        process.env.GRAPHQL_DEBUG === 'true',
       context: ({ req, res }: { req: Request; res: Response }) => ({
         req,
         res,

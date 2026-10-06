@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test';
 
-const API_URL = 'http://localhost:3001/graphql';
+const API_URL = process.env.E2E_API_URL ?? 'http://localhost:3001/graphql';
 
 /**
  * Integration test for character linking and role recalculation
@@ -34,7 +34,7 @@ test.describe('Character Linking and Role Recalculation', () => {
           mutation {
             register(input: {
               email: "${userEmail}",
-              username: "test${shortId}",
+              displayName: "test${shortId}",
               password: "Test12345"
             }) {
               accessToken

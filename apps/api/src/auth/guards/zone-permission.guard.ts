@@ -1,4 +1,5 @@
 import {
+  ForbiddenException,
   Injectable,
   type CanActivate,
   type ExecutionContext,
@@ -44,6 +45,9 @@ const BYPASS_ROLES: UserRole[] = [
 ];
 
 const MAX_DEPTH = 5;
+
+export const NO_ZONE_GRANTS_MESSAGE =
+  'No zone grants assigned — ask an implementor';
 
 /**
  * Guard that checks zone-based write permissions using UserGrants.
@@ -103,7 +107,14 @@ export class ZonePermissionGuard implements CanActivate {
         zoneId,
         GrantPermission.WRITE
       );
-      if (!allowed) return false;
+      if (!allowed) {
+        // Explicit (not silent) diagnosis for the common day-one case: a
+        // builder who was never given any zone grants.
+        if (!(await this.grants.hasAnyZoneGrants(user.id))) {
+          throw new ForbiddenException(NO_ZONE_GRANTS_MESSAGE);
+        }
+        return false;
+      }
     }
     return true;
   }

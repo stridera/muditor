@@ -78,8 +78,22 @@ mutation AttachTrigger($input: AttachTriggerInput!) {
   }
 }
 
-mutation DetachTrigger($zoneId: Int!, $id: Int!) {
-  detachTrigger(zoneId: $zoneId, id: $id) {
+mutation DetachTrigger(
+  $zoneId: Int!
+  $id: Int!
+  $mobZoneId: Int
+  $mobId: Int
+  $objectZoneId: Int
+  $objectId: Int
+) {
+  detachTrigger(
+    zoneId: $zoneId
+    id: $id
+    mobZoneId: $mobZoneId
+    mobId: $mobId
+    objectZoneId: $objectZoneId
+    objectId: $objectId
+  ) {
     id
     zoneId
   }

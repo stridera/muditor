@@ -176,7 +176,8 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @RequireZoneWrite()
+  // The keeper mob's zone must be writable as well as the shop's zone.
+  @RequireZoneWrite({ keys: ['zoneId', 'keeperZoneId'] })
   async createShop(@Args('data') data: CreateShopInput): Promise<ShopDto> {
     const shop = await this.shopsService.create({
       id: data.id,

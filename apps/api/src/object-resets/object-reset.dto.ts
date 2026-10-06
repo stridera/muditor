@@ -82,4 +82,3 @@ export class UpdateObjectResetInput {
   @Max(1.0, { message: 'Probability must be between 0.0 and 1.0' })
   probability?: number;
 }
-

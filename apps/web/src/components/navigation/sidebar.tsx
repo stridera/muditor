@@ -291,6 +291,13 @@ export function Sidebar() {
       icon: <Settings className='h-4 w-4' />,
     });
   }
+  if (isCoder) {
+    adminItems.push({
+      name: 'Zone Grants',
+      href: '/dashboard/admin/grants',
+      icon: <Shield className='h-4 w-4' />,
+    });
+  }
   adminItems.push({
     name: 'Console',
     href: '/dashboard/admin/console',

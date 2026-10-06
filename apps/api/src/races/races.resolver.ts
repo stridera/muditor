@@ -18,21 +18,18 @@ import { RacesService } from './races.service';
 export class RacesResolver {
   constructor(private readonly racesService: RacesService) {}
 
-  // Race Queries - IMMORTAL+ can view
+  // Race Queries - any authenticated user can read (needed by the player character-creation form)
   @Query(() => [RaceDto], { name: 'races' })
-  @MinimumRole(UserRole.IMMORTAL)
   async findAll() {
     return this.racesService.findAll();
   }
 
   @Query(() => RaceDto, { name: 'race' })
-  @MinimumRole(UserRole.IMMORTAL)
   async findOne(@Args('race', { type: () => Race }) race: Race) {
     return this.racesService.findOne(race);
   }
 
   @Query(() => Int, { name: 'racesCount' })
-  @MinimumRole(UserRole.IMMORTAL)
   async count() {
     return this.racesService.count();
   }
@@ -67,7 +64,6 @@ export class RacesResolver {
     name: 'raceSkills',
     description: 'Get all skills for a race',
   })
-  @MinimumRole(UserRole.IMMORTAL)
   async getRaceSkills(@Args('race', { type: () => Race }) race: Race) {
     return this.racesService.getRaceSkills(race);
   }

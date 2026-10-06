@@ -120,8 +120,22 @@ const ATTACH_TRIGGER = gql`
 `;
 
 const DETACH_TRIGGER = gql`
-  mutation DetachTriggerInline($zoneId: Int!, $id: Int!) {
-    detachTrigger(zoneId: $zoneId, id: $id) {
+  mutation DetachTriggerInline(
+    $zoneId: Int!
+    $id: Int!
+    $mobZoneId: Int
+    $mobId: Int
+    $objectZoneId: Int
+    $objectId: Int
+  ) {
+    detachTrigger(
+      zoneId: $zoneId
+      id: $id
+      mobZoneId: $mobZoneId
+      mobId: $mobId
+      objectZoneId: $objectZoneId
+      objectId: $objectId
+    ) {
       id
       zoneId
       name
@@ -331,8 +345,18 @@ export default function TriggerManager({
 
   const handleDetachTrigger = async (trigger: TriggerData) => {
     try {
+      // The API detaches from exactly one entity: pass the one being edited.
       await detachTrigger({
-        variables: { zoneId: trigger.zoneId, id: trigger.id },
+        variables: {
+          zoneId: trigger.zoneId,
+          id: trigger.id,
+          ...(entityType === 'MOB'
+            ? { mobZoneId: entityZoneId, mobId: entityId }
+            : {}),
+          ...(entityType === 'OBJECT'
+            ? { objectZoneId: entityZoneId, objectId: entityId }
+            : {}),
+        },
       });
       refetchAttached();
       refetchAll();

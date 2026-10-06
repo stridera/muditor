@@ -1,6 +1,20 @@
 import { Injectable } from '@nestjs/common';
 import { UserRole } from '@muditor/db';
 import { DatabaseService } from '../../database/database.service';
+import { roleAtLeast } from '../../auth/role.util';
+
+/**
+ * Pure level -> role mapping (see class doc for the table). Exported so
+ * resolvers can authorize level changes without a DB-backed service.
+ */
+export function calculateRoleFromLevel(level: number): UserRole {
+  if (level < 100) return UserRole.PLAYER;
+  if (level === 100) return UserRole.IMMORTAL;
+  if (level >= 101 && level <= 102) return UserRole.BUILDER;
+  if (level === 103) return UserRole.HEAD_BUILDER;
+  if (level === 104) return UserRole.CODER;
+  return UserRole.IMPLEMENTOR; // 105+
+}
 
 /**
  * Service responsible for calculating user roles based on character levels
@@ -21,15 +35,7 @@ export class RoleCalculatorService {
    * Calculate role from character level
    */
   calculateRoleFromLevel(level: number): UserRole {
-    if (level < 100) return UserRole.PLAYER;
-    if (level === 100) return UserRole.IMMORTAL;
-    if (level >= 101 && level <= 102) return UserRole.BUILDER;
-    if (level === 103) return UserRole.HEAD_BUILDER;
-    if (level === 104) return UserRole.CODER;
-    if (level >= 105) return UserRole.IMPLEMENTOR;
-
-    // Fallback (should never reach here)
-    return UserRole.PLAYER;
+    return calculateRoleFromLevel(level);
   }
 
   /**
@@ -51,18 +57,38 @@ export class RoleCalculatorService {
   }
 
   /**
-   * Update user's role based on their characters
-   * Called after character link/unlink operations
+   * Update user's role based on their characters.
+   *
+   * Escalation rule: recalculation only ever LOWERS a role automatically.
+   * A raise is applied only when the caller passes `allowRaise: true`, which
+   * is reserved for `linkCharacterToUser` (the user proves ownership of a
+   * legacy character with its password). Unlink and every other trigger
+   * (character create/update by staff) can never promote anyone, so staff
+   * cannot mint a high-level character and then link/unlink it to escalate.
    */
-  async updateUserRole(userId: string): Promise<UserRole> {
-    const newRole = await this.calculateRoleFromCharacters(userId);
+  async updateUserRole(
+    userId: string,
+    options: { allowRaise?: boolean } = {}
+  ): Promise<UserRole> {
+    const calculated = await this.calculateRoleFromCharacters(userId);
+    const user = await this.db.users.findUnique({
+      where: { id: userId },
+      select: { role: true },
+    });
+    if (!user) return calculated;
+
+    const isRaise = !roleAtLeast(user.role, calculated);
+    if (isRaise && !options.allowRaise) {
+      return user.role;
+    }
+    if (calculated === user.role) return user.role;
 
     await this.db.users.update({
       where: { id: userId },
-      data: { role: newRole },
+      data: { role: calculated },
     });
 
-    return newRole;
+    return calculated;
   }
 
   /**

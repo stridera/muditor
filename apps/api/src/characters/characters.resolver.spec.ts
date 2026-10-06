@@ -145,6 +145,65 @@ describe('CharactersResolver authorization', () => {
     });
   });
 
+  describe('role escalation via level', () => {
+    const implementor = user('impl-1', UserRole.IMPLEMENTOR);
+
+    it('forbids an IMMORTAL creating a level-105 character', async () => {
+      await expect(
+        resolver.createCharacter(
+          { name: 'Rise', level: 105 } as CreateCharacterInput,
+          immortal
+        )
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.createCharacter).not.toHaveBeenCalled();
+    });
+
+    it('forbids an IMMORTAL updating a character to level 101', async () => {
+      await expect(
+        resolver.updateCharacter(
+          'c1',
+          { level: 101 } as UpdateCharacterInput,
+          immortal
+        )
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.updateCharacter).not.toHaveBeenCalled();
+    });
+
+    it('forbids a non-IMPLEMENTOR setting level >= 100 even if the role fits', async () => {
+      const coder = user('coder-1', UserRole.CODER);
+      await expect(
+        resolver.updateCharacter(
+          'c1',
+          { level: 104 } as UpdateCharacterInput,
+          coder
+        )
+      ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('allows an IMMORTAL to set a sub-staff level', async () => {
+      await resolver.updateCharacter(
+        'c1',
+        { level: 50 } as UpdateCharacterInput,
+        immortal
+      );
+      expect(service.updateCharacter).toHaveBeenCalled();
+    });
+
+    it('allows an IMPLEMENTOR to create and update at level 105', async () => {
+      await resolver.createCharacter(
+        { name: 'Rise', level: 105 } as CreateCharacterInput,
+        implementor
+      );
+      await resolver.updateCharacter(
+        'c1',
+        { level: 105 } as UpdateCharacterInput,
+        implementor
+      );
+      expect(service.createCharacter).toHaveBeenCalled();
+      expect(service.updateCharacter).toHaveBeenCalled();
+    });
+  });
+
   describe('item / effect mutations', () => {
     it('forbids PLAYER from minting items, even on their own character', () => {
       expect(() =>
