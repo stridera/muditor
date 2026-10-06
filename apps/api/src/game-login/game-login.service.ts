@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ConflictException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -36,9 +37,12 @@ function formatCode(code: string): string {
 
 function toDto(
   row: GameLoginCode,
-  lockedUntil: Date | null = null
+  lockedUntil: Date | null = null,
+  characterHasPassword = true
 ): GameLoginCodeDto {
   return {
+    linkRequired: row.userId === null,
+    characterHasPassword,
     accountLocked: !!lockedUntil && lockedUntil.getTime() > Date.now(),
     lockedUntil,
     code: formatCode(row.code),
@@ -112,8 +116,10 @@ export class GameLoginService implements OnModuleInit, OnModuleDestroy {
 
   /**
    * Find a PENDING, unexpired code visible to the caller. Anything else
-   * (unknown, expired, already used, owned by another user or by nobody) is
-   * NotFound so the existence of a code is never leaked.
+   * (unknown, expired, already used, owned by another user) is NotFound so the
+   * existence of a code is never leaked. A code with no userId is visible to
+   * any caller while its character still exists and is unlinked; `character`
+   * is then that character (the caller must link it to approve).
    */
   private async findVisible(rawCode: string, callerId: string) {
     this.throttle(callerId);
@@ -122,12 +128,27 @@ export class GameLoginService implements OnModuleInit, OnModuleDestroy {
     if (
       !row ||
       row.status !== GameLoginCodeStatus.PENDING ||
-      row.expiresAt.getTime() <= Date.now() ||
-      row.userId !== callerId
+      row.expiresAt.getTime() <= Date.now()
     ) {
       throw new NotFoundException('Code not found or expired');
     }
-    return row;
+    if (row.userId !== null) {
+      if (row.userId !== callerId) {
+        throw new NotFoundException('Code not found or expired');
+      }
+      return { row, character: null };
+    }
+    const character = await this.db.characters.findFirst({
+      where: {
+        name: { equals: row.characterName, mode: 'insensitive' },
+        userId: null,
+      },
+      select: { name: true, passwordHash: true },
+    });
+    if (!character) {
+      throw new NotFoundException('Code not found or expired');
+    }
+    return { row, character };
   }
 
   private async lockedUntilOf(userId: string): Promise<Date | null> {
@@ -189,13 +210,97 @@ export class GameLoginService implements OnModuleInit, OnModuleDestroy {
   }
 
   async lookup(rawCode: string, callerId: string): Promise<GameLoginCodeDto> {
-    const row = await this.findVisible(rawCode, callerId);
-    return toDto(row, await this.lockedUntilOf(callerId));
+    const { row, character } = await this.findVisible(rawCode, callerId);
+    return toDto(
+      row,
+      await this.lockedUntilOf(callerId),
+      character ? !!character.passwordHash : true
+    );
   }
 
-  async approve(rawCode: string, callerId: string): Promise<GameLoginCodeDto> {
-    const row = await this.findVisible(rawCode, callerId);
+  /**
+   * Approve a pending code. For a code whose character is not yet linked to
+   * any account (row.userId null), the caller must supply the character's game
+   * password; on success the character is linked to the caller and the code is
+   * approved in one transaction.
+   */
+  async approve(
+    rawCode: string,
+    callerId: string,
+    characterPassword?: string | null
+  ): Promise<GameLoginCodeDto> {
+    const { row, character } = await this.findVisible(rawCode, callerId);
     const now = new Date();
+
+    if (character) {
+      if (!character.passwordHash) {
+        throw new BadRequestException(
+          'This character has no password; contact staff to link it.'
+        );
+      }
+      if (!characterPassword) {
+        throw new BadRequestException(
+          "Enter the character's game password to link it"
+        );
+      }
+      await this.characters.verifyCharacterPasswordForLink(
+        row.characterName,
+        characterPassword
+      );
+      await this.db.$transaction(async tx => {
+        const linked = await tx.characters.updateMany({
+          where: {
+            name: { equals: row.characterName, mode: 'insensitive' },
+            userId: null,
+          },
+          data: { userId: callerId },
+        });
+        if (linked.count !== 1) {
+          throw new ConflictException(
+            'This character is already linked to an account'
+          );
+        }
+        const approved = await tx.gameLoginCode.updateMany({
+          where: {
+            id: row.id,
+            status: GameLoginCodeStatus.PENDING,
+            expiresAt: { gt: now },
+          },
+          data: {
+            userId: callerId,
+            status: GameLoginCodeStatus.APPROVED,
+            approvedAt: now,
+            approvedByUserId: callerId,
+          },
+        });
+        if (approved.count !== 1) {
+          throw new NotFoundException('Code not found or expired');
+        }
+      });
+      // The claim is committed; failures here must not surface as errors.
+      try {
+        await this.characters.clearFailedAttempts(row.characterName);
+        await this.characters.refreshRoleAfterLink(callerId);
+      } catch (err) {
+        this.logger.warn(
+          `Post-link cleanup failed for ${row.characterName}: ${err instanceof Error ? err.message : String(err)}`
+        );
+      }
+      this.logger.log(
+        `Game login ${row.id} approved by user ${callerId}; linked character ${row.characterName}`
+      );
+      return toDto(
+        {
+          ...row,
+          userId: callerId,
+          status: GameLoginCodeStatus.APPROVED,
+          approvedAt: now,
+          approvedByUserId: callerId,
+        },
+        await this.lockedUntilOf(callerId)
+      );
+    }
+
     const result = await this.db.gameLoginCode.updateMany({
       where: {
         id: row.id,
@@ -224,7 +329,12 @@ export class GameLoginService implements OnModuleInit, OnModuleDestroy {
   }
 
   async deny(rawCode: string, callerId: string): Promise<boolean> {
-    const row = await this.findVisible(rawCode, callerId);
+    const { row } = await this.findVisible(rawCode, callerId);
+    // Unlinked-character codes (userId null) are visible but not deniable:
+    // anyone could otherwise kill a legitimate owner's pending login.
+    if (row.userId !== callerId) {
+      throw new NotFoundException('Code not found or expired');
+    }
     const result = await this.db.gameLoginCode.updateMany({
       where: { id: row.id, status: GameLoginCodeStatus.PENDING },
       data: { status: GameLoginCodeStatus.DENIED },

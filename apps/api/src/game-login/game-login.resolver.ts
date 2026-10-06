@@ -28,15 +28,18 @@ export class GameLoginResolver {
   }
 
   @Mutation(() => GameLoginCodeDto, {
-    description: 'Approve a pending game login for one of your characters',
+    description:
+      'Approve a pending game login for one of your characters. For a character not yet linked to any account, characterPassword (its game password) is required and the character is linked to you',
   })
   @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   @MinimumRole(UserRole.PLAYER)
   async approveGameLogin(
     @Args('code') code: string,
+    @Args('characterPassword', { type: () => String, nullable: true })
+    characterPassword: string | null | undefined,
     @CurrentUser() user: Users
   ) {
-    return this.gameLogin.approve(code, user.id);
+    return this.gameLogin.approve(code, user.id, characterPassword);
   }
 
   @Mutation(() => Boolean, {

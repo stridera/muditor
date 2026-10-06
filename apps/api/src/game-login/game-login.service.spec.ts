@@ -1,5 +1,9 @@
 import 'reflect-metadata';
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { GameLoginCodeStatus, UserRole } from '@muditor/db';
 import * as bcrypt from 'bcrypt';
@@ -47,10 +51,17 @@ describe('GameLoginService', () => {
   let charactersService: {
     getLockoutRemaining: jest.Mock;
     clearFailedAttempts: jest.Mock;
+    verifyCharacterPasswordForLink: jest.Mock;
+    refreshRoleAfterLink: jest.Mock;
   };
   let db: {
     users: { findUnique: jest.Mock; update: jest.Mock };
-    characters: { updateMany: jest.Mock; findMany: jest.Mock };
+    characters: {
+      updateMany: jest.Mock;
+      findMany: jest.Mock;
+      findFirst: jest.Mock;
+    };
+    $transaction: jest.Mock;
     gameLoginCode: {
       findUnique: jest.Mock;
       updateMany: jest.Mock;
@@ -62,16 +73,27 @@ describe('GameLoginService', () => {
     jest.resetAllMocks();
     db = {
       users: { findUnique: jest.fn(), update: jest.fn() },
-      characters: { updateMany: jest.fn(), findMany: jest.fn() },
+      characters: {
+        updateMany: jest.fn(),
+        findMany: jest.fn(),
+        findFirst: jest.fn(),
+      },
       gameLoginCode: {
         findUnique: jest.fn(),
         updateMany: jest.fn(),
         deleteMany: jest.fn(),
       },
+      // Run the callback against the same mocked tables.
+      $transaction: jest.fn(),
     };
+    db.$transaction.mockImplementation((cb: (tx: unknown) => unknown) =>
+      cb(db)
+    );
     charactersService = {
       getLockoutRemaining: jest.fn().mockResolvedValue(0),
       clearFailedAttempts: jest.fn().mockResolvedValue(undefined),
+      verifyCharacterPasswordForLink: jest.fn().mockResolvedValue({}),
+      refreshRoleAfterLink: jest.fn().mockResolvedValue(undefined),
     };
     service = new GameLoginService(
       db as unknown as DatabaseService,
@@ -177,7 +199,7 @@ describe('GameLoginService', () => {
       expect(normalizeGameLoginCode(' ab cd-ef gh ')).toBe('ABCDEFGH');
     });
 
-    it('is not found when the code has no resolved user', async () => {
+    it('is not found when the code has no user and no unlinked character', async () => {
       db.gameLoginCode.findUnique.mockResolvedValue(makeRow({ userId: null }));
       await expect(service.approve('ABCD-EFGH', 'user-1')).rejects.toThrow(
         NotFoundException
@@ -244,19 +266,205 @@ describe('GameLoginService', () => {
   });
 
   describe('deny / lookup visibility', () => {
-    it('deny does not work on a code with null userId', async () => {
+    it('deny cannot touch an unlinked-character code (NotFound)', async () => {
       db.gameLoginCode.findUnique.mockResolvedValue(makeRow({ userId: null }));
+      db.characters.findFirst.mockResolvedValue({
+        name: 'Strider',
+        passwordHash: '$2b$x',
+      });
       await expect(service.deny('ABCD-EFGH', 'user-1')).rejects.toThrow(
         NotFoundException
       );
       expect(db.gameLoginCode.updateMany).not.toHaveBeenCalled();
     });
 
-    it('lookup hides a null-userId code', async () => {
-      db.gameLoginCode.findUnique.mockResolvedValue(makeRow({ userId: null }));
+    it("deny works on the owner's own code", async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(makeRow());
+      db.gameLoginCode.updateMany.mockResolvedValue({ count: 1 });
+      await expect(service.deny('ABCD-EFGH', 'user-1')).resolves.toBe(true);
+    });
+  });
+
+  describe('unlinked character codes', () => {
+    const unlinkedRow = () => makeRow({ userId: null });
+    const unlinkedChar = (passwordHash = '$2b$hash') => ({
+      name: 'Strider',
+      passwordHash,
+    });
+
+    it('lookup is visible when the character is unlinked and the code pending', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      db.users.findUnique.mockResolvedValue({ lockedUntil: null });
+      await expect(
+        service.lookup('ABCD-EFGH', 'user-1')
+      ).resolves.toMatchObject({
+        linkRequired: true,
+        characterHasPassword: true,
+      });
+      expect(db.characters.findFirst).toHaveBeenCalledWith({
+        where: {
+          name: { equals: 'Strider', mode: 'insensitive' },
+          userId: null,
+        },
+        select: { name: true, passwordHash: true },
+      });
+    });
+
+    it('lookup reports characterHasPassword false for an empty hash', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar(''));
+      db.users.findUnique.mockResolvedValue({ lockedUntil: null });
+      await expect(
+        service.lookup('ABCD-EFGH', 'user-1')
+      ).resolves.toMatchObject({
+        linkRequired: true,
+        characterHasPassword: false,
+      });
+    });
+
+    it('is not found once the character is linked elsewhere', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(null);
       await expect(service.lookup('ABCD-EFGH', 'user-1')).rejects.toThrow(
         NotFoundException
       );
+      await expect(
+        service.approve('ABCD-EFGH', 'user-1', 'pw')
+      ).rejects.toThrow(NotFoundException);
+      expect(db.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('is not found when the code is not pending', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(
+        makeRow({ userId: null, status: GameLoginCodeStatus.DENIED })
+      );
+      await expect(service.lookup('ABCD-EFGH', 'user-1')).rejects.toThrow(
+        NotFoundException
+      );
+      expect(db.characters.findFirst).not.toHaveBeenCalled();
+    });
+
+    it('linked rows report linkRequired false', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(makeRow());
+      db.users.findUnique.mockResolvedValue({ lockedUntil: null });
+      await expect(
+        service.lookup('ABCD-EFGH', 'user-1')
+      ).resolves.toMatchObject({
+        linkRequired: false,
+        characterHasPassword: true,
+      });
+    });
+
+    it('approve without a password is a BadRequest', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      await expect(service.approve('ABCD-EFGH', 'user-1')).rejects.toThrow(
+        "Enter the character's game password to link it"
+      );
+      expect(
+        charactersService.verifyCharacterPasswordForLink
+      ).not.toHaveBeenCalled();
+      expect(db.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('approve for an empty-hash character is a BadRequest', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar(''));
+      const err = await service
+        .approve('ABCD-EFGH', 'user-1', 'whatever')
+        .catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(BadRequestException);
+      expect((err as Error).message).toBe(
+        'This character has no password; contact staff to link it.'
+      );
+      expect(db.$transaction).not.toHaveBeenCalled();
+    });
+
+    it('a wrong password surfaces the link-flow error and leaves the row PENDING', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      charactersService.verifyCharacterPasswordForLink.mockRejectedValue(
+        new BadRequestException(
+          'Invalid character password. 4 attempts remaining.'
+        )
+      );
+      await expect(
+        service.approve('ABCD-EFGH', 'user-1', 'wrong')
+      ).rejects.toThrow('Invalid character password. 4 attempts remaining.');
+      expect(
+        charactersService.verifyCharacterPasswordForLink
+      ).toHaveBeenCalledWith('Strider', 'wrong');
+      expect(db.$transaction).not.toHaveBeenCalled();
+      expect(db.characters.updateMany).not.toHaveBeenCalled();
+      expect(db.gameLoginCode.updateMany).not.toHaveBeenCalled();
+      expect(charactersService.clearFailedAttempts).not.toHaveBeenCalled();
+    });
+
+    it('the right password links the character and approves the row', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      db.characters.updateMany.mockResolvedValue({ count: 1 });
+      db.gameLoginCode.updateMany.mockResolvedValue({ count: 1 });
+      db.users.findUnique.mockResolvedValue({ lockedUntil: null });
+
+      const dto = await service.approve('ABCD-EFGH', 'user-1', 'right');
+
+      expect(dto).toMatchObject({
+        status: GameLoginCodeStatus.APPROVED,
+        linkRequired: false,
+      });
+      expect(db.characters.updateMany).toHaveBeenCalledWith({
+        where: {
+          name: { equals: 'Strider', mode: 'insensitive' },
+          userId: null,
+        },
+        data: { userId: 'user-1' },
+      });
+      expect(db.gameLoginCode.updateMany).toHaveBeenCalledWith({
+        where: {
+          id: 'row-1',
+          status: GameLoginCodeStatus.PENDING,
+          expiresAt: { gt: expect.any(Date) },
+        },
+        data: {
+          userId: 'user-1',
+          status: GameLoginCodeStatus.APPROVED,
+          approvedAt: expect.any(Date),
+          approvedByUserId: 'user-1',
+        },
+      });
+      expect(charactersService.clearFailedAttempts).toHaveBeenCalledWith(
+        'Strider'
+      );
+      expect(charactersService.refreshRoleAfterLink).toHaveBeenCalledWith(
+        'user-1'
+      );
+    });
+
+    it('a post-commit cleanup failure does not surface after a successful claim', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      db.characters.updateMany.mockResolvedValue({ count: 1 });
+      db.gameLoginCode.updateMany.mockResolvedValue({ count: 1 });
+      db.users.findUnique.mockResolvedValue({ lockedUntil: null });
+      charactersService.refreshRoleAfterLink.mockRejectedValue(
+        new Error('boom')
+      );
+      await expect(
+        service.approve('ABCD-EFGH', 'user-1', 'right')
+      ).resolves.toMatchObject({ status: GameLoginCodeStatus.APPROVED });
+    });
+
+    it('conflicts (and does not approve) when the character was linked meanwhile', async () => {
+      db.gameLoginCode.findUnique.mockResolvedValue(unlinkedRow());
+      db.characters.findFirst.mockResolvedValue(unlinkedChar());
+      db.characters.updateMany.mockResolvedValue({ count: 0 });
+      await expect(
+        service.approve('ABCD-EFGH', 'user-1', 'right')
+      ).rejects.toThrow(ConflictException);
+      expect(db.gameLoginCode.updateMany).not.toHaveBeenCalled();
+      expect(charactersService.clearFailedAttempts).not.toHaveBeenCalled();
     });
   });
 

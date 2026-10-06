@@ -69,6 +69,7 @@ export function GameLoginApproval() {
   const [code, setCode] = useState(initial);
   const [outcome, setOutcome] = useState<Outcome>(null);
   const [actionError, setActionError] = useState<string | null>(null);
+  const [characterPassword, setCharacterPassword] = useState('');
   const { lookup, request, loading, error } = useGameLoginLookup();
   const [approve, { loading: approving }] = useApproveGameLogin();
   const [deny, { loading: denying }] = useDenyGameLogin();
@@ -123,18 +124,30 @@ export function GameLoginApproval() {
     e.preventDefault();
     setOutcome(null);
     setActionError(null);
+    setCharacterPassword('');
     if (code.length === 9) {
       void lookup({ variables: { code } }).catch(() => {});
     }
   };
 
+  const linkRequired = request?.linkRequired === true;
+  const canLink = linkRequired && request?.characterHasPassword === true;
+  const accountLabel = user.email || user.displayName;
+
   const doApprove = async () => {
     if (!request) return;
     setActionError(null);
     try {
-      await approve({ variables: { code: request.code } });
+      await approve({
+        variables: {
+          code: request.code,
+          ...(linkRequired ? { characterPassword } : {}),
+        },
+      });
+      setCharacterPassword('');
       setOutcome('approved');
     } catch (err) {
+      setCharacterPassword('');
       setActionError(extractErrorMessage(err));
     }
   };
@@ -186,7 +199,9 @@ export function GameLoginApproval() {
         <Alert role='status'>
           <CheckCircle2 className='h-4 w-4' />
           <AlertDescription>
-            Approved. Return to your game client and press Enter.
+            {linkRequired
+              ? 'Linked and approved. Return to your game client and press Enter.'
+              : 'Approved. Return to your game client and press Enter.'}
           </AlertDescription>
         </Alert>
       )}
@@ -201,7 +216,9 @@ export function GameLoginApproval() {
         <Card>
           <CardHeader>
             <CardTitle>
-              {request.characterName ? (
+              {linkRequired ? (
+                'Link this character and sign in?'
+              ) : request.characterName ? (
                 <>
                   Sign in as{' '}
                   <span className='text-primary'>{request.characterName}</span>?
@@ -211,10 +228,37 @@ export function GameLoginApproval() {
               )}
             </CardTitle>
             <CardDescription>
-              Only approve this if you just started this login yourself.
+              {linkRequired
+                ? 'Only approve if you just started this login from your game client.'
+                : 'Only approve this if you just started this login yourself.'}
             </CardDescription>
+            {linkRequired && (
+              <div className='flex flex-wrap items-center gap-2 pt-2 text-sm'>
+                <span className='text-muted-foreground'>Requested from</span>
+                <span className='font-mono'>{request.clientIp}</span>
+                {request.tls ? (
+                  <Badge variant='secondary'>
+                    <Lock className='mr-1 h-3 w-3' aria-hidden />
+                    Encrypted (TLS)
+                  </Badge>
+                ) : (
+                  <Badge variant='destructive'>
+                    <Unlock className='mr-1 h-3 w-3' aria-hidden />
+                    Not encrypted
+                  </Badge>
+                )}
+              </div>
+            )}
           </CardHeader>
           <CardContent className='space-y-5'>
+            {linkRequired && (
+              <p className='text-sm'>
+                {request.characterName || 'This character'} isn&apos;t linked to
+                a website account yet. Enter its game password to link it to
+                your account ({accountLabel}) and approve this login.
+              </p>
+            )}
+
             {request.accountLocked && (
               <Alert role='status'>
                 <ShieldAlert className='h-4 w-4' />
@@ -287,13 +331,54 @@ export function GameLoginApproval() {
 
             {pending ? (
               <>
+                {linkRequired && !canLink && (
+                  <Alert role='status'>
+                    <ShieldAlert className='h-4 w-4' />
+                    <AlertDescription>
+                      This character has no password set, so it can&apos;t be
+                      linked from here. Ask staff to link it.
+                    </AlertDescription>
+                  </Alert>
+                )}
+                {canLink && (
+                  <div className='space-y-2'>
+                    <Label htmlFor='character-password'>
+                      Character game password
+                    </Label>
+                    <Input
+                      id='character-password'
+                      type='password'
+                      value={characterPassword}
+                      onChange={e => setCharacterPassword(e.target.value)}
+                      onKeyDown={e => {
+                        if (e.key === 'Enter' && characterPassword && !busy) {
+                          e.preventDefault();
+                          void doApprove();
+                        }
+                      }}
+                      autoComplete='off'
+                      className='max-w-xs'
+                    />
+                  </div>
+                )}
                 <p className='text-sm font-medium'>
                   Never approve a code you did not request yourself.
                 </p>
                 <div className='flex flex-wrap gap-3'>
-                  <Button onClick={doApprove} disabled={busy}>
-                    {approving ? 'Approving...' : 'Approve'}
-                  </Button>
+                  {(!linkRequired || canLink) && (
+                    <Button
+                      onClick={doApprove}
+                      disabled={busy || (linkRequired && !characterPassword)}
+                    >
+                      {approving
+                        ? linkRequired
+                          ? 'Linking...'
+                          : 'Approving...'
+                        : linkRequired
+                          ? 'Link and sign in'
+                          : 'Approve'}
+                    </Button>
+                  )}
                   <Button variant='outline' onClick={doDeny} disabled={busy}>
                     {denying ? 'Denying...' : 'Deny'}
                   </Button>

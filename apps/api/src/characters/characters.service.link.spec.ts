@@ -1,4 +1,8 @@
-import { BadRequestException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { GameAdminService } from '../bridge/game-admin.service';
@@ -19,7 +23,11 @@ const CALLER_ID = 'real-user';
 
 describe('CharactersService.linkCharacterToUser', () => {
   let db: {
-    characters: { findFirst: jest.Mock; update: jest.Mock };
+    characters: {
+      findFirst: jest.Mock;
+      update: jest.Mock;
+      count: jest.Mock;
+    };
     users: { findUnique: jest.Mock };
     $transaction: jest.Mock;
   };
@@ -29,6 +37,13 @@ describe('CharactersService.linkCharacterToUser', () => {
   };
   let roleCalculator: { updateUserRole: jest.Mock };
   let service: CharactersService;
+  let redis: {
+    incr: jest.Mock;
+    expire: jest.Mock;
+    del: jest.Mock;
+    get: jest.Mock;
+    ttl: jest.Mock;
+  };
   let passwordHash: string;
 
   const owner = (overrides: Record<string, unknown> = {}) => ({
@@ -52,10 +67,12 @@ describe('CharactersService.linkCharacterToUser', () => {
         findFirst: jest.fn().mockResolvedValue({
           id: 'c1',
           name: 'Venath',
+          level: 30,
           userId: PLACEHOLDER_ID,
           passwordHash,
         }),
         update: jest.fn().mockResolvedValue({}),
+        count: jest.fn().mockResolvedValue(0),
       },
       users: { findUnique: jest.fn().mockResolvedValue(owner()) },
       $transaction: jest.fn(async (fn: (t: typeof tx) => Promise<unknown>) =>
@@ -70,6 +87,14 @@ describe('CharactersService.linkCharacterToUser', () => {
       {} as RacesService,
       {} as GameAdminService
     );
+    redis = {
+      incr: jest.fn().mockResolvedValue(1),
+      expire: jest.fn().mockResolvedValue(1),
+      del: jest.fn().mockResolvedValue(1),
+      get: jest.fn().mockResolvedValue(null),
+      ttl: jest.fn().mockResolvedValue(600),
+    };
+    (service as unknown as { redis: unknown }).redis = redis;
   });
 
   it('claims every character of a legacy placeholder and deletes it', async () => {
@@ -92,6 +117,7 @@ describe('CharactersService.linkCharacterToUser', () => {
     db.characters.findFirst.mockResolvedValue({
       id: 'c1',
       name: 'Venath',
+      level: 30,
       userId: null,
       passwordHash,
     });
@@ -123,6 +149,7 @@ describe('CharactersService.linkCharacterToUser', () => {
     db.characters.findFirst.mockResolvedValue({
       id: 'c1',
       name: 'Venath',
+      level: 30,
       userId: CALLER_ID,
       passwordHash,
     });
@@ -144,5 +171,40 @@ describe('CharactersService.linkCharacterToUser', () => {
     expect(tx.users.delete).not.toHaveBeenCalled();
     expect(db.characters.update).not.toHaveBeenCalled();
     expect(roleCalculator.updateUserRole).not.toHaveBeenCalled();
+  });
+
+  it('refuses to claim a placeholder that owns a level 100+ character', async () => {
+    db.characters.count.mockResolvedValue(1);
+
+    await expect(
+      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(redis.incr).not.toHaveBeenCalled();
+    expect(db.$transaction).not.toHaveBeenCalled();
+  });
+
+  it('refuses to link a level 100+ character', async () => {
+    db.characters.findFirst.mockResolvedValue({
+      id: 'c1',
+      name: 'Venath',
+      level: 100,
+      userId: null,
+      passwordHash,
+    });
+
+    await expect(
+      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(db.characters.update).not.toHaveBeenCalled();
+  });
+
+  it('fails closed when Redis is unavailable, without claiming', async () => {
+    (service as unknown as { redis: unknown }).redis = null;
+
+    await expect(
+      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
+    ).rejects.toBeInstanceOf(ServiceUnavailableException);
+    expect(db.$transaction).not.toHaveBeenCalled();
+    expect(db.characters.update).not.toHaveBeenCalled();
   });
 });

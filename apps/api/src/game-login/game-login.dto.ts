@@ -40,6 +40,18 @@ export class GameLoginCodeDto {
 
   @Field(() => Date, { nullable: true })
   lockedUntil?: Date | null;
+
+  @Field({
+    description:
+      'True when the character is not linked to any account yet; approving requires its game password and links it to the caller',
+  })
+  linkRequired: boolean;
+
+  @Field({
+    description:
+      'False when the character has no game password (staff must link it)',
+  })
+  characterHasPassword: boolean;
 }
 
 @ObjectType({

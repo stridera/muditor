@@ -1385,6 +1385,9 @@ type GameLoginCodeDto {
   """
   accountLocked: Boolean!
 
+  """False when the character has no game password (staff must link it)"""
+  characterHasPassword: Boolean!
+
   """Character name the player typed at the prompt"""
   characterName: String!
 
@@ -1395,6 +1398,11 @@ type GameLoginCodeDto {
   code: String!
   createdAt: DateTime!
   expiresAt: DateTime!
+
+  """
+  True when the character is not linked to any account yet; approving requires its game password and links it to the caller
+  """
+  linkRequired: Boolean!
   lockedUntil: DateTime
   status: GameLoginCodeStatus!
 
@@ -1808,8 +1816,10 @@ type Mutation {
   """Unlink a character from its owner and lower the owner's role if needed"""
   adminUnlinkCharacter(input: AdminUnlinkCharacterInput!): AdminUserAccount!
 
-  """Approve a pending game login for one of your characters"""
-  approveGameLogin(code: String!): GameLoginCodeDto!
+  """
+  Approve a pending game login for one of your characters. For a character not yet linked to any account, characterPassword (its game password) is required and the character is linked to you
+  """
+  approveGameLogin(characterPassword: String, code: String!): GameLoginCodeDto!
 
   """Assign a skill to a class"""
   assignSkillToClass(data: AssignSkillToClassInput!): ClassSkillDto!

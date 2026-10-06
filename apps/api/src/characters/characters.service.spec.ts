@@ -1,4 +1,11 @@
-import { BadRequestException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  HttpException,
+  NotFoundException,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import * as bcrypt from 'bcrypt';
 import type { ConfigService } from '@nestjs/config';
 import { Race } from '@muditor/db';
 import type { GameAdminService } from '../bridge/game-admin.service';
@@ -10,6 +17,8 @@ import type {
   UpdateCharacterInput,
 } from './character.input';
 import { CharactersService } from './characters.service';
+
+jest.mock('bcrypt', () => ({ compare: jest.fn(), hash: jest.fn() }));
 
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
@@ -268,6 +277,101 @@ describe('CharactersService race/class handling', () => {
       await expect(service.getOnlineCharacters()).resolves.toEqual([]);
       expect(db.characters.findMany).not.toHaveBeenCalled();
       expect(warn).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  describe('verifyCharacterPasswordForLink', () => {
+    let redis: {
+      incr: jest.Mock;
+      expire: jest.Mock;
+      del: jest.Mock;
+      get: jest.Mock;
+      ttl: jest.Mock;
+    };
+    const unlinked = (overrides: Record<string, unknown> = {}) => ({
+      id: 'c1',
+      name: 'Newbie',
+      level: 20,
+      userId: null,
+      passwordHash: '$2b$hash',
+      ...overrides,
+    });
+    const compare = bcrypt.compare as unknown as jest.Mock;
+
+    beforeEach(() => {
+      redis = {
+        incr: jest.fn().mockResolvedValue(1),
+        expire: jest.fn().mockResolvedValue(1),
+        del: jest.fn().mockResolvedValue(1),
+        get: jest.fn().mockResolvedValue(null),
+        ttl: jest.fn().mockResolvedValue(600),
+      };
+      (service as unknown as { redis: unknown }).redis = redis;
+      (db.characters as unknown as { findFirst: jest.Mock }).findFirst = jest
+        .fn()
+        .mockResolvedValue(unlinked());
+      compare.mockReset();
+    });
+
+    const findFirst = () =>
+      (db.characters as unknown as { findFirst: jest.Mock }).findFirst;
+
+    it('refuses level 100+ characters before any password check', async () => {
+      findFirst().mockResolvedValue(unlinked({ level: 100 }));
+      await expect(
+        service.verifyCharacterPasswordForLink('Newbie', 'pw')
+      ).rejects.toThrow(ForbiddenException);
+      expect(redis.incr).not.toHaveBeenCalled();
+      expect(compare).not.toHaveBeenCalled();
+    });
+
+    it('fails closed when Redis is unavailable', async () => {
+      (service as unknown as { redis: unknown }).redis = null;
+      await expect(
+        service.verifyCharacterPasswordForLink('Newbie', 'pw')
+      ).rejects.toThrow(ServiceUnavailableException);
+      expect(findFirst()).not.toHaveBeenCalled();
+      expect(compare).not.toHaveBeenCalled();
+    });
+
+    it('counts the attempt with INCR before comparing, then resets on success', async () => {
+      compare.mockResolvedValue(true);
+      const order: string[] = [];
+      redis.incr.mockImplementation(async () => (order.push('incr'), 1));
+      compare.mockImplementation(async () => (order.push('compare'), true));
+      await service.verifyCharacterPasswordForLink('Newbie', 'pw');
+      expect(order).toEqual(['incr', 'compare']);
+      expect(redis.expire).toHaveBeenCalledWith('charlink:lockout:newbie', 900);
+      expect(redis.del).toHaveBeenCalledWith('charlink:lockout:newbie');
+    });
+
+    it('rejects over the limit as locked without comparing', async () => {
+      redis.incr.mockResolvedValue(6);
+      redis.get.mockResolvedValue('6');
+      const err = await service
+        .verifyCharacterPasswordForLink('Newbie', 'pw')
+        .catch((e: unknown) => e);
+      expect(err).toBeInstanceOf(HttpException);
+      expect((err as HttpException).getStatus()).toBe(429);
+      expect(compare).not.toHaveBeenCalled();
+    });
+
+    it('a wrong password keeps the counter and reports attempts remaining', async () => {
+      redis.incr.mockResolvedValue(2);
+      compare.mockResolvedValue(false);
+      await expect(
+        service.verifyCharacterPasswordForLink('Newbie', 'bad')
+      ).rejects.toThrow('Invalid character password. 3 attempts remaining.');
+      expect(redis.del).not.toHaveBeenCalled();
+    });
+
+    it('the limit-reaching wrong attempt reports locked (429)', async () => {
+      redis.incr.mockResolvedValue(5);
+      compare.mockResolvedValue(false);
+      const err = await service
+        .verifyCharacterPasswordForLink('Newbie', 'bad')
+        .catch((e: unknown) => e);
+      expect((err as HttpException).getStatus()).toBe(429);
     });
   });
 });

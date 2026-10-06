@@ -1,11 +1,13 @@
 import {
   BadRequestException,
+  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
   Logger,
   NotFoundException,
   type OnModuleDestroy,
+  ServiceUnavailableException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
@@ -37,6 +39,8 @@ import {
 const LOCKOUT_MAX_ATTEMPTS = 5;
 /** Lockout duration in seconds (15 minutes) */
 const LOCKOUT_WINDOW_SECONDS = 900;
+/** Characters at or above this level are staff-linked only */
+const GOD_LEVEL = 100;
 
 /** Email domain of the placeholder users the game server auto-creates */
 const LEGACY_PLACEHOLDER_EMAIL_SUFFIX = '@legacy.fierymud.local';
@@ -90,21 +94,29 @@ export class CharactersService implements OnModuleDestroy {
   }
 
   /**
-   * Record a failed password attempt for a character.
-   * Returns the new attempt count.
+   * Atomically count a link attempt for a character (INCR + TTL) BEFORE the
+   * password is compared. Fails closed: with Redis unavailable, linking is
+   * refused rather than proceeding without a lockout.
    */
-  private async recordFailedAttempt(characterName: string): Promise<number> {
-    if (!this.redis) return 0;
+  private async countLinkAttempt(characterName: string): Promise<number> {
+    const redis = this.redis;
+    if (!redis) {
+      throw new ServiceUnavailableException(
+        'Character linking is temporarily unavailable'
+      );
+    }
     const key = `charlink:lockout:${characterName.toLowerCase()}`;
     try {
-      const count = await this.redis.incr(key);
+      const count = await redis.incr(key);
       // Set/refresh TTL on first attempt or when reaching lockout threshold
       if (count === 1 || count === LOCKOUT_MAX_ATTEMPTS) {
-        await this.redis.expire(key, LOCKOUT_WINDOW_SECONDS);
+        await redis.expire(key, LOCKOUT_WINDOW_SECONDS);
       }
       return count;
     } catch {
-      return 0;
+      throw new ServiceUnavailableException(
+        'Character linking is temporarily unavailable'
+      );
     }
   }
 
@@ -832,27 +844,23 @@ export class CharactersService implements OnModuleDestroy {
 
   // Character linking methods
   /**
-   * Link an existing game character to a user account.
-   * Validates character password, enforces per-character lockout,
-   * and recalculates user role on success.
+   * Verify the game password of an unlinked character, enforcing the
+   * per-character lockout (wrong passwords count toward it). Upgrades legacy
+   * crypt(3) hashes to bcrypt on success. Resets the attempt counter on success; does NOT link;
+   * callers link once it succeeds. Returns `placeholderOwnerId` when the
+   * character belongs to a claimable legacy placeholder account and
+   * `callerUserId` was given (the claim flow); otherwise an owned character is
+   * rejected as already linked.
    */
-  async linkCharacterToUser(
-    userId: string,
+  async verifyCharacterPasswordForLink(
     characterName: string,
-    characterPassword: string
+    characterPassword: string,
+    callerUserId?: string
   ) {
-    // Check lockout BEFORE doing any expensive work
-    const lockoutRemaining = await this.getLockoutRemaining(characterName);
-    if (lockoutRemaining > 0) {
-      const minutes = Math.ceil(lockoutRemaining / 60);
-      throw new HttpException(
-        {
-          statusCode: HttpStatus.TOO_MANY_REQUESTS,
-          message: `Too many failed attempts for this character. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`,
-          error: 'Too Many Requests',
-          retryAfter: lockoutRemaining,
-        },
-        HttpStatus.TOO_MANY_REQUESTS
+    // Fail closed without Redis: no lockout means unlimited guessing.
+    if (!this.redis) {
+      throw new ServiceUnavailableException(
+        'Character linking is temporarily unavailable'
       );
     }
 
@@ -870,22 +878,59 @@ export class CharactersService implements OnModuleDestroy {
       throw new NotFoundException(`Character '${characterName}' not found`);
     }
 
+    // Gods are never self-service linkable: claiming one must not raise the
+    // website role. Refused before any password check, on every link/claim path.
+    if (character.level >= GOD_LEVEL) {
+      throw new ForbiddenException(
+        'Characters of level 100+ must be linked by staff.'
+      );
+    }
+
     // Check if character is already linked. The one exception is a legacy
     // placeholder owner (auto-created by the game server on a legacy
-    // character's first telnet login): the caller may claim it below, after
-    // proving the character's game password.
+    // character's first telnet login): a caller who identifies themselves
+    // (callerUserId) may claim it after proving the character's game password.
     let placeholderOwnerId: string | null = null;
     if (character.userId) {
       if (
-        character.userId !== userId &&
+        callerUserId !== undefined &&
+        character.userId !== callerUserId &&
         (await this.isClaimablePlaceholder(character.userId))
       ) {
+        // A claim moves ALL of the placeholder's characters, so the god guard
+        // must cover them too, not just the named one.
+        const godCount = await this.db.characters.count({
+          where: { userId: character.userId, level: { gte: GOD_LEVEL } },
+        });
+        if (godCount > 0) {
+          throw new ForbiddenException(
+            'Characters of level 100+ must be linked by staff.'
+          );
+        }
         placeholderOwnerId = character.userId;
       } else {
         throw new BadRequestException(
           `Character '${characterName}' is already linked to another account`
         );
       }
+    }
+
+    // Count the attempt atomically BEFORE comparing; over the limit is locked
+    // without comparing.
+    const attempts = await this.countLinkAttempt(characterName);
+    if (attempts > LOCKOUT_MAX_ATTEMPTS) {
+      const ttl = (await this.getLockoutRemaining(characterName)) || 0;
+      const remainingSeconds = ttl > 0 ? ttl : LOCKOUT_WINDOW_SECONDS;
+      const minutes = Math.ceil(remainingSeconds / 60);
+      throw new HttpException(
+        {
+          statusCode: HttpStatus.TOO_MANY_REQUESTS,
+          message: `Too many failed attempts for this character. Try again in ${minutes} minute${minutes !== 1 ? 's' : ''}.`,
+          error: 'Too Many Requests',
+          retryAfter: remainingSeconds,
+        },
+        HttpStatus.TOO_MANY_REQUESTS
+      );
     }
 
     // Validate character password
@@ -917,7 +962,6 @@ export class CharactersService implements OnModuleDestroy {
     }
 
     if (!isPasswordValid) {
-      const attempts = await this.recordFailedAttempt(characterName);
       const remaining = LOCKOUT_MAX_ATTEMPTS - attempts;
       this.logger.warn(
         `Failed character link attempt for '${characterName}' (${attempts}/${LOCKOUT_MAX_ATTEMPTS})`
@@ -941,8 +985,36 @@ export class CharactersService implements OnModuleDestroy {
       );
     }
 
-    // Password valid — clear any failed attempts
+    // Password valid: reset the attempt counter
     await this.clearFailedAttempts(characterName);
+
+    return { character, placeholderOwnerId };
+  }
+
+  /** Recalculate the user's role after a character link has been committed. */
+  async refreshRoleAfterLink(userId: string): Promise<void> {
+    // Raising is allowed here only: the caller proved ownership with the
+    // character's password (legacy staff characters).
+    await this.roleCalculator.updateUserRole(userId, { allowRaise: true });
+  }
+
+  /**
+   * Link an existing game character to a user account.
+   * Verifies the character password via verifyCharacterPasswordForLink (god
+   * guard, Redis fail-closed, atomic lockout), then links or claims, and
+   * recalculates user role on success.
+   */
+  async linkCharacterToUser(
+    userId: string,
+    characterName: string,
+    characterPassword: string
+  ) {
+    const { character, placeholderOwnerId } =
+      await this.verifyCharacterPasswordForLink(
+        characterName,
+        characterPassword,
+        userId
+      );
 
     if (placeholderOwnerId) {
       // Claim: move every character of the placeholder to the caller and
@@ -967,9 +1039,7 @@ export class CharactersService implements OnModuleDestroy {
       });
     }
 
-    // Recalculate user role. Raising is allowed here only: the caller proved
-    // ownership with the character's password (legacy staff characters).
-    await this.roleCalculator.updateUserRole(userId, { allowRaise: true });
+    await this.refreshRoleAfterLink(userId);
 
     return character;
   }

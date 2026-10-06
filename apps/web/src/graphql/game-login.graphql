@@ -10,6 +10,8 @@ fragment GameLoginCodeFields on GameLoginCodeDto {
   expiresAt
   accountLocked
   lockedUntil
+  linkRequired
+  characterHasPassword
 }
 
 query GameLoginCode($code: String!) {
@@ -18,8 +20,8 @@ query GameLoginCode($code: String!) {
   }
 }
 
-mutation ApproveGameLogin($code: String!) {
-  approveGameLogin(code: $code) {
+mutation ApproveGameLogin($code: String!, $characterPassword: String) {
+  approveGameLogin(code: $code, characterPassword: $characterPassword) {
     ...GameLoginCodeFields
   }
 }
