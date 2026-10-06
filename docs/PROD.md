@@ -61,7 +61,7 @@ Passwordless sudo is limited to: `systemctl restart fieryNT`, `systemctl restart
 `setup-root.sh` is executed as root through sudo and is now version-controlled and reachable via the git checkout
 (`/opt/NEXT/deploy` -> the repo). A malicious or mistaken commit to `main` that reaches the host with `git pull` therefore
 means root on prod. Enable branch protection on `main` (required reviews, no force-push) and read any diff touching
-`deploy/prod/` before pulling it on the host.
+`deploy/prod/` before pulling it on the host. `setup-root.sh` strips group/other write bits from the kit on every run, because the `fierymud` group (which also owns the legacy MUD's service account) must not be able to edit a root-executed script.
 
 ## Rollback
 

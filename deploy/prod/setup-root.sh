@@ -12,6 +12,8 @@ set -euo pipefail
 if [[ $EUID -ne 0 ]]; then echo "run with sudo" >&2; exit 1; fi
 
 KIT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# This script runs as root via sudo: never leave the kit group/world-writable (git pull applies strider's umask).
+chmod -R go-w "$KIT_DIR" 2>/dev/null || true
 NEXT=/opt/NEXT
 SRC_HOME=/home/strider/fierymudv3
 OLD_OPT=/opt/V3   # earlier staging location (migrated if present)
