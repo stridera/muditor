@@ -1,5 +1,11 @@
 export { HelpButton, type HelpButtonProps } from './HelpButton';
-export { HelpDrawer, type HelpDrawerProps } from './HelpDrawer';
+export { HelpPanel, type HelpPanelProps } from './HelpPanel';
+export {
+  HelpPanelProvider,
+  HelpPanelSlot,
+  useHelpPanel,
+  type HelpPanelApi,
+} from './HelpPanelProvider';
 export {
   HELP_TOPICS,
   QUESTS_HELP_ANCHORS,

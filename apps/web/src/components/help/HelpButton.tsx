@@ -2,9 +2,8 @@
 
 import { cn } from '@/lib/utils';
 import { HelpCircle } from 'lucide-react';
-import { useState } from 'react';
 
-import { HelpDrawer } from './HelpDrawer';
+import { useHelpPanel } from './HelpPanelProvider';
 import type { HelpTopic } from './help-topics';
 
 export interface HelpButtonProps {
@@ -24,10 +23,13 @@ export interface HelpButtonProps {
 }
 
 /**
- * Opens a help drawer for `topic`, optionally at a section `anchor`.
+ * Opens the docked help panel for `topic`, optionally at a section `anchor`.
+ * The labelled `button` variant toggles the panel; the `icon` variant always
+ * opens or scrolls it.
  *
  * Reusable across editors: the mob, object, zone and shop editors can add
  * their own topic to `help-topics.ts` and drop in `<HelpButton topic='mobs' />`.
+ * Must render inside `HelpPanelProvider` (the dashboard layout).
  */
 export function HelpButton({
   topic,
@@ -37,24 +39,26 @@ export function HelpButton({
   tip,
   className,
 }: HelpButtonProps) {
-  const [open, setOpen] = useState(false);
+  const { open, topic: openTopic, openHelp, closeHelp } = useHelpPanel();
+  const showing = open && openTopic === topic;
 
-  const openDrawer = (event: React.MouseEvent) => {
+  const onClick = (event: React.MouseEvent<HTMLButtonElement>) => {
     // The button often sits inside labels or clickable headers.
     event.preventDefault();
     event.stopPropagation();
-    setOpen(true);
+    if (variant === 'button' && showing) {
+      closeHelp();
+      return;
+    }
+    openHelp(topic, anchor, event.currentTarget);
   };
 
   return (
-    // Events from the drawer portal bubble through the React tree; stop them
-    // here so clicks inside the drawer never reach clickable ancestors.
-
-    <span className='inline-flex' onClick={event => event.stopPropagation()}>
+    <span className='inline-flex'>
       {variant === 'icon' ? (
         <button
           type='button'
-          onClick={openDrawer}
+          onClick={onClick}
           title={tip}
           aria-label={tip ? `Help: ${tip}` : 'Help'}
           className={cn(
@@ -67,8 +71,9 @@ export function HelpButton({
       ) : (
         <button
           type='button'
-          onClick={openDrawer}
+          onClick={onClick}
           title={tip}
+          aria-expanded={showing}
           className={cn(
             'inline-flex items-center rounded-md border border-border bg-card px-3 py-2 text-sm font-medium text-foreground shadow-sm hover:bg-muted',
             className
@@ -78,12 +83,6 @@ export function HelpButton({
           {label}
         </button>
       )}
-      <HelpDrawer
-        topic={topic}
-        anchor={anchor}
-        open={open}
-        onOpenChange={setOpen}
-      />
     </span>
   );
 }
