@@ -85,7 +85,6 @@ describe('HelpButton + HelpDrawer (quests topic)', () => {
   it('does not bubble clicks to clickable ancestors', () => {
     const onAncestorClick = jest.fn();
     render(
-       
       <div onClick={onAncestorClick}>
         <HelpButton topic='quests' variant='icon' tip='Anything' />
       </div>

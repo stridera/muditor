@@ -49,7 +49,7 @@ export function HelpButton({
   return (
     // Events from the drawer portal bubble through the React tree; stop them
     // here so clicks inside the drawer never reach clickable ancestors.
-     
+
     <span className='inline-flex' onClick={event => event.stopPropagation()}>
       {variant === 'icon' ? (
         <button
