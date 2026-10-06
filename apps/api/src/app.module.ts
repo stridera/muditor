@@ -12,6 +12,9 @@ import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
 import { GrantsModule } from './grants/grants.module';
 import { HelpModule } from './help/help.module';
+import { ServerStatusModule } from './server-status/server-status.module';
+import { SiteContentModule } from './site-content/site-content.module';
+import { GameLoginModule } from './game-login/game-login.module';
 import { MobsModule } from './mobs/mobs.module';
 import { ObjectsModule } from './objects/objects.module';
 import { QuestsModule } from './quests/quests.module';
@@ -113,6 +116,9 @@ import * as jwt from 'jsonwebtoken';
     ClassesModule,
     SocialsModule,
     HelpModule,
+    SiteContentModule,
+    GameLoginModule,
+    ServerStatusModule,
     SettingsModule,
     AccountStorageModule,
     BoardsModule,

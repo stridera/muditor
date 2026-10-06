@@ -97,6 +97,16 @@ secrets/cert/bun and preserves file modes.
 `/opt/NEXT/deploy/update.sh [mud|muditor|all]` pulls (ff-only) and rebuilds, then prints the restart
 lines to run yourself (the build rewrites `.next`/`dist` in place, so NEXT-web may blip until restarted): `sudo systemctl restart fieryNT` and/or `sudo systemctl restart muditorNT-api muditorNT-web`.
 
+### Schema push and SQL seeds (muditor target)
+
+`update.sh muditor` also rolls out DB changes, after `db:generate` and before the build: (1) `bunx prisma db push
+--skip-generate` from `muditor/packages/db`, with `DATABASE_URL` from `/opt/NEXT/env/muditor.env` (sourced in a
+subshell, never printed); no `--accept-data-loss`, so a destructive schema change aborts the update; (2) every
+`deploy/prod/sql/*.sql` file in name order via `psql -v ON_ERROR_STOP=1` (auth: `PGPASSFILE=/opt/NEXT/.secrets/pgpass`,
+user/db `fierynext` on 127.0.0.1). Any failure stops the script before the build. **Files in `sql/` run on every update
+and must be idempotent** (`ON CONFLICT ... DO NOTHING` or `WHERE NOT EXISTS`) and must never overwrite builder edits.
+Prod-only rows (e.g. `GameConfig security/website_url`) belong here, not in the dev seeds.
+
 ## Logs and status
 
 - `journalctl -u fieryNT -f`, `journalctl -u muditorNT-api -f`, `journalctl -u muditorNT-web -f`

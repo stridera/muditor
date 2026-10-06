@@ -1,0 +1,177 @@
+# Public (anonymous) site queries
+
+query PublicHelpCategories {
+  helpCategories
+}
+
+query PublicHelpEntries($filter: HelpEntryFilterInput) {
+  helpEntries(filter: $filter) {
+    id
+    title
+    keywords
+    category
+    minLevel
+  }
+}
+
+query PublicSearchHelp($query: String!, $filter: HelpEntryFilterInput) {
+  searchHelp(query: $query, filter: $filter) {
+    id
+    title
+    keywords
+    category
+    minLevel
+  }
+}
+
+query PublicHelpEntryById($id: ID!) {
+  helpEntry(id: $id) {
+    id
+    title
+    keywords
+    category
+    sphere
+    usage
+    duration
+    content
+    minLevel
+    updatedAt
+  }
+}
+
+query PublicHelpByKeyword($keyword: String!) {
+  helpByKeyword(keyword: $keyword) {
+    id
+    title
+    keywords
+    category
+    sphere
+    usage
+    duration
+    content
+    minLevel
+    updatedAt
+  }
+}
+
+query PublicRaces {
+  races {
+    race
+    name
+    plainName
+    keywords
+    playable
+    humanoid
+    magical
+    defaultSize
+  }
+}
+
+query PublicRace($race: Race!) {
+  race(race: $race) {
+    race
+    name
+    plainName
+    keywords
+    playable
+    humanoid
+    magical
+    defaultSize
+    defaultLifeforce
+    defaultAlignment
+    raceAlign
+    expFactor
+    hpFactor
+    focusBonus
+    maxStrength
+    maxDexterity
+    maxConstitution
+    maxIntelligence
+    maxWisdom
+    maxCharisma
+  }
+}
+
+query PublicClasses {
+  classes {
+    id
+    name
+    plainName
+    description
+    hitDice
+    primaryStat
+  }
+}
+
+query PublicSiteContents($kind: SiteContentKind) {
+  siteContents(kind: $kind) {
+    id
+    slug
+    kind
+    title
+    summary
+    published
+    publishedAt
+    sortOrder
+  }
+}
+
+query PublicSiteContent($slug: String!) {
+  siteContent(slug: $slug) {
+    id
+    slug
+    kind
+    title
+    summary
+    body
+    publishedAt
+    updatedAt
+  }
+}
+
+query PublicServerStatus {
+  publicServerStatus {
+    online
+    playersOnline
+    uptimeSeconds
+    tick
+    host
+    port
+    tlsPort
+  }
+}
+
+query PublicClassSkills($classId: Int!) {
+  classSkills(classId: $classId) {
+    id
+    skillId
+    skillName
+    category
+    minLevel
+    maxLevel
+  }
+}
+
+query PublicClassCircles($classId: Int!) {
+  classCirclesList(classId: $classId) {
+    id
+    circle
+    minLevel
+    spells {
+      id
+      spellId
+      spellName
+      minLevel
+    }
+  }
+}
+
+query PublicRaceSkills($race: Race!) {
+  raceSkills(race: $race) {
+    id
+    skillId
+    skillName
+    category
+    bonus
+  }
+}

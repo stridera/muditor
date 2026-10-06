@@ -29,7 +29,14 @@ describe('AuthService', () => {
       banRecords: {
         findFirst: jest.fn(),
       },
-    } as unknown as Pick<DatabaseService, 'users' | 'banRecords'>;
+      characters: {
+        findMany: jest.fn(),
+        updateMany: jest.fn(),
+      },
+    } as unknown as Pick<
+      DatabaseService,
+      'users' | 'banRecords' | 'characters'
+    >;
 
     const mockJwtService = {
       sign: jest.fn(),
@@ -371,6 +378,60 @@ describe('AuthService', () => {
       ).checkBanStatus('user-id');
 
       expect(result).toBe(false);
+    });
+  });
+
+  describe('website password vs game password', () => {
+    const user = {
+      id: 'user-id',
+      displayName: 'Tester',
+      passwordHash: '$2b$12$site',
+    };
+
+    beforeEach(() => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(user);
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(user);
+    });
+
+    it('changePassword rejects a password matching a bcrypt game password', async () => {
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([
+        { passwordHash: 'abXYZ12345' }, // legacy crypt: skipped
+        { passwordHash: '$2b$12$game' },
+      ]);
+      (bcrypt.compare as jest.Mock).mockImplementation(
+        async (_pw: string, hash: string) =>
+          hash === '$2b$12$site' || hash === '$2b$12$game'
+      );
+      await expect(
+        service.changePassword('user-id', 'current', 'same-as-game')
+      ).rejects.toThrow('Website password must differ from your game password');
+      expect(bcrypt.compare).not.toHaveBeenCalledWith(
+        'same-as-game',
+        'abXYZ12345'
+      );
+      expect(databaseService.users.update).not.toHaveBeenCalled();
+    });
+
+    it('changePassword no longer writes to Characters.passwordHash', async () => {
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([
+        { passwordHash: '$2b$12$game' },
+      ]);
+      (bcrypt.compare as jest.Mock).mockImplementation(
+        async (_pw: string, hash: string) => hash === '$2b$12$site'
+      );
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$12$new');
+      await service.changePassword('user-id', 'current', 'brand-new-pass');
+      expect(databaseService.characters.updateMany).not.toHaveBeenCalled();
+    });
+
+    it('resetPassword rejects a password matching a bcrypt game password', async () => {
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([
+        { passwordHash: '$2b$12$game' },
+      ]);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      await expect(
+        service.resetPassword('token', 'same-as-game')
+      ).rejects.toThrow('Website password must differ from your game password');
     });
   });
 

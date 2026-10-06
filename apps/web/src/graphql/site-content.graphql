@@ -1,0 +1,56 @@
+# Site content (public website lore, news, static pages) admin operations
+
+query AdminSiteContents($kind: SiteContentKind) {
+  siteContents(kind: $kind, publishedOnly: false) {
+    id
+    slug
+    kind
+    title
+    summary
+    body
+    published
+    publishedAt
+    sortOrder
+    authorId
+    createdAt
+    updatedAt
+  }
+}
+
+mutation CreateSiteContent($data: CreateSiteContentInput!) {
+  createSiteContent(data: $data) {
+    id
+    slug
+    kind
+    title
+    summary
+    body
+    published
+    publishedAt
+    sortOrder
+    authorId
+    createdAt
+    updatedAt
+  }
+}
+
+mutation UpdateSiteContent($id: ID!, $data: UpdateSiteContentInput!) {
+  updateSiteContent(id: $id, data: $data) {
+    id
+    slug
+    kind
+    title
+    summary
+    body
+    published
+    publishedAt
+    sortOrder
+    authorId
+    createdAt
+    updatedAt
+  }
+}
+
+mutation DeleteSiteContent($id: ID!) {
+  deleteSiteContent(id: $id)
+}

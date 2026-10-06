@@ -1,5 +1,7 @@
 'use client';
 
+import { AccountLockCard } from '@/components/account/AccountLockCard';
+import { GamePasswordCard } from '@/components/account/GamePasswordCard';
 import { ProtectedRoute } from '@/components/auth/protected-route';
 import { RoleBadge } from '@/components/role-badge';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -355,6 +357,10 @@ function ProfileContent() {
                     </form>
                   </CardContent>
                 </Card>
+
+                <AccountLockCard />
+
+                <GamePasswordCard />
 
                 <Card>
                   <CardHeader>

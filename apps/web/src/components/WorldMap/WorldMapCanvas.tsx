@@ -128,8 +128,6 @@ export const WorldMapCanvas: React.FC<WorldMapCanvasProps> = ({
           }
         );
 
-        console.log('GraphQL response:', result);
-
         if (result.data?.rooms) {
           console.log('Fetched rooms:', result.data.rooms.length);
           setRooms(result.data.rooms);

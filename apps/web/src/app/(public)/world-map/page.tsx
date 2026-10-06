@@ -4,8 +4,11 @@ import { useState } from 'react';
 import { WorldMapCanvas } from '@/components/WorldMap/WorldMapCanvas';
 import { useRouter } from 'next/navigation';
 
+import { useAuth } from '@/contexts/auth-context';
+
 export default function WorldMapPage() {
   const router = useRouter();
+  const { isAuthenticated } = useAuth();
   const [loading, setLoading] = useState(false);
   const [mapOptions, setMapOptions] = useState({
     zoneGlow: true,
@@ -15,13 +18,15 @@ export default function WorldMapPage() {
   });
 
   const handleZoneClick = (zoneId: number) => {
-    router.push(`/zones/${zoneId}/edit`);
+    // Anonymous visitors can browse the map but not open editor pages.
+    if (!isAuthenticated) return;
+    router.push(`/dashboard/zones/${zoneId}`);
   };
 
   return (
-    <div className='flex flex-col h-screen'>
+    <div className='flex flex-col h-[calc(100vh-4rem)]'>
       <div className='flex items-center justify-between px-4 py-2 border-b bg-white dark:bg-gray-800'>
-        <h1 className='text-lg font-semibold'>World Map (Canvas Test)</h1>
+        <h1 className='text-lg font-semibold'>World Map</h1>
         <div className='text-sm text-gray-600 dark:text-gray-400'>
           Pan: Click & Drag | Zoom: Scroll | Click Room to navigate
         </div>

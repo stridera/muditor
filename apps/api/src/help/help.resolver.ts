@@ -1,8 +1,10 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UserRole } from '@muditor/db';
+import { UserRole, type Users } from '@muditor/db';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import { HelpEntryDto } from './help.dto';
 import {
@@ -13,71 +15,80 @@ import {
 import { HelpService } from './help.service';
 
 @Resolver(() => HelpEntryDto)
-@UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
 export class HelpResolver {
   constructor(private readonly helpService: HelpService) {}
 
-  // Queries - PLAYER+ can view help entries (read-only access for all users)
+  // Queries - public (anonymous allowed). Anonymous/PLAYER callers only see
+  // minLevel < 100; staff (IMMORTAL+) see everything.
 
   @Query(() => [HelpEntryDto], {
     name: 'helpEntries',
     description: 'Get all help entries with optional filtering',
   })
-  @MinimumRole(UserRole.PLAYER)
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
-    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput
+    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput,
+    @CurrentUser() user?: Users | null
   ) {
-    return this.helpService.findAll(filter);
+    return this.helpService.findAll(filter, user);
   }
 
   @Query(() => HelpEntryDto, {
     name: 'helpEntry',
     description: 'Get a single help entry by ID',
   })
-  @MinimumRole(UserRole.PLAYER)
-  async findOne(@Args('id', { type: () => ID }) id: string | number) {
-    return this.helpService.findOne(Number(id));
+  @UseGuards(OptionalJwtAuthGuard)
+  async findOne(
+    @Args('id', { type: () => ID }) id: string | number,
+    @CurrentUser() user?: Users | null
+  ) {
+    return this.helpService.findOne(Number(id), user);
   }
 
   @Query(() => HelpEntryDto, {
     name: 'helpByKeyword',
     description: 'Get a help entry by keyword',
   })
-  @MinimumRole(UserRole.PLAYER)
-  async findByKeyword(@Args('keyword') keyword: string) {
-    return this.helpService.findByKeyword(keyword);
+  @UseGuards(OptionalJwtAuthGuard)
+  async findByKeyword(
+    @Args('keyword') keyword: string,
+    @CurrentUser() user?: Users | null
+  ) {
+    return this.helpService.findByKeyword(keyword, user);
   }
 
   @Query(() => Int, {
     name: 'helpEntriesCount',
     description: 'Get total count of help entries',
   })
-  @MinimumRole(UserRole.PLAYER)
+  @UseGuards(OptionalJwtAuthGuard)
   async count(
-    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput
+    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput,
+    @CurrentUser() user?: Users | null
   ) {
-    return this.helpService.count(filter);
+    return this.helpService.count(filter, user);
   }
 
   @Query(() => [String], {
     name: 'helpCategories',
     description: 'Get all distinct help entry categories',
   })
-  @MinimumRole(UserRole.PLAYER)
-  async getCategories() {
-    return this.helpService.getCategories();
+  @UseGuards(OptionalJwtAuthGuard)
+  async getCategories(@CurrentUser() user?: Users | null) {
+    return this.helpService.getCategories(user);
   }
 
   @Query(() => [HelpEntryDto], {
     name: 'searchHelp',
     description: 'Search help entries by keyword, title, or content',
   })
-  @MinimumRole(UserRole.PLAYER)
+  @UseGuards(OptionalJwtAuthGuard)
   async search(
     @Args('query') query: string,
-    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput
+    @Args('filter', { nullable: true }) filter?: HelpEntryFilterInput,
+    @CurrentUser() user?: Users | null
   ) {
-    return this.helpService.search(query, filter);
+    return this.helpService.search(query, filter, user);
   }
 
   // Mutations - BUILDER+ can create/update, CODER+ can delete
@@ -85,6 +96,7 @@ export class HelpResolver {
   @Mutation(() => HelpEntryDto, {
     description: 'Create a new help entry',
   })
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   @MinimumRole(UserRole.BUILDER)
   async createHelpEntry(@Args('data') data: CreateHelpEntryInput) {
     return this.helpService.create(data);
@@ -93,6 +105,7 @@ export class HelpResolver {
   @Mutation(() => HelpEntryDto, {
     description: 'Update an existing help entry',
   })
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   @MinimumRole(UserRole.BUILDER)
   async updateHelpEntry(
     @Args('id', { type: () => ID }) id: string | number,
@@ -104,6 +117,7 @@ export class HelpResolver {
   @Mutation(() => Boolean, {
     description: 'Delete a help entry',
   })
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   @MinimumRole(UserRole.CODER)
   async deleteHelpEntry(@Args('id', { type: () => ID }) id: string | number) {
     await this.helpService.remove(Number(id));

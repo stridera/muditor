@@ -24,6 +24,7 @@ import {
   Menu,
   MessageCircle,
   Monitor,
+  Newspaper,
   Package,
   ScrollText,
   Settings,
@@ -71,7 +72,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
-  const { isImmortal, isCoder } = usePermissions();
+  const { isImmortal, isBuilder, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
   // Collapse state
@@ -233,6 +234,14 @@ export function Sidebar() {
       },
     ],
   };
+
+  if (isBuilder) {
+    worldBuildingSection.items.push({
+      name: 'Site Content',
+      href: '/dashboard/site-content',
+      icon: <Newspaper className='h-4 w-4' />,
+    });
+  }
 
   const gameSystemsItems: NavItem[] = [
     {

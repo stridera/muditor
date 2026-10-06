@@ -1,12 +1,6 @@
-'use client';
-
-import { ThemeProvider } from '@/components/theme-provider';
-import { EnhancedCommandPalette } from '@/components/EnhancedCommandPalette';
-import { AuthProvider } from '@/contexts/auth-context';
-import { EnvironmentProvider } from '@/contexts/environment-context';
-import { ZoneProvider } from '@/contexts/zone-context';
-import { ApolloWrapper } from '../lib/apollo-wrapper';
+import type { Metadata } from 'next';
 import { Cinzel, Plus_Jakarta_Sans } from 'next/font/google';
+import { Providers } from './providers';
 import './globals.css';
 
 const cinzel = Cinzel({
@@ -21,6 +15,10 @@ const jakarta = Plus_Jakarta_Sans({
   display: 'swap',
 });
 
+export const metadata: Metadata = {
+  title: 'Muditor',
+};
+
 export default function RootLayout({
   children,
 }: {
@@ -28,30 +26,11 @@ export default function RootLayout({
 }) {
   return (
     <html lang='en' suppressHydrationWarning>
-      <head>
-        <title>Muditor</title>
-      </head>
       <body
         className={`${cinzel.variable} ${jakarta.variable} bg-background text-foreground`}
         suppressHydrationWarning
       >
-        <ThemeProvider
-          attribute='class'
-          defaultTheme='dark'
-          enableSystem
-          disableTransitionOnChange
-        >
-          <ApolloWrapper>
-            <EnvironmentProvider>
-              <AuthProvider>
-                <ZoneProvider>
-                  {children}
-                  <EnhancedCommandPalette />
-                </ZoneProvider>
-              </AuthProvider>
-            </EnvironmentProvider>
-          </ApolloWrapper>
-        </ThemeProvider>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

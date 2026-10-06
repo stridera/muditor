@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/auth-context';
+import { setPostLoginPath, useAuth } from '@/contexts/auth-context';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -26,6 +26,11 @@ function LoginContent() {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
+  const redirect = searchParams.get('redirect');
+  useEffect(() => {
+    setPostLoginPath(redirect);
+  }, [redirect]);
 
   useEffect(() => {
     const oauthError = searchParams.get('error');

@@ -123,6 +123,16 @@ type AccountItemObjectDto {
   zoneId: Int!
 }
 
+"""Game-side account lock and character-link lockout state"""
+type AccountLockStatus {
+  characterLinkLockouts: [CharacterLinkLockout!]!
+  failedLoginAttempts: Int!
+
+  """True only while lockedUntil is in the future"""
+  locked: Boolean!
+  lockedUntil: DateTime
+}
+
 type AccountStorageDto {
   accountWealth: BigInt!
   items: [AccountItemDto!]!
@@ -370,6 +380,12 @@ type CharacterItemDto {
   updatedAt: DateTime!
 }
 
+"""Remaining website character-link lockout for one character"""
+type CharacterLinkLockout {
+  characterName: String!
+  remainingSeconds: Int!
+}
+
 type CharacterLinkingInfoDto {
   class: String
   hasPassword: Boolean!
@@ -380,6 +396,17 @@ type CharacterLinkingInfoDto {
   name: String!
   race: String
   timePlayed: Int!
+}
+
+"""Whether a character has a game password (Characters.passwordHash) set"""
+type CharacterPasswordStatus {
+  characterName: String!
+
+  """True when the stored hash is a legacy crypt(3) hash (not bcrypt)"""
+  isLegacyHash: Boolean!
+
+  """True when a game password hash is stored"""
+  isSet: Boolean!
 }
 
 type CharacterQuestDto {
@@ -1025,6 +1052,18 @@ input CreateShopInput {
   zoneId: Int!
 }
 
+"""Input for creating site content"""
+input CreateSiteContentInput {
+  """Markdown body"""
+  body: String!
+  kind: SiteContentKind!
+  published: Boolean! = false
+  slug: String!
+  sortOrder: Int! = 0
+  summary: String
+  title: String!
+}
+
 """Input for creating a new social command"""
 input CreateSocialInput {
   """Message to actor when targeting self"""
@@ -1297,6 +1336,41 @@ enum GameEventType {
   ZONE_RESET
 }
 
+"""
+A pending game login request created at the telnet prompt, approved from the website
+"""
+type GameLoginCodeDto {
+  """
+  True when the account is currently locked in-game; approving still logs the player in
+  """
+  accountLocked: Boolean!
+
+  """Character name the player typed at the prompt"""
+  characterName: String!
+
+  """IP address of the connecting telnet client"""
+  clientIp: String!
+
+  """Display form of the code, e.g. ABCD-EFGH"""
+  code: String!
+  createdAt: DateTime!
+  expiresAt: DateTime!
+  lockedUntil: DateTime
+  status: GameLoginCodeStatus!
+
+  """Whether the telnet connection used TLS"""
+  tls: Boolean!
+}
+
+"""Lifecycle state of a game login device code"""
+enum GameLoginCodeStatus {
+  APPROVED
+  CONSUMED
+  DENIED
+  EXPIRED
+  PENDING
+}
+
 enum Gender {
   FEMALE
   MALE
@@ -1481,6 +1555,7 @@ enum LoginStage {
   LOGIN_APPROVAL_EXPIRED
   LOGIN_APPROVAL_PENDING
   PASSWORD_PROMPT
+  PLAIN_TELNET_NOTICE
   RECONNECT_MESSAGE
   SELECT_CLASS
   SELECT_RACE
@@ -1679,6 +1754,9 @@ enum MovementMode {
 type Mutation {
   addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
 
+  """Approve a pending game login for one of your characters"""
+  approveGameLogin(code: String!): GameLoginCodeDto!
+
   """Assign a skill to a class"""
   assignSkillToClass(data: AssignSkillToClassInput!): ClassSkillDto!
 
@@ -1694,6 +1772,11 @@ type Mutation {
   """Broadcast a message to all online players"""
   broadcastMessage(message: String!, sender: String): BroadcastResultType!
   changePassword(input: ChangePasswordInput!): PasswordResetResponse!
+
+  """
+  Clear your game-side account lock and character-link lockouts (does not affect staff bans)
+  """
+  clearAccountLock: AccountLockStatus!
   completeGoogleRegistration(displayName: String!, token: String!): AuthPayload!
   createAbility(data: CreateAbilityInput!): Ability!
   createAbilityMessages(data: CreateAbilityMessagesInput!): AbilityMessages!
@@ -1728,6 +1811,9 @@ type Mutation {
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
   createShop(data: CreateShopInput!): ShopDto!
+
+  """Create site content"""
+  createSiteContent(data: CreateSiteContentInput!): SiteContentDto!
 
   """Create a new social command"""
   createSocial(data: CreateSocialInput!): SocialDto!
@@ -1772,6 +1858,9 @@ type Mutation {
   deleteRoomExit(exitId: Float!): RoomExitDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
 
+  """Delete site content"""
+  deleteSiteContent(id: ID!): Boolean!
+
   """Delete a social command"""
   deleteSocial(id: ID!): Boolean!
 
@@ -1779,6 +1868,9 @@ type Mutation {
   deleteSystemText(id: ID!): Boolean!
   deleteTrigger(id: Int!, zoneId: Int!): TriggerDto!
   deleteZone(id: Int!): ZoneDto!
+
+  """Deny a pending game login request"""
+  denyGameLogin(code: String!): Boolean!
   depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
   depositWealth(amount: BigInt!, characterId: String!): BigInt!
 
@@ -1818,6 +1910,11 @@ type Mutation {
   sendGameChat(channel: String!, characterName: String!, message: String!): CommandResultType!
   setCharacterOffline(characterId: ID!): Boolean!
   setCharacterOnline(characterId: ID!): Boolean!
+
+  """
+  Set the game password (Characters.passwordHash) for all your characters, or one when characterName is given. Must differ from the website password
+  """
+  setGamePassword(characterName: String, password: String!): Boolean!
   unbanUser(input: UnbanUserInput!): BanRecord!
 
   """Unlink a character from your user account"""
@@ -1872,6 +1969,9 @@ type Mutation {
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
+
+  """Update site content"""
+  updateSiteContent(data: UpdateSiteContentInput!, id: ID!): SiteContentDto!
 
   """Update an existing social command"""
   updateSocial(data: UpdateSocialInput!, id: ID!): SocialDto!
@@ -2087,12 +2187,41 @@ enum Position {
   STUNNED
 }
 
+"""Public game server status (no authentication required)"""
+type PublicServerStatus {
+  """Public hostname players connect to"""
+  host: String!
+
+  """True when the game server answered the status probe"""
+  online: Boolean!
+
+  """Players currently online"""
+  playersOnline: Int
+
+  """Public telnet port"""
+  port: Int!
+
+  """Current world tick"""
+  tick: Int
+
+  """Public TLS port"""
+  tlsPort: Int
+
+  """
+  Seconds since the game server started (null when the server does not report it)
+  """
+  uptimeSeconds: Int
+}
+
 type Query {
   abilities(abilityType: String, search: String, skip: Int, take: Int): [Ability!]!
   abilitiesCount(abilityType: String, search: String): Int!
   ability(id: ID!): Ability!
   abilitySchool(id: ID!): AbilitySchool!
   abilitySchools: [AbilitySchool!]!
+
+  """Game-side account lock and character-link lockout state"""
+  accountLockStatus: AccountLockStatus!
   activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
 
   """Get all unique permission flags used across commands"""
@@ -2155,6 +2284,14 @@ type Query {
 
   """Get configuration entries by category"""
   gameConfigsByCategory(category: String!): [GameConfigDto!]!
+
+  """
+  Look up a pending game login code (ABCD-EFGH) shown at the telnet prompt
+  """
+  gameLoginCode(code: String!): GameLoginCodeDto!
+
+  """Per-character game password status"""
+  gamePasswordStatus: [CharacterPasswordStatus!]!
 
   """Check if FieryMUD admin API is connected"""
   gameServerConnected: Boolean!
@@ -2229,6 +2366,9 @@ type Query {
 
   """Get list of online players in FieryMUD"""
   onlinePlayers: [OnlinePlayerType!]!
+
+  """Public game server status (cached for 15 seconds)"""
+  publicServerStatus: PublicServerStatus!
   quest(id: Int!, zoneId: Int!): QuestDto
   quests(filter: QuestFilterInput, skip: Int, take: Int): [QuestDto!]!
   questsByZone(zoneId: Int!): [QuestDto!]!
@@ -2259,6 +2399,14 @@ type Query {
   shops(skip: Int, take: Int): [ShopDto!]!
   shopsByZone(zoneId: Int!): [ShopDto!]!
   shopsCount: Int!
+
+  """Get a single piece of site content by slug"""
+  siteContent(slug: String!): SiteContentDto!
+
+  """
+  List site content. Anonymous callers only get published rows; BUILDER+ may pass publishedOnly=false to include drafts
+  """
+  siteContents(kind: SiteContentKind, publishedOnly: Boolean = true): [SiteContentDto!]!
 
   """Get a single social by ID"""
   social(id: ID!): SocialDto!
@@ -2751,6 +2899,37 @@ enum ShopTradesWith {
   TRADE_NONEUTRAL
   TRADE_NOTHIEF
   TRADE_NOWARRIOR
+}
+
+"""Public website content (rules, guides, lore, news) in markdown"""
+type SiteContentDto {
+  authorId: String
+
+  """Markdown body"""
+  body: String!
+  createdAt: DateTime!
+  id: ID!
+  kind: SiteContentKind!
+
+  """Only published content is visible to anonymous users"""
+  published: Boolean!
+  publishedAt: DateTime
+
+  """URL slug, unique across all content"""
+  slug: String!
+  sortOrder: Int!
+
+  """Short teaser text"""
+  summary: String
+  title: String!
+  updatedAt: DateTime!
+}
+
+"""Type of public website content"""
+enum SiteContentKind {
+  LORE
+  NEWS
+  PAGE
 }
 
 enum Size {
@@ -3417,6 +3596,17 @@ input UpdateShopInput {
 
 input UpdateShopInventoryInput {
   items: [ShopItemInput!]!
+}
+
+"""Input for updating site content"""
+input UpdateSiteContentInput {
+  body: String
+  kind: SiteContentKind
+  published: Boolean
+  slug: String
+  sortOrder: Int
+  summary: String
+  title: String
 }
 
 """Input for updating a social command"""

@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   ConflictException,
   Injectable,
   Logger,
@@ -266,6 +267,31 @@ export class AuthService {
     return true;
   }
 
+  /**
+   * The website password must never equal a game password
+   * (Characters.passwordHash). Only bcrypt hashes can be compared; legacy
+   * crypt(3) hashes are skipped.
+   */
+  private async assertDiffersFromGamePasswords(
+    userId: string,
+    newPassword: string
+  ): Promise<void> {
+    const characters = await this.databaseService.characters.findMany({
+      where: { userId },
+      select: { passwordHash: true },
+    });
+    for (const { passwordHash } of characters) {
+      if (
+        passwordHash.startsWith('$2') &&
+        (await bcrypt.compare(newPassword, passwordHash))
+      ) {
+        throw new BadRequestException(
+          'Website password must differ from your game password'
+        );
+      }
+    }
+  }
+
   async resetPassword(token: string, newPassword: string): Promise<boolean> {
     const user = await this.databaseService.users.findFirst({
       where: {
@@ -280,6 +306,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid or expired reset token');
     }
 
+    await this.assertDiffersFromGamePasswords(user.id, newPassword);
+
     // Hash new password
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
@@ -292,12 +320,6 @@ export class AuthService {
         resetToken: null,
         resetTokenExpiry: null,
       },
-    });
-
-    // Sync password hash to all linked characters so FieryMUD can authenticate them
-    await this.databaseService.characters.updateMany({
-      where: { userId: user.id },
-      data: { passwordHash },
     });
 
     this.logger.log(`Password reset completed for user: ${user.displayName}`);
@@ -356,18 +378,14 @@ export class AuthService {
       }
     }
 
+    await this.assertDiffersFromGamePasswords(userId, newPassword);
+
     // Hash new password
     const saltRounds = 12;
     const passwordHash = await bcrypt.hash(newPassword, saltRounds);
 
     await this.databaseService.users.update({
       where: { id: userId },
-      data: { passwordHash },
-    });
-
-    // Sync password hash to all linked characters so FieryMUD can authenticate them
-    await this.databaseService.characters.updateMany({
-      where: { userId },
       data: { passwordHash },
     });
 

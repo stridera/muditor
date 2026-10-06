@@ -1,0 +1,63 @@
+# Game login (telnet device codes) and per-character game passwords
+
+fragment GameLoginCodeFields on GameLoginCodeDto {
+  code
+  characterName
+  clientIp
+  tls
+  status
+  createdAt
+  expiresAt
+  accountLocked
+  lockedUntil
+}
+
+query GameLoginCode($code: String!) {
+  gameLoginCode(code: $code) {
+    ...GameLoginCodeFields
+  }
+}
+
+mutation ApproveGameLogin($code: String!) {
+  approveGameLogin(code: $code) {
+    ...GameLoginCodeFields
+  }
+}
+
+mutation DenyGameLogin($code: String!) {
+  denyGameLogin(code: $code)
+}
+
+query GamePasswordStatus {
+  gamePasswordStatus {
+    characterName
+    isSet
+    isLegacyHash
+  }
+}
+
+mutation SetGamePassword($password: String!, $characterName: String) {
+  setGamePassword(password: $password, characterName: $characterName)
+}
+
+fragment AccountLockFields on AccountLockStatus {
+  locked
+  lockedUntil
+  failedLoginAttempts
+  characterLinkLockouts {
+    characterName
+    remainingSeconds
+  }
+}
+
+query AccountLockStatus {
+  accountLockStatus {
+    ...AccountLockFields
+  }
+}
+
+mutation ClearAccountLock {
+  clearAccountLock {
+    ...AccountLockFields
+  }
+}

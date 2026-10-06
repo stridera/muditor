@@ -25,6 +25,16 @@ if [[ "$TARGET" == muditor || "$TARGET" == all ]]; then
     cd /opt/NEXT/muditor
     bun install --frozen-lockfile
     bun run db:generate
+    # Push the Prisma schema (repo convention is `db push`, no migrations dir). Without
+    # --accept-data-loss prisma aborts on destructive changes, which fails the update.
+    echo "-- prisma db push"
+    ( set -a; . /opt/NEXT/env/muditor.env; set +a; cd packages/db && bunx prisma db push --skip-generate )
+    # Idempotent SQL seeds from sql/*.sql from the repo checkout, in name order. Auth via pgpass (no password in argv).
+    for f in /opt/NEXT/muditor/deploy/prod/sql/*.sql; do
+      [[ -e "$f" ]] || continue
+      echo "-- seed $(basename "$f")"
+      PGPASSFILE=/opt/NEXT/.secrets/pgpass psql -h 127.0.0.1 -p 5432 -U fierynext -d fierynext -v ON_ERROR_STOP=1 -q -f "$f"
+    done
     set -a; . /opt/NEXT/.env; set +a
     NODE_OPTIONS=--max-old-space-size=2048 bun run build
   )

@@ -71,7 +71,7 @@ export class CharactersService implements OnModuleDestroy {
    * Check if a character is locked out from linking attempts.
    * Returns the remaining lockout time in seconds, or 0 if not locked out.
    */
-  private async getLockoutRemaining(characterName: string): Promise<number> {
+  async getLockoutRemaining(characterName: string): Promise<number> {
     if (!this.redis) return 0;
     const key = `charlink:lockout:${characterName.toLowerCase()}`;
     try {
@@ -108,7 +108,7 @@ export class CharactersService implements OnModuleDestroy {
   /**
    * Clear failed attempt counter for a character (on successful link).
    */
-  private async clearFailedAttempts(characterName: string): Promise<void> {
+  async clearFailedAttempts(characterName: string): Promise<void> {
     if (!this.redis) return;
     const key = `charlink:lockout:${characterName.toLowerCase()}`;
     try {

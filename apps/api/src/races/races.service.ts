@@ -19,10 +19,20 @@ export class RacesService {
   // Race CRUD operations
 
   /**
+   * Visibility rule for public reads: pass `viewer = null` for an anonymous
+   * caller (only playable races are visible). Any authenticated viewer, or
+   * `undefined` (internal callers), sees everything.
+   */
+  private isAnonymous(viewer: object | null | undefined): boolean {
+    return viewer === null;
+  }
+
+  /**
    * Find all races
    */
-  async findAll() {
+  async findAll(viewer?: object | null) {
     return this.db.races.findMany({
+      ...(this.isAnonymous(viewer) && { where: { playable: true } }),
       orderBy: { name: 'asc' },
     });
   }
@@ -30,9 +40,9 @@ export class RacesService {
   /**
    * Find a single race by enum value
    */
-  async findOne(race: Race) {
-    const raceData = await this.db.races.findUnique({
-      where: { race },
+  async findOne(race: Race, viewer?: object | null) {
+    const raceData = await this.db.races.findFirst({
+      where: { race, ...(this.isAnonymous(viewer) && { playable: true }) },
     });
 
     if (!raceData) {
@@ -45,8 +55,10 @@ export class RacesService {
   /**
    * Get total count of races
    */
-  async count() {
-    return this.db.races.count();
+  async count(viewer?: object | null) {
+    return this.db.races.count({
+      ...(this.isAnonymous(viewer) && { where: { playable: true } }),
+    });
   }
 
   /**
@@ -110,7 +122,11 @@ export class RacesService {
   /**
    * Get all abilities for a race
    */
-  async getRaceSkills(race: Race) {
+  async getRaceSkills(race: Race, viewer?: object | null) {
+    if (this.isAnonymous(viewer)) {
+      // Same visibility as findOne: non-playable races are not-found for anonymous callers
+      await this.findOne(race, viewer);
+    }
     const abilities = await this.db.raceAbilities.findMany({
       where: { race },
       include: {

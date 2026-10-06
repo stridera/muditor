@@ -30,6 +30,7 @@ import {
   Mail,
   Map,
   MessageCircle,
+  Newspaper,
   ScrollText,
   Settings,
   Shield,
@@ -134,7 +135,7 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
 export function Navigation() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
-  const { isImmortal, isCoder } = usePermissions();
+  const { isImmortal, isBuilder, isCoder } = usePermissions();
   const { isInZoneContext } = useZoneContext();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
 
@@ -413,6 +414,14 @@ export function Navigation() {
                           Help Entries
                         </Link>
                       </DropdownMenuItem>
+                      {isBuilder && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/site-content'>
+                            <Newspaper className='mr-2 h-4 w-4' />
+                            Site Content
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
                       {isCoder && (
                         <DropdownMenuItem asChild>
                           <Link href='/dashboard/admin/game-config'>

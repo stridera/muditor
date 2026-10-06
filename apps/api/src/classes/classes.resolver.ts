@@ -3,6 +3,7 @@ import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { UserRole } from '@muditor/db';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import { ClassDto, ClassSkillDto, ClassCircleDto } from './classes.dto';
 import {
@@ -16,12 +17,12 @@ import {
 import { ClassesService } from './classes.service';
 
 @Resolver(() => ClassDto)
-@UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
 export class ClassesResolver {
   constructor(private readonly classesService: ClassesService) {}
 
-  // Class Queries - any authenticated user can read (needed by the player character-creation form)
+  // Class Queries - public (anonymous allowed); there is no hidden/unplayable flag on classes
   @Query(() => [ClassDto], { name: 'classes' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
@@ -30,16 +31,19 @@ export class ClassesResolver {
   }
 
   @Query(() => ClassDto, { name: 'class' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(@Args('id', { type: () => ID }) id: string | number) {
     return this.classesService.findOne(Number(id));
   }
 
   @Query(() => ClassDto, { name: 'classByName', nullable: true })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByName(@Args('name') name: string) {
     return this.classesService.findByName(name);
   }
 
   @Query(() => Int, { name: 'classesCount' })
+  @UseGuards(OptionalJwtAuthGuard)
   async count() {
     return this.classesService.count();
   }
@@ -47,6 +51,7 @@ export class ClassesResolver {
   // Class Mutations - CODER can create (requires FieryMUD code changes)
   @Mutation(() => ClassDto)
   @MinimumRole(UserRole.CODER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async createClass(@Args('data') data: CreateClassInput) {
     return this.classesService.create(data);
   }
@@ -54,6 +59,7 @@ export class ClassesResolver {
   // HEAD_BUILDER can edit existing
   @Mutation(() => ClassDto)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async updateClass(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateClassInput
@@ -64,6 +70,7 @@ export class ClassesResolver {
   // HEAD_BUILDER can delete
   @Mutation(() => Boolean)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async deleteClass(@Args('id', { type: () => ID }) id: string | number) {
     await this.classesService.remove(Number(id));
     return true;
@@ -74,6 +81,7 @@ export class ClassesResolver {
     name: 'classSkills',
     description: 'Get all skills for a class',
   })
+  @UseGuards(OptionalJwtAuthGuard)
   async getClassSkills(@Args('classId', { type: () => Int }) classId: number) {
     return this.classesService.getClassSkills(classId);
   }
@@ -83,12 +91,14 @@ export class ClassesResolver {
     description: 'Assign a skill to a class',
   })
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async assignSkillToClass(@Args('data') data: AssignSkillToClassInput) {
     return this.classesService.assignSkillToClass(data);
   }
 
   @Mutation(() => ClassSkillDto)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async updateClassSkill(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateClassSkillInput
@@ -98,6 +108,7 @@ export class ClassesResolver {
 
   @Mutation(() => Boolean)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async removeClassSkill(@Args('id', { type: () => ID }) id: string | number) {
     await this.classesService.removeClassSkill(Number(id));
     return true;
@@ -108,6 +119,7 @@ export class ClassesResolver {
     name: 'classCirclesList',
     description: 'Get all spell circles for a class',
   })
+  @UseGuards(OptionalJwtAuthGuard)
   async getClassCircles(@Args('classId', { type: () => Int }) classId: number) {
     return this.classesService.getClassCircles(classId);
   }
@@ -115,12 +127,14 @@ export class ClassesResolver {
   // Class Circle Mutations - HEAD_BUILDER can manage circles
   @Mutation(() => ClassCircleDto)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async createClassCircle(@Args('data') data: CreateClassCircleInput) {
     return this.classesService.createClassCircle(data);
   }
 
   @Mutation(() => ClassCircleDto)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async updateClassCircle(
     @Args('id', { type: () => ID }) id: string | number,
     @Args('data') data: UpdateClassCircleInput
@@ -130,6 +144,7 @@ export class ClassesResolver {
 
   @Mutation(() => Boolean)
   @MinimumRole(UserRole.HEAD_BUILDER)
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
   async removeClassCircle(@Args('id', { type: () => ID }) id: string | number) {
     await this.classesService.removeClassCircle(Number(id));
     return true;
