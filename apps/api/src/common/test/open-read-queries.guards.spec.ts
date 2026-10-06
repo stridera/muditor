@@ -36,12 +36,12 @@ describe.each([
     const queries = methodsOfType(resolver, 'Query');
     expect(queries.length).toBeGreaterThan(0);
     for (const q of queries) {
-      expect([q, Reflect.getMetadata(MINIMUM_ROLE_KEY, (proto[q] as object))]).toEqual([
+      expect([
         q,
-        undefined,
-      ]);
+        Reflect.getMetadata(MINIMUM_ROLE_KEY, proto[q] as object),
+      ]).toEqual([q, undefined]);
       const methodGuards: unknown[] =
-        Reflect.getMetadata(GUARDS_METADATA, (proto[q] as object)) ?? [];
+        Reflect.getMetadata(GUARDS_METADATA, proto[q] as object) ?? [];
       expect(methodGuards).toEqual([]);
     }
   });
@@ -50,7 +50,7 @@ describe.each([
     const mutations = getMutationMethods(resolver);
     expect(mutations.length).toBeGreaterThan(0);
     for (const m of mutations) {
-      const role = Reflect.getMetadata(MINIMUM_ROLE_KEY, (proto[m] as object));
+      const role = Reflect.getMetadata(MINIMUM_ROLE_KEY, proto[m] as object);
       expect([m, [UserRole.HEAD_BUILDER, UserRole.CODER]]).toEqual([
         m,
         expect.arrayContaining([role]),

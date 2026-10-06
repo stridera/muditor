@@ -15,7 +15,10 @@ describe('ShopsResolver guards', () => {
 
   it('createShop checks both the shop zone and the keeper mob zone', () => {
     const proto = ShopsResolver.prototype as unknown as Record<string, object>;
-    const opts = Reflect.getMetadata(ZONE_SCOPE_KEY, proto.createShop as object);
+    const opts = Reflect.getMetadata(
+      ZONE_SCOPE_KEY,
+      proto.createShop as object
+    );
     expect(opts.keys).toEqual(
       expect.arrayContaining(['zoneId', 'keeperZoneId'])
     );

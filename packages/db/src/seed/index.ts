@@ -2,6 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@muditor/db';
 import { seedGameSystem } from './game-system';
 import { seedCharacters } from './characters';
+import { seedTestUsers } from './test-users';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -37,6 +38,12 @@ async function main() {
   console.log('');
 
   try {
+    if (process.env.SEED_TEST_USERS === '1') {
+      console.log('👤 SEED_TEST_USERS=1: seeding CI test accounts...');
+      await seedTestUsers(prisma);
+      console.log('');
+    }
+
     // Check if users exist
     console.log('👤 Checking for users...');
     const userCount = await prisma.users.count();
@@ -58,6 +65,15 @@ async function main() {
     console.log('');
     console.log('🎮 Seeding game system...');
     await seedGameSystem(prisma);
+
+    // CI mode only needs the accounts + game system. The legacy character
+    // fixtures below predate the Characters schema (they still pass `userId`)
+    // and are superseded by `fierylib seed users`.
+    if (process.env.SEED_TEST_USERS === '1') {
+      console.log('');
+      console.log('✅ Game system seeding completed (CI mode)!');
+      return;
+    }
 
     // Seed test characters
     console.log('');

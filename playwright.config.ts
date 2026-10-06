@@ -57,12 +57,16 @@ export default defineConfig({
     : [
         {
           command: 'bun run dev:api',
+          stdout: 'pipe',
+          stderr: 'pipe',
           url: 'http://localhost:3001/graphql',
           reuseExistingServer: !process.env.CI,
           timeout: 120 * 1000,
         },
         {
           command: 'bun run dev:web',
+          stdout: 'pipe',
+          stderr: 'pipe',
           url: 'http://localhost:3000',
           reuseExistingServer: !process.env.CI,
           timeout: 120 * 1000,

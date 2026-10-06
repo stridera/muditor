@@ -12,6 +12,7 @@
     "migrate:reset": "prisma migrate reset && bun run generate",
     "migrate:deploy": "prisma migrate deploy && bun run generate",
     "seed": "bun src/seed/index.ts",
+    "build": "tsc --build",
     "type-check": "tsc --noEmit",
     "clean": "rm -rf src/generated"
   },

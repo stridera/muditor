@@ -20,7 +20,7 @@ Relative paths to sibling projects use `../`.
 
 ## Relationships
 
-- **fierylib → Postgres**: fierylib parses legacy `lib/` files and writes them into the shared DB. One-shot, not a sync loop. Conversion of legacy → modern values happens *here* (see [[project-legacy-value-removal]]); the DB never stores legacy values.
+- **fierylib → Postgres**: fierylib parses legacy `lib/` files and writes them into the shared DB. One-shot, not a sync loop. Conversion of legacy → modern values happens _here_ (see [[project-legacy-value-removal]]); the DB never stores legacy values.
 - **Muditor ↔ Postgres**: Muditor is the authoring UI. Reads and writes the shared DB.
 - **fierymud-rs ← Postgres**: fierymud-rs loads world data at startup. Persists player state back to the DB.
 - **fierymud ← Postgres**: same as above; the C++ runtime and the Rust runtime both read the same world data and write to the same player tables. They are NOT run simultaneously.

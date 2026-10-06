@@ -7,7 +7,7 @@ on:
     branches: [main, develop]
 
 env:
-  BUN_VERSION: '1.3'
+  BUN_VERSION: '1.4'
 
 jobs:
   # Install dependencies and cache
@@ -156,6 +156,15 @@ jobs:
       DATABASE_URL: postgresql://muditor:password@localhost:5432/muditor_test
       REDIS_URL: redis://localhost:6379
       PLAYWRIGHT_BASE_URL: http://localhost:3000
+      # The API refuses to boot without JWT_SECRET; CI-only value, not a real secret.
+      JWT_SECRET: ci-only-secret-0123456789abcdef0123456789abcdef
+      CORS_ORIGINS: http://localhost:3000
+      FRONTEND_URL: http://localhost:3000
+      NEXT_PUBLIC_API_URL: http://localhost:3001
+      NEXT_PUBLIC_GRAPHQL_URL: http://localhost:3001/graphql
+      API_PORT: 3001
+      # Creates the admin/builder/player accounts the e2e specs log in with.
+      SEED_TEST_USERS: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun

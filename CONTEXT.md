@@ -19,7 +19,7 @@ _Avoid_: "object effect" / "mob effect" (ambiguous between the Effect and the at
 
 **StatModifier**:
 The conceptual subcategory of **Effect attachment** where the linked Effect has `effectType="modify"` and `modifier_data` carries `{target, amount}` — e.g. `armor_pct +5`, `max_stamina +10`, `accuracy -3`. All current `ObjectEffects` rows are StatModifiers (4044/4044); the term is useful for distinguishing flat-stat-bump attachments from behavior-bearing ones in builder language and runtime code.
-_Avoid_: "apply" (legacy CircleMUD term), "modifier delta", "stat bonus", "affect", "APPLY_*"
+_Avoid_: "apply" (legacy CircleMUD term), "modifier delta", "stat bonus", "affect", "APPLY\_\*"
 
 ### Shop trade gating
 
@@ -52,7 +52,7 @@ _Avoid_: "rested buff", "extra buff", "wake buff", "special bed buff"
   - `effectType="modify"` → `modifier_data` MUST carry `{target: string, amount: int}` (this is a **StatModifier**)
   - `effectType="status"` (etc.) → `modifier_data` may be empty or carry effect-specific overrides
 - A **StatModifier**'s `target` string must match a known `apply_stat_modifier` arm in fierymud-rs. There is no schema-side guarantee of synchrony — keys are stringly-typed by design (kept flexible for future stats).
-- Today each junction table is used narrowly: `ObjectEffects` holds only StatModifiers (no status grants on items yet); `RaceEffects` holds only status-type Effects; `MobDefaultEffects` and `CharacterEffects` are empty in the current dataset. The schema *supports* any Effect type on any junction; the data is just sparse.
+- Today each junction table is used narrowly: `ObjectEffects` holds only StatModifiers (no status grants on items yet); `RaceEffects` holds only status-type Effects; `MobDefaultEffects` and `CharacterEffects` are empty in the current dataset. The schema _supports_ any Effect type on any junction; the data is just sparse.
 
 ## Example dialogue
 

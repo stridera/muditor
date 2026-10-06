@@ -350,7 +350,6 @@ export function MobCombatStatsTab({
               </select>
               <p className='text-xs text-muted-foreground mt-1'>Resistances</p>
             </div>
-
           </div>
 
           {/* Generation Button Row */}
@@ -405,8 +404,8 @@ export function MobCombatStatsTab({
                           distributions
                         </li>
                         <li>
-                          • <strong>Offense/Defense</strong>: Accuracy,
-                          evasion, and armor rating scaled by level and role
+                          • <strong>Offense/Defense</strong>: Accuracy, evasion,
+                          and armor rating scaled by level and role
                         </li>
                         <li>
                           • <strong>Resistances</strong>: Based on race (e.g.,
@@ -548,7 +547,6 @@ export function MobCombatStatsTab({
               />
             </div>
           </div>
-
         </div>
 
         {/* Right Column */}
