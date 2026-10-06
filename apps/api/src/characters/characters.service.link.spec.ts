@@ -10,6 +10,7 @@ import { CharactersService } from './characters.service';
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
     connect: jest.fn().mockResolvedValue(undefined),
+    on: jest.fn(),
     disconnect: jest.fn(),
   }));
 });

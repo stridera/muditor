@@ -21,7 +21,7 @@ import { AuditService } from './audit.service';
  * - Admin API for remote game server management
  *
  * Configuration:
- * - REDIS_URL: Redis connection URL (default: redis://localhost:6379)
+ * - REDIS_URL: Redis connection URL (unset = no Redis: event bridge disabled)
  * - FIERYMUD_ADMIN_URL: Admin API URL (default: http://localhost:8080)
  * - FIERYMUD_ADMIN_TOKEN: Bearer token for admin API authentication
  *

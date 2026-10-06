@@ -5,12 +5,14 @@ import {
   type ExecutionContext,
   HttpException,
   HttpStatus,
+  Logger,
   SetMetadata,
 } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
+import { createRedisClient, getRedisUrl } from '../common/redis';
 
 export const RATE_LIMIT_KEY = 'rateLimit';
 
@@ -46,6 +48,7 @@ export const RateLimit = (options: RateLimitOptions) =>
  */
 @Injectable()
 export class RateLimitGuard implements CanActivate, OnModuleDestroy {
+  private readonly logger = new Logger(RateLimitGuard.name);
   private redis: Redis | null = null;
   private readonly enabled: boolean;
 
@@ -53,22 +56,14 @@ export class RateLimitGuard implements CanActivate, OnModuleDestroy {
     private reflector: Reflector,
     private configService: ConfigService
   ) {
-    const redisUrl =
-      this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
+    const redisUrl = getRedisUrl(this.configService);
     this.enabled =
       this.configService.get<string>('RATE_LIMIT_ENABLED') !== 'false';
 
-    if (this.enabled) {
-      this.redis = new Redis(redisUrl, {
-        lazyConnect: true,
-        maxRetriesPerRequest: 3,
-      });
-      const client = this.redis;
-      client.connect().catch(() => {
-        // Silently fail - rate limiting will be disabled. Stop the client's
-        // reconnect loop so it cannot keep the event loop alive.
-        client.disconnect();
-        this.redis = null;
+    if (this.enabled && redisUrl) {
+      this.redis = createRedisClient(redisUrl, {
+        logger: this.logger,
+        label: 'Redis (rate limiting)',
       });
     }
   }

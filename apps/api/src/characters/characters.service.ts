@@ -11,12 +11,13 @@ import {
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
 import {
   FallbackTtlCounter,
   InMemoryTtlCounter,
   type TtlCounter,
 } from '../common/ttl-counter';
+import { createRedisClient, getRedisUrl } from '../common/redis';
 import { unixCrypt as crypt } from '../common/unix-crypt';
 import type {
   ItemInstanceFlag,
@@ -69,19 +70,13 @@ export class CharactersService implements OnModuleDestroy {
     private readonly racesService: RacesService,
     private readonly gameAdmin: GameAdminService
   ) {
-    const redisUrl =
-      this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
-    this.redis = new Redis(redisUrl, {
-      lazyConnect: true,
-      maxRetriesPerRequest: 3,
-    });
-    const client = this.redis;
-    client.connect().catch(() => {
-      this.logger.warn('link lockout using in-memory store (no Redis)');
-      // Stop the reconnect loop so it cannot keep the event loop alive.
-      client.disconnect();
-      this.redis = null;
-    });
+    const redisUrl = getRedisUrl(this.configService);
+    if (redisUrl) {
+      this.redis = createRedisClient(redisUrl, {
+        logger: this.logger,
+        label: 'Redis (link lockout)',
+      });
+    }
   }
 
   /**

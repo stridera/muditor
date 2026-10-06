@@ -5,7 +5,8 @@ import {
   Logger,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
+import { createRedisClient, getRedisUrl } from '../common/redis';
 import { Subject, Observable, filter } from 'rxjs';
 import {
   GameEvent,
@@ -37,45 +38,39 @@ export class BridgeService implements OnModuleInit, OnModuleDestroy {
 
   constructor(private readonly configService: ConfigService) {}
 
-  async onModuleInit(): Promise<void> {
-    const redisUrl = this.configService.get<string>(
-      'REDIS_URL',
-      'redis://localhost:6379'
-    );
-
-    try {
-      this.subscriber = new Redis(redisUrl, {
-        retryStrategy: times => {
-          const delay = Math.min(times * 1000, 30000);
-          this.logger.warn(
-            `Redis connection retry #${times}, next attempt in ${delay}ms`
-          );
-          return delay;
-        },
-        lazyConnect: true,
-      });
-
-      this.subscriber.on('message', this.handleMessage.bind(this));
-      this.subscriber.on('connect', () => {
-        this.isConnected = true;
-        this.logger.log('Connected to Redis for game event subscription');
-      });
-      this.subscriber.on('error', error => {
-        this.logger.error('Redis subscriber error:', error.message);
-      });
-      this.subscriber.on('close', () => {
-        this.isConnected = false;
-        this.logger.warn('Redis connection closed');
-      });
-
-      await this.subscriber.connect();
-      await this.subscriber.subscribe(...REDIS_CHANNELS);
-      this.logger.log(`Subscribed to channels: ${REDIS_CHANNELS.join(', ')}`);
-    } catch (error) {
-      this.logger.error('Failed to connect to Redis:', error);
-      // Don't throw - allow the service to start without Redis
-      // It will retry connection automatically
+  onModuleInit(): void {
+    const redisUrl = getRedisUrl(this.configService);
+    if (!redisUrl) {
+      this.logger.log('Redis not configured — game event bridge disabled');
+      return;
     }
+
+    const subscriber = createRedisClient(redisUrl, {
+      logger: this.logger,
+      label: 'Redis (game events)',
+      subscriber: true,
+    });
+    this.subscriber = subscriber;
+
+    subscriber.on('message', this.handleMessage.bind(this));
+    subscriber.on('ready', () => {
+      this.isConnected = true;
+      this.logger.log('Connected to Redis for game event subscription');
+    });
+    subscriber.on('close', () => {
+      this.isConnected = false;
+    });
+
+    // Queued until connected and re-issued by ioredis after a reconnect; must
+    // not block application startup while Redis is down.
+    subscriber.subscribe(...REDIS_CHANNELS).then(
+      () =>
+        this.logger.log(`Subscribed to channels: ${REDIS_CHANNELS.join(', ')}`),
+      (error: unknown) =>
+        this.logger.warn(
+          `Failed to subscribe to game event channels: ${error instanceof Error ? error.message : String(error)}`
+        )
+    );
   }
 
   async onModuleDestroy(): Promise<void> {

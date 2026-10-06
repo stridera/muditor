@@ -5,7 +5,8 @@ import {
   type OnModuleDestroy,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import Redis from 'ioredis';
+import type Redis from 'ioredis';
+import { createRedisClient, getRedisUrl } from '../common/redis';
 import { DiscordService } from './discord.service';
 import { DatabaseService } from '../database/database.service';
 
@@ -19,25 +20,23 @@ import { DatabaseService } from '../database/database.service';
 export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(DiscordBridgeService.name);
   private subscriber: Redis | null = null;
-  private readonly redisUrl: string;
+  private readonly redisUrl: string | null;
 
   constructor(
     private readonly configService: ConfigService,
     private readonly discordService: DiscordService,
     private readonly databaseService: DatabaseService
   ) {
-    this.redisUrl =
-      this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
+    this.redisUrl = getRedisUrl(this.configService);
   }
 
-  async onModuleInit() {
-    try {
-      await this.connectToRedis();
-      await this.subscribeToChannels();
-      this.logger.log('Discord bridge connected to Redis event stream');
-    } catch (error) {
-      this.logger.error('Failed to initialize Discord bridge', error);
+  onModuleInit() {
+    if (!this.redisUrl) {
+      this.logger.log('Redis not configured — Discord bridge disabled');
+      return;
     }
+    this.connectToRedis(this.redisUrl);
+    this.subscribeToChannels();
   }
 
   onModuleDestroy() {
@@ -48,31 +47,17 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  private async connectToRedis() {
-    this.subscriber = new Redis(this.redisUrl, {
-      retryStrategy: times => {
-        if (times > 10) {
-          this.logger.error('Redis connection failed after 10 retries');
-          return null;
-        }
-        return Math.min(times * 100, 3000);
-      },
-      lazyConnect: true,
+  private connectToRedis(url: string) {
+    this.subscriber = createRedisClient(url, {
+      logger: this.logger,
+      label: 'Redis (Discord bridge)',
+      subscriber: true,
     });
-
-    this.subscriber.on('error', error => {
-      this.logger.error('Redis subscriber error', error);
-    });
-
-    this.subscriber.on('reconnecting', () => {
-      this.logger.warn('Redis subscriber reconnecting...');
-    });
-
-    await this.subscriber.connect();
   }
 
-  private async subscribeToChannels() {
-    if (!this.subscriber) return;
+  private subscribeToChannels() {
+    const subscriber = this.subscriber;
+    if (!subscriber) return;
 
     const channels = [
       'fierymud:events:chat',
@@ -80,16 +65,24 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
       'fierymud:events:admin',
     ];
 
-    await this.subscriber.subscribe(...channels);
-    this.logger.log(`Discord bridge subscribed to: ${channels.join(', ')}`);
-
-    this.subscriber.on('message', async (channel: string, message: string) => {
+    subscriber.on('message', async (channel: string, message: string) => {
       try {
         await this.handleEvent(channel, message);
       } catch (error) {
         this.logger.error(`Error handling event from ${channel}`, error);
       }
     });
+
+    // Queued until connected (and re-issued after reconnects); must not block
+    // application startup while Redis is down.
+    subscriber.subscribe(...channels).then(
+      () =>
+        this.logger.log(`Discord bridge subscribed to: ${channels.join(', ')}`),
+      (error: unknown) =>
+        this.logger.warn(
+          `Discord bridge subscribe failed: ${error instanceof Error ? error.message : String(error)}`
+        )
+    );
   }
 
   private async handleEvent(channel: string, rawMessage: string) {

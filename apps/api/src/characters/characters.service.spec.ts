@@ -22,6 +22,7 @@ jest.mock('bcrypt', () => ({ compare: jest.fn(), hash: jest.fn() }));
 jest.mock('ioredis', () => {
   return jest.fn().mockImplementation(() => ({
     connect: jest.fn().mockResolvedValue(undefined),
+    on: jest.fn(),
     disconnect: jest.fn(),
   }));
 });
