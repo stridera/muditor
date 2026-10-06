@@ -6,18 +6,20 @@ test.describe('Basic Application Functionality', () => {
     await expect(page.locator('h1:has-text("MUDITOR")')).toBeVisible();
   });
 
-  test('should navigate to login page', async ({ page }) => {
+  // Skipped: the home page is being replaced by the public site, so the old landing-page Sign In / Create Account links are gone.
+  test.skip('should navigate to login page', async ({ page }) => {
     await page.goto('/');
     await page.click('a[href*="login"], a:has-text("Sign In")');
     await expect(page).toHaveURL(/.*login/);
     await expect(page.locator('#identifier')).toBeVisible();
   });
 
-  test('should navigate to register page', async ({ page }) => {
+  // Skipped: the home page is being replaced by the public site, so the old landing-page Sign In / Create Account links are gone.
+  test.skip('should navigate to register page', async ({ page }) => {
     await page.goto('/');
     await page.click('a[href*="register"], a:has-text("Create Account")');
     await expect(page).toHaveURL(/.*register/);
-    await expect(page.locator('#username')).toBeVisible();
+    await expect(page.locator('#displayName')).toBeVisible();
   });
 
   test('should show validation error for invalid login', async ({ page }) => {
@@ -72,7 +74,8 @@ test.describe('Basic Application Functionality', () => {
     }
   });
 
-  test('should have working navigation links', async ({ page }) => {
+  // Skipped: the home page is being replaced by the public site, so the old landing-page Sign In / Create Account links are gone.
+  test.skip('should have working navigation links', async ({ page }) => {
     await page.goto('/');
 
     // Check that main navigation links exist and are clickable

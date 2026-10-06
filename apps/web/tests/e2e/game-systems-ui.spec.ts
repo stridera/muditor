@@ -49,7 +49,7 @@ test.describe('Game Systems UI - Editor Pages', () => {
 
     // Check that class items are displayed as buttons
     const classItems = page.locator(
-      'button:has-text("Berserker"), button:has-text("Warrior"), button:has-text("Priest")'
+      'button:has-text("Warrior"), button:has-text("Warrior"), button:has-text("Priest")'
     );
     await expect(classItems.first()).toBeVisible();
   });
@@ -106,13 +106,13 @@ test.describe('Game Systems UI - Editor Pages', () => {
     await page.goto('/dashboard/classes');
 
     // Wait for class items to load
-    await page.waitForSelector('button:has-text("Berserker")', {
+    await page.waitForSelector('button:has-text("Warrior")', {
       state: 'visible',
       timeout: 30000,
     });
 
     // Click a class button
-    await page.locator('button:has-text("Berserker")').click();
+    await page.locator('button:has-text("Warrior")').click();
 
     // Should show class details in the right panel (no longer "No class selected")
     await expect(page.locator('text=No class selected')).not.toBeVisible({

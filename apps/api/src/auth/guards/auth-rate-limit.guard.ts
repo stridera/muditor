@@ -43,6 +43,15 @@ export class AuthRateLimitGuard implements CanActivate {
   constructor(private readonly reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
+    // E2E suites log in dozens of times from one IP. CI sets this; it is
+    // ignored in production so the limiter can never be disabled there.
+    if (
+      process.env.AUTH_RATE_LIMIT_DISABLED === '1' &&
+      process.env.NODE_ENV !== 'production'
+    ) {
+      return true;
+    }
+
     const options =
       this.reflector.getAllAndOverride<RateLimitOptions | undefined>(
         RATE_LIMIT_KEY,

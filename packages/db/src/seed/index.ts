@@ -2,7 +2,7 @@ import { PrismaPg } from '@prisma/adapter-pg';
 import { PrismaClient } from '@muditor/db';
 import { seedGameSystem } from './game-system';
 import { seedCharacters } from './characters';
-import { seedTestUsers } from './test-users';
+import { seedTestUsers, seedTestWorld } from './ci-fixtures';
 
 const adapter = new PrismaPg({
   connectionString: process.env.DATABASE_URL!,
@@ -41,6 +41,7 @@ async function main() {
     if (process.env.SEED_TEST_USERS === '1') {
       console.log('👤 SEED_TEST_USERS=1: seeding CI test accounts...');
       await seedTestUsers(prisma);
+      await seedTestWorld(prisma);
       console.log('');
     }
 

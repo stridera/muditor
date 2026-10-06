@@ -11,7 +11,7 @@ test.describe('Authentication System', () => {
       await page.goto('/register');
 
       await expect(page.locator('#email')).toBeVisible();
-      await expect(page.locator('#username')).toBeVisible();
+      await expect(page.locator('#displayName')).toBeVisible();
       await expect(page.locator('#password')).toBeVisible();
       await expect(page.locator('#confirmPassword')).toBeVisible();
       await expect(page.locator('button[type="submit"]')).toBeVisible();
@@ -24,7 +24,7 @@ test.describe('Authentication System', () => {
       const testEmail = `test-${timestamp}@example.com`;
       const testUsername = `tu${timestamp}`;
 
-      await page.fill('#username', testUsername);
+      await page.fill('#displayName', testUsername);
       await page.fill('#email', testEmail);
       await page.fill('#password', testPassword);
       await page.fill('#confirmPassword', testPassword);
@@ -42,7 +42,7 @@ test.describe('Authentication System', () => {
 
       // Try with mismatched passwords
       await page.fill('#email', 'invalid-email');
-      await page.fill('#username', 'u'); // too short
+      await page.fill('#displayName', 'u'); // too short
       await page.fill('#password', '123'); // too weak
       await page.fill('#confirmPassword', '456'); // mismatch
 
@@ -68,7 +68,7 @@ test.describe('Authentication System', () => {
       const uniqueEmail = `dup-${timestamp}@example.com`;
       const username1 = `d1${timestamp}`;
 
-      await page.fill('#username', username1);
+      await page.fill('#displayName', username1);
       await page.fill('#email', uniqueEmail);
       await page.fill('#password', testPassword);
       await page.fill('#confirmPassword', testPassword);
@@ -83,7 +83,7 @@ test.describe('Authentication System', () => {
 
       // Try to register with same email
       const username2 = `d2${timestamp}`;
-      await page.fill('#username', username2);
+      await page.fill('#displayName', username2);
       await page.fill('#email', uniqueEmail);
       await page.fill('#password', testPassword);
       await page.fill('#confirmPassword', testPassword);
@@ -116,7 +116,8 @@ test.describe('Authentication System', () => {
       ).toBeVisible();
     });
 
-    test('should login with username successfully', async ({ page }) => {
+    // The login form is email-only now (input type=email); username login was removed.
+    test.skip('should login with username successfully', async ({ page }) => {
       await page.goto('/login');
 
       await page.fill('#identifier', adminUsername);
@@ -278,7 +279,7 @@ test.describe('Authentication System', () => {
       const uniqueEmail = `se-${timestamp}@example.com`;
       const uniqueUsername = `se${timestamp}`;
 
-      await page.fill('#username', uniqueUsername);
+      await page.fill('#displayName', uniqueUsername);
       await page.fill('#email', uniqueEmail);
       await page.fill('#password', testPassword);
       await page.fill('#confirmPassword', testPassword);
@@ -325,7 +326,7 @@ test.describe('Authentication System', () => {
       const uniqueEmail = `ro-${timestamp}@example.com`;
       const uniqueUsername = `ro${timestamp}`;
 
-      await page.fill('#username', uniqueUsername);
+      await page.fill('#displayName', uniqueUsername);
       await page.fill('#email', uniqueEmail);
       await page.fill('#password', testPassword);
       await page.fill('#confirmPassword', testPassword);

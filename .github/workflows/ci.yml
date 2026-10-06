@@ -129,6 +129,7 @@ jobs:
   e2e-tests:
     needs: install
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     services:
       postgres:
         image: postgres:16-alpine
@@ -165,6 +166,8 @@ jobs:
       API_PORT: 3001
       # Creates the admin/builder/player accounts the e2e specs log in with.
       SEED_TEST_USERS: '1'
+      # Specs log in many times from one IP; ignored when NODE_ENV=production.
+      AUTH_RATE_LIMIT_DISABLED: '1'
     steps:
       - uses: actions/checkout@v4
       - name: Setup Bun
