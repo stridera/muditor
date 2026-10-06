@@ -84,6 +84,14 @@ workspace crates; the existing binary keeps working. Run order stays: `sudo depl
 | 3000        | 127.0.0.1 | Muditor web (Apache proxies it)        |
 | 3001        | 127.0.0.1 | Muditor API / GraphQL (Apache proxies) |
 
+## Redis (optional)
+
+The Muditor API uses Redis only when `REDIS_URL` is set in `env/muditor.env` (there is no default URL). With it, the
+game-event and Discord bridges run and rate limits are shared across processes; without it the bridges are disabled
+(one info line at boot) and rate limiting/link lockout use in-process memory. Install with
+`sudo apt install redis-server`, then set `REDIS_URL=redis://127.0.0.1:6379` and restart `muditorNT-api`.
+`phase1-strider.sh` writes that line automatically when `redis-server` is active at generation time.
+
 ## Layout
 
 `/opt/NEXT/{fierymud-rs,muditor,fierylib,env,.secrets,certs,tools/bun,logs,run,backups,deploy}`

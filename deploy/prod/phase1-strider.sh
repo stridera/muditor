@@ -66,6 +66,14 @@ RUST_LOG=info
 ENVEOF
 note "env/fierymud-rs.env: written"
 
+# Redis is optional. The API only talks to Redis when REDIS_URL is set (it
+# enables the game-event/Discord bridge and cross-process rate limits).
+if systemctl is-active --quiet redis-server; then
+  REDIS_LINE="REDIS_URL=redis://127.0.0.1:6379"
+else
+  REDIS_LINE="# REDIS_URL unset: redis-server not active when this file was generated (sudo apt install redis-server)."
+fi
+
 cat > "$ENVDIR/muditor.env" <<ENVEOF
 # Muditor NEXT (api + web). /opt/NEXT/.env -> this file; muditor/.env -> /opt/NEXT/.env
 DATABASE_URL=${DB_URL}
@@ -77,7 +85,7 @@ GOOGLE_CLIENT_ID=${GOOGLE_ID}
 GOOGLE_CLIENT_SECRET=${GOOGLE_SECRET}
 GOOGLE_CALLBACK_URL=https://muditor-api.fierymud.org/api/auth/google/callback
 FRONTEND_URL=https://muditor.fierymud.org
-# REDIS_URL intentionally unset: no Redis is installed on this host.
+${REDIS_LINE}
 LOG_DIR=/opt/NEXT/logs
 CORS_ORIGINS=https://muditor.fierymud.org
 API_HOST=127.0.0.1
