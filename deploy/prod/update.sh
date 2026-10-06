@@ -28,7 +28,7 @@ if [[ "$TARGET" == muditor || "$TARGET" == all ]]; then
     # Push the Prisma schema (repo convention is `db push`, no migrations dir). Without
     # --accept-data-loss prisma aborts on destructive changes, which fails the update.
     echo "-- prisma db push"
-    ( set -a; . /opt/NEXT/env/muditor.env; set +a; cd packages/db && bunx prisma db push --skip-generate )
+    ( set -a; . /opt/NEXT/env/muditor.env; set +a; cd packages/db && bunx prisma db push )
     # Idempotent SQL seeds from sql/*.sql from the repo checkout, in name order. Auth via pgpass (no password in argv).
     for f in /opt/NEXT/muditor/deploy/prod/sql/*.sql; do
       [[ -e "$f" ]] || continue
