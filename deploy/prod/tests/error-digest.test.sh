@@ -57,6 +57,9 @@ for line in \
   lacks "redacted (bearer/jwt): ${line:0:40}" "abc.def.ghi" "$out"
   lacks "redacted (jwt): ${line:0:40}" "eyJhbGci" "$out"
 done
+out=$(printf 'msg="Variable \\"$i\\" got invalid value { email: \\"a@b.c\\", pw: \\"zzz\\" }; at x"\n' | redact)
+lacks "gql variable values dropped" "a@b.c" "$out"
+has "gql variable message prefix kept" "got invalid value {redacted}" "$out"
 has "bearer token placeholder" "Bearer {redacted}" "$(printf 'Bearer sekret123\n' | redact)"
 eq "non-secret text untouched" "user alice logged in" "$(printf 'user alice logged in\n' | redact)"
 

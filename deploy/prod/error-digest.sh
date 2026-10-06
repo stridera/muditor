@@ -27,6 +27,7 @@ strip_ansi() { sed -E 's/\x1b\[[0-9;]*[A-Za-z]//g'; }
 redact() {
   sed -E \
     -e 's/Bearer +[^[:space:]]+/Bearer {redacted}/gI' \
+    -e 's/(got invalid value ).*/\1{redacted}/' \
     -e 's/(Basic|Digest) +[^[:space:]]+/\1 {redacted}/g' \
     -e 's/eyJ[A-Za-z0-9_-]{8,}\.[A-Za-z0-9_-]+\.?[A-Za-z0-9_-]*/{jwt}/g' \
     -e "s/(password|passwd|token|secret|authorization)(\"?[ ]*[=:][ ]*|[ ]+)(\"[^\"]*\"|'[^']*'|[^[:space:]\",}]+)/\\1={redacted}/gI"
