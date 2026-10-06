@@ -1,11 +1,17 @@
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { GrantPermission, UserRole, type Users } from '@muditor/db';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { GrantsService } from '../grants/grants.service';
 import { CreateZoneInput, UpdateZoneInput, ZoneDto } from './zone.dto';
 import { ZonesService } from './zones.service';
 
 @Resolver(() => ZoneDto)
 export class ZonesResolver {
-  constructor(private readonly zonesService: ZonesService) {}
+  constructor(
+    private readonly zonesService: ZonesService,
+    private readonly grantsService: GrantsService
+  ) {}
 
   @Query(() => [ZoneDto], { name: 'zones' })
   async findAll(
@@ -30,10 +36,34 @@ export class ZonesResolver {
     return this.zonesService.count();
   }
 
+  /**
+   * Guarded like every other zone write: BUILDER minimum role plus a WRITE
+   * grant on the target zone id. A brand-new zone cannot have a pre-existing
+   * grant, so in practice only the grant-bypass roles (IMPLEMENTOR, CODER,
+   * HEAD_BUILDER) can create zones.
+   *
+   * Should creation ever be opened to plain BUILDERs, they must not create a
+   * zone they cannot edit: a BUILDER creator is automatically given an ADMIN
+   * grant on the new zone. Bypass roles need no grant.
+   */
   @Mutation(() => ZoneDto)
   @RequireZoneWrite({ keys: ['id'] })
-  async createZone(@Args('data') data: CreateZoneInput): Promise<ZoneDto> {
-    return this.zonesService.create(data);
+  async createZone(
+    @Args('data') data: CreateZoneInput,
+    @CurrentUser() user: Users
+  ): Promise<ZoneDto> {
+    const zone = await this.zonesService.create(data);
+    if (user.role === UserRole.BUILDER) {
+      await this.grantsService.grantZoneAccess(
+        {
+          userId: user.id,
+          zoneId: zone.id,
+          permissions: [GrantPermission.ADMIN],
+        },
+        user.id
+      );
+    }
+    return zone;
   }
 
   @Mutation(() => ZoneDto)

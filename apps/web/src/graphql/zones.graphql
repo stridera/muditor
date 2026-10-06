@@ -31,6 +31,13 @@ query GetZone($id: Int!) {
   }
 }
 
+mutation CreateZone($data: CreateZoneInput!) {
+  createZone(data: $data) {
+    id
+    name
+  }
+}
+
 mutation UpdateZone($id: Int!, $data: UpdateZoneInput!) {
   updateZone(id: $id, data: $data) {
     id

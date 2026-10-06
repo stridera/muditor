@@ -13,6 +13,7 @@ import {
   type Hemisphere,
   type ResetMode,
 } from '@/generated/graphql';
+import { parseIntParam } from '@/lib/route-params';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useCallback, useEffect, useState } from 'react';
@@ -42,20 +43,22 @@ export default function ZoneDetailPage() {
 
 function ZoneDetailContent() {
   const params = useParams();
-  const zoneId = params.id as string;
+  // null for non-numeric segments (e.g. "new"): never query with a null id
+  const zoneId = parseIntParam(params.id);
   const [zone, setZone] = useState<ZoneDetail | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(zoneId !== null);
   const [error, setError] = useState<string | null>(null);
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
   const fetchZone = useCallback(async () => {
+    if (zoneId === null) return;
     try {
       const response = await authenticatedFetch(
         process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql',
         {
           method: 'POST',
           body: graphqlRequestBody(ZoneDetailDocument, {
-            id: parseInt(zoneId),
+            id: zoneId,
           }),
         }
       );
@@ -111,7 +114,9 @@ function ZoneDetailContent() {
     return (
       <div className='bg-red-50 border border-red-200 rounded-md p-4'>
         <h3 className='text-red-800 font-medium'>Error loading zone</h3>
-        <p className='text-red-600 text-sm mt-1'>{error || 'Zone not found'}</p>
+        <p className='text-red-600 text-sm mt-1'>
+          {zoneId === null ? 'Zone not found' : error || 'Zone not found'}
+        </p>
         <Link
           href='/dashboard/zones'
           className='text-red-700 hover:text-red-900 text-sm underline mt-2 inline-block'
