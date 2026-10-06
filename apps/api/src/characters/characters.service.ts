@@ -19,6 +19,7 @@ import type {
   Prisma,
   Race,
 } from '@muditor/db';
+import { GameAdminService } from '../bridge/game-admin.service';
 import { DatabaseService } from '../database/database.service';
 import { RacesService } from '../races/races.service';
 import { RoleCalculatorService } from '../users/services/role-calculator.service';
@@ -46,7 +47,8 @@ export class CharactersService implements OnModuleDestroy {
     private readonly db: DatabaseService,
     private readonly roleCalculator: RoleCalculatorService,
     private readonly configService: ConfigService,
-    private readonly racesService: RacesService
+    private readonly racesService: RacesService,
+    private readonly gameAdmin: GameAdminService
   ) {
     const redisUrl =
       this.configService.get<string>('REDIS_URL') ?? 'redis://localhost:6379';
@@ -727,10 +729,32 @@ export class CharactersService implements OnModuleDestroy {
     }
   }
 
+  /**
+   * Characters with a live session on the game server. The game server's
+   * session list is the only source of truth; if it is unreachable the result
+   * is empty (never an approximation from recent logins).
+   */
   async getOnlineCharacters(userId?: string) {
-    // No DB-side `isOnline` column anymore — game server tracks live sessions.
-    // Return recently-logged-in characters as a best-effort approximation.
-    const where = userId ? { userId } : {};
+    let names: string[];
+    try {
+      const live = await this.gameAdmin.getOnlinePlayers();
+      names = live.map(p => p.name);
+    } catch (error) {
+      this.logger.warn(
+        `Game server player list unavailable, reporting no online characters: ${
+          error instanceof Error ? error.message : String(error)
+        }`
+      );
+      return [];
+    }
+    if (names.length === 0) {
+      return [];
+    }
+
+    const where: Prisma.CharactersWhereInput = {
+      OR: names.map(name => ({ name: { equals: name, mode: 'insensitive' } })),
+      ...(userId ? { userId } : {}),
+    };
 
     const characters = await this.db.characters.findMany({
       where,
@@ -753,8 +777,7 @@ export class CharactersService implements OnModuleDestroy {
           },
         },
       },
-      orderBy: { lastLogin: 'desc' },
-      take: 50,
+      orderBy: { name: 'asc' },
     });
 
     return characters.map(c => ({

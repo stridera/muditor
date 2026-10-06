@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { CharactersService } from './characters.service';
 import { CharactersResolver } from './characters.resolver';
+import { BridgeModule } from '../bridge/bridge.module';
 import { DatabaseModule } from '../database/database.module';
 import { RacesModule } from '../races/races.module';
 import { UsersModule } from '../users/users.module';
 import { RateLimitGuard } from '../bridge/rate-limit.guard';
 
 @Module({
-  imports: [DatabaseModule, UsersModule, RacesModule],
+  imports: [DatabaseModule, UsersModule, RacesModule, BridgeModule],
   providers: [CharactersService, CharactersResolver, RateLimitGuard],
   exports: [CharactersService],
 })

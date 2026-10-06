@@ -1,6 +1,7 @@
 import { BadRequestException, NotFoundException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import { Race } from '@muditor/db';
+import type { GameAdminService } from '../bridge/game-admin.service';
 import type { DatabaseService } from '../database/database.service';
 import type { RacesService } from '../races/races.service';
 import type { RoleCalculatorService } from '../users/services/role-calculator.service';
@@ -39,6 +40,7 @@ const createInput = (
 describe('CharactersService race/class handling', () => {
   let db: {
     characters: {
+      findMany: jest.Mock;
       findUnique: jest.Mock;
       create: jest.Mock;
       update: jest.Mock;
@@ -46,11 +48,13 @@ describe('CharactersService race/class handling', () => {
     characterClass: { findUnique: jest.Mock };
   };
   let racesService: { findOne: jest.Mock };
+  let gameAdmin: { getOnlinePlayers: jest.Mock };
   let service: CharactersService;
 
   beforeEach(() => {
     db = {
       characters: {
+        findMany: jest.fn().mockResolvedValue([]),
         findUnique: jest.fn(),
         create: jest.fn().mockResolvedValue({ id: 'c1' }),
         update: jest.fn().mockResolvedValue({ id: 'c1' }),
@@ -62,11 +66,13 @@ describe('CharactersService race/class handling', () => {
     racesService = {
       findOne: jest.fn().mockResolvedValue({ playable: true }),
     };
+    gameAdmin = { getOnlinePlayers: jest.fn().mockResolvedValue([]) };
     service = new CharactersService(
       db as unknown as DatabaseService,
       {} as RoleCalculatorService,
       { get: jest.fn() } as unknown as ConfigService,
-      racesService as unknown as RacesService
+      racesService as unknown as RacesService,
+      gameAdmin as unknown as GameAdminService
     );
   });
 
@@ -185,6 +191,83 @@ describe('CharactersService race/class handling', () => {
       } as UpdateCharacterInput);
       const { data } = db.characters.update.mock.calls[0][0];
       expect(data).toEqual({ stamina: 50, currentRoomId: 12 });
+    });
+  });
+
+  describe('getOnlineCharacters', () => {
+    const livePlayer = (name: string) => ({
+      name,
+      level: 10,
+      class: 'Warrior',
+      race: 'HUMAN',
+      roomId: 1,
+      roomZoneId: 30,
+      godLevel: 0,
+      isLinkdead: false,
+    });
+    const row = (id: string, name: string) => ({
+      id,
+      name,
+      level: 10,
+      lastLogin: null,
+      race: 'HUMAN',
+      characterClass: { plainName: 'Warrior' },
+      users: { id: `u-${id}`, displayName: name, role: 'PLAYER' },
+    });
+
+    it('maps the game server session list onto character rows', async () => {
+      gameAdmin.getOnlinePlayers.mockResolvedValue([
+        livePlayer('Bob'),
+        livePlayer('alice'),
+      ]);
+      db.characters.findMany.mockResolvedValue([
+        row('c1', 'Alice'),
+        row('c2', 'Bob'),
+      ]);
+
+      const result = await service.getOnlineCharacters();
+
+      expect(result.map(c => c.name)).toEqual(['Alice', 'Bob']);
+      expect(result[0]).toMatchObject({
+        id: 'c1',
+        level: 10,
+        race: 'HUMAN',
+        class: 'Warrior',
+      });
+      const { where } = db.characters.findMany.mock.calls[0][0];
+      expect(where.OR).toEqual([
+        { name: { equals: 'Bob', mode: 'insensitive' } },
+        { name: { equals: 'alice', mode: 'insensitive' } },
+      ]);
+      expect(where).not.toHaveProperty('userId');
+    });
+
+    it('restricts to one account when userId is given', async () => {
+      gameAdmin.getOnlinePlayers.mockResolvedValue([livePlayer('Bob')]);
+      await service.getOnlineCharacters('user-1');
+      const { where } = db.characters.findMany.mock.calls[0][0];
+      expect(where.userId).toBe('user-1');
+    });
+
+    it('returns [] when nobody is logged in, without querying the DB', async () => {
+      await expect(service.getOnlineCharacters()).resolves.toEqual([]);
+      expect(db.characters.findMany).not.toHaveBeenCalled();
+    });
+
+    it('returns [] (never recent logins) when the game server is unreachable', async () => {
+      gameAdmin.getOnlinePlayers.mockRejectedValue(
+        new Error('Failed to connect to FieryMUD admin API')
+      );
+      const warn = jest
+        .spyOn(
+          (service as unknown as { logger: { warn: () => void } }).logger,
+          'warn'
+        )
+        .mockImplementation(() => undefined);
+
+      await expect(service.getOnlineCharacters()).resolves.toEqual([]);
+      expect(db.characters.findMany).not.toHaveBeenCalled();
+      expect(warn).toHaveBeenCalledTimes(1);
     });
   });
 });

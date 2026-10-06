@@ -1,6 +1,11 @@
 import { Injectable, Logger, type OnModuleInit } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 
+/** How long a successful player-list response is reused. */
+const ONLINE_PLAYERS_CACHE_MS = 5000;
+/** Abort the player-list request if the game server doesn't answer. */
+const ONLINE_PLAYERS_TIMEOUT_MS = 3000;
+
 /**
  * Online player information from FieryMUD
  */
@@ -84,6 +89,9 @@ export class GameAdminService implements OnModuleInit {
   private readonly logger = new Logger(GameAdminService.name);
   private readonly baseUrl: string;
   private readonly adminToken: string;
+  private playersCache:
+    | { at: number; promise: Promise<OnlinePlayer[]> }
+    | undefined;
 
   constructor(private readonly configService: ConfigService) {
     // Default to localhost:8080 for development
@@ -109,7 +117,8 @@ export class GameAdminService implements OnModuleInit {
   private async makeRequest<T>(
     method: 'GET' | 'POST',
     endpoint: string,
-    body?: Record<string, unknown>
+    body?: Record<string, unknown>,
+    timeoutMs?: number
   ): Promise<T> {
     const url = `${this.baseUrl}${endpoint}`;
 
@@ -125,6 +134,10 @@ export class GameAdminService implements OnModuleInit {
       method,
       headers,
     };
+
+    if (timeoutMs !== undefined) {
+      options.signal = AbortSignal.timeout(timeoutMs);
+    }
 
     if (body) {
       options.body = JSON.stringify(body);
@@ -152,38 +165,63 @@ export class GameAdminService implements OnModuleInit {
   }
 
   /**
-   * Get list of online players
+   * Get list of live game sessions (cached for ONLINE_PLAYERS_CACHE_MS).
+   *
+   * The game server lists only fully logged-in sessions. It does not report
+   * god level or link-dead state, so `godLevel` is derived from the level
+   * (gods are level 100+) and `isLinkdead` is always false. Failures are not
+   * cached; callers decide how to degrade.
    */
-  async getOnlinePlayers(): Promise<OnlinePlayer[]> {
+  getOnlinePlayers(): Promise<OnlinePlayer[]> {
+    const now = Date.now();
+    if (
+      this.playersCache &&
+      now - this.playersCache.at < ONLINE_PLAYERS_CACHE_MS
+    ) {
+      return this.playersCache.promise;
+    }
+
+    const promise = this.fetchOnlinePlayers();
+    const entry = { at: now, promise };
+    this.playersCache = entry;
+    promise.catch(() => {
+      if (this.playersCache === entry) {
+        this.playersCache = undefined;
+      }
+    });
+    return promise;
+  }
+
+  private async fetchOnlinePlayers(): Promise<OnlinePlayer[]> {
     interface PlayersResponse {
-      success: boolean;
-      player_count: number;
+      count: number;
       players: Array<{
         name: string;
         level: number;
-        class: string;
+        class: string | null;
         race: string;
-        room_id: number;
-        room_zone_id: number;
-        god_level: number;
-        is_linkdead: boolean;
+        room: { zone_id: number; id: number } | null;
+        idle_seconds: number;
+        connected_seconds: number;
       }>;
     }
 
     const response = await this.makeRequest<PlayersResponse>(
       'GET',
-      '/api/admin/players'
+      '/api/admin/players',
+      undefined,
+      ONLINE_PLAYERS_TIMEOUT_MS
     );
 
     return response.players.map(p => ({
       name: p.name,
       level: p.level,
-      class: p.class,
+      class: p.class ?? '',
       race: p.race,
-      roomId: p.room_id,
-      roomZoneId: p.room_zone_id,
-      godLevel: p.god_level,
-      isLinkdead: p.is_linkdead,
+      roomId: p.room?.id ?? 0,
+      roomZoneId: p.room?.zone_id ?? 0,
+      godLevel: p.level >= 100 ? p.level - 99 : 0,
+      isLinkdead: false,
     }));
   }
 
