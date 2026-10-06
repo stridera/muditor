@@ -1,4 +1,5 @@
 import { Module, forwardRef } from '@nestjs/common';
+import { AdminUsersService } from './admin-users.service';
 import { UsersService } from './users.service';
 import { UsersResolver } from './users.resolver';
 import { RoleCalculatorService } from './services/role-calculator.service';
@@ -9,6 +10,7 @@ import { AuthModule } from '../auth/auth.module';
   imports: [forwardRef(() => AuthModule)],
   providers: [
     UsersService,
+    AdminUsersService,
     UsersResolver,
     RoleCalculatorService,
     MinimumRoleGuard,

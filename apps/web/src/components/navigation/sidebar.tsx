@@ -312,6 +312,13 @@ export function Sidebar() {
     href: '/dashboard/admin/console',
     icon: <Terminal className='h-4 w-4' />,
   });
+  if (isImmortal) {
+    adminItems.push({
+      name: 'Accounts',
+      href: '/dashboard/admin/users',
+      icon: <Users className='h-4 w-4' />,
+    });
+  }
   if (isCoder) {
     adminItems.push({
       name: 'Users',

@@ -138,10 +138,50 @@ type AccountStorageDto {
   items: [AccountItemDto!]!
 }
 
+input AdminSetUserDeletedInput {
+  """true = soft-delete, false = restore"""
+  deleted: Boolean!
+
+  """Required when deleting"""
+  reason: String
+  userId: ID!
+}
+
+input AdminSetUserRoleInput {
+  role: UserRole!
+  userId: ID!
+}
+
+input AdminUnlinkCharacterInput {
+  characterId: ID!
+}
+
 type AdminUser {
   displayName: String!
   id: ID!
   role: UserRole!
+}
+
+"""User account row for the admin users page (no secrets)"""
+type AdminUserAccount {
+  characters: [AdminUserAccountCharacter!]!
+  createdAt: DateTime!
+  deletedAt: DateTime
+  deletionReason: String
+  displayName: String!
+  email: String!
+  hasGoogleLink: Boolean!
+  hasPassword: Boolean!
+  id: ID!
+  isBanned: Boolean!
+  lastLoginAt: DateTime
+  role: UserRole!
+}
+
+type AdminUserAccountCharacter {
+  id: ID!
+  level: Int!
+  name: String!
 }
 
 enum Alignment {
@@ -1754,6 +1794,20 @@ enum MovementMode {
 type Mutation {
   addMobResetEquipment(maxInstances: Int, objectId: Int!, objectZoneId: Int!, probability: Float, resetId: ID!, wearLocation: WearFlag): MobResetDto!
 
+  """Create a password reset link for a user and return it to the admin"""
+  adminCreatePasswordResetLink(userId: ID!): PasswordResetLink!
+
+  """Soft-delete or restore a user account"""
+  adminSetUserDeleted(input: AdminSetUserDeletedInput!): AdminUserAccount!
+
+  """
+  Set a user role. CODER: only below own role; IMPLEMENTOR: any (never demotes the last IMPLEMENTOR)
+  """
+  adminSetUserRole(input: AdminSetUserRoleInput!): AdminUserAccount!
+
+  """Unlink a character from its owner and lower the owner's role if needed"""
+  adminUnlinkCharacter(input: AdminUnlinkCharacterInput!): AdminUserAccount!
+
   """Approve a pending game login for one of your characters"""
   approveGameLogin(code: String!): GameLoginCodeDto!
 
@@ -2170,6 +2224,15 @@ type OnlinePlayerType {
   roomZoneId: Int!
 }
 
+type PasswordResetLink {
+  expiresAt: DateTime!
+
+  """
+  Full reset URL to hand to the player. Shown once; never stored in logs.
+  """
+  url: String!
+}
+
 type PasswordResetResponse {
   message: String!
   success: Boolean!
@@ -2223,6 +2286,9 @@ type Query {
   """Game-side account lock and character-link lockout state"""
   accountLockStatus: AccountLockStatus!
   activeCharacterEffects(characterId: ID!): [CharacterEffectDto!]!
+
+  """All accounts with link/password/character info (IMMORTAL+)"""
+  adminUsers: [AdminUserAccount!]!
 
   """Get all unique permission flags used across commands"""
   availablePermissions: [String!]!

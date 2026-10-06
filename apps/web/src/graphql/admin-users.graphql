@@ -1,0 +1,51 @@
+# Admin users page (IMMORTAL+ to view, CODER+ to act)
+
+fragment AdminUserAccountFields on AdminUserAccount {
+  id
+  email
+  displayName
+  role
+  hasGoogleLink
+  hasPassword
+  isBanned
+  lastLoginAt
+  createdAt
+  deletedAt
+  deletionReason
+  characters {
+    id
+    name
+    level
+  }
+}
+
+query AdminUsersList {
+  adminUsers {
+    ...AdminUserAccountFields
+  }
+}
+
+mutation AdminSetUserRole($input: AdminSetUserRoleInput!) {
+  adminSetUserRole(input: $input) {
+    ...AdminUserAccountFields
+  }
+}
+
+mutation AdminSetUserDeleted($input: AdminSetUserDeletedInput!) {
+  adminSetUserDeleted(input: $input) {
+    ...AdminUserAccountFields
+  }
+}
+
+mutation AdminUnlinkCharacter($input: AdminUnlinkCharacterInput!) {
+  adminUnlinkCharacter(input: $input) {
+    ...AdminUserAccountFields
+  }
+}
+
+mutation AdminCreatePasswordResetLink($userId: ID!) {
+  adminCreatePasswordResetLink(userId: $userId) {
+    url
+    expiresAt
+  }
+}

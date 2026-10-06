@@ -21,6 +21,9 @@ import { RegisterInput } from './dto/register.input';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import type { GoogleProfile } from './strategies/google.strategy';
 
+const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000; // 15 minutes
+const ADMIN_PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour (handed over out of band)
+
 // Sanitized user returned by auth operations (no password or reset tokens)
 interface SanitizedUser extends Omit<
   User,
@@ -153,6 +156,8 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
     }
 
+    this.assertNotDeleted(user);
+
     // Check ban status
     const isBanned = await this.checkBanStatus(user.id);
     if (isBanned) {
@@ -203,6 +208,8 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    this.assertNotDeleted(user);
+
     if (await this.checkBanStatus(user.id)) {
       throw new UnauthorizedException('Account is banned');
     }
@@ -220,6 +227,8 @@ export class AuthService {
       throw new UnauthorizedException('User not found');
     }
 
+    this.assertNotDeleted(user);
+
     if (await this.checkBanStatus(user.id)) {
       throw new UnauthorizedException('Account is banned');
     }
@@ -230,6 +239,7 @@ export class AuthService {
   async requestPasswordReset(email: string): Promise<boolean> {
     const user = await this.databaseService.users.findFirst({
       where: { email: { equals: email, mode: 'insensitive' } },
+      include: { googleLink: true },
     });
 
     if (!user) {
@@ -240,17 +250,17 @@ export class AuthService {
       return true;
     }
 
-    // Generate reset token
-    const resetToken = crypto.randomBytes(32).toString('hex');
-    const resetTokenExpiry = new Date(Date.now() + 15 * 60 * 1000); // 15 minutes
+    if (!user.passwordHash && user.googleLink) {
+      // Google-only account: there is no password to reset. Respond
+      // generically (no account-existence leak); the forgot-password page
+      // tells Google users to use "Sign in with Google".
+      this.logger.log(
+        `Password reset requested for Google-only account ${user.id}; no email sent`
+      );
+      return true;
+    }
 
-    await this.databaseService.users.update({
-      where: { id: user.id },
-      data: {
-        resetToken: resetToken,
-        resetTokenExpiry: resetTokenExpiry,
-      },
-    });
+    const { resetToken } = await this.issueResetToken(user.id);
 
     // Send password reset email
     try {
@@ -265,6 +275,41 @@ export class AuthService {
     }
 
     return true;
+  }
+
+  /** Create and store a password reset token (same one for email and admin links). */
+  private async issueResetToken(
+    userId: string,
+    ttlMs = PASSWORD_RESET_TTL_MS
+  ): Promise<{ resetToken: string; resetTokenExpiry: Date }> {
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const resetTokenExpiry = new Date(Date.now() + ttlMs);
+    await this.databaseService.users.update({
+      where: { id: userId },
+      data: { resetToken, resetTokenExpiry },
+    });
+    return { resetToken, resetTokenExpiry };
+  }
+
+  /**
+   * Admin-initiated reset: same token as the forgot-password flow, but the
+   * full URL is returned to the admin instead of being emailed.
+   */
+  async createAdminPasswordResetLink(
+    userId: string
+  ): Promise<{ url: string; expiresAt: Date }> {
+    const { resetToken, resetTokenExpiry } = await this.issueResetToken(
+      userId,
+      ADMIN_PASSWORD_RESET_TTL_MS
+    );
+    const base = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(
+      /\/+$/,
+      ''
+    );
+    return {
+      url: `${base}/reset-password?token=${resetToken}`,
+      expiresAt: resetTokenExpiry,
+    };
   }
 
   /**
@@ -408,6 +453,7 @@ export class AuthService {
 
     if (existingLink) {
       const user = existingLink.user;
+      this.assertNotDeleted(user);
       const isBanned = await this.checkBanStatus(user.id);
       if (isBanned) {
         throw new UnauthorizedException('Account is banned');
@@ -440,6 +486,7 @@ export class AuthService {
         );
       }
 
+      this.assertNotDeleted(existingUser);
       const isBanned = await this.checkBanStatus(existingUser.id);
       if (isBanned) {
         throw new UnauthorizedException('Account is banned');
@@ -646,6 +693,13 @@ export class AuthService {
         : {}),
       isBanned: false,
     };
+  }
+
+  /** Soft-deleted accounts (admin action) can never log in or refresh. */
+  private assertNotDeleted(user: Pick<Users, 'deletedAt'>): void {
+    if (user.deletedAt) {
+      throw new UnauthorizedException('Account is deactivated');
+    }
   }
 
   private async checkBanStatus(userId: string): Promise<boolean> {

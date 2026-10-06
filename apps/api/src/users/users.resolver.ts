@@ -15,6 +15,16 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { RolesGuard } from '../auth/guards/roles.guard';
+import { AdminUsersService } from './admin-users.service';
+import {
+  AdminSetUserDeletedInput,
+  AdminSetUserRoleInput,
+  AdminUnlinkCharacterInput,
+} from './dto/admin-user.input';
+import {
+  AdminUserAccount,
+  PasswordResetLink,
+} from './entities/admin-user.entity';
 import { BanUserInput } from './dto/ban-user.input';
 import { UnbanUserInput } from './dto/unban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -64,7 +74,10 @@ export class UserPermissions {
 
 @Resolver(() => User)
 export class UsersResolver {
-  constructor(private readonly usersService: UsersService) {}
+  constructor(
+    private readonly usersService: UsersService,
+    private readonly adminUsersService: AdminUsersService
+  ) {}
 
   @Query(() => [User])
   @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
@@ -76,6 +89,81 @@ export class UsersResolver {
   @Query(() => User)
   async user(@Args('id', { type: () => ID }) id: string): Promise<User> {
     return this.usersService.getUserWithBanStatus(id);
+  }
+
+  @Query(() => [AdminUserAccount], {
+    description: 'All accounts with link/password/character info (IMMORTAL+)',
+  })
+  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
+  async adminUsers(): Promise<AdminUserAccount[]> {
+    return this.adminUsersService.listUsers();
+  }
+
+  @Mutation(() => AdminUserAccount, {
+    description:
+      'Set a user role. CODER: only below own role; IMPLEMENTOR: any (never demotes the last IMPLEMENTOR)',
+  })
+  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
+  async adminSetUserRole(
+    @Args('input') input: AdminSetUserRoleInput,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<AdminUserAccount> {
+    return this.adminUsersService.setUserRole(
+      currentUser.id,
+      input.userId,
+      input.role
+    );
+  }
+
+  @Mutation(() => AdminUserAccount, {
+    description: 'Soft-delete or restore a user account',
+  })
+  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
+  async adminSetUserDeleted(
+    @Args('input') input: AdminSetUserDeletedInput,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<AdminUserAccount> {
+    return this.adminUsersService.setUserDeleted(
+      currentUser.id,
+      input.userId,
+      input.deleted,
+      input.reason
+    );
+  }
+
+  @Mutation(() => AdminUserAccount, {
+    description:
+      "Unlink a character from its owner and lower the owner's role if needed",
+  })
+  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
+  async adminUnlinkCharacter(
+    @Args('input') input: AdminUnlinkCharacterInput,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<AdminUserAccount> {
+    return this.adminUsersService.unlinkCharacter(
+      currentUser.id,
+      input.characterId
+    );
+  }
+
+  @Mutation(() => PasswordResetLink, {
+    description:
+      'Create a password reset link for a user and return it to the admin',
+  })
+  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
+  async adminCreatePasswordResetLink(
+    @Args('userId', { type: () => ID }) userId: string,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<PasswordResetLink> {
+    return this.adminUsersService.createPasswordResetLink(
+      currentUser.id,
+      userId
+    );
   }
 
   @Query(() => [BanRecord])
@@ -90,7 +178,19 @@ export class UsersResolver {
   @Mutation(() => User)
   @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
-  async updateUser(@Args('input') input: UpdateUserInput): Promise<User> {
+  async updateUser(
+    @Args('input') input: UpdateUserInput,
+    @CurrentUser() currentUser: CurrentUserContext
+  ): Promise<User> {
+    // Role changes go through the same rank rules as the admin users page
+    // (a CODER must not be able to mint IMPLEMENTORs through this mutation).
+    if (input.role) {
+      await this.adminUsersService.setUserRole(
+        currentUser.id,
+        input.id,
+        input.role
+      );
+    }
     return this.usersService.updateUser(input);
   }
 

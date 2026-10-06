@@ -478,6 +478,75 @@ describe('AuthService', () => {
     });
   });
 
+  describe('Google-only accounts and admin reset links', () => {
+    it('answers generically but sends nothing for a Google-only account', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
+        id: 'g-user',
+        email: 'g@example.com',
+        passwordHash: null,
+        googleLink: { id: 'link' },
+      });
+
+      await expect(service.requestPasswordReset('g@example.com')).resolves.toBe(
+        true
+      );
+      expect(databaseService.users.update).not.toHaveBeenCalled();
+      expect(emailService.sendPasswordResetEmail).not.toHaveBeenCalled();
+    });
+
+    it('createAdminPasswordResetLink stores a token and returns the full URL', async () => {
+      process.env.FRONTEND_URL = 'https://muditor.example/';
+      (databaseService.users.update as jest.Mock).mockResolvedValue({});
+
+      const { url, expiresAt } =
+        await service.createAdminPasswordResetLink('user-id');
+
+      const stored = (databaseService.users.update as jest.Mock).mock
+        .calls[0][0];
+      expect(stored.where).toEqual({ id: 'user-id' });
+      expect(url).toBe(
+        `https://muditor.example/reset-password?token=${stored.data.resetToken}`
+      );
+      expect(stored.data.resetTokenExpiry).toEqual(expiresAt);
+      expect(emailService.sendPasswordResetEmail).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('soft-deleted accounts', () => {
+    const deleted = {
+      id: 'user-id',
+      displayName: 'Gone',
+      role: UserRole.PLAYER,
+      passwordHash: 'hash',
+      deletedAt: new Date(),
+    };
+
+    it('login refuses a deleted user even with the right password', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(deleted);
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+
+      await expect(
+        service.login({ identifier: 'Gone', password: 'pw' })
+      ).rejects.toThrow('Account is deactivated');
+    });
+
+    it('validateJwtPayload and refreshToken refuse a deleted user', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(
+        deleted
+      );
+      await expect(
+        service.validateJwtPayload({
+          sub: 'user-id',
+          displayName: 'Gone',
+          role: UserRole.PLAYER,
+        })
+      ).rejects.toThrow('Account is deactivated');
+      await expect(service.refreshToken('user-id')).rejects.toThrow(
+        'Account is deactivated'
+      );
+    });
+  });
+
   describe('ban enforcement on token use', () => {
     const dbUser = {
       id: 'user-id',

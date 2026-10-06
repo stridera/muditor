@@ -114,6 +114,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
     icon: <Users className='h-5 w-5' />,
   },
   '/dashboard/users': { name: 'Users', icon: <Users className='h-5 w-5' /> },
+  '/dashboard/admin/users': {
+    name: 'Accounts',
+    icon: <Users className='h-5 w-5' />,
+  },
   '/dashboard/admin/game-config': {
     name: 'Game Config',
     icon: <Settings className='h-5 w-5' />,

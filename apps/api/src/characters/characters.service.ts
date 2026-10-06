@@ -38,6 +38,9 @@ const LOCKOUT_MAX_ATTEMPTS = 5;
 /** Lockout duration in seconds (15 minutes) */
 const LOCKOUT_WINDOW_SECONDS = 900;
 
+/** Email domain of the placeholder users the game server auto-creates */
+const LEGACY_PLACEHOLDER_EMAIL_SUFFIX = '@legacy.fierymud.local';
+
 @Injectable()
 export class CharactersService implements OnModuleDestroy {
   private readonly logger = new Logger(CharactersService.name);
@@ -867,11 +870,22 @@ export class CharactersService implements OnModuleDestroy {
       throw new NotFoundException(`Character '${characterName}' not found`);
     }
 
-    // Check if character is already linked
+    // Check if character is already linked. The one exception is a legacy
+    // placeholder owner (auto-created by the game server on a legacy
+    // character's first telnet login): the caller may claim it below, after
+    // proving the character's game password.
+    let placeholderOwnerId: string | null = null;
     if (character.userId) {
-      throw new BadRequestException(
-        `Character '${characterName}' is already linked to another account`
-      );
+      if (
+        character.userId !== userId &&
+        (await this.isClaimablePlaceholder(character.userId))
+      ) {
+        placeholderOwnerId = character.userId;
+      } else {
+        throw new BadRequestException(
+          `Character '${characterName}' is already linked to another account`
+        );
+      }
     }
 
     // Validate character password
@@ -930,17 +944,56 @@ export class CharactersService implements OnModuleDestroy {
     // Password valid — clear any failed attempts
     await this.clearFailedAttempts(characterName);
 
-    // Link character to user
-    await this.db.characters.update({
-      where: { id: character.id },
-      data: { userId },
-    });
+    if (placeholderOwnerId) {
+      // Claim: move every character of the placeholder to the caller and
+      // remove the placeholder, atomically. The guard on userId makes a
+      // concurrent claim a no-op instead of a double move.
+      const ownerId = placeholderOwnerId;
+      await this.db.$transaction(async tx => {
+        const moved = await tx.characters.updateMany({
+          where: { userId: ownerId },
+          data: { userId },
+        });
+        await tx.users.delete({ where: { id: ownerId } });
+        this.logger.log(
+          `User ${userId} claimed ${moved.count} character(s) from legacy placeholder ${ownerId} via '${character.name}'`
+        );
+      });
+    } else {
+      // Link character to user
+      await this.db.characters.update({
+        where: { id: character.id },
+        data: { userId },
+      });
+    }
 
     // Recalculate user role. Raising is allowed here only: the caller proved
     // ownership with the character's password (legacy staff characters).
     await this.roleCalculator.updateUserRole(userId, { allowRaise: true });
 
     return character;
+  }
+
+  /**
+   * A legacy placeholder is the synthetic account the game server creates on a
+   * legacy character's first telnet login: placeholder email, no website
+   * password and no Google link. Only such accounts may be claimed.
+   */
+  private async isClaimablePlaceholder(ownerId: string): Promise<boolean> {
+    const owner = await this.db.users.findUnique({
+      where: { id: ownerId },
+      select: {
+        email: true,
+        passwordHash: true,
+        googleLink: { select: { id: true } },
+      },
+    });
+    return (
+      !!owner &&
+      owner.email.toLowerCase().endsWith(LEGACY_PLACEHOLDER_EMAIL_SUFFIX) &&
+      !owner.passwordHash &&
+      !owner.googleLink
+    );
   }
 
   /**

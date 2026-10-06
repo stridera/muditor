@@ -139,6 +139,10 @@ export default function ForgotPasswordPage() {
             </CardDescription>
           </CardHeader>
           <CardContent>
+            <p className='mb-4 text-sm text-muted-foreground'>
+              If you signed up with Google, use 'Sign in with Google' — there is
+              no password to reset.
+            </p>
             <form onSubmit={handleSubmit} className='space-y-4'>
               {error && (
                 <Alert variant='destructive'>

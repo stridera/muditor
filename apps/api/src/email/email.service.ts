@@ -49,7 +49,7 @@ export class EmailService {
 
     if (!this.sendGridEnabled && !this.smtpEnabled) {
       this.logger.warn(
-        'No email providers configured. Emails will be logged only.'
+        'EMAIL transport not configured (set SENDGRID_API_KEY or SMTP_HOST/SMTP_USER/SMTP_PASS); password reset emails will not be delivered'
       );
     }
   }
