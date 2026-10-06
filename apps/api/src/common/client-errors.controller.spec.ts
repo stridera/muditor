@@ -56,6 +56,24 @@ describe('ClientErrorsController', () => {
     expect(line).not.toContain('\n');
   });
 
+  it('redacts echoed values from reported GraphQL error messages', async () => {
+    const logging = { logWarn: jest.fn().mockResolvedValue(undefined) };
+    const controller = new ClientErrorsController(
+      logging as unknown as LoggingService,
+      { verify: jest.fn() } as unknown as JwtService
+    );
+    await controller.report(
+      {
+        ...validBody,
+        kind: 'apollo',
+        message:
+          'GraphQL error [BAD_USER_INPUT]: Variable "$i" got invalid value { password: "hunter2-secret" }; Field "identifier" of required type "String!" was not provided.',
+      } as ClientErrorDto,
+      { headers: {} } as never
+    );
+    expect(logging.logWarn.mock.calls[0][0]).not.toContain('hunter2-secret');
+  });
+
   it('is anonymous without or with an invalid token', async () => {
     const logging = { logWarn: jest.fn().mockResolvedValue(undefined) };
     const jwt = {

@@ -17,6 +17,7 @@ import { IsIn, IsOptional, IsString, MaxLength } from 'class-validator';
 import type { Request } from 'express';
 import { InMemoryTtlCounter, type TtlCounter } from './ttl-counter';
 import { LoggingService } from './logging/logging.service';
+import { redactValueEchoes } from './logging/redact';
 
 export const CLIENT_ERROR_PREFIX = '[client-error]';
 export const CLIENT_ERROR_MAX_BYTES = 16 * 1024;
@@ -133,7 +134,7 @@ export class ClientErrorsController {
       `user=${this.identify(req)}`,
       `release=${clean(body.release, 40) || '-'}`,
       `ua=${JSON.stringify(clean(body.userAgent, 160))}`,
-      `msg=${JSON.stringify(clean(body.message, 500))}`,
+      `msg=${JSON.stringify(clean(redactValueEchoes(body.message), 500))}`,
     ];
     if (body.stack) {
       parts.push(`stack=${JSON.stringify(clean(body.stack, 1500))}`);

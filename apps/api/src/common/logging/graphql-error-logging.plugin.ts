@@ -8,6 +8,11 @@ import type {
 import { randomUUID } from 'crypto';
 import type { GraphQLError } from 'graphql';
 import { LoggingService } from './logging.service';
+import {
+  describeInternalError,
+  redactValueEchoes,
+  stackFramesOnly,
+} from './redact';
 
 export const GQL_ERROR_PREFIX = '[gql-error]';
 export const GQL_ERROR_CONTEXT = 'GraphQL';
@@ -110,6 +115,11 @@ export class GraphQLErrorLoggingPlugin implements ApolloServerPlugin {
         for (const error of ctx.errors) {
           const code = resolveErrorCode(error);
           const clientClass = isClientClassError(code);
+          const original: unknown = error.originalError;
+          // Messages can echo caller-supplied values (passwords, tokens)
+          const message = clientClass
+            ? redactValueEchoes(error.message)
+            : describeInternalError(original, error.message);
           const parts = [
             GQL_ERROR_PREFIX,
             `op=${clean(String(operationName), 80)}`,
@@ -119,16 +129,16 @@ export class GraphQLErrorLoggingPlugin implements ApolloServerPlugin {
             `req=${clean(requestId, 64)}`,
             `route=${route ? clean(route, 200) : '-'}`,
             `vars=[${variableNames.map(n => clean(n, 40)).join(',')}]`,
-            `msg=${JSON.stringify(clean(error.message))}`,
+            `msg=${JSON.stringify(clean(message))}`,
           ];
           const line = parts.join(' ');
           if (clientClass) {
             void this.logging.logWarn(line, GQL_ERROR_CONTEXT);
           } else {
-            const original: unknown = error.originalError;
-            const stack =
+            const stack = stackFramesOnly(
               (original instanceof Error ? original.stack : undefined) ??
-              error.stack;
+                error.stack
+            );
             void this.logging.logError(
               line,
               GQL_ERROR_CONTEXT,

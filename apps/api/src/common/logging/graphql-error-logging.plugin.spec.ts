@@ -87,7 +87,24 @@ describe('GraphQLErrorLoggingPlugin', () => {
     expect(line).toContain('code=INTERNAL_SERVER_ERROR');
     expect(context).toBe('GraphQL');
     expect(data).toBeUndefined();
-    expect(stack).toBe(original.stack);
+    expect(stack).toContain('    at ');
+    // message (which may carry values) is not repeated in the stack
+    expect(stack).not.toContain('relation "Zones"');
+  });
+
+  it('never logs values echoed in a variable coercion error message', async () => {
+    const { plugin, logging } = setup();
+    const error = new GraphQLError(
+      'Variable "$i" got invalid value { email: "a@b.c", password: "hunter2-secret" }; Field "identifier" of required type "String!" was not provided.',
+      { extensions: { code: 'BAD_USER_INPUT' } }
+    );
+    await run(plugin, [error], {
+      variables: { i: { password: 'hunter2-secret' } },
+    });
+    const line = logging.logWarn.mock.calls[0][0] as string;
+    expect(line).not.toContain('hunter2-secret');
+    expect(line).not.toContain('a@b.c');
+    expect(line).toContain('vars=[i]');
   });
 
   it('classifies Nest HttpExceptions by status (403 -> FORBIDDEN at WARN)', async () => {
