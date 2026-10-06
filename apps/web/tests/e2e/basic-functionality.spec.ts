@@ -3,7 +3,7 @@ import { test, expect } from './fixtures';
 test.describe('Basic Application Functionality', () => {
   test('should load home page', async ({ page }) => {
     await page.goto('/');
-    await expect(page.locator('h1:has-text("MUDITOR")')).toBeVisible();
+    await expect(page.locator('h1:has-text("FieryMUD")')).toBeVisible();
   });
 
   // Skipped: the home page is being replaced by the public site, so the old landing-page Sign In / Create Account links are gone.
