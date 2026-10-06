@@ -1,6 +1,8 @@
 'use client';
 
-import { isValidRoomId, isValidZoneId } from '@/lib/room-utils';
+import { isValidRoomId, isValidZoneId, nextFreeRoomId } from '@/lib/room-utils';
+import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
+import type { CreatedRoom } from '@/hooks/use-create-room';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
 import React, {
@@ -416,6 +418,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     Record<string, number>
   >({});
   const [editorMode, setEditorMode] = useState<EditorMode>('view');
+  const [createRoomOpen, setCreateRoomOpen] = useState(false);
   // Pending room edits state
   const [pendingRoomEdits, setPendingRoomEdits] = useState<
     Partial<PropertyPanelRoom>
@@ -1795,7 +1798,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         setCurrentZLevel(targetZ);
         return;
       }
-      const newId = Math.max(0, ...rooms.map(r => r.id)) + 1;
+      const newId = nextFreeRoomId(
+        rooms.filter(r => r.zoneId === selectedRoom.zoneId).map(r => r.id)
+      );
       const tempRoom: Room = {
         id: newId,
         zoneId: selectedRoom.zoneId,
@@ -1927,9 +1932,72 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     ]
   );
 
+  // Toolbar "Add room": the dialog creates the room, then we place it on the
+  // canvas at the first free cell to the right of the current floor's rooms.
+  const handleRoomCreatedFromDialog = useCallback(
+    async (created: CreatedRoom) => {
+      const floorRooms = rooms.filter(
+        r =>
+          r.zoneId === created.zoneId &&
+          r.layoutX != null &&
+          (r.layoutZ ?? 0) === currentZLevel
+      );
+      let targetX = 0;
+      let targetY = 0;
+      if (floorRooms.length > 0) {
+        const eastmost = floorRooms.reduce((a, b) =>
+          (b.layoutX ?? 0) > (a.layoutX ?? 0) ? b : a
+        );
+        targetX = Math.round(eastmost.layoutX ?? 0) + 1;
+        targetY = Math.round(eastmost.layoutY ?? 0);
+      }
+      const newRoom: Room = {
+        id: created.id,
+        zoneId: created.zoneId,
+        name: created.name,
+        sector: created.sector,
+        roomDescription: created.description,
+        layoutX: targetX,
+        layoutY: targetY,
+        layoutZ: currentZLevel,
+        exits: [],
+        mobs: [],
+        objects: [],
+      };
+      setRooms(rs => [...rs.filter(r => r.id !== created.id), newRoom]);
+      setSelectedRoomId(created.id);
+      try {
+        const response = await authenticatedFetch('/graphql', {
+          method: 'POST',
+          body: graphqlRequestBody(ZoneEditorUpdateRoomPositionDocument, {
+            zoneId: created.zoneId,
+            id: created.id,
+            position: {
+              layoutX: targetX,
+              layoutY: targetY,
+              layoutZ: currentZLevel,
+            },
+          }),
+        });
+        const json = await response.json();
+        if (!response.ok || json.errors) {
+          throw new Error(
+            json.errors?.[0]?.message || 'Failed to position new room'
+          );
+        }
+      } catch (err) {
+        setError(
+          err instanceof Error ? err.message : 'Failed to position new room'
+        );
+      }
+    },
+    [rooms, currentZLevel, authenticatedFetch, setRooms, setSelectedRoomId]
+  );
+
   // Keyboard shortcuts for undo/redo and navigation
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
+      if (createRoomOpen) return; // dialog open: typing is not a shortcut
       const key = e.key;
       const lowered = key.toLowerCase();
       // Avoid interfering with typing in inputs/textareas/contentEditable
@@ -2150,6 +2218,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
     isEditing,
     handleKeyboardMoveRoom,
     handleCreateRoomInDirection,
+    createRoomOpen,
   ]);
 
   // Reflect selectedRoomId into React Flow's node selected state for visual highlight
@@ -2606,6 +2675,7 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             overlapCount={overlaps.length}
             showOverlapButton={isEditing && overlaps.length > 0}
             onToggleOverlapInfo={toggleOverlapInfo}
+            onAddRoom={() => setCreateRoomOpen(true)}
           />
         </div>
         <OverlapPanel
@@ -2860,6 +2930,14 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           />
         </div>
       )}
+
+      <CreateRoomDialog
+        open={createRoomOpen}
+        onOpenChange={setCreateRoomOpen}
+        zoneId={activeZoneId}
+        lockZone
+        onCreated={handleRoomCreatedFromDialog}
+      />
 
       {/* Context-aware help modal */}
       <HelpModal

@@ -1,13 +1,16 @@
 'use client';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
+import { Button } from '@/components/ui/button';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { SectorBadge } from '@/components/ui/sector-badge';
 import { useZone } from '@/contexts/zone-context';
+import { usePermissions } from '@/hooks/use-permissions';
 import { stripMarkup } from '@/utils/xmlLiteParser';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useMemo, useState, Suspense } from 'react';
 
 interface RoomExit {
@@ -63,7 +66,10 @@ function RoomsPageContent() {
 }
 
 function RoomsContent() {
+  const router = useRouter();
   const searchParams = useSearchParams();
+  const { isBuilder } = usePermissions();
+  const [createOpen, setCreateOpen] = useState(false);
   const zoneParam = searchParams.get('zone');
   const { selectedZone, setSelectedZone } = useZone();
 
@@ -307,7 +313,24 @@ function RoomsContent() {
             {selectedZone && ' in this zone'}
           </p>
         </div>
+        {isBuilder && (
+          <Button onClick={() => setCreateOpen(true)}>
+            <Plus className='w-4 h-4 mr-2' />
+            New room
+          </Button>
+        )}
       </div>
+
+      <CreateRoomDialog
+        open={createOpen}
+        onOpenChange={setCreateOpen}
+        zoneId={selectedZone}
+        onCreated={room =>
+          router.push(
+            `/dashboard/zones/editor?zone=${room.zoneId}&room=${room.id}`
+          )
+        }
+      />
 
       <div className='bg-card rounded-lg shadow mb-6 p-4'>
         <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>

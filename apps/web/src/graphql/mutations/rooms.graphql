@@ -16,3 +16,13 @@ mutation UpdateRoomEnvironmentalEffects(
     }
   }
 }
+
+mutation CreateRoom($data: CreateRoomInput!) {
+  createRoom(data: $data) {
+    id
+    zoneId
+    name
+    description
+    sector
+  }
+}

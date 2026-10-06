@@ -24,6 +24,7 @@ interface ZoneEditorToolbarProps {
   overlapCount: number;
   showOverlapButton: boolean;
   onToggleOverlapInfo: () => void;
+  onAddRoom: () => void;
 }
 
 export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
@@ -47,6 +48,7 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
   overlapCount,
   showOverlapButton,
   onToggleOverlapInfo,
+  onAddRoom,
 }) => {
   return (
     <div className='flex items-center gap-2 p-2 border-b bg-gray-50 dark:bg-gray-900 dark:border-gray-700'>
@@ -149,6 +151,15 @@ export const EditorToolbar: React.FC<ZoneEditorToolbarProps> = ({
       >
         {hideOtherFloors ? '👁️ Show Other Floors' : '👁️‍🗨️ Hide Other Floors'}
       </button>
+      {editorMode === 'edit' && canEdit && viewMode === 'zone' && (
+        <button
+          className='px-2 py-1 text-xs rounded bg-green-600 hover:bg-green-700 text-white'
+          onClick={onAddRoom}
+          title='Create a new room in this zone (or Shift+Arrow from a selected room)'
+        >
+          + Add room
+        </button>
+      )}
       {editorMode === 'edit' && (
         <>
           <button

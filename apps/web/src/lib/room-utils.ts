@@ -20,6 +20,36 @@ export function isValidZoneId(id: number | null | undefined): id is number {
 }
 
 /**
+ * Next free room id in a zone: one past the highest id in use (0 for an empty
+ * zone). Never reuses gaps, so ids of deleted rooms are not recycled.
+ */
+export function nextFreeRoomId(usedIds: Iterable<number>): number {
+  let max = -1;
+  for (const id of usedIds) {
+    if (id > max) max = id;
+  }
+  return max + 1;
+}
+
+/**
+ * Validate a candidate room id against the ids already used in its zone.
+ * Returns an error message, or null when the id is usable. 0 is valid.
+ */
+export function validateNewRoomId(
+  id: number | null | undefined,
+  usedIds: Iterable<number>
+): string | null {
+  if (!isValidRoomId(id) || !Number.isInteger(id)) {
+    return 'Room id must be a whole number';
+  }
+  if (id < 0) return 'Room id must be 0 or greater';
+  for (const used of usedIds) {
+    if (used === id) return `Room ${id} already exists in this zone`;
+  }
+  return null;
+}
+
+/**
  * Type definition for a RoomExit with validated destination
  */
 export interface RoomExitWithDestination {

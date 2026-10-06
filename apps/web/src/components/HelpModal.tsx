@@ -87,13 +87,27 @@ const HELP_CONTENT: Record<HelpContext, HelpSection[]> = {
       ],
     },
     {
-      title: 'Entity Creation (Chords)',
+      title: 'Room Creation',
       shortcuts: [
         {
-          keys: 'Ctrl+N → R',
-          description: 'Create new room (in direction)',
-          implemented: false,
+          keys: 'Shift+Arrow',
+          description:
+            'Edit mode: create an adjacent room (with exits) in that direction from the selected room',
         },
+        {
+          keys: 'Toolbar → + Add room',
+          description:
+            'Edit mode: open the new room dialog (zone is fixed to this zone)',
+        },
+        {
+          keys: 'Rooms list → New room',
+          description: 'Open the new room dialog from the rooms list',
+        },
+      ],
+    },
+    {
+      title: 'Entity Creation (Chords)',
+      shortcuts: [
         {
           keys: 'Ctrl+N → M',
           description: 'Create new mob in current room',

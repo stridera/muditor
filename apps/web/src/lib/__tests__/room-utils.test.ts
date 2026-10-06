@@ -8,9 +8,39 @@ import {
   isCrossZoneExit,
   isValidRoomId,
   isValidZoneId,
+  nextFreeRoomId,
+  validateNewRoomId,
 } from '../room-utils';
 
 describe('room-utils', () => {
+  describe('nextFreeRoomId', () => {
+    it('returns 0 for an empty zone', () => {
+      expect(nextFreeRoomId([])).toBe(0);
+    });
+
+    it('returns one past the highest id, not the first gap', () => {
+      expect(nextFreeRoomId([0, 1, 2])).toBe(3);
+      expect(nextFreeRoomId([1, 5, 3])).toBe(6);
+      expect(nextFreeRoomId(new Set([0]))).toBe(1);
+    });
+  });
+
+  describe('validateNewRoomId', () => {
+    it('accepts 0 and unused ids', () => {
+      expect(validateNewRoomId(0, [1, 2])).toBeNull();
+      expect(validateNewRoomId(7, [1, 2])).toBeNull();
+    });
+
+    it('rejects used, negative, fractional and missing ids', () => {
+      expect(validateNewRoomId(2, [1, 2])).toMatch(/already exists/);
+      expect(validateNewRoomId(0, [0])).toMatch(/already exists/);
+      expect(validateNewRoomId(-1, [])).toMatch(/0 or greater/);
+      expect(validateNewRoomId(1.5, [])).toMatch(/whole number/);
+      expect(validateNewRoomId(null, [])).toMatch(/whole number/);
+      expect(validateNewRoomId(NaN, [])).toMatch(/whole number/);
+    });
+  });
+
   describe('isValidRoomId', () => {
     it('should return true for valid room IDs including 0', () => {
       expect(isValidRoomId(0)).toBe(true);
