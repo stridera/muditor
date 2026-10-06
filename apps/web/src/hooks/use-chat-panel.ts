@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { useAuth } from '@/contexts/auth-context';
+import { roleAtLeast } from '@/lib/roles';
 import {
   useChatMessages,
   usePlayerActivity,
@@ -57,17 +58,8 @@ export function useChatPanel() {
 
   const { user } = useAuth();
   const channels = useMemo(() => {
-    const roleLevel: Record<string, number> = {
-      PLAYER: 1,
-      IMMORTAL: 2,
-      BUILDER: 3,
-      HEAD_BUILDER: 4,
-      CODER: 5,
-      GOD: 6,
-    };
-    const level = roleLevel[user?.role ?? ''] ?? 0;
     const chs = [{ value: 'gossip', label: 'gossip' }];
-    if (level >= (roleLevel['IMMORTAL'] ?? 0)) {
+    if (roleAtLeast(user?.role, 'IMMORTAL')) {
       chs.push({ value: 'wiznet', label: 'wiznet' });
     }
     return chs;

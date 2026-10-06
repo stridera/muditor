@@ -3,12 +3,15 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/contexts/auth-context';
+import { roleAtLeast, type UserRole } from '@/lib/roles';
 import { Loader2 } from 'lucide-react';
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
-  requireRole?: ('PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR')[];
-  requiredRole?: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR'; // Legacy support
+  /** Allow any of these roles or higher (hierarchical, not exact match). */
+  requireRole?: UserRole[];
+  /** Minimum role required. */
+  requiredRole?: UserRole;
 }
 
 export function ProtectedRoute({
@@ -45,8 +48,8 @@ export function ProtectedRoute({
 
   // Check role permissions
   const hasRequiredRole = requireRole
-    ? requireRole.includes(user.role as any)
-    : checkRolePermission(user.role, requiredRole);
+    ? requireRole.some(role => roleAtLeast(user.role, role))
+    : roleAtLeast(user.role, requiredRole);
 
   if (!hasRequiredRole) {
     return (
@@ -68,21 +71,4 @@ export function ProtectedRoute({
   }
 
   return <>{children}</>;
-}
-
-// Role hierarchy helper function
-function checkRolePermission(userRole: string, requiredRole: string): boolean {
-  const roleHierarchy = {
-    PLAYER: 1,
-    IMMORTAL: 2,
-    BUILDER: 3,
-    CODER: 4,
-    GOD: 5,
-  };
-
-  const userLevel = roleHierarchy[userRole as keyof typeof roleHierarchy] || 0;
-  const requiredLevel =
-    roleHierarchy[requiredRole as keyof typeof roleHierarchy] || 0;
-
-  return userLevel >= requiredLevel;
 }

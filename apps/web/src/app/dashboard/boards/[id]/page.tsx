@@ -32,6 +32,7 @@ import {
   User,
   XCircle,
 } from 'lucide-react';
+import { rolePosterLevel } from '@/lib/roles';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
 import { useState } from 'react';
@@ -121,14 +122,6 @@ interface Board {
 interface GetBoardQueryResult {
   board: Board | null;
 }
-
-const ROLE_TO_LEVEL: Record<string, number> = {
-  PLAYER: 1,
-  IMMORTAL: 100,
-  BUILDER: 102,
-  CODER: 104,
-  GOD: 105,
-};
 
 export default function BoardDetailPage() {
   const params = useParams();
@@ -236,7 +229,7 @@ export default function BoardDetailPage() {
         data: {
           boardId,
           poster: user?.displayName || 'Anonymous',
-          posterLevel: user?.role ? ROLE_TO_LEVEL[user.role] : 1,
+          posterLevel: rolePosterLevel(user?.role),
           subject,
           content,
           sticky,

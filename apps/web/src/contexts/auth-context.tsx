@@ -2,6 +2,7 @@
 
 import { apolloClient } from '@/lib/apollo-client';
 import { gql } from '@apollo/client';
+import type { UserRole } from '@/lib/roles';
 import { useRouter } from 'next/navigation';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
@@ -52,7 +53,7 @@ export interface User {
   id: string;
   displayName: string;
   email: string;
-  role: 'PLAYER' | 'IMMORTAL' | 'BUILDER' | 'CODER' | 'IMPLEMENTOR';
+  role: UserRole;
   createdAt: string;
 }
 
@@ -133,7 +134,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setStoredToken(accessToken);
         setStoredUser(loginUser);
         setUser(loginUser);
-        router.push('/dashboard');
+        router.push(consumePostLoginPath());
       }
     } catch (error: any) {
       // Extract meaningful error message
@@ -155,7 +156,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if ((result.data as any)?.me) {
         setUser((result.data as any).me);
         setStoredUser((result.data as any).me);
-        router.push('/dashboard');
+        router.push(consumePostLoginPath());
       }
     } catch {
       removeStoredToken();
@@ -183,7 +184,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         setStoredToken(accessToken);
         setStoredUser(registerUser);
         setUser(registerUser);
-        router.push('/dashboard');
+        router.push(consumePostLoginPath());
       }
     } catch (error: any) {
       // Extract meaningful error message
@@ -236,6 +237,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Post-login redirect: the login page stashes a safe in-app path (from ?redirect=)
+// in sessionStorage so password, Google, and registration flows all return to it.
+const POST_LOGIN_KEY = 'post-login-redirect';
+
+// Resolve against our own origin; anything that leaves it (or fails to parse)
+// is rejected. Returns the normalised same-origin path + query, or null.
+export const safeRedirectPath = (path: string | null): string | null => {
+  if (!path || typeof window === 'undefined') return null;
+  try {
+    const u = new URL(path, window.location.origin);
+    if (u.origin !== window.location.origin) return null;
+    return u.pathname + u.search;
+  } catch {
+    return null;
+  }
+};
+
+export const setPostLoginPath = (path: string | null): void => {
+  if (typeof window === 'undefined') return;
+  const safe = safeRedirectPath(path);
+  if (safe) sessionStorage.setItem(POST_LOGIN_KEY, safe);
+  else sessionStorage.removeItem(POST_LOGIN_KEY);
+};
+
+const consumePostLoginPath = (): string => {
+  if (typeof window === 'undefined') return '/dashboard';
+  const path = sessionStorage.getItem(POST_LOGIN_KEY);
+  sessionStorage.removeItem(POST_LOGIN_KEY);
+  return safeRedirectPath(path) ?? '/dashboard';
 };
 
 // Token management utilities
