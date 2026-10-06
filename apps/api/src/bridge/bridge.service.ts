@@ -80,8 +80,9 @@ export class BridgeService implements OnModuleInit, OnModuleDestroy {
 
   async onModuleDestroy(): Promise<void> {
     if (this.subscriber) {
-      await this.subscriber.unsubscribe(...REDIS_CHANNELS);
-      await this.subscriber.quit();
+      // disconnect(), not quit(): quit waits for a reply from a server that may
+      // be unreachable, and would also leave the reconnect loop running.
+      this.subscriber.disconnect();
       this.subscriber = null;
     }
     this.eventSubject.complete();

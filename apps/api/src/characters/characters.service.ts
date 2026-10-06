@@ -5,15 +5,13 @@ import {
   Injectable,
   Logger,
   NotFoundException,
+  type OnModuleDestroy,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import Redis from 'ioredis';
-// SWC CJS interop: import * gives the function directly at runtime,
-// but tsc sees it as { default: fn }. Cast to reconcile.
-import * as _crypt from 'unix-crypt-td-js';
-const crypt = _crypt as unknown as (password: string, salt: string) => string;
+import { unixCrypt as crypt } from '../common/unix-crypt';
 import type {
   ItemInstanceFlag,
   Permission,
@@ -40,7 +38,7 @@ const LOCKOUT_MAX_ATTEMPTS = 5;
 const LOCKOUT_WINDOW_SECONDS = 900;
 
 @Injectable()
-export class CharactersService {
+export class CharactersService implements OnModuleDestroy {
   private readonly logger = new Logger(CharactersService.name);
   private redis: Redis | null = null;
 
@@ -56,10 +54,13 @@ export class CharactersService {
       lazyConnect: true,
       maxRetriesPerRequest: 3,
     });
-    this.redis.connect().catch(() => {
+    const client = this.redis;
+    client.connect().catch(() => {
       this.logger.warn(
         'Redis unavailable — character linking lockout protection disabled'
       );
+      // Stop the reconnect loop so it cannot keep the event loop alive.
+      client.disconnect();
       this.redis = null;
     });
   }
@@ -115,10 +116,11 @@ export class CharactersService {
     }
   }
 
-  async onModuleDestroy() {
-    if (this.redis) {
-      await this.redis.quit();
-    }
+  onModuleDestroy() {
+    // disconnect(), not quit(): quit waits on a reply from a server that may
+    // be unreachable.
+    this.redis?.disconnect();
+    this.redis = null;
   }
 
   // Character operations

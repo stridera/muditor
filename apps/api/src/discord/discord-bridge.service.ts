@@ -40,10 +40,10 @@ export class DiscordBridgeService implements OnModuleInit, OnModuleDestroy {
     }
   }
 
-  async onModuleDestroy() {
+  onModuleDestroy() {
     if (this.subscriber) {
       this.logger.log('Disconnecting Discord bridge from Redis...');
-      await this.subscriber.quit();
+      this.subscriber.disconnect();
       this.subscriber = null;
     }
   }

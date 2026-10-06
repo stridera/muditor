@@ -1,6 +1,7 @@
 import {
   Injectable,
   type CanActivate,
+  type OnModuleDestroy,
   type ExecutionContext,
   HttpException,
   HttpStatus,
@@ -44,7 +45,7 @@ export const RateLimit = (options: RateLimitOptions) =>
  * - Kicks: 5
  */
 @Injectable()
-export class RateLimitGuard implements CanActivate {
+export class RateLimitGuard implements CanActivate, OnModuleDestroy {
   private redis: Redis | null = null;
   private readonly enabled: boolean;
 
@@ -62,8 +63,11 @@ export class RateLimitGuard implements CanActivate {
         lazyConnect: true,
         maxRetriesPerRequest: 3,
       });
-      this.redis.connect().catch(() => {
-        // Silently fail - rate limiting will be disabled
+      const client = this.redis;
+      client.connect().catch(() => {
+        // Silently fail - rate limiting will be disabled. Stop the client's
+        // reconnect loop so it cannot keep the event loop alive.
+        client.disconnect();
         this.redis = null;
       });
     }
@@ -128,10 +132,11 @@ export class RateLimitGuard implements CanActivate {
     }
   }
 
-  async onModuleDestroy() {
-    if (this.redis) {
-      await this.redis.quit();
-    }
+  onModuleDestroy() {
+    // disconnect(), not quit(): quit waits on a reply from a server that may
+    // be unreachable.
+    this.redis?.disconnect();
+    this.redis = null;
   }
 }
 

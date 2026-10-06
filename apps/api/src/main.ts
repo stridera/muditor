@@ -4,6 +4,7 @@ import { GraphQLSchemaHost } from '@nestjs/graphql';
 import { AppModule } from './app.module';
 import { LoggingService } from './common/logging/logging.service';
 import { parseCorsOrigins } from './common/cors';
+import { shutdownWithDeadline } from './common/shutdown';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -36,20 +37,27 @@ async function bootstrap() {
   const port = process.env.API_PORT || 3001; // API uses 3001 to avoid conflict with game server
   const host = process.env.API_HOST || 'localhost';
 
-  // Set up graceful shutdown
-  process.on('SIGINT', async () => {
-    Logger.log('Received SIGINT signal, shutting down gracefully...');
-    await loggingService.logInfo('Application shutdown initiated', 'Bootstrap');
-    await app.close();
-    process.exit(0);
-  });
-
-  process.on('SIGTERM', async () => {
-    Logger.log('Received SIGTERM signal, shutting down gracefully...');
-    await loggingService.logInfo('Application shutdown initiated', 'Bootstrap');
-    await app.close();
-    process.exit(0);
-  });
+  // Graceful shutdown: app.close() runs every OnModuleDestroy /
+  // beforeApplicationShutdown hook; bound it so a hung hook can never keep the
+  // process alive until the supervisor SIGKILLs it.
+  let shuttingDown = false;
+  const handleSignal = (signal: string) => {
+    if (shuttingDown) return;
+    shuttingDown = true;
+    Logger.log(`Received ${signal} signal, shutting down gracefully...`);
+    void shutdownWithDeadline(
+      async () => {
+        await loggingService.logInfo(
+          'Application shutdown initiated',
+          'Bootstrap'
+        );
+        await app.close();
+      },
+      { log: message => Logger.warn(message, 'Bootstrap') }
+    );
+  };
+  process.on('SIGINT', () => handleSignal('SIGINT'));
+  process.on('SIGTERM', () => handleSignal('SIGTERM'));
 
   // Handle uncaught exceptions
   process.on('uncaughtException', async error => {
@@ -80,7 +88,7 @@ async function bootstrap() {
       await loggingService.cleanupLogs();
     },
     24 * 60 * 60 * 1000
-  );
+  ).unref();
 
   // Defer schema validation until after listen to ensure ApolloDriver completed schema build.
   // (Accessing GraphQLSchemaHost.schema too early causes "schema has not yet been created" errors.)
