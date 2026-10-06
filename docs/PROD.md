@@ -63,6 +63,20 @@ Passwordless sudo is limited to: `systemctl restart fieryNT`, `systemctl restart
 means root on prod. Enable branch protection on `main` (required reviews, no force-push) and read any diff touching
 `deploy/prod/` before pulling it on the host. `setup-root.sh` strips group/other write bits from the kit on every run, because the `fierymud` group (which also owns the legacy MUD's service account) must not be able to edit a root-executed script.
 
+## Where errors go
+
+Every error a user sees should also be in a server log:
+
+- **Muditor API (GraphQL errors, including validation failures) and browser errors** both land in the API journal under
+  greppable prefixes: `journalctl -u muditorNT-api -o cat | grep -E '\[(gql|client)-error\]'`.
+  `[gql-error]` lines carry op, code, path, user, request id and the page route (variable names only, never values);
+  client-class errors (validation, auth, not found) are WARN, everything else is ERROR with a stack. `[client-error]`
+  lines come from `POST /api/client-errors` (window errors, unhandled rejections, React error boundary, Apollo errors).
+- **API log files** (JSON lines, same entries as the journal): `$LOG_DIR` = `/opt/NEXT/logs/` (`error.log`, `warn.log`,
+  `info.log`, `combined.log`; rotated at 10 MB, 10 files kept).
+- **Game server (Rust)**: `journalctl -u fieryNT`.
+- **Lua trigger errors**: the `ScriptErrorLog` model, i.e. table `script_error_log` (`psql ... -c 'SELECT * FROM script_error_log ORDER BY occurred_at DESC LIMIT 20;'`).
+
 ## Rollback
 
 In `/opt/NEXT/<repo>`: `git checkout <sha>`, rebuild (`update.sh` pulls `--ff-only`, so build by hand or checkout the

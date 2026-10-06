@@ -11,6 +11,7 @@ import {
 } from '@/components/ui/card';
 import { AlertTriangle, Home, RefreshCw } from 'lucide-react';
 import Link from 'next/link';
+import { reportClientError } from '@/lib/client-error-reporter';
 import type { ErrorInfo, ReactNode } from 'react';
 import { Component } from 'react';
 
@@ -41,6 +42,11 @@ export class ErrorBoundary extends Component<Props, State> {
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
     console.error('Error caught by boundary:', error, errorInfo);
+    reportClientError({
+      kind: 'react',
+      message: error.message,
+      stack: `${error.stack ?? ''}\nComponent stack:${errorInfo.componentStack ?? ''}`,
+    });
     this.setState({
       error,
       errorInfo,

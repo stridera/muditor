@@ -19,25 +19,31 @@ export default function DashboardLayout({
   } = useHelpModal('global');
 
   return (
-    <ProtectedRoute>
-      <div className='flex h-screen overflow-hidden bg-background text-foreground'>
-        <Sidebar />
-        <div className='flex-1 flex flex-col overflow-hidden'>
-          <TopBar />
-          <main className='flex-1 overflow-y-auto p-6'>
-            <ErrorBoundary>{children}</ErrorBoundary>
-          </main>
+    <ErrorBoundary>
+      <ProtectedRoute>
+        <div className='flex h-screen overflow-hidden bg-background text-foreground'>
+          <Sidebar />
+          <div className='flex-1 flex flex-col overflow-hidden'>
+            <TopBar />
+            <main className='flex-1 overflow-y-auto p-6'>
+              <ErrorBoundary>{children}</ErrorBoundary>
+            </main>
+          </div>
         </div>
-      </div>
 
-      {/* Game chat bubble */}
-      <ChatContainer />
+        {/* Game chat bubble */}
+        <ChatContainer />
 
-      {/* Global help modal */}
-      <HelpModal open={helpOpen} onOpenChange={setHelpOpen} context='global' />
+        {/* Global help modal */}
+        <HelpModal
+          open={helpOpen}
+          onOpenChange={setHelpOpen}
+          context='global'
+        />
 
-      {/* Global go-to hint popup */}
-      <GoToHint show={showGoToHint} />
-    </ProtectedRoute>
+        {/* Global go-to hint popup */}
+        <GoToHint show={showGoToHint} />
+      </ProtectedRoute>
+    </ErrorBoundary>
   );
 }

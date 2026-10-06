@@ -48,7 +48,13 @@ export class LoggingService {
     if (stack !== undefined) entry.stack = stack;
 
     await this.writeToFile('error', entry);
-    this.logger.error(message, context);
+    // Nest's Logger signature is (message, stack, context); passing the stack
+    // puts it on stdout (journald) as well as in error.log.
+    if (stack !== undefined) {
+      this.logger.error(message, stack, context);
+    } else {
+      this.logger.error(message, context);
+    }
   }
 
   /**

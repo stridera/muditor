@@ -113,6 +113,20 @@ Prod-only rows (e.g. `GameConfig security/website_url`) belong here, not in the 
 - `/opt/NEXT/logs/` (import.log, build-muditor.log, API LOG_DIR), Apache: `/var/log/apache2/muditor-*.log`
 - `systemctl status fieryNT muditorNT-api muditorNT-web`
 
+## Where errors go
+
+Every error a user sees should also be in a server log:
+
+- **Muditor API (GraphQL errors, including validation failures) and browser errors** both land in the API journal under
+  greppable prefixes: `journalctl -u muditorNT-api -o cat | grep -E '\[(gql|client)-error\]'`.
+  `[gql-error]` lines carry op, code, path, user, request id and the page route (variable names only, never values);
+  client-class errors (validation, auth, not found) are WARN, everything else is ERROR with a stack. `[client-error]`
+  lines come from `POST /api/client-errors` (window errors, unhandled rejections, React error boundary, Apollo errors).
+- **API log files** (JSON lines, same entries as the journal): `$LOG_DIR` = `/opt/NEXT/logs/` (`error.log`, `warn.log`,
+  `info.log`, `combined.log`; rotated at 10 MB, 10 files kept).
+- **Game server (Rust)**: `journalctl -u fieryNT`.
+- **Lua trigger errors**: the `ScriptErrorLog` model, i.e. table `script_error_log` (`psql ... -c 'SELECT * FROM script_error_log ORDER BY occurred_at DESC LIMIT 20;'`).
+
 ## Rollback
 
 `sudo systemctl stop fieryNT muditorNT-api muditorNT-web` (add `disable` to prevent boot start). The old C++ build is at the backup path (its unit was disabled; re-enable by restoring the directory and removing `/etc/systemd/system/fieryNT.service`). Legacy
