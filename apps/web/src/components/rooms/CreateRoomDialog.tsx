@@ -23,6 +23,7 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 import { GetRoomsByZoneDocument, type Sector } from '@/generated/graphql';
 import { type CreatedRoom, useCreateRoom } from '@/hooks/use-create-room';
+import { usePermissions } from '@/hooks/use-permissions';
 import { useZonesForSelector } from '@/hooks/use-zones-for-selector';
 import { nextFreeRoomId, validateNewRoomId } from '@/lib/room-utils';
 
@@ -73,11 +74,14 @@ export function CreateRoomDialog({
   onCreated,
 }: CreateRoomDialogProps) {
   const { zones } = useZonesForSelector();
+  const { canEditZone } = usePermissions();
+  const writableZones = zones.filter(z => canEditZone(z.id));
   const { createRoom, loading: creating } = useCreateRoom();
 
   const [zone, setZone] = useState<number | null>(zoneId);
   const [idText, setIdText] = useState('');
   const [idTouched, setIdTouched] = useState(false);
+  const [serverIdError, setServerIdError] = useState<string | null>(null);
   const [name, setName] = useState('');
   const [sector, setSector] = useState<Sector>('STRUCTURE');
   const [description, setDescription] = useState(DEFAULT_ROOM_DESCRIPTION);
@@ -88,6 +92,7 @@ export function CreateRoomDialog({
     setZone(zoneId);
     setIdText('');
     setIdTouched(false);
+    setServerIdError(null);
     setName('');
     setSector('STRUCTURE');
     setDescription(DEFAULT_ROOM_DESCRIPTION);
@@ -97,6 +102,7 @@ export function CreateRoomDialog({
     data: roomsData,
     loading: loadingIds,
     error: idsError,
+    refetch: refetchIds,
   } = useQuery(GetRoomsByZoneDocument, {
     variables: { zoneId: zone ?? 0, lightweight: true },
     skip: !open || zone == null,
@@ -132,14 +138,25 @@ export function CreateRoomDialog({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!canSubmit || zone == null || parsedId == null) return;
-    const room = await createRoom({
+    const { room, error } = await createRoom({
       id: parsedId,
       zoneId: zone,
       name: trimmedName,
       description: trimmedDescription,
       sector,
     });
-    if (!room) return;
+    if (!room) {
+      // Most likely the id was taken since the list loaded: show the API
+      // message, re-load the ids and let the id field re-prefill.
+      setServerIdError(error && /already exists/i.test(error) ? error : null);
+      setIdTouched(false);
+      try {
+        await refetchIds();
+      } catch {
+        // the inline id error already reports the failure
+      }
+      return;
+    }
     onOpenChange(false);
     await onCreated?.(room);
   };
@@ -164,6 +181,7 @@ export function CreateRoomDialog({
                 onValueChange={value => {
                   setZone(Number(value));
                   setIdTouched(false);
+                  setServerIdError(null);
                   setIdText('');
                 }}
                 disabled={lockZone}
@@ -172,7 +190,7 @@ export function CreateRoomDialog({
                   <SelectValue placeholder='Select a zone' />
                 </SelectTrigger>
                 <SelectContent>
-                  {zones.map(z => (
+                  {writableZones.map(z => (
                     <SelectItem key={z.id} value={String(z.id)}>
                       {z.id} - {z.name}
                     </SelectItem>
@@ -192,6 +210,7 @@ export function CreateRoomDialog({
                 disabled={zone == null || !idsReady}
                 onChange={e => {
                   setIdTouched(true);
+                  setServerIdError(null);
                   setIdText(e.target.value);
                 }}
                 aria-invalid={idError != null}
@@ -203,6 +222,7 @@ export function CreateRoomDialog({
                 role={idError ? 'alert' : undefined}
               >
                 {idError ??
+                  serverIdError ??
                   (idsError ? 'Could not load existing room ids' : '')}
               </p>
             </div>
@@ -216,7 +236,11 @@ export function CreateRoomDialog({
               onChange={e => setName(e.target.value)}
               placeholder='e.g. The Rusty Tankard'
               autoFocus
+              aria-invalid={trimmedName.length === 0}
             />
+            {trimmedName.length === 0 && (
+              <p className='text-xs text-muted-foreground'>Name is required</p>
+            )}
           </div>
 
           <div className='space-y-1'>
@@ -245,7 +269,13 @@ export function CreateRoomDialog({
               rows={4}
               value={description}
               onChange={e => setDescription(e.target.value)}
+              aria-invalid={trimmedDescription.length === 0}
             />
+            {trimmedDescription.length === 0 && (
+              <p className='text-xs text-muted-foreground'>
+                Description is required
+              </p>
+            )}
           </div>
 
           <DialogFooter>

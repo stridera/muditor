@@ -1,5 +1,9 @@
 // CLEAN REWRITE START -------------------------------------------------------
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
   BatchUpdateResult,
@@ -325,25 +329,39 @@ export class RoomsService {
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {
-    const room = await this.db.room.create({
-      data: {
-        id: data.id,
-        zoneId: data.zoneId,
-        name: data.name,
-        roomDescription: data.description ?? data.roomDescription ?? '',
-        sector: data.sector || 'STRUCTURE',
-        baseLightLevel: data.baseLightLevel ?? 0,
-        capacity: data.capacity ?? 10,
-        entryRestriction: data.entryRestriction ?? null,
-        isPeaceful: data.isPeaceful ?? false,
-        allowsMagic: data.allowsMagic ?? true,
-        allowsRecall: data.allowsRecall ?? true,
-        allowsSummon: data.allowsSummon ?? true,
-        allowsTeleport: data.allowsTeleport ?? true,
-        isDeathTrap: data.isDeathTrap ?? false,
-      },
-      include: this.includeFull,
-    });
+    let room;
+    try {
+      room = await this.db.room.create({
+        data: {
+          id: data.id,
+          zoneId: data.zoneId,
+          name: data.name,
+          roomDescription: data.description ?? data.roomDescription ?? '',
+          sector: data.sector || 'STRUCTURE',
+          baseLightLevel: data.baseLightLevel ?? 0,
+          capacity: data.capacity ?? 10,
+          entryRestriction: data.entryRestriction ?? null,
+          isPeaceful: data.isPeaceful ?? false,
+          allowsMagic: data.allowsMagic ?? true,
+          allowsRecall: data.allowsRecall ?? true,
+          allowsSummon: data.allowsSummon ?? true,
+          allowsTeleport: data.allowsTeleport ?? true,
+          isDeathTrap: data.isDeathTrap ?? false,
+        },
+        include: this.includeFull,
+      });
+    } catch (err) {
+      if (
+        typeof err === 'object' &&
+        err !== null &&
+        (err as { code?: string }).code === 'P2002'
+      ) {
+        throw new ConflictException(
+          `Room ${data.id} already exists in zone ${data.zoneId}`
+        );
+      }
+      throw err;
+    }
     return this.mapRoom(room);
   }
 

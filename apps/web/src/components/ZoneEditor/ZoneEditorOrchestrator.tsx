@@ -1912,7 +1912,11 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           err instanceof Error ? err.message : 'Failed to create room with exit'
         );
         if (!roomCreated) {
-          setRooms(rs => rs.filter(r => r.id !== newId));
+          setRooms(rs =>
+            rs.filter(
+              r => !(r.zoneId === selectedRoom.zoneId && r.id === newId)
+            )
+          );
           setSelectedRoomId(selectedRoom.id);
           setCurrentZLevel(baseZ);
         } else {
@@ -1964,7 +1968,12 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         mobs: [],
         objects: [],
       };
-      setRooms(rs => [...rs.filter(r => r.id !== created.id), newRoom]);
+      setRooms(rs => [
+        ...rs.filter(
+          r => !(r.zoneId === created.zoneId && r.id === created.id)
+        ),
+        newRoom,
+      ]);
       setSelectedRoomId(created.id);
       try {
         const response = await authenticatedFetch('/graphql', {

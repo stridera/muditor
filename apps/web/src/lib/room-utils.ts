@@ -19,6 +19,9 @@ export function isValidZoneId(id: number | null | undefined): id is number {
   return id != null;
 }
 
+/** Largest room id the database (32-bit integer column) can store. */
+export const MAX_ROOM_ID = 2147483647;
+
 /**
  * Next free room id in a zone: one past the highest id in use (0 for an empty
  * zone). Never reuses gaps, so ids of deleted rooms are not recycled.
@@ -43,6 +46,9 @@ export function validateNewRoomId(
     return 'Room id must be a whole number';
   }
   if (id < 0) return 'Room id must be 0 or greater';
+  if (id > MAX_ROOM_ID) {
+    return `Room id must be ${MAX_ROOM_ID} or less`;
+  }
   for (const used of usedIds) {
     if (used === id) return `Room ${id} already exists in this zone`;
   }

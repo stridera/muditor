@@ -35,6 +35,8 @@ describe('room-utils', () => {
       expect(validateNewRoomId(2, [1, 2])).toMatch(/already exists/);
       expect(validateNewRoomId(0, [0])).toMatch(/already exists/);
       expect(validateNewRoomId(-1, [])).toMatch(/0 or greater/);
+      expect(validateNewRoomId(2147483647, [])).toBeNull();
+      expect(validateNewRoomId(2147483648, [])).toMatch(/2147483647 or less/);
       expect(validateNewRoomId(1.5, [])).toMatch(/whole number/);
       expect(validateNewRoomId(null, [])).toMatch(/whole number/);
       expect(validateNewRoomId(NaN, [])).toMatch(/whole number/);

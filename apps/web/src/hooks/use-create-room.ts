@@ -14,10 +14,16 @@ export type CreatedRoom = CreateRoomMutation['createRoom'];
 /** Active queries refetched after a room is created. */
 const REFETCH_QUERIES = ['GetRoomsByZone', 'GetZone'];
 
+export interface CreateRoomResult {
+  room: CreatedRoom | null;
+  /** Server/client error message when creation failed. */
+  error: string | null;
+}
+
 /**
  * Creates a room via the `createRoom` mutation, toasts the outcome and
- * refetches the active room lists. Resolves to the created room, or null when
- * creation failed (the error is toasted and returned via `error`).
+ * refetches the active room lists. Resolves to `{ room }` on success or
+ * `{ room: null, error }` on failure (the error is also toasted).
  */
 export function useCreateRoom() {
   const [mutate, { loading, error }] = useMutation(CreateRoomDocument, {
@@ -25,7 +31,7 @@ export function useCreateRoom() {
   });
 
   const createRoom = useCallback(
-    async (data: CreateRoomInput): Promise<CreatedRoom | null> => {
+    async (data: CreateRoomInput): Promise<CreateRoomResult> => {
       try {
         const result = await mutate({ variables: { data } });
         const room = result.data?.createRoom ?? null;
@@ -33,12 +39,12 @@ export function useCreateRoom() {
           throw new Error('Room was not created');
         }
         toast.success(`Created room #${room.id} in zone ${room.zoneId}`);
-        return room;
+        return { room, error: null };
       } catch (err) {
-        toast.error(
-          err instanceof Error ? err.message : 'Failed to create room'
-        );
-        return null;
+        const message =
+          err instanceof Error ? err.message : 'Failed to create room';
+        toast.error(message);
+        return { room: null, error: message };
       }
     },
     [mutate]

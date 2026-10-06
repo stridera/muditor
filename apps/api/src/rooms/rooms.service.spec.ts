@@ -1,4 +1,5 @@
 import { Sector } from '@muditor/db';
+import { ConflictException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../database/database.service';
 import {
@@ -149,6 +150,23 @@ describe('RoomsService', () => {
         }),
         include: expect.any(Object),
       });
+    });
+
+    it('should throw ConflictException when the room id already exists', async () => {
+      (databaseService.room.create as jest.Mock).mockRejectedValue(
+        Object.assign(new Error('Unique constraint failed'), { code: 'P2002' })
+      );
+
+      await expect(service.create(createRoomInput)).rejects.toThrow(
+        new ConflictException('Room 1 already exists in zone 511')
+      );
+    });
+
+    it('should rethrow other database errors unchanged', async () => {
+      const boom = new Error('connection lost');
+      (databaseService.room.create as jest.Mock).mockRejectedValue(boom);
+
+      await expect(service.create(createRoomInput)).rejects.toBe(boom);
     });
   });
 
