@@ -18,6 +18,11 @@ const nextConfig = {
   experimental: {
     // Enable experimental features if needed
   },
+  // Markdown help guides (src/content/help/*.md) are bundled as raw strings.
+  webpack(config) {
+    config.module.rules.push({ test: /\.md$/, type: 'asset/source' });
+    return config;
+  },
   // Other Next.js config options can be added here
 };
 

@@ -6,7 +6,14 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { ColoredInput } from '@/components/ColoredInput';
 import { ColoredTextarea } from '@/components/ColoredTextarea';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import { HelpButton } from '@/components/help/HelpButton';
+import { QUESTS_HELP_ANCHORS as HELP } from '@/components/help/help-topics';
 import { EntityAutocomplete } from '@/components/quests/EntityAutocomplete';
+import {
+  OBJECTIVE_TYPES,
+  REWARD_TYPES,
+  TRIGGER_TYPES,
+} from '@/components/quests/quest-constants';
 import {
   CreateQuestDocument,
   GetQuestDocument,
@@ -96,16 +103,6 @@ interface ObjectiveFormData {
   luaExpression: string;
 }
 
-const OBJECTIVE_TYPES: { value: QuestObjectiveType; label: string }[] = [
-  { value: 'KILL_MOB' as QuestObjectiveType, label: 'Kill Mob' },
-  { value: 'COLLECT_ITEM' as QuestObjectiveType, label: 'Collect Item' },
-  { value: 'DELIVER_ITEM' as QuestObjectiveType, label: 'Deliver Item' },
-  { value: 'VISIT_ROOM' as QuestObjectiveType, label: 'Visit Room' },
-  { value: 'TALK_TO_NPC' as QuestObjectiveType, label: 'Talk to NPC' },
-  { value: 'USE_SKILL' as QuestObjectiveType, label: 'Use Skill' },
-  { value: 'CUSTOM_LUA' as QuestObjectiveType, label: 'Custom (Lua)' },
-];
-
 interface RewardFormData {
   id: number;
   phaseId: number;
@@ -116,60 +113,6 @@ interface RewardFormData {
   abilityId: number | null;
   choiceGroup: number | null;
 }
-
-const REWARD_TYPES: { value: QuestRewardType; label: string }[] = [
-  { value: 'EXPERIENCE' as QuestRewardType, label: 'Experience' },
-  { value: 'GOLD' as QuestRewardType, label: 'Gold' },
-  { value: 'ITEM' as QuestRewardType, label: 'Item' },
-  { value: 'ABILITY' as QuestRewardType, label: 'Ability' },
-];
-
-const TRIGGER_TYPES: {
-  value: QuestTriggerType;
-  label: string;
-  description: string;
-}[] = [
-  {
-    value: 'MANUAL' as QuestTriggerType,
-    label: 'Manual',
-    description: 'Quest is given by talking to an NPC quest giver',
-  },
-  {
-    value: 'MOB' as QuestTriggerType,
-    label: 'Mob Encounter',
-    description: 'Quest triggers when player encounters a specific mob',
-  },
-  {
-    value: 'LEVEL' as QuestTriggerType,
-    label: 'Level Reached',
-    description: 'Quest triggers when player reaches a certain level',
-  },
-  {
-    value: 'ITEM' as QuestTriggerType,
-    label: 'Item Obtained',
-    description: 'Quest triggers when player obtains a specific item',
-  },
-  {
-    value: 'ROOM' as QuestTriggerType,
-    label: 'Room Entered',
-    description: 'Quest triggers when player enters a specific room',
-  },
-  {
-    value: 'SKILL' as QuestTriggerType,
-    label: 'Skill Used',
-    description: 'Quest triggers when player uses a specific skill/ability',
-  },
-  {
-    value: 'EVENT' as QuestTriggerType,
-    label: 'Event Active',
-    description: 'Quest only available during a specific game event',
-  },
-  {
-    value: 'AUTO' as QuestTriggerType,
-    label: 'Auto-Start',
-    description: 'Quest automatically starts when player meets requirements',
-  },
-];
 
 function QuestEditorContent() {
   const searchParams = useSearchParams();
@@ -785,6 +728,10 @@ function QuestEditorContent() {
           </p>
         </div>
         <div className='flex gap-2'>
+          <HelpButton
+            topic='quests'
+            tip='How quests work and how to build one'
+          />
           <Link href='/dashboard/quests'>
             <button className='inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
@@ -940,6 +887,12 @@ function QuestEditorContent() {
                     className='rounded border-input'
                   />
                   <span className='text-sm text-foreground'>Repeatable</span>
+                  <HelpButton
+                    topic='quests'
+                    anchor={HELP.repeatable}
+                    variant='icon'
+                    tip='Whether a completed quest can be accepted again'
+                  />
                 </label>
                 <label className='flex items-center gap-2'>
                   <input
@@ -951,6 +904,12 @@ function QuestEditorContent() {
                     className='rounded border-input'
                   />
                   <span className='text-sm text-foreground'>Hidden</span>
+                  <HelpButton
+                    topic='quests'
+                    anchor={HELP.offering}
+                    variant='icon'
+                    tip='Hidden quests cannot be accepted by players; staff assign them with qload / qgive'
+                  />
                 </label>
               </div>
 
@@ -961,8 +920,14 @@ function QuestEditorContent() {
                 </h4>
                 <div className='grid grid-cols-2 gap-4'>
                   <div>
-                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground mb-1'>
                       Trigger Type
+                      <HelpButton
+                        topic='quests'
+                        anchor={HELP.offering}
+                        variant='icon'
+                        tip='How players are offered this quest'
+                      />
                     </label>
                     <select
                       value={formData.triggerType}
@@ -989,8 +954,14 @@ function QuestEditorContent() {
                     </p>
                   </div>
                   <div>
-                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground mb-1'>
                       Time Limit (minutes)
+                      <HelpButton
+                        topic='quests'
+                        anchor={HELP.repeatable}
+                        variant='icon'
+                        tip='Quest fails this many minutes after it is accepted (checked about once a minute)'
+                      />
                     </label>
                     <input
                       type='number'
@@ -1014,8 +985,14 @@ function QuestEditorContent() {
                 {/* Conditional trigger fields based on type */}
                 {formData.triggerType === 'MOB' && (
                   <div>
-                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                    <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground mb-1'>
                       Quest Giver Mob
+                      <HelpButton
+                        topic='quests'
+                        anchor={HELP.offering}
+                        variant='icon'
+                        tip='Stored but not used by the game yet'
+                      />
                     </label>
                     <EntityAutocomplete
                       entityType='mob'
@@ -1033,7 +1010,8 @@ function QuestEditorContent() {
                       placeholder='Search mob that gives quest (e.g., "helena" or "30:5")'
                     />
                     <p className='text-xs text-muted-foreground mt-1'>
-                      Player talks to this mob to receive the quest
+                      Not used by the game yet. Players take the quest with
+                      qaccept &lt;zone&gt; &lt;id&gt;; have this mob tell them.
                     </p>
                   </div>
                 )}
@@ -1151,7 +1129,7 @@ function QuestEditorContent() {
                         className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
                       />
                       <p className='text-xs text-muted-foreground mt-1'>
-                        Quest only available when this event is active
+                        Offered to online players when this event switches on
                       </p>
                     </div>
                   </div>
@@ -1164,8 +1142,14 @@ function QuestEditorContent() {
                   Branching Paths
                 </h4>
                 <div>
-                  <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                  <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground mb-1'>
                     Exclusive Group
+                    <HelpButton
+                      topic='quests'
+                      anchor={HELP.requirements}
+                      variant='icon'
+                      tip='Quests sharing a group name are mutually exclusive'
+                    />
                   </label>
                   <input
                     type='text'
@@ -1216,6 +1200,12 @@ function QuestEditorContent() {
                         <span className='text-xs bg-primary/20 text-primary px-2 py-0.5 rounded'>
                           Phase {phaseIdx + 1}
                         </span>
+                        <HelpButton
+                          topic='quests'
+                          anchor={HELP.phases}
+                          variant='icon'
+                          tip='Phases run in order; a phase finishes when all its objectives are done'
+                        />
                         <input
                           value={phase.name}
                           onChange={e => {
@@ -1293,27 +1283,35 @@ function QuestEditorContent() {
                                 <Target className='w-4 h-4 text-muted-foreground mt-2' />
                                 <div className='flex-1 space-y-3'>
                                   <div className='grid grid-cols-3 gap-3'>
-                                    <select
-                                      value={obj.objectiveType}
-                                      onChange={e =>
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'objectiveType',
-                                          e.target.value as QuestObjectiveType
-                                        )
-                                      }
-                                      className='rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                    >
-                                      {OBJECTIVE_TYPES.map(type => (
-                                        <option
-                                          key={type.value}
-                                          value={type.value}
-                                        >
-                                          {type.label}
-                                        </option>
-                                      ))}
-                                    </select>
+                                    <div className='flex items-center gap-1'>
+                                      <select
+                                        value={obj.objectiveType}
+                                        onChange={e =>
+                                          handleUpdateObjective(
+                                            phase.id,
+                                            obj.id,
+                                            'objectiveType',
+                                            e.target.value as QuestObjectiveType
+                                          )
+                                        }
+                                        className='rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                                      >
+                                        {OBJECTIVE_TYPES.map(type => (
+                                          <option
+                                            key={type.value}
+                                            value={type.value}
+                                          >
+                                            {type.label}
+                                          </option>
+                                        ))}
+                                      </select>
+                                      <HelpButton
+                                        topic='quests'
+                                        anchor={HELP.objectives}
+                                        variant='icon'
+                                        tip='What each objective type needs and how players complete it'
+                                      />
+                                    </div>
                                     <input
                                       type='number'
                                       value={obj.requiredCount}
@@ -1453,21 +1451,41 @@ function QuestEditorContent() {
                                     />
                                   )}
 
+                                  {(obj.objectiveType === 'USE_SKILL' ||
+                                    obj.objectiveType === 'DELIVER_ITEM') && (
+                                    <p className='text-xs text-amber-600 dark:text-amber-400'>
+                                      {obj.objectiveType === 'USE_SKILL'
+                                        ? 'The editor cannot set the skill for this type yet, so it will not advance.'
+                                        : 'The editor cannot set the recipient mob for this type yet, so it will not advance.'}
+                                    </p>
+                                  )}
+
                                   {obj.objectiveType === 'CUSTOM_LUA' && (
-                                    <textarea
-                                      value={obj.luaExpression}
-                                      onChange={e =>
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'luaExpression',
-                                          e.target.value
-                                        )
-                                      }
-                                      placeholder='Lua expression for custom objective'
-                                      rows={3}
-                                      className='block w-full rounded-md border border-input bg-background font-mono text-sm'
-                                    />
+                                    <div className='space-y-1'>
+                                      <div className='flex items-center gap-1 text-xs font-medium text-muted-foreground'>
+                                        Lua expression
+                                        <HelpButton
+                                          topic='quests'
+                                          anchor={HELP.customLua}
+                                          variant='icon'
+                                          tip='A boolean expression checked about once a minute; true adds 1 to the count'
+                                        />
+                                      </div>
+                                      <textarea
+                                        value={obj.luaExpression}
+                                        onChange={e =>
+                                          handleUpdateObjective(
+                                            phase.id,
+                                            obj.id,
+                                            'luaExpression',
+                                            e.target.value
+                                          )
+                                        }
+                                        placeholder='e.g. actor.level >= 10 and actor:has_item(30, 12)'
+                                        rows={3}
+                                        className='block w-full rounded-md border border-input bg-background font-mono text-sm'
+                                      />
+                                    </div>
                                   )}
                                 </div>
                                 <button
@@ -1496,6 +1514,12 @@ function QuestEditorContent() {
                             <h4 className='text-sm font-medium text-muted-foreground flex items-center gap-2'>
                               <Gift className='w-4 h-4' />
                               Phase Rewards
+                              <HelpButton
+                                topic='quests'
+                                anchor={HELP.rewards}
+                                variant='icon'
+                                tip='All rewards are paid when the whole quest completes, whichever phase they are on'
+                              />
                             </h4>
                             <button
                               onClick={() => handleAddReward(phase.id)}
@@ -1622,8 +1646,14 @@ function QuestEditorContent() {
                                     )}
 
                                     <div>
-                                      <label className='block text-xs font-medium text-muted-foreground mb-1'>
+                                      <label className='flex items-center gap-1 text-xs font-medium text-muted-foreground mb-1'>
                                         Choice Group
+                                        <HelpButton
+                                          topic='quests'
+                                          anchor={HELP.rewards}
+                                          variant='icon'
+                                          tip='Rewards sharing a group are pick-one, claimed with qreward'
+                                        />
                                       </label>
                                       <input
                                         type='number'
@@ -1692,20 +1722,28 @@ function QuestEditorContent() {
               </h2>
 
               <p className='text-muted-foreground'>
-                Use a Lua expression to control who can receive this quest. This
-                is checked in addition to level requirements.
+                Use a Lua expression to control who can accept this quest. It is
+                checked, in addition to level requirements, when a player types
+                qaccept. The player is <code>actor</code>; class and race names
+                are lower-case. A broken expression lets everyone through.
               </p>
 
               <div className='bg-muted/50 rounded-lg p-4 space-y-3'>
-                <label className='block text-sm font-medium text-muted-foreground'>
+                <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground'>
                   Lua Expression
+                  <HelpButton
+                    topic='quests'
+                    anchor={HELP.availability}
+                    variant='icon'
+                    tip='Checked only when a player types qaccept; errors let the player through'
+                  />
                 </label>
                 <textarea
                   value={formData.availabilityRequirement}
                   onChange={e =>
                     handleInputChange('availabilityRequirement', e.target.value)
                   }
-                  placeholder="e.g., character.class == 'WARRIOR'"
+                  placeholder="e.g., actor.class == 'warrior'"
                   rows={3}
                   className='block w-full rounded-md border border-input bg-background shadow-sm font-mono text-sm px-3 py-2'
                 />
@@ -1716,28 +1754,28 @@ function QuestEditorContent() {
                   <ul className='list-disc list-inside space-y-0.5 ml-2'>
                     <li>
                       <code className='bg-muted px-1 rounded'>
-                        character.class == &apos;WARRIOR&apos;
+                        actor.class == &apos;warrior&apos;
                       </code>{' '}
                       - Warriors only
                     </li>
                     <li>
                       <code className='bg-muted px-1 rounded'>
-                        character.class == &apos;WARRIOR&apos; or
-                        character.class == &apos;PALADIN&apos;
+                        actor.class == &apos;warrior&apos; or actor.class ==
+                        &apos;paladin&apos;
                       </code>{' '}
                       - Warrior or Paladin
                     </li>
                     <li>
                       <code className='bg-muted px-1 rounded'>
-                        character.race == &apos;ELF&apos;
+                        actor.race == &apos;elf&apos;
                       </code>{' '}
                       - Elves only
                     </li>
                     <li>
                       <code className='bg-muted px-1 rounded'>
-                        character:hasCompletedQuest(0, 5)
+                        actor.level &gt;= 20 and actor:has_item(30, 12)
                       </code>{' '}
-                      - Completed Quest 0:5
+                      - Level 20+ carrying item 30:12
                     </li>
                   </ul>
                 </div>

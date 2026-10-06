@@ -2,6 +2,7 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
+import { HelpButton } from '@/components/help/HelpButton';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useZone } from '@/contexts/zone-context';
 import {
@@ -134,6 +135,10 @@ function QuestsContent() {
           </p>
         </div>
         <div className='flex items-center gap-2'>
+          <HelpButton
+            topic='quests'
+            tip='How quests work and how to build one'
+          />
           <button
             onClick={() => refetch()}
             className='inline-flex items-center px-3 py-2 border border-border rounded-md shadow-sm text-sm font-medium bg-card text-foreground hover:bg-muted'

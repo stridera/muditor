@@ -67,13 +67,20 @@ const components: Components = {
   ),
 };
 
-export function Markdown({ children }: { children: string }) {
+export function Markdown({
+  children,
+  components: overrides,
+}: {
+  children: string;
+  /** Per-element overrides merged over the defaults (e.g. headings with ids). */
+  components?: Components;
+}) {
   return (
     <div className='max-w-none'>
       <ReactMarkdown
         remarkPlugins={[remarkGfm]}
         skipHtml
-        components={components}
+        components={overrides ? { ...components, ...overrides } : components}
       >
         {children}
       </ReactMarkdown>
