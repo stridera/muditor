@@ -10,6 +10,7 @@ describe('QuestsResolver guards', () => {
       'createQuestPhase',
       'updateQuestPhase',
       'deleteQuestPhase',
+      'reorderQuestPhases',
       'createQuestObjective',
       'updateQuestObjective',
       'deleteQuestObjective',

@@ -162,6 +162,23 @@ export class QuestsResolver {
     ) as Promise<QuestPhaseDto>;
   }
 
+  @Mutation(() => [QuestPhaseDto], {
+    description:
+      'Set the phase order: phaseIds lists every phase of the quest once, in the new order',
+  })
+  @RequireZoneWrite({ keys: ['questZoneId'] })
+  async reorderQuestPhases(
+    @Args('questZoneId', { type: () => Int }) questZoneId: number,
+    @Args('questId', { type: () => Int }) questId: number,
+    @Args('phaseIds', { type: () => [Int] }) phaseIds: number[]
+  ): Promise<QuestPhaseDto[]> {
+    return this.questsService.reorderPhases(
+      questZoneId,
+      questId,
+      phaseIds
+    ) as Promise<QuestPhaseDto[]>;
+  }
+
   // ============================================================================
   // Objective Mutations
   // ============================================================================

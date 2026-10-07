@@ -18,6 +18,7 @@ import {
 } from 'class-validator';
 import {
   QuestObjectiveType,
+  QuestObjectiveScope,
   QuestRewardType,
   QuestStatus,
   DialogueMatchType,
@@ -26,6 +27,10 @@ import {
 
 // Register enums for GraphQL
 registerEnumType(QuestObjectiveType, { name: 'QuestObjectiveType' });
+registerEnumType(QuestObjectiveScope, {
+  name: 'QuestObjectiveScope',
+  description: 'Whether an objective counts only the holder or the whole party',
+});
 registerEnumType(QuestRewardType, { name: 'QuestRewardType' });
 registerEnumType(QuestStatus, { name: 'QuestStatus' });
 registerEnumType(DialogueMatchType, { name: 'DialogueMatchType' });
@@ -87,6 +92,12 @@ export class QuestRewardDto {
 
   @Field(() => Int, { nullable: true })
   choiceGroup?: number;
+
+  @Field(() => Int)
+  quantity: number;
+
+  @Field({ nullable: true })
+  condition?: string;
 }
 
 @ObjectType()
@@ -105,6 +116,9 @@ export class QuestPrerequisiteDto {
 
   @Field(() => Int)
   prerequisiteQuestId: number;
+
+  @Field(() => Boolean)
+  requireCompletion: boolean;
 }
 
 @ObjectType()
@@ -123,6 +137,9 @@ export class QuestObjectiveDto {
 
   @Field(() => QuestObjectiveType)
   objectiveType: QuestObjectiveType;
+
+  @Field(() => QuestObjectiveScope)
+  scope: QuestObjectiveScope;
 
   @Field()
   playerDescription: string;
@@ -211,6 +228,9 @@ export class QuestDto {
   @Field({ nullable: true })
   description?: string;
 
+  @Field({ nullable: true })
+  shortDescription?: string;
+
   @Field(() => Int, { nullable: true })
   minLevel?: number;
 
@@ -222,6 +242,15 @@ export class QuestDto {
 
   @Field(() => Boolean)
   hidden: boolean;
+
+  @Field(() => Boolean)
+  autoAccept: boolean;
+
+  @Field(() => Boolean)
+  shareable: boolean;
+
+  @Field(() => Int, { nullable: true })
+  cooldownMinutes?: number;
 
   // Branching paths - quests with same non-null exclusiveGroup are mutually exclusive
   @Field({ nullable: true })
@@ -353,6 +382,27 @@ export class CreateQuestInput {
   @IsString()
   description?: string;
 
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  shortDescription?: string;
+
+  @Field(() => Boolean, { defaultValue: false })
+  @IsOptional()
+  @IsBoolean()
+  autoAccept?: boolean;
+
+  @Field(() => Boolean, { defaultValue: true })
+  @IsOptional()
+  @IsBoolean()
+  shareable?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  cooldownMinutes?: number;
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
@@ -455,6 +505,27 @@ export class UpdateQuestInput {
   @IsOptional()
   @IsString()
   description?: string;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  shortDescription?: string;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  autoAccept?: boolean;
+
+  @Field(() => Boolean, { nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  shareable?: boolean;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  cooldownMinutes?: number;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
@@ -613,6 +684,11 @@ export class CreateQuestObjectiveInput {
   @IsEnum(QuestObjectiveType)
   objectiveType: QuestObjectiveType;
 
+  @Field(() => QuestObjectiveScope, { defaultValue: QuestObjectiveScope.SOLO })
+  @IsOptional()
+  @IsEnum(QuestObjectiveScope)
+  scope?: QuestObjectiveScope;
+
   @Field()
   @IsString()
   playerDescription: string;
@@ -690,6 +766,11 @@ export class UpdateQuestObjectiveInput {
   @IsOptional()
   @IsEnum(QuestObjectiveType)
   objectiveType?: QuestObjectiveType;
+
+  @Field(() => QuestObjectiveScope, { nullable: true })
+  @IsOptional()
+  @IsEnum(QuestObjectiveScope)
+  scope?: QuestObjectiveScope;
 
   @Field({ nullable: true })
   @IsOptional()
@@ -865,6 +946,17 @@ export class CreateQuestRewardInput {
   @IsOptional()
   @IsNumber()
   choiceGroup?: number;
+
+  @Field(() => Int, { defaultValue: 1 })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  quantity?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  condition?: string;
 }
 
 @InputType()
@@ -898,6 +990,17 @@ export class UpdateQuestRewardInput {
   @IsOptional()
   @IsNumber()
   choiceGroup?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  quantity?: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
+  condition?: string;
 }
 
 @InputType()

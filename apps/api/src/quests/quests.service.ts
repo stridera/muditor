@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateQuestInput,
@@ -85,10 +85,14 @@ export class QuestsService {
         name: data.name,
         plainName: data.name, // Will be overwritten by middleware with markup stripped
         description: data.description ?? null,
+        shortDescription: data.shortDescription ?? null,
         minLevel: data.minLevel ?? 1,
         maxLevel: data.maxLevel ?? 100,
         repeatable: data.repeatable ?? false,
         hidden: data.hidden ?? false,
+        autoAccept: data.autoAccept ?? false,
+        shareable: data.shareable ?? true,
+        cooldownMinutes: data.cooldownMinutes ?? null,
         // Branching paths
         exclusiveGroup: data.exclusiveGroup ?? null,
         // Trigger configuration
@@ -120,10 +124,16 @@ export class QuestsService {
     if (data.name !== undefined) updateData.name = data.name;
     if (data.description !== undefined)
       updateData.description = data.description;
+    if (data.shortDescription !== undefined)
+      updateData.shortDescription = data.shortDescription;
     if (data.minLevel !== undefined) updateData.minLevel = data.minLevel;
     if (data.maxLevel !== undefined) updateData.maxLevel = data.maxLevel;
     if (data.repeatable !== undefined) updateData.repeatable = data.repeatable;
     if (data.hidden !== undefined) updateData.hidden = data.hidden;
+    if (data.autoAccept !== undefined) updateData.autoAccept = data.autoAccept;
+    if (data.shareable !== undefined) updateData.shareable = data.shareable;
+    if (data.cooldownMinutes !== undefined)
+      updateData.cooldownMinutes = data.cooldownMinutes;
     // Branching paths
     if (data.exclusiveGroup !== undefined)
       updateData.exclusiveGroup = data.exclusiveGroup;
@@ -235,6 +245,48 @@ export class QuestsService {
     });
   }
 
+  /**
+   * Persist a new phase order. `phaseIds` must list every phase of the quest
+   * exactly once; each phase's `order` becomes its index in the list. All rows
+   * are written in one transaction so a failure never leaves a half-reordered
+   * quest.
+   */
+  async reorderPhases(
+    questZoneId: number,
+    questId: number,
+    phaseIds: number[]
+  ) {
+    const existing = await this.database.questPhases.findMany({
+      where: { questZoneId, questId },
+      select: { id: true },
+    });
+    const existingIds = existing.map(p => p.id).sort((a, b) => a - b);
+    const requested = [...phaseIds].sort((a, b) => a - b);
+    if (
+      existingIds.length !== requested.length ||
+      existingIds.some((id, i) => id !== requested[i])
+    ) {
+      throw new BadRequestException(
+        'phaseIds must list every phase of the quest exactly once'
+      );
+    }
+
+    await this.database.$transaction(async tx => {
+      for (const [index, id] of phaseIds.entries()) {
+        await tx.questPhases.update({
+          where: { questZoneId_questId_id: { questZoneId, questId, id } },
+          data: { order: index },
+        });
+      }
+    });
+
+    return this.database.questPhases.findMany({
+      where: { questZoneId, questId },
+      orderBy: [{ order: 'asc' }, { id: 'asc' }],
+      include: { objectives: { orderBy: { id: 'asc' } }, rewards: true },
+    });
+  }
+
   // ============================================================================
   // Objective CRUD
   // ============================================================================
@@ -261,6 +313,7 @@ export class QuestsService {
         phaseId: data.phaseId,
         id: data.id,
         objectiveType: data.objectiveType,
+        scope: data.scope ?? 'SOLO',
         playerDescription: data.playerDescription,
         internalNote: data.internalNote ?? null,
         showProgress: data.showProgress ?? true,
@@ -290,6 +343,7 @@ export class QuestsService {
     const updateData: Record<string, unknown> = {};
     if (data.objectiveType !== undefined)
       updateData.objectiveType = data.objectiveType;
+    if (data.scope !== undefined) updateData.scope = data.scope;
     if (data.playerDescription !== undefined)
       updateData.playerDescription = data.playerDescription;
     if (data.internalNote !== undefined)
@@ -346,6 +400,9 @@ export class QuestsService {
   // ============================================================================
 
   async createDialogue(data: CreateQuestDialogueInput) {
+    if (data.dialogueTreeId != null) {
+      await this.assertTreeLinkable(data.dialogueTreeId, data.questZoneId);
+    }
     return this.database.questDialogue.create({
       data: {
         questZoneId: data.questZoneId,
@@ -361,6 +418,19 @@ export class QuestsService {
   }
 
   async updateDialogue(id: number, data: UpdateQuestDialogueInput) {
+    if (data.dialogueTreeId != null) {
+      const existing = await this.database.questDialogue.findUnique({
+        where: { id },
+        select: { questZoneId: true },
+      });
+      if (existing) {
+        await this.assertTreeLinkable(
+          data.dialogueTreeId,
+          existing.questZoneId,
+          id
+        );
+      }
+    }
     const updateData: Record<string, unknown> = {};
     if (data.npcMessage !== undefined) updateData.npcMessage = data.npcMessage;
     if (data.matchType !== undefined) updateData.matchType = data.matchType;
@@ -376,7 +446,52 @@ export class QuestsService {
   }
 
   async deleteDialogue(id: number) {
-    return this.database.questDialogue.delete({ where: { id } });
+    const deleted = await this.database.questDialogue.delete({ where: { id } });
+    // A tree only exists to serve its dialogue rows; drop it with the last one.
+    if (deleted.dialogueTreeId != null) {
+      const remaining = await this.database.questDialogue.count({
+        where: { dialogueTreeId: deleted.dialogueTreeId },
+      });
+      if (remaining === 0) {
+        await this.database.dialogueTrees.deleteMany({
+          where: { id: deleted.dialogueTreeId },
+        });
+      }
+    }
+    return deleted;
+  }
+
+  /**
+   * Dialogue trees carry no zone of their own; write access to a tree is
+   * derived from the quest dialogues that use it. Refuse links that would make
+   * one tree span zones, otherwise a builder could edit another zone's tree.
+   */
+  private async assertTreeLinkable(
+    treeId: number,
+    questZoneId: number,
+    exceptDialogueId?: number
+  ) {
+    const tree = await this.database.dialogueTrees.findUnique({
+      where: { id: treeId },
+      select: { id: true },
+    });
+    if (!tree) {
+      throw new BadRequestException(`Dialogue tree ${treeId} does not exist`);
+    }
+    const links = await this.database.questDialogue.findMany({
+      where: {
+        dialogueTreeId: treeId,
+        ...(exceptDialogueId !== undefined && {
+          id: { not: exceptDialogueId },
+        }),
+      },
+      select: { questZoneId: true },
+    });
+    if (links.some(l => l.questZoneId !== questZoneId)) {
+      throw new BadRequestException(
+        `Dialogue tree ${treeId} is used by a quest in another zone`
+      );
+    }
   }
 
   // ============================================================================
@@ -405,6 +520,8 @@ export class QuestsService {
         objectId: data.objectId ?? null,
         abilityId: data.abilityId ?? null,
         choiceGroup: data.choiceGroup ?? null,
+        quantity: data.quantity ?? 1,
+        condition: data.condition ?? null,
       },
     });
   }
@@ -419,6 +536,8 @@ export class QuestsService {
     if (data.abilityId !== undefined) updateData.abilityId = data.abilityId;
     if (data.choiceGroup !== undefined)
       updateData.choiceGroup = data.choiceGroup;
+    if (data.quantity !== undefined) updateData.quantity = data.quantity;
+    if (data.condition !== undefined) updateData.condition = data.condition;
 
     return this.database.questRewards.update({
       where: { id },
@@ -444,6 +563,17 @@ export class QuestsService {
   }
 
   async createPrerequisite(data: CreateQuestPrerequisiteInput) {
+    if (
+      data.questZoneId === data.prerequisiteQuestZoneId &&
+      data.questId === data.prerequisiteQuestId
+    ) {
+      throw new BadRequestException('A quest cannot be its own prerequisite');
+    }
+    if (await this.prerequisiteWouldCycle(data)) {
+      throw new BadRequestException(
+        'That prerequisite would create a loop: the other quest already requires this one'
+      );
+    }
     return this.database.questPrerequisites.create({
       data: {
         questZoneId: data.questZoneId,
@@ -453,6 +583,45 @@ export class QuestsService {
       },
       include: { prerequisiteQuest: true },
     });
+  }
+
+  /**
+   * True when `prerequisiteQuest` (directly or through its own prerequisites)
+   * already requires `quest`, i.e. adding the edge would make the chain
+   * impossible to start.
+   */
+  private async prerequisiteWouldCycle(
+    data: CreateQuestPrerequisiteInput
+  ): Promise<boolean> {
+    const target = `${data.questZoneId}:${data.questId}`;
+    const seen = new Set<string>();
+    let frontier = [
+      { zoneId: data.prerequisiteQuestZoneId, id: data.prerequisiteQuestId },
+    ];
+    while (frontier.length > 0) {
+      const next: { zoneId: number; id: number }[] = [];
+      for (const q of frontier) {
+        const key = `${q.zoneId}:${q.id}`;
+        if (key === target) return true;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        const rows = await this.database.questPrerequisites.findMany({
+          where: { questZoneId: q.zoneId, questId: q.id },
+          select: {
+            prerequisiteQuestZoneId: true,
+            prerequisiteQuestId: true,
+          },
+        });
+        for (const r of rows) {
+          next.push({
+            zoneId: r.prerequisiteQuestZoneId,
+            id: r.prerequisiteQuestId,
+          });
+        }
+      }
+      frontier = next;
+    }
+    return false;
   }
 
   async deletePrerequisite(id: number) {

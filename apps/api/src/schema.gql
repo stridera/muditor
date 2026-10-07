@@ -742,6 +742,18 @@ input CreateClassInput {
   primaryStat: String
 }
 
+input CreateDialogueNodeInput {
+  isTerminal: Boolean! = false
+  npcMessage: String!
+}
+
+input CreateDialogueResponseInput {
+  displayHint: String
+  matchKeywords: [String!]!
+  matchType: DialogueMatchType! = CONTAINS
+  nextNodeId: Int
+}
+
 input CreateEffectInput {
   defaultParams: JSON
   description: String
@@ -945,7 +957,9 @@ input CreateQuestDialogueInput {
 }
 
 input CreateQuestInput {
+  autoAccept: Boolean! = false
   availabilityRequirement: String
+  cooldownMinutes: Int
   description: String
   exclusiveGroup: String
   hidden: Boolean! = false
@@ -954,6 +968,8 @@ input CreateQuestInput {
   minLevel: Int
   name: String!
   repeatable: Boolean! = false
+  shareable: Boolean! = true
+  shortDescription: String
   timeLimitMinutes: Int
   triggerAbilityId: Int
   triggerEventId: Int
@@ -980,6 +996,7 @@ input CreateQuestObjectiveInput {
   questId: Int!
   questZoneId: Int!
   requiredCount: Int! = 1
+  scope: QuestObjectiveScope! = SOLO
   showProgress: Boolean! = true
   targetAbilityId: Int
   targetMobId: Int
@@ -1010,9 +1027,11 @@ input CreateQuestRewardInput {
   abilityId: Int
   amount: Int
   choiceGroup: Int
+  condition: String
   objectId: Int
   objectZoneId: Int
   phaseId: Int!
+  quantity: Int! = 1
   questId: Int!
   questZoneId: Int!
   rewardType: QuestRewardType!
@@ -1221,6 +1240,33 @@ enum DialogueMatchType {
   EXACT
   REGEX
   STARTS_WITH
+}
+
+type DialogueNodeDto {
+  dialogueTreeId: Int!
+  id: Int!
+  isRoot: Boolean!
+  isTerminal: Boolean!
+  npcMessage: String!
+  order: Int!
+  responses: [DialogueResponseDto!]!
+}
+
+type DialogueResponseDto {
+  displayHint: String
+  id: Int!
+  matchKeywords: [String!]!
+  matchType: DialogueMatchType!
+  nextNodeId: Int
+  nodeId: Int!
+  order: Int!
+}
+
+type DialogueTreeDto {
+  description: String
+  id: Int!
+  name: String!
+  nodes: [DialogueNodeDto!]!
 }
 
 enum Direction {
@@ -1871,6 +1917,8 @@ type Mutation {
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createClass(data: CreateClassInput!): ClassDto!
   createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
+  createDialogueNode(data: CreateDialogueNodeInput!, treeId: Int!): DialogueNodeDto!
+  createDialogueResponse(data: CreateDialogueResponseInput!, nodeId: Int!): DialogueResponseDto!
   createEffect(data: CreateEffectInput!): Effect!
   createGrant(data: CreateGrantInput!): UserGrantDto!
 
@@ -1885,6 +1933,11 @@ type Mutation {
   createObjectReset(data: CreateObjectResetInput!): ObjectResetDto!
   createQuest(data: CreateQuestInput!): QuestDto!
   createQuestDialogue(data: CreateQuestDialogueInput!): QuestDialogueDto!
+
+  """
+  Create a tree (with a root node holding the dialogue message) and link it to a quest dialogue
+  """
+  createQuestDialogueTree(name: String!, questDialogueId: Int!): DialogueTreeDto!
   createQuestObjective(data: CreateQuestObjectiveInput!): QuestObjectiveDto!
   createQuestPhase(data: CreateQuestPhaseInput!): QuestPhaseDto!
   createQuestPrerequisite(data: CreateQuestPrerequisiteInput!): QuestPrerequisiteDto!
@@ -1914,6 +1967,9 @@ type Mutation {
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
   deleteClass(id: ID!): Boolean!
+  deleteDialogueNode(id: Int!): DialogueNodeDto!
+  deleteDialogueResponse(id: Int!): DialogueResponseDto!
+  deleteDialogueTree(id: Int!): DialogueTreeDto!
   deleteEffect(id: ID!): Boolean!
   deleteGrant(id: ID!): Boolean!
 
@@ -1987,6 +2043,11 @@ type Mutation {
   """Remove expired effects for a character or all characters"""
   removeExpiredEffects(characterId: ID): Int!
   removeRaceSkill(id: ID!): Boolean!
+
+  """
+  Set the phase order: phaseIds lists every phase of the quest once, in the new order
+  """
+  reorderQuestPhases(phaseIds: [Int!]!, questId: Int!, questZoneId: Int!): [QuestPhaseDto!]!
   requestPasswordReset(input: RequestPasswordResetInput!): PasswordResetResponse!
   resetPassword(input: ResetPasswordInput!): PasswordResetResponse!
 
@@ -2021,6 +2082,9 @@ type Mutation {
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
   updateConsumableEffects(effects: [ConsumableEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
+  updateDialogueNode(data: UpdateDialogueNodeInput!, id: Int!): DialogueNodeDto!
+  updateDialogueResponse(data: UpdateDialogueResponseInput!, id: Int!): DialogueResponseDto!
+  updateDialogueTree(data: UpdateDialogueTreeInput!, id: Int!): DialogueTreeDto!
   updateEffect(data: UpdateEffectInput!, id: ID!): Effect!
 
   """Update a game configuration value"""
@@ -2371,6 +2435,7 @@ type Query {
 
   """Get commands by category"""
   commandsByCategory(category: CommandCategory!): [CommandDto!]!
+  dialogueTree(id: Int!): DialogueTreeDto
   effect(id: ID!): Effect!
   effects(search: String, skip: Int, take: Int): [Effect!]!
   effectsCount(search: String): Int!
@@ -2573,7 +2638,9 @@ type QuestDialogueDto {
 }
 
 type QuestDto {
+  autoAccept: Boolean!
   availabilityRequirement: String
+  cooldownMinutes: Int
   createdAt: DateTime!
   description: String
   exclusiveGroup: String
@@ -2585,6 +2652,8 @@ type QuestDto {
   phases: [QuestPhaseDto!]
   prerequisites: [QuestPrerequisiteDto!]
   repeatable: Boolean!
+  shareable: Boolean!
+  shortDescription: String
   timeLimitMinutes: Int
   triggerAbilityId: Int
   triggerEventId: Int
@@ -2622,6 +2691,7 @@ type QuestObjectiveDto {
   questId: Int!
   questZoneId: Int!
   requiredCount: Int!
+  scope: QuestObjectiveScope!
   showProgress: Boolean!
   targetAbilityId: Int
   targetMobId: Int
@@ -2630,6 +2700,12 @@ type QuestObjectiveDto {
   targetObjectZoneId: Int
   targetRoomId: Int
   targetRoomZoneId: Int
+}
+
+"""Whether an objective counts only the holder or the whole party"""
+enum QuestObjectiveScope {
+  PARTY
+  SOLO
 }
 
 enum QuestObjectiveType {
@@ -2659,16 +2735,19 @@ type QuestPrerequisiteDto {
   prerequisiteQuestZoneId: Int!
   questId: Int!
   questZoneId: Int!
+  requireCompletion: Boolean!
 }
 
 type QuestRewardDto {
   abilityId: Int
   amount: Int
   choiceGroup: Int
+  condition: String
   id: Int!
   objectId: Int
   objectZoneId: Int
   phaseId: Int!
+  quantity: Int!
   questId: Int!
   questZoneId: Int!
   rewardType: QuestRewardType!
@@ -3436,6 +3515,29 @@ input UpdateClassSkillInput {
   minLevel: Int
 }
 
+input UpdateDialogueNodeInput {
+  """
+  true makes this the tree root (the previous root is demoted); false is refused
+  """
+  isRoot: Boolean
+  isTerminal: Boolean
+  npcMessage: String
+  order: Int
+}
+
+input UpdateDialogueResponseInput {
+  displayHint: String
+  matchKeywords: [String!]
+  matchType: DialogueMatchType
+  nextNodeId: Int
+  order: Int
+}
+
+input UpdateDialogueTreeInput {
+  description: String
+  name: String
+}
+
 input UpdateEffectInput {
   defaultParams: JSON
   description: String
@@ -3658,7 +3760,9 @@ input UpdateQuestDialogueInput {
 }
 
 input UpdateQuestInput {
+  autoAccept: Boolean
   availabilityRequirement: String
+  cooldownMinutes: Int
   description: String
   exclusiveGroup: String
   hidden: Boolean
@@ -3666,6 +3770,8 @@ input UpdateQuestInput {
   minLevel: Int
   name: String
   repeatable: Boolean
+  shareable: Boolean
+  shortDescription: String
   timeLimitMinutes: Int
   triggerAbilityId: Int
   triggerEventId: Int
@@ -3687,6 +3793,7 @@ input UpdateQuestObjectiveInput {
   objectiveType: QuestObjectiveType
   playerDescription: String
   requiredCount: Int
+  scope: QuestObjectiveScope
   showProgress: Boolean
   targetAbilityId: Int
   targetMobId: Int
@@ -3707,8 +3814,10 @@ input UpdateQuestRewardInput {
   abilityId: Int
   amount: Int
   choiceGroup: Int
+  condition: String
   objectId: Int
   objectZoneId: Int
+  quantity: Int
   rewardType: QuestRewardType
 }
 
