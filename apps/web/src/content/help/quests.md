@@ -36,7 +36,7 @@ Goal: "Kill 5 sewer rats, then report back to the mayor." We use zone 30, quest 
    - type **Kill Mob**, count `5`, tick **Show Progress**;
    - **Player-visible description**: `Kill 5 sewer rats`;
    - target: search the rat mob in **Search target mob...**.
-7. Add a second objective in the same phase: type **Talk to NPC**, count `1`, description `Report to the mayor`, target the mayor mob. Players complete it with `ask mayor hello` once the mayor is in the room. Keep both objectives in one phase: objectives in later phases can be finished early (see [Phases](#phases)), which would stall the quest.
+7. Add a second objective in the same phase: type **Talk to NPC**, count `1`, description `Report to the mayor`, target the mayor mob. Players complete it with `ask mayor hello` once the mayor is in the room. With both objectives in one phase they can be done in either order; put them in two phases to force kill-then-report (see [Phases](#phases)).
 8. Click **Add Reward** under **Phase Rewards**. Choose **Experience**, **Amount** `500`; add another with **Gold** `100`.
 9. Make the quest discoverable. Attach a greeting or speech trigger to the mayor mob that tells players `Type qaccept 30 5 to take the job.`
 10. Test it (see [Testing a quest](#testing-a-quest)): `qload 30 5`, kill five rats, `ask mayor hello`, then `quests`.
@@ -55,12 +55,12 @@ The **Trigger Type** decides how a player is told about the quest. What the game
 | Mob Encounter        | `MOB`    | **Nothing.** The Quest Giver Mob is not read by the game. Players take the quest with `qaccept <zone> <id>`. Have the mob tell them the command.               |
 | Level Reached        | `LEVEL`  | When a character levels up to exactly **Trigger Level**, the quest is offered (or accepted, see below). Characters already past that level are not offered it. |
 | Item Obtained        | `ITEM`   | Offered when a character picks up the **Trigger Item** with `get`.                                                                                             |
-| Room Entered         | `ROOM`   | Offered when a character first enters the **Trigger Room** (see the VISIT_ROOM note under [Objectives](#objectives)).                                          |
+| Room Entered         | `ROOM`   | Offered when a character enters the **Trigger Room**, every time they enter until they hold the quest (earlier visits do not matter).                          |
 | Skill Used           | `SKILL`  | Offered when a character successfully uses the **Trigger Ability**.                                                                                            |
 | Event Active         | `EVENT`  | Offered to every player online when the game event is switched on (the server checks about once a minute). Players who log in later are not offered it.        |
 | Auto-Start           | `AUTO`   | Offered (or accepted) at every login until the character holds the quest.                                                                                      |
 
-For `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. The editor has no field for auto-accept yet, so today these types only **offer**. A trigger never re-offers a quest the character is already on or has completed.
+For `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. The editor has no field for auto-accept yet, so today these types only **offer**. A trigger never re-offers a quest the character is already on or has completed. A `ROOM` quest that is only offered (not auto-accepted) is offered again on every entry until the character takes it.
 
 Whatever the trigger type, any player can type `qaccept <zone> <id>` for any quest that is not Hidden.
 
@@ -81,31 +81,32 @@ The **Lua Expression** on the **Requirements** tab is evaluated only when a play
 - The expression is wrapped as `return (<your expression>)` and `actor` is the player. Write an expression, not a script.
 - Useful fields: `actor.level`, `actor.class` and `actor.race` (both **lower-case**: `'paladin'`, `'elf'`), `actor.name`. Useful methods: `actor:has_item(zone, id)`, `actor:has_skill(name)`, `actor:has_effect(name)`.
 - Examples: `actor.class == 'paladin'`, `actor.race == 'elf' and actor.level >= 20`, `actor:has_item(30, 12)`.
-- **It fails open.** A typo, a runtime error, or a result that is not a boolean lets the player through. The warning goes to the server log (`syslog`), never to the player. Always test the expression (see [Testing a quest](#testing-a-quest)).
+- **It fails closed.** A typo, a runtime error, or a result that is not a boolean (a number, a string, nil) **denies** the quest to everyone. The warning, naming the quest, goes to the server log (`syslog`), never to the player. Always test the expression (see [Testing a quest](#testing-a-quest)).
 - `character.class == 'WARRIOR'` (the placeholder text in the editor) does not work: there is no `character` variable and class names are lower-case.
 
 ### Phases
 
 - Phases run in **Order**, lowest first (ties broken by phase ID). The editor numbers new phases in the order you add them and has no reordering control yet. In the in-game `quests` listing the number after "Phase" is that Order value, so the first phase shows as `Phase 0`.
 - A phase finishes when **all** its objectives are complete (any order). Then the next phase becomes current. Finishing the last phase completes the quest.
-- **Objectives are not gated by the current phase.** From the moment a quest is accepted, a matching action advances objectives in every phase. If a later phase's objectives are all finished early, the quest stalls when it reaches that phase: the server only checks whether a phase is done when an objective completes, and there is nothing left to complete. Design phases so that later-phase objectives cannot be done early, or put everything in one phase.
+- **Only the current phase's objectives advance.** A kill, pickup, visit, talk or skill use counts only towards objectives in the phase the player is on; progress cannot be banked for a later phase. The one exception is **Collect Item**: when a phase starts (on acceptance or when the previous phase finishes) each Collect Item objective in it is credited with the matching items the player is already carrying (inventory or worn, not inside containers), so a phase that is already satisfied finishes straight away. After a phase finishes the server immediately checks the next one, so several phases can complete at once.
+- A phase with no objectives never finishes by itself.
 - The phase **Name** and **Phase Description** are shown to players in `quests`. A quest with no phases or no objectives can never complete by play.
 
 ### Objectives
 
 Each objective has a type, a **Required Count**, **Show Progress**, a **Player-visible description** (shown in `quests` and in progress messages) and an **Internal note (builder only)** (shown only to Builder-or-higher viewers in `quests`).
 
-| Editor label | Value          | Needs                                  | Player completes it by                                                                                                                                                                                 |
-| ------------ | -------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Kill Mob     | `KILL_MOB`     | Target mob                             | Killing a mob of that prototype. Credit goes to the player who lands the kill; group members do not share it (the editor cannot set party scope yet). Each kill adds 1.                                |
-| Collect Item | `COLLECT_ITEM` | Target object                          | Picking the item up with `get` (floor, container, `get all`). Each pickup adds 1: it counts pickups, not items currently held. Items bought, received with `give`, or rewarded do not count.           |
-| Deliver Item | `DELIVER_ITEM` | Target object **and** a deliver-to mob | `give <item> <mob>` to a mob of that prototype. The item is not consumed by the objective itself. **The editor has no deliver-to field yet, so this type cannot be completed from editor-built data.** |
-| Visit Room   | `VISIT_ROOM`   | Target room                            | Entering the room for the first time. It only counts the first time the character is recorded entering that room; a character who already walked through it may never complete the objective.          |
-| Talk to NPC  | `TALK_TO_NPC`  | Target mob                             | `ask <mob> <anything>` with the mob in the room. Any topic counts; `say` does not. Optional dialogue adds a reply (see [Dialogue](#dialogue)).                                                         |
-| Use Skill    | `USE_SKILL`    | Target ability                         | Successfully using that skill or spell (a failed attempt does not count). **The editor has no ability field for this type yet.**                                                                       |
-| Custom (Lua) | `CUSTOM_LUA`   | A Lua expression                       | The server evaluates the expression about once a minute. See [Custom Lua](#custom-lua).                                                                                                                |
+| Editor label | Value          | Needs                                  | Player completes it by                                                                                                                                                                                                                                                      |
+| ------------ | -------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Kill Mob     | `KILL_MOB`     | Target mob                             | Killing a mob of that prototype. Credit goes to the player who lands the kill; group members do not share it (the editor cannot set party scope yet). Each kill adds 1.                                                                                                     |
+| Collect Item | `COLLECT_ITEM` | Target object                          | Picking the item up with `get` (floor, container, `get all`) while its phase is current. Each pickup adds 1. Items bought, received with `give`, or rewarded do not count as pickups, but items already carried when the phase starts are credited (see [Phases](#phases)). |
+| Deliver Item | `DELIVER_ITEM` | Target object **and** a deliver-to mob | `give <item> <mob>` to a mob of that prototype. The item is not consumed by the objective itself. The game fully supports it; **the editor has no deliver-to field yet**, so the recipient can only be set through the API for now.                                         |
+| Visit Room   | `VISIT_ROOM`   | Target room                            | Walking into the room while the objective's phase is current. Every entry counts (one per entry for a Required Count above 1), whether or not the character has been there before. Logging in inside the room is not an entry.                                              |
+| Talk to NPC  | `TALK_TO_NPC`  | Target mob                             | `ask <mob> <topic>` with the mob in the room; `say` does not count. Without a dialogue any topic counts; with one the topic must match its keywords (see [Dialogue](#dialogue)).                                                                                            |
+| Use Skill    | `USE_SKILL`    | Target ability                         | Successfully using that skill or spell (a failed attempt does not count). The game fully supports it; **the editor has no ability field yet**, so the ability can only be set through the API for now.                                                                      |
+| Custom (Lua) | `CUSTOM_LUA`   | A Lua expression                       | The server evaluates the expression about once a minute, while its phase is current. See [Custom Lua](#custom-lua).                                                                                                                                                         |
 
-"Required Count" is capped: progress never exceeds it, and an objective completes when the count is reached. The target pickers store the **zone:id** of the mob, object or room prototype; double-check you picked the right one.
+"Required Count" is capped: progress never exceeds it, and an objective completes when the count is reached. Whatever finishes the last objective (a kill, a dialogue, the Custom Lua sweep), the quest completes and pays its rewards. The target pickers store the **zone:id** of the mob, object or room prototype; double-check you picked the right one.
 
 ### Rewards
 
@@ -122,7 +123,7 @@ The game also understands Skill Points and Housing rewards, but the editor canno
 
 **Choice Group**: rewards that share a group number are a "pick one" set. They are **not** paid at completion. The player must type `qreward` to list the choices and `qreward <zone> <id> <reward id>` to pick one. The completion message does not mention choice rewards, so tell players about `qreward` in your NPC dialogue or quest description.
 
-Rewards with a condition (a Lua expression, same rules as the availability requirement) are also claimed with `qreward`; the editor cannot set conditions yet.
+Rewards with a condition (a Lua expression, same rules as the availability requirement, including failing closed: an error or non-boolean result refuses the reward) are also claimed with `qreward`; the editor cannot set conditions yet.
 
 ### Repeatable, cooldown and time limits
 
@@ -130,14 +131,16 @@ Rewards with a condition (a Lua expression, same rules as the availability requi
 - **Cooldown** (minutes between completion and the next acceptance) is enforced by the game but the editor has no field for it yet.
 - **Time Limit (minutes)** sets an expiry when the quest is accepted through `qaccept` or an auto-accept trigger. The server checks about once a minute and marks overdue quests FAILED with `*** Quest expired: ... ***`. Quests given with `qload` / `qgive` get no expiry.
 - Abandoning (`abandon <#>`) or failing a quest never blocks it: the player can accept it again.
-- **Known limitation:** accepting a quest again resets its phase and variables but keeps old objective counts. A repeated quest whose objectives were all finished last time starts with them already finished and cannot progress. Until this is fixed, test repeatables with care, and prefer one-shot quests.
+- Accepting a quest again (a repeat, or a retry after it failed or was abandoned) starts it from scratch: first phase, no objective progress, empty quest variables.
 
 ### Dialogue
 
-Dialogue is bound to a **Talk to NPC** objective: when the player does `ask <mob> <topic>` and the topic matches the dialogue's keywords (match types: exact, contains, starts with, any of, regex; all case-insensitive), the mob replies with the dialogue's message.
+Dialogue is bound to a **Talk to NPC** objective. It has three parts: opening **keywords** (match types: exact, contains, starts with, any of, regex; all case-insensitive), an NPC message, and optionally a **dialogue tree** for a longer conversation.
 
-- Progress is not gated by the keywords: every `ask` of that mob advances the objective, matching or not.
-- A dialogue can link a dialogue tree, but only the tree's root message is ever shown; the game does not walk the rest of the tree.
+- **Keywords gate the objective.** When the player does `ask <mob> <topic>`, an objective with a dialogue only advances if the topic matches its keywords. A dialogue with no keywords accepts any topic. Objectives without a dialogue still accept any topic.
+- When the keywords match, the mob answers with the dialogue's message. If a tree is linked, the tree's root node speaks instead and the conversation begins. The objective counts when the conversation opens, not when it ends.
+- **Walking the tree.** While in a conversation, the player's next `ask` of the same mob is matched against the current node's responses (same match types). A matching response moves to its next node, whose message the mob says. The builder hint of each available response is listed under the mob's line. The conversation ends at a terminal node, at a response with no next node, or when the player asks someone else. An `ask` that matches no response goes back to the opening keywords (which can restart the conversation).
+- The reply to a matched topic, and each tree step, is shown to the asking player only.
 - The editor has no dialogue screen yet (the API can create them), and dialogue changes need a server restart.
 
 ### Quest variables
@@ -153,7 +156,7 @@ end
 ```
 
 - Values are saved with the player's quest record (about every 10 seconds) and wiped when the quest is accepted again. Writes for a quest the player has no record of are lost.
-- `getvar` reads the server's in-memory copy. Values saved before a server restart are not loaded back into it yet.
+- `getvar` reads the server's in-memory copy, which is loaded from the saved values when the server starts, so values survive restarts. (The reserved `claimed_rewards` key is not loaded.)
 - Do not use the key `claimed_rewards`; the game uses it for `qreward`.
 - Do not confuse these with the older script helpers `start_quest`, `advance_quest`, `complete_quest`, `get_quest_stage` and friends: those keep a flat note on the player and do **not** touch Quest, `quests`, objectives or rewards.
 - `setvar` / `getvar` on a mob, object or room are different again: they are stored per prototype (shared by every copy), not per player.
@@ -192,7 +195,8 @@ Staff commands (Builder role or higher) in the game:
 - `quests`: your quests. Shows each phase (`>` current, a tick when done), each objective as `[done]`, `[n/total]` or `[ ]`, and, for staff, the internal notes.
 - `questinfo <zone> <id>`: the definition. Staff also see time limit, cooldown, exclusive group and the availability expression.
 - `qaccept <zone> <id>`: accept it the way a player would. This is the only way to test level, prerequisites, exclusive group, cooldown, time limit and the availability expression.
-- `qcomplete <#>`: force-complete the quest in slot number `#` of `quests`. It does **not** pay rewards or run phases, so use it only to test what happens afterwards. To test rewards, finish the objectives for real.
+- `qcomplete <#>`: force-complete the quest in slot number `#` of `quests` and pay its unconditional rewards, as a real completion would (conditional and choice rewards are claimed with `qreward`). It does not run phases or objectives.
+- `qreset <player> <zone> <id>`: wipe a player's whole record of the quest (status, objective progress, variables), online or offline, so it can be loaded or accepted from scratch. Rewards already paid are not taken back. `<zone>:<id>` also works.
 - `abandon <#>`: drop a quest. `qreward`: list or claim choice and conditional rewards.
 - `lua <code>`: run Lua as your character, for example `lua print(actor.class, actor.race, actor.level)` or `lua print(actor.level >= 10)`. Use it to check an expression before saving it.
 
@@ -201,18 +205,17 @@ Seeing errors:
 - `syslog watch warn` shows warnings live. Failed availability, reward-condition and Custom Lua expressions are logged there (for example `CUSTOM_LUA eval failed`). Run `syslog 100 lua` to search recent lines for them.
 - `scripterrors` lists failures from mob, object and room **trigger scripts**. It does not list quest expression errors.
 
-Starting over: there is no in-game reset. `qload` will not replace an existing record, and a repeated `qaccept` keeps old objective counts (see the limitation above). The clean way is to test with a fresh character, or ask someone with database access to delete that character's row from the CharacterQuest table.
+Starting over: `qreset <player> <zone> <id>` deletes the record, after which `qload` / `qgive` / `qaccept` work from scratch. (`qload` alone refuses while any record exists. Accepting a finished repeatable quest again also starts fresh.)
 
 ## Common mistakes
 
 - **Expecting the Quest Giver Mob to hand out the quest.** The game ignores it. Tell players the `qaccept` command in the mob's dialogue or in the quest Description.
 - **Hidden left on.** Players cannot accept hidden quests at all.
-- **Availability expression typos.** They fail open, so everyone gets the quest. Use `actor`, not `character`, and lower-case class and race names.
-- **Objectives in later phases that can be finished early.** The quest stalls on reaching that phase. Use one phase or make later objectives impossible to do early.
-- **Deliver Item or Use Skill objectives.** The editor cannot set the recipient or ability yet, so these objectives never advance.
-- **Talking with `say`.** Talk to NPC only counts `ask <mob> <topic>`.
-- **Collect Item miscounts.** It counts pickups with `get`, not what the player holds, and not items bought or given.
-- **Visit Room for a place the player has already been.** Only the first recorded entry counts.
+- **Availability expression typos.** They fail closed, so nobody can take the quest (check `syslog 100 lua`). Use `actor`, not `character`, and lower-case class and race names.
+- **Expecting early progress to carry over.** An objective only advances while its phase is current. A kill made in phase 1 does not count towards a phase 2 kill objective. Only carried Collect Item items are credited when a phase starts.
+- **Deliver Item or Use Skill objectives built in the editor.** The game supports them, but the editor cannot set the recipient or ability yet, so an objective built there has nothing to match and never advances. Set those fields through the API until the editor catches up.
+- **Talking with `say`.** Talk to NPC only counts `ask <mob> <topic>`, and with a dialogue the topic must match its keywords.
+- **Collect Item miscounts.** After the phase starts it counts pickups with `get`, not items bought or given.
 - **Rewards on the first phase.** They are still paid only at completion. Attach them to the last phase to avoid confusion.
 - **Choice rewards nobody can find.** Players must know about `qreward`.
 - **Custom Lua returning a number or nil.** Only a real `true` counts. Compare, for example `actor.level >= 10`.
