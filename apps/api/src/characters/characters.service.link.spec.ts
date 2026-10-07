@@ -30,7 +30,7 @@ describe('CharactersService.linkCharacterToUser', () => {
   };
   let tx: {
     characters: { updateMany: jest.Mock };
-    users: { delete: jest.Mock };
+    users: { findUnique: jest.Mock; update: jest.Mock };
   };
   let roleCalculator: { updateUserRole: jest.Mock };
   let service: CharactersService;
@@ -46,6 +46,7 @@ describe('CharactersService.linkCharacterToUser', () => {
   const owner = (overrides: Record<string, unknown> = {}) => ({
     email: 'venath@legacy.fierymud.local',
     passwordHash: null,
+    deletedAt: null,
     googleLink: null,
     ...overrides,
   });
@@ -57,7 +58,12 @@ describe('CharactersService.linkCharacterToUser', () => {
   beforeEach(() => {
     tx = {
       characters: { updateMany: jest.fn().mockResolvedValue({ count: 2 }) },
-      users: { delete: jest.fn().mockResolvedValue({}) },
+      users: {
+        findUnique: jest
+          .fn()
+          .mockResolvedValue({ email: 'venath@legacy.fierymud.local' }),
+        update: jest.fn().mockResolvedValue({}),
+      },
     };
     db = {
       characters: {
@@ -94,20 +100,38 @@ describe('CharactersService.linkCharacterToUser', () => {
     (service as unknown as { redis: unknown }).redis = redis;
   });
 
-  it('claims every character of a legacy placeholder and deletes it', async () => {
+  it('claims every character of a legacy placeholder and soft-deletes it', async () => {
     await service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass');
 
     expect(tx.characters.updateMany).toHaveBeenCalledWith({
       where: { userId: PLACEHOLDER_ID },
       data: { userId: CALLER_ID },
     });
-    expect(tx.users.delete).toHaveBeenCalledWith({
-      where: { id: PLACEHOLDER_ID },
-    });
+    expect(tx.users.update).toHaveBeenCalledTimes(1);
+    const arg = tx.users.update.mock.calls[0][0];
+    expect(arg.where).toEqual({ id: PLACEHOLDER_ID });
+    expect(arg.data.deletedAt).toBeInstanceOf(Date);
+    expect(arg.data.passwordHash).toBeNull();
+    expect(arg.data.email).toMatch(
+      /^venath@legacy\.fierymud\.local\.claimed-\d+$/
+    );
     expect(db.characters.update).not.toHaveBeenCalled();
     expect(roleCalculator.updateUserRole).toHaveBeenCalledWith(CALLER_ID, {
       allowRaise: true,
     });
+  });
+
+  it('claims a placeholder that has a website password hash set', async () => {
+    db.users.findUnique.mockResolvedValue(
+      owner({ passwordHash: '$2b$12$abc' })
+    );
+    await service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass');
+
+    expect(tx.characters.updateMany).toHaveBeenCalledWith({
+      where: { userId: PLACEHOLDER_ID },
+      data: { userId: CALLER_ID },
+    });
+    expect(tx.users.update).toHaveBeenCalledTimes(1);
   });
 
   it('still links an unowned character with a plain update', async () => {
@@ -129,7 +153,7 @@ describe('CharactersService.linkCharacterToUser', () => {
 
   it.each([
     ['a real email', owner({ email: 'someone@example.com' })],
-    ['a website password', owner({ passwordHash: '$2b$12$abc' })],
+    ['a soft-deleted flag', owner({ deletedAt: new Date() })],
     ['a Google link', owner({ googleLink: { id: 'g1' } })],
     ['a missing owner row', null],
   ])('rejects a character owned by an account with %s', async (_l, row) => {
@@ -192,7 +216,7 @@ describe('CharactersService.linkCharacterToUser', () => {
 
     expect(db.$transaction).not.toHaveBeenCalled();
     expect(tx.characters.updateMany).not.toHaveBeenCalled();
-    expect(tx.users.delete).not.toHaveBeenCalled();
+    expect(tx.users.update).not.toHaveBeenCalled();
     expect(db.characters.update).not.toHaveBeenCalled();
     expect(roleCalculator.updateUserRole).not.toHaveBeenCalled();
   });

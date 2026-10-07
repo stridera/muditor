@@ -1010,7 +1010,7 @@ export class CharactersService implements OnModuleDestroy {
 
     if (placeholderOwnerId) {
       // Claim: move every character of the placeholder to the caller and
-      // remove the placeholder, atomically. The guard on userId makes a
+      // retire the placeholder (soft-delete), atomically. The guard on userId makes a
       // concurrent claim a no-op instead of a double move.
       const ownerId = placeholderOwnerId;
       await this.db.$transaction(async tx => {
@@ -1018,7 +1018,26 @@ export class CharactersService implements OnModuleDestroy {
           where: { userId: ownerId },
           data: { userId },
         });
-        await tx.users.delete({ where: { id: ownerId } });
+        // Soft-delete rather than hard-delete: BanRecords.bannedBy and
+        // UserGrants.grantedBy reference Users without a cascade, so a hard
+        // delete could fail and roll back the whole claim. The email is
+        // scrambled so the row can neither be claimed again nor collide with
+        // the game server recreating a placeholder, and credentials are cleared.
+        const placeholder = await tx.users.findUnique({
+          where: { id: ownerId },
+          select: { email: true },
+        });
+        await tx.users.update({
+          where: { id: ownerId },
+          data: {
+            deletedAt: new Date(),
+            deletionReason: `Legacy placeholder claimed by user ${userId}`,
+            email: `${placeholder?.email ?? ownerId}.claimed-${Date.now()}`,
+            passwordHash: null,
+            resetToken: null,
+            resetTokenExpiry: null,
+          },
+        });
         this.logger.log(
           `User ${userId} claimed ${moved.count} character(s) from legacy placeholder ${ownerId} via '${character.name}'`
         );
@@ -1042,22 +1061,25 @@ export class CharactersService implements OnModuleDestroy {
 
   /**
    * A legacy placeholder is the synthetic account the game server creates on a
-   * legacy character's first telnet login: placeholder email, no website
-   * password and no Google link. Only such accounts may be claimed.
+   * legacy character's first telnet login: placeholder email, no Google link,
+   * not soft-deleted. The website password hash is deliberately ignored: older
+   * server versions created placeholders with one populated, and nobody can
+   * log in with it anyway. Ownership is proven by the character's game
+   * password check in verifyCharacterPasswordForLink, not by this predicate.
    */
   private async isClaimablePlaceholder(ownerId: string): Promise<boolean> {
     const owner = await this.db.users.findUnique({
       where: { id: ownerId },
       select: {
         email: true,
-        passwordHash: true,
+        deletedAt: true,
         googleLink: { select: { id: true } },
       },
     });
     return (
       !!owner &&
       owner.email.toLowerCase().endsWith(LEGACY_PLACEHOLDER_EMAIL_SUFFIX) &&
-      !owner.passwordHash &&
+      !owner.deletedAt &&
       !owner.googleLink
     );
   }
