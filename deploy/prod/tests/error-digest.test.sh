@@ -104,8 +104,11 @@ has "reports age in hours" "| 2h |" "$rep_md"
 lacks "reports table limited to top N" "teh sword" "$rep_md"
 lacks "reports message redacted" "abc123" "$rep_md"
 rep_c=$(printf '%s\n' "$rep_tsv" | reports_cands)
-has "BUG >= 60 is a top candidate" $'1\t215\treport\t#6\t' "$rep_c"
-has "second BUG candidate" $'1\t140\treport\t#1\tdoor stuck' "$rep_c"
+has "BUG >= 60 is a top candidate (group -1)" $'-1\t215\treport\t#6\t' "$rep_c"
+has "second BUG candidate" $'-1\t140\treport\t#1\tdoor stuck' "$rep_c"
+REPORTS_TOP5_MAX=1
+eq "candidates capped at REPORTS_TOP5_MAX" "1" "$(printf '%s\n' "$rep_tsv" | reports_cands | wc -l)"
+REPORTS_TOP5_MAX=2
 lacks "TYPO is not a top candidate" "teh sword" "$rep_c"
 lacks "candidate message redacted" "abc123" "$rep_c"
 

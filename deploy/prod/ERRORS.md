@@ -28,8 +28,8 @@ strider is in groups `systemd-journal` and `fierymud`, so none of this needs sud
 - Self-test (no host access needed): `deploy/prod/error-digest.sh --self-test`.
 
 What is in it: a header with counts per source (including open player reports) and any ALERT (unit not active, Lua table or reports
-table unreachable), a "Top 5 to look at" list (server errors before client-reported ones, highest count first; open player BUG
-reports with score >= 60 are listed with the client-reported group, by score), the last 5 lines of `REVIEWS.md`, then one table per source with
+table unreachable), a "Top 5 to look at" list (server errors before client-reported ones, highest count first; the best 2 open player BUG
+reports with score >= 60 are listed first, by score), the last 5 lines of `REVIEWS.md`, then one table per source with
 count, first/last seen (UTC), a short id, the normalised signature and one example line (max 300 chars). The "Open player reports
 (top 10 by rank)" section ranks open reports in SQL (`deploy/prod/reports-rank.sql`), which mirrors the Reports page formula in
 `apps/api/src/reports/report-ranking.ts` (type weight + duplicates + distinct reporters + recency + manual priority). Change a weight
@@ -50,7 +50,7 @@ Caveats: `[gql-error]`/`[client-error]` tables are empty until the API build tha
 3. Reproduce: pull the raw lines around the example (`journalctl -u <unit> --since ... | grep <fragment>`), or for Lua open the trigger in Muditor.
 4. Triage new player reports: open `/dashboard/admin/reports` (default view is open + in progress by rank). For each new report set a
    status (IN_PROGRESS, RESOLVED, WONT_FIX) or a priority override (P0 critical ... P3 low), mark duplicates, and add a resolution
-   note when closing. Reports you leave OPEN keep appearing in the digest; BUG reports with score >= 60 stay in "Top 5" until triaged.
+   note when closing. Reports you leave OPEN keep appearing in the digest; the best two BUG reports with score >= 60 stay in "Top 5" until triaged.
 5. Fix in the repo (fierymud-rs / muditor / fierylib trigger data), commit, deploy via `update.sh` + restart (see `docs/PROD.md`).
 6. Record it in the review log (below).
 

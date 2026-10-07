@@ -20,6 +20,7 @@ UNITS=(fieryNT muditorNT-api muditorNT-web)
 PGPASSFILE_DEFAULT=/opt/NEXT/.secrets/pgpass
 REPORTS_TOP_N=10
 REPORTS_BUG_TOP_SCORE=60
+REPORTS_TOP5_MAX=2
 DIGEST_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 LOG_DIR="${LOG_DIR:-/opt/NEXT/logs}"
 
@@ -210,11 +211,13 @@ render_reports() {
   done
 }
 
-# Top-5 candidates from reports.tsv: BUG reports with score >= $REPORTS_BUG_TOP_SCORE.
-# Same TSV shape as aggregate()'s cands: group<TAB>count<TAB>label<TAB>id<TAB>sig (group 1 = with
-# client errors; count column carries the score, see "score" special case in main).
+# Top-5 candidates from reports.tsv: the best REPORTS_TOP5_MAX BUG reports with score >=
+# $REPORTS_BUG_TOP_SCORE (input is already rank-ordered). Same TSV shape as aggregate()'s cands:
+# group<TAB>count<TAB>label<TAB>id<TAB>sig. Group -1 sorts before server errors so a player-reported
+# bug is never starved by log noise; the capped count keeps it from crowding everything out.
+# The count column carries the score (see the "report" label special case in main).
 reports_cands() {
-  awk -F'\t' -v OFS='\t' -v min="$REPORTS_BUG_TOP_SCORE" '$4 == "BUG" && $3 >= min { print 1, $3, "report", "#" $1, $11 }' | redact
+  awk -F'\t' -v OFS='\t' -v min="$REPORTS_BUG_TOP_SCORE" -v max="$REPORTS_TOP5_MAX" '$4 == "BUG" && $3 >= min && ++n <= max { print -1, $3, "report", "#" $1, $11 }' | redact
 }
 
 src_units() {
@@ -324,7 +327,7 @@ main() {
     done
     echo
     echo "## Top 5 to look at"; echo
-    echo "_Server errors before client-reported ones, then by count. Player BUG reports with score >= $REPORTS_BUG_TOP_SCORE rank with the client-reported group (by score)._"; echo
+    echo "_Server errors before client-reported ones, then by count. The best $REPORTS_TOP5_MAX open player BUG reports with score >= $REPORTS_BUG_TOP_SCORE come first (by score)._"; echo
     local c=0 grp cnt label id sig
     while IFS=$'\t' read -r grp cnt label id sig; do
       c=$((c + 1))
