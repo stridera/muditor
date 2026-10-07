@@ -6,8 +6,9 @@
 #   error-digest.sh --self-test
 #
 # Sources: fieryNT (journald, tracing text), muditorNT-api (journald + LOG_DIR
-# error*.log), muditorNT-web (journald), Lua errors (table script_error_log),
-# systemd unit state. See ERRORS.md. When *sourced* only the helper functions are
+# error*.log), muditorNT-web (journald), Lua errors (table script_error_log), open
+# player reports ranked in SQL (reports-rank.sql, table reports), systemd unit state.
+# See ERRORS.md. When *sourced* only the helper functions are
 # defined (used by tests/error-digest.test.sh).
 set -euo pipefail
 export LC_ALL=C.UTF-8
@@ -17,6 +18,9 @@ EX_MAX=300
 SIG_MAX=160
 UNITS=(fieryNT muditorNT-api muditorNT-web)
 PGPASSFILE_DEFAULT=/opt/NEXT/.secrets/pgpass
+REPORTS_TOP_N=10
+REPORTS_BUG_TOP_SCORE=60
+DIGEST_DIR="$(dirname "$(readlink -f "${BASH_SOURCE[0]}")")"
 LOG_DIR="${LOG_DIR:-/opt/NEXT/logs}"
 
 # ---------------------------------------------------------------- helpers
@@ -181,6 +185,38 @@ src_lua() {
   fi
 }
 
+# Open player reports, ranked in SQL (reports-rank.sql mirrors the API formula).
+# Writes $WORK/reports.tsv (columns documented in reports-rank.sql).
+src_reports() {
+  export PGPASSFILE="${PGPASSFILE:-$PGPASSFILE_DEFAULT}"
+  if ! psql -h 127.0.0.1 -U fierynext -d fierynext -X -At -F $'\t' -v ON_ERROR_STOP=1 \
+      -v now_ts="$(date -u -d "@$NOW_EPOCH" '+%Y-%m-%d %H:%M:%S+00')" \
+      -f "$DIGEST_DIR/reports-rank.sql" > "$WORK/reports.tsv" 2> "$WORK/reports.stderr"; then
+    : > "$WORK/reports.tsv"; echo "psql failed: $(head -c 200 "$WORK/reports.stderr" | tr '\n' ' ')" > "$WORK/reports.unavailable"
+  fi
+}
+
+# stdin: reports.tsv. Prints the markdown table of the top $REPORTS_TOP_N rows.
+render_reports() {
+  local id rank score type status prio dups reporter room age_s msg n=0 age prio_txt
+  echo "| Rank | Score | Type | Id | Status | Priority | Similar | Age | Reporter | Room | Message |"
+  echo "|---:|---:|---|---:|---|---|---:|---|---|---|---|"
+  while IFS=$'\t' read -r id rank score type status prio dups reporter room age_s msg; do
+    n=$((n + 1)); ((n <= REPORTS_TOP_N)) || break
+    if ((age_s < 3600)); then age="$((age_s / 60))m"; elif ((age_s < 86400)); then age="$((age_s / 3600))h"; else age="$((age_s / 86400))d"; fi
+    if ((prio < 0)); then prio_txt="auto"; else prio_txt="P$prio"; fi
+    printf '| %s | %s | %s | %s | %s | %s | %s | %s | %s | %s | `%s` |\n' "$rank" "$score" "$type" "$id" "$status" "$prio_txt" "$dups" "$age" \
+      "$(md_cell "$reporter")" "$room" "$(md_cell "$(printf '%s' "${msg:0:160}" | redact)")"
+  done
+}
+
+# Top-5 candidates from reports.tsv: BUG reports with score >= $REPORTS_BUG_TOP_SCORE.
+# Same TSV shape as aggregate()'s cands: group<TAB>count<TAB>label<TAB>id<TAB>sig (group 1 = with
+# client errors; count column carries the score, see "score" special case in main).
+reports_cands() {
+  awk -F'\t' -v OFS='\t' -v min="$REPORTS_BUG_TOP_SCORE" '$4 == "BUG" && $3 >= min { print 1, $3, "report", "#" $1, $11 }' | redact
+}
+
 src_units() {
   local u state restarts active_since
   {
@@ -221,7 +257,8 @@ main() {
   WORK=$(mktemp -d); trap 'rm -rf "$WORK"' EXIT
   : > "$WORK/alerts"
 
-  src_fiery; src_api; src_web; src_lua; src_units
+  src_fiery; src_api; src_web; src_lua; src_reports; src_units
+  reports_cands < "$WORK/reports.tsv" > "$WORK/agg.reports.cands"
 
   local today; today=$(date +%F)
   local body="$WORK/body.md"
@@ -248,6 +285,16 @@ main() {
       awk -F'\t' -v OFS='\t' '{ print $1, $2, $3 }' "$WORK/lua.tsv" | aggregate lua 0 "lua"
     fi
     echo
+    echo "## Open player reports (top $REPORTS_TOP_N by rank)"; echo
+    if [[ -s $WORK/reports.unavailable ]]; then
+      echo "_Unavailable: $(cat "$WORK/reports.unavailable")_"; echo "reports unavailable" >> "$WORK/alerts"
+    elif [[ ! -s $WORK/reports.tsv ]]; then
+      echo "_No open reports._"
+    else
+      render_reports < "$WORK/reports.tsv"
+      echo; echo "_Rank mirrors the Reports page (deploy/prod/reports-rank.sql). Triage at /dashboard/admin/reports._"
+    fi
+    echo
     echo "## systemd"; echo
     cat "$WORK/units.md"; echo
     echo "### Unit start/exit events in window"; echo
@@ -260,6 +307,11 @@ main() {
     echo "# Error digest $today"; echo
     echo "- Window: since $(date -u -d "@$SINCE_EPOCH" '+%Y-%m-%d %H:%M:%S') UTC (\`$SINCE\`) until $(date -u -d "@$NOW_EPOCH" '+%Y-%m-%d %H:%M:%S') UTC"
     echo "- Generated: $(date -u '+%Y-%m-%d %H:%M:%S') UTC on $(hostname)"
+    if [[ -s $WORK/reports.unavailable ]]; then
+      echo "- Open player reports: unavailable"
+    else
+      echo "- Open player reports: $(wc -l < "$WORK/reports.tsv") ($(awk -F'\t' '$4=="BUG"' "$WORK/reports.tsv" | wc -l) bug, $(awk -F'\t' '$4=="IDEA"' "$WORK/reports.tsv" | wc -l) idea, $(awk -F'\t' '$4=="TYPO"' "$WORK/reports.tsv" | wc -l) typo; $(awk -F'\t' '$4=="BUG" && $3>=m' m="$REPORTS_BUG_TOP_SCORE" "$WORK/reports.tsv" | wc -l) high-scoring bugs)"
+    fi
     if [[ -s $WORK/alerts ]]; then echo "- **ALERT**: $(paste -sd';' "$WORK/alerts" | sed 's/;/; /g')"; fi
     echo
     echo "| Source | Distinct signatures | Total events |"
@@ -272,11 +324,15 @@ main() {
     done
     echo
     echo "## Top 5 to look at"; echo
-    echo "_Server errors before client-reported ones, then by count._"; echo
+    echo "_Server errors before client-reported ones, then by count. Player BUG reports with score >= $REPORTS_BUG_TOP_SCORE rank with the client-reported group (by score)._"; echo
     local c=0 grp cnt label id sig
     while IFS=$'\t' read -r grp cnt label id sig; do
       c=$((c + 1))
-      printf '%s. **%s** x%s `%s` `%s`\n' "$c" "$label" "$cnt" "$id" "$(md_cell "$sig")"
+      if [[ $label == report ]]; then
+        printf '%s. **player BUG report** score %s `%s` `%s`\n' "$c" "$cnt" "$id" "$(md_cell "$sig")"
+      else
+        printf '%s. **%s** x%s `%s` `%s`\n' "$c" "$label" "$cnt" "$id" "$(md_cell "$sig")"
+      fi
     done < <(cat "$WORK"/agg.*.cands | awk -F'\t' '$1 < 9' | sort -t$'\t' -k1,1n -k2,2nr | awk 'NR<=5')
     ((c > 0)) || echo "_Nothing to report._"
     echo

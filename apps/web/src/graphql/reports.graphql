@@ -1,0 +1,52 @@
+# Player reports triage (IMMORTAL+ to view, HEAD_BUILDER+ to change)
+
+fragment ReportFields on Report {
+  id
+  reportType
+  status
+  reporterName
+  roomZoneId
+  roomId
+  message
+  resolvedBy
+  resolvedAt
+  resolution
+  priority
+  duplicateOfId
+  tags
+  assignedTo
+  createdAt
+  score
+  rank
+  similarCount
+}
+
+query ReportsList(
+  $filter: ReportFilterInput
+  $sort: ReportSort
+  $take: Int
+  $skip: Int
+) {
+  reports(filter: $filter, sort: $sort, take: $take, skip: $skip) {
+    total
+    items {
+      ...ReportFields
+    }
+  }
+}
+
+query ReportOpenCount {
+  reportOpenCount
+}
+
+mutation UpdateReport($id: ID!, $data: UpdateReportInput!) {
+  updateReport(id: $id, data: $data) {
+    ...ReportFields
+  }
+}
+
+mutation MarkReportDuplicate($id: ID!, $ofId: ID!) {
+  markDuplicate(id: $id, ofId: $ofId) {
+    ...ReportFields
+  }
+}

@@ -6,14 +6,16 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
 import { gql } from '@/generated/gql';
+import { ReportOpenCountDocument } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
-import { useMutation } from '@apollo/client/react';
+import { useMutation, useQuery } from '@apollo/client/react';
 import {
   Box,
   ChevronLeft,
   ChevronRight,
   Clipboard,
   FileCode,
+  Flag,
   Gamepad2,
   HelpCircle,
   Home,
@@ -61,6 +63,8 @@ interface NavItem {
   name: string;
   href: string;
   icon: React.ReactNode;
+  /** Optional count shown as a badge (hidden when 0 or undefined). */
+  badge?: number;
 }
 
 interface NavSection {
@@ -74,6 +78,11 @@ export function Sidebar() {
   const { user, logout } = useAuth();
   const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
+  const { data: openReportsData } = useQuery(ReportOpenCountDocument, {
+    skip: !isImmortal,
+    pollInterval: 60_000,
+  });
+  const openReports = openReportsData?.reportOpenCount ?? 0;
 
   // Collapse state
   const [collapsed, setCollapsed] = useState(() => {
@@ -314,6 +323,12 @@ export function Sidebar() {
   });
   if (isImmortal) {
     adminItems.push({
+      name: 'Reports',
+      href: '/dashboard/admin/reports',
+      icon: <Flag className='h-4 w-4' />,
+      badge: openReports,
+    });
+    adminItems.push({
       name: 'Accounts',
       href: '/dashboard/admin/users',
       icon: <Users className='h-4 w-4' />,
@@ -371,6 +386,15 @@ export function Sidebar() {
             {item.icon}
           </span>
           {!collapsed && <span>{item.name}</span>}
+          {!collapsed && item.badge != null && item.badge > 0 && (
+            <Badge
+              variant='secondary'
+              className='ml-auto h-5 px-1.5 text-[10px]'
+              aria-label={`${item.badge} open`}
+            >
+              {item.badge}
+            </Badge>
+          )}
         </div>
       </Link>
     );

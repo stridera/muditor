@@ -2989,10 +2989,19 @@ model Report {
   resolvedAt DateTime? @map("resolved_at")
   resolution String?   @db.Text // Resolution notes
 
+  // Triage (additive; the game server never writes these)
+  priority      Int?     @map("priority") // manual override: 0=P0 critical .. 3=P3 low
+  duplicateOfId Int?     @map("duplicate_of_id")
+  duplicateOf   Report?  @relation("ReportDuplicates", fields: [duplicateOfId], references: [id], onDelete: SetNull)
+  duplicates    Report[] @relation("ReportDuplicates")
+  tags          String[] @default([])
+  assignedTo    String?  @map("assigned_to")
+
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
   @@index([reportType])
+  @@index([duplicateOfId])
   @@index([status])
   @@index([reporterName])
   @@index([createdAt])

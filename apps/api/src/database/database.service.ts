@@ -358,6 +358,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.siteContent;
   }
 
+  get report() {
+    return this.client.report;
+  }
+
   get gameLoginCode() {
     return this.client.gameLoginCode;
   }

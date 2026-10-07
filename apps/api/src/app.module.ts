@@ -14,6 +14,7 @@ import { GrantsModule } from './grants/grants.module';
 import { HelpModule } from './help/help.module';
 import { ServerStatusModule } from './server-status/server-status.module';
 import { SiteContentModule } from './site-content/site-content.module';
+import { ReportsModule } from './reports/reports.module';
 import { GameLoginModule } from './game-login/game-login.module';
 import { MobsModule } from './mobs/mobs.module';
 import { ObjectsModule } from './objects/objects.module';
@@ -117,6 +118,7 @@ import * as jwt from 'jsonwebtoken';
     SocialsModule,
     HelpModule,
     SiteContentModule,
+    ReportsModule,
     GameLoginModule,
     ServerStatusModule,
     SettingsModule,

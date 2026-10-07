@@ -115,6 +115,13 @@ user/db `fierynext` on 127.0.0.1). Any failure stops the script before the build
 and must be idempotent** (`ON CONFLICT ... DO NOTHING` or `WHERE NOT EXISTS`) and must never overwrite builder edits.
 Prod-only rows (e.g. `GameConfig security/website_url`) belong here, not in the dev seeds.
 
+**Additive schema changes need no hand-written SQL.** Because the update runs `prisma db push`, new nullable/defaulted columns
+(e.g. the `reports` triage columns `priority`, `duplicate_of_id`, `tags`, `assigned_to`) reach prod with the next
+`update.sh muditor`. Do not add one-off `ALTER TABLE` scripts to `sql/`; that directory is only for idempotent data seeds.
+If a change ever has to land before the build (or `db push` would refuse it), run a guarded
+`ALTER TABLE ... ADD COLUMN IF NOT EXISTS ...` script via `psql` over stdin on the host and record it here.
+Anything else that reads new columns outside the app (the digest's `reports-rank.sql`) just reports "unavailable" until the push ran.
+
 ## Logs and status
 
 - `journalctl -u fieryNT -f`, `journalctl -u muditorNT-api -f`, `journalctl -u muditorNT-web -f`

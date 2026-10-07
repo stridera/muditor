@@ -33,6 +33,7 @@ import {
   Newspaper,
   ScrollText,
   Settings,
+  Flag,
   Shield,
   ShoppingBag,
   Sparkles,
@@ -121,6 +122,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/admin/game-config': {
     name: 'Game Config',
     icon: <Settings className='h-5 w-5' />,
+  },
+  '/dashboard/admin/reports': {
+    name: 'Reports',
+    icon: <Flag className='h-5 w-5' />,
   },
   '/dashboard/admin/grants': {
     name: 'Zone Grants',

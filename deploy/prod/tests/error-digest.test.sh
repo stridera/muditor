@@ -90,6 +90,62 @@ row=$(printf '2026-10-06T10:00:00\t\tERROR [Svc] oops id=12345\n' | aggregate r 
 eq "empty-prefix row layout" '| 1 | 2026-10-06 10:00:00 | 2026-10-06 10:00:00 | '"$(printf '%s' 'ERROR [Svc] oops id={n}' | sha1sum | cut -c1-8)"' | `ERROR [Svc] oops id={n}` | `ERROR [Svc] oops id=12345` |' "$row"
 eq "empty input" "_No events in window._" "$(: | aggregate e 0 empty)"
 
+# --- reports: rendering + top-5 candidates (no DB needed)
+REPORTS_TOP_N=2
+rep_tsv=$(printf '%s\n' \
+  $'6\t1\t215\tBUG\tOPEN\t0\t1\tfrank\t32:3\t3600\tcrash on rest | token=abc123' \
+  $'1\t2\t140\tBUG\tOPEN\t-1\t2\talice\t30:1\t7200\tdoor stuck' \
+  $'4\t3\t55\tTYPO\tOPEN\t2\t0\tdave\t31:2\t259200\tteh sword' \
+  $'5\t4\t20\tIDEA\tOPEN\t-1\t0\terin\t-\t2592000\tadd fishing')
+rep_md=$(printf '%s\n' "$rep_tsv" | render_reports)
+has "reports table header" "| Rank | Score | Type |" "$rep_md"
+has "reports row: rank 1 with P0 and room" "| 1 | 215 | BUG | 6 | OPEN | P0 | 1 | 1h | frank | 32:3 |" "$rep_md"
+has "reports age in hours" "| 2h |" "$rep_md"
+lacks "reports table limited to top N" "teh sword" "$rep_md"
+lacks "reports message redacted" "abc123" "$rep_md"
+rep_c=$(printf '%s\n' "$rep_tsv" | reports_cands)
+has "BUG >= 60 is a top candidate" $'1\t215\treport\t#6\t' "$rep_c"
+has "second BUG candidate" $'1\t140\treport\t#1\tdoor stuck' "$rep_c"
+lacks "TYPO is not a top candidate" "teh sword" "$rep_c"
+lacks "candidate message redacted" "abc123" "$rep_c"
+
+# --- reports: SQL rank mirrors apps/api/src/reports/report-ranking.ts (needs a reachable Postgres)
+pick_psql() {
+  if [[ -r $PGPASSFILE_DEFAULT ]] && PGPASSFILE=$PGPASSFILE_DEFAULT psql -h 127.0.0.1 -U fierynext -d fierynext -X -Atc 'select 1' >/dev/null 2>&1; then
+    export PGPASSFILE=$PGPASSFILE_DEFAULT; echo "-h 127.0.0.1 -U fierynext -d fierynext"; return
+  fi
+  local d
+  for d in ${DIGEST_TEST_DB:-} fierydev postgres; do
+    [[ -n $d ]] && psql -X -d "$d" -Atc 'select 1' >/dev/null 2>&1 && { echo "-d $d"; return; }
+  done
+  return 1
+}
+if ! command -v psql >/dev/null 2>&1 || ! psql_args=$(pick_psql); then
+  echo "skip - reports SQL fixture (no reachable Postgres)"
+else
+  # A TEMP table named "reports" shadows the real one for this session only; text columns
+  # stand in for the enums (the SQL casts with ::text). Rows == "matches the SQL mirror fixture"
+  # in report-ranking.spec.ts; now_ts = 2026-10-07T12:00:00Z.
+  # shellcheck disable=SC2086
+  sql_out=$(psql -X -q $psql_args -v ON_ERROR_STOP=1 -v now_ts='2026-10-07 12:00:00+00' -At -F $'\t' <<SQL
+CREATE TEMP TABLE reports (id int, report_type text, status text, reporter_name text, room_zone_id int, room_id int,
+  message text, priority int, duplicate_of_id int, created_at timestamp);
+INSERT INTO reports VALUES
+ (1,'BUG','OPEN','alice',30,1,'door stuck in the tavern',NULL,NULL,'2026-10-07 10:00:00'),
+ (2,'BUG','OPEN','bob',30,1,'Door stuck in the tavern!',NULL,NULL,'2026-10-07 09:00:00'),
+ (3,'BUG','IN_PROGRESS','carol',30,1,'door stuck in the tavern',NULL,NULL,'2026-10-05 10:00:00'),
+ (4,'TYPO','OPEN','dave',31,2,'teh sword',2,NULL,'2026-10-04 12:00:00'),
+ (5,'IDEA','OPEN','erin',NULL,NULL,'add fishing',NULL,NULL,'2026-09-07 12:00:00'),
+ (6,'BUG','OPEN','frank',32,3,'crash on rest',0,NULL,'2026-10-07 11:00:00'),
+ (7,'BUG','DUPLICATE','gina',32,4,'a duplicate of crash',NULL,6,'2026-10-07 11:00:00'),
+ (8,'BUG','RESOLVED','hank',30,1,'resolved long ago',NULL,NULL,'2026-10-07 11:00:00');
+\i $HERE/../reports-rank.sql
+SQL
+  )
+  got=$(printf '%s\n' "$sql_out" | awk -F'\t' '{ printf "%s%s:%s/%s", (NR>1 ? " " : ""), $1, $3, $7 }')
+  eq "SQL rank mirrors API formula (id:score/duplicates, ranked order)" "6:215/1 1:140/2 2:140/2 3:130/2 4:55/0 5:20/0" "$got"
+fi
+
 echo
 if ((fails)); then echo "$fails FAILED"; exit 1; fi
 echo "all passed"

@@ -1975,6 +1975,9 @@ type Mutation {
   """
   linkCharacter(data: LinkCharacterInput!): LinkCharacterResultDto!
   login(input: LoginInput!): AuthPayload!
+
+  """Mark a report as a duplicate of another report"""
+  markDuplicate(id: ID!, ofId: ID!): Report!
   markTriggerReviewed(id: Int!, zoneId: Int!): TriggerDto!
   refreshToken: String!
   register(input: RegisterInput!): AuthPayload!
@@ -2048,6 +2051,9 @@ type Mutation {
   updateQuestReward(data: UpdateQuestRewardInput!, id: Int!): QuestRewardDto!
   updateRace(data: UpdateRaceInput!, race: Race!): RaceDto!
   updateRaceSkill(data: UpdateRaceSkillInput!, id: ID!): RaceSkillDto!
+
+  """Update status, priority, resolution note, assignee or tags"""
+  updateReport(data: UpdateReportInput!, id: ID!): Report!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomEnvironmentalEffects(effects: [RoomEnvironmentalEffectInput!]!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
@@ -2476,6 +2482,15 @@ type Query {
   raceSkills(race: Race!): [RaceSkillDto!]!
   races: [RaceDto!]!
   racesCount: Int!
+
+  """A single report"""
+  report(id: ID!): Report!
+
+  """Reports that are OPEN or IN_PROGRESS (nav badge)"""
+  reportOpenCount: Int!
+
+  """List player reports with computed rank and score"""
+  reports(filter: ReportFilterInput, skip: Int! = 0, sort: ReportSort = RANK, take: Int! = 50): ReportPage!
   room(id: Int!, zoneId: Int!): RoomDto!
   rooms(lightweight: Boolean = false, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
@@ -2776,6 +2791,81 @@ input RegisterInput {
   displayName: String!
   email: String!
   password: String!
+}
+
+"""A player-filed bug, idea or typo report with computed ranking"""
+type Report {
+  assignedTo: String
+  createdAt: DateTime!
+  duplicateOfId: ID
+  id: ID!
+  message: String!
+
+  """Manual priority override: 0 = P0 critical ... 3 = P3 low"""
+  priority: Int
+
+  """1-based position by score among all reports matching the filter"""
+  rank: Int!
+  reportType: ReportType!
+  reporterId: String
+  reporterName: String!
+  resolution: String
+  resolvedAt: DateTime
+  resolvedBy: String
+  roomId: Int
+  roomZoneId: Int
+
+  """Ranking score (see report-ranking.ts for the formula)"""
+  score: Int!
+
+  """
+  Duplicate reports: marked duplicates plus similar open reports in the same room
+  """
+  similarCount: Int!
+  status: ReportStatus!
+  tags: [String!]!
+  updatedAt: DateTime!
+}
+
+input ReportFilterInput {
+  """Matches message or reporter name"""
+  search: String
+
+  """Only these statuses (default: all)"""
+  status: [ReportStatus!]
+  type: ReportType
+
+  """Zone of the room the report was filed in"""
+  zoneId: Int
+}
+
+type ReportPage {
+  items: [Report!]!
+
+  """Total reports matching the filter"""
+  total: Int!
+}
+
+"""Sort order for the reports list"""
+enum ReportSort {
+  NEWEST
+  RANK
+}
+
+"""Triage status of a player report"""
+enum ReportStatus {
+  DUPLICATE
+  IN_PROGRESS
+  OPEN
+  RESOLVED
+  WONT_FIX
+}
+
+"""Kind of player report (in-game bug / idea / typo commands)"""
+enum ReportType {
+  BUG
+  IDEA
+  TYPO
 }
 
 input RequestPasswordResetInput {
@@ -3649,6 +3739,19 @@ input UpdateRaceInput {
 input UpdateRaceSkillInput {
   bonus: Int
   category: SkillCategory
+}
+
+input UpdateReportInput {
+  """Empty string clears the assignment"""
+  assignedTo: String
+
+  """0..3 sets the priority override; -1 clears it"""
+  priority: Int
+
+  """Resolution note"""
+  resolution: String
+  status: ReportStatus
+  tags: [String!]
 }
 
 input UpdateRoomInput {
