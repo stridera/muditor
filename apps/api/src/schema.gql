@@ -3878,6 +3878,9 @@ input UpdateUserInput {
 input UpdateZoneInput {
   climate: Climate
   hemisphere: Hemisphere
+
+  """Requires HEAD_BUILDER or above (checked by the resolver)"""
+  isGodZone: Boolean
   lifespan: Int
   name: String
   resetMode: ResetMode
@@ -4074,6 +4077,11 @@ type ZoneDto {
   createdAt: DateTime!
   hemisphere: Hemisphere!
   id: Int!
+
+  """
+  God zone: hidden from mortals, grants no achievements, never a random teleport destination
+  """
+  isGodZone: Boolean!
   lifespan: Int!
   name: String!
   resetMode: ResetMode!

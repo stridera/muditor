@@ -182,16 +182,25 @@ export class RoomsService {
     };
   }
 
+  /**
+   * `hideGodZones` omits rooms in god zones (Zones.isGodZone). Public readers
+   * pass it for anonymous/mortal viewers; internal callers leave it unset.
+   */
   async findMany(params?: {
     skip?: number;
     take?: number;
     zoneId?: number;
     lightweight?: boolean;
+    hideGodZones?: boolean;
   }): Promise<RoomServiceResult[]> {
-    const { skip, take, zoneId, lightweight } = params || {};
+    const { skip, take, zoneId, lightweight, hideGodZones } = params || {};
     if (lightweight) {
       const clauses: string[] = [];
       if (zoneId !== undefined) clauses.push(`r.zone_id = ${zoneId}`);
+      if (hideGodZones)
+        clauses.push(
+          `r.zone_id NOT IN (SELECT id FROM "Zones" WHERE is_god_zone)`
+        );
       const where = clauses.length ? `WHERE ${clauses.join(' AND ')}` : '';
       const limit = take !== undefined ? `LIMIT ${take}` : '';
       const offset = skip !== undefined ? `OFFSET ${skip}` : '';
@@ -286,11 +295,16 @@ export class RoomsService {
     const query: {
       include: typeof RoomsService.prototype.includeFull;
       orderBy: { id: 'asc' };
-      where?: { zoneId: number };
+      where?: { zoneId?: number; zones?: { isGodZone: false } };
       skip?: number;
       take?: number;
     } = { include: this.includeFull, orderBy: { id: 'asc' } };
-    if (zoneId !== undefined) query.where = { zoneId };
+    if (zoneId !== undefined || hideGodZones) {
+      query.where = {
+        ...(zoneId !== undefined && { zoneId }),
+        ...(hideGodZones && { zones: { isGodZone: false } }),
+      };
+    }
     if (skip !== undefined) query.skip = skip;
     if (take !== undefined) query.take = take;
     const rooms = await this.db.room.findMany(query);
@@ -303,29 +317,48 @@ export class RoomsService {
     take?: number;
     zoneId?: number;
     lightweight?: boolean;
+    hideGodZones?: boolean;
   }): Promise<RoomServiceResult[]> {
     return this.findMany(params);
   }
 
-  async findOne(zoneId: number, id: number): Promise<RoomServiceResult> {
+  async findOne(
+    zoneId: number,
+    id: number,
+    hideGodZones = false
+  ): Promise<RoomServiceResult> {
     const room = await this.db.room.findUnique({
       where: { zoneId_id: { zoneId, id } },
       include: this.includeFull,
     });
     if (!room) throw new NotFoundException(`Room ${zoneId}/${id} not found`);
+    if (hideGodZones) {
+      const zone = await this.db.zones.findUnique({
+        where: { id: zoneId },
+        select: { isGodZone: true },
+      });
+      // Indistinguishable from a missing room, so mortals cannot probe.
+      if (zone?.isGodZone)
+        throw new NotFoundException(`Room ${zoneId}/${id} not found`);
+    }
     return this.mapRoom(room);
   }
 
   async findByZone(
     zoneId: number,
-    lightweight = false
+    lightweight = false,
+    hideGodZones = false
   ): Promise<RoomServiceResult[]> {
-    return this.findMany({ zoneId, lightweight });
+    return this.findMany({ zoneId, lightweight, hideGodZones });
   }
 
-  async count(zoneId?: number): Promise<number> {
-    if (zoneId !== undefined) return this.db.room.count({ where: { zoneId } });
-    return this.db.room.count();
+  async count(zoneId?: number, hideGodZones = false): Promise<number> {
+    return this.db.room.count({
+      where: {
+        ...(zoneId !== undefined && { zoneId }),
+        ...(hideGodZones && { zones: { isGodZone: false } }),
+      },
+    });
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {

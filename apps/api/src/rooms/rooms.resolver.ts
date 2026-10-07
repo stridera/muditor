@@ -1,4 +1,8 @@
+import { UseGuards } from '@nestjs/common';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones } from '../common/god-zone-visibility';
 import { zoneLookups } from '../common/decorators/zone-lookups';
 import {
   Args,
@@ -9,7 +13,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Direction, ExitFlag, ExitState } from '@muditor/db';
+import { Direction, ExitFlag, ExitState, type Users } from '@muditor/db';
 // Import from barrel to ensure mapper files are included in program graph for tooling
 import { mapRoom } from '../common/mappers';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
@@ -90,7 +94,10 @@ export class RoomsResolver {
     private readonly shopsService: ShopsService
   ) {}
 
+  // Room reads are public (the world map is). Rooms in god zones are hidden
+  // from anonymous callers and mortal accounts; IMMORTAL+ still see them.
   @Query(() => [RoomDto], { name: 'rooms' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
@@ -100,14 +107,16 @@ export class RoomsResolver {
       nullable: true,
       defaultValue: false,
     })
-    lightweight?: boolean
+    lightweight?: boolean,
+    @CurrentUser() user?: Users | null
   ): Promise<RoomDto[]> {
     const params: {
       skip?: number;
       take?: number;
       zoneId?: number;
       lightweight?: boolean;
-    } = {};
+      hideGodZones: boolean;
+    } = { hideGodZones: hidesGodZones(user ?? null) };
     if (skip !== undefined) params.skip = skip;
     if (take !== undefined) params.take = take;
     if (zoneId !== undefined) params.zoneId = zoneId;
@@ -117,15 +126,22 @@ export class RoomsResolver {
   }
 
   @Query(() => RoomDto, { name: 'room' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<RoomDto | null> {
-    const room = await this.roomsService.findOne(zoneId, id);
+    const room = await this.roomsService.findOne(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return room ? mapRoom(room as unknown as RoomsMapperInput) : null;
   }
 
   @Query(() => [RoomDto], { name: 'roomsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByZone(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('lightweight', {
@@ -133,17 +149,24 @@ export class RoomsResolver {
       nullable: true,
       defaultValue: false,
     })
-    lightweight?: boolean
+    lightweight?: boolean,
+    @CurrentUser() user?: Users | null
   ): Promise<RoomDto[]> {
-    const rooms = await this.roomsService.findByZone(zoneId, lightweight);
+    const rooms = await this.roomsService.findByZone(
+      zoneId,
+      lightweight,
+      hidesGodZones(user ?? null)
+    );
     return rooms.map(r => mapRoom(r as unknown as RoomsMapperInput));
   }
 
   @Query(() => Int, { name: 'roomsCount' })
+  @UseGuards(OptionalJwtAuthGuard)
   async count(
-    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<number> {
-    return this.roomsService.count(zoneId);
+    return this.roomsService.count(zoneId, hidesGodZones(user ?? null));
   }
 
   @Mutation(() => RoomDto)

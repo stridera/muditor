@@ -8,6 +8,7 @@ query GetZones {
     hemisphere
     lifespan
     resetMode
+    isGodZone
   }
 }
 
@@ -26,6 +27,7 @@ query GetZone($id: Int!) {
     hemisphere
     lifespan
     resetMode
+    isGodZone
     createdAt
     updatedAt
   }
@@ -46,5 +48,6 @@ mutation UpdateZone($id: Int!, $data: UpdateZoneInput!) {
     hemisphere
     lifespan
     resetMode
+    isGodZone
   }
 }

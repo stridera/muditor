@@ -137,6 +137,7 @@ query ZoneDetail($id: Int!) {
     climate
     resetMode
     hemisphere
+    isGodZone
     _count {
       rooms
       mobs

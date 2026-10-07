@@ -25,6 +25,7 @@ interface ZoneDetail {
   climate: Climate;
   resetMode: ResetMode;
   hemisphere: Hemisphere;
+  isGodZone: boolean;
   _count: {
     rooms: number;
     mobs: number;
@@ -229,6 +230,16 @@ function ZoneDetailContent() {
                 {zone.lifespan} minutes
               </p>
             </div>
+            {zone.isGodZone && (
+              <div>
+                <label className='block text-sm font-medium text-muted-foreground'>
+                  Visibility
+                </label>
+                <p className='text-foreground font-semibold mt-1'>
+                  God zone (staff only)
+                </p>
+              </div>
+            )}
             <div>
               <label className='block text-sm font-medium text-muted-foreground'>
                 Reset Mode
@@ -293,6 +304,7 @@ function ZoneDetailContent() {
             resetMode: zone.resetMode,
             hemisphere: zone.hemisphere,
             climate: zone.climate,
+            isGodZone: zone.isGodZone,
           }}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}

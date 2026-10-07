@@ -2,6 +2,8 @@
 
 import { useMutation } from '@apollo/client/react';
 import { useState } from 'react';
+import { useAuth } from '@/contexts/auth-context';
+import { roleAtLeast } from '@/lib/roles';
 import {
   UpdateZoneDocument,
   type UpdateZoneMutationVariables,
@@ -17,6 +19,7 @@ interface ZoneData {
   resetMode: ResetMode;
   hemisphere: Hemisphere;
   climate: Climate;
+  isGodZone: boolean;
 }
 
 interface EditZoneModalProps {
@@ -52,6 +55,10 @@ export function EditZoneModal({
   onClose,
   onSuccess,
 }: EditZoneModalProps) {
+  const { user } = useAuth();
+  // Marking a god zone changes what every mortal can see; the API enforces
+  // HEAD_BUILDER+, the UI just doesn't offer it to anyone else.
+  const canEditGodZone = roleAtLeast(user?.role, 'HEAD_BUILDER');
   const [formData, setFormData] = useState({
     name: zone.name,
     lifespan: zone.lifespan,
@@ -59,6 +66,7 @@ export function EditZoneModal({
     hemisphere: zone.hemisphere,
     climate: zone.climate,
   });
+  const [isGodZone, setIsGodZone] = useState(zone.isGodZone);
 
   const [updateZone, { loading, error }] = useMutation(UpdateZoneDocument, {
     onCompleted: () => {
@@ -72,7 +80,7 @@ export function EditZoneModal({
     await updateZone({
       variables: {
         id: zone.id,
-        data: formData,
+        data: canEditGodZone ? { ...formData, isGodZone } : formData,
       },
     });
   };
@@ -214,6 +222,32 @@ export function EditZoneModal({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* God zone (HEAD_BUILDER+) */}
+          <div>
+            <label
+              htmlFor='isGodZone'
+              className='flex items-start gap-2 text-sm font-medium text-muted-foreground'
+            >
+              <input
+                id='isGodZone'
+                type='checkbox'
+                className='mt-1 rounded border-border'
+                checked={isGodZone}
+                disabled={!canEditGodZone}
+                onChange={e => setIsGodZone(e.target.checked)}
+              />
+              <span>
+                God zone (hidden from mortals, no achievements, excluded from
+                random teleport)
+                {!canEditGodZone && (
+                  <span className='block text-xs font-normal'>
+                    Only HEAD_BUILDER and above can change this.
+                  </span>
+                )}
+              </span>
+            </label>
           </div>
 
           {/* Error Display */}

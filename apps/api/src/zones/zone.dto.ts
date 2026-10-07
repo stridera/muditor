@@ -5,7 +5,13 @@ import {
   InputType,
   registerEnumType,
 } from '@nestjs/graphql';
-import { IsOptional, IsString, IsNumber, IsEnum } from 'class-validator';
+import {
+  IsBoolean,
+  IsOptional,
+  IsString,
+  IsNumber,
+  IsEnum,
+} from 'class-validator';
 import { ResetMode, Hemisphere, Climate } from '@muditor/db';
 
 // Enums for GraphQL
@@ -88,6 +94,12 @@ export class ZoneDto {
   @Field(() => Climate)
   climate: Climate;
 
+  @Field({
+    description:
+      'God zone: hidden from mortals, grants no achievements, never a random teleport destination',
+  })
+  isGodZone: boolean;
+
   @Field(() => Date)
   createdAt: Date;
 
@@ -163,4 +175,12 @@ export class UpdateZoneInput {
   @IsOptional()
   @IsEnum(Climate)
   climate?: Climate;
+
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Requires HEAD_BUILDER or above (checked by the resolver)',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isGodZone?: boolean;
 }

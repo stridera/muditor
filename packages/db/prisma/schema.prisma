@@ -1682,6 +1682,10 @@ model Zones {
   resetMode    ResetMode      @default(NORMAL)
   hemisphere   Hemisphere     @default(NORTHWEST)
   climate      Climate        @default(NONE)
+  // God zones are staff-only content: hidden from mortals (game commands,
+  // public website, world map), grant no exploration achievements, and are
+  // never picked as a random teleport destination. HEAD_BUILDER+ only.
+  isGodZone    Boolean        @default(false) @map("is_god_zone")
   createdAt    DateTime       @default(now()) @map("created_at")
   updatedAt    DateTime       @updatedAt @map("updated_at")
   deletedAt    DateTime?      @map("deleted_at")
