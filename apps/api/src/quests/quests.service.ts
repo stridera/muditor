@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateQuestInput,
@@ -418,18 +419,19 @@ export class QuestsService {
   }
 
   async updateDialogue(id: number, data: UpdateQuestDialogueInput) {
-    if (data.dialogueTreeId != null) {
-      const existing = await this.database.questDialogue.findUnique({
-        where: { id },
-        select: { questZoneId: true },
-      });
-      if (existing) {
-        await this.assertTreeLinkable(
-          data.dialogueTreeId,
-          existing.questZoneId,
-          id
-        );
-      }
+    const existing =
+      data.dialogueTreeId !== undefined
+        ? await this.database.questDialogue.findUnique({
+            where: { id },
+            select: { questZoneId: true, dialogueTreeId: true },
+          })
+        : null;
+    if (data.dialogueTreeId != null && existing) {
+      await this.assertTreeLinkable(
+        data.dialogueTreeId,
+        existing.questZoneId,
+        id
+      );
     }
     const updateData: Record<string, unknown> = {};
     if (data.npcMessage !== undefined) updateData.npcMessage = data.npcMessage;
@@ -439,26 +441,40 @@ export class QuestsService {
     if (data.dialogueTreeId !== undefined)
       updateData.dialogueTreeId = data.dialogueTreeId;
 
-    return this.database.questDialogue.update({
+    const updated = await this.database.questDialogue.update({
       where: { id },
       data: updateData,
     });
+    // Re-linking or clearing the tree can leave the old one with no dialogue
+    // at all; trees carry no zone of their own, so nobody could ever reach
+    // (or clean up) it again. Drop it.
+    const previousTree = existing?.dialogueTreeId ?? null;
+    if (
+      previousTree != null &&
+      previousTree !== (data.dialogueTreeId ?? null)
+    ) {
+      await this.deleteTreeIfUnused(previousTree);
+    }
+    return updated;
   }
 
   async deleteDialogue(id: number) {
     const deleted = await this.database.questDialogue.delete({ where: { id } });
     // A tree only exists to serve its dialogue rows; drop it with the last one.
     if (deleted.dialogueTreeId != null) {
-      const remaining = await this.database.questDialogue.count({
-        where: { dialogueTreeId: deleted.dialogueTreeId },
-      });
-      if (remaining === 0) {
-        await this.database.dialogueTrees.deleteMany({
-          where: { id: deleted.dialogueTreeId },
-        });
-      }
+      await this.deleteTreeIfUnused(deleted.dialogueTreeId);
     }
     return deleted;
+  }
+
+  /** Delete a dialogue tree once no quest dialogue links to it any more. */
+  private async deleteTreeIfUnused(treeId: number) {
+    const remaining = await this.database.questDialogue.count({
+      where: { dialogueTreeId: treeId },
+    });
+    if (remaining === 0) {
+      await this.database.dialogueTrees.deleteMany({ where: { id: treeId } });
+    }
   }
 
   /**
@@ -569,20 +585,41 @@ export class QuestsService {
     ) {
       throw new BadRequestException('A quest cannot be its own prerequisite');
     }
-    if (await this.prerequisiteWouldCycle(data)) {
-      throw new BadRequestException(
-        'That prerequisite would create a loop: the other quest already requires this one'
-      );
+    // The loop check and the insert must be one atomic decision: with two
+    // concurrent requests (A needs B, B needs A) each could pass the check
+    // before the other's row exists. Serializable isolation makes one of
+    // them fail with a serialization error (P2034); retrying it re-runs the
+    // check against the winner's row and rejects it as a loop.
+    const attempts = 4;
+    for (let attempt = 1; ; attempt++) {
+      try {
+        return await this.database.$transaction(
+          async tx => {
+            if (await this.prerequisiteWouldCycle(tx, data)) {
+              throw new BadRequestException(
+                'That prerequisite would create a loop: the other quest already requires this one'
+              );
+            }
+            return tx.questPrerequisites.create({
+              data: {
+                questZoneId: data.questZoneId,
+                questId: data.questId,
+                prerequisiteQuestZoneId: data.prerequisiteQuestZoneId,
+                prerequisiteQuestId: data.prerequisiteQuestId,
+              },
+              include: { prerequisiteQuest: true },
+            });
+          },
+          { isolationLevel: Prisma.TransactionIsolationLevel.Serializable }
+        );
+      } catch (error) {
+        const serializationFailure =
+          typeof error === 'object' &&
+          error !== null &&
+          (error as { code?: string }).code === 'P2034';
+        if (!serializationFailure || attempt >= attempts) throw error;
+      }
     }
-    return this.database.questPrerequisites.create({
-      data: {
-        questZoneId: data.questZoneId,
-        questId: data.questId,
-        prerequisiteQuestZoneId: data.prerequisiteQuestZoneId,
-        prerequisiteQuestId: data.prerequisiteQuestId,
-      },
-      include: { prerequisiteQuest: true },
-    });
   }
 
   /**
@@ -591,6 +628,7 @@ export class QuestsService {
    * impossible to start.
    */
   private async prerequisiteWouldCycle(
+    db: Pick<Prisma.TransactionClient, 'questPrerequisites'>,
     data: CreateQuestPrerequisiteInput
   ): Promise<boolean> {
     const target = `${data.questZoneId}:${data.questId}`;
@@ -605,7 +643,7 @@ export class QuestsService {
         if (key === target) return true;
         if (seen.has(key)) continue;
         seen.add(key);
-        const rows = await this.database.questPrerequisites.findMany({
+        const rows = await db.questPrerequisites.findMany({
           where: { questZoneId: q.zoneId, questId: q.id },
           select: {
             prerequisiteQuestZoneId: true,

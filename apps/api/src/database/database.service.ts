@@ -501,11 +501,16 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
         | '$use'
         | '$extends'
       >
-    ) => Promise<R>
+    ) => Promise<R>,
+    options?: {
+      maxWait?: number;
+      timeout?: number;
+      isolationLevel?: Prisma.TransactionIsolationLevel;
+    }
   ): Promise<R>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any -- Prisma $transaction accepts both PrismaPromise<any>[] and function forms
-  $transaction<R>(arg: any): Promise<R> {
-    return this.client.$transaction(arg) as Promise<R>;
+  $transaction<R>(arg: any, options?: any): Promise<R> {
+    return this.client.$transaction(arg, options) as Promise<R>;
   }
 
   async onModuleInit() {

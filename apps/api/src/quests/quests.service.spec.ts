@@ -5,7 +5,6 @@ import { QuestsService } from './quests.service';
 
 describe('QuestsService', () => {
   let service: QuestsService;
-  const tx = { questPhases: { update: jest.fn() } };
   const db = {
     quests: { create: jest.fn(), update: jest.fn() },
     questPhases: { findMany: jest.fn() },
@@ -22,6 +21,10 @@ describe('QuestsService', () => {
     },
     dialogueTrees: { findUnique: jest.fn(), deleteMany: jest.fn() },
     $transaction: jest.fn(),
+  };
+  const tx = {
+    questPhases: { update: jest.fn() },
+    questPrerequisites: db.questPrerequisites,
   };
 
   beforeEach(async () => {
@@ -193,6 +196,65 @@ describe('QuestsService', () => {
       expect(db.questPrerequisites.create).not.toHaveBeenCalled();
     });
 
+    it('decides loop-or-insert in one SERIALIZABLE transaction', async () => {
+      db.questPrerequisites.findMany.mockResolvedValue([]);
+      await service.createPrerequisite({
+        ...base,
+        prerequisiteQuestZoneId: 31,
+        prerequisiteQuestId: 1,
+      });
+      expect(db.$transaction).toHaveBeenCalledTimes(1);
+      expect(db.$transaction.mock.calls[0][1]).toEqual({
+        isolationLevel: 'Serializable',
+      });
+    });
+
+    it('re-checks after a serialization failure, so concurrent A->B / B->A cannot both win', async () => {
+      // Request A: 30:5 requires 30:6. Concurrently B (30:6 requires 30:5)
+      // committed first. Postgres aborts A with P2034; the retry now sees
+      // B's row and refuses the loop.
+      let committed = false;
+      db.$transaction
+        .mockImplementationOnce(async () => {
+          committed = true;
+          throw Object.assign(new Error('could not serialize access'), {
+            code: 'P2034',
+          });
+        })
+        .mockImplementation(async (fn: (t: typeof tx) => unknown) => fn(tx));
+      db.questPrerequisites.findMany.mockImplementation(
+        async ({ where }: { where: { questId: number } }) =>
+          committed && where.questId === 6
+            ? [{ prerequisiteQuestZoneId: 30, prerequisiteQuestId: 5 }]
+            : []
+      );
+      await expect(
+        service.createPrerequisite({
+          ...base,
+          prerequisiteQuestZoneId: 30,
+          prerequisiteQuestId: 6,
+        })
+      ).rejects.toThrow(/loop/);
+      expect(db.$transaction).toHaveBeenCalledTimes(2);
+      expect(db.questPrerequisites.create).not.toHaveBeenCalled();
+    });
+
+    it('gives up on a serialization failure that keeps happening', async () => {
+      db.$transaction.mockImplementation(async () => {
+        throw Object.assign(new Error('could not serialize access'), {
+          code: 'P2034',
+        });
+      });
+      await expect(
+        service.createPrerequisite({
+          ...base,
+          prerequisiteQuestZoneId: 31,
+          prerequisiteQuestId: 1,
+        })
+      ).rejects.toThrow(/serialize/);
+      expect(db.$transaction).toHaveBeenCalledTimes(4);
+    });
+
     it('creates an acyclic prerequisite', async () => {
       db.questPrerequisites.findMany.mockResolvedValue([]);
       await service.createPrerequisite({
@@ -242,6 +304,68 @@ describe('QuestsService', () => {
       expect(db.dialogueTrees.deleteMany).toHaveBeenCalledWith({
         where: { id: 4 },
       });
+    });
+
+    it('drops the old tree when a dialogue is re-linked and nothing else uses it', async () => {
+      db.questDialogue.findUnique.mockResolvedValue({
+        questZoneId: 30,
+        dialogueTreeId: 4,
+      });
+      db.dialogueTrees.findUnique.mockResolvedValue({ id: 9 });
+      db.questDialogue.findMany.mockResolvedValue([]);
+      db.questDialogue.update.mockResolvedValue({ id: 1, dialogueTreeId: 9 });
+      db.questDialogue.count.mockResolvedValue(0);
+      await service.updateDialogue(1, { dialogueTreeId: 9 });
+      expect(db.questDialogue.count).toHaveBeenCalledWith({
+        where: { dialogueTreeId: 4 },
+      });
+      expect(db.dialogueTrees.deleteMany).toHaveBeenCalledWith({
+        where: { id: 4 },
+      });
+    });
+
+    it('drops the old tree when the link is cleared', async () => {
+      db.questDialogue.findUnique.mockResolvedValue({
+        questZoneId: 30,
+        dialogueTreeId: 4,
+      });
+      db.questDialogue.update.mockResolvedValue({
+        id: 1,
+        dialogueTreeId: null,
+      });
+      db.questDialogue.count.mockResolvedValue(0);
+      await service.updateDialogue(1, { dialogueTreeId: null as never });
+      expect(db.dialogueTrees.deleteMany).toHaveBeenCalledWith({
+        where: { id: 4 },
+      });
+    });
+
+    it('keeps the old tree when another dialogue still uses it', async () => {
+      db.questDialogue.findUnique.mockResolvedValue({
+        questZoneId: 30,
+        dialogueTreeId: 4,
+      });
+      db.questDialogue.update.mockResolvedValue({
+        id: 1,
+        dialogueTreeId: null,
+      });
+      db.questDialogue.count.mockResolvedValue(1);
+      await service.updateDialogue(1, { dialogueTreeId: null as never });
+      expect(db.dialogueTrees.deleteMany).not.toHaveBeenCalled();
+    });
+
+    it('leaves the tree alone when the link is unchanged or not touched', async () => {
+      db.questDialogue.findUnique.mockResolvedValue({
+        questZoneId: 30,
+        dialogueTreeId: 4,
+      });
+      db.dialogueTrees.findUnique.mockResolvedValue({ id: 4 });
+      db.questDialogue.findMany.mockResolvedValue([]);
+      db.questDialogue.update.mockResolvedValue({ id: 1, dialogueTreeId: 4 });
+      await service.updateDialogue(1, { dialogueTreeId: 4 });
+      await service.updateDialogue(1, { npcMessage: 'Hello' });
+      expect(db.questDialogue.count).not.toHaveBeenCalled();
+      expect(db.dialogueTrees.deleteMany).not.toHaveBeenCalled();
     });
 
     it('keeps a tree that other dialogues still use', async () => {
