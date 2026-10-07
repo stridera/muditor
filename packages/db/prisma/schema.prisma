@@ -2507,6 +2507,8 @@ enum PlayerFlag {
   BRIEF // Show shortened room descriptions
   COMPACT // Reduce blank lines in output
   NO_REPEAT // Don't echo commands back
+  EXPAND_MOBS // List identical mobs one per line instead of stacking as "(x3)"
+  EXPAND_OBJS // List identical objects one per line instead of stacking as "(x3)"
 
   // Auto-actions
   AUTO_LOOT // Automatically loot corpses after kills
