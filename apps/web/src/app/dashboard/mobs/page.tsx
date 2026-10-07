@@ -3,7 +3,7 @@
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
-import { useZone } from '@/contexts/zone-context';
+import { useListState } from '@/hooks/use-list-state';
 import {
   GetMobsDocument,
   GetMobsByZoneDocument,
@@ -28,11 +28,10 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
-  type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import {
   applySearchFilters,
@@ -76,15 +75,12 @@ function MobsPageContent() {
 
 function MobsContent() {
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const zoneParam = searchParams.get('zone');
   const idParam = searchParams.get('id');
-  const { selectedZone, setSelectedZone } = useZone();
+  const list = useListState();
+  const selectedZone = list.zone;
+  const { searchFilters, setSearchFilters } = list;
   const searchRef = useRef<EnhancedSearchRef>(null);
 
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    searchTerm: '',
-  });
   const [selectedMobs, setSelectedMobs] = useState<Set<string>>(new Set());
   const [isDeleting, setIsDeleting] = useState(false);
   const [cloningId, setCloningId] = useState<number | null>(null);
@@ -92,10 +88,16 @@ function MobsContent() {
   const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
-  const [sortBy, setSortBy] = useState('level');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  // Pagination, sort and filters live in the URL (see useListState)
+  const currentPage = list.page;
+  const setCurrentPage = list.setPage;
+  const itemsPerPage = parseInt(list.get('per') ?? '', 10) || 25;
+  const setItemsPerPage = (n: number) => list.set({ per: n === 25 ? null : n });
+  const sortBy = list.get('sort') ?? 'level';
+  const setSortBy = (v: string) => list.set({ sort: v === 'level' ? null : v });
+  const sortOrder: 'asc' | 'desc' = list.get('dir') === 'desc' ? 'desc' : 'asc';
+  const setSortOrder = (v: 'asc' | 'desc') =>
+    list.set({ dir: v === 'asc' ? null : v });
 
   // Auto-expand mob if id parameter is provided (for display, not editing)
   useEffect(() => {
@@ -113,19 +115,6 @@ function MobsContent() {
       }
     }
   }, [idParam]);
-
-  // Sync zone parameter from URL with context
-  useEffect(() => {
-    if (zoneParam) {
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId) && selectedZone !== zoneId) {
-        setSelectedZone(zoneId);
-      }
-    } else if (!zoneParam && selectedZone !== null) {
-      // Clear zone when parameter is removed from URL
-      setSelectedZone(null);
-    }
-  }, [zoneParam, selectedZone, setSelectedZone]);
 
   // Fetch mobs using Apollo Client with conditional query
   const {
@@ -153,11 +142,6 @@ function MobsContent() {
   const mobs: Mob[] = Array.from(
     new Map(rawMobs.map(mob => [`${mob.zoneId}-${mob.id}`, mob])).values()
   );
-
-  // Reset to page 1 when search term changes
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchFilters.searchTerm]);
 
   // Keyboard shortcut: '/' to focus search
   useEffect(() => {
@@ -628,6 +612,7 @@ function MobsContent() {
       {/* Enhanced Search */}
       <EnhancedSearch
         ref={searchRef}
+        initialFilters={searchFilters}
         onFiltersChange={setSearchFilters}
         placeholder='Search mobs by name, keywords, description, or ID...'
         showLevelFilter={true}

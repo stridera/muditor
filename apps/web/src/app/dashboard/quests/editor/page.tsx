@@ -61,6 +61,7 @@ import {
   Target,
   Trash2,
 } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -97,6 +98,7 @@ interface QuestFormData {
 }
 
 function QuestEditorContent() {
+  const listHref = useListReturnHref('/dashboard/quests');
   const searchParams = useSearchParams();
   const router = useRouter();
   const questId = searchParams.get('id');
@@ -750,7 +752,7 @@ function QuestEditorContent() {
             topic='quests'
             tip='How quests work and how to build one'
           />
-          <Link href='/dashboard/quests'>
+          <Link href={listHref}>
             <button className='inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Quests

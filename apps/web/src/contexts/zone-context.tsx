@@ -8,6 +8,7 @@ import React, {
   useState,
 } from 'react';
 import { useSearchParams } from 'next/navigation';
+import { LAST_ZONE_KEY } from '@/hooks/use-list-state';
 
 export interface ZoneContextType {
   selectedZone: number | null;
@@ -34,7 +35,7 @@ interface ZoneProviderProps {
  * the whole app tree (rendered from the root layout) into client-side bailout.
  */
 const ZoneUrlSync: React.FC<{
-  onZone: (zone: number) => void;
+  onZone: (zone: number | null) => void;
 }> = ({ onZone }) => {
   const searchParams = useSearchParams();
 
@@ -44,21 +45,17 @@ const ZoneUrlSync: React.FC<{
     if (urlZone) {
       const zoneId = parseInt(urlZone);
       if (!isNaN(zoneId)) {
+        // Persisting the zone is the list pages' job (useListState): an editor
+        // URL's ?zone= is the entity's zone, not a list filter.
         onZone(zoneId);
-        // Update localStorage to match URL
-        localStorage.setItem('muditor-selected-zone', zoneId.toString());
         return;
       }
     }
 
     // Priority 2: Load from localStorage if no URL parameter
-    const stored = localStorage.getItem('muditor-selected-zone');
-    if (stored && stored !== 'null') {
-      const zoneId = parseInt(stored);
-      if (!isNaN(zoneId)) {
-        onZone(zoneId);
-      }
-    }
+    const stored = localStorage.getItem(LAST_ZONE_KEY);
+    const zoneId = stored ? parseInt(stored) : NaN;
+    onZone(isNaN(zoneId) ? null : zoneId);
   }, [searchParams, onZone]);
 
   return null;
@@ -69,9 +66,9 @@ export const ZoneProvider: React.FC<ZoneProviderProps> = ({ children }) => {
   const setSelectedZone = (zone: number | null) => {
     setSelectedZoneState(zone);
     if (zone === null) {
-      localStorage.removeItem('muditor-selected-zone');
+      localStorage.removeItem(LAST_ZONE_KEY);
     } else {
-      localStorage.setItem('muditor-selected-zone', zone.toString());
+      localStorage.setItem(LAST_ZONE_KEY, zone.toString());
     }
   };
 

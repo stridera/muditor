@@ -8,7 +8,7 @@ import {
   DeleteQuestDialog,
   type QuestToDelete,
 } from '@/components/quests/DeleteQuestDialog';
-import { useZone } from '@/contexts/zone-context';
+import { useListState } from '@/hooks/use-list-state';
 import { usePermissions } from '@/hooks/use-permissions';
 import {
   GetQuestsDocument,
@@ -31,8 +31,7 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
+import { useState, Suspense } from 'react';
 
 type Quest = GetQuestsQuery['quests'][number];
 
@@ -45,9 +44,8 @@ function QuestsPageContent() {
 }
 
 function QuestsContent() {
-  const searchParams = useSearchParams();
-  const zoneParam = searchParams.get('zone');
-  const { selectedZone, setSelectedZone } = useZone();
+  const list = useListState();
+  const selectedZone = list.zone;
   const { canEditZone } = usePermissions();
 
   const [questToDelete, setQuestToDelete] = useState<QuestToDelete | null>(
@@ -55,20 +53,10 @@ function QuestsContent() {
   );
   const [deletedMessage, setDeletedMessage] = useState('');
   const [expandedQuests, setExpandedQuests] = useState<Set<string>>(new Set());
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
-
-  // Sync zone parameter from URL with context
-  useEffect(() => {
-    if (zoneParam) {
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId) && selectedZone !== zoneId) {
-        setSelectedZone(zoneId);
-      }
-    } else if (!zoneParam && selectedZone !== null) {
-      setSelectedZone(null);
-    }
-  }, [zoneParam, selectedZone, setSelectedZone]);
+  const currentPage = list.page;
+  const setCurrentPage = list.setPage;
+  const itemsPerPage = parseInt(list.get('per') ?? '', 10) || 25;
+  const setItemsPerPage = (n: number) => list.set({ per: n === 25 ? null : n });
 
   // Fetch quests
   const {

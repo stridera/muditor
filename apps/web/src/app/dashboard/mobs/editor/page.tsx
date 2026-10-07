@@ -28,6 +28,7 @@ import {
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -148,6 +149,7 @@ const mobValidationRules: ValidationRules<MobFormData> = [
 ];
 
 function MobEditorContent() {
+  const listHref = useListReturnHref('/dashboard/mobs');
   const searchParams = useSearchParams();
   const mobId = searchParams.get('id');
   const zoneId = searchParams.get('zone');
@@ -567,7 +569,7 @@ function MobEditorContent() {
           </p>
         </div>
         <div className='flex gap-2'>
-          <Link href='/dashboard/mobs'>
+          <Link href={listHref}>
             <button className='inline-flex items-center px-4 py-2 border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Mobs

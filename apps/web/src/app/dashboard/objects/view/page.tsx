@@ -10,6 +10,7 @@ import {
 } from '@/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import { Edit, ArrowLeft } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -28,6 +29,7 @@ export default function ObjectViewPage() {
 
 function ObjectViewContent() {
   const searchParams = useSearchParams();
+  const listHref = useListReturnHref('/dashboard/objects');
   const router = useRouter();
   const zoneParam = searchParams.get('zone');
   const idParam = searchParams.get('id');
@@ -38,9 +40,9 @@ function ObjectViewContent() {
   // Redirect to list if missing parameters
   useEffect(() => {
     if (zoneId === null || objectId === null) {
-      router.push('/dashboard/objects');
+      router.push(listHref);
     }
-  }, [zoneId, objectId, router]);
+  }, [zoneId, objectId, router, listHref]);
 
   const { loading, error, data } = useQuery<
     GetObjectQuery,
@@ -75,7 +77,7 @@ function ObjectViewContent() {
       {/* Header */}
       <div className='flex items-center justify-between mb-6'>
         <div className='flex items-center gap-4'>
-          <Link href={`/dashboard/objects?zone=${zoneId}`}>
+          <Link href={listHref}>
             <Button variant='outline' size='sm'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to List

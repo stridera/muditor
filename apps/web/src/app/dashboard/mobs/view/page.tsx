@@ -10,6 +10,7 @@ import {
 } from '@/generated/graphql';
 import { useQuery } from '@apollo/client/react';
 import { Edit, ArrowLeft } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense, useEffect } from 'react';
@@ -28,6 +29,7 @@ export default function MobViewPage() {
 
 function MobViewContent() {
   const searchParams = useSearchParams();
+  const listHref = useListReturnHref('/dashboard/mobs');
   const router = useRouter();
   const zoneParam = searchParams.get('zone');
   const idParam = searchParams.get('id');
@@ -38,9 +40,9 @@ function MobViewContent() {
   // Redirect to list if missing parameters
   useEffect(() => {
     if (zoneId === null || mobId === null) {
-      router.push('/dashboard/mobs');
+      router.push(listHref);
     }
-  }, [zoneId, mobId, router]);
+  }, [zoneId, mobId, router, listHref]);
 
   const { loading, error, data } = useQuery<GetMobQuery, GetMobQueryVariables>(
     GetMobDocument,
@@ -75,7 +77,7 @@ function MobViewContent() {
       {/* Header */}
       <div className='flex items-center justify-between mb-6'>
         <div className='flex items-center gap-4'>
-          <Link href={`/dashboard/mobs?zone=${zoneId}`}>
+          <Link href={listHref}>
             <Button variant='outline' size='sm'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to List

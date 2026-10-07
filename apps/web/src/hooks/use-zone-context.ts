@@ -1,5 +1,6 @@
 import { usePathname, useSearchParams } from 'next/navigation';
 import { useMemo, useEffect, useState } from 'react';
+import { LAST_ZONE_KEY } from '@/hooks/use-list-state';
 
 export interface ZoneContext {
   zoneId: number | null;
@@ -17,18 +18,12 @@ export function useZoneContext(): ZoneContext {
   const searchParams = useSearchParams();
   const [localStorageZone, setLocalStorageZone] = useState<number | null>(null);
 
-  // Load zone from localStorage on client side
+  // Re-read the remembered zone on every navigation so clearing the zone filter
+  // (which forgets it) is reflected here too.
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('muditor-selected-zone');
-      if (stored && stored !== 'null') {
-        const zoneId = parseInt(stored, 10);
-        if (!isNaN(zoneId)) {
-          setLocalStorageZone(zoneId);
-        }
-      }
-    }
-  }, []);
+    const zoneId = parseInt(localStorage.getItem(LAST_ZONE_KEY) ?? '', 10);
+    setLocalStorageZone(isNaN(zoneId) ? null : zoneId);
+  }, [pathname, searchParams]);
 
   return useMemo(() => {
     // Check for zone in query params first (used by rooms, mobs, objects, visual editor)

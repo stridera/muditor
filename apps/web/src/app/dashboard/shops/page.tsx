@@ -2,16 +2,13 @@
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
-import { useZone } from '@/contexts/zone-context';
+import { useListState } from '@/hooks/use-list-state';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ChevronDown, Edit, Plus, Trash2 } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useState, Suspense } from 'react';
-import EnhancedSearch, {
-  type SearchFilters,
-} from '../../../components/EnhancedSearch';
+import { useState, Suspense } from 'react';
+import EnhancedSearch from '../../../components/EnhancedSearch';
 import { applySearchFilters } from '../../../lib/search-utils';
 
 const GET_SHOPS = gql`
@@ -173,14 +170,13 @@ interface Shop {
 }
 
 function ShopsContent() {
-  const searchParams = useSearchParams();
-  const zoneParam = searchParams.get('zone');
-  const { selectedZone, setSelectedZone } = useZone();
+  const {
+    zone: selectedZone,
+    searchFilters,
+    setSearchFilters,
+  } = useListState();
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    searchTerm: '',
-  });
   const [expandedShops, setExpandedShops] = useState<Set<number>>(new Set());
 
   const { loading, error, data, refetch } = useQuery(
@@ -194,16 +190,6 @@ function ShopsContent() {
   };
 
   const [deleteShop] = useMutation(DELETE_SHOP);
-
-  // Handle initial zone parameter from URL
-  useEffect(() => {
-    if (zoneParam && selectedZone === null) {
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId)) {
-        setSelectedZone(zoneId);
-      }
-    }
-  }, [zoneParam, selectedZone, setSelectedZone]);
 
   const toggleShopExpanded = (shopId: number) => {
     if (expandedShops.has(shopId)) {
@@ -274,6 +260,7 @@ function ShopsContent() {
 
       {/* Enhanced Search */}
       <EnhancedSearch
+        initialFilters={searchFilters}
         onFiltersChange={setSearchFilters}
         placeholder='Search shops by ID, keeper ID, or zone...'
         customFilterOptions={[

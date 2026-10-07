@@ -16,6 +16,7 @@ import {
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Plus, Save, Trash2, X } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -166,6 +167,7 @@ const shopValidationRules: ValidationRules<ShopFormData> = [
 // Types now imported from mapping helpers
 
 function ShopEditorContent() {
+  const listHref = useListReturnHref('/dashboard/shops');
   const searchParams = useSearchParams();
   const shopId = searchParams.get('id');
   const zoneId = searchParams.get('zone');
@@ -563,7 +565,7 @@ function ShopEditorContent() {
           </p>
         </div>
         <div className='flex gap-2'>
-          <Link href='/dashboard/shops'>
+          <Link href={listHref}>
             <button className='inline-flex items-center px-4 py-2 border border-input rounded-md shadow-sm text-sm font-medium text-muted-foreground bg-card hover:bg-accent'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Shops

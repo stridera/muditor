@@ -4,7 +4,7 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { TypeBadge } from '@/components/ui/type-badge';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
-import { useZone } from '@/contexts/zone-context';
+import { useListState } from '@/hooks/use-list-state';
 import {
   CreateObjectDocument,
   type CreateObjectInput,
@@ -44,11 +44,10 @@ import {
   Trash2,
 } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, Suspense } from 'react';
 import EnhancedSearch, {
   type EnhancedSearchRef,
-  type SearchFilters,
 } from '../../../components/EnhancedSearch';
 import {
   applySearchFilters,
@@ -69,15 +68,12 @@ function ObjectsPageContent() {
 function ObjectsContent() {
   const apolloClient = useApolloClient();
   const searchParams = useSearchParams();
-  const router = useRouter();
-  const zoneParam = searchParams.get('zone');
   const idParam = searchParams.get('id');
-  const { selectedZone, setSelectedZone } = useZone();
+  const list = useListState();
+  const selectedZone = list.zone;
+  const { searchFilters, setSearchFilters } = list;
 
   const [deletingId, setDeletingId] = useState<number | null>(null);
-  const [searchFilters, setSearchFilters] = useState<SearchFilters>({
-    searchTerm: '',
-  });
   const [selectedObjects, setSelectedObjects] = useState<Set<string>>(
     new Set()
   );
@@ -93,10 +89,16 @@ function ObjectsContent() {
   >({});
 
   // Pagination state
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(25);
-  const [sortBy, setSortBy] = useState('level');
-  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc');
+  // Pagination, sort and filters live in the URL (see useListState)
+  const currentPage = list.page;
+  const setCurrentPage = list.setPage;
+  const itemsPerPage = parseInt(list.get('per') ?? '', 10) || 25;
+  const setItemsPerPage = (n: number) => list.set({ per: n === 25 ? null : n });
+  const sortBy = list.get('sort') ?? 'level';
+  const setSortBy = (v: string) => list.set({ sort: v === 'level' ? null : v });
+  const sortOrder: 'asc' | 'desc' = list.get('dir') === 'desc' ? 'desc' : 'asc';
+  const setSortOrder = (v: 'asc' | 'desc') =>
+    list.set({ dir: v === 'asc' ? null : v });
 
   // Ref for search box focus
   const searchRef = useRef<EnhancedSearchRef>(null);
@@ -133,19 +135,6 @@ function ObjectsContent() {
       }
     }
   }, [idParam]);
-
-  // Sync zone parameter from URL with context
-  useEffect(() => {
-    if (zoneParam) {
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId) && selectedZone !== zoneId) {
-        setSelectedZone(zoneId);
-      }
-    } else if (!zoneParam && selectedZone !== null) {
-      // Clear zone when parameter is removed from URL
-      setSelectedZone(null);
-    }
-  }, [zoneParam, selectedZone, setSelectedZone]);
 
   // Keyboard shortcut: '/' focuses search box
   useEffect(() => {
@@ -554,6 +543,7 @@ function ObjectsContent() {
       {/* Enhanced Search */}
       <EnhancedSearch
         ref={searchRef}
+        initialFilters={searchFilters}
         onFiltersChange={setSearchFilters}
         placeholder='Search objects by name, keywords, type, or ID...'
         showLevelFilter={true}

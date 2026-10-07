@@ -24,6 +24,8 @@ export interface SearchPreset {
 }
 
 interface EnhancedSearchProps {
+  /** Filters to start with (e.g. restored from the URL). Read on mount only. */
+  initialFilters?: SearchFilters;
   onFiltersChange: (filters: SearchFilters) => void;
   placeholder?: string;
   availableTypes?: string[];
@@ -45,6 +47,7 @@ export interface EnhancedSearchRef {
 const EnhancedSearch = forwardRef<EnhancedSearchRef, EnhancedSearchProps>(
   (
     {
+      initialFilters,
       onFiltersChange,
       placeholder = 'Search...',
       availableTypes = [],
@@ -68,6 +71,7 @@ const EnhancedSearch = forwardRef<EnhancedSearchRef, EnhancedSearchProps>(
       searchTerm: '',
       types: [],
       customFilters: {},
+      ...initialFilters,
     });
 
     // Default search presets

@@ -5,12 +5,12 @@ import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
 import { Button } from '@/components/ui/button';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { SectorBadge } from '@/components/ui/sector-badge';
-import { useZone } from '@/contexts/zone-context';
+import { useListState } from '@/hooks/use-list-state';
 import { usePermissions } from '@/hooks/use-permissions';
 import { stripMarkup } from '@/utils/xmlLiteParser';
 import { ChevronDown, Plus } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useEffect, useMemo, useState, Suspense } from 'react';
 
 interface RoomExit {
@@ -67,30 +67,31 @@ function RoomsPageContent() {
 
 function RoomsContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const { isBuilder } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
-  const zoneParam = searchParams.get('zone');
-  const { selectedZone, setSelectedZone } = useZone();
+  const list = useListState();
+  const selectedZone = list.zone;
 
   const [rooms, setRooms] = useState<Room[]>([]);
   const [roomsCount, setRoomsCount] = useState(0);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSector, setSelectedSector] = useState('all');
+  // Local state keeps typing responsive; it is mirrored into the URL below.
+  const [searchTerm, setSearchTerm] = useState(() => list.get('q') ?? '');
+  const [selectedSector, setSelectedSector] = useState(
+    () => list.get('sector') ?? 'all'
+  );
   const [expandedRooms, setExpandedRooms] = useState<Set<number>>(new Set());
   const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
 
-  // Sync zone parameter from URL with zone context
+  // Mirror search text and sector into the URL (deep links, back-navigation).
+  const { set: setListParams } = list;
   useEffect(() => {
-    if (zoneParam) {
-      const zoneId = parseInt(zoneParam);
-      if (!isNaN(zoneId) && zoneId !== selectedZone) {
-        setSelectedZone(zoneId);
-      }
-    }
-  }, [zoneParam, selectedZone, setSelectedZone]);
+    setListParams({
+      q: searchTerm,
+      sector: selectedSector === 'all' ? null : selectedSector,
+    });
+  }, [searchTerm, selectedSector, setListParams]);
 
   useEffect(() => {
     const fetchRooms = async () => {

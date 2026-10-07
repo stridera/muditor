@@ -17,6 +17,7 @@ import {
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -292,6 +293,7 @@ const objectValidationRules: ValidationRules<ObjectFormData> = [
 ];
 
 function ObjectEditorContent() {
+  const listHref = useListReturnHref('/dashboard/objects');
   const searchParams = useSearchParams();
   const objectId = searchParams.get('id');
   const zoneIdParam = searchParams.get('zone');
@@ -619,7 +621,7 @@ function ObjectEditorContent() {
           </p>
         </div>
         <div className='flex gap-2'>
-          <Link href='/dashboard/objects'>
+          <Link href={listHref}>
             <button className='inline-flex items-center px-4 py-2 border border-border rounded-md shadow-sm text-sm font-medium bg-secondary text-secondary-foreground hover:bg-secondary/80'>
               <ArrowLeft className='w-4 h-4 mr-2' />
               Back to Objects

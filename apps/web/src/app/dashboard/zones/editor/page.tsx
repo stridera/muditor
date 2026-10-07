@@ -5,6 +5,7 @@ export const dynamic = 'force-dynamic';
 import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrchestrator';
 import { WorldMapCanvas } from '@/components/WorldMap/WorldMapCanvas';
 import { PermissionGuard } from '@/components/auth/permission-guard';
+import { LAST_ZONE_KEY } from '@/hooks/use-list-state';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -29,7 +30,7 @@ function ZoneEditorContent() {
   // Load zone from localStorage on client side
   useEffect(() => {
     if (typeof window !== 'undefined') {
-      const stored = localStorage.getItem('muditor-selected-zone');
+      const stored = localStorage.getItem(LAST_ZONE_KEY);
       if (stored && stored !== 'null') {
         const storedZoneId = parseInt(stored, 10);
         if (!isNaN(storedZoneId)) {
