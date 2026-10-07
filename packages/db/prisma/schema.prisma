@@ -372,6 +372,12 @@ model CharacterClass {
   // Future: stack with weapon/gear crit modifiers from ObjectEffects.
   baseCritChance Int @default(5) @map("base_crit_chance")
 
+  // Legacy per-class "exp needed to level" multiplier (class.cpp
+  // exp_gain_factor; 1.0 = normal, 1.3 = 30% more XP per level). The game
+  // multiplies LevelDefinition.expRequired (the class-neutral legacy
+  // init_exp_table) by this and truncates, like legacy exp_next_level.
+  expGainFactor Float @default(1.0) @map("exp_gain_factor")
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")
@@ -2736,7 +2742,7 @@ model GameConfig {
 model LevelDefinition {
   level       Int      @id
   name        String? // Optional name: "Immortal", "Avatar", "God"
-  expRequired Int      @default(0) @map("exp_required") // XP to reach this level
+  expRequired Int      @default(0) @map("exp_required") // Class-neutral XP to reach this level (legacy exp table); Class.expGainFactor scales it per class
   hpGain      Int      @default(10) @map("hp_gain") // HP gained at this level
   staminaGain Int      @default(5) @map("stamina_gain") // Stamina gained at this level
   isImmortal  Boolean      @default(false) @map("is_immortal")
