@@ -930,6 +930,7 @@ model Mobs {
   gender              Gender       @default(NEUTRAL)
   size            Size         @default(MEDIUM)
   lifeForce       LifeForce    @default(LIFE)
+  composition     Composition  @default(FLESH)
   damageType      DamageType   @default(HIT)
   // Drives "kill the wrong target" alignment penalties (Section 21).
   // NORMAL = no alignment hit; INNOCENT/SHOPKEEPER/QUEST_NPC = scaled hit toward EVIL when killed.
@@ -1155,6 +1156,7 @@ model Races {
   defaultAlignment   Int          @default(0) @map("default_alignment")
   focusBonus         Int          @default(100) @map("focus_bonus")
   defaultLifeforce   LifeForce    @default(LIFE) @map("default_lifeforce")
+  defaultComposition Composition  @default(FLESH) @map("default_composition")
   maleWeightLow      Int          @default(0) @map("male_weight_low")
   maleWeightHigh     Int          @default(0) @map("male_weight_high")
   maleHeightLow      Int          @default(0) @map("male_height_low")
@@ -2253,6 +2255,24 @@ enum ShopTradesWith {
   TRADE_NOCLERIC
   TRADE_NOTHIEF
   TRADE_NOWARRIOR
+}
+
+// What a creature is physically made of. Order mirrors legacy composition.hpp
+// (COMP_FLESH..COMP_PLANT). Drives look text now; damage susceptibilities later.
+enum Composition {
+  FLESH
+  EARTH
+  AIR
+  FIRE
+  WATER
+  ICE
+  MIST
+  ETHER
+  METAL
+  STONE
+  BONE
+  LAVA
+  PLANT
 }
 
 enum Size {

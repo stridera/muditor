@@ -12,6 +12,7 @@ import {
   GetMobDocument,
   UpdateMobDocument,
   UpdateMobDefaultEffectsDocument,
+  type Composition,
   type DamageType,
   type Gender,
   type GetMobQuery,
@@ -91,6 +92,7 @@ interface MobFormData {
   gender: string;
   size: string;
   lifeForce: string;
+  composition: string;
   damageType: string;
   traits: string[];
   behaviors: string[];
@@ -205,6 +207,7 @@ function MobEditorContent() {
     gender: 'NEUTRAL',
     size: 'MEDIUM',
     lifeForce: 'LIFE',
+    composition: 'FLESH',
     damageType: 'HIT',
     traits: [],
     behaviors: [],
@@ -330,6 +333,7 @@ function MobEditorContent() {
         gender: mob.gender,
         size: mob.size,
         lifeForce: mob.lifeForce,
+        composition: mob.composition,
         damageType: mob.damageType,
         traits: mob.traits || [],
         behaviors: mob.behaviors || [],
@@ -432,6 +436,7 @@ function MobEditorContent() {
         gender: formData.gender as Gender,
         size: formData.size as Size,
         lifeForce: formData.lifeForce as LifeForce,
+        composition: formData.composition as Composition,
         traits: formData.traits as MobTrait[],
         behaviors: formData.behaviors as MobBehavior[],
         professions: formData.professions as MobProfession[],
@@ -753,6 +758,37 @@ function MobEditorContent() {
                     <option value='LARGE'>Large</option>
                     <option value='HUGE'>Huge</option>
                     <option value='GIGANTIC'>Gigantic</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label
+                    htmlFor='composition'
+                    className='block text-sm font-medium text-card-foreground mb-1'
+                  >
+                    Composition
+                  </label>
+                  <select
+                    id='composition'
+                    value={formData.composition}
+                    onChange={e =>
+                      handleInputChange('composition', e.target.value)
+                    }
+                    className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  >
+                    <option value='FLESH'>Flesh</option>
+                    <option value='EARTH'>Earth</option>
+                    <option value='AIR'>Air</option>
+                    <option value='FIRE'>Fire</option>
+                    <option value='WATER'>Water</option>
+                    <option value='ICE'>Ice</option>
+                    <option value='MIST'>Mist</option>
+                    <option value='ETHER'>Ether</option>
+                    <option value='METAL'>Metal</option>
+                    <option value='STONE'>Stone</option>
+                    <option value='BONE'>Bone</option>
+                    <option value='LAVA'>Lava</option>
+                    <option value='PLANT'>Plant</option>
                   </select>
                 </div>
               </div>

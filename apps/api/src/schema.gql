@@ -587,6 +587,22 @@ type CommandResultType {
   success: Boolean!
 }
 
+enum Composition {
+  AIR
+  BONE
+  EARTH
+  ETHER
+  FIRE
+  FLESH
+  ICE
+  LAVA
+  METAL
+  MIST
+  PLANT
+  STONE
+  WATER
+}
+
 """Type of configuration value"""
 enum ConfigValueType {
   BOOL
@@ -830,6 +846,7 @@ input CreateMobInput {
   behaviors: [MobBehavior!]! = []
   charisma: Int! = 13
   classId: Int
+  composition: Composition! = FLESH
   concealment: Int! = 0
   constitution: Int! = 13
 
@@ -1039,6 +1056,7 @@ input CreateQuestRewardInput {
 
 input CreateRaceInput {
   defaultAlignment: Int! = 0
+  defaultComposition: Composition! = FLESH
   defaultLifeforce: LifeForce! = LIFE
   defaultSize: Size! = MEDIUM
   displayName: String!
@@ -1738,6 +1756,7 @@ type MobDto {
   behaviors: [MobBehavior!]!
   charisma: Int!
   classId: Int
+  composition: Composition!
   concealment: Int!
   constitution: Int!
   createdAt: DateTime!
@@ -2830,6 +2849,7 @@ enum RaceAlign {
 type RaceDto {
   createdAt: DateTime!
   defaultAlignment: Int!
+  defaultComposition: Composition!
   defaultLifeforce: LifeForce!
   defaultSize: Size!
   expFactor: Int!
@@ -3632,6 +3652,7 @@ input UpdateMobInput {
   behaviors: [MobBehavior!]
   charisma: Int
   classId: Int
+  composition: Composition
   concealment: Int
   constitution: Int
   damageDice: String
@@ -3823,6 +3844,7 @@ input UpdateQuestRewardInput {
 
 input UpdateRaceInput {
   defaultAlignment: Int
+  defaultComposition: Composition
   defaultLifeforce: LifeForce
   defaultSize: Size
   displayName: String

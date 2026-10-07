@@ -80,6 +80,7 @@ export function mapMob(db: MobMapperSource): MobDto {
     gender: db.gender,
     size: db.size,
     lifeForce: db.lifeForce,
+    composition: db.composition,
     traits: db.traits ?? [],
     behaviors: db.behaviors ?? [],
     professions: db.professions ?? [],

@@ -38,6 +38,7 @@ const GET_RACES = gql`
       humanoid
       magical
       defaultSize
+      defaultComposition
       maxStrength
       maxDexterity
       maxIntelligence
@@ -72,6 +73,7 @@ const UPDATE_RACE = gql`
       humanoid
       magical
       defaultSize
+      defaultComposition
       maxStrength
       maxDexterity
       maxIntelligence
@@ -619,6 +621,7 @@ export default function RacesPage() {
                       )}
                     </div>
                     <div>Size: {selectedRace?.defaultSize}</div>
+                    <div>Composition: {selectedRace?.defaultComposition}</div>
                   </div>
                 </div>
 

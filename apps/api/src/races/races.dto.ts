@@ -1,11 +1,19 @@
 import { ObjectType, Field, ID, Int, registerEnumType } from '@nestjs/graphql';
-import { Race, RaceAlign, Size, LifeForce, SkillCategory } from '@muditor/db';
+import {
+  Race,
+  RaceAlign,
+  Size,
+  LifeForce,
+  Composition,
+  SkillCategory,
+} from '@muditor/db';
 
 // Register enums for GraphQL
 registerEnumType(Race, { name: 'Race' });
 registerEnumType(RaceAlign, { name: 'RaceAlign' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(LifeForce, { name: 'LifeForce' });
+registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(SkillCategory, { name: 'SkillCategory' });
 
 @ObjectType()
@@ -45,6 +53,9 @@ export class RaceDto {
 
   @Field(() => LifeForce)
   defaultLifeforce: LifeForce;
+
+  @Field(() => Composition)
+  defaultComposition: Composition;
 
   @Field(() => Int)
   maxStrength: number;

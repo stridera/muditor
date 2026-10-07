@@ -23,6 +23,7 @@ mutation UpdateMob($zoneId: Int!, $id: Int!, $data: UpdateMobInput!) {
     gender
     size
     lifeForce
+    composition
     traits
     behaviors
     professions
@@ -60,6 +61,7 @@ mutation CreateMob($data: CreateMobInput!) {
     gender
     size
     lifeForce
+    composition
     traits
     behaviors
     professions

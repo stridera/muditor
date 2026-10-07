@@ -395,6 +395,12 @@ function MobViewContent() {
             </div>
             <div>
               <dt className='text-sm font-medium text-muted-foreground'>
+                Composition
+              </dt>
+              <dd className='text-base'>{mob.composition}</dd>
+            </div>
+            <div>
+              <dt className='text-sm font-medium text-muted-foreground'>
                 Default Position
               </dt>
               <dd className='text-base'>{mob.defaultPosition}</dd>

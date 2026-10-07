@@ -6,6 +6,7 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import {
+  Composition,
   DamageType,
   Gender,
   LifeForce,
@@ -34,6 +35,7 @@ registerEnumType(Race, { name: 'Race' });
 registerEnumType(DamageType, { name: 'DamageType' });
 registerEnumType(Position, { name: 'Position' });
 registerEnumType(LifeForce, { name: 'LifeForce' });
+registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(MobRole, { name: 'MobRole' });
 registerEnumType(MobTrait, { name: 'MobTrait' });
@@ -175,6 +177,9 @@ export class MobDto {
 
   @Field(() => LifeForce)
   lifeForce: LifeForce;
+
+  @Field(() => Composition)
+  composition: Composition;
 
   @Field(() => [MobTrait])
   traits: MobTrait[];
@@ -438,6 +443,11 @@ export class CreateMobInput {
   @IsOptional()
   @IsEnum(LifeForce)
   lifeForce?: LifeForce;
+
+  @Field(() => Composition, { defaultValue: Composition.FLESH })
+  @IsOptional()
+  @IsEnum(Composition)
+  composition?: Composition;
 
   @Field(() => [MobTrait], { defaultValue: [] })
   @IsOptional()
@@ -732,6 +742,11 @@ export class UpdateMobInput {
   @IsOptional()
   @IsEnum(LifeForce)
   lifeForce?: LifeForce;
+
+  @Field(() => Composition, { nullable: true })
+  @IsOptional()
+  @IsEnum(Composition)
+  composition?: Composition;
 
   @Field(() => [MobTrait], { nullable: true })
   @IsOptional()
