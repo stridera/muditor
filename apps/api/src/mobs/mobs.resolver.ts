@@ -1,3 +1,7 @@
+import { UseGuards } from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones } from '../common/god-zone-visibility';
 import { EntityKeyInput } from '../common/dto/entity-key.input';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import {
@@ -9,7 +13,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Prisma, Race } from '@muditor/db'; // all enums already registered in mob.dto
+import { Prisma, Race, type Users } from '@muditor/db'; // all enums already registered in mob.dto
 import { calculateMobCombatDefaults } from '../common/dice-formulas';
 import { mapMob } from '../common/mappers/mob.mapper';
 import {
@@ -29,13 +33,22 @@ interface MobFieldSource {
 export class MobsResolver {
   constructor(private readonly mobsService: MobsService) {}
 
+  // Mob reads are public. Mobs in god zones are hidden from anonymous
+  // callers and mortal accounts; IMMORTAL+ still see them.
   @Query(() => [MobDto], { name: 'mobs' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
-    @Args('search', { type: () => String, nullable: true }) search?: string
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @CurrentUser() user?: Users | null
   ): Promise<MobDto[]> {
-    const params: { skip?: number; take?: number; search?: string } = {};
+    const params: {
+      skip?: number;
+      take?: number;
+      search?: string;
+      hideGodZones: boolean;
+    } = { hideGodZones: hidesGodZones(user ?? null) };
     if (skip !== undefined) params.skip = skip;
     if (take !== undefined) params.take = take;
     if (search !== undefined) params.search = search;
@@ -44,35 +57,55 @@ export class MobsResolver {
   }
 
   @Query(() => MobDto, { name: 'mob' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<MobDto | null> {
-    const mob = await this.mobsService.findOne(zoneId, id);
+    const mob = await this.mobsService.findOne(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return mob ? mapMob(mob) : null;
   }
 
   @Query(() => [MobDto], { name: 'mobsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByZone(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('search', { type: () => String, nullable: true }) search?: string
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @CurrentUser() user?: Users | null
   ): Promise<MobDto[]> {
-    const mobs = await this.mobsService.findByZone(zoneId, search);
+    const mobs = await this.mobsService.findByZone(
+      zoneId,
+      search,
+      hidesGodZones(user ?? null)
+    );
     return mobs.map(m => mapMob(m));
   }
 
   @Query(() => Int, { name: 'mobsCount' })
-  async count(): Promise<number> {
-    return this.mobsService.count();
+  @UseGuards(OptionalJwtAuthGuard)
+  async count(@CurrentUser() user?: Users | null): Promise<number> {
+    return this.mobsService.count(undefined, hidesGodZones(user ?? null));
   }
 
   @Query(() => [MobDto], { name: 'searchMobs' })
+  @UseGuards(OptionalJwtAuthGuard)
   async searchMobs(
     @Args('search', { type: () => String }) search: string,
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
-    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<MobDto[]> {
-    const mobs = await this.mobsService.search(search, limit, zoneId);
+    const mobs = await this.mobsService.search(
+      search,
+      limit,
+      zoneId,
+      hidesGodZones(user ?? null)
+    );
     return mobs.map(m => mapMob(m));
   }
 

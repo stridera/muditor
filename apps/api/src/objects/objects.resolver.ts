@@ -1,8 +1,12 @@
+import { UseGuards } from '@nestjs/common';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones } from '../common/god-zone-visibility';
 import { EntityKeyInput } from '../common/dto/entity-key.input';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 // Import enum only AFTER GraphQL enums have been registered in object.dto (registration side-effect)
-import { ObjectType as ObjectTypeEnum, Prisma } from '@muditor/db';
+import { ObjectType as ObjectTypeEnum, Prisma, type Users } from '@muditor/db';
 import { mapObject } from '../common/mappers/object.mapper';
 import { CreateObjectInput, ObjectDto, UpdateObjectInput } from './object.dto';
 import {
@@ -16,12 +20,18 @@ import { ObjectsService } from './objects.service';
 export class ObjectsResolver {
   constructor(private readonly objectsService: ObjectsService) {}
 
+  // Object reads are public. Objects in god zones are hidden from anonymous
+  // callers and mortal accounts; IMMORTAL+ still see them.
   @Query(() => [ObjectDto], { name: 'objects' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number
+    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ObjectDto[]> {
-    const params: { skip?: number; take?: number } = {};
+    const params: { skip?: number; take?: number; hideGodZones: boolean } = {
+      hideGodZones: hidesGodZones(user ?? null),
+    };
     if (skip !== undefined) params.skip = skip;
     if (take !== undefined) params.take = take;
     const objects = await this.objectsService.findAll(params);
@@ -29,44 +39,68 @@ export class ObjectsResolver {
   }
 
   @Query(() => ObjectDto, { name: 'object' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ObjectDto | null> {
-    const obj = await this.objectsService.findOne(zoneId, id);
+    const obj = await this.objectsService.findOne(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return obj ? mapObject(obj) : null;
   }
 
   @Query(() => [ObjectDto], { name: 'objectsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByZone(
-    @Args('zoneId', { type: () => Int }) zoneId: number
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ObjectDto[]> {
-    const objects = await this.objectsService.findByZone(zoneId);
+    const objects = await this.objectsService.findByZone(
+      zoneId,
+      hidesGodZones(user ?? null)
+    );
     return objects.map(o => mapObject(o));
   }
 
   @Query(() => [ObjectDto], { name: 'objectsByType' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByType(
     // Provide explicit enum type in the decorator factory to prevent UndefinedTypeError.
     // The explicit lambda ensures Nest can reflect the enum even in CommonJS compilation mode.
-    @Args('type', { type: () => ObjectTypeEnum }) type: ObjectTypeEnum
+    @Args('type', { type: () => ObjectTypeEnum }) type: ObjectTypeEnum,
+    @CurrentUser() user?: Users | null
   ): Promise<ObjectDto[]> {
-    const objects = await this.objectsService.findByType(type);
+    const objects = await this.objectsService.findByType(
+      type,
+      hidesGodZones(user ?? null)
+    );
     return objects.map(o => mapObject(o));
   }
 
   @Query(() => Int, { name: 'objectsCount' })
-  async count(): Promise<number> {
-    return this.objectsService.count();
+  @UseGuards(OptionalJwtAuthGuard)
+  async count(@CurrentUser() user?: Users | null): Promise<number> {
+    return this.objectsService.count(undefined, hidesGodZones(user ?? null));
   }
 
   @Query(() => [ObjectDto], { name: 'searchObjects' })
+  @UseGuards(OptionalJwtAuthGuard)
   async searchObjects(
     @Args('search', { type: () => String }) search: string,
     @Args('limit', { type: () => Int, defaultValue: 10 }) limit: number,
-    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ObjectDto[]> {
-    const objects = await this.objectsService.search(search, limit, zoneId);
+    const objects = await this.objectsService.search(
+      search,
+      limit,
+      zoneId,
+      hidesGodZones(user ?? null)
+    );
     return objects.map(o => mapObject(o));
   }
 

@@ -186,6 +186,33 @@ export class RoomsService {
    * `hideGodZones` omits rooms in god zones (Zones.isGodZone). Public readers
    * pass it for anonymous/mortal viewers; internal callers leave it unset.
    */
+  /**
+   * For viewers who must not see god zones: drop exits whose target room is
+   * in one, so a mortal-visible room never reveals a way into (or the
+   * existence of) a god zone. One cheap query for the distinct target zones.
+   */
+  private async withoutGodZoneExits(
+    rooms: RoomServiceResult[]
+  ): Promise<RoomServiceResult[]> {
+    const targets = new Set<number>();
+    for (const room of rooms)
+      for (const exit of room.exits)
+        if (exit.toZoneId !== null) targets.add(exit.toZoneId);
+    if (targets.size === 0) return rooms;
+    const god = await this.db.zones.findMany({
+      where: { id: { in: [...targets] }, isGodZone: true },
+      select: { id: true },
+    });
+    if (god.length === 0) return rooms;
+    const hidden = new Set(god.map(z => z.id));
+    return rooms.map(room => ({
+      ...room,
+      exits: room.exits.filter(
+        e => e.toZoneId === null || !hidden.has(e.toZoneId)
+      ),
+    }));
+  }
+
   async findMany(params?: {
     skip?: number;
     take?: number;
@@ -282,7 +309,7 @@ export class RoomsService {
         });
       }
 
-      return rows.map((r: (typeof rows)[0]) => {
+      const mapped = rows.map((r: (typeof rows)[0]) => {
         const roomKey = `${r.zoneId}-${r.id}`;
         const roomExits = exitsByRoom.get(roomKey) || [];
         return this.mapRoom({
@@ -291,6 +318,7 @@ export class RoomsService {
           roomExtraDescriptions: [],
         });
       });
+      return hideGodZones ? this.withoutGodZoneExits(mapped) : mapped;
     }
     const query: {
       include: typeof RoomsService.prototype.includeFull;
@@ -308,7 +336,8 @@ export class RoomsService {
     if (skip !== undefined) query.skip = skip;
     if (take !== undefined) query.take = take;
     const rooms = await this.db.room.findMany(query);
-    return rooms.map(r => this.mapRoom(r));
+    const mapped = rooms.map(r => this.mapRoom(r));
+    return hideGodZones ? this.withoutGodZoneExits(mapped) : mapped;
   }
 
   // Backward-compatible alias used by existing tests/specs
@@ -341,7 +370,10 @@ export class RoomsService {
       if (zone?.isGodZone)
         throw new NotFoundException(`Room ${zoneId}/${id} not found`);
     }
-    return this.mapRoom(room);
+    const mapped = this.mapRoom(room);
+    if (!hideGodZones) return mapped;
+    const [visible] = await this.withoutGodZoneExits([mapped]);
+    return visible!;
   }
 
   async findByZone(

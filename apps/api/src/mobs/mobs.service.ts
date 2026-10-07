@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { type Mobs, Prisma } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -12,8 +13,13 @@ export class MobsService {
     search?: string;
     where?: Prisma.MobsWhereInput;
     orderBy?: Prisma.MobsOrderByWithRelationInput;
+    /** Omit mobs in god zones (public readers below IMMORTAL). */
+    hideGodZones?: boolean;
   }): Promise<Mobs[]> {
-    const whereClause: Prisma.MobsWhereInput = args?.where || {};
+    const whereClause: Prisma.MobsWhereInput = {
+      ...(args?.where || {}),
+      ...inVisibleZone(!!args?.hideGodZones),
+    };
 
     // Add search filter if provided
     if (args?.search && args.search.trim()) {
@@ -35,14 +41,13 @@ export class MobsService {
     return mobs;
   }
 
-  async findOne(zoneId: number, id: number): Promise<Mobs | null> {
-    const mob = await this.database.mobs.findUnique({
-      where: {
-        zoneId_id: {
-          zoneId,
-          id,
-        },
-      },
+  async findOne(
+    zoneId: number,
+    id: number,
+    hideGodZones = false
+  ): Promise<Mobs | null> {
+    const mob = await this.database.mobs.findFirst({
+      where: { zoneId, id, ...inVisibleZone(hideGodZones) },
       include: {
         mobAbilities: { include: { ability: true } },
         defaultEffects: { include: { effect: true } },
@@ -58,8 +63,15 @@ export class MobsService {
     return mob;
   }
 
-  async findByZone(zoneId: number, search?: string): Promise<Mobs[]> {
-    const whereClause: Prisma.MobsWhereInput = { zoneId };
+  async findByZone(
+    zoneId: number,
+    search?: string,
+    hideGodZones = false
+  ): Promise<Mobs[]> {
+    const whereClause: Prisma.MobsWhereInput = {
+      zoneId,
+      ...inVisibleZone(hideGodZones),
+    };
 
     // Add search filter if provided
     if (search && search.trim()) {
@@ -83,16 +95,20 @@ export class MobsService {
     return mobs;
   }
 
-  async count(where?: Prisma.MobsWhereInput): Promise<number> {
-    const countArgs: { where?: Prisma.MobsWhereInput } = {};
-    if (where) countArgs.where = where;
-    return this.database.mobs.count(countArgs);
+  async count(
+    where?: Prisma.MobsWhereInput,
+    hideGodZones = false
+  ): Promise<number> {
+    return this.database.mobs.count({
+      where: { ...(where || {}), ...inVisibleZone(hideGodZones) },
+    });
   }
 
   async search(
     search: string,
     limit: number = 10,
-    zoneId?: number
+    zoneId?: number,
+    hideGodZones = false
   ): Promise<Mobs[]> {
     const searchTerm = search.trim().toLowerCase();
     const searchNum = parseInt(searchTerm, 10);
@@ -104,6 +120,7 @@ export class MobsService {
     // Build WHERE clause using plaintext fields
     const where: Prisma.MobsWhereInput = {
       ...(zoneId && { zoneId }),
+      ...inVisibleZone(hideGodZones),
       OR: [
         // Check ID if numeric
         ...(isNumeric ? [{ id: searchNum }] : []),

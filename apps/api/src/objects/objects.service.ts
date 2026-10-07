@@ -6,6 +6,7 @@ import {
   ElementType,
   WearFlag,
 } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -17,24 +18,30 @@ export class ObjectsService {
     take?: number;
     where?: Prisma.ObjectsWhereInput;
     orderBy?: Prisma.ObjectsOrderByWithRelationInput;
+    /** Omit objects in god zones (public readers below IMMORTAL). */
+    hideGodZones?: boolean;
   }): Promise<Objects[]> {
     const findArgs: Prisma.ObjectsFindManyArgs = {
       orderBy: args?.orderBy || { id: 'asc' },
     };
-    if (args?.where) findArgs.where = args.where;
+    if (args?.where || args?.hideGodZones) {
+      findArgs.where = {
+        ...(args.where || {}),
+        ...inVisibleZone(!!args.hideGodZones),
+      };
+    }
     if (args?.skip !== undefined) findArgs.skip = args.skip;
     if (args?.take !== undefined) findArgs.take = args.take;
     return this.database.objects.findMany(findArgs);
   }
 
-  async findOne(zoneId: number, id: number): Promise<Objects | null> {
-    return this.database.objects.findUnique({
-      where: {
-        zoneId_id: {
-          zoneId,
-          id,
-        },
-      },
+  async findOne(
+    zoneId: number,
+    id: number,
+    hideGodZones = false
+  ): Promise<Objects | null> {
+    return this.database.objects.findFirst({
+      where: { zoneId, id, ...inVisibleZone(hideGodZones) },
       include: {
         zones: {
           select: {
@@ -89,10 +96,11 @@ export class ObjectsService {
     });
   }
 
-  async findByZone(zoneId: number): Promise<Objects[]> {
+  async findByZone(zoneId: number, hideGodZones = false): Promise<Objects[]> {
     return this.database.objects.findMany({
       where: {
         zoneId: zoneId,
+        ...inVisibleZone(hideGodZones),
       },
       include: {
         zones: {
@@ -105,25 +113,29 @@ export class ObjectsService {
     });
   }
 
-  async findByType(type: ObjectType): Promise<Objects[]> {
+  async findByType(type: ObjectType, hideGodZones = false): Promise<Objects[]> {
     return this.database.objects.findMany({
-      where: { type },
+      where: { type, ...inVisibleZone(hideGodZones) },
       include: {
         zones: { select: { id: true, name: true } },
       },
     });
   }
 
-  async count(where?: Prisma.ObjectsWhereInput): Promise<number> {
-    const countArgs: { where?: Prisma.ObjectsWhereInput } = {};
-    if (where) countArgs.where = where;
-    return this.database.objects.count(countArgs);
+  async count(
+    where?: Prisma.ObjectsWhereInput,
+    hideGodZones = false
+  ): Promise<number> {
+    return this.database.objects.count({
+      where: { ...(where || {}), ...inVisibleZone(hideGodZones) },
+    });
   }
 
   async search(
     search: string,
     limit: number = 10,
-    zoneId?: number
+    zoneId?: number,
+    hideGodZones = false
   ): Promise<Objects[]> {
     const searchTerm = search.trim().toLowerCase();
     const searchNum = parseInt(searchTerm, 10);
@@ -135,6 +147,7 @@ export class ObjectsService {
     // Build WHERE clause using plaintext fields
     const where: Prisma.ObjectsWhereInput = {
       ...(zoneId && { zoneId }),
+      ...inVisibleZone(hideGodZones),
       OR: [
         // Check ID if numeric
         ...(isNumeric ? [{ id: searchNum }] : []),

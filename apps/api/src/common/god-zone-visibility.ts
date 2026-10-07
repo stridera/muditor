@@ -15,3 +15,13 @@ export function hidesGodZones(
   if (viewer === undefined) return false;
   return !isStaff(viewer?.role);
 }
+
+/**
+ * Prisma `where` fragment for entities that carry a `zones` relation (rooms,
+ * mobs, objects, ...): excludes rows in god zones when `hide` is set.
+ */
+export function inVisibleZone(hide: boolean): {
+  zones?: { isGodZone: false };
+} {
+  return hide ? { zones: { isGodZone: false } } : {};
+}

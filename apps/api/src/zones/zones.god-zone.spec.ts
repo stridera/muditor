@@ -6,6 +6,10 @@ import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import type { DatabaseService } from '../database/database.service';
 import type { GrantsService } from '../grants/grants.service';
 import { hidesGodZones } from '../common/god-zone-visibility';
+import { MobsResolver } from '../mobs/mobs.resolver';
+import { MobsService } from '../mobs/mobs.service';
+import { ObjectsResolver } from '../objects/objects.resolver';
+import { ObjectsService } from '../objects/objects.service';
 import { RoomsResolver } from '../rooms/rooms.resolver';
 import { RoomsService } from '../rooms/rooms.service';
 import type { ShopsService } from '../shops/shops.service';
@@ -236,6 +240,12 @@ describe('Rooms god zone visibility', () => {
         },
         zones: {
           findUnique: jest.fn().mockResolvedValue({ isGodZone }),
+          findMany: jest
+            .fn()
+            .mockImplementation(
+              ({ where }: { where: { id: { in: number[] } } }) =>
+                Promise.resolve(where.id.in.includes(12) ? [{ id: 12 }] : [])
+            ),
         },
         $queryRawUnsafe: jest.fn().mockResolvedValue([]),
       };
@@ -296,6 +306,227 @@ describe('Rooms god zone visibility', () => {
       expect(db.room.count).toHaveBeenLastCalledWith({
         where: { zoneId: 30 },
       });
+    });
+  });
+});
+
+describe('Room exits into god zones', () => {
+  const exit = (toZoneId: number | null) => ({
+    id: 1,
+    roomZoneId: 30,
+    roomId: 1,
+    direction: 'UP',
+    description: null,
+    keywords: [],
+    toZoneId,
+    toRoomId: 4,
+    keyZoneId: null,
+    keyId: null,
+    flags: [],
+    defaultState: 'OPEN',
+    hitPoints: null,
+  });
+  const room = {
+    id: 1,
+    zoneId: 30,
+    name: 'Square',
+    roomDescription: '',
+    sector: 'CITY',
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    exits: [exit(12), exit(31), exit(null)],
+  };
+  function setup() {
+    const db = {
+      room: {
+        findMany: jest.fn().mockResolvedValue([room]),
+        findUnique: jest.fn().mockResolvedValue(room),
+      },
+      zones: {
+        findUnique: jest.fn().mockResolvedValue({ isGodZone: false }),
+        findMany: jest.fn().mockResolvedValue([{ id: 12 }]),
+      },
+    };
+    return {
+      db,
+      service: new RoomsService(db as unknown as DatabaseService),
+    };
+  }
+
+  it('drops exits that lead into a god zone for hidden viewers only', async () => {
+    const { service } = setup();
+    const hidden = await service.findMany({ hideGodZones: true });
+    expect(hidden[0]!.exits.map(e => e.toZoneId)).toEqual([31, null]);
+    const one = await service.findOne(30, 1, true);
+    expect(one.exits.map(e => e.toZoneId)).toEqual([31, null]);
+    const staff = await service.findMany({});
+    expect(staff[0]!.exits.map(e => e.toZoneId)).toEqual([12, 31, null]);
+    const staffOne = await service.findOne(30, 1);
+    expect(staffOne.exits).toHaveLength(3);
+  });
+});
+
+describe('Mobs and objects in god zones', () => {
+  it('mob and object reads use optional auth', () => {
+    for (const [resolver, methods] of [
+      [
+        MobsResolver,
+        ['findAll', 'findOne', 'findByZone', 'count', 'searchMobs'],
+      ],
+      [
+        ObjectsResolver,
+        [
+          'findAll',
+          'findOne',
+          'findByZone',
+          'findByType',
+          'count',
+          'searchObjects',
+        ],
+      ],
+    ] as const) {
+      const proto = resolver.prototype as unknown as Record<string, object>;
+      for (const q of methods) {
+        expect([q, Reflect.getMetadata(GUARDS_METADATA, proto[q]!)]).toEqual([
+          q,
+          [OptionalJwtAuthGuard],
+        ]);
+      }
+    }
+  });
+
+  it('resolvers ask the services to hide god zones from mortals only', async () => {
+    const mobsService = {
+      findAll: jest.fn().mockResolvedValue([]),
+      findOne: jest.fn().mockResolvedValue(null),
+      findByZone: jest.fn().mockResolvedValue([]),
+      count: jest.fn().mockResolvedValue(0),
+      search: jest.fn().mockResolvedValue([]),
+    };
+    const objectsService = {
+      findAll: jest.fn().mockResolvedValue([]),
+      findOne: jest.fn().mockResolvedValue(null),
+      findByZone: jest.fn().mockResolvedValue([]),
+      findByType: jest.fn().mockResolvedValue([]),
+      count: jest.fn().mockResolvedValue(0),
+      search: jest.fn().mockResolvedValue([]),
+    };
+    const mobs = new MobsResolver(mobsService as unknown as MobsService);
+    const objects = new ObjectsResolver(
+      objectsService as unknown as ObjectsService
+    );
+    for (const [viewer, hide] of [
+      [null, true],
+      [user(UserRole.PLAYER), true],
+      [user(UserRole.IMMORTAL), false],
+    ] as const) {
+      await mobs.findAll(undefined, undefined, undefined, viewer);
+      await mobs.findOne(12, 1, viewer);
+      await mobs.findByZone(12, undefined, viewer);
+      await mobs.count(viewer);
+      await mobs.searchMobs('titan', 10, undefined, viewer);
+      await objects.findAll(undefined, undefined, viewer);
+      await objects.findOne(12, 1, viewer);
+      await objects.findByZone(12, viewer);
+      await objects.count(viewer);
+      await objects.searchObjects('sword', 10, undefined, viewer);
+      expect(mobsService.findAll.mock.lastCall![0]).toMatchObject({
+        hideGodZones: hide,
+      });
+      expect(mobsService.findOne).toHaveBeenLastCalledWith(12, 1, hide);
+      expect(mobsService.findByZone).toHaveBeenLastCalledWith(
+        12,
+        undefined,
+        hide
+      );
+      expect(mobsService.count).toHaveBeenLastCalledWith(undefined, hide);
+      expect(mobsService.search).toHaveBeenLastCalledWith(
+        'titan',
+        10,
+        undefined,
+        hide
+      );
+      expect(objectsService.findAll.mock.lastCall![0]).toMatchObject({
+        hideGodZones: hide,
+      });
+      expect(objectsService.findOne).toHaveBeenLastCalledWith(12, 1, hide);
+      expect(objectsService.findByZone).toHaveBeenLastCalledWith(12, hide);
+      expect(objectsService.count).toHaveBeenLastCalledWith(undefined, hide);
+      expect(objectsService.search).toHaveBeenLastCalledWith(
+        'sword',
+        10,
+        undefined,
+        hide
+      );
+    }
+  });
+
+  it('services add the zone filter to lists, counts and searches', async () => {
+    const mobsDb = {
+      mobs: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn().mockResolvedValue(null),
+        count: jest.fn().mockResolvedValue(0),
+      },
+    };
+    const mobs = new MobsService(mobsDb as unknown as DatabaseService);
+    const hiddenFilter = { zones: { isGodZone: false } };
+    await mobs.findAll({ hideGodZones: true });
+    expect(mobsDb.mobs.findMany.mock.calls[0]![0].where).toMatchObject(
+      hiddenFilter
+    );
+    await mobs.findAll({});
+    expect(mobsDb.mobs.findMany.mock.calls[1]![0].where).not.toHaveProperty(
+      'zones'
+    );
+    await mobs.findOne(12, 1, true);
+    expect(mobsDb.mobs.findFirst.mock.calls[0]![0].where).toEqual({
+      zoneId: 12,
+      id: 1,
+      ...hiddenFilter,
+    });
+    await mobs.findByZone(12, undefined, true);
+    expect(mobsDb.mobs.findMany.mock.calls[2]![0].where).toMatchObject(
+      hiddenFilter
+    );
+    await mobs.search('titan', 10, undefined, true);
+    expect(mobsDb.mobs.findMany.mock.calls[3]![0].where).toMatchObject(
+      hiddenFilter
+    );
+    await mobs.count(undefined, true);
+    expect(mobsDb.mobs.count).toHaveBeenLastCalledWith({
+      where: hiddenFilter,
+    });
+
+    const objDb = {
+      objects: {
+        findMany: jest.fn().mockResolvedValue([]),
+        findFirst: jest.fn().mockResolvedValue(null),
+        count: jest.fn().mockResolvedValue(0),
+      },
+    };
+    const objects = new ObjectsService(objDb as unknown as DatabaseService);
+    await objects.findAll({ hideGodZones: true });
+    expect(objDb.objects.findMany.mock.calls[0]![0].where).toEqual(
+      hiddenFilter
+    );
+    await objects.findAll({});
+    expect(objDb.objects.findMany.mock.calls[1]![0].where).toBeUndefined();
+    await objects.findOne(12, 1, true);
+    expect(objDb.objects.findFirst.mock.calls[0]![0].where).toEqual({
+      zoneId: 12,
+      id: 1,
+      ...hiddenFilter,
+    });
+    await objects.findByZone(12, true);
+    await objects.findByType('WEAPON' as never, true);
+    await objects.search('sword', 10, undefined, true);
+    for (const call of objDb.objects.findMany.mock.calls.slice(2)) {
+      expect(call[0].where).toMatchObject(hiddenFilter);
+    }
+    await objects.count(undefined, true);
+    expect(objDb.objects.count).toHaveBeenLastCalledWith({
+      where: hiddenFilter,
     });
   });
 });

@@ -6,6 +6,7 @@ import { ObjectsService } from '../../objects/objects.service';
 
 // Minimal DTO import ensures enum registration side effects run
 import '../../objects/object.dto';
+import { OptionalJwtAuthGuard } from '../../auth/guards/optional-jwt-auth.guard';
 import { GraphQLJwtAuthGuard } from '../../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../../auth/guards/minimum-role.guard';
 import { ZonePermissionGuard } from '../../auth/guards/zone-permission.guard';
@@ -49,6 +50,8 @@ describe('ObjectsResolver', () => {
       ],
     })
       // Guards are covered by *.resolver.guards.spec.ts; stub them here.
+      .overrideGuard(OptionalJwtAuthGuard)
+      .useValue(allowAll)
       .overrideGuard(GraphQLJwtAuthGuard)
       .useValue(allowAll)
       .overrideGuard(MinimumRoleGuard)
@@ -61,7 +64,10 @@ describe('ObjectsResolver', () => {
 
   it('findByType returns mapped objects and calls service with enum', async () => {
     const result = await resolver.findByType(ObjectTypeEnum.NOTHING);
-    expect(mockService.findByType).toHaveBeenCalledWith(ObjectTypeEnum.NOTHING);
+    expect(mockService.findByType).toHaveBeenCalledWith(
+      ObjectTypeEnum.NOTHING,
+      true
+    );
     expect(result[0]!.type).toBe(ObjectTypeEnum.NOTHING);
   });
 });
