@@ -775,6 +775,18 @@ export type CreateClassInput = {
   primaryStat?: InputMaybe<Scalars['String']['input']>;
 };
 
+export type CreateDialogueNodeInput = {
+  isTerminal?: Scalars['Boolean']['input'];
+  npcMessage: Scalars['String']['input'];
+};
+
+export type CreateDialogueResponseInput = {
+  displayHint?: InputMaybe<Scalars['String']['input']>;
+  matchKeywords: Array<Scalars['String']['input']>;
+  matchType?: DialogueMatchType;
+  nextNodeId?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type CreateEffectInput = {
   defaultParams?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -957,7 +969,9 @@ export type CreateQuestDialogueInput = {
 };
 
 export type CreateQuestInput = {
+  autoAccept?: Scalars['Boolean']['input'];
   availabilityRequirement?: InputMaybe<Scalars['String']['input']>;
+  cooldownMinutes?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
   hidden?: Scalars['Boolean']['input'];
@@ -966,6 +980,8 @@ export type CreateQuestInput = {
   minLevel?: InputMaybe<Scalars['Int']['input']>;
   name: Scalars['String']['input'];
   repeatable?: Scalars['Boolean']['input'];
+  shareable?: Scalars['Boolean']['input'];
+  shortDescription?: InputMaybe<Scalars['String']['input']>;
   timeLimitMinutes?: InputMaybe<Scalars['Int']['input']>;
   triggerAbilityId?: InputMaybe<Scalars['Int']['input']>;
   triggerEventId?: InputMaybe<Scalars['Int']['input']>;
@@ -992,6 +1008,7 @@ export type CreateQuestObjectiveInput = {
   questId: Scalars['Int']['input'];
   questZoneId: Scalars['Int']['input'];
   requiredCount?: Scalars['Int']['input'];
+  scope?: QuestObjectiveScope;
   showProgress?: Scalars['Boolean']['input'];
   targetAbilityId?: InputMaybe<Scalars['Int']['input']>;
   targetMobId?: InputMaybe<Scalars['Int']['input']>;
@@ -1022,9 +1039,11 @@ export type CreateQuestRewardInput = {
   abilityId?: InputMaybe<Scalars['Int']['input']>;
   amount?: InputMaybe<Scalars['Int']['input']>;
   choiceGroup?: InputMaybe<Scalars['Int']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   objectId?: InputMaybe<Scalars['Int']['input']>;
   objectZoneId?: InputMaybe<Scalars['Int']['input']>;
   phaseId: Scalars['Int']['input'];
+  quantity?: Scalars['Int']['input'];
   questId: Scalars['Int']['input'];
   questZoneId: Scalars['Int']['input'];
   rewardType: QuestRewardType;
@@ -1213,6 +1232,36 @@ export type DialogueMatchType =
   | 'EXACT'
   | 'REGEX'
   | 'STARTS_WITH';
+
+export type DialogueNodeDto = {
+  __typename?: 'DialogueNodeDto';
+  dialogueTreeId: Scalars['Int']['output'];
+  id: Scalars['Int']['output'];
+  isRoot: Scalars['Boolean']['output'];
+  isTerminal: Scalars['Boolean']['output'];
+  npcMessage: Scalars['String']['output'];
+  order: Scalars['Int']['output'];
+  responses: Array<DialogueResponseDto>;
+};
+
+export type DialogueResponseDto = {
+  __typename?: 'DialogueResponseDto';
+  displayHint?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  matchKeywords: Array<Scalars['String']['output']>;
+  matchType: DialogueMatchType;
+  nextNodeId?: Maybe<Scalars['Int']['output']>;
+  nodeId: Scalars['Int']['output'];
+  order: Scalars['Int']['output'];
+};
+
+export type DialogueTreeDto = {
+  __typename?: 'DialogueTreeDto';
+  description?: Maybe<Scalars['String']['output']>;
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+  nodes: Array<DialogueNodeDto>;
+};
 
 export type Direction =
   | 'DOWN'
@@ -1790,6 +1839,8 @@ export type Mutation = {
   createCharacterItem: CharacterItemDto;
   createClass: ClassDto;
   createClassCircle: ClassCircleDto;
+  createDialogueNode: DialogueNodeDto;
+  createDialogueResponse: DialogueResponseDto;
   createEffect: Effect;
   createGrant: UserGrantDto;
   /** Create a new help entry */
@@ -1802,6 +1853,8 @@ export type Mutation = {
   createObjectReset: ObjectResetDto;
   createQuest: QuestDto;
   createQuestDialogue: QuestDialogueDto;
+  /** Create a tree (with a root node holding the dialogue message) and link it to a quest dialogue */
+  createQuestDialogueTree: DialogueTreeDto;
   createQuestObjective: QuestObjectiveDto;
   createQuestPhase: QuestPhaseDto;
   createQuestPrerequisite: QuestPrerequisiteDto;
@@ -1828,6 +1881,9 @@ export type Mutation = {
   deleteCharacterEffect: Scalars['Boolean']['output'];
   deleteCharacterItem: Scalars['Boolean']['output'];
   deleteClass: Scalars['Boolean']['output'];
+  deleteDialogueNode: DialogueNodeDto;
+  deleteDialogueResponse: DialogueResponseDto;
+  deleteDialogueTree: DialogueTreeDto;
   deleteEffect: Scalars['Boolean']['output'];
   deleteGrant: Scalars['Boolean']['output'];
   /** Delete a help entry */
@@ -1884,6 +1940,8 @@ export type Mutation = {
   /** Remove expired effects for a character or all characters */
   removeExpiredEffects: Scalars['Int']['output'];
   removeRaceSkill: Scalars['Boolean']['output'];
+  /** Set the phase order: phaseIds lists every phase of the quest once, in the new order */
+  reorderQuestPhases: Array<QuestPhaseDto>;
   requestPasswordReset: PasswordResetResponse;
   resetPassword: PasswordResetResponse;
   /** Revoke zone access from a user */
@@ -1912,6 +1970,9 @@ export type Mutation = {
   updateClassCircle: ClassCircleDto;
   updateClassSkill: ClassSkillDto;
   updateConsumableEffects: ObjectDto;
+  updateDialogueNode: DialogueNodeDto;
+  updateDialogueResponse: DialogueResponseDto;
+  updateDialogueTree: DialogueTreeDto;
   updateEffect: Effect;
   /** Update a game configuration value */
   updateGameConfig: GameConfigDto;
@@ -2100,6 +2161,18 @@ export type MutationCreateClassCircleArgs = {
 };
 
 
+export type MutationCreateDialogueNodeArgs = {
+  data: CreateDialogueNodeInput;
+  treeId: Scalars['Int']['input'];
+};
+
+
+export type MutationCreateDialogueResponseArgs = {
+  data: CreateDialogueResponseInput;
+  nodeId: Scalars['Int']['input'];
+};
+
+
 export type MutationCreateEffectArgs = {
   data: CreateEffectInput;
 };
@@ -2147,6 +2220,12 @@ export type MutationCreateQuestArgs = {
 
 export type MutationCreateQuestDialogueArgs = {
   data: CreateQuestDialogueInput;
+};
+
+
+export type MutationCreateQuestDialogueTreeArgs = {
+  name: Scalars['String']['input'];
+  questDialogueId: Scalars['Int']['input'];
 };
 
 
@@ -2262,6 +2341,21 @@ export type MutationDeleteCharacterItemArgs = {
 
 export type MutationDeleteClassArgs = {
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteDialogueNodeArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteDialogueResponseArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteDialogueTreeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -2499,6 +2593,13 @@ export type MutationRemoveRaceSkillArgs = {
 };
 
 
+export type MutationReorderQuestPhasesArgs = {
+  phaseIds: Array<Scalars['Int']['input']>;
+  questId: Scalars['Int']['input'];
+  questZoneId: Scalars['Int']['input'];
+};
+
+
 export type MutationRequestPasswordResetArgs = {
   input: RequestPasswordResetInput;
 };
@@ -2630,6 +2731,24 @@ export type MutationUpdateConsumableEffectsArgs = {
   effects: Array<ConsumableEffectInput>;
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateDialogueNodeArgs = {
+  data: UpdateDialogueNodeInput;
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateDialogueResponseArgs = {
+  data: UpdateDialogueResponseInput;
+  id: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateDialogueTreeArgs = {
+  data: UpdateDialogueTreeInput;
+  id: Scalars['Int']['input'];
 };
 
 
@@ -3153,6 +3272,7 @@ export type Query = {
   commands: Array<CommandDto>;
   /** Get commands by category */
   commandsByCategory: Array<CommandDto>;
+  dialogueTree?: Maybe<DialogueTreeDto>;
   effect: Effect;
   effects: Array<Effect>;
   effectsCount: Scalars['Int']['output'];
@@ -3456,6 +3576,11 @@ export type QueryCommandArgs = {
 
 export type QueryCommandsByCategoryArgs = {
   category: CommandCategory;
+};
+
+
+export type QueryDialogueTreeArgs = {
+  id: Scalars['Int']['input'];
 };
 
 
@@ -3832,7 +3957,9 @@ export type QuestDialogueDto = {
 
 export type QuestDto = {
   __typename?: 'QuestDto';
+  autoAccept: Scalars['Boolean']['output'];
   availabilityRequirement?: Maybe<Scalars['String']['output']>;
+  cooldownMinutes?: Maybe<Scalars['Int']['output']>;
   createdAt: Scalars['DateTime']['output'];
   description?: Maybe<Scalars['String']['output']>;
   exclusiveGroup?: Maybe<Scalars['String']['output']>;
@@ -3844,6 +3971,8 @@ export type QuestDto = {
   phases?: Maybe<Array<QuestPhaseDto>>;
   prerequisites?: Maybe<Array<QuestPrerequisiteDto>>;
   repeatable: Scalars['Boolean']['output'];
+  shareable: Scalars['Boolean']['output'];
+  shortDescription?: Maybe<Scalars['String']['output']>;
   timeLimitMinutes?: Maybe<Scalars['Int']['output']>;
   triggerAbilityId?: Maybe<Scalars['Int']['output']>;
   triggerEventId?: Maybe<Scalars['Int']['output']>;
@@ -3882,6 +4011,7 @@ export type QuestObjectiveDto = {
   questId: Scalars['Int']['output'];
   questZoneId: Scalars['Int']['output'];
   requiredCount: Scalars['Int']['output'];
+  scope: QuestObjectiveScope;
   showProgress: Scalars['Boolean']['output'];
   targetAbilityId?: Maybe<Scalars['Int']['output']>;
   targetMobId?: Maybe<Scalars['Int']['output']>;
@@ -3891,6 +4021,11 @@ export type QuestObjectiveDto = {
   targetRoomId?: Maybe<Scalars['Int']['output']>;
   targetRoomZoneId?: Maybe<Scalars['Int']['output']>;
 };
+
+/** Whether an objective counts only the holder or the whole party */
+export type QuestObjectiveScope =
+  | 'PARTY'
+  | 'SOLO';
 
 export type QuestObjectiveType =
   | 'COLLECT_ITEM'
@@ -3920,6 +4055,7 @@ export type QuestPrerequisiteDto = {
   prerequisiteQuestZoneId: Scalars['Int']['output'];
   questId: Scalars['Int']['output'];
   questZoneId: Scalars['Int']['output'];
+  requireCompletion: Scalars['Boolean']['output'];
 };
 
 export type QuestRewardDto = {
@@ -3927,10 +4063,12 @@ export type QuestRewardDto = {
   abilityId?: Maybe<Scalars['Int']['output']>;
   amount?: Maybe<Scalars['Int']['output']>;
   choiceGroup?: Maybe<Scalars['Int']['output']>;
+  condition?: Maybe<Scalars['String']['output']>;
   id: Scalars['Int']['output'];
   objectId?: Maybe<Scalars['Int']['output']>;
   objectZoneId?: Maybe<Scalars['Int']['output']>;
   phaseId: Scalars['Int']['output'];
+  quantity: Scalars['Int']['output'];
   questId: Scalars['Int']['output'];
   questZoneId: Scalars['Int']['output'];
   rewardType: QuestRewardType;
@@ -4681,6 +4819,27 @@ export type UpdateClassSkillInput = {
   minLevel?: InputMaybe<Scalars['Int']['input']>;
 };
 
+export type UpdateDialogueNodeInput = {
+  /** true makes this the tree root (the previous root is demoted); false is refused */
+  isRoot?: InputMaybe<Scalars['Boolean']['input']>;
+  isTerminal?: InputMaybe<Scalars['Boolean']['input']>;
+  npcMessage?: InputMaybe<Scalars['String']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateDialogueResponseInput = {
+  displayHint?: InputMaybe<Scalars['String']['input']>;
+  matchKeywords?: InputMaybe<Array<Scalars['String']['input']>>;
+  matchType?: InputMaybe<DialogueMatchType>;
+  nextNodeId?: InputMaybe<Scalars['Int']['input']>;
+  order?: InputMaybe<Scalars['Int']['input']>;
+};
+
+export type UpdateDialogueTreeInput = {
+  description?: InputMaybe<Scalars['String']['input']>;
+  name?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type UpdateEffectInput = {
   defaultParams?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -4881,7 +5040,9 @@ export type UpdateQuestDialogueInput = {
 };
 
 export type UpdateQuestInput = {
+  autoAccept?: InputMaybe<Scalars['Boolean']['input']>;
   availabilityRequirement?: InputMaybe<Scalars['String']['input']>;
+  cooldownMinutes?: InputMaybe<Scalars['Int']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
   exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
   hidden?: InputMaybe<Scalars['Boolean']['input']>;
@@ -4889,6 +5050,8 @@ export type UpdateQuestInput = {
   minLevel?: InputMaybe<Scalars['Int']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
   repeatable?: InputMaybe<Scalars['Boolean']['input']>;
+  shareable?: InputMaybe<Scalars['Boolean']['input']>;
+  shortDescription?: InputMaybe<Scalars['String']['input']>;
   timeLimitMinutes?: InputMaybe<Scalars['Int']['input']>;
   triggerAbilityId?: InputMaybe<Scalars['Int']['input']>;
   triggerEventId?: InputMaybe<Scalars['Int']['input']>;
@@ -4910,6 +5073,7 @@ export type UpdateQuestObjectiveInput = {
   objectiveType?: InputMaybe<QuestObjectiveType>;
   playerDescription?: InputMaybe<Scalars['String']['input']>;
   requiredCount?: InputMaybe<Scalars['Int']['input']>;
+  scope?: InputMaybe<QuestObjectiveScope>;
   showProgress?: InputMaybe<Scalars['Boolean']['input']>;
   targetAbilityId?: InputMaybe<Scalars['Int']['input']>;
   targetMobId?: InputMaybe<Scalars['Int']['input']>;
@@ -4930,8 +5094,10 @@ export type UpdateQuestRewardInput = {
   abilityId?: InputMaybe<Scalars['Int']['input']>;
   amount?: InputMaybe<Scalars['Int']['input']>;
   choiceGroup?: InputMaybe<Scalars['Int']['input']>;
+  condition?: InputMaybe<Scalars['String']['input']>;
   objectId?: InputMaybe<Scalars['Int']['input']>;
   objectZoneId?: InputMaybe<Scalars['Int']['input']>;
+  quantity?: InputMaybe<Scalars['Int']['input']>;
   rewardType?: InputMaybe<QuestRewardType>;
 };
 
@@ -6564,6 +6730,96 @@ export type SearchMobsQueryVariables = Exact<{
 
 export type SearchMobsQuery = { __typename?: 'Query', searchMobs: Array<{ __typename?: 'MobDto', id: number, zoneId: number, name: string, plainName: string, roomDescription: string, level: number, race: Race }> };
 
+export type GetDialogueTreeQueryVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type GetDialogueTreeQuery = { __typename?: 'Query', dialogueTree?: { __typename?: 'DialogueTreeDto', id: number, name: string, description?: string | null, nodes: Array<{ __typename?: 'DialogueNodeDto', id: number, dialogueTreeId: number, npcMessage: string, order: number, isRoot: boolean, isTerminal: boolean, responses: Array<{ __typename?: 'DialogueResponseDto', id: number, nodeId: number, nextNodeId?: number | null, matchType: DialogueMatchType, matchKeywords: Array<string>, displayHint?: string | null, order: number }> }> } | null };
+
+export type CreateQuestDialogueMutationVariables = Exact<{
+  data: CreateQuestDialogueInput;
+}>;
+
+
+export type CreateQuestDialogueMutation = { __typename?: 'Mutation', createQuestDialogue: { __typename?: 'QuestDialogueDto', id: number, npcMessage: string, matchType: DialogueMatchType, matchKeywords: Array<string>, dialogueTreeId?: number | null } };
+
+export type UpdateQuestDialogueMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateQuestDialogueInput;
+}>;
+
+
+export type UpdateQuestDialogueMutation = { __typename?: 'Mutation', updateQuestDialogue: { __typename?: 'QuestDialogueDto', id: number, npcMessage: string, matchType: DialogueMatchType, matchKeywords: Array<string>, dialogueTreeId?: number | null } };
+
+export type DeleteQuestDialogueMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteQuestDialogueMutation = { __typename?: 'Mutation', deleteQuestDialogue: { __typename?: 'QuestDialogueDto', id: number } };
+
+export type CreateQuestDialogueTreeMutationVariables = Exact<{
+  questDialogueId: Scalars['Int']['input'];
+  name: Scalars['String']['input'];
+}>;
+
+
+export type CreateQuestDialogueTreeMutation = { __typename?: 'Mutation', createQuestDialogueTree: { __typename?: 'DialogueTreeDto', id: number, name: string } };
+
+export type DeleteDialogueTreeMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteDialogueTreeMutation = { __typename?: 'Mutation', deleteDialogueTree: { __typename?: 'DialogueTreeDto', id: number } };
+
+export type CreateDialogueNodeMutationVariables = Exact<{
+  treeId: Scalars['Int']['input'];
+  data: CreateDialogueNodeInput;
+}>;
+
+
+export type CreateDialogueNodeMutation = { __typename?: 'Mutation', createDialogueNode: { __typename?: 'DialogueNodeDto', id: number } };
+
+export type UpdateDialogueNodeMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateDialogueNodeInput;
+}>;
+
+
+export type UpdateDialogueNodeMutation = { __typename?: 'Mutation', updateDialogueNode: { __typename?: 'DialogueNodeDto', id: number } };
+
+export type DeleteDialogueNodeMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteDialogueNodeMutation = { __typename?: 'Mutation', deleteDialogueNode: { __typename?: 'DialogueNodeDto', id: number } };
+
+export type CreateDialogueResponseMutationVariables = Exact<{
+  nodeId: Scalars['Int']['input'];
+  data: CreateDialogueResponseInput;
+}>;
+
+
+export type CreateDialogueResponseMutation = { __typename?: 'Mutation', createDialogueResponse: { __typename?: 'DialogueResponseDto', id: number } };
+
+export type UpdateDialogueResponseMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateDialogueResponseInput;
+}>;
+
+
+export type UpdateDialogueResponseMutation = { __typename?: 'Mutation', updateDialogueResponse: { __typename?: 'DialogueResponseDto', id: number } };
+
+export type DeleteDialogueResponseMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteDialogueResponseMutation = { __typename?: 'Mutation', deleteDialogueResponse: { __typename?: 'DialogueResponseDto', id: number } };
+
 export type GetQuestsQueryVariables = Exact<{
   filter?: InputMaybe<QuestFilterInput>;
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -6586,7 +6842,7 @@ export type GetQuestQueryVariables = Exact<{
 }>;
 
 
-export type GetQuestQuery = { __typename?: 'Query', quest?: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null, createdAt: any, updatedAt: any, phases?: Array<{ __typename?: 'QuestPhaseDto', id: number, questZoneId: number, questId: number, name: string, description?: string | null, order: number, objectives?: Array<{ __typename?: 'QuestObjectiveDto', id: number, questZoneId: number, questId: number, phaseId: number, objectiveType: QuestObjectiveType, playerDescription: string, internalNote?: string | null, showProgress: boolean, requiredCount: number, targetMobZoneId?: number | null, targetMobId?: number | null, targetObjectZoneId?: number | null, targetObjectId?: number | null, targetRoomZoneId?: number | null, targetRoomId?: number | null, targetAbilityId?: number | null, deliverToMobZoneId?: number | null, deliverToMobId?: number | null, luaExpression?: string | null, dialogue?: { __typename?: 'QuestDialogueDto', id: number, npcMessage: string, matchType: DialogueMatchType, matchKeywords: Array<string>, dialogueTreeId?: number | null } | null }> | null, rewards?: Array<{ __typename?: 'QuestRewardDto', id: number, questZoneId: number, questId: number, phaseId: number, rewardType: QuestRewardType, amount?: number | null, objectZoneId?: number | null, objectId?: number | null, abilityId?: number | null, choiceGroup?: number | null }> | null }> | null, prerequisites?: Array<{ __typename?: 'QuestPrerequisiteDto', id: number, questZoneId: number, questId: number, prerequisiteQuestZoneId: number, prerequisiteQuestId: number }> | null } | null };
+export type GetQuestQuery = { __typename?: 'Query', quest?: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, shortDescription?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, autoAccept: boolean, shareable: boolean, cooldownMinutes?: number | null, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null, createdAt: any, updatedAt: any, phases?: Array<{ __typename?: 'QuestPhaseDto', id: number, questZoneId: number, questId: number, name: string, description?: string | null, order: number, objectives?: Array<{ __typename?: 'QuestObjectiveDto', id: number, questZoneId: number, questId: number, phaseId: number, objectiveType: QuestObjectiveType, scope: QuestObjectiveScope, playerDescription: string, internalNote?: string | null, showProgress: boolean, requiredCount: number, targetMobZoneId?: number | null, targetMobId?: number | null, targetObjectZoneId?: number | null, targetObjectId?: number | null, targetRoomZoneId?: number | null, targetRoomId?: number | null, targetAbilityId?: number | null, deliverToMobZoneId?: number | null, deliverToMobId?: number | null, luaExpression?: string | null, dialogue?: { __typename?: 'QuestDialogueDto', id: number, npcMessage: string, matchType: DialogueMatchType, matchKeywords: Array<string>, dialogueTreeId?: number | null } | null }> | null, rewards?: Array<{ __typename?: 'QuestRewardDto', id: number, questZoneId: number, questId: number, phaseId: number, rewardType: QuestRewardType, amount?: number | null, objectZoneId?: number | null, objectId?: number | null, abilityId?: number | null, choiceGroup?: number | null, quantity: number, condition?: string | null }> | null }> | null, prerequisites?: Array<{ __typename?: 'QuestPrerequisiteDto', id: number, questZoneId: number, questId: number, prerequisiteQuestZoneId: number, prerequisiteQuestId: number, requireCompletion: boolean }> | null } | null };
 
 export type GetQuestsCountQueryVariables = Exact<{
   zoneId?: InputMaybe<Scalars['Int']['input']>;
@@ -6600,7 +6856,7 @@ export type CreateQuestMutationVariables = Exact<{
 }>;
 
 
-export type CreateQuestMutation = { __typename?: 'Mutation', createQuest: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null } };
+export type CreateQuestMutation = { __typename?: 'Mutation', createQuest: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, shortDescription?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, autoAccept: boolean, shareable: boolean, cooldownMinutes?: number | null, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null } };
 
 export type UpdateQuestMutationVariables = Exact<{
   zoneId: Scalars['Int']['input'];
@@ -6609,7 +6865,7 @@ export type UpdateQuestMutationVariables = Exact<{
 }>;
 
 
-export type UpdateQuestMutation = { __typename?: 'Mutation', updateQuest: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null } };
+export type UpdateQuestMutation = { __typename?: 'Mutation', updateQuest: { __typename?: 'QuestDto', zoneId: number, id: number, name: string, description?: string | null, shortDescription?: string | null, minLevel?: number | null, maxLevel?: number | null, repeatable: boolean, hidden: boolean, autoAccept: boolean, shareable: boolean, cooldownMinutes?: number | null, exclusiveGroup?: string | null, triggerType: QuestTriggerType, triggerMobZoneId?: number | null, triggerMobId?: number | null, triggerLevel?: number | null, triggerItemZoneId?: number | null, triggerItemId?: number | null, triggerRoomZoneId?: number | null, triggerRoomId?: number | null, triggerAbilityId?: number | null, triggerEventId?: number | null, timeLimitMinutes?: number | null, availabilityRequirement?: string | null } };
 
 export type DeleteQuestMutationVariables = Exact<{
   zoneId: Scalars['Int']['input'];
@@ -6636,6 +6892,15 @@ export type UpdateQuestPhaseMutationVariables = Exact<{
 
 export type UpdateQuestPhaseMutation = { __typename?: 'Mutation', updateQuestPhase: { __typename?: 'QuestPhaseDto', id: number, questZoneId: number, questId: number, name: string, description?: string | null, order: number, rewards?: Array<{ __typename?: 'QuestRewardDto', id: number, rewardType: QuestRewardType, amount?: number | null }> | null } };
 
+export type ReorderQuestPhasesMutationVariables = Exact<{
+  questZoneId: Scalars['Int']['input'];
+  questId: Scalars['Int']['input'];
+  phaseIds: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+}>;
+
+
+export type ReorderQuestPhasesMutation = { __typename?: 'Mutation', reorderQuestPhases: Array<{ __typename?: 'QuestPhaseDto', id: number, order: number }> };
+
 export type DeleteQuestPhaseMutationVariables = Exact<{
   questZoneId: Scalars['Int']['input'];
   questId: Scalars['Int']['input'];
@@ -6650,7 +6915,7 @@ export type CreateQuestObjectiveMutationVariables = Exact<{
 }>;
 
 
-export type CreateQuestObjectiveMutation = { __typename?: 'Mutation', createQuestObjective: { __typename?: 'QuestObjectiveDto', id: number, questZoneId: number, questId: number, phaseId: number, objectiveType: QuestObjectiveType, playerDescription: string, requiredCount: number } };
+export type CreateQuestObjectiveMutation = { __typename?: 'Mutation', createQuestObjective: { __typename?: 'QuestObjectiveDto', id: number, questZoneId: number, questId: number, phaseId: number, objectiveType: QuestObjectiveType, scope: QuestObjectiveScope, playerDescription: string, requiredCount: number } };
 
 export type UpdateQuestObjectiveMutationVariables = Exact<{
   questZoneId: Scalars['Int']['input'];
@@ -6661,7 +6926,7 @@ export type UpdateQuestObjectiveMutationVariables = Exact<{
 }>;
 
 
-export type UpdateQuestObjectiveMutation = { __typename?: 'Mutation', updateQuestObjective: { __typename?: 'QuestObjectiveDto', id: number, objectiveType: QuestObjectiveType, playerDescription: string, requiredCount: number } };
+export type UpdateQuestObjectiveMutation = { __typename?: 'Mutation', updateQuestObjective: { __typename?: 'QuestObjectiveDto', id: number, objectiveType: QuestObjectiveType, scope: QuestObjectiveScope, playerDescription: string, requiredCount: number } };
 
 export type DeleteQuestObjectiveMutationVariables = Exact<{
   questZoneId: Scalars['Int']['input'];
@@ -6678,7 +6943,7 @@ export type CreateQuestRewardMutationVariables = Exact<{
 }>;
 
 
-export type CreateQuestRewardMutation = { __typename?: 'Mutation', createQuestReward: { __typename?: 'QuestRewardDto', id: number, questZoneId: number, questId: number, phaseId: number, rewardType: QuestRewardType, amount?: number | null } };
+export type CreateQuestRewardMutation = { __typename?: 'Mutation', createQuestReward: { __typename?: 'QuestRewardDto', id: number, questZoneId: number, questId: number, phaseId: number, rewardType: QuestRewardType, amount?: number | null, quantity: number, condition?: string | null } };
 
 export type UpdateQuestRewardMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -6686,7 +6951,7 @@ export type UpdateQuestRewardMutationVariables = Exact<{
 }>;
 
 
-export type UpdateQuestRewardMutation = { __typename?: 'Mutation', updateQuestReward: { __typename?: 'QuestRewardDto', id: number, rewardType: QuestRewardType, amount?: number | null } };
+export type UpdateQuestRewardMutation = { __typename?: 'Mutation', updateQuestReward: { __typename?: 'QuestRewardDto', id: number, rewardType: QuestRewardType, amount?: number | null, quantity: number, condition?: string | null } };
 
 export type DeleteQuestRewardMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -6700,7 +6965,7 @@ export type CreateQuestPrerequisiteMutationVariables = Exact<{
 }>;
 
 
-export type CreateQuestPrerequisiteMutation = { __typename?: 'Mutation', createQuestPrerequisite: { __typename?: 'QuestPrerequisiteDto', id: number, questZoneId: number, questId: number, prerequisiteQuestZoneId: number, prerequisiteQuestId: number } };
+export type CreateQuestPrerequisiteMutation = { __typename?: 'Mutation', createQuestPrerequisite: { __typename?: 'QuestPrerequisiteDto', id: number, questZoneId: number, questId: number, prerequisiteQuestZoneId: number, prerequisiteQuestId: number, requireCompletion: boolean } };
 
 export type DeleteQuestPrerequisiteMutationVariables = Exact<{
   id: Scalars['Int']['input'];
@@ -6708,6 +6973,26 @@ export type DeleteQuestPrerequisiteMutationVariables = Exact<{
 
 
 export type DeleteQuestPrerequisiteMutation = { __typename?: 'Mutation', deleteQuestPrerequisite: { __typename?: 'QuestPrerequisiteDto', id: number } };
+
+export type GetQuestOptionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetQuestOptionsQuery = { __typename?: 'Query', quests: Array<{ __typename?: 'QuestDto', zoneId: number, id: number, name: string }> };
+
+export type GetAbilityOptionsQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type GetAbilityOptionsQuery = { __typename?: 'Query', abilities: Array<{ __typename?: 'Ability', id: string, name: string, abilityType: string }> };
+
+export type GetAbilityNameQueryVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type GetAbilityNameQuery = { __typename?: 'Query', ability: { __typename?: 'Ability', id: string, name: string } };
 
 export type GetRoomsByZoneQueryVariables = Exact<{
   zoneId: Scalars['Int']['input'];
@@ -7441,24 +7726,40 @@ export const GetMobDocument = {"kind":"Document","definitions":[{"kind":"Operati
 export const GetMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}}]}}]}}]} as unknown as DocumentNode<GetMobsQuery, GetMobsQueryVariables>;
 export const GetMobsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}}]}}]}}]} as unknown as DocumentNode<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
 export const SearchMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SearchMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"searchMobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}}]}}]}}]} as unknown as DocumentNode<SearchMobsQuery, SearchMobsQueryVariables>;
+export const GetDialogueTreeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetDialogueTree"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"dialogueTree"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"nodes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"dialogueTreeId"}},{"kind":"Field","name":{"kind":"Name","value":"npcMessage"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"isRoot"}},{"kind":"Field","name":{"kind":"Name","value":"isTerminal"}},{"kind":"Field","name":{"kind":"Name","value":"responses"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"nodeId"}},{"kind":"Field","name":{"kind":"Name","value":"nextNodeId"}},{"kind":"Field","name":{"kind":"Name","value":"matchType"}},{"kind":"Field","name":{"kind":"Name","value":"matchKeywords"}},{"kind":"Field","name":{"kind":"Name","value":"displayHint"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetDialogueTreeQuery, GetDialogueTreeQueryVariables>;
+export const CreateQuestDialogueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestDialogue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestDialogueInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestDialogue"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npcMessage"}},{"kind":"Field","name":{"kind":"Name","value":"matchType"}},{"kind":"Field","name":{"kind":"Name","value":"matchKeywords"}},{"kind":"Field","name":{"kind":"Name","value":"dialogueTreeId"}}]}}]}}]} as unknown as DocumentNode<CreateQuestDialogueMutation, CreateQuestDialogueMutationVariables>;
+export const UpdateQuestDialogueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestDialogue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestDialogueInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestDialogue"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npcMessage"}},{"kind":"Field","name":{"kind":"Name","value":"matchType"}},{"kind":"Field","name":{"kind":"Name","value":"matchKeywords"}},{"kind":"Field","name":{"kind":"Name","value":"dialogueTreeId"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestDialogueMutation, UpdateQuestDialogueMutationVariables>;
+export const DeleteQuestDialogueDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuestDialogue"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuestDialogue"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestDialogueMutation, DeleteQuestDialogueMutationVariables>;
+export const CreateQuestDialogueTreeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestDialogueTree"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questDialogueId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestDialogueTree"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questDialogueId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questDialogueId"}}},{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateQuestDialogueTreeMutation, CreateQuestDialogueTreeMutationVariables>;
+export const DeleteDialogueTreeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteDialogueTree"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDialogueTree"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteDialogueTreeMutation, DeleteDialogueTreeMutationVariables>;
+export const CreateDialogueNodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateDialogueNode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"treeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateDialogueNodeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDialogueNode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"treeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"treeId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateDialogueNodeMutation, CreateDialogueNodeMutationVariables>;
+export const UpdateDialogueNodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateDialogueNode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateDialogueNodeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDialogueNode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateDialogueNodeMutation, UpdateDialogueNodeMutationVariables>;
+export const DeleteDialogueNodeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteDialogueNode"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDialogueNode"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteDialogueNodeMutation, DeleteDialogueNodeMutationVariables>;
+export const CreateDialogueResponseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateDialogueResponse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"nodeId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateDialogueResponseInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createDialogueResponse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"nodeId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"nodeId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateDialogueResponseMutation, CreateDialogueResponseMutationVariables>;
+export const UpdateDialogueResponseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateDialogueResponse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateDialogueResponseInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateDialogueResponse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateDialogueResponseMutation, UpdateDialogueResponseMutationVariables>;
+export const DeleteDialogueResponseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteDialogueResponse"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteDialogueResponse"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteDialogueResponseMutation, DeleteDialogueResponseMutationVariables>;
 export const GetQuestsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuests"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"filter"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"QuestFilterInput"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quests"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"filter"},"value":{"kind":"Variable","name":{"kind":"Name","value":"filter"}}},{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}},{"kind":"Field","name":{"kind":"Name","value":"showProgress"}}]}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"prerequisites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestId"}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestsQuery, GetQuestsQueryVariables>;
 export const GetQuestsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuestsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"questsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}}]}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestsByZoneQuery, GetQuestsByZoneQueryVariables>;
-export const GetQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"internalNote"}},{"kind":"Field","name":{"kind":"Name","value":"showProgress"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}},{"kind":"Field","name":{"kind":"Name","value":"targetMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetMobId"}},{"kind":"Field","name":{"kind":"Name","value":"targetObjectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetObjectId"}},{"kind":"Field","name":{"kind":"Name","value":"targetRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"targetAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"deliverToMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"deliverToMobId"}},{"kind":"Field","name":{"kind":"Name","value":"luaExpression"}},{"kind":"Field","name":{"kind":"Name","value":"dialogue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npcMessage"}},{"kind":"Field","name":{"kind":"Name","value":"matchType"}},{"kind":"Field","name":{"kind":"Name","value":"matchKeywords"}},{"kind":"Field","name":{"kind":"Name","value":"dialogueTreeId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}},{"kind":"Field","name":{"kind":"Name","value":"choiceGroup"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"prerequisites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestId"}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestQuery, GetQuestQueryVariables>;
+export const GetQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"autoAccept"}},{"kind":"Field","name":{"kind":"Name","value":"shareable"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}},{"kind":"Field","name":{"kind":"Name","value":"phases"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"objectives"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"internalNote"}},{"kind":"Field","name":{"kind":"Name","value":"showProgress"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}},{"kind":"Field","name":{"kind":"Name","value":"targetMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetMobId"}},{"kind":"Field","name":{"kind":"Name","value":"targetObjectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetObjectId"}},{"kind":"Field","name":{"kind":"Name","value":"targetRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"targetRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"targetAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"deliverToMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"deliverToMobId"}},{"kind":"Field","name":{"kind":"Name","value":"luaExpression"}},{"kind":"Field","name":{"kind":"Name","value":"dialogue"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"npcMessage"}},{"kind":"Field","name":{"kind":"Name","value":"matchType"}},{"kind":"Field","name":{"kind":"Name","value":"matchKeywords"}},{"kind":"Field","name":{"kind":"Name","value":"dialogueTreeId"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}},{"kind":"Field","name":{"kind":"Name","value":"choiceGroup"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"prerequisites"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestId"}},{"kind":"Field","name":{"kind":"Name","value":"requireCompletion"}}]}}]}}]}}]} as unknown as DocumentNode<GetQuestQuery, GetQuestQueryVariables>;
 export const GetQuestsCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuestsCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"questsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}]}]}}]} as unknown as DocumentNode<GetQuestsCountQuery, GetQuestsCountQueryVariables>;
-export const CreateQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}}]}}]}}]} as unknown as DocumentNode<CreateQuestMutation, CreateQuestMutationVariables>;
-export const UpdateQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestMutation, UpdateQuestMutationVariables>;
+export const CreateQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"autoAccept"}},{"kind":"Field","name":{"kind":"Name","value":"shareable"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}}]}}]}}]} as unknown as DocumentNode<CreateQuestMutation, CreateQuestMutationVariables>;
+export const UpdateQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"shortDescription"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}},{"kind":"Field","name":{"kind":"Name","value":"repeatable"}},{"kind":"Field","name":{"kind":"Name","value":"hidden"}},{"kind":"Field","name":{"kind":"Name","value":"autoAccept"}},{"kind":"Field","name":{"kind":"Name","value":"shareable"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"triggerType"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerMobId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerLevel"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerItemId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerAbilityId"}},{"kind":"Field","name":{"kind":"Name","value":"triggerEventId"}},{"kind":"Field","name":{"kind":"Name","value":"timeLimitMinutes"}},{"kind":"Field","name":{"kind":"Name","value":"availabilityRequirement"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestMutation, UpdateQuestMutationVariables>;
 export const DeleteQuestDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuest"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuest"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestMutation, DeleteQuestMutationVariables>;
 export const CreateQuestPhaseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestPhase"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestPhaseInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestPhase"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]}}]} as unknown as DocumentNode<CreateQuestPhaseMutation, CreateQuestPhaseMutationVariables>;
 export const UpdateQuestPhaseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestPhase"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestPhaseInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestPhase"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"order"}},{"kind":"Field","name":{"kind":"Name","value":"rewards"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]}}]} as unknown as DocumentNode<UpdateQuestPhaseMutation, UpdateQuestPhaseMutationVariables>;
+export const ReorderQuestPhasesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderQuestPhases"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phaseIds"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderQuestPhases"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"phaseIds"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phaseIds"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"order"}}]}}]}}]} as unknown as DocumentNode<ReorderQuestPhasesMutation, ReorderQuestPhasesMutationVariables>;
 export const DeleteQuestPhaseDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuestPhase"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuestPhase"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestPhaseMutation, DeleteQuestPhaseMutationVariables>;
-export const CreateQuestObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestObjectiveInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestObjective"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}}]}}]}}]} as unknown as DocumentNode<CreateQuestObjectiveMutation, CreateQuestObjectiveMutationVariables>;
-export const UpdateQuestObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestObjectiveInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestObjective"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"phaseId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestObjectiveMutation, UpdateQuestObjectiveMutationVariables>;
+export const CreateQuestObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestObjectiveInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestObjective"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}}]}}]}}]} as unknown as DocumentNode<CreateQuestObjectiveMutation, CreateQuestObjectiveMutationVariables>;
+export const UpdateQuestObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestObjectiveInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestObjective"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"phaseId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"objectiveType"}},{"kind":"Field","name":{"kind":"Name","value":"scope"}},{"kind":"Field","name":{"kind":"Name","value":"playerDescription"}},{"kind":"Field","name":{"kind":"Name","value":"requiredCount"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestObjectiveMutation, UpdateQuestObjectiveMutationVariables>;
 export const DeleteQuestObjectiveDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuestObjective"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"questId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuestObjective"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"questZoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questZoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"questId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"questId"}}},{"kind":"Argument","name":{"kind":"Name","value":"phaseId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"phaseId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestObjectiveMutation, DeleteQuestObjectiveMutationVariables>;
-export const CreateQuestRewardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestReward"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestRewardInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestReward"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]} as unknown as DocumentNode<CreateQuestRewardMutation, CreateQuestRewardMutationVariables>;
-export const UpdateQuestRewardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestReward"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestRewardInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestReward"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestRewardMutation, UpdateQuestRewardMutationVariables>;
+export const CreateQuestRewardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestReward"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestRewardInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestReward"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"phaseId"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}}]}}]}}]} as unknown as DocumentNode<CreateQuestRewardMutation, CreateQuestRewardMutationVariables>;
+export const UpdateQuestRewardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateQuestReward"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateQuestRewardInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateQuestReward"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"rewardType"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"quantity"}},{"kind":"Field","name":{"kind":"Name","value":"condition"}}]}}]}}]} as unknown as DocumentNode<UpdateQuestRewardMutation, UpdateQuestRewardMutationVariables>;
 export const DeleteQuestRewardDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuestReward"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuestReward"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestRewardMutation, DeleteQuestRewardMutationVariables>;
-export const CreateQuestPrerequisiteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestPrerequisite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestPrerequisiteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestPrerequisite"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestId"}}]}}]}}]} as unknown as DocumentNode<CreateQuestPrerequisiteMutation, CreateQuestPrerequisiteMutationVariables>;
+export const CreateQuestPrerequisiteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateQuestPrerequisite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateQuestPrerequisiteInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createQuestPrerequisite"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"questZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"questId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"prerequisiteQuestId"}},{"kind":"Field","name":{"kind":"Name","value":"requireCompletion"}}]}}]}}]} as unknown as DocumentNode<CreateQuestPrerequisiteMutation, CreateQuestPrerequisiteMutationVariables>;
 export const DeleteQuestPrerequisiteDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteQuestPrerequisite"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteQuestPrerequisite"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<DeleteQuestPrerequisiteMutation, DeleteQuestPrerequisiteMutationVariables>;
+export const GetQuestOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetQuestOptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"quests"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetQuestOptionsQuery, GetQuestOptionsQueryVariables>;
+export const GetAbilityOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAbilityOptions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"abilities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}}]}}]} as unknown as DocumentNode<GetAbilityOptionsQuery, GetAbilityOptionsQueryVariables>;
+export const GetAbilityNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetAbilityName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"ability"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetAbilityNameQuery, GetAbilityNameQueryVariables>;
 export const GetRoomsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRoomsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"lightweight"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"roomsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"lightweight"},"value":{"kind":"Variable","name":{"kind":"Name","value":"lightweight"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<GetRoomsByZoneQuery, GetRoomsByZoneQueryVariables>;
 export const GetRoomDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRoom"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"room"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"sector"}},{"kind":"Field","name":{"kind":"Name","value":"baseLightLevel"}},{"kind":"Field","name":{"kind":"Name","value":"capacity"}},{"kind":"Field","name":{"kind":"Name","value":"entryRestriction"}},{"kind":"Field","name":{"kind":"Name","value":"isPeaceful"}},{"kind":"Field","name":{"kind":"Name","value":"allowsMagic"}},{"kind":"Field","name":{"kind":"Name","value":"allowsRecall"}},{"kind":"Field","name":{"kind":"Name","value":"allowsSummon"}},{"kind":"Field","name":{"kind":"Name","value":"allowsTeleport"}},{"kind":"Field","name":{"kind":"Name","value":"isDeathTrap"}},{"kind":"Field","name":{"kind":"Name","value":"exits"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"keyZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keyId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"defaultState"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}},{"kind":"Field","name":{"kind":"Name","value":"toZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"toRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"environmentalEffects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectId"}},{"kind":"Field","name":{"kind":"Name","value":"effect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}}]}}]}}]}}]}}]} as unknown as DocumentNode<GetRoomQuery, GetRoomQueryVariables>;
 export const GetRacesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetRaces"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"races"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}},{"kind":"Field","name":{"kind":"Name","value":"playable"}},{"kind":"Field","name":{"kind":"Name","value":"humanoid"}},{"kind":"Field","name":{"kind":"Name","value":"magical"}}]}}]}}]} as unknown as DocumentNode<GetRacesQuery, GetRacesQueryVariables>;

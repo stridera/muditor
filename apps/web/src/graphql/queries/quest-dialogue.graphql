@@ -1,0 +1,105 @@
+query GetDialogueTree($id: Int!) {
+  dialogueTree(id: $id) {
+    id
+    name
+    description
+    nodes {
+      id
+      dialogueTreeId
+      npcMessage
+      order
+      isRoot
+      isTerminal
+      responses {
+        id
+        nodeId
+        nextNodeId
+        matchType
+        matchKeywords
+        displayHint
+        order
+      }
+    }
+  }
+}
+
+mutation CreateQuestDialogue($data: CreateQuestDialogueInput!) {
+  createQuestDialogue(data: $data) {
+    id
+    npcMessage
+    matchType
+    matchKeywords
+    dialogueTreeId
+  }
+}
+
+mutation UpdateQuestDialogue($id: Int!, $data: UpdateQuestDialogueInput!) {
+  updateQuestDialogue(id: $id, data: $data) {
+    id
+    npcMessage
+    matchType
+    matchKeywords
+    dialogueTreeId
+  }
+}
+
+mutation DeleteQuestDialogue($id: Int!) {
+  deleteQuestDialogue(id: $id) {
+    id
+  }
+}
+
+mutation CreateQuestDialogueTree($questDialogueId: Int!, $name: String!) {
+  createQuestDialogueTree(questDialogueId: $questDialogueId, name: $name) {
+    id
+    name
+  }
+}
+
+mutation DeleteDialogueTree($id: Int!) {
+  deleteDialogueTree(id: $id) {
+    id
+  }
+}
+
+mutation CreateDialogueNode($treeId: Int!, $data: CreateDialogueNodeInput!) {
+  createDialogueNode(treeId: $treeId, data: $data) {
+    id
+  }
+}
+
+mutation UpdateDialogueNode($id: Int!, $data: UpdateDialogueNodeInput!) {
+  updateDialogueNode(id: $id, data: $data) {
+    id
+  }
+}
+
+mutation DeleteDialogueNode($id: Int!) {
+  deleteDialogueNode(id: $id) {
+    id
+  }
+}
+
+mutation CreateDialogueResponse(
+  $nodeId: Int!
+  $data: CreateDialogueResponseInput!
+) {
+  createDialogueResponse(nodeId: $nodeId, data: $data) {
+    id
+  }
+}
+
+mutation UpdateDialogueResponse(
+  $id: Int!
+  $data: UpdateDialogueResponseInput!
+) {
+  updateDialogueResponse(id: $id, data: $data) {
+    id
+  }
+}
+
+mutation DeleteDialogueResponse($id: Int!) {
+  deleteDialogueResponse(id: $id) {
+    id
+  }
+}

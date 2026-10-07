@@ -1,4 +1,6 @@
 import type {
+  DialogueMatchType,
+  QuestObjectiveScope,
   QuestObjectiveType,
   QuestRewardType,
   QuestTriggerType,
@@ -23,6 +25,65 @@ export const REWARD_TYPES: { value: QuestRewardType; label: string }[] = [
   { value: 'GOLD' as QuestRewardType, label: 'Gold' },
   { value: 'ITEM' as QuestRewardType, label: 'Item' },
   { value: 'ABILITY' as QuestRewardType, label: 'Ability' },
+  { value: 'SKILL_POINTS' as QuestRewardType, label: 'Skill Points' },
+  { value: 'HOUSING' as QuestRewardType, label: 'Housing' },
+];
+
+/** Reward types the game announces but does not actually grant yet. */
+export const UNGRANTED_REWARD_TYPES: QuestRewardType[] = [
+  'HOUSING' as QuestRewardType,
+];
+
+export const OBJECTIVE_SCOPES: {
+  value: QuestObjectiveScope;
+  label: string;
+  description: string;
+}[] = [
+  {
+    value: 'SOLO' as QuestObjectiveScope,
+    label: 'Solo',
+    description: "Only the quest holder's own actions count",
+  },
+  {
+    value: 'PARTY' as QuestObjectiveScope,
+    label: 'Party',
+    description:
+      "Actions by anyone in the holder's group count for every member who holds the quest",
+  },
+];
+
+// ANY_RESPONSE exists in the database but the game never matches it, so the
+// dialogue editor does not offer it.
+export const DIALOGUE_MATCH_TYPES: {
+  value: DialogueMatchType;
+  label: string;
+  hint: string;
+}[] = [
+  {
+    value: 'CONTAINS' as DialogueMatchType,
+    label: 'Contains',
+    hint: 'Any keyword appears in what the player says',
+  },
+  {
+    value: 'EXACT' as DialogueMatchType,
+    label: 'Exact',
+    hint: 'What the player says is exactly a keyword',
+  },
+  {
+    value: 'STARTS_WITH' as DialogueMatchType,
+    label: 'Starts with',
+    hint: 'What the player says begins with a keyword',
+  },
+  {
+    value: 'ANY_OF' as DialogueMatchType,
+    label: 'Any of (whole words)',
+    hint: 'One of the words the player says is a keyword',
+  },
+  {
+    value: 'REGEX' as DialogueMatchType,
+    label: 'Regex',
+    hint: 'A keyword is a regular expression (case-insensitive)',
+  },
 ];
 
 export const TRIGGER_TYPES: {

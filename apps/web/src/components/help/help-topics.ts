@@ -26,6 +26,7 @@ export const QUESTS_HELP_ANCHORS = {
   phases: 'phases',
   objectives: 'objectives',
   rewards: 'rewards',
+  dialogue: 'dialogue',
   repeatable: 'repeatable-cooldown-and-time-limits',
   customLua: 'custom-lua',
 } as const;

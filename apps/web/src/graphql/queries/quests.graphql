@@ -82,10 +82,14 @@ query GetQuest($zoneId: Int!, $id: Int!) {
     id
     name
     description
+    shortDescription
     minLevel
     maxLevel
     repeatable
     hidden
+    autoAccept
+    shareable
+    cooldownMinutes
     exclusiveGroup
     triggerType
     triggerMobZoneId
@@ -114,6 +118,7 @@ query GetQuest($zoneId: Int!, $id: Int!) {
         questId
         phaseId
         objectiveType
+        scope
         playerDescription
         internalNote
         showProgress
@@ -147,6 +152,8 @@ query GetQuest($zoneId: Int!, $id: Int!) {
         objectId
         abilityId
         choiceGroup
+        quantity
+        condition
       }
     }
     prerequisites {
@@ -155,6 +162,7 @@ query GetQuest($zoneId: Int!, $id: Int!) {
       questId
       prerequisiteQuestZoneId
       prerequisiteQuestId
+      requireCompletion
     }
   }
 }
@@ -169,10 +177,14 @@ mutation CreateQuest($data: CreateQuestInput!) {
     id
     name
     description
+    shortDescription
     minLevel
     maxLevel
     repeatable
     hidden
+    autoAccept
+    shareable
+    cooldownMinutes
     exclusiveGroup
     triggerType
     triggerMobZoneId
@@ -195,10 +207,14 @@ mutation UpdateQuest($zoneId: Int!, $id: Int!, $data: UpdateQuestInput!) {
     id
     name
     description
+    shortDescription
     minLevel
     maxLevel
     repeatable
     hidden
+    autoAccept
+    shareable
+    cooldownMinutes
     exclusiveGroup
     triggerType
     triggerMobZoneId
@@ -264,6 +280,21 @@ mutation UpdateQuestPhase(
   }
 }
 
+mutation ReorderQuestPhases(
+  $questZoneId: Int!
+  $questId: Int!
+  $phaseIds: [Int!]!
+) {
+  reorderQuestPhases(
+    questZoneId: $questZoneId
+    questId: $questId
+    phaseIds: $phaseIds
+  ) {
+    id
+    order
+  }
+}
+
 mutation DeleteQuestPhase($questZoneId: Int!, $questId: Int!, $id: Int!) {
   deleteQuestPhase(questZoneId: $questZoneId, questId: $questId, id: $id) {
     id
@@ -277,6 +308,7 @@ mutation CreateQuestObjective($data: CreateQuestObjectiveInput!) {
     questId
     phaseId
     objectiveType
+    scope
     playerDescription
     requiredCount
   }
@@ -298,6 +330,7 @@ mutation UpdateQuestObjective(
   ) {
     id
     objectiveType
+    scope
     playerDescription
     requiredCount
   }
@@ -327,6 +360,8 @@ mutation CreateQuestReward($data: CreateQuestRewardInput!) {
     phaseId
     rewardType
     amount
+    quantity
+    condition
   }
 }
 
@@ -335,6 +370,8 @@ mutation UpdateQuestReward($id: Int!, $data: UpdateQuestRewardInput!) {
     id
     rewardType
     amount
+    quantity
+    condition
   }
 }
 
@@ -351,11 +388,37 @@ mutation CreateQuestPrerequisite($data: CreateQuestPrerequisiteInput!) {
     questId
     prerequisiteQuestZoneId
     prerequisiteQuestId
+    requireCompletion
   }
 }
 
 mutation DeleteQuestPrerequisite($id: Int!) {
   deleteQuestPrerequisite(id: $id) {
     id
+  }
+}
+
+# Lightweight list for the prerequisite picker.
+query GetQuestOptions {
+  quests {
+    zoneId
+    id
+    name
+  }
+}
+
+# Ability pickers (USE_SKILL objective, ABILITY reward, SKILL trigger).
+query GetAbilityOptions($search: String, $take: Int) {
+  abilities(search: $search, take: $take) {
+    id
+    name
+    abilityType
+  }
+}
+
+query GetAbilityName($id: ID!) {
+  ability(id: $id) {
+    id
+    name
   }
 }

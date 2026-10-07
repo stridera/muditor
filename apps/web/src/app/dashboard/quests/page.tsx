@@ -4,7 +4,12 @@ import { PermissionGuard } from '@/components/auth/permission-guard';
 import { DualInterface } from '@/components/dashboard/dual-interface';
 import { HelpButton } from '@/components/help/HelpButton';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
+import {
+  DeleteQuestDialog,
+  type QuestToDelete,
+} from '@/components/quests/DeleteQuestDialog';
 import { useZone } from '@/contexts/zone-context';
+import { usePermissions } from '@/hooks/use-permissions';
 import {
   GetQuestsDocument,
   GetQuestsByZoneDocument,
@@ -43,7 +48,12 @@ function QuestsContent() {
   const searchParams = useSearchParams();
   const zoneParam = searchParams.get('zone');
   const { selectedZone, setSelectedZone } = useZone();
+  const { canEditZone } = usePermissions();
 
+  const [questToDelete, setQuestToDelete] = useState<QuestToDelete | null>(
+    null
+  );
+  const [deletedMessage, setDeletedMessage] = useState('');
   const [expandedQuests, setExpandedQuests] = useState<Set<string>>(new Set());
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(25);
@@ -154,6 +164,15 @@ function QuestsContent() {
           </Link>
         </div>
       </div>
+
+      {deletedMessage && (
+        <div
+          role='status'
+          className='mb-4 rounded border border-emerald-500/40 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-600 dark:text-emerald-400'
+        >
+          {deletedMessage}
+        </div>
+      )}
 
       {/* Items Per Page Controls */}
       <div className='flex items-center gap-4 mb-4 p-4 bg-muted rounded-lg'>
@@ -383,10 +402,23 @@ function QuestsContent() {
                         Edit
                       </button>
                     </Link>
-                    <button className='inline-flex items-center text-destructive hover:text-destructive-foreground px-3 py-1 text-sm'>
-                      <Trash2 className='w-3 h-3 mr-1' />
-                      Delete
-                    </button>
+                    {canEditZone(quest.zoneId) && (
+                      <button
+                        type='button'
+                        onClick={() => {
+                          setDeletedMessage('');
+                          setQuestToDelete({
+                            zoneId: quest.zoneId,
+                            id: quest.id,
+                            name: quest.name,
+                          });
+                        }}
+                        className='inline-flex items-center text-destructive hover:text-destructive-foreground px-3 py-1 text-sm'
+                      >
+                        <Trash2 className='w-3 h-3 mr-1' />
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
@@ -458,13 +490,24 @@ function QuestsContent() {
   );
 
   return (
-    <DualInterface
-      title='Quests'
-      description='View and manage quest configurations'
-      adminView={adminView}
-    >
-      <div></div>
-    </DualInterface>
+    <>
+      <DualInterface
+        title='Quests'
+        description='View and manage quest configurations'
+        adminView={adminView}
+      >
+        <div></div>
+      </DualInterface>
+      <DeleteQuestDialog
+        quest={questToDelete}
+        onClose={() => setQuestToDelete(null)}
+        onDeleted={deleted => {
+          setQuestToDelete(null);
+          setDeletedMessage(`Deleted quest ${deleted.zoneId}:${deleted.id}.`);
+          void refetch();
+        }}
+      />
+    </>
   );
 }
 

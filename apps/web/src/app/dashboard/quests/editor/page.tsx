@@ -8,12 +8,24 @@ import { ColoredTextarea } from '@/components/ColoredTextarea';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { HelpButton } from '@/components/help/HelpButton';
 import { QUESTS_HELP_ANCHORS as HELP } from '@/components/help/help-topics';
+import { AbilityPicker } from '@/components/quests/AbilityPicker';
 import { EntityAutocomplete } from '@/components/quests/EntityAutocomplete';
+import { ObjectiveFields } from '@/components/quests/ObjectiveFields';
 import {
-  OBJECTIVE_TYPES,
-  REWARD_TYPES,
-  TRIGGER_TYPES,
-} from '@/components/quests/quest-constants';
+  PrerequisitesEditor,
+  type PrerequisiteRow,
+} from '@/components/quests/PrerequisitesEditor';
+import { QuestDialogueEditor } from '@/components/quests/QuestDialogueEditor';
+import { RewardFields } from '@/components/quests/RewardFields';
+import { TRIGGER_TYPES } from '@/components/quests/quest-constants';
+import {
+  movePhase,
+  type DialogueFormData,
+  type ObjectiveFormData,
+  type PhaseFormData,
+  type RewardFormData,
+} from '@/components/quests/quest-form';
+import { useDebouncedPersist } from '@/components/quests/use-debounced-persist';
 import {
   CreateQuestDocument,
   GetQuestDocument,
@@ -21,6 +33,7 @@ import {
   DeleteQuestPhaseDocument,
   CreateQuestPhaseDocument,
   UpdateQuestPhaseDocument,
+  ReorderQuestPhasesDocument,
   CreateQuestObjectiveDocument,
   UpdateQuestObjectiveDocument,
   DeleteQuestObjectiveDocument,
@@ -28,17 +41,21 @@ import {
   UpdateQuestRewardDocument,
   DeleteQuestRewardDocument,
   type GetQuestQuery,
+  type QuestObjectiveScope,
   type QuestObjectiveType,
   type QuestRewardType,
   type QuestTriggerType,
+  type UpdateQuestObjectiveInput,
+  type UpdateQuestRewardInput,
 } from '@/generated/graphql';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
+  ArrowDown,
   ArrowLeft,
+  ArrowUp,
   ChevronDown,
   ChevronUp,
   Gift,
-  GripVertical,
   Plus,
   Save,
   Target,
@@ -53,10 +70,14 @@ interface QuestFormData {
   id: number;
   name: string;
   description: string;
+  shortDescription: string;
   minLevel: number;
   maxLevel: number;
   repeatable: boolean;
   hidden: boolean;
+  autoAccept: boolean;
+  shareable: boolean;
+  cooldownMinutes: number | null;
   // Branching paths
   exclusiveGroup: string;
   // Trigger configuration
@@ -73,45 +94,6 @@ interface QuestFormData {
   timeLimitMinutes: number | null;
   // Availability requirement (Lua expression for class/race checks)
   availabilityRequirement: string;
-}
-
-interface PhaseFormData {
-  id: number;
-  name: string;
-  description: string;
-  order: number;
-  objectives: ObjectiveFormData[];
-  rewards: RewardFormData[];
-}
-
-interface ObjectiveFormData {
-  id: number;
-  objectiveType: QuestObjectiveType;
-  playerDescription: string;
-  internalNote: string;
-  showProgress: boolean;
-  requiredCount: number;
-  targetMobZoneId: number | null;
-  targetMobId: number | null;
-  targetObjectZoneId: number | null;
-  targetObjectId: number | null;
-  targetRoomZoneId: number | null;
-  targetRoomId: number | null;
-  targetAbilityId: number | null;
-  deliverToMobZoneId: number | null;
-  deliverToMobId: number | null;
-  luaExpression: string;
-}
-
-interface RewardFormData {
-  id: number;
-  phaseId: number;
-  rewardType: QuestRewardType;
-  amount: number | null;
-  objectZoneId: number | null;
-  objectId: number | null;
-  abilityId: number | null;
-  choiceGroup: number | null;
 }
 
 function QuestEditorContent() {
@@ -132,10 +114,14 @@ function QuestEditorContent() {
     id: parseInt(questId || '1'),
     name: '',
     description: '',
+    shortDescription: '',
     minLevel: 1,
     maxLevel: 100,
     repeatable: false,
     hidden: false,
+    autoAccept: false,
+    shareable: true,
+    cooldownMinutes: null,
     // Branching paths
     exclusiveGroup: '',
     // Trigger defaults
@@ -155,6 +141,7 @@ function QuestEditorContent() {
   });
 
   const [phases, setPhases] = useState<PhaseFormData[]>([]);
+  const [prerequisites, setPrerequisites] = useState<PrerequisiteRow[]>([]);
 
   const { loading, error, data } = useQuery(GetQuestDocument, {
     variables: {
@@ -177,6 +164,12 @@ function QuestEditorContent() {
   const [createReward] = useMutation(CreateQuestRewardDocument);
   const [updateReward] = useMutation(UpdateQuestRewardDocument);
   const [deleteReward] = useMutation(DeleteQuestRewardDocument);
+  const [reorderPhases] = useMutation(ReorderQuestPhasesDocument);
+
+  const persist = useDebouncedPersist(err => {
+    console.error('Error saving change:', err);
+    setGeneralError('Failed to save a change. Reload the quest and try again.');
+  });
 
   useEffect(() => {
     const typedData = data as GetQuestQuery | undefined;
@@ -187,10 +180,14 @@ function QuestEditorContent() {
         id: quest.id,
         name: quest.name,
         description: quest.description || '',
+        shortDescription: quest.shortDescription || '',
         minLevel: quest.minLevel || 1,
         maxLevel: quest.maxLevel || 100,
         repeatable: quest.repeatable,
         hidden: quest.hidden,
+        autoAccept: quest.autoAccept,
+        shareable: quest.shareable,
+        cooldownMinutes: quest.cooldownMinutes ?? null,
         // Branching paths
         exclusiveGroup: quest.exclusiveGroup || '',
         // Trigger fields
@@ -209,6 +206,15 @@ function QuestEditorContent() {
         availabilityRequirement: quest.availabilityRequirement || '',
       });
 
+      setPrerequisites(
+        (quest.prerequisites ?? []).map(p => ({
+          id: p.id,
+          prerequisiteQuestZoneId: p.prerequisiteQuestZoneId,
+          prerequisiteQuestId: p.prerequisiteQuestId,
+          requireCompletion: p.requireCompletion,
+        }))
+      );
+
       // Load phases, objectives, and rewards (rewards are now per-phase)
       if (quest.phases) {
         setPhases(
@@ -221,6 +227,7 @@ function QuestEditorContent() {
               phase.objectives?.map(obj => ({
                 id: obj.id,
                 objectiveType: obj.objectiveType,
+                scope: obj.scope,
                 playerDescription: obj.playerDescription,
                 internalNote: obj.internalNote || '',
                 showProgress: obj.showProgress,
@@ -235,6 +242,15 @@ function QuestEditorContent() {
                 deliverToMobZoneId: obj.deliverToMobZoneId || null,
                 deliverToMobId: obj.deliverToMobId || null,
                 luaExpression: obj.luaExpression || '',
+                dialogue: obj.dialogue
+                  ? {
+                      id: obj.dialogue.id,
+                      npcMessage: obj.dialogue.npcMessage,
+                      matchType: obj.dialogue.matchType,
+                      matchKeywords: obj.dialogue.matchKeywords,
+                      dialogueTreeId: obj.dialogue.dialogueTreeId ?? null,
+                    }
+                  : null,
               })) || [],
             rewards:
               phase.rewards?.map(reward => ({
@@ -246,6 +262,8 @@ function QuestEditorContent() {
                 objectId: reward.objectId ?? null,
                 abilityId: reward.abilityId ?? null,
                 choiceGroup: reward.choiceGroup ?? null,
+                quantity: reward.quantity,
+                condition: reward.condition ?? '',
               })) || [],
           }))
         );
@@ -273,10 +291,14 @@ function QuestEditorContent() {
               id: formData.id,
               name: formData.name,
               description: formData.description || undefined,
+              shortDescription: formData.shortDescription || undefined,
               minLevel: formData.minLevel,
               maxLevel: formData.maxLevel,
               repeatable: formData.repeatable,
               hidden: formData.hidden,
+              autoAccept: formData.autoAccept,
+              shareable: formData.shareable,
+              cooldownMinutes: formData.cooldownMinutes,
               // Branching paths
               exclusiveGroup: formData.exclusiveGroup || undefined,
               // Trigger fields
@@ -309,10 +331,14 @@ function QuestEditorContent() {
             data: {
               name: formData.name,
               description: formData.description || undefined,
+              shortDescription: formData.shortDescription,
               minLevel: formData.minLevel,
               maxLevel: formData.maxLevel,
               repeatable: formData.repeatable,
               hidden: formData.hidden,
+              autoAccept: formData.autoAccept,
+              shareable: formData.shareable,
+              cooldownMinutes: formData.cooldownMinutes,
               // Branching paths
               exclusiveGroup: formData.exclusiveGroup || undefined,
               // Trigger fields
@@ -342,7 +368,7 @@ function QuestEditorContent() {
 
   const handleAddPhase = async () => {
     const newPhaseId = Math.max(0, ...phases.map(p => p.id)) + 1;
-    const newOrder = phases.length;
+    const newOrder = Math.max(-1, ...phases.map(p => p.order)) + 1;
 
     try {
       await createPhase({
@@ -375,27 +401,43 @@ function QuestEditorContent() {
     }
   };
 
-  const handleUpdatePhase = async (
+  const handleUpdatePhase = (
     phaseId: number,
-    field: keyof PhaseFormData,
-    value: string | number
+    field: 'name' | 'description',
+    value: string
   ) => {
     setPhases(prev =>
       prev.map(p => (p.id === phaseId ? { ...p, [field]: value } : p))
     );
-
-    // Debounce API call
-    try {
-      await updatePhase({
+    persist(`phase:${phaseId}`, { [field]: value }, patch =>
+      updatePhase({
         variables: {
           questZoneId: formData.zoneId,
           questId: formData.id,
           id: phaseId,
-          data: { [field]: value },
+          data: patch,
+        },
+      })
+    );
+  };
+
+  const handleMovePhase = async (phaseId: number, direction: 'up' | 'down') => {
+    const moved = movePhase(phases, phaseId, direction);
+    if (!moved) return;
+    const previous = phases;
+    setPhases(moved);
+    try {
+      await reorderPhases({
+        variables: {
+          questZoneId: formData.zoneId,
+          questId: formData.id,
+          phaseIds: moved.map(p => p.id),
         },
       });
     } catch (err) {
-      console.error('Error updating phase:', err);
+      console.error('Error reordering phases:', err);
+      setPhases(previous);
+      setGeneralError('Failed to reorder phases.');
     }
   };
 
@@ -448,6 +490,7 @@ function QuestEditorContent() {
                   {
                     id: newObjectiveId,
                     objectiveType: 'KILL_MOB' as QuestObjectiveType,
+                    scope: 'SOLO' as QuestObjectiveScope,
                     playerDescription: 'New objective',
                     internalNote: '',
                     showProgress: true,
@@ -462,6 +505,7 @@ function QuestEditorContent() {
                     deliverToMobZoneId: null,
                     deliverToMobId: null,
                     luaExpression: '',
+                    dialogue: null,
                   },
                 ],
               }
@@ -474,11 +518,10 @@ function QuestEditorContent() {
     }
   };
 
-  const handleUpdateObjective = async (
+  const handleUpdateObjective = (
     phaseId: number,
     objectiveId: number,
-    field: keyof ObjectiveFormData,
-    value: string | number | boolean | null
+    patch: Partial<ObjectiveFormData>
   ) => {
     setPhases(prev =>
       prev.map(p =>
@@ -486,27 +529,34 @@ function QuestEditorContent() {
           ? {
               ...p,
               objectives: p.objectives.map(o =>
-                o.id === objectiveId ? { ...o, [field]: value } : o
+                o.id === objectiveId ? { ...o, ...patch } : o
               ),
             }
           : p
       )
     );
 
-    try {
-      await updateObjective({
+    // `dialogue` is edited (and saved) by the dialogue editor itself.
+    const { dialogue: _dialogue, ...saved } = patch;
+    if (Object.keys(saved).length === 0) return;
+    persist(`objective:${phaseId}:${objectiveId}`, saved, merged =>
+      updateObjective({
         variables: {
           questZoneId: formData.zoneId,
           questId: formData.id,
           phaseId: phaseId,
           id: objectiveId,
-          data: { [field]: value },
+          data: merged as UpdateQuestObjectiveInput,
         },
-      });
-    } catch (err) {
-      console.error('Error updating objective:', err);
-    }
+      })
+    );
   };
+
+  const handleDialogueChange = (
+    phaseId: number,
+    objectiveId: number,
+    dialogue: DialogueFormData | null
+  ) => handleUpdateObjective(phaseId, objectiveId, { dialogue });
 
   const handleDeleteObjective = async (
     phaseId: number,
@@ -573,6 +623,8 @@ function QuestEditorContent() {
                       objectId: null,
                       abilityId: null,
                       choiceGroup: null,
+                      quantity: newReward.quantity,
+                      condition: newReward.condition ?? '',
                     },
                   ],
                 }
@@ -586,66 +638,32 @@ function QuestEditorContent() {
     }
   };
 
-  const handleUpdateReward = async (
+  const handleUpdateReward = (
     phaseId: number,
     rewardId: number,
-    field: keyof RewardFormData,
-    value: string | number | boolean | null
+    patch: Partial<RewardFormData>
   ) => {
-    // Update local state first
     setPhases(prev =>
       prev.map(p =>
         p.id === phaseId
           ? {
               ...p,
               rewards: p.rewards.map(r =>
-                r.id === rewardId ? { ...r, [field]: value } : r
+                r.id === rewardId ? { ...r, ...patch } : r
               ),
             }
           : p
       )
     );
 
-    // Find the updated reward
-    const phase = phases.find(p => p.id === phaseId);
-    const updatedReward = phase?.rewards.find(r => r.id === rewardId);
-    if (!updatedReward) return;
-
-    try {
-      await updateReward({
-        variables: {
-          id: rewardId,
-          data: {
-            rewardType:
-              field === 'rewardType'
-                ? (value as QuestRewardType)
-                : updatedReward.rewardType,
-            amount:
-              field === 'amount'
-                ? (value as number | null)
-                : updatedReward.amount,
-            objectZoneId:
-              field === 'objectZoneId'
-                ? (value as number | null)
-                : updatedReward.objectZoneId,
-            objectId:
-              field === 'objectId'
-                ? (value as number | null)
-                : updatedReward.objectId,
-            abilityId:
-              field === 'abilityId'
-                ? (value as number | null)
-                : updatedReward.abilityId,
-            choiceGroup:
-              field === 'choiceGroup'
-                ? (value as number | null)
-                : updatedReward.choiceGroup,
-          },
-        },
-      });
-    } catch (err) {
-      console.error('Error updating reward:', err);
-    }
+    // Only the changed fields are sent; the server leaves the rest alone.
+    const { id: _id, phaseId: _phaseId, ...saved } = patch;
+    if (Object.keys(saved).length === 0) return;
+    persist(`reward:${rewardId}`, saved, merged =>
+      updateReward({
+        variables: { id: rewardId, data: merged as UpdateQuestRewardInput },
+      })
+    );
   };
 
   const handleDeleteReward = async (phaseId: number, rewardId: number) => {
@@ -837,6 +855,22 @@ function QuestEditorContent() {
                 />
               </div>
 
+              <div>
+                <label className='block text-sm font-medium text-card-foreground mb-1'>
+                  Short Description
+                </label>
+                <input
+                  type='text'
+                  aria-label='Short description'
+                  value={formData.shortDescription}
+                  onChange={e =>
+                    handleInputChange('shortDescription', e.target.value)
+                  }
+                  placeholder='One line for quest lists'
+                  className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                />
+              </div>
+
               <div className='grid grid-cols-2 gap-4'>
                 <div>
                   <label className='block text-sm font-medium text-muted-foreground mb-1'>
@@ -911,7 +945,79 @@ function QuestEditorContent() {
                     tip='Hidden quests cannot be accepted by players; staff assign them with qload / qgive'
                   />
                 </label>
+                <label className='flex items-center gap-2'>
+                  <input
+                    type='checkbox'
+                    checked={formData.autoAccept}
+                    onChange={e =>
+                      handleInputChange('autoAccept', e.target.checked)
+                    }
+                    className='rounded border-input'
+                  />
+                  <span className='text-sm text-foreground'>Auto-accept</span>
+                  <HelpButton
+                    topic='quests'
+                    anchor={HELP.offering}
+                    variant='icon'
+                    tip='Level, Item, Room, Skill, Event and Auto-Start triggers put the character on the quest instead of only offering it'
+                  />
+                </label>
+                <label className='flex items-center gap-2'>
+                  <input
+                    type='checkbox'
+                    checked={formData.shareable}
+                    onChange={e =>
+                      handleInputChange('shareable', e.target.checked)
+                    }
+                    className='rounded border-input'
+                  />
+                  <span className='text-sm text-foreground'>Shareable</span>
+                  <HelpButton
+                    topic='quests'
+                    anchor={HELP.offering}
+                    variant='icon'
+                    tip='Stored and shown by questinfo, but the game does not restrict sharing with it yet'
+                  />
+                </label>
               </div>
+              {formData.autoAccept &&
+                !['LEVEL', 'ITEM', 'ROOM', 'SKILL', 'EVENT', 'AUTO'].includes(
+                  formData.triggerType
+                ) && (
+                  <p className='text-xs text-amber-600 dark:text-amber-400'>
+                    Auto-accept only applies to Level, Item, Room, Skill, Event
+                    and Auto-Start triggers; this trigger type never
+                    auto-accepts.
+                  </p>
+                )}
+
+              {formData.repeatable && (
+                <div className='max-w-xs'>
+                  <label className='flex items-center gap-1 text-sm font-medium text-muted-foreground mb-1'>
+                    Cooldown (minutes)
+                    <HelpButton
+                      topic='quests'
+                      anchor={HELP.repeatable}
+                      variant='icon'
+                      tip='Minutes after completion before a repeatable quest can be accepted again'
+                    />
+                  </label>
+                  <input
+                    type='number'
+                    aria-label='Cooldown (minutes)'
+                    value={formData.cooldownMinutes ?? ''}
+                    onChange={e =>
+                      handleInputChange(
+                        'cooldownMinutes',
+                        e.target.value ? parseInt(e.target.value) : null
+                      )
+                    }
+                    placeholder='No cooldown'
+                    min={0}
+                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
+                  />
+                </div>
+              )}
 
               {/* Trigger Configuration */}
               <div className='pt-4 border-t border-border space-y-4'>
@@ -1087,25 +1193,20 @@ function QuestEditorContent() {
                 )}
 
                 {formData.triggerType === 'SKILL' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Trigger Ability ID
-                      </label>
-                      <input
-                        type='number'
-                        value={formData.triggerAbilityId || ''}
-                        onChange={e =>
-                          handleInputChange(
-                            'triggerAbilityId',
-                            e.target.value ? parseInt(e.target.value) : null
-                          )
-                        }
-                        placeholder='Ability ID'
-                        min={1}
-                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                      />
-                    </div>
+                  <div>
+                    <label className='block text-sm font-medium text-muted-foreground mb-1'>
+                      Trigger Ability
+                    </label>
+                    <AbilityPicker
+                      value={formData.triggerAbilityId}
+                      onChange={abilityId =>
+                        setFormData(prev => ({
+                          ...prev,
+                          triggerAbilityId: abilityId,
+                        }))
+                      }
+                      placeholder='Search skill or spell that triggers the quest...'
+                    />
                   </div>
                 )}
 
@@ -1196,7 +1297,29 @@ function QuestEditorContent() {
                       onClick={() => togglePhaseExpanded(phase.id)}
                     >
                       <div className='flex items-center gap-3'>
-                        <GripVertical className='w-4 h-4 text-muted-foreground' />
+                        <div
+                          className='flex flex-col'
+                          onClick={e => e.stopPropagation()}
+                        >
+                          <button
+                            type='button'
+                            aria-label={`Move phase ${phase.name} up`}
+                            disabled={phaseIdx === 0}
+                            onClick={() => handleMovePhase(phase.id, 'up')}
+                            className='p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30'
+                          >
+                            <ArrowUp className='w-3 h-3' />
+                          </button>
+                          <button
+                            type='button'
+                            aria-label={`Move phase ${phase.name} down`}
+                            disabled={phaseIdx === phases.length - 1}
+                            onClick={() => handleMovePhase(phase.id, 'down')}
+                            className='p-0.5 text-muted-foreground hover:text-foreground disabled:opacity-30'
+                          >
+                            <ArrowDown className='w-3 h-3' />
+                          </button>
+                        </div>
                         <span className='text-xs bg-primary/20 text-primary px-2 py-0.5 rounded'>
                           Phase {phaseIdx + 1}
                         </span>
@@ -1274,221 +1397,44 @@ function QuestEditorContent() {
                             </button>
                           </div>
 
-                          {phase.objectives.map((obj, objIdx) => (
+                          {phase.objectives.map(obj => (
                             <div
                               key={obj.id}
                               className='bg-muted/50 rounded-lg p-3 space-y-3'
                             >
                               <div className='flex items-start gap-3'>
                                 <Target className='w-4 h-4 text-muted-foreground mt-2' />
-                                <div className='flex-1 space-y-3'>
-                                  <div className='grid grid-cols-3 gap-3'>
-                                    <div className='flex items-center gap-1'>
-                                      <select
-                                        value={obj.objectiveType}
-                                        onChange={e =>
-                                          handleUpdateObjective(
-                                            phase.id,
-                                            obj.id,
-                                            'objectiveType',
-                                            e.target.value as QuestObjectiveType
-                                          )
-                                        }
-                                        className='rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                      >
-                                        {OBJECTIVE_TYPES.map(type => (
-                                          <option
-                                            key={type.value}
-                                            value={type.value}
-                                          >
-                                            {type.label}
-                                          </option>
-                                        ))}
-                                      </select>
-                                      <HelpButton
-                                        topic='quests'
-                                        anchor={HELP.objectives}
-                                        variant='icon'
-                                        tip='What each objective type needs and how players complete it'
-                                      />
-                                    </div>
-                                    <input
-                                      type='number'
-                                      value={obj.requiredCount}
-                                      onChange={e =>
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'requiredCount',
-                                          parseInt(e.target.value) || 1
-                                        )
-                                      }
-                                      min={1}
-                                      placeholder='Count'
-                                      className='rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                    />
-                                    <label className='flex items-center gap-2'>
-                                      <input
-                                        type='checkbox'
-                                        checked={obj.showProgress}
-                                        onChange={e =>
-                                          handleUpdateObjective(
-                                            phase.id,
-                                            obj.id,
-                                            'showProgress',
-                                            e.target.checked
-                                          )
-                                        }
-                                        className='rounded border-input'
-                                      />
-                                      <span className='text-sm'>
-                                        Show Progress
-                                      </span>
-                                    </label>
-                                  </div>
-                                  <input
-                                    value={obj.playerDescription}
-                                    onChange={e =>
+                                <div className='flex-1'>
+                                  <ObjectiveFields
+                                    objective={obj}
+                                    onChange={patch =>
                                       handleUpdateObjective(
                                         phase.id,
                                         obj.id,
-                                        'playerDescription',
-                                        e.target.value
+                                        patch
                                       )
                                     }
-                                    placeholder='Player-visible description'
-                                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                  />
-                                  <input
-                                    value={obj.internalNote}
-                                    onChange={e =>
-                                      handleUpdateObjective(
-                                        phase.id,
-                                        obj.id,
-                                        'internalNote',
-                                        e.target.value
-                                      )
-                                    }
-                                    placeholder='Internal note (builder only)'
-                                    className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm text-muted-foreground'
-                                  />
-
-                                  {/* Target fields based on objective type */}
-                                  {(obj.objectiveType === 'KILL_MOB' ||
-                                    obj.objectiveType === 'TALK_TO_NPC') && (
-                                    <EntityAutocomplete
-                                      entityType='mob'
-                                      value={{
-                                        zoneId: obj.targetMobZoneId,
-                                        id: obj.targetMobId,
-                                      }}
-                                      onChange={({ zoneId, id }) => {
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetMobZoneId',
-                                          zoneId
-                                        );
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetMobId',
-                                          id
-                                        );
-                                      }}
-                                      placeholder='Search target mob...'
-                                    />
-                                  )}
-
-                                  {(obj.objectiveType === 'COLLECT_ITEM' ||
-                                    obj.objectiveType === 'DELIVER_ITEM') && (
-                                    <EntityAutocomplete
-                                      entityType='object'
-                                      value={{
-                                        zoneId: obj.targetObjectZoneId,
-                                        id: obj.targetObjectId,
-                                      }}
-                                      onChange={({ zoneId, id }) => {
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetObjectZoneId',
-                                          zoneId
-                                        );
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetObjectId',
-                                          id
-                                        );
-                                      }}
-                                      placeholder='Search target object...'
-                                    />
-                                  )}
-
-                                  {obj.objectiveType === 'VISIT_ROOM' && (
-                                    <EntityAutocomplete
-                                      entityType='room'
-                                      value={{
-                                        zoneId: obj.targetRoomZoneId,
-                                        id: obj.targetRoomId,
-                                      }}
-                                      onChange={({ zoneId, id }) => {
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetRoomZoneId',
-                                          zoneId
-                                        );
-                                        handleUpdateObjective(
-                                          phase.id,
-                                          obj.id,
-                                          'targetRoomId',
-                                          id
-                                        );
-                                      }}
-                                      placeholder='Search target room...'
-                                    />
-                                  )}
-
-                                  {(obj.objectiveType === 'USE_SKILL' ||
-                                    obj.objectiveType === 'DELIVER_ITEM') && (
-                                    <p className='text-xs text-amber-600 dark:text-amber-400'>
-                                      {obj.objectiveType === 'USE_SKILL'
-                                        ? 'The editor cannot set the skill for this type yet, so it will not advance.'
-                                        : 'The editor cannot set the recipient mob for this type yet, so it will not advance.'}
-                                    </p>
-                                  )}
-
-                                  {obj.objectiveType === 'CUSTOM_LUA' && (
-                                    <div className='space-y-1'>
-                                      <div className='flex items-center gap-1 text-xs font-medium text-muted-foreground'>
-                                        Lua expression
-                                        <HelpButton
-                                          topic='quests'
-                                          anchor={HELP.customLua}
-                                          variant='icon'
-                                          tip='A boolean expression checked about once a minute; true adds 1 to the count'
-                                        />
-                                      </div>
-                                      <textarea
-                                        value={obj.luaExpression}
-                                        onChange={e =>
-                                          handleUpdateObjective(
+                                    dialogueSlot={
+                                      <QuestDialogueEditor
+                                        questZoneId={formData.zoneId}
+                                        questId={formData.id}
+                                        phaseId={phase.id}
+                                        objectiveId={obj.id}
+                                        dialogue={obj.dialogue}
+                                        onChange={dialogue =>
+                                          handleDialogueChange(
                                             phase.id,
                                             obj.id,
-                                            'luaExpression',
-                                            e.target.value
+                                            dialogue
                                           )
                                         }
-                                        placeholder='e.g. actor.level >= 10 and actor:has_item(30, 12)'
-                                        rows={3}
-                                        className='block w-full rounded-md border border-input bg-background font-mono text-sm'
                                       />
-                                    </div>
-                                  )}
+                                    }
+                                  />
                                 </div>
                                 <button
+                                  type='button'
+                                  aria-label='Delete objective'
                                   onClick={() =>
                                     handleDeleteObjective(phase.id, obj.id)
                                   }
@@ -1537,145 +1483,21 @@ function QuestEditorContent() {
                             >
                               <div className='flex items-start gap-3'>
                                 <Gift className='w-4 h-4 text-amber-500 mt-2' />
-                                <div className='flex-1 space-y-3'>
-                                  <div className='grid grid-cols-4 gap-3'>
-                                    <div>
-                                      <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                        Type
-                                      </label>
-                                      <select
-                                        value={reward.rewardType}
-                                        onChange={e =>
-                                          handleUpdateReward(
-                                            phase.id,
-                                            reward.id,
-                                            'rewardType',
-                                            e.target.value as QuestRewardType
-                                          )
-                                        }
-                                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                      >
-                                        {REWARD_TYPES.map(type => (
-                                          <option
-                                            key={type.value}
-                                            value={type.value}
-                                          >
-                                            {type.label}
-                                          </option>
-                                        ))}
-                                      </select>
-                                    </div>
-
-                                    {(reward.rewardType === 'EXPERIENCE' ||
-                                      reward.rewardType === 'GOLD') && (
-                                      <div>
-                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                          Amount
-                                        </label>
-                                        <input
-                                          type='number'
-                                          value={reward.amount || ''}
-                                          onChange={e =>
-                                            handleUpdateReward(
-                                              phase.id,
-                                              reward.id,
-                                              'amount',
-                                              e.target.value
-                                                ? parseInt(e.target.value)
-                                                : null
-                                            )
-                                          }
-                                          placeholder='Amount'
-                                          className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                        />
-                                      </div>
-                                    )}
-
-                                    {reward.rewardType === 'ITEM' && (
-                                      <div className='col-span-2'>
-                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                          Item
-                                        </label>
-                                        <EntityAutocomplete
-                                          entityType='object'
-                                          value={{
-                                            zoneId: reward.objectZoneId,
-                                            id: reward.objectId,
-                                          }}
-                                          onChange={({ zoneId, id }) => {
-                                            handleUpdateReward(
-                                              phase.id,
-                                              reward.id,
-                                              'objectZoneId',
-                                              zoneId
-                                            );
-                                            handleUpdateReward(
-                                              phase.id,
-                                              reward.id,
-                                              'objectId',
-                                              id
-                                            );
-                                          }}
-                                          placeholder='Search item...'
-                                        />
-                                      </div>
-                                    )}
-
-                                    {reward.rewardType === 'ABILITY' && (
-                                      <div>
-                                        <label className='block text-xs font-medium text-muted-foreground mb-1'>
-                                          Ability ID
-                                        </label>
-                                        <input
-                                          type='number'
-                                          value={reward.abilityId || ''}
-                                          onChange={e =>
-                                            handleUpdateReward(
-                                              phase.id,
-                                              reward.id,
-                                              'abilityId',
-                                              e.target.value
-                                                ? parseInt(e.target.value)
-                                                : null
-                                            )
-                                          }
-                                          placeholder='Ability ID'
-                                          className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                        />
-                                      </div>
-                                    )}
-
-                                    <div>
-                                      <label className='flex items-center gap-1 text-xs font-medium text-muted-foreground mb-1'>
-                                        Choice Group
-                                        <HelpButton
-                                          topic='quests'
-                                          anchor={HELP.rewards}
-                                          variant='icon'
-                                          tip='Rewards sharing a group are pick-one, claimed with qreward'
-                                        />
-                                      </label>
-                                      <input
-                                        type='number'
-                                        value={reward.choiceGroup || ''}
-                                        onChange={e =>
-                                          handleUpdateReward(
-                                            phase.id,
-                                            reward.id,
-                                            'choiceGroup',
-                                            e.target.value
-                                              ? parseInt(e.target.value)
-                                              : null
-                                          )
-                                        }
-                                        placeholder='Group'
-                                        title='Same group = player chooses one'
-                                        className='block w-full rounded-md border border-input bg-background shadow-sm sm:text-sm'
-                                      />
-                                    </div>
-                                  </div>
+                                <div className='flex-1'>
+                                  <RewardFields
+                                    reward={reward}
+                                    onChange={patch =>
+                                      handleUpdateReward(
+                                        phase.id,
+                                        reward.id,
+                                        patch
+                                      )
+                                    }
+                                  />
                                 </div>
                                 <button
+                                  type='button'
+                                  aria-label='Delete reward'
                                   onClick={() =>
                                     handleDeleteReward(phase.id, reward.id)
                                   }
@@ -1714,6 +1536,21 @@ function QuestEditorContent() {
         {/* Requirements Tab */}
         {activeTab === 'requirements' && (
           <div className='space-y-8'>
+            {isNew ? (
+              <div className='bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 rounded-lg p-4'>
+                <p className='text-amber-800 dark:text-amber-200 text-sm'>
+                  Save the quest first before adding prerequisite quests.
+                </p>
+              </div>
+            ) : (
+              <PrerequisitesEditor
+                questZoneId={formData.zoneId}
+                questId={formData.id}
+                prerequisites={prerequisites}
+                onChange={setPrerequisites}
+              />
+            )}
+
             {/* Availability Requirements Section */}
             <div className='space-y-4'>
               <h2 className='text-lg font-semibold flex items-center gap-2'>

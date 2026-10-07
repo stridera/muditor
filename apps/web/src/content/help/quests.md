@@ -41,7 +41,7 @@ Goal: "Kill 5 sewer rats, then report back to the mayor." We use zone 30, quest 
 9. Make the quest discoverable. Attach a greeting or speech trigger to the mayor mob that tells players `Type qaccept 30 5 to take the job.`
 10. Test it (see [Testing a quest](#testing-a-quest)): `qload 30 5`, kill five rats, `ask mayor hello`, then `quests`.
 
-Basic Info and Requirements are saved with **Create Quest** / **Save Changes**. Phases, objectives and rewards are saved the moment you edit them.
+Basic Info and the availability expression are saved with **Create Quest** / **Save Changes**. Prerequisites, phases, objectives, rewards and dialogue are saved the moment you edit them (typed text a moment after you stop typing, dialogue text when you click away).
 
 ## Concepts
 
@@ -60,7 +60,7 @@ The **Trigger Type** decides how a player is told about the quest. What the game
 | Event Active         | `EVENT`  | Offered to every player online when the game event is switched on (the server checks about once a minute). Players who log in later are not offered it.        |
 | Auto-Start           | `AUTO`   | Offered (or accepted) at every login until the character holds the quest.                                                                                      |
 
-For `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. The editor has no field for auto-accept yet, so today these types only **offer**. A trigger never offers a quest the character has any record of (in progress, completed, failed or abandoned), and offers each quest at most **once per login session**, however often the trigger fires again. The quest's Availability Requirement is checked first, exactly as for `qaccept`: a character who fails it (or whose expression errors) is not offered or given the quest. Room-trigger quests are cached by the server and refreshed about once a minute, so a newly edited quest can take up to a minute to start triggering.
+For `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. Tick **Auto-accept** on the Basic Info tab to accept for the character; leave it off to only **offer**. A trigger never offers a quest the character has any record of (in progress, completed, failed or abandoned), and offers each quest at most **once per login session**, however often the trigger fires again. The quest's Availability Requirement is checked first, exactly as for `qaccept`: a character who fails it (or whose expression errors) is not offered or given the quest. Room-trigger quests are cached by the server and refreshed about once a minute, so a newly edited quest can take up to a minute to start triggering.
 
 Whatever the trigger type, any player can type `qaccept <zone> <id>` for any quest that is not Hidden.
 
@@ -71,7 +71,7 @@ Whatever the trigger type, any player can type `qaccept <zone> <id>` for any que
 Checked when the quest is accepted:
 
 - **Min Level / Max Level**: the character's level must be inside the range (a Max Level of 0 or less means no upper limit).
-- **Prerequisites**: other quests the character must have **completed**. The game enforces every prerequisite row whose "require completion" flag is on. The editor has no screen for prerequisites yet (the quest list shows them); they are managed through the API.
+- **Prerequisites**: other quests the character must have **completed**. Build the list under **Prerequisite Quests** on the Requirements tab: filter by name or `zone:id`, pick a quest, click **Add**; the trash icon removes one. Each change is saved at once, and a quest cannot require itself or start a loop (A needs B, B needs A). The game enforces every prerequisite row whose "require completion" flag is on. Level range is the Min Level / Max Level pair above, and class or race limits go in the availability expression below; the prerequisite list itself only holds quests.
 - **Exclusive Group**: quests that share a group name are mutually exclusive. While a character holds any quest in the group with a status other than abandoned (in progress, completed or failed), the others refuse with "you already hold quest ... in exclusive group".
 
 #### Availability requirement
@@ -86,7 +86,7 @@ The **Lua Expression** on the **Requirements** tab is evaluated only when a play
 
 ### Phases
 
-- Phases run in **Order**, lowest first (ties broken by phase ID). The editor numbers new phases in the order you add them and has no reordering control yet. In the in-game `quests` listing the number after "Phase" is that Order value, so the first phase shows as `Phase 0`.
+- Phases run in **Order**, lowest first (ties broken by phase ID). New phases go to the end of the list; the up and down arrows at the left of each phase header move it, and the new order is saved at once (it renumbers every phase 0, 1, 2, ...). In the in-game `quests` listing the number after "Phase" is that Order value, so the first phase shows as `Phase 0`.
 - A phase finishes when **all** its objectives are complete (any order). Then the next phase becomes current. Finishing the last phase completes the quest.
 - **Only the current phase's objectives advance.** A kill, pickup, visit, talk or skill use counts only towards objectives in the phase the player is on; progress cannot be banked for a later phase. The exception is **Collect Item**, which follows what the player carries (see [Objectives](#objectives)): when a phase starts (on acceptance or when the previous phase finishes) its Collect Item objectives count the matching items already in the pack, so a phase that is already satisfied finishes straight away. After a phase finishes the server immediately checks the next one, so several phases can complete at once.
 - A phase with no objectives never finishes by itself.
@@ -98,37 +98,41 @@ Each objective has a type, a **Required Count**, **Show Progress**, a **Player-v
 
 | Editor label | Value          | Needs                                  | Player completes it by                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  |
 | ------------ | -------------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Kill Mob     | `KILL_MOB`     | Target mob                             | Killing a mob of that prototype. Credit goes to the player who lands the kill; group members do not share it (the editor cannot set party scope yet). Each kill adds 1.                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
+| Kill Mob     | `KILL_MOB`     | Target mob                             | Killing a mob of that prototype. Credit goes to the player who lands the kill; group members share it only when the objective's **Who counts** is **Party** (see below). Each kill adds 1.                                                                                                                                                                                                                                                                                                                                                                                                                                              |
 | Collect Item | `COLLECT_ITEM` | Target object                          | Carrying the item. Progress is the number of matching items the player holds right now (pack and worn, not inside containers), capped at the Required Count, however they got them (picked up, bought, given, looted); dropping or handing one over lowers it. When the count is reached the objective completes and **the server takes those items** from the player (a turn-in), so the same items cannot complete the objective twice or be passed to another player to complete it again. To make players hand items to an NPC use Deliver Item instead; do not also use Collect Item for the same item (it would take them first). |
-| Deliver Item | `DELIVER_ITEM` | Target object **and** a deliver-to mob | `give <item> <mob>` to a mob of that prototype. The item is not consumed by the objective itself. The game fully supports it; **the editor has no deliver-to field yet**, so the recipient can only be set through the API for now.                                                                                                                                                                                                                                                                                                                                                                                                     |
+| Deliver Item | `DELIVER_ITEM` | Target object **and** a deliver-to mob | `give <item> <mob>` to a mob of that prototype. The item is not consumed by the objective itself. Pick the item under **Item to deliver** and the recipient under **Deliver to mob**.                                                                                                                                                                                                                                                                                                                                                                                                                                                   |
 | Visit Room   | `VISIT_ROOM`   | Target room                            | Walking into the room while the objective's phase is current. Every entry counts (one per entry for a Required Count above 1), whether or not the character has been there before. Logging in inside the room is not an entry.                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Talk to NPC  | `TALK_TO_NPC`  | Target mob                             | `ask <mob> <topic>` with the mob in the room; `say` does not count. Without a dialogue any topic counts; with one the topic must match its keywords (see [Dialogue](#dialogue)).                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| Use Skill    | `USE_SKILL`    | Target ability                         | Successfully using that skill or spell (a failed attempt does not count). The game fully supports it; **the editor has no ability field yet**, so the ability can only be set through the API for now.                                                                                                                                                                                                                                                                                                                                                                                                                                  |
+| Use Skill    | `USE_SKILL`    | Target ability                         | Successfully using that skill or spell (a failed attempt does not count). Search the **Skill or spell to use** picker by name.                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
 | Custom (Lua) | `CUSTOM_LUA`   | A Lua expression                       | The server evaluates the expression about once a minute, while its phase is current. See [Custom Lua](#custom-lua).                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     |
 
 "Required Count" is capped: progress never exceeds it, and an objective completes when the count is reached. Whatever finishes the last objective (a kill, a dialogue, the Custom Lua sweep), the quest completes and pays its rewards. The target pickers store the **zone:id** of the mob, object or room prototype; double-check you picked the right one.
+
+The editor only shows the fields an objective type uses (Kill Mob: a mob picker; Collect Item: an item picker; Deliver Item: an item and a recipient mob; Visit Room: a room picker; Talk to NPC: a mob picker and the dialogue editor; Use Skill: an ability picker; Custom (Lua): the expression). Changing an objective's type clears the targets the new type does not use.
+
+**Who counts** (every type except Custom (Lua)): **Solo** means only the quest holder's own action advances the objective. **Party** means an action by anyone in the holder's group (the follow chain) also advances it for each member who holds the quest and is in the same phase, so one kill or one `ask` can credit the whole party.
 
 ### Rewards
 
 Rewards live on a phase in the editor, but the game pays **all of a quest's rewards when the quest completes**, whichever phase they were attached to. Put them on the last phase so the editor matches reality.
 
-| Editor type | Value        | What the player gets                                                                         |
-| ----------- | ------------ | -------------------------------------------------------------------------------------------- |
-| Experience  | `EXPERIENCE` | **Amount** experience points.                                                                |
-| Gold        | `GOLD`       | **Amount** gold.                                                                             |
-| Item        | `ITEM`       | One copy of the item (quantity 1; the editor cannot set a quantity) placed in the inventory. |
-| Ability     | `ABILITY`    | Teaches the ability (**Ability ID**) as known.                                               |
-
-The game also understands Skill Points and Housing rewards, but the editor cannot create them. Housing is only announced, not granted.
+| Editor type  | Value          | What the player gets                                                                    |
+| ------------ | -------------- | --------------------------------------------------------------------------------------- |
+| Experience   | `EXPERIENCE`   | **Amount** experience points.                                                           |
+| Gold         | `GOLD`         | **Amount** gold.                                                                        |
+| Item         | `ITEM`         | **Quantity** copies of the item (default 1) placed in the inventory.                    |
+| Ability      | `ABILITY`      | Teaches the chosen skill or spell as known.                                             |
+| Skill Points | `SKILL_POINTS` | **Amount** skill points.                                                                |
+| Housing      | `HOUSING`      | **Not yet granted.** The game only announces "housing access"; the player gets nothing. |
 
 **Choice Group**: rewards that share a group number are a "pick one" set. They are **not** paid at completion. The player must type `qreward` to list the choices and `qreward <zone> <id> <reward id>` to pick one. The completion message does not mention choice rewards, so tell players about `qreward` in your NPC dialogue or quest description.
 
-Rewards with a condition (a Lua expression, same rules as the availability requirement, including failing closed: an error or non-boolean result refuses the reward) are also claimed with `qreward`; the editor cannot set conditions yet.
+Rewards with a condition (a Lua expression, same rules as the availability requirement, including failing closed: an error or non-boolean result refuses the reward) are also claimed with `qreward`. Write it in the reward's **Condition** box (the `?` there opens the availability requirement section: same `actor` fields and methods).
 
 ### Repeatable, cooldown and time limits
 
 - **Repeatable** off: once COMPLETED the quest can never be accepted again by that character. On: it can be accepted again.
-- **Cooldown** (minutes between completion and the next acceptance) is enforced by the game but the editor has no field for it yet.
+- **Cooldown** (minutes between completion and the next acceptance) is enforced by the game. The **Cooldown (minutes)** field appears on Basic Info when Repeatable is ticked; empty means none.
 - **Time Limit (minutes)** sets an expiry when the quest is accepted through `qaccept` or an auto-accept trigger. The server checks about once a minute and marks overdue quests FAILED with `*** Quest expired: ... ***`. Quests given with `qload` / `qgive` get no expiry.
 - Abandoning (`abandon <#>`) or failing a quest never blocks it: the player can accept it again.
 - Accepting a quest again (a repeat, or a retry after it failed or was abandoned) starts it from scratch: first phase, no objective progress, empty quest variables.
@@ -141,7 +145,8 @@ Dialogue is bound to a **Talk to NPC** objective. It has three parts: opening **
 - When the keywords match, the mob answers with the dialogue's message. If a tree is linked, the tree's root node speaks instead and the conversation begins. The objective counts when the conversation opens, not when it ends.
 - **Walking the tree.** While in a conversation, the player's next `ask` of the same mob is matched against the current node's responses (same match types). A matching response moves to its next node, whose message the mob says. The builder hint of each available response is listed under the mob's line. The conversation ends at a terminal node, at a response with no next node, or when the player asks someone else. An `ask` that matches no response goes back to the opening keywords (which can restart the conversation).
 - The reply to a matched topic, and each tree step, is shown to the asking player only.
-- The editor has no dialogue screen yet (the API can create them), and dialogue changes need a server restart.
+- **Building it.** Each Talk to NPC objective card has a **Dialogue** box. **Add dialogue** creates one; set the match type, the keywords (comma separated; none means any topic) and the NPC reply. **Create conversation tree** adds a tree whose root node starts with the reply you wrote. In the tree, each node is an NPC line with its own **Player replies**: keywords, match type, which node the reply **leads to** (or "ends the conversation") and an optional hint shown to the player. Tick **Ends the conversation** on a node to make it terminal, use **Make root** to change the opening line, and **Add node** / **Add reply** to grow it. The root node cannot be deleted, and a reply can only lead to a node of the same tree. Text fields save when you click away from them. The "Any response" match type exists in the database but the game never matches it, so the editor does not offer it.
+- Dialogue changes need a server restart.
 
 ### Quest variables
 
@@ -214,37 +219,42 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 - **Hidden left on.** Players cannot accept hidden quests at all.
 - **Availability expression typos.** They fail closed, so nobody can take the quest (check `syslog 100 lua`). Use `actor`, not `character`, and lower-case class and race names.
 - **Expecting early progress to carry over.** An objective only advances while its phase is current. A kill made in phase 1 does not count towards a phase 2 kill objective. Only carried Collect Item items are credited when a phase starts.
-- **Deliver Item or Use Skill objectives built in the editor.** The game supports them, but the editor cannot set the recipient or ability yet, so an objective built there has nothing to match and never advances. Set those fields through the API until the editor catches up.
 - **Talking with `say`.** Talk to NPC only counts `ask <mob> <topic>`, and with a dialogue the topic must match its keywords.
+- **Housing rewards.** The editor offers them but the game does not grant them yet.
 - **Collect Item takes the items.** Completing the objective removes the required items from the player. Do not use it for items the player must keep or later hand to someone (use Deliver Item for the hand-over), and remember a held count goes down if they drop one.
 - **Rewards on the first phase.** They are still paid only at completion. Attach them to the last phase to avoid confusion.
 - **Choice rewards nobody can find.** Players must know about `qreward`.
 - **Custom Lua returning a number or nil.** Only a real `true` counts. Compare, for example `actor.level >= 10`.
-- **Forgetting to save.** Basic Info and Requirements need **Create Quest** / **Save Changes**. The Phases & Objectives tab is unavailable until the quest exists.
+- **Forgetting to save.** Basic Info and the availability expression need **Create Quest** / **Save Changes**. The Phases & Objectives tab and the prerequisite list are unavailable until the quest exists.
 
 ## Reference
 
 ### Basic Info tab
 
-| Field                                                                           | Meaning                                                                                                         |
-| ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
-| Zone ID, Quest ID                                                               | The quest's permanent identity `(zone, id)`. Fixed after creation. Players type these in `qaccept <zone> <id>`. |
-| Name                                                                            | Display name; supports colour markup. Shown in `quests`.                                                        |
-| Description                                                                     | Long text shown by `questinfo`.                                                                                 |
-| Min Level, Max Level                                                            | Accept-time level range (see [Prerequisites and requirements](#prerequisites-and-requirements)).                |
-| Repeatable                                                                      | Whether a completed quest can be accepted again.                                                                |
-| Hidden                                                                          | Players cannot accept it; staff can still assign it.                                                            |
-| Trigger Type                                                                    | How the quest is offered. See [Offering a quest](#offering-a-quest).                                            |
-| Time Limit (minutes)                                                            | Expiry after acceptance; empty means none.                                                                      |
-| Quest Giver Mob                                                                 | Stored but ignored by the game.                                                                                 |
-| Trigger Level, Trigger Item, Trigger Room, Trigger Ability ID, Trigger Event ID | The target for the matching trigger type.                                                                       |
-| Exclusive Group                                                                 | Quests sharing a name are mutually exclusive.                                                                   |
+| Field                                                                        | Meaning                                                                                                         |
+| ---------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| Zone ID, Quest ID                                                            | The quest's permanent identity `(zone, id)`. Fixed after creation. Players type these in `qaccept <zone> <id>`. |
+| Name                                                                         | Display name; supports colour markup. Shown in `quests`.                                                        |
+| Description                                                                  | Long text shown by `questinfo`.                                                                                 |
+| Short Description                                                            | One line for quest lists.                                                                                       |
+| Min Level, Max Level                                                         | Accept-time level range (see [Prerequisites and requirements](#prerequisites-and-requirements)).                |
+| Repeatable                                                                   | Whether a completed quest can be accepted again.                                                                |
+| Hidden                                                                       | Players cannot accept it; staff can still assign it.                                                            |
+| Auto-accept                                                                  | Trigger types that offer the quest accept it for the character instead.                                         |
+| Shareable                                                                    | Stored and shown by `questinfo`; the game does not use it to restrict sharing yet.                              |
+| Cooldown (minutes)                                                           | Shown when Repeatable is ticked; minutes after completion before it can be accepted again.                      |
+| Trigger Type                                                                 | How the quest is offered. See [Offering a quest](#offering-a-quest).                                            |
+| Time Limit (minutes)                                                         | Expiry after acceptance; empty means none.                                                                      |
+| Quest Giver Mob                                                              | Stored but ignored by the game.                                                                                 |
+| Trigger Level, Trigger Item, Trigger Room, Trigger Ability, Trigger Event ID | The target for the matching trigger type.                                                                       |
+| Exclusive Group                                                              | Quests sharing a name are mutually exclusive.                                                                   |
 
 ### Requirements tab
 
-| Field          | Meaning                                                                                              |
-| -------------- | ---------------------------------------------------------------------------------------------------- |
-| Lua Expression | The availability requirement; see [Prerequisites and requirements](#prerequisites-and-requirements). |
+| Field               | Meaning                                                                                                     |
+| ------------------- | ----------------------------------------------------------------------------------------------------------- |
+| Prerequisite Quests | Quests that must be completed first; see [Prerequisites and requirements](#prerequisites-and-requirements). |
+| Lua Expression      | The availability requirement; see [Prerequisites and requirements](#prerequisites-and-requirements).        |
 
 ### Phases & Objectives tab
 
@@ -252,14 +262,21 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 | -------------------------------------- | -------------------------------------------------------------------------------------------------- |
 | Phase name                             | Shown in `quests`.                                                                                 |
 | Phase Description                      | One-line blurb shown under the phase name in `quests`.                                             |
+| Up / down arrows                       | Move the phase; saved at once. See [Phases](#phases).                                              |
 | Objective type                         | See [Objectives](#objectives).                                                                     |
 | Count                                  | Required Count. At least 1.                                                                        |
 | Show Progress                          | On: `[n/total]`; off: `[ ]` until done, and progress messages say only that the objective updated. |
 | Player-visible description             | The text players see.                                                                              |
 | Internal note (builder only)           | Visible to staff in `quests`.                                                                      |
 | Target mob, target object, target room | The prototype to match.                                                                            |
+| Deliver to mob                         | Deliver Item only: the recipient prototype.                                                        |
+| Skill or spell to use                  | Use Skill only: the ability.                                                                       |
+| Who counts                             | Solo or Party; see [Objectives](#objectives).                                                      |
+| Dialogue                               | Talk to NPC only; see [Dialogue](#dialogue).                                                       |
 | Lua expression                         | For Custom (Lua) only; see [Custom Lua](#custom-lua).                                              |
-| Reward Type, Amount, Item, Ability ID  | See [Rewards](#rewards).                                                                           |
+| Reward Type, Amount, Item, Quantity    | See [Rewards](#rewards).                                                                           |
+| Skill or spell taught                  | Ability rewards: the ability taught.                                                               |
+| Condition                              | Optional Lua expression; the reward is then claimed with `qreward`.                                |
 | Choice Group                           | Same number means pick one with `qreward`.                                                         |
 
 ### Player commands
@@ -276,4 +293,4 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 
 ### What the editor cannot set yet
 
-These exist in the database and the game, but have no editor control: prerequisites, auto-accept, cooldown, short description, share flag (the game ignores it), objective scope (solo or party), the Use Skill ability, the Deliver Item recipient, reward quantity, reward condition, Skill Points and Housing rewards, dialogue and dialogue trees, and phase ordering.
+Every quest column the game reads can be set in the editor. Settings that run the other way (the editor offers them, the game does not act on them): the **Quest Giver Mob**, **Shareable**, and **Housing** rewards. The "Any response" dialogue match type is hidden because the game never matches it.
