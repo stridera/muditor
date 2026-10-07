@@ -1025,6 +1025,8 @@ model ObjectResetContents {
   objectZoneId    Int     @map("object_zone_id")
   objectId        Int     @map("object_id")
   quantity        Int     @default(1)
+  // Legacy `P` max: world-wide cap on live copies of this object (all containers).
+  maxInstances    Int     @default(1) @map("max_instances")
   comment         String?
 
   reset         ObjectResets          @relation(fields: [resetId], references: [id], onDelete: Cascade)
