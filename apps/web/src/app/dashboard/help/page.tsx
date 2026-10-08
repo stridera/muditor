@@ -33,6 +33,8 @@ import {
   ColoredTextViewer,
   ColoredTextInline,
 } from '@/components/ColoredTextViewer';
+import { HelpCategorySelect } from './category-select';
+import { parseSeeAlso } from './see-also';
 import { usePermissions } from '@/hooks/use-permissions';
 import { gql } from '@apollo/client';
 import { useLazyQuery, useMutation, useQuery } from '@apollo/client/react';
@@ -189,23 +191,6 @@ const defaultFormData: HelpFormData = {
   duration: '',
   sphere: '',
 };
-
-/**
- * Parse "See also:" references from help content and extract keywords
- */
-function parseSeeAlso(content: string): string[] {
-  const seeAlsoMatch = content.match(/See\s+also\s*:?\s*(.+?)(?:\n\n|\n$|$)/i);
-  if (!seeAlsoMatch || !seeAlsoMatch[1]) return [];
-
-  const seeAlsoText = seeAlsoMatch[1];
-  // Split by commas, "and", or multiple spaces
-  const references = seeAlsoText
-    .split(/[,]|\s+and\s+|\s{2,}/)
-    .map(ref => ref.trim().toLowerCase())
-    .filter(ref => ref.length > 0 && ref !== 'and');
-
-  return references;
-}
 
 /**
  * Component to render help content with clickable "See also" links
@@ -849,27 +834,13 @@ export default function HelpPage() {
                 </div>
                 <div>
                   <Label htmlFor='category'>Category</Label>
-                  <Select
+                  <HelpCategorySelect
                     value={formData.category}
-                    onValueChange={value =>
+                    onChange={value =>
                       setFormData({ ...formData, category: value })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select category' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>None</SelectItem>
-                      <SelectItem value='spell'>Spell</SelectItem>
-                      <SelectItem value='skill'>Skill</SelectItem>
-                      <SelectItem value='chant'>Chant</SelectItem>
-                      <SelectItem value='command'>Command</SelectItem>
-                      <SelectItem value='class'>Class</SelectItem>
-                      <SelectItem value='race'>Race</SelectItem>
-                      <SelectItem value='area'>Area</SelectItem>
-                      <SelectItem value='reference'>Reference</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    extraCategories={categories}
+                  />
                 </div>
               </div>
 
@@ -996,27 +967,13 @@ export default function HelpPage() {
                 </div>
                 <div>
                   <Label htmlFor='editCategory'>Category</Label>
-                  <Select
+                  <HelpCategorySelect
                     value={formData.category}
-                    onValueChange={value =>
+                    onChange={value =>
                       setFormData({ ...formData, category: value })
                     }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder='Select category' />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value=''>None</SelectItem>
-                      <SelectItem value='spell'>Spell</SelectItem>
-                      <SelectItem value='skill'>Skill</SelectItem>
-                      <SelectItem value='chant'>Chant</SelectItem>
-                      <SelectItem value='command'>Command</SelectItem>
-                      <SelectItem value='class'>Class</SelectItem>
-                      <SelectItem value='race'>Race</SelectItem>
-                      <SelectItem value='area'>Area</SelectItem>
-                      <SelectItem value='reference'>Reference</SelectItem>
-                    </SelectContent>
-                  </Select>
+                    extraCategories={categories}
+                  />
                 </div>
               </div>
 
