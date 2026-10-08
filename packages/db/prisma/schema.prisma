@@ -160,6 +160,26 @@ model AbilityEffect {
   @@id([abilityId, effectId, order])
 }
 
+// Flavor sentence shown when someone `look`s at an actor carrying a matching
+// effect (legacy print_char_spells_to_char). `keys` are lowercase, space-separated
+// labels matched against the originating ability's name and the effect's flag
+// name. Text placeholders: {S} his/her/its, {M} him/her/it, {E} he/she/it,
+// {^S}/{^E} capitalized. Rows sharing an exclusiveGroup show only the first
+// match (by sortOrder); min/maxAlignment (inclusive) gate on the bearer's alignment.
+model EffectAura {
+  id               Int      @id @default(autoincrement())
+  slug             String   @unique
+  keys             String[]
+  text             String
+  needsDetectMagic Boolean  @default(false) @map("needs_detect_magic")
+  exclusiveGroup   String?  @map("exclusive_group")
+  minAlignment     Int?     @map("min_alignment")
+  maxAlignment     Int?     @map("max_alignment")
+  sortOrder        Int      @default(0) @map("sort_order")
+
+  @@map("EffectAura")
+}
+
 model AbilitySchool {
   id          Int       @id @default(autoincrement())
   name        String    @unique
