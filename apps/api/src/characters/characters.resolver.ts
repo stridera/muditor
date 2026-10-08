@@ -55,6 +55,9 @@ export const SELF_EDITABLE_CHARACTER_FIELDS: ReadonlySet<string> = new Set([
   'weight',
 ]);
 
+/** Matches no user; used to scope list queries to nothing when the caller is unknown. */
+const NO_ACCESS_USER_ID = '00000000-0000-0000-0000-000000000000';
+
 @Resolver(() => CharacterDto)
 @UseGuards(GraphQLJwtAuthGuard)
 export class CharactersResolver {
@@ -68,6 +71,34 @@ export class CharactersResolver {
     if (isStaff(user.role)) return;
     const ownerId =
       await this.charactersService.findCharacterOwnerId(characterId);
+    if (ownerId !== user.id) {
+      throw new ForbiddenException('You do not have access to this character');
+    }
+  }
+
+  /** Throws unless the caller is IMMORTAL+ or owns the character holding the item. */
+  private async assertItemOwnerOrStaff(
+    user: Users,
+    itemId: number
+  ): Promise<void> {
+    if (isStaff(user.role)) return;
+    const ownerId = await this.charactersService.findCharacterItemOwnerId(
+      Number(itemId)
+    );
+    if (ownerId !== user.id) {
+      throw new ForbiddenException('You do not have access to this character');
+    }
+  }
+
+  /** Throws unless the caller is IMMORTAL+ or owns the character an effect is on. */
+  private async assertEffectOwnerOrStaff(
+    user: Users,
+    effectId: number
+  ): Promise<void> {
+    if (isStaff(user.role)) return;
+    const ownerId = await this.charactersService.findCharacterEffectOwnerId(
+      Number(effectId)
+    );
     if (ownerId !== user.id) {
       throw new ForbiddenException('You do not have access to this character');
     }
@@ -198,13 +229,24 @@ export class CharactersResolver {
   async findAllCharacters(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
-    @Args('filter', { nullable: true }) filter?: CharacterFilterInput
+    @Args('filter', { nullable: true }) filter?: CharacterFilterInput,
+    @CurrentUser() user?: Users
   ) {
-    return this.charactersService.findAllCharacters(skip, take, filter);
+    // Non-staff only ever see their own characters.
+    return this.charactersService.findAllCharacters(
+      skip,
+      take,
+      filter,
+      isStaff(user?.role) ? undefined : (user?.id ?? NO_ACCESS_USER_ID)
+    );
   }
 
   @Query(() => CharacterDto, { name: 'character' })
-  async findCharacterById(@Args('id', { type: () => ID }) id: string) {
+  async findCharacterById(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() user: Users
+  ) {
+    await this.assertOwnerOrStaff(user, id);
     return this.charactersService.findCharacterById(id);
   }
 
@@ -215,9 +257,13 @@ export class CharactersResolver {
 
   @Query(() => Int, { name: 'charactersCount' })
   async getCharactersCount(
-    @Args('filter', { nullable: true }) filter?: CharacterFilterInput
+    @Args('filter', { nullable: true }) filter?: CharacterFilterInput,
+    @CurrentUser() user?: Users
   ) {
-    return this.charactersService.getCharactersCount(filter);
+    return this.charactersService.getCharactersCount(
+      filter,
+      isStaff(user?.role) ? undefined : (user?.id ?? NO_ACCESS_USER_ID)
+    );
   }
 
   // Character mutations
@@ -289,13 +335,19 @@ export class CharactersResolver {
   // Character Item queries
   @Query(() => [CharacterItemDto], { name: 'characterItems' })
   async findCharacterItems(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.charactersService.findCharacterItems(characterId);
   }
 
   @Query(() => CharacterItemDto, { name: 'characterItem' })
-  async findCharacterItemById(@Args('id', { type: () => ID }) id: number) {
+  async findCharacterItemById(
+    @Args('id', { type: () => ID }) id: number,
+    @CurrentUser() user: Users
+  ) {
+    await this.assertItemOwnerOrStaff(user, id);
     return this.charactersService.findCharacterItemById(id);
   }
 
@@ -333,20 +385,28 @@ export class CharactersResolver {
   // Character Effect queries
   @Query(() => [CharacterEffectDto], { name: 'characterEffects' })
   async findCharacterEffects(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.charactersService.findCharacterEffects(characterId);
   }
 
   @Query(() => [CharacterEffectDto], { name: 'activeCharacterEffects' })
   async findActiveCharacterEffects(
-    @Args('characterId', { type: () => ID }) characterId: string
+    @Args('characterId', { type: () => ID }) characterId: string,
+    @CurrentUser() user: Users
   ) {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.charactersService.getActiveEffects(characterId);
   }
 
   @Query(() => CharacterEffectDto, { name: 'characterEffect' })
-  async findCharacterEffectById(@Args('id', { type: () => ID }) id: number) {
+  async findCharacterEffectById(
+    @Args('id', { type: () => ID }) id: number,
+    @CurrentUser() user: Users
+  ) {
+    await this.assertEffectOwnerOrStaff(user, id);
     return this.charactersService.findCharacterEffectById(id);
   }
 

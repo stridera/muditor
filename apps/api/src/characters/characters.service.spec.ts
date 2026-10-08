@@ -393,6 +393,11 @@ describe('CharactersService race/class handling', () => {
       expect(include.characterItems.include.corpse).toEqual(corpseSelect);
     });
 
+    it('findAllCharacters filters by owner userId when given', async () => {
+      await service.findAllCharacters(undefined, undefined, undefined, 'u1');
+      expect(db.characters.findMany.mock.calls[0][0].where.userId).toBe('u1');
+    });
+
     it('findCharacterItems includes the corpse and keeps corpse rows', async () => {
       db.characters.findUnique.mockResolvedValue({ id: 'c1' });
       const rows = [

@@ -27,6 +27,15 @@ describe('CharactersResolver authorization', () => {
       | 'createCharacterItem'
       | 'removeExpiredEffects'
       | 'getOnlineCharacters'
+      | 'findCharacterById'
+      | 'findCharacterItems'
+      | 'findCharacterItemById'
+      | 'findCharacterItemOwnerId'
+      | 'findCharacterEffects'
+      | 'getActiveEffects'
+      | 'findCharacterEffectById'
+      | 'findCharacterEffectOwnerId'
+      | 'getCharactersCount'
     >
   >;
   let resolver: CharactersResolver;
@@ -41,6 +50,15 @@ describe('CharactersResolver authorization', () => {
       createCharacterItem: jest.fn(),
       removeExpiredEffects: jest.fn().mockResolvedValue({ count: 0 }),
       getOnlineCharacters: jest.fn().mockResolvedValue([]),
+      findCharacterById: jest.fn().mockResolvedValue({ id: 'c1' }),
+      findCharacterItems: jest.fn().mockResolvedValue([]),
+      findCharacterItemById: jest.fn().mockResolvedValue({ id: 7 }),
+      findCharacterItemOwnerId: jest.fn().mockResolvedValue('player-1'),
+      findCharacterEffects: jest.fn().mockResolvedValue([]),
+      getActiveEffects: jest.fn().mockResolvedValue([]),
+      findCharacterEffectById: jest.fn().mockResolvedValue({ id: 3 }),
+      findCharacterEffectOwnerId: jest.fn().mockResolvedValue('player-1'),
+      getCharactersCount: jest.fn().mockResolvedValue(0),
     };
     resolver = new CharactersResolver(service as unknown as CharactersService);
   });
@@ -258,6 +276,94 @@ describe('CharactersResolver authorization', () => {
     });
   });
 
+  describe('character read access', () => {
+    it('character: forbids a non-owner PLAYER, allows owner and staff', async () => {
+      await expect(
+        resolver.findCharacterById('c1', otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.findCharacterById).not.toHaveBeenCalled();
+      await expect(resolver.findCharacterById('c1', player)).resolves.toEqual({
+        id: 'c1',
+      });
+      await expect(resolver.findCharacterById('c1', immortal)).resolves.toEqual(
+        { id: 'c1' }
+      );
+    });
+
+    it('characterItems: forbids a non-owner PLAYER, allows owner and staff', async () => {
+      await expect(
+        resolver.findCharacterItems('c1', otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.findCharacterItems).not.toHaveBeenCalled();
+      await resolver.findCharacterItems('c1', player);
+      await resolver.findCharacterItems('c1', immortal);
+      expect(service.findCharacterItems).toHaveBeenCalledTimes(2);
+    });
+
+    it('characterItem: forbids a non-owner PLAYER, allows owner and staff', async () => {
+      await expect(
+        resolver.findCharacterItemById(7, otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.findCharacterItemById).not.toHaveBeenCalled();
+      await resolver.findCharacterItemById(7, player);
+      await resolver.findCharacterItemById(7, immortal);
+      expect(service.findCharacterItemById).toHaveBeenCalledTimes(2);
+    });
+
+    it('characterItem: forbids access to an unlinked character item', async () => {
+      service.findCharacterItemOwnerId.mockResolvedValue(null);
+      await expect(
+        resolver.findCharacterItemById(7, player)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+
+    it('characterEffects / activeCharacterEffects / characterEffect: forbid non-owner PLAYER', async () => {
+      await expect(
+        resolver.findCharacterEffects('c1', otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.findActiveCharacterEffects('c1', otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.findCharacterEffectById(3, otherPlayer)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await resolver.findCharacterEffects('c1', player);
+      await resolver.findActiveCharacterEffects('c1', immortal);
+      await resolver.findCharacterEffectById(3, player);
+    });
+
+    it('characters list: non-staff is scoped to own userId, staff sees all', async () => {
+      service.findAllCharacters.mockResolvedValue([]);
+      await resolver.findAllCharacters(0, 10, undefined, player);
+      expect(service.findAllCharacters).toHaveBeenLastCalledWith(
+        0,
+        10,
+        undefined,
+        'player-1'
+      );
+      await resolver.findAllCharacters(0, 10, undefined, immortal);
+      expect(service.findAllCharacters).toHaveBeenLastCalledWith(
+        0,
+        10,
+        undefined,
+        undefined
+      );
+    });
+
+    it('charactersCount: non-staff is scoped to own userId, staff sees all', async () => {
+      await resolver.getCharactersCount(undefined, player);
+      expect(service.getCharactersCount).toHaveBeenLastCalledWith(
+        undefined,
+        'player-1'
+      );
+      await resolver.getCharactersCount(undefined, immortal);
+      expect(service.getCharactersCount).toHaveBeenLastCalledWith(
+        undefined,
+        undefined
+      );
+    });
+  });
+
   describe('userId exposure', () => {
     const character = { id: 'c1', userId: 'player-1' } as unknown as Characters;
     const otherRow = { id: 'c2', userId: 'player-9' } as unknown as Characters;
@@ -267,7 +373,12 @@ describe('CharactersResolver authorization', () => {
         character,
         otherRow,
       ] as never);
-      const rows: Characters[] = await resolver.findAllCharacters();
+      const rows: Characters[] = await resolver.findAllCharacters(
+        undefined,
+        undefined,
+        undefined,
+        player
+      );
       // Field resolver output is what GraphQL serialises for `userId`.
       const exposed = rows.map(r => resolver.resolveUserId(r, otherPlayer));
       expect(exposed).toEqual([null, null]);

@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { Prisma } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
@@ -669,6 +673,18 @@ export class QuestsService {
   // ============================================================================
   // Character Quest Progress
   // ============================================================================
+
+  /** Owning user id of a character (null if unlinked); NotFound when the character is missing. */
+  async findCharacterOwnerId(characterId: string): Promise<string | null> {
+    const character = await this.database.characters.findUnique({
+      where: { id: characterId },
+      select: { userId: true },
+    });
+    if (!character) {
+      throw new NotFoundException(`Character ${characterId} not found`);
+    }
+    return character.userId ?? null;
+  }
 
   async findCharacterQuests(characterId: string) {
     return this.database.characterQuests.findMany({

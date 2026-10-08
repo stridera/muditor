@@ -1,6 +1,9 @@
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { zoneLookups } from '../common/decorators/zone-lookups';
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
+import type { Users } from '@muditor/db';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { isStaff } from '../auth/role.util';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import {
@@ -29,6 +32,18 @@ import { QuestsService } from './quests.service';
 @Resolver(() => QuestDto)
 export class QuestsResolver {
   constructor(private readonly questsService: QuestsService) {}
+
+  /** Throws unless the caller is IMMORTAL+ or owns the character. */
+  private async assertOwnerOrStaff(
+    user: Users,
+    characterId: string
+  ): Promise<void> {
+    if (isStaff(user.role)) return;
+    const ownerId = await this.questsService.findCharacterOwnerId(characterId);
+    if (ownerId !== user.id) {
+      throw new ForbiddenException('You do not have access to this character');
+    }
+  }
 
   // ============================================================================
   // Quest Queries
@@ -319,8 +334,10 @@ export class QuestsResolver {
   @Query(() => [CharacterQuestDto], { name: 'characterQuests' })
   @UseGuards(JwtAuthGuard)
   async findCharacterQuests(
-    @Args('characterId') characterId: string
+    @Args('characterId') characterId: string,
+    @CurrentUser() user: Users
   ): Promise<CharacterQuestDto[]> {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.questsService.findCharacterQuests(characterId) as Promise<
       CharacterQuestDto[]
     >;
@@ -330,8 +347,10 @@ export class QuestsResolver {
   @UseGuards(JwtAuthGuard)
   async getAvailableQuests(
     @Args('characterId') characterId: string,
-    @Args('level', { type: () => Int }) level: number
+    @Args('level', { type: () => Int }) level: number,
+    @CurrentUser() user: Users
   ): Promise<QuestDto[]> {
+    await this.assertOwnerOrStaff(user, characterId);
     return this.questsService.getAvailableQuests(characterId, level) as Promise<
       QuestDto[]
     >;

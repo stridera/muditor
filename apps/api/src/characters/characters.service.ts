@@ -139,9 +139,11 @@ export class CharactersService implements OnModuleDestroy {
   async findAllCharacters(
     skip?: number,
     take?: number,
-    filter?: CharacterFilterInput
+    filter?: CharacterFilterInput,
+    ownerUserId?: string
   ) {
     const where: Prisma.CharactersWhereInput = {};
+    if (ownerUserId) where.userId = ownerUserId;
 
     // Build filter conditions
     if (filter?.name) {
@@ -246,6 +248,32 @@ export class CharactersService implements OnModuleDestroy {
     return character.userId ?? null;
   }
 
+  /** Owning user id of the character holding an item (null if unlinked); NotFound when the item is missing. */
+  async findCharacterItemOwnerId(itemId: number): Promise<string | null> {
+    const item = await this.db.characterItems.findUnique({
+      where: { id: itemId },
+      select: { characters: { select: { userId: true } } },
+    });
+    if (!item) {
+      throw new NotFoundException(`Character item with ID ${itemId} not found`);
+    }
+    return item.characters?.userId ?? null;
+  }
+
+  /** Owning user id of the character an effect is on (null if unlinked); NotFound when the effect is missing. */
+  async findCharacterEffectOwnerId(effectId: number): Promise<string | null> {
+    const effect = await this.db.characterEffects.findUnique({
+      where: { id: effectId },
+      select: { characters: { select: { userId: true } } },
+    });
+    if (!effect) {
+      throw new NotFoundException(
+        `Character effect with ID ${effectId} not found`
+      );
+    }
+    return effect.characters?.userId ?? null;
+  }
+
   async findCharactersByUser(userId: string) {
     return this.db.characters.findMany({
       where: { userId },
@@ -269,8 +297,12 @@ export class CharactersService implements OnModuleDestroy {
     });
   }
 
-  async getCharactersCount(filter?: CharacterFilterInput) {
+  async getCharactersCount(
+    filter?: CharacterFilterInput,
+    ownerUserId?: string
+  ) {
     const where: Prisma.CharactersWhereInput = {};
+    if (ownerUserId) where.userId = ownerUserId;
 
     // Build filter conditions (same as findAllCharacters)
     if (filter?.name) {
