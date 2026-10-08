@@ -784,6 +784,18 @@ input CreateDialogueResponseInput {
   nextNodeId: Int
 }
 
+"""Input for creating an effect aura"""
+input CreateEffectAuraInput {
+  exclusiveGroup: String
+  keys: [String!]!
+  maxAlignment: Int
+  minAlignment: Int
+  needsDetectMagic: Boolean! = false
+  slug: String!
+  sortOrder: Int! = 0
+  text: String!
+}
+
 input CreateEffectInput {
   defaultParams: JSON
   description: String
@@ -1325,6 +1337,36 @@ type Effect {
   id: ID!
   name: String!
   tags: [String!]!
+}
+
+"""Aura flavor line shown when looking at an actor with a matching effect"""
+type EffectAuraDto {
+  """
+  Auras sharing a group are mutually exclusive (only the first by sort order is shown)
+  """
+  exclusiveGroup: String
+  id: ID!
+
+  """Effect keys that trigger this aura line"""
+  keys: [String!]!
+
+  """Maximum target alignment for this aura (inclusive)"""
+  maxAlignment: Int
+
+  """Minimum target alignment for this aura (inclusive)"""
+  minAlignment: Int
+
+  """Only shown to viewers with detect magic"""
+  needsDetectMagic: Boolean!
+
+  """Unique identifier (e.g., sanctuary)"""
+  slug: String!
+
+  """Display order (ascending)"""
+  sortOrder: Int!
+
+  """Text shown on look"""
+  text: String!
 }
 
 enum ElementType {
@@ -1953,6 +1995,9 @@ type Mutation {
   createDialogueNode(data: CreateDialogueNodeInput!, treeId: Int!): DialogueNodeDto!
   createDialogueResponse(data: CreateDialogueResponseInput!, nodeId: Int!): DialogueResponseDto!
   createEffect(data: CreateEffectInput!): Effect!
+
+  """Create an effect aura"""
+  createEffectAura(data: CreateEffectAuraInput!): EffectAuraDto!
   createGrant(data: CreateGrantInput!): UserGrantDto!
 
   """Create a new help entry"""
@@ -2004,6 +2049,9 @@ type Mutation {
   deleteDialogueResponse(id: Int!): DialogueResponseDto!
   deleteDialogueTree(id: Int!): DialogueTreeDto!
   deleteEffect(id: ID!): Boolean!
+
+  """Delete an effect aura"""
+  deleteEffectAura(id: ID!): Boolean!
   deleteGrant(id: ID!): Boolean!
 
   """Delete a help entry"""
@@ -2120,6 +2168,9 @@ type Mutation {
   updateDialogueResponse(data: UpdateDialogueResponseInput!, id: Int!): DialogueResponseDto!
   updateDialogueTree(data: UpdateDialogueTreeInput!, id: Int!): DialogueTreeDto!
   updateEffect(data: UpdateEffectInput!, id: ID!): Effect!
+
+  """Update an effect aura"""
+  updateEffectAura(data: UpdateEffectAuraInput!, id: ID!): EffectAuraDto!
 
   """Update a game configuration value"""
   updateGameConfig(category: String!, data: UpdateGameConfigInput!, key: String!): GameConfigDto!
@@ -2471,6 +2522,12 @@ type Query {
   commandsByCategory(category: CommandCategory!): [CommandDto!]!
   dialogueTree(id: Int!): DialogueTreeDto
   effect(id: ID!): Effect!
+
+  """Get a single effect aura by ID"""
+  effectAura(id: ID!): EffectAuraDto!
+
+  """Get all effect aura lines, in display order"""
+  effectAuras: [EffectAuraDto!]!
   effects(search: String, skip: Int, take: Int): [Effect!]!
   effectsCount(search: String): Int!
 
@@ -3586,6 +3643,23 @@ input UpdateDialogueResponseInput {
 input UpdateDialogueTreeInput {
   description: String
   name: String
+}
+
+"""Input for updating an effect aura"""
+input UpdateEffectAuraInput {
+  """Pass null or empty to clear"""
+  exclusiveGroup: String
+  keys: [String!]
+
+  """Pass null to clear"""
+  maxAlignment: Int
+
+  """Pass null to clear"""
+  minAlignment: Int
+  needsDetectMagic: Boolean
+  slug: String
+  sortOrder: Int
+  text: String
 }
 
 input UpdateEffectInput {

@@ -20,6 +20,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useZoneContext } from '@/hooks/use-zone-context';
 import { useMutation } from '@apollo/client/react';
 import {
+  Aperture,
   Box,
   Clipboard,
   FileCode,
@@ -97,6 +98,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/socials': {
     name: 'Socials',
     icon: <MessageCircle className='h-5 w-5' />,
+  },
+  '/dashboard/effect-auras': {
+    name: 'Effect Auras',
+    icon: <Aperture className='h-5 w-5' />,
   },
   '/dashboard/help': {
     name: 'Help',
@@ -428,6 +433,14 @@ export function Navigation() {
                           <Link href='/dashboard/site-content'>
                             <Newspaper className='mr-2 h-4 w-4' />
                             Site Content
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {isBuilder && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/effect-auras'>
+                            <Aperture className='mr-2 h-4 w-4' />
+                            Effect Auras
                           </Link>
                         </DropdownMenuItem>
                       )}

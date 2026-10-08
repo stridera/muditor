@@ -24,6 +24,7 @@ import { RoomsModule } from './rooms/rooms.module';
 import { ShopsModule } from './shops/shops.module';
 import { SettingsModule } from './settings/settings.module';
 import { SocialsModule } from './socials/socials.module';
+import { EffectAurasModule } from './effect-auras/effect-auras.module';
 import { TriggersModule } from './triggers/triggers.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
@@ -116,6 +117,7 @@ import * as jwt from 'jsonwebtoken';
     RacesModule,
     ClassesModule,
     SocialsModule,
+    EffectAurasModule,
     HelpModule,
     SiteContentModule,
     ReportsModule,

@@ -10,6 +10,7 @@ import { ReportOpenCountDocument } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
+  Aperture,
   Box,
   ChevronLeft,
   ChevronRight,
@@ -249,6 +250,11 @@ export function Sidebar() {
       name: 'Site Content',
       href: '/dashboard/site-content',
       icon: <Newspaper className='h-4 w-4' />,
+    });
+    worldBuildingSection.items.push({
+      name: 'Effect Auras',
+      href: '/dashboard/effect-auras',
+      icon: <Aperture className='h-4 w-4' />,
     });
   }
 

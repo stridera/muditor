@@ -814,6 +814,18 @@ export type CreateDialogueResponseInput = {
   nextNodeId?: InputMaybe<Scalars['Int']['input']>;
 };
 
+/** Input for creating an effect aura */
+export type CreateEffectAuraInput = {
+  exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
+  keys: Array<Scalars['String']['input']>;
+  maxAlignment?: InputMaybe<Scalars['Int']['input']>;
+  minAlignment?: InputMaybe<Scalars['Int']['input']>;
+  needsDetectMagic?: Scalars['Boolean']['input'];
+  slug: Scalars['String']['input'];
+  sortOrder?: Scalars['Int']['input'];
+  text: Scalars['String']['input'];
+};
+
 export type CreateEffectInput = {
   defaultParams?: InputMaybe<Scalars['JSON']['input']>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -1316,6 +1328,28 @@ export type Effect = {
   id: Scalars['ID']['output'];
   name: Scalars['String']['output'];
   tags: Array<Scalars['String']['output']>;
+};
+
+/** Aura flavor line shown when looking at an actor with a matching effect */
+export type EffectAuraDto = {
+  __typename?: 'EffectAuraDto';
+  /** Auras sharing a group are mutually exclusive (only the first by sort order is shown) */
+  exclusiveGroup?: Maybe<Scalars['String']['output']>;
+  id: Scalars['ID']['output'];
+  /** Effect keys that trigger this aura line */
+  keys: Array<Scalars['String']['output']>;
+  /** Maximum target alignment for this aura (inclusive) */
+  maxAlignment?: Maybe<Scalars['Int']['output']>;
+  /** Minimum target alignment for this aura (inclusive) */
+  minAlignment?: Maybe<Scalars['Int']['output']>;
+  /** Only shown to viewers with detect magic */
+  needsDetectMagic: Scalars['Boolean']['output'];
+  /** Unique identifier (e.g., sanctuary) */
+  slug: Scalars['String']['output'];
+  /** Display order (ascending) */
+  sortOrder: Scalars['Int']['output'];
+  /** Text shown on look */
+  text: Scalars['String']['output'];
 };
 
 export type ElementType =
@@ -1872,6 +1906,8 @@ export type Mutation = {
   createDialogueNode: DialogueNodeDto;
   createDialogueResponse: DialogueResponseDto;
   createEffect: Effect;
+  /** Create an effect aura */
+  createEffectAura: EffectAuraDto;
   createGrant: UserGrantDto;
   /** Create a new help entry */
   createHelpEntry: HelpEntryDto;
@@ -1915,6 +1951,8 @@ export type Mutation = {
   deleteDialogueResponse: DialogueResponseDto;
   deleteDialogueTree: DialogueTreeDto;
   deleteEffect: Scalars['Boolean']['output'];
+  /** Delete an effect aura */
+  deleteEffectAura: Scalars['Boolean']['output'];
   deleteGrant: Scalars['Boolean']['output'];
   /** Delete a help entry */
   deleteHelpEntry: Scalars['Boolean']['output'];
@@ -2005,6 +2043,8 @@ export type Mutation = {
   updateDialogueResponse: DialogueResponseDto;
   updateDialogueTree: DialogueTreeDto;
   updateEffect: Effect;
+  /** Update an effect aura */
+  updateEffectAura: EffectAuraDto;
   /** Update a game configuration value */
   updateGameConfig: GameConfigDto;
   updateGrant: UserGrantDto;
@@ -2209,6 +2249,11 @@ export type MutationCreateEffectArgs = {
 };
 
 
+export type MutationCreateEffectAuraArgs = {
+  data: CreateEffectAuraInput;
+};
+
+
 export type MutationCreateGrantArgs = {
   data: CreateGrantInput;
 };
@@ -2391,6 +2436,11 @@ export type MutationDeleteDialogueTreeArgs = {
 
 
 export type MutationDeleteEffectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationDeleteEffectAuraArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -2785,6 +2835,12 @@ export type MutationUpdateDialogueTreeArgs = {
 
 export type MutationUpdateEffectArgs = {
   data: UpdateEffectInput;
+  id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateEffectAuraArgs = {
+  data: UpdateEffectAuraInput;
   id: Scalars['ID']['input'];
 };
 
@@ -3305,6 +3361,10 @@ export type Query = {
   commandsByCategory: Array<CommandDto>;
   dialogueTree?: Maybe<DialogueTreeDto>;
   effect: Effect;
+  /** Get a single effect aura by ID */
+  effectAura: EffectAuraDto;
+  /** Get all effect aura lines, in display order */
+  effectAuras: Array<EffectAuraDto>;
   effects: Array<Effect>;
   effectsCount: Scalars['Int']['output'];
   /** Get a single configuration entry */
@@ -3617,6 +3677,11 @@ export type QueryDialogueTreeArgs = {
 
 
 export type QueryEffectArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryEffectAuraArgs = {
   id: Scalars['ID']['input'];
 };
 
@@ -4881,6 +4946,21 @@ export type UpdateDialogueResponseInput = {
 export type UpdateDialogueTreeInput = {
   description?: InputMaybe<Scalars['String']['input']>;
   name?: InputMaybe<Scalars['String']['input']>;
+};
+
+/** Input for updating an effect aura */
+export type UpdateEffectAuraInput = {
+  /** Pass null or empty to clear */
+  exclusiveGroup?: InputMaybe<Scalars['String']['input']>;
+  keys?: InputMaybe<Array<Scalars['String']['input']>>;
+  /** Pass null to clear */
+  maxAlignment?: InputMaybe<Scalars['Int']['input']>;
+  /** Pass null to clear */
+  minAlignment?: InputMaybe<Scalars['Int']['input']>;
+  needsDetectMagic?: InputMaybe<Scalars['Boolean']['input']>;
+  slug?: InputMaybe<Scalars['String']['input']>;
+  sortOrder?: InputMaybe<Scalars['Int']['input']>;
+  text?: InputMaybe<Scalars['String']['input']>;
 };
 
 export type UpdateEffectInput = {
@@ -6323,6 +6403,33 @@ export type RemoveClassCircleMutationVariables = Exact<{
 
 export type RemoveClassCircleMutation = { __typename?: 'Mutation', removeClassCircle: boolean };
 
+export type GetEffectAurasQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetEffectAurasQuery = { __typename?: 'Query', effectAuras: Array<{ __typename?: 'EffectAuraDto', id: string, slug: string, keys: Array<string>, text: string, needsDetectMagic: boolean, exclusiveGroup?: string | null, minAlignment?: number | null, maxAlignment?: number | null, sortOrder: number }> };
+
+export type CreateEffectAuraMutationVariables = Exact<{
+  data: CreateEffectAuraInput;
+}>;
+
+
+export type CreateEffectAuraMutation = { __typename?: 'Mutation', createEffectAura: { __typename?: 'EffectAuraDto', id: string, slug: string } };
+
+export type UpdateEffectAuraMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+  data: UpdateEffectAuraInput;
+}>;
+
+
+export type UpdateEffectAuraMutation = { __typename?: 'Mutation', updateEffectAura: { __typename?: 'EffectAuraDto', id: string, slug: string, keys: Array<string>, text: string, needsDetectMagic: boolean, exclusiveGroup?: string | null, minAlignment?: number | null, maxAlignment?: number | null, sortOrder: number } };
+
+export type DeleteEffectAuraMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteEffectAuraMutation = { __typename?: 'Mutation', deleteEffectAura: boolean };
+
 export type GetEffectEditorOptionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -7713,6 +7820,10 @@ export const AssignSkillToClassDocument = {"kind":"Document","definitions":[{"ki
 export const RemoveClassSkillDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassSkill"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassSkill"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassSkillMutation, RemoveClassSkillMutationVariables>;
 export const CreateClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateClassCircleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"circle"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}}]}}]}}]} as unknown as DocumentNode<CreateClassCircleMutation, CreateClassCircleMutationVariables>;
 export const RemoveClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassCircleMutation, RemoveClassCircleMutationVariables>;
+export const GetEffectAurasDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffectAuras"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectAuras"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"keys"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"needsDetectMagic"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"minAlignment"}},{"kind":"Field","name":{"kind":"Name","value":"maxAlignment"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]} as unknown as DocumentNode<GetEffectAurasQuery, GetEffectAurasQueryVariables>;
+export const CreateEffectAuraDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateEffectAura"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateEffectAuraInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createEffectAura"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}}]}}]}}]} as unknown as DocumentNode<CreateEffectAuraMutation, CreateEffectAuraMutationVariables>;
+export const UpdateEffectAuraDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateEffectAura"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateEffectAuraInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateEffectAura"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"slug"}},{"kind":"Field","name":{"kind":"Name","value":"keys"}},{"kind":"Field","name":{"kind":"Name","value":"text"}},{"kind":"Field","name":{"kind":"Name","value":"needsDetectMagic"}},{"kind":"Field","name":{"kind":"Name","value":"exclusiveGroup"}},{"kind":"Field","name":{"kind":"Name","value":"minAlignment"}},{"kind":"Field","name":{"kind":"Name","value":"maxAlignment"}},{"kind":"Field","name":{"kind":"Name","value":"sortOrder"}}]}}]}}]} as unknown as DocumentNode<UpdateEffectAuraMutation, UpdateEffectAuraMutationVariables>;
+export const DeleteEffectAuraDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteEffectAura"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteEffectAura"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteEffectAuraMutation, DeleteEffectAuraMutationVariables>;
 export const GetEffectEditorOptionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffectEditorOptions"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"zones"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"effects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"1000"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"defaultParams"}}]}},{"kind":"Field","name":{"kind":"Name","value":"mobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"1000"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"objects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"IntValue","value":"1000"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"triggers"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<GetEffectEditorOptionsQuery, GetEffectEditorOptionsQueryVariables>;
 export const GetEffectsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffects"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effects"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}},{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"defaultParams"}}]}}]}}]} as unknown as DocumentNode<GetEffectsQuery, GetEffectsQueryVariables>;
 export const GetEffectsCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetEffectsCount"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"effectsCount"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}}]}]}}]} as unknown as DocumentNode<GetEffectsCountQuery, GetEffectsCountQueryVariables>;

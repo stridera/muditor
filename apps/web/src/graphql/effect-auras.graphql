@@ -1,0 +1,40 @@
+# Effect aura (look-at-actor flavor line) operations
+
+query GetEffectAuras {
+  effectAuras {
+    id
+    slug
+    keys
+    text
+    needsDetectMagic
+    exclusiveGroup
+    minAlignment
+    maxAlignment
+    sortOrder
+  }
+}
+
+mutation CreateEffectAura($data: CreateEffectAuraInput!) {
+  createEffectAura(data: $data) {
+    id
+    slug
+  }
+}
+
+mutation UpdateEffectAura($id: ID!, $data: UpdateEffectAuraInput!) {
+  updateEffectAura(id: $id, data: $data) {
+    id
+    slug
+    keys
+    text
+    needsDetectMagic
+    exclusiveGroup
+    minAlignment
+    maxAlignment
+    sortOrder
+  }
+}
+
+mutation DeleteEffectAura($id: ID!) {
+  deleteEffectAura(id: $id)
+}

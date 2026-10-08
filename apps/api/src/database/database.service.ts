@@ -350,6 +350,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.social;
   }
 
+  get effectAura() {
+    return this.client.effectAura;
+  }
+
   get helpEntry() {
     return this.client.helpEntry;
   }
