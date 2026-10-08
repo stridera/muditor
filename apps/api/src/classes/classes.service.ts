@@ -112,6 +112,8 @@ export class ClassesService {
         plainName: stripMarkup(data.name),
       }),
       ...(data.description !== undefined && { description: data.description }),
+      ...(data.hitDice !== undefined && { hitDice: data.hitDice }),
+      ...(data.primaryStat !== undefined && { primaryStat: data.primaryStat }),
       ...(data.alignmentBias !== undefined && {
         alignmentBias: data.alignmentBias,
       }),
