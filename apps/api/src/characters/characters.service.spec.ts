@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   HttpException,
   NotFoundException,
 } from '@nestjs/common';
@@ -523,15 +522,6 @@ describe('CharactersService race/class handling', () => {
 
     const findFirst = () =>
       (db.characters as unknown as { findFirst: jest.Mock }).findFirst;
-
-    it('refuses level 100+ characters before any password check', async () => {
-      findFirst().mockResolvedValue(unlinked({ level: 100 }));
-      await expect(
-        service.verifyCharacterPasswordForLink('Newbie', 'pw')
-      ).rejects.toThrow(ForbiddenException);
-      expect(redis.incr).not.toHaveBeenCalled();
-      expect(compare).not.toHaveBeenCalled();
-    });
 
     describe('without Redis (in-memory store)', () => {
       beforeEach(() => {

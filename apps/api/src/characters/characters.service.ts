@@ -1,6 +1,5 @@
 import {
   BadRequestException,
-  ForbiddenException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -59,7 +58,6 @@ const LOCKOUT_MAX_ATTEMPTS = 5;
 /** Lockout duration in seconds (15 minutes) */
 const LOCKOUT_WINDOW_SECONDS = 900;
 /** Characters at or above this level are staff-linked only */
-const GOD_LEVEL = 100;
 
 /** Email domain of the placeholder users the game server auto-creates */
 const LEGACY_PLACEHOLDER_EMAIL_SUFFIX = '@legacy.fierymud.local';
@@ -951,14 +949,6 @@ export class CharactersService implements OnModuleDestroy {
       return { character, placeholderOwnerId: null, alreadyLinked: true };
     }
 
-    // Gods are never self-service linkable: claiming one must not raise the
-    // website role. Refused before any password check, on every link/claim path.
-    if (character.level >= GOD_LEVEL) {
-      throw new ForbiddenException(
-        'Characters of level 100+ must be linked by staff.'
-      );
-    }
-
     // Check if character is already linked. The one exception is a legacy
     // placeholder owner (auto-created by the game server on a legacy
     // character's first telnet login): a caller who identifies themselves
@@ -970,16 +960,6 @@ export class CharactersService implements OnModuleDestroy {
         character.userId !== callerUserId &&
         (await this.isClaimablePlaceholder(character.userId))
       ) {
-        // A claim moves ALL of the placeholder's characters, so the god guard
-        // must cover them too, not just the named one.
-        const godCount = await this.db.characters.count({
-          where: { userId: character.userId, level: { gte: GOD_LEVEL } },
-        });
-        if (godCount > 0) {
-          throw new ForbiddenException(
-            'Characters of level 100+ must be linked by staff.'
-          );
-        }
         placeholderOwnerId = character.userId;
       } else {
         throw new BadRequestException(

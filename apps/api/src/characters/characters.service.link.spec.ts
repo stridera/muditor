@@ -1,4 +1,4 @@
-import { BadRequestException, ForbiddenException } from '@nestjs/common';
+import { BadRequestException } from '@nestjs/common';
 import type { ConfigService } from '@nestjs/config';
 import * as bcrypt from 'bcrypt';
 import type { GameAdminService } from '../bridge/game-admin.service';
@@ -219,31 +219,6 @@ describe('CharactersService.linkCharacterToUser', () => {
     expect(tx.users.update).not.toHaveBeenCalled();
     expect(db.characters.update).not.toHaveBeenCalled();
     expect(roleCalculator.updateUserRole).not.toHaveBeenCalled();
-  });
-
-  it('refuses to claim a placeholder that owns a level 100+ character', async () => {
-    db.characters.count.mockResolvedValue(1);
-
-    await expect(
-      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
-    ).rejects.toBeInstanceOf(ForbiddenException);
-    expect(redis.incr).not.toHaveBeenCalled();
-    expect(db.$transaction).not.toHaveBeenCalled();
-  });
-
-  it('refuses to link a level 100+ character', async () => {
-    db.characters.findFirst.mockResolvedValue({
-      id: 'c1',
-      name: 'Venath',
-      level: 100,
-      userId: null,
-      passwordHash,
-    });
-
-    await expect(
-      service.linkCharacterToUser(CALLER_ID, 'venath', 'gamepass')
-    ).rejects.toBeInstanceOf(ForbiddenException);
-    expect(db.characters.update).not.toHaveBeenCalled();
   });
 
   it('links without Redis (in-memory lockout), never failing closed', async () => {
