@@ -628,8 +628,31 @@ model CharacterItems {
   container                CharacterItems?  @relation("itemContainer", fields: [containerId], references: [id])
   containedItems           CharacterItems[] @relation("itemContainer")
   objects                  Objects          @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  // Set while the item sits in a dead player's corpse (characterId stays the
+  // corpse owner). Cleared when the item is looted into an inventory.
+  corpseId                 Int?             @map("corpse_id")
+  corpse                   PlayerCorpses?   @relation(fields: [corpseId], references: [id], onDelete: Cascade)
 
   @@index([characterId])
+  @@index([corpseId])
+}
+
+// A dead player's corpse. The items live in CharacterItems rows with
+// corpse_id = id (nesting preserved via container_id); coins are held here.
+// Deleting the row (decay) deletes its items.
+model PlayerCorpses {
+  id         Int              @id @default(autoincrement())
+  ownerId    String           @map("owner_id")
+  roomZoneId Int              @map("room_zone_id")
+  roomId     Int              @map("room_id")
+  coins      BigInt           @default(0) // Copper units, like Characters.wealth
+  createdAt  DateTime         @default(now()) @map("created_at")
+  decayAt    DateTime         @map("decay_at")
+  owner      Characters       @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  items      CharacterItems[]
+
+  @@index([ownerId])
+  @@index([decayAt])
 }
 
 model Characters {
@@ -778,6 +801,7 @@ model Characters {
   characterAliases      CharacterAliases[]
   characterEffects      CharacterEffects[]
   characterItems        CharacterItems[]
+  playerCorpses         PlayerCorpses[]
   characterAbilities    CharacterAbilities[]
   characterPets         CharacterPets[]
   characterClass        CharacterClass?      @relation(fields: [classId], references: [id])
