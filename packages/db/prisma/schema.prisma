@@ -709,6 +709,7 @@ model Characters {
   recallRoomZoneId      Int?                 @map("recall_room_zone_id")
   recallRoomId          Int?                 @map("recall_room_id")
   lastLogin             DateTime?            @map("last_login")
+  lastLogout            DateTime?            @map("last_logout")
   timePlayed            Int                  @default(0) @map("time_played")
   hunger                Int                  @default(0)
   thirst                Int                  @default(0)
