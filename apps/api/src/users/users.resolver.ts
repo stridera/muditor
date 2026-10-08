@@ -95,7 +95,7 @@ export class UsersResolver {
   ) {}
 
   @Query(() => [User])
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async users(): Promise<User[]> {
     return this.usersService.getAllUsersWithBanStatus();
@@ -116,7 +116,7 @@ export class UsersResolver {
   @Query(() => [AdminUserAccount], {
     description: 'All accounts with link/password/character info (IMMORTAL+)',
   })
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async adminUsers(): Promise<AdminUserAccount[]> {
     return this.adminUsersService.listUsers();
@@ -126,7 +126,7 @@ export class UsersResolver {
     description:
       'Set a user role. CODER: only below own role; IMPLEMENTOR: any (never demotes the last IMPLEMENTOR)',
   })
-  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async adminSetUserRole(
     @Args('input') input: AdminSetUserRoleInput,
@@ -142,7 +142,7 @@ export class UsersResolver {
   @Mutation(() => AdminUserAccount, {
     description: 'Soft-delete or restore a user account',
   })
-  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async adminSetUserDeleted(
     @Args('input') input: AdminSetUserDeletedInput,
@@ -160,7 +160,7 @@ export class UsersResolver {
     description:
       "Unlink a character from its owner and lower the owner's role if needed",
   })
-  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async adminUnlinkCharacter(
     @Args('input') input: AdminUnlinkCharacterInput,
@@ -176,7 +176,7 @@ export class UsersResolver {
     description:
       'Create a password reset link for a user and return it to the admin',
   })
-  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async adminCreatePasswordResetLink(
     @Args('userId', { type: () => ID }) userId: string,
@@ -189,7 +189,7 @@ export class UsersResolver {
   }
 
   @Query(() => [BanRecord])
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async banHistory(
     @Args('userId', { type: () => ID }) userId: string
@@ -198,7 +198,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => User)
-  @Roles(UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async updateUser(
     @Args('input') input: UpdateUserInput,
@@ -217,7 +217,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => BanRecord)
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async banUser(
     @Args('input') input: BanUserInput,
@@ -227,7 +227,7 @@ export class UsersResolver {
   }
 
   @Mutation(() => BanRecord)
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async unbanUser(
     @Args('input') input: UnbanUserInput,
@@ -271,7 +271,7 @@ export class UsersResolver {
   }
 
   @Query(() => UserPermissions, { name: 'userPermissions' })
-  @Roles(UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR)
+  @Roles(UserRole.IMMORTAL)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)
   async getUserPermissions(
     @Args('userId', { type: () => ID }) userId: string

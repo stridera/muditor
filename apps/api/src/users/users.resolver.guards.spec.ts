@@ -1,5 +1,6 @@
 import 'reflect-metadata';
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, type ExecutionContext } from '@nestjs/common';
+import { Reflector } from '@nestjs/core';
 import { GUARDS_METADATA } from '@nestjs/common/constants';
 import { UserRole } from '@muditor/db';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
@@ -12,10 +13,7 @@ const RESOLVER_TYPE_METADATA = 'graphql:resolver_type';
 const proto = UsersResolver.prototype as unknown as Record<string, object>;
 const handlerOf = (method: string): object => proto[method] as object;
 
-const CODER_PLUS = [UserRole.CODER, UserRole.IMPLEMENTOR];
-const IMMORTAL_PLUS = [UserRole.IMMORTAL, UserRole.CODER, UserRole.IMPLEMENTOR];
-
-function expectGuarded(method: string, roles: UserRole[]) {
+function expectGuarded(method: string, minimum: UserRole) {
   const handler = handlerOf(method);
   expect(Reflect.getMetadata(RESOLVER_TYPE_METADATA, handler)).toBeDefined();
   const guards: unknown[] = Reflect.getMetadata(GUARDS_METADATA, handler) ?? [];
@@ -26,13 +24,20 @@ function expectGuarded(method: string, roles: UserRole[]) {
   expect([method, guards.includes(RolesGuard)]).toEqual([method, true]);
   expect([method, Reflect.getMetadata(ROLES_KEY, handler)]).toEqual([
     method,
-    roles,
+    minimum,
   ]);
 }
 
 describe('UsersResolver admin guards', () => {
-  it('lets IMMORTAL+ list users on the admin page', () => {
-    expectGuarded('adminUsers', IMMORTAL_PLUS);
+  it.each([
+    'users',
+    'adminUsers',
+    'banHistory',
+    'banUser',
+    'unbanUser',
+    'getUserPermissions',
+  ])('%s requires login and IMMORTAL+', method => {
+    expectGuarded(method, UserRole.IMMORTAL);
   });
 
   it.each([
@@ -42,7 +47,51 @@ describe('UsersResolver admin guards', () => {
     'adminCreatePasswordResetLink',
     'updateUser',
   ])('%s requires login and CODER+', method => {
-    expectGuarded(method, CODER_PLUS);
+    expectGuarded(method, UserRole.CODER);
+  });
+});
+
+describe('RolesGuard minimum-rank semantics', () => {
+  const guardFor = (minimum: UserRole | undefined, role: UserRole | null) => {
+    const reflector = {
+      getAllAndOverride: jest.fn().mockReturnValue(minimum),
+    } as unknown as Reflector;
+    const user = role ? { role } : undefined;
+    const ctx = {
+      getHandler: () => undefined,
+      getClass: () => undefined,
+      getType: () => 'graphql',
+      getArgs: () => [undefined, undefined, { req: { user } }, undefined],
+      getArgByIndex: (i: number) =>
+        [undefined, undefined, { req: { user } }, undefined][i],
+    } as unknown as ExecutionContext;
+    return new RolesGuard(reflector).canActivate(ctx);
+  };
+
+  it.each([
+    [UserRole.PLAYER, false],
+    [UserRole.IMMORTAL, true],
+    [UserRole.BUILDER, true],
+    [UserRole.HEAD_BUILDER, true],
+    [UserRole.CODER, true],
+    [UserRole.IMPLEMENTOR, true],
+  ])('IMMORTAL+ with %s -> %s', (role, allowed) => {
+    expect(guardFor(UserRole.IMMORTAL, role)).toBe(allowed);
+  });
+
+  it.each([
+    [UserRole.IMMORTAL, false],
+    [UserRole.BUILDER, false],
+    [UserRole.HEAD_BUILDER, false],
+    [UserRole.CODER, true],
+    [UserRole.IMPLEMENTOR, true],
+  ])('CODER+ with %s -> %s', (role, allowed) => {
+    expect(guardFor(UserRole.CODER, role)).toBe(allowed);
+  });
+
+  it('denies a missing user and allows undecorated handlers', () => {
+    expect(guardFor(UserRole.IMMORTAL, null)).toBe(false);
+    expect(guardFor(undefined, null)).toBe(true);
   });
 });
 

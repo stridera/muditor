@@ -7,18 +7,23 @@ import { Reflector } from '@nestjs/core';
 import { GqlExecutionContext } from '@nestjs/graphql';
 import { UserRole } from '@muditor/db';
 import { ROLES_KEY } from '../decorators/roles.decorator';
+import { roleAtLeast } from '../role.util';
 
+/**
+ * Minimum-rank role guard: passes when the user's role is at or above the
+ * role given to `@Roles(minimum)` in the hierarchy (see `role.util.ts`).
+ */
 @Injectable()
 export class RolesGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
 
   canActivate(context: ExecutionContext): boolean {
-    const requiredRoles = this.reflector.getAllAndOverride<UserRole[]>(
+    const minimum = this.reflector.getAllAndOverride<UserRole | undefined>(
       ROLES_KEY,
       [context.getHandler(), context.getClass()]
     );
 
-    if (!requiredRoles) {
+    if (!minimum) {
       return true;
     }
 
@@ -29,6 +34,6 @@ export class RolesGuard implements CanActivate {
       return false;
     }
 
-    return requiredRoles.includes(user.role);
+    return roleAtLeast(user.role, minimum);
   }
 }

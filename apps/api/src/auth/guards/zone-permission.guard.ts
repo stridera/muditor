@@ -9,6 +9,7 @@ import { GqlExecutionContext } from '@nestjs/graphql';
 import { UserRole, GrantPermission } from '@muditor/db';
 import { DatabaseService } from '../../database/database.service';
 import { GrantsService } from '../../grants/grants.service';
+import { roleAtLeast } from '../role.util';
 
 export const ZONE_SCOPE_KEY = 'zoneScope';
 
@@ -38,11 +39,8 @@ export interface ZoneScopeOptions {
   lookup?: ZoneScopeLookup;
 }
 
-const BYPASS_ROLES: UserRole[] = [
-  UserRole.IMPLEMENTOR,
-  UserRole.CODER,
-  UserRole.HEAD_BUILDER,
-];
+/** HEAD_BUILDER and above bypass zone scoping. */
+const BYPASS_MINIMUM_ROLE = UserRole.HEAD_BUILDER;
 
 const MAX_DEPTH = 5;
 
@@ -75,7 +73,7 @@ export class ZonePermissionGuard implements CanActivate {
 
     if (!user) return false;
 
-    if (BYPASS_ROLES.includes(user.role)) return true;
+    if (roleAtLeast(user.role, BYPASS_MINIMUM_ROLE)) return true;
     if (user.role !== UserRole.BUILDER) return false;
 
     const options =
