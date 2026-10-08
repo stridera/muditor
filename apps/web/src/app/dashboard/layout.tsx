@@ -7,12 +7,14 @@ import { HelpPanelProvider, HelpPanelSlot } from '@/components/help';
 import { Sidebar } from '@/components/navigation/sidebar';
 import { TopBar } from '@/components/navigation/top-bar';
 import { GoToHint, HelpModal, useHelpModal } from '@/components/HelpModal';
+import { usePathname } from 'next/navigation';
 
 export default function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const pathname = usePathname();
   const {
     open: helpOpen,
     setOpen: setHelpOpen,
@@ -31,7 +33,7 @@ export default function DashboardLayout({
                   opening help shrinks the content instead of overlaying it. */}
               <div className='flex flex-1 min-h-0 overflow-hidden'>
                 <main className='flex-1 min-w-0 overflow-y-auto p-6'>
-                  <ErrorBoundary>{children}</ErrorBoundary>
+                  <ErrorBoundary resetKey={pathname}>{children}</ErrorBoundary>
                 </main>
                 <HelpPanelSlot />
               </div>

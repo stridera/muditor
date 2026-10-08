@@ -42,4 +42,30 @@ describe('ErrorBoundary', () => {
     expect(screen.getByText('all good')).toBeVisible();
     expect(reportClientError).not.toHaveBeenCalled();
   });
+
+  it('recovers when resetKey changes so one failed page does not break later navigation', () => {
+    const { rerender } = render(
+      <ErrorBoundary resetKey='/dashboard/zones'>
+        <Bomb />
+      </ErrorBoundary>
+    );
+    expect(screen.getByText('Something went wrong')).toBeVisible();
+
+    // Same key: stays on the fallback.
+    rerender(
+      <ErrorBoundary resetKey='/dashboard/zones'>
+        <p>rooms page</p>
+      </ErrorBoundary>
+    );
+    expect(screen.getByText('Something went wrong')).toBeVisible();
+
+    // Navigated elsewhere: the healthy page renders.
+    rerender(
+      <ErrorBoundary resetKey='/dashboard/rooms'>
+        <p>rooms page</p>
+      </ErrorBoundary>
+    );
+    expect(screen.getByText('rooms page')).toBeVisible();
+    expect(screen.queryByText('Something went wrong')).toBeNull();
+  });
 });

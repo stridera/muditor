@@ -18,6 +18,13 @@ import { Component } from 'react';
 interface Props {
   children?: ReactNode;
   fallback?: ReactNode;
+  /**
+   * When this value changes (e.g. the pathname), a boundary that is showing its
+   * fallback clears the error and re-renders its children. Without it one
+   * failed page leaves every later client-side navigation stuck on the
+   * fallback until a full reload.
+   */
+  resetKey?: unknown;
 }
 
 interface State {
@@ -38,6 +45,12 @@ export class ErrorBoundary extends Component<Props, State> {
       hasError: true,
       error,
     };
+  }
+
+  componentDidUpdate(prevProps: Props) {
+    if (this.state.hasError && prevProps.resetKey !== this.props.resetKey) {
+      this.setState({ hasError: false });
+    }
   }
 
   componentDidCatch(error: Error, errorInfo: ErrorInfo) {
