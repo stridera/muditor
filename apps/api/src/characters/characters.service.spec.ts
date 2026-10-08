@@ -16,6 +16,9 @@ import type {
   UpdateCharacterInput,
 } from './character.input';
 import { CharactersService } from './characters.service';
+import { issueStatRoll } from './stat-roll';
+
+process.env.JWT_SECRET = 'test-secret-for-stat-rolls';
 
 jest.mock('bcrypt', () => ({ compare: jest.fn(), hash: jest.fn() }));
 
@@ -27,24 +30,38 @@ jest.mock('ioredis', () => {
   }));
 });
 
-const createInput = (
-  overrides: Partial<CreateCharacterInput> = {}
-): CreateCharacterInput => ({
-  name: 'Newbie',
-  level: 1,
-  alignment: 0,
-  strength: 13,
-  intelligence: 13,
-  wisdom: 13,
-  dexterity: 13,
-  constitution: 13,
-  charisma: 13,
-  luck: 13,
-  gender: 'neutral',
-  race: Race.ELF,
-  classId: 7,
-  ...overrides,
-});
+// Rolled values for user-1; createInput() assigns them in roll order.
+const ROLL: [number, number, number, number, number, number, number] = [
+  15, 12, 9, 14, 11, 16, 8,
+];
+type InputOverrides = {
+  [K in keyof CreateCharacterInput]?: CreateCharacterInput[K] | undefined;
+};
+const createInput = (overrides: InputOverrides = {}): CreateCharacterInput => {
+  const input: CreateCharacterInput = {
+    name: 'Newbie',
+    level: 1,
+    alignment: 0,
+    strength: ROLL[0],
+    intelligence: ROLL[1],
+    wisdom: ROLL[2],
+    dexterity: ROLL[3],
+    constitution: ROLL[4],
+    charisma: ROLL[5],
+    luck: ROLL[6],
+    gender: 'neutral',
+    race: Race.ELF,
+    classId: 7,
+    statRollToken: issueStatRoll('user-1', ROLL).token,
+  };
+  // An explicit undefined override removes the field (e.g. no roll token).
+  for (const [key, value] of Object.entries(overrides)) {
+    if (value === undefined)
+      delete (input as unknown as Record<string, unknown>)[key];
+    else (input as unknown as Record<string, unknown>)[key] = value;
+  }
+  return input;
+};
 
 describe('CharactersService race/class handling', () => {
   let db: {
@@ -97,6 +114,97 @@ describe('CharactersService race/class handling', () => {
       expect(data.users).toEqual({ connect: { id: 'user-1' } });
       expect(data).not.toHaveProperty('raceId');
       expect(data).not.toHaveProperty('classId');
+    });
+
+    describe('stat roll + assign', () => {
+      beforeEach(() => db.characters.findUnique.mockResolvedValue(null));
+
+      it('rejects arbitrary stats from a player without a roll token', async () => {
+        await expect(
+          service.createCharacter(
+            createInput({
+              statRollToken: undefined,
+              strength: 18,
+              intelligence: 18,
+              wisdom: 18,
+              dexterity: 18,
+              constitution: 18,
+              charisma: 18,
+              luck: 18,
+            }),
+            'user-1'
+          )
+        ).rejects.toBeInstanceOf(BadRequestException);
+        expect(db.characters.create).not.toHaveBeenCalled();
+      });
+
+      it('rejects stats that are not a permutation of the issued roll', async () => {
+        await expect(
+          service.createCharacter(createInput({ strength: 18 }), 'user-1')
+        ).rejects.toBeInstanceOf(BadRequestException);
+        expect(db.characters.create).not.toHaveBeenCalled();
+      });
+
+      it('rejects a roll token issued to another user', async () => {
+        await expect(
+          service.createCharacter(createInput(), 'someone-else')
+        ).rejects.toBeInstanceOf(BadRequestException);
+        expect(db.characters.create).not.toHaveBeenCalled();
+      });
+
+      it('rejects a tampered roll token', async () => {
+        const token = issueStatRoll(
+          'user-1',
+          [18, 18, 18, 18, 18, 18, 18]
+        ).token;
+        const forged = `${token.split('.')[0]}.${'A'.repeat(43)}`;
+        await expect(
+          service.createCharacter(
+            createInput({
+              statRollToken: forged,
+              strength: 18,
+              intelligence: 18,
+              wisdom: 18,
+              dexterity: 18,
+              constitution: 18,
+              charisma: 18,
+              luck: 18,
+            }),
+            'user-1'
+          )
+        ).rejects.toBeInstanceOf(BadRequestException);
+      });
+
+      it('accepts any assignment (permutation) of the issued roll', async () => {
+        const swapped = createInput({
+          strength: ROLL[6],
+          luck: ROLL[0],
+          intelligence: ROLL[5],
+          charisma: ROLL[1],
+        });
+        await service.createCharacter(swapped, 'user-1');
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data).toMatchObject({
+          strength: 8,
+          luck: 15,
+          intelligence: 16,
+          charisma: 12,
+        });
+      });
+
+      it('lets staff set stats directly without a roll', async () => {
+        await service.createCharacter(
+          createInput({
+            statRollToken: undefined,
+            strength: 25,
+            intelligence: 25,
+          }),
+          'user-1',
+          { isStaff: true }
+        );
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data).toMatchObject({ strength: 25, intelligence: 25 });
+      });
     });
 
     it('rejects an unknown classId without creating anything', async () => {

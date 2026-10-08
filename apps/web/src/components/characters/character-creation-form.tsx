@@ -51,6 +51,61 @@ const CREATE_CHARACTER_MUTATION = gql`
   }
 `;
 
+const ROLL_STATS_MUTATION = gql`
+  mutation RollCharacterStats {
+    rollCharacterStats {
+      token
+      values
+      expiresAt
+    }
+  }
+`;
+
+interface RollStatsMutationResult {
+  rollCharacterStats: { token: string; values: number[]; expiresAt: string };
+}
+
+export const STAT_FIELDS = [
+  { key: 'strength', label: 'Strength (STR)' },
+  { key: 'intelligence', label: 'Intelligence (INT)' },
+  { key: 'wisdom', label: 'Wisdom (WIS)' },
+  { key: 'dexterity', label: 'Dexterity (DEX)' },
+  { key: 'constitution', label: 'Constitution (CON)' },
+  { key: 'charisma', label: 'Charisma (CHA)' },
+  { key: 'luck', label: 'Luck (LCK)' },
+] as const;
+
+export type StatKey = (typeof STAT_FIELDS)[number]['key'];
+
+/** Which rolled value (index into the roll) each attribute currently holds. */
+export type StatAssignment = Record<StatKey, number>;
+
+/** Default assignment: rolled values in roll order. */
+export function defaultAssignment(): StatAssignment {
+  return Object.fromEntries(
+    STAT_FIELDS.map((f, i) => [f.key, i])
+  ) as StatAssignment;
+}
+
+/**
+ * Give `stat` the rolled value at `index`. If another attribute already holds
+ * that value, the two swap, so the assignment always stays a permutation of
+ * the roll.
+ */
+export function assignRolledValue(
+  current: StatAssignment,
+  stat: StatKey,
+  index: number
+): StatAssignment {
+  const next = { ...current };
+  const holder = STAT_FIELDS.find(
+    f => f.key !== stat && current[f.key] === index
+  );
+  if (holder) next[holder.key] = current[stat];
+  next[stat] = index;
+  return next;
+}
+
 interface CharacterCreationFormProps {
   onCharacterCreated: () => void;
 }
@@ -76,13 +131,6 @@ interface CreateCharacterData {
   race: Race;
   classId: number | null;
   description?: string;
-  strength: number;
-  intelligence: number;
-  wisdom: number;
-  dexterity: number;
-  constitution: number;
-  charisma: number;
-  luck: number;
 }
 
 export function CharacterCreationForm({
@@ -94,14 +142,13 @@ export function CharacterCreationForm({
     race: 'HUMAN',
     classId: null,
     description: '',
-    strength: 13,
-    intelligence: 13,
-    wisdom: 13,
-    dexterity: 13,
-    constitution: 13,
-    charisma: 13,
-    luck: 13,
   });
+  const [roll, setRoll] = useState<{
+    token: string;
+    values: number[];
+  } | null>(null);
+  const [assignment, setAssignment] =
+    useState<StatAssignment>(defaultAssignment);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
@@ -128,49 +175,27 @@ export function CharacterCreationForm({
     }));
   };
 
-  const handleStatChange = (stat: keyof CreateCharacterData, value: number) => {
-    // Ensure stats stay within valid range (1-18 for character creation)
-    const clampedValue = Math.max(1, Math.min(18, value));
-    setFormData(prev => ({
-      ...prev,
-      [stat]: clampedValue,
-    }));
+  const [rollStats, { loading: rolling }] =
+    useMutation<RollStatsMutationResult>(ROLL_STATS_MUTATION);
+
+  // Stats are rolled by the server (3d6 each); the player only chooses which
+  // rolled value goes to which attribute.
+  const handleRoll = async () => {
+    setError(null);
+    try {
+      const result = await rollStats();
+      const rolled = result.data?.rollCharacterStats;
+      if (rolled) {
+        setRoll({ token: rolled.token, values: rolled.values });
+        setAssignment(defaultAssignment());
+      }
+    } catch (err: any) {
+      setError(err.message || 'Failed to roll stats');
+    }
   };
 
-  const rollRandomStats = () => {
-    const rollStat = () => {
-      // Roll 3d6 for each stat (classic D&D style)
-      return (
-        Math.floor(Math.random() * 6) +
-        Math.floor(Math.random() * 6) +
-        Math.floor(Math.random() * 6) +
-        3
-      );
-    };
-
-    setFormData(prev => ({
-      ...prev,
-      strength: rollStat(),
-      intelligence: rollStat(),
-      wisdom: rollStat(),
-      dexterity: rollStat(),
-      constitution: rollStat(),
-      charisma: rollStat(),
-      luck: rollStat(),
-    }));
-  };
-
-  const getTotalStatPoints = () => {
-    return (
-      formData.strength +
-      formData.intelligence +
-      formData.wisdom +
-      formData.dexterity +
-      formData.constitution +
-      formData.charisma +
-      formData.luck
-    );
-  };
+  const getTotalStatPoints = () =>
+    roll ? roll.values.reduce((sum, v) => sum + v, 0) : 0;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -198,11 +223,22 @@ export function CharacterCreationForm({
       return;
     }
 
+    if (!roll) {
+      setError('Roll your stats first');
+      return;
+    }
+
+    const stats = Object.fromEntries(
+      STAT_FIELDS.map(f => [f.key, roll.values[assignment[f.key]]])
+    ) as Record<StatKey, number>;
+
     try {
       const result = await createCharacter({
         variables: {
           data: {
             ...formData,
+            ...stats,
+            statRollToken: roll.token,
             name:
               formData.name.charAt(0).toUpperCase() +
               formData.name.slice(1).toLowerCase(),
@@ -221,14 +257,9 @@ export function CharacterCreationForm({
           race: 'HUMAN',
           classId: null,
           description: '',
-          strength: 13,
-          intelligence: 13,
-          wisdom: 13,
-          dexterity: 13,
-          constitution: 13,
-          charisma: 13,
-          luck: 13,
         });
+        setRoll(null);
+        setAssignment(defaultAssignment());
         onCharacterCreated();
       }
     } catch (err: any) {
@@ -376,63 +407,68 @@ export function CharacterCreationForm({
                   Character Stats
                 </CardTitle>
                 <CardDescription>
-                  Set your character's core attributes (Total:{' '}
-                  {getTotalStatPoints()})
+                  {roll
+                    ? `Rolled ${roll.values.join(', ')} (total ${getTotalStatPoints()}). Assign each rolled value to an attribute, or reroll.`
+                    : 'Stats are rolled randomly (3d6 each). Roll, then assign the results to your attributes.'}
                 </CardDescription>
               </div>
               <Button
                 type='button'
                 variant='outline'
-                onClick={rollRandomStats}
-                disabled={loading}
+                onClick={handleRoll}
+                disabled={loading || rolling}
               >
-                <Wand2 className='h-4 w-4 mr-2' />
-                Roll Random
+                {rolling ? (
+                  <Loader2 className='h-4 w-4 animate-spin mr-2' />
+                ) : (
+                  <Wand2 className='h-4 w-4 mr-2' />
+                )}
+                {roll ? 'Reroll' : 'Roll Stats'}
               </Button>
             </div>
           </CardHeader>
-          <CardContent>
-            <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-              {[
-                { key: 'strength', label: 'Strength (STR)' },
-                { key: 'intelligence', label: 'Intelligence (INT)' },
-                { key: 'wisdom', label: 'Wisdom (WIS)' },
-                { key: 'dexterity', label: 'Dexterity (DEX)' },
-                { key: 'constitution', label: 'Constitution (CON)' },
-                { key: 'charisma', label: 'Charisma (CHA)' },
-                { key: 'luck', label: 'Luck (LCK)' },
-              ].map(stat => (
-                <div key={stat.key} className='space-y-2'>
-                  <Label htmlFor={stat.key}>{stat.label}</Label>
-                  <Input
-                    id={stat.key}
-                    type='number'
-                    min='1'
-                    max='18'
-                    value={
-                      formData[stat.key as keyof CreateCharacterData] as number
-                    }
-                    onChange={e =>
-                      handleStatChange(
-                        stat.key as keyof CreateCharacterData,
-                        parseInt(e.target.value) || 1
-                      )
-                    }
-                    disabled={loading}
-                  />
-                </div>
-              ))}
-            </div>
-            <div className='mt-4 text-sm text-muted-foreground'>
-              <p>Valid range: 1-18 for each stat. Higher values are better.</p>
-              <p>Recommended total: 70-100 points for balanced characters.</p>
-            </div>
-          </CardContent>
+          {roll && (
+            <CardContent>
+              <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
+                {STAT_FIELDS.map(stat => (
+                  <div key={stat.key} className='space-y-2'>
+                    <Label htmlFor={stat.key}>{stat.label}</Label>
+                    <Select
+                      value={String(assignment[stat.key])}
+                      onValueChange={value =>
+                        setAssignment(prev =>
+                          assignRolledValue(prev, stat.key, Number(value))
+                        )
+                      }
+                      disabled={loading}
+                    >
+                      <SelectTrigger id={stat.key}>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {roll.values.map((value, index) => (
+                          <SelectItem key={index} value={String(index)}>
+                            {value}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                ))}
+              </div>
+              <div className='mt-4 text-sm text-muted-foreground'>
+                <p>
+                  Picking a value already used by another attribute swaps the
+                  two.
+                </p>
+              </div>
+            </CardContent>
+          )}
         </Card>
 
         {/* Submit */}
         <div className='flex gap-4'>
-          <Button type='submit' disabled={loading} className='flex-1'>
+          <Button type='submit' disabled={loading || !roll} className='flex-1'>
             {loading ? (
               <Loader2 className='h-4 w-4 animate-spin mr-2' />
             ) : (

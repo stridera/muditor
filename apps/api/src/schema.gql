@@ -727,6 +727,11 @@ input CreateCharacterInput {
   luck: Int! = 13
   name: String!
   race: Race! = HUMAN
+
+  """
+  Token from rollCharacterStats. Required for non-staff: the stat fields must then be an assignment (permutation) of the rolled values. Staff may omit it and set stats directly.
+  """
+  statRollToken: String
   strength: Int! = 13
   title: String
   wisdom: Int! = 13
@@ -2072,6 +2077,7 @@ type Mutation {
 
   """Revoke zone access from a user"""
   revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
+  rollCharacterStats: StatRollDto!
 
   """Send a chat message in-game as a linked character"""
   sendGameChat(channel: String!, characterName: String!, message: String!): CommandResultType!
@@ -3289,6 +3295,18 @@ enum SpellSphere {
   PROTECTION
   SUMMONING
   WATER
+}
+
+type StatRollDto {
+  expiresAt: DateTime!
+
+  """Pass as statRollToken to createCharacter"""
+  token: String!
+
+  """
+  Rolled values (3d6 each); assign them to STR, INT, WIS, DEX, CON, CHA, LUCK in any order
+  """
+  values: [Int!]!
 }
 
 type Subscription {

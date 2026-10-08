@@ -51,6 +51,13 @@ export class CreateCharacterInput {
 
   @Field({ nullable: true })
   title?: string;
+
+  @Field({
+    nullable: true,
+    description:
+      'Token from rollCharacterStats. Required for non-staff: the stat fields must then be an assignment (permutation) of the rolled values. Staff may omit it and set stats directly.',
+  })
+  statRollToken?: string;
 }
 
 @InputType()

@@ -355,3 +355,20 @@ export class OnlineCharacterDto {
   @Field(() => UserSummaryDto, { nullable: true })
   user?: UserSummaryDto;
 }
+
+@ObjectType()
+export class StatRollDto {
+  @Field(() => String, {
+    description: 'Pass as statRollToken to createCharacter',
+  })
+  token: string;
+
+  @Field(() => [Int], {
+    description:
+      'Rolled values (3d6 each); assign them to STR, INT, WIS, DEX, CON, CHA, LUCK in any order',
+  })
+  values: number[];
+
+  @Field(() => Date)
+  expiresAt: Date;
+}

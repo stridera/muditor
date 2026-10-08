@@ -23,6 +23,7 @@ import {
   CharacterSessionInfoDto,
   LinkCharacterResultDto,
   OnlineCharacterDto,
+  StatRollDto,
 } from './character.dto';
 import {
   CharacterFilterInput,
@@ -36,6 +37,7 @@ import {
   UpdateCharacterItemInput,
 } from './character.input';
 import { CharactersService } from './characters.service';
+import { issueStatRoll } from './stat-roll';
 
 /**
  * Fields of UpdateCharacterInput that the owner of a character may change on
@@ -219,6 +221,19 @@ export class CharactersResolver {
   }
 
   // Character mutations
+
+  /**
+   * Roll starting stats (3d6 per attribute). The values are signed into a
+   * token bound to the caller; createCharacter only accepts an assignment of
+   * these values from non-staff. Rerolling is allowed, like the in-game flow.
+   */
+  @Mutation(() => StatRollDto)
+  @UseGuards(RateLimitGuard)
+  @RateLimit({ limit: 30, windowSeconds: 60, keyPrefix: 'char:statroll' })
+  rollCharacterStats(@CurrentUser() user: Users): StatRollDto {
+    return issueStatRoll(user.id);
+  }
+
   @Mutation(() => CharacterDto)
   async createCharacter(
     @Args('data') data: CreateCharacterInput,

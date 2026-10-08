@@ -1,5 +1,6 @@
 import { ForbiddenException } from '@nestjs/common';
 import { Race, UserRole, type Characters, type Users } from '@muditor/db';
+import { verifyStatRoll } from './stat-roll';
 import { CharactersResolver } from './characters.resolver';
 import type { CharactersService } from './characters.service';
 import type {
@@ -133,7 +134,35 @@ describe('CharactersResolver authorization', () => {
     });
   });
 
+  describe('rollCharacterStats', () => {
+    it('issues a roll bound to the caller that only the caller can redeem', () => {
+      process.env.JWT_SECRET = 'test-secret-for-stat-rolls';
+      const roll = resolver.rollCharacterStats(player);
+      expect(roll.values).toHaveLength(7);
+      expect(verifyStatRoll(roll.token, player.id)).toEqual(roll.values);
+      expect(() => verifyStatRoll(roll.token, immortal.id)).toThrow();
+    });
+  });
+
   describe('createCharacter', () => {
+    it('tells the service whether the caller is staff (stat-roll enforcement)', async () => {
+      const input = { name: 'Newbie', level: 1 } as CreateCharacterInput;
+      await resolver.createCharacter(input, player);
+      await resolver.createCharacter(input, immortal);
+      expect(service.createCharacter).toHaveBeenNthCalledWith(
+        1,
+        input,
+        player.id,
+        { isStaff: false }
+      );
+      expect(service.createCharacter).toHaveBeenNthCalledWith(
+        2,
+        input,
+        immortal.id,
+        { isStaff: true }
+      );
+    });
+
     it('forbids a PLAYER creating a character above level 1', async () => {
       await expect(
         resolver.createCharacter(
