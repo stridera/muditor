@@ -95,6 +95,13 @@ query SearchObjects($search: String!, $limit: Int, $zoneId: Int) {
   }
 }
 
+# Full summaries for the objects list page (server-side search across all zones)
+query SearchObjectSummaries($search: String!, $limit: Int, $zoneId: Int) {
+  searchObjects(search: $search, limit: $limit, zoneId: $zoneId) {
+    ...ObjectSummary
+  }
+}
+
 mutation CreateObject($data: CreateObjectInput!) {
   createObject(data: $data) {
     ...ObjectSummary

@@ -27,6 +27,9 @@ import {
   type GetObjectsQueryVariables,
   type ObjectDetailsFragment,
   type ObjectSummaryFragment,
+  SearchObjectSummariesDocument,
+  type SearchObjectSummariesQuery,
+  type SearchObjectSummariesQueryVariables,
 } from '@/generated/graphql';
 import { useApolloClient, useMutation, useQuery } from '@apollo/client/react';
 import {
@@ -57,6 +60,16 @@ import {
 
 // Inline queries removed; using unified generated documents & fragments.
 
+// Objects use composite keys (zoneId, id); every map/set/DOM id on this page is
+// keyed by this so same-numbered objects in different zones never collide.
+const objectKey = (obj: { zoneId: number; id: number }) =>
+  `${obj.zoneId}-${obj.id}`;
+
+// Debounce before hitting the server with the search term.
+const SEARCH_DEBOUNCE_MS = 300;
+// Server-side search result cap (all-zones search).
+const SERVER_SEARCH_LIMIT = 500;
+
 function ObjectsPageContent() {
   return (
     <PermissionGuard requireImmortal={true}>
@@ -69,23 +82,24 @@ function ObjectsContent() {
   const apolloClient = useApolloClient();
   const searchParams = useSearchParams();
   const idParam = searchParams.get('id');
+  const zoneParam = searchParams.get('zone');
   const list = useListState();
   const selectedZone = list.zone;
   const { searchFilters, setSearchFilters } = list;
 
-  const [deletingId, setDeletingId] = useState<number | null>(null);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
   const [selectedObjects, setSelectedObjects] = useState<Set<string>>(
     new Set()
   );
   const [isDeleting, setIsDeleting] = useState(false);
-  const [cloningId, setCloningId] = useState<number | null>(null);
-  const [expandedObjects, setExpandedObjects] = useState<Set<number>>(
+  const [cloningId, setCloningId] = useState<string | null>(null);
+  const [expandedObjects, setExpandedObjects] = useState<Set<string>>(
     new Set()
   );
-  const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
-  // Store detailed object data keyed by object id (details fragment)
+  const [loadingDetails, setLoadingDetails] = useState<Set<string>>(new Set());
+  // Store detailed object data keyed by composite object key (details fragment)
   const [objectDetails, setObjectDetails] = useState<
-    Record<number, ObjectDetailsFragment>
+    Record<string, ObjectDetailsFragment>
   >({});
 
   // Pagination state
@@ -103,12 +117,57 @@ function ObjectsContent() {
   // Ref for search box focus
   const searchRef = useRef<EnhancedSearchRef>(null);
 
-  // Fetch objects using conditional query based on selectedZone
-  const { loading, error, data, refetch } = useQuery<
-    GetObjectsByZoneQuery | GetObjectsQuery
-  >(selectedZone ? GetObjectsByZoneDocument : GetObjectsDocument, {
-    variables: selectedZone ? { zoneId: selectedZone } : { take: 1000 },
-  });
+  // Debounced search term, used to query the server when no zone is selected
+  const [debouncedTerm, setDebouncedTerm] = useState('');
+  useEffect(() => {
+    const timer = setTimeout(
+      () => setDebouncedTerm(searchFilters.searchTerm ?? ''),
+      SEARCH_DEBOUNCE_MS
+    );
+    return () => clearTimeout(timer);
+  }, [searchFilters.searchTerm]);
+
+  // With no zone selected the first 1000 objects (by id) don't cover the whole
+  // world, so a non-empty search term is resolved server-side instead.
+  // Quotes (exact-match syntax) are only meaningful to the client filter.
+  const serverSearchTerm = selectedZone
+    ? ''
+    : debouncedTerm.replace(/"/g, '').trim();
+  const useServerSearch = serverSearchTerm.length > 0;
+
+  // Zone-selected mode loads the whole zone; otherwise the first page of all
+  // objects (client-side filtered) or the server search results.
+  const {
+    loading: listLoading,
+    error: listError,
+    data: listData,
+    refetch: refetchList,
+  } = useQuery<GetObjectsByZoneQuery | GetObjectsQuery>(
+    selectedZone ? GetObjectsByZoneDocument : GetObjectsDocument,
+    {
+      variables: selectedZone ? { zoneId: selectedZone } : { take: 1000 },
+      skip: useServerSearch,
+    }
+  );
+  const {
+    loading: searchLoading,
+    error: searchError,
+    data: searchData,
+    previousData: searchPreviousData,
+    refetch: refetchSearch,
+  } = useQuery<SearchObjectSummariesQuery, SearchObjectSummariesQueryVariables>(
+    SearchObjectSummariesDocument,
+    {
+      variables: { search: serverSearchTerm, limit: SERVER_SEARCH_LIMIT },
+      skip: !useServerSearch,
+    }
+  );
+  // Only the list query gates the page; search loading must not unmount the
+  // search box mid-typing.
+  const loading = useServerSearch ? false : listLoading;
+  const error = useServerSearch ? searchError : listError;
+  const data = useServerSearch ? (searchData ?? searchPreviousData) : listData;
+  const refetch = () => (useServerSearch ? refetchSearch() : refetchList());
 
   const [deleteObject] = useMutation<
     DeleteObjectMutation,
@@ -121,20 +180,22 @@ function ObjectsContent() {
 
   // Auto-expand object if id parameter is provided (for display, not editing)
   useEffect(() => {
-    if (idParam) {
+    if (idParam && zoneParam) {
       const objectId = parseInt(idParam);
-      if (!isNaN(objectId)) {
-        setExpandedObjects(prev => new Set(prev).add(objectId));
+      const zoneId = parseInt(zoneParam);
+      if (!isNaN(objectId) && !isNaN(zoneId)) {
+        const key = objectKey({ zoneId, id: objectId });
+        setExpandedObjects(prev => new Set(prev).add(key));
         // Scroll to the object after a short delay to allow rendering
         setTimeout(() => {
-          const element = document.getElementById(`object-${objectId}`);
+          const element = document.getElementById(`object-${key}`);
           if (element) {
             element.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
         }, 100);
       }
     }
-  }, [idParam]);
+  }, [idParam, zoneParam]);
 
   // Keyboard shortcut: '/' focuses search box
   useEffect(() => {
@@ -159,7 +220,9 @@ function ObjectsContent() {
       ? (data.objectsByZone as ObjectSummaryFragment[])
       : data && 'objects' in data
         ? ((data as GetObjectsQuery).objects as ObjectSummaryFragment[])
-        : [];
+        : data && 'searchObjects' in data
+          ? (data.searchObjects as ObjectSummaryFragment[])
+          : [];
 
   // Deduplicate objects based on composite key (zoneId, id)
   const objects: ObjectSummaryFragment[] = Array.from(
@@ -174,48 +237,50 @@ function ObjectsContent() {
     return (obj as ObjectDetailsFragment).examineDescription !== undefined;
   };
 
-  const toggleObjectExpanded = async (objectId: number) => {
-    if (expandedObjects.has(objectId)) {
-      setExpandedObjects(
-        new Set([...expandedObjects].filter(id => id !== objectId))
-      );
+  const toggleObjectExpanded = async (object: {
+    zoneId: number;
+    id: number;
+  }) => {
+    const key = objectKey(object);
+    if (expandedObjects.has(key)) {
+      setExpandedObjects(new Set([...expandedObjects].filter(k => k !== key)));
       return;
     }
 
     // Add to expanded set
-    setExpandedObjects(new Set(expandedObjects).add(objectId));
+    setExpandedObjects(new Set(expandedObjects).add(key));
 
     // Load detailed data if not already loaded
-    const object = objects.find(obj => obj.id === objectId);
-    if (object && !objectDetails[objectId]) {
-      setLoadingDetails(new Set(loadingDetails).add(objectId));
+    if (!objectDetails[key]) {
+      setLoadingDetails(new Set(loadingDetails).add(key));
       try {
         const detailed = await apolloClient.query<
           GetObjectQuery,
           GetObjectQueryVariables
         >({
           query: GetObjectDocument,
-          variables: { id: objectId, zoneId: object.zoneId },
+          variables: { id: object.id, zoneId: object.zoneId },
           fetchPolicy: 'network-only',
         });
         const objDetails = detailed.data?.object;
         if (objDetails) {
           setObjectDetails(prev => ({
             ...prev,
-            [objectId]: objDetails,
+            [key]: objDetails,
           }));
         }
       } catch {
         /* LoggingService.error('Error loading object details'); */
       } finally {
-        setLoadingDetails(
-          new Set([...loadingDetails].filter(id => id !== objectId))
-        );
+        setLoadingDetails(new Set([...loadingDetails].filter(k => k !== key)));
       }
     }
   };
 
-  const handleDelete = async (id: number, name: string) => {
+  const handleDelete = async (
+    obj: { zoneId: number; id: number },
+    name: string
+  ) => {
     if (
       !confirm(
         `Are you sure you want to delete "${name}"? This action cannot be undone.`
@@ -224,13 +289,9 @@ function ObjectsContent() {
       return;
     }
 
-    setDeletingId(id);
+    setDeletingId(objectKey(obj));
     try {
-      const obj = objects.find(o => o.id === id);
-      if (!obj) {
-        throw new Error('Object not found for deletion');
-      }
-      await deleteObject({ variables: { id, zoneId: obj.zoneId! } });
+      await deleteObject({ variables: { id: obj.id, zoneId: obj.zoneId } });
       await refetch();
     } catch {
       /* LoggingService.error('Error deleting object'); */
@@ -244,11 +305,8 @@ function ObjectsContent() {
   const availableTypes = getUniqueValues(objects, 'type');
 
   // Bulk operations
-  // Selection is keyed by composite (zoneId, id) so same-numbered objects in
-  // different zones are never conflated.
-  const objectKey = (obj: { zoneId: number; id: number }) =>
-    `${obj.zoneId}-${obj.id}`;
-
+  // Selection is keyed by composite (zoneId, id) via objectKey so
+  // same-numbered objects in different zones are never conflated.
   const toggleObjectSelection = (obj: { zoneId: number; id: number }) => {
     const key = objectKey(obj);
     const newSelected = new Set(selectedObjects);
@@ -306,21 +364,16 @@ function ObjectsContent() {
     CreateObjectMutationVariables
   >(CreateObjectDocument);
 
-  const handleCloneObject = async (objectId: number) => {
-    setCloningId(objectId);
+  const handleCloneObject = async (object: { zoneId: number; id: number }) => {
+    setCloningId(objectKey(object));
     try {
-      const object = objects.find(obj => obj.id === objectId);
-      if (!object) {
-        throw new Error('Object not found');
-      }
-
       // Fetch full object details (still using network-only to ensure fresh data)
       const detailed = await apolloClient.query<
         GetObjectQuery,
         GetObjectQueryVariables
       >({
         query: GetObjectDocument,
-        variables: { id: objectId, zoneId: object.zoneId },
+        variables: { id: object.id, zoneId: object.zoneId },
         fetchPolicy: 'network-only',
       });
       const originalObject = detailed.data?.object;
@@ -426,8 +479,8 @@ function ObjectsContent() {
 
   // Sort the filtered objects
   // Map filtered search shapes back to original fragment objects for display
-  const filteredIdSet = new Set(filteredObjects.map(o => o.id));
-  const displayObjects = objects.filter(o => filteredIdSet.has(o.id));
+  const filteredKeySet = new Set(filteredObjects.map(objectKey));
+  const displayObjects = objects.filter(o => filteredKeySet.has(objectKey(o)));
 
   const sortedDisplayObjects = [...displayObjects].sort((a, b) => {
     const aVal = (a as unknown as Record<string, unknown>)[sortBy];
@@ -617,7 +670,11 @@ function ObjectsContent() {
 
       {filteredObjects.length === 0 ? (
         <div className='text-center py-12'>
-          <div className='text-muted-foreground mb-4'>No objects found</div>
+          <div className='text-muted-foreground mb-4'>
+            {useServerSearch && searchLoading
+              ? 'Searching...'
+              : 'No objects found'}
+          </div>
           <Link
             href='/dashboard/objects/editor'
             className='bg-primary text-primary-foreground px-4 py-2 rounded hover:bg-primary/90'
@@ -630,16 +687,17 @@ function ObjectsContent() {
           {paginatedObjects.map(object => {
             // Merge object with detailed data if available (union type)
             const fullObject: ObjectSummaryFragment | ObjectDetailsFragment =
-              objectDetails[object.id] || object;
+              objectDetails[objectKey(object)] || object;
+            const fullKey = objectKey(fullObject);
             return (
               <div
-                id={`object-${fullObject.id}`}
-                key={`${fullObject.zoneId}-${fullObject.id}`}
+                id={`object-${fullKey}`}
+                key={fullKey}
                 className='bg-card border rounded-lg hover:shadow-md transition-shadow'
               >
                 <div
                   className='p-4 cursor-pointer'
-                  onClick={() => toggleObjectExpanded(fullObject.id)}
+                  onClick={() => toggleObjectExpanded(fullObject)}
                 >
                   <div className='flex items-start justify-between'>
                     {/* Checkbox for selection */}
@@ -666,9 +724,7 @@ function ObjectsContent() {
                           <TypeBadge type={fullObject.type ?? ''} />
                           <ChevronDown
                             className={`w-4 h-4 text-muted-foreground transition-transform ${
-                              expandedObjects.has(fullObject.id)
-                                ? 'rotate-180'
-                                : ''
+                              expandedObjects.has(fullKey) ? 'rotate-180' : ''
                             }`}
                           />
                         </div>
@@ -711,35 +767,33 @@ function ObjectsContent() {
                       <button
                         onClick={e => {
                           e.stopPropagation();
-                          handleCloneObject(fullObject.id);
+                          handleCloneObject(fullObject);
                         }}
-                        disabled={cloningId === fullObject.id}
+                        disabled={cloningId === fullKey}
                         className='inline-flex items-center text-secondary hover:text-secondary/80 px-3 py-1 text-sm disabled:opacity-50'
                       >
                         <Copy className='w-3 h-3 mr-1' />
-                        {cloningId === fullObject.id ? 'Cloning...' : 'Clone'}
+                        {cloningId === fullKey ? 'Cloning...' : 'Clone'}
                       </button>
                       <button
                         onClick={e => {
                           e.stopPropagation();
-                          handleDelete(fullObject.id!, fullObject.name ?? '');
+                          handleDelete(fullObject, fullObject.name ?? '');
                         }}
-                        disabled={deletingId === fullObject.id}
+                        disabled={deletingId === fullKey}
                         className='inline-flex items-center text-destructive hover:text-destructive/80 px-3 py-1 text-sm disabled:opacity-50'
                       >
                         <Trash2 className='w-3 h-3 mr-1' />
-                        {deletingId === fullObject.id
-                          ? 'Deleting...'
-                          : 'Delete'}
+                        {deletingId === fullKey ? 'Deleting...' : 'Delete'}
                       </button>
                     </div>
                   </div>
                 </div>
 
                 {/* Expanded Details */}
-                {expandedObjects.has(fullObject.id) && (
+                {expandedObjects.has(fullKey) && (
                   <div className='border-t border-border p-4 bg-muted'>
-                    {loadingDetails.has(fullObject.id) ? (
+                    {loadingDetails.has(fullKey) ? (
                       <div className='text-center py-4'>
                         <div className='inline-flex items-center'>
                           <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2'></div>
