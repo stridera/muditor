@@ -1,7 +1,9 @@
-import { UseGuards } from '@nestjs/common';
+import { ForbiddenException, UseGuards } from '@nestjs/common';
 import {
   Args,
+  Context,
   Field,
+  GraphQLISODateTime,
   ID,
   Mutation,
   ObjectType,
@@ -11,6 +13,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { UserRole } from '@muditor/db';
+import type { Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { Roles } from '../auth/decorators/roles.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
@@ -31,7 +34,19 @@ import { UpdateUserInput } from './dto/update-user.input';
 import { UpdatePreferencesInput } from './dto/update-preferences.input';
 import { BanRecord } from './entities/ban-record.entity';
 import { User } from './entities/user.entity';
+import {
+  assertCanViewUserAccount,
+  canViewUserAccount,
+  type UserViewer,
+} from './user-access.util';
 import { UsersService } from './users.service';
+
+type GqlCtx = { req?: { user?: UserViewer | null | undefined } };
+
+/** Request user attached by GraphQLJwtAuthGuard, if the request was authenticated. */
+function viewerOf(ctx: GqlCtx): UserViewer | null {
+  return ctx?.req?.user ?? null;
+}
 
 interface CurrentUserContext {
   id: string;
@@ -86,8 +101,15 @@ export class UsersResolver {
     return this.usersService.getAllUsersWithBanStatus();
   }
 
-  @Query(() => User)
-  async user(@Args('id', { type: () => ID }) id: string): Promise<User> {
+  @Query(() => User, {
+    description: 'A user account. Only the account owner or IMMORTAL+.',
+  })
+  @UseGuards(GraphQLJwtAuthGuard)
+  async user(
+    @Args('id', { type: () => ID }) id: string,
+    @CurrentUser() currentUser: Users
+  ): Promise<User> {
+    assertCanViewUserAccount(currentUser, id);
     return this.usersService.getUserWithBanStatus(id);
   }
 
@@ -214,8 +236,28 @@ export class UsersResolver {
     return this.usersService.unbanUser(input.userId, currentUser.id);
   }
 
-  @ResolveField(() => [BanRecord])
-  async banRecords(@Parent() user: User): Promise<BanRecord[]> {
+  // Sensitive User fields: only the account itself or IMMORTAL+ may read them.
+
+  @ResolveField(() => String)
+  email(@Parent() user: User, @Context() ctx: GqlCtx): string {
+    if (!canViewUserAccount(viewerOf(ctx), user)) {
+      throw new ForbiddenException('You do not have access to this account');
+    }
+    return user.email;
+  }
+
+  @ResolveField(() => GraphQLISODateTime, { nullable: true })
+  lastLoginAt(@Parent() user: User, @Context() ctx: GqlCtx): Date | null {
+    if (!canViewUserAccount(viewerOf(ctx), user)) return null;
+    return user.lastLoginAt ?? null;
+  }
+
+  @ResolveField(() => [BanRecord], { nullable: true })
+  async banRecords(
+    @Parent() user: User,
+    @Context() ctx: GqlCtx
+  ): Promise<BanRecord[] | null> {
+    if (!canViewUserAccount(viewerOf(ctx), user)) return null;
     return this.usersService.getBanHistory(user.id);
   }
 

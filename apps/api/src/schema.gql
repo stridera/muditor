@@ -2647,6 +2647,8 @@ type Query {
   triggersByZone(zoneId: Int!): [TriggerDto!]!
   triggersNeedingReview: [TriggerDto!]!
   triggersNeedingReviewCount: Int!
+
+  """A user account. Only the account owner or IMMORTAL+."""
   user(id: ID!): User!
   userPermissions(userId: ID!): UserPermissions!
   userZoneGrants(userId: String!): [ZoneGrantDto!]!

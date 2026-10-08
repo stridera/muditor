@@ -389,4 +389,35 @@ describe('CharactersResolver authorization', () => {
       expect(resolver.resolveUserId(character, immortal)).toBe('player-1');
     });
   });
+  describe('onlineCharacters account exposure', () => {
+    const online = [
+      {
+        id: 'c-mine',
+        name: 'Mine',
+        level: 10,
+        user: { id: 'player-1', displayName: 'P1', role: 'PLAYER' },
+      },
+      {
+        id: 'c-other',
+        name: 'Other',
+        level: 50,
+        user: { id: 'player-2', displayName: 'P2', role: 'CODER' },
+      },
+    ];
+
+    it('hides other accounts (id, role) from non-staff but keeps the who-list', async () => {
+      service.getOnlineCharacters.mockResolvedValue(online as never);
+      const rows = await resolver.getOnlineCharacters(player);
+      expect(rows.map(r => r.name)).toEqual(['Mine', 'Other']);
+      expect(rows[0]?.user?.id).toBe('player-1');
+      expect(rows[1]?.user).toBeNull();
+      expect(JSON.stringify(rows)).not.toMatch(/player-2|email|CODER/);
+    });
+
+    it('shows account summaries to IMMORTAL+', async () => {
+      service.getOnlineCharacters.mockResolvedValue(online as never);
+      const rows = await resolver.getOnlineCharacters(immortal);
+      expect(rows[1]?.user?.id).toBe('player-2');
+    });
+  });
 });

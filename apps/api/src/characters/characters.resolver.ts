@@ -509,7 +509,11 @@ export class CharactersResolver {
         'You can only list your own online characters'
       );
     }
-    return this.charactersService.getOnlineCharacters(userId);
+    const online = await this.charactersService.getOnlineCharacters(userId);
+    if (isStaff(user.role)) return online;
+    // Non-staff see who is online, but account ids and roles belong to staff
+    // and to the account's owner: those are what make `user(id)` harvestable.
+    return online.map(c => (c.user?.id === user.id ? c : { ...c, user: null }));
   }
 
   @Query(() => [OnlineCharacterDto], { name: 'myOnlineCharacters' })

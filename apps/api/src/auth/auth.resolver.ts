@@ -1,7 +1,15 @@
 import { UseGuards } from '@nestjs/common';
-import { Args, Mutation, Query, Resolver } from '@nestjs/graphql';
+import {
+  Args,
+  Mutation,
+  Parent,
+  Query,
+  ResolveField,
+  Resolver,
+} from '@nestjs/graphql';
 import type { Users as PrismaUser } from '@muditor/db';
 import { User } from '../users/entities/user.entity';
+import { markSelfAuthenticated } from '../users/user-access.util';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
 import { CurrentUser } from './decorators/current-user.decorator';
@@ -143,5 +151,18 @@ export class AuthResolver {
   @UseGuards(GraphQLJwtAuthGuard)
   async hasGoogleLink(@CurrentUser('id') userId: string): Promise<boolean> {
     return this.authService.hasGoogleLink(userId);
+  }
+}
+
+/**
+ * Auth mutations hand the account back to the person who just proved they own
+ * it, before any JWT exists. Mark that user so its private fields (email, ...)
+ * resolve for them.
+ */
+@Resolver(() => AuthPayload)
+export class AuthPayloadResolver {
+  @ResolveField(() => User)
+  user(@Parent() payload: AuthPayload): User {
+    return markSelfAuthenticated(payload.user);
   }
 }

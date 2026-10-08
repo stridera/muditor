@@ -3437,6 +3437,7 @@ export type Query = {
   triggersByZone: Array<TriggerDto>;
   triggersNeedingReview: Array<TriggerDto>;
   triggersNeedingReviewCount: Scalars['Int']['output'];
+  /** A user account. Only the account owner or IMMORTAL+. */
   user: User;
   userPermissions: UserPermissions;
   userZoneGrants: Array<ZoneGrantDto>;

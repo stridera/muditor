@@ -191,7 +191,7 @@ export function OnlineStats({ showMyStats = false }: OnlineStatsProps) {
   // Calculate some stats
   const totalOnline = onlineCharacters.length;
   const uniqueUsers = new Set(
-    onlineCharacters.map((c: OnlineCharacter) => c.user?.id ?? 'unknown')
+    onlineCharacters.map((c: OnlineCharacter) => c.user?.id ?? c.id)
   ).size;
   const roleStats = onlineCharacters.reduce(
     (acc: Record<string, number>, char: OnlineCharacter) => {
