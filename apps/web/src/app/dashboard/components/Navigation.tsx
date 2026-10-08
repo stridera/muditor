@@ -1,6 +1,5 @@
 'use client';
 
-import { EnvironmentSelector } from '@/components/environment-selector';
 import { Breadcrumb } from '@/components/navigation/breadcrumb';
 import { ZoneEntityTabs } from '@/components/navigation/zone-entity-tabs';
 import { ThemeToggle } from '@/components/theme-toggle';
@@ -306,7 +305,7 @@ export function Navigation() {
             </div>
           )}
 
-          {/* Right: View Toggle, Theme, Environment, User - Always positioned at the right */}
+          {/* Right: View Toggle, Theme, User - Always positioned at the right */}
           <div className='flex items-center gap-3 flex-1 justify-end'>
             {/* View Mode Toggle (only for Immortal+) */}
             {canSwitchViews && (
@@ -342,9 +341,6 @@ export function Navigation() {
 
             {/* Theme Toggle */}
             <ThemeToggle />
-
-            {/* Environment Selector */}
-            <EnvironmentSelector />
 
             {/* User Menu */}
             {user && (

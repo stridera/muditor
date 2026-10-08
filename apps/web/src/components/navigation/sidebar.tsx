@@ -1,6 +1,5 @@
 'use client';
 
-import { EnvironmentSelector } from '@/components/environment-selector';
 import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -508,7 +507,6 @@ export function Sidebar() {
           className={`flex items-center ${collapsed ? 'flex-col gap-2' : 'gap-2'}`}
         >
           <ThemeToggle />
-          {!collapsed && <EnvironmentSelector />}
         </div>
 
         {/* User info */}
