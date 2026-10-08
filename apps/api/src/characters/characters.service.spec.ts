@@ -372,6 +372,40 @@ describe('CharactersService race/class handling', () => {
     });
   });
 
+  describe('corpse info on character items', () => {
+    const corpseSelect = {
+      select: { id: true, roomZoneId: true, roomId: true },
+    };
+
+    it('findCharacterById includes the corpse each item lies in', async () => {
+      db.characters.findUnique.mockResolvedValue({
+        id: 'c1',
+        characterItems: [],
+      });
+      await service.findCharacterById('c1');
+      const include = db.characters.findUnique.mock.calls[0][0].include;
+      expect(include.characterItems.include.corpse).toEqual(corpseSelect);
+    });
+
+    it('findCharacters includes the corpse each item lies in', async () => {
+      await service.findAllCharacters();
+      const include = db.characters.findMany.mock.calls[0][0].include;
+      expect(include.characterItems.include.corpse).toEqual(corpseSelect);
+    });
+
+    it('findCharacterItems includes the corpse and keeps corpse rows', async () => {
+      db.characters.findUnique.mockResolvedValue({ id: 'c1' });
+      const rows = [
+        { id: 1, corpseId: null, corpse: null },
+        { id: 2, corpseId: 9, corpse: { id: 9, roomZoneId: 30, roomId: 45 } },
+      ];
+      const findMany = jest.fn().mockResolvedValue(rows);
+      (db as unknown as Record<string, unknown>).characterItems = { findMany };
+      await expect(service.findCharacterItems('c1')).resolves.toBe(rows);
+      expect(findMany.mock.calls[0][0].include.corpse).toEqual(corpseSelect);
+    });
+  });
+
   describe('getOnlineCharacters', () => {
     const livePlayer = (name: string) => ({
       name,

@@ -46,6 +46,14 @@ import {
   verifyStatRoll,
 } from './stat-roll';
 
+/**
+ * Where a CharacterItems row's corpse lies. Rows with a corpse belong to a
+ * dead player's corpse, not to their inventory.
+ */
+const CORPSE_SUMMARY = {
+  select: { id: true, roomZoneId: true, roomId: true },
+} as const;
+
 /** Max failed password attempts before lockout */
 const LOCKOUT_MAX_ATTEMPTS = 5;
 /** Lockout duration in seconds (15 minutes) */
@@ -148,6 +156,7 @@ export class CharactersService implements OnModuleDestroy {
       include: {
         characterItems: {
           include: {
+            corpse: CORPSE_SUMMARY,
             objects: {
               select: { id: true, zoneId: true, name: true, type: true },
             },
@@ -169,6 +178,7 @@ export class CharactersService implements OnModuleDestroy {
       include: {
         characterItems: {
           include: {
+            corpse: CORPSE_SUMMARY,
             objects: {
               select: {
                 id: true,
@@ -242,6 +252,7 @@ export class CharactersService implements OnModuleDestroy {
       include: {
         characterItems: {
           include: {
+            corpse: CORPSE_SUMMARY,
             objects: {
               select: {
                 id: true,
@@ -325,6 +336,7 @@ export class CharactersService implements OnModuleDestroy {
       include: {
         characterItems: {
           include: {
+            corpse: CORPSE_SUMMARY,
             objects: {
               select: {
                 id: true,
@@ -450,6 +462,7 @@ export class CharactersService implements OnModuleDestroy {
       include: {
         characterItems: {
           include: {
+            corpse: CORPSE_SUMMARY,
             objects: {
               select: {
                 id: true,
@@ -483,6 +496,7 @@ export class CharactersService implements OnModuleDestroy {
     return this.db.characterItems.findMany({
       where: { characterId },
       include: {
+        corpse: CORPSE_SUMMARY,
         objects: {
           select: {
             id: true,
@@ -502,6 +516,7 @@ export class CharactersService implements OnModuleDestroy {
       where: { id },
       include: {
         characters: true,
+        corpse: CORPSE_SUMMARY,
         objects: {
           select: {
             id: true,
@@ -568,6 +583,7 @@ export class CharactersService implements OnModuleDestroy {
       data: itemCreateData,
       include: {
         characters: true,
+        corpse: CORPSE_SUMMARY,
         objects: {
           select: {
             id: true,
@@ -603,6 +619,7 @@ export class CharactersService implements OnModuleDestroy {
       data: data as Prisma.CharacterItemsUpdateInput,
       include: {
         characters: true,
+        corpse: CORPSE_SUMMARY,
         objects: {
           select: {
             id: true,

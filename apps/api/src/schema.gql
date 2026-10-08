@@ -400,6 +400,12 @@ input CharacterFilterInput {
   name: String
 }
 
+type CharacterItemCorpseDto {
+  id: Int!
+  roomId: Int!
+  roomZoneId: Int!
+}
+
 type CharacterItemDto {
   characterId: String!
   characters: CharacterDto!
@@ -408,6 +414,8 @@ type CharacterItemDto {
   containedItems: [CharacterItemDto!]!
   container: CharacterItemDto
   containerId: Int
+  corpse: CharacterItemCorpseDto
+  corpseId: Int
   createdAt: DateTime!
   customLongDesc: String
   customShortDesc: String

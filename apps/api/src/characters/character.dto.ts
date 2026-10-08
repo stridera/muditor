@@ -162,6 +162,19 @@ export class CharacterDto {
   characterEffects?: CharacterEffectDto[];
 }
 
+/** The player corpse a CharacterItems row currently sits in. */
+@ObjectType()
+export class CharacterItemCorpseDto {
+  @Field(() => Int)
+  id: number;
+
+  @Field(() => Int)
+  roomZoneId: number;
+
+  @Field(() => Int)
+  roomId: number;
+}
+
 @ObjectType()
 export class CharacterItemDto {
   @Field(() => ID)
@@ -175,6 +188,16 @@ export class CharacterItemDto {
 
   @Field(() => Int, { nullable: true })
   containerId?: number;
+
+  /**
+   * Set while the item lies in the owner's corpse (it is not carried then);
+   * `corpse` says where. Null for carried and worn items.
+   */
+  @Field(() => Int, { nullable: true })
+  corpseId?: number | null;
+
+  @Field(() => CharacterItemCorpseDto, { nullable: true })
+  corpse?: CharacterItemCorpseDto | null;
 
   @Field({ nullable: true })
   equippedLocation?: string;

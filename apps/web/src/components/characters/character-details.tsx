@@ -35,6 +35,8 @@ import { CharacterDeleteDialog } from './character-delete-dialog';
 import { CharacterEditForm } from './character-edit-form';
 import { ColoredText } from '@/lib/color-codes';
 import { CharacterSessionInfo } from './character-session-info';
+import { CharacterCorpseItems } from './character-corpse-items';
+import { splitCharacterItems } from './character-items';
 
 const GET_CHARACTER_DETAILS = gql`
   query GetCharacterDetailsInline($id: ID!) {
@@ -82,6 +84,12 @@ const GET_CHARACTER_DETAILS = gql`
       characterItems {
         id
         equippedLocation
+        corpseId
+        corpse {
+          id
+          roomZoneId
+          roomId
+        }
         condition
         charges
         objects {
@@ -206,15 +214,15 @@ export function CharacterDetails({
     return 'text-red-600';
   };
 
-  const equippedItems = (character.characterItems || []).filter(
-    (item: any) => item.equippedLocation
-  );
+  // Rows in the character's corpse are not carried: keep them out of the
+  // equipped and inventory lists and show them in their own section.
+  const {
+    equipped: equippedItems,
+    inventory: inventoryItems,
+    corpses: corpseGroups,
+  } = splitCharacterItems<any>(character.characterItems);
 
   // Group inventory items by object ID and name
-  const inventoryItems = (character.characterItems || []).filter(
-    (item: any) => !item.equippedLocation
-  );
-
   const groupedInventory = inventoryItems.reduce((acc: any[], item: any) => {
     const key = `${item.objects.zoneId}-${item.objects.id}`;
     const existing = acc.find(g => g.key === key);
@@ -556,6 +564,10 @@ export function CharacterDetails({
                 )}
               </CardContent>
             </Card>
+
+            {corpseGroups.map(group => (
+              <CharacterCorpseItems key={group.corpseId} group={group} />
+            ))}
           </div>
         </TabsContent>
 
