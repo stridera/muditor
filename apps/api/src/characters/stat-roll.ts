@@ -129,3 +129,52 @@ export function isAssignmentOfRoll(
   const rolled = [...values].sort((a, b) => a - b);
   return assigned.every((v, i) => v === rolled[i]);
 }
+
+/**
+ * Races columns holding the per-attribute caps. Luck has no race cap. These
+ * are the same `Races.max_*` columns the game reads at character creation
+ * (fierymud-rs `roll_starting_stats` via `RaceCatalog::stat_cap`).
+ */
+export const RACE_CAP_COLUMNS = {
+  strength: 'maxStrength',
+  intelligence: 'maxIntelligence',
+  wisdom: 'maxWisdom',
+  dexterity: 'maxDexterity',
+  constitution: 'maxConstitution',
+  charisma: 'maxCharisma',
+} as const;
+
+export type RaceStatCaps = Record<keyof typeof RACE_CAP_COLUMNS, number>;
+
+/** Pick the six cap columns off a Races row. */
+export function raceStatCaps(
+  race: Record<(typeof RACE_CAP_COLUMNS)[keyof typeof RACE_CAP_COLUMNS], number>
+): RaceStatCaps {
+  return {
+    strength: race.maxStrength,
+    intelligence: race.maxIntelligence,
+    wisdom: race.maxWisdom,
+    dexterity: race.maxDexterity,
+    constitution: race.maxConstitution,
+    charisma: race.maxCharisma,
+  };
+}
+
+/**
+ * Clamp each capped attribute to the race's cap (`min(value, cap)`), exactly
+ * as the game does to freshly rolled stats at creation. Uncapped attributes
+ * (luck) pass through.
+ */
+export function clampToRaceCaps<T extends Partial<StatBlock>>(
+  stats: T,
+  caps: RaceStatCaps
+): T {
+  const out = { ...stats };
+  for (const key of Object.keys(caps) as (keyof RaceStatCaps)[]) {
+    const value = out[key];
+    if (typeof value === 'number') {
+      (out as Partial<StatBlock>)[key] = Math.min(value, caps[key]);
+    }
+  }
+  return out;
+}

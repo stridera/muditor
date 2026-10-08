@@ -9,14 +9,29 @@ import {
   STAT_FIELDS,
   assignRolledValue,
   defaultAssignment,
+  statCap,
 } from '../character-creation-form';
 
 const mockRoll = jest.fn();
 const mockCreate = jest.fn();
 
+const mockRaces = [
+  {
+    race: 'HUMAN',
+    displayName: 'Human',
+    playable: true,
+    maxStrength: 76,
+    maxIntelligence: 76,
+    maxWisdom: 76,
+    maxDexterity: 76,
+    maxConstitution: 76,
+    maxCharisma: 76,
+  },
+];
+
 jest.mock('@/hooks/use-races', () => ({
   useRaces: () => ({
-    races: [{ race: 'HUMAN', displayName: 'Human', playable: true }],
+    races: mockRaces,
     loading: false,
     error: undefined,
   }),
@@ -90,5 +105,43 @@ describe('CharacterCreationForm', () => {
     expect(
       screen.getByRole('button', { name: /create character/i })
     ).toBeEnabled();
+  });
+
+  it('shows a racial cap next to a capped attribute only', async () => {
+    mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 12 };
+    mockRoll.mockResolvedValue({
+      data: {
+        rollCharacterStats: {
+          token: 'tok',
+          values: [15, 16, 9, 14, 11, 12, 8],
+          expiresAt: '2026-01-01T00:00:00Z',
+        },
+      },
+    });
+    render(<CharacterCreationForm onCharacterCreated={jest.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: /roll stats/i }));
+    await waitFor(() =>
+      expect(screen.getByTestId('cap-intelligence')).toBeInTheDocument()
+    );
+    // INT holds the rolled 16 by default, above the cap of 12.
+    expect(screen.getByTestId('cap-intelligence')).toHaveTextContent(
+      'Racial max 12: 16 becomes 12'
+    );
+    expect(screen.queryByTestId('cap-strength')).toBeNull();
+    mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 76 };
+  });
+});
+
+describe('statCap', () => {
+  const human = mockRaces[0] as never;
+  it('ignores default caps and luck', () => {
+    expect(statCap(human, 'strength')).toBeNull();
+    expect(statCap(human, 'luck')).toBeNull();
+    expect(statCap(undefined, 'strength')).toBeNull();
+  });
+  it('reports lowered caps', () => {
+    expect(
+      statCap({ ...(human as object), maxStrength: 10 } as never, 'strength')
+    ).toBe(10);
   });
 });

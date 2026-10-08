@@ -14,6 +14,13 @@ export interface RaceOption {
   playable: boolean;
   humanoid: boolean;
   magical: boolean;
+  /** Per-attribute caps (Races.max_*); the game clamps creation stats to these. */
+  maxStrength: number;
+  maxIntelligence: number;
+  maxWisdom: number;
+  maxDexterity: number;
+  maxConstitution: number;
+  maxCharisma: number;
 }
 
 export interface UseRacesResult {
@@ -34,6 +41,12 @@ export function useRaces(): UseRacesResult {
     playable: r.playable,
     humanoid: r.humanoid,
     magical: r.magical,
+    maxStrength: r.maxStrength,
+    maxIntelligence: r.maxIntelligence,
+    maxWisdom: r.maxWisdom,
+    maxDexterity: r.maxDexterity,
+    maxConstitution: r.maxConstitution,
+    maxCharisma: r.maxCharisma,
   }));
 
   return {

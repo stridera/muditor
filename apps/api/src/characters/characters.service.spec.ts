@@ -63,6 +63,18 @@ const createInput = (overrides: InputOverrides = {}): CreateCharacterInput => {
   return input;
 };
 
+// Races row with the schema-default caps (76); override to lower specific ones.
+const raceRow = (caps: Record<string, number> = {}) => ({
+  playable: true,
+  maxStrength: 76,
+  maxDexterity: 76,
+  maxIntelligence: 76,
+  maxWisdom: 76,
+  maxConstitution: 76,
+  maxCharisma: 76,
+  ...caps,
+});
+
 describe('CharactersService race/class handling', () => {
   let db: {
     characters: {
@@ -90,7 +102,7 @@ describe('CharactersService race/class handling', () => {
       },
     };
     racesService = {
-      findOne: jest.fn().mockResolvedValue({ playable: true }),
+      findOne: jest.fn().mockResolvedValue(raceRow()),
     };
     gameAdmin = { getOnlinePlayers: jest.fn().mockResolvedValue([]) };
     service = new CharactersService(
@@ -190,6 +202,55 @@ describe('CharactersService race/class handling', () => {
           intelligence: 16,
           charisma: 12,
         });
+      });
+
+      it('clamps a stat above the race cap, as the game does at creation', async () => {
+        // Brute-style race: INT capped at 12. Player puts the rolled 16 there.
+        racesService.findOne.mockResolvedValue(
+          raceRow({ maxIntelligence: 12 })
+        );
+        await service.createCharacter(
+          createInput({ intelligence: ROLL[5], charisma: ROLL[1] }),
+          'user-1'
+        );
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data.intelligence).toBe(12);
+        expect(data.charisma).toBe(12);
+        // Uncapped stats keep their rolled values.
+        expect(data.strength).toBe(ROLL[0]);
+      });
+
+      it('leaves stats alone for races whose caps are not lowered', async () => {
+        await service.createCharacter(createInput(), 'user-1');
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data).toMatchObject({
+          strength: ROLL[0],
+          intelligence: ROLL[1],
+          wisdom: ROLL[2],
+          dexterity: ROLL[3],
+          constitution: ROLL[4],
+          charisma: ROLL[5],
+          luck: ROLL[6],
+        });
+      });
+
+      it('still rejects a non-permutation before looking at race caps', async () => {
+        racesService.findOne.mockResolvedValue(raceRow({ maxStrength: 10 }));
+        await expect(
+          service.createCharacter(createInput({ strength: 18 }), 'user-1')
+        ).rejects.toBeInstanceOf(BadRequestException);
+        expect(db.characters.create).not.toHaveBeenCalled();
+      });
+
+      it('lets staff exceed race caps', async () => {
+        racesService.findOne.mockResolvedValue(raceRow({ maxStrength: 10 }));
+        await service.createCharacter(
+          createInput({ statRollToken: undefined, strength: 25 }),
+          'user-1',
+          { isStaff: true }
+        );
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data.strength).toBe(25);
       });
 
       it('lets staff set stats directly without a roll', async () => {

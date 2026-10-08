@@ -39,7 +39,12 @@ import {
   UpdateCharacterInput,
   UpdateCharacterItemInput,
 } from './character.input';
-import { isAssignmentOfRoll, verifyStatRoll } from './stat-roll';
+import {
+  clampToRaceCaps,
+  isAssignmentOfRoll,
+  raceStatCaps,
+  verifyStatRoll,
+} from './stat-roll';
 
 /** Max failed password attempts before lockout */
 const LOCKOUT_MAX_ATTEMPTS = 5;
@@ -285,7 +290,10 @@ export class CharactersService implements OnModuleDestroy {
 
     await this.assertRaceAllowed(data.race, options.isStaff ?? false);
     await this.assertClassExists(data.classId);
-    if (!options.isStaff) this.assertStatsFromRoll(data, userId);
+    if (!options.isStaff) {
+      this.assertStatsFromRoll(data, userId);
+      data = await this.applyRaceStatCaps(data);
+    }
 
     const hitPoints = Math.max(50, data.constitution * 5 + data.level * 10);
     const stamina = Math.max(100, data.constitution * 8 + data.level * 5);
@@ -347,6 +355,19 @@ export class CharactersService implements OnModuleDestroy {
         'Stats must be an assignment of the rolled values'
       );
     }
+  }
+
+  /**
+   * Apply the race's per-attribute caps (Races.max_* columns) the way the game
+   * does at creation: a value above the cap is clamped down to it, not
+   * rejected. Runs after the roll-permutation check so the submitted values
+   * are known to come from the server roll.
+   */
+  private async applyRaceStatCaps(
+    data: CreateCharacterInput
+  ): Promise<CreateCharacterInput> {
+    const raceData = await this.racesService.findOne(data.race);
+    return clampToRaceCaps(data, raceStatCaps(raceData));
   }
 
   async updateCharacter(

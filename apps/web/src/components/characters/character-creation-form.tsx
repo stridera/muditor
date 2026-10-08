@@ -20,7 +20,7 @@ import {
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
 import { useClasses } from '@/hooks/use-classes';
-import { useRaces } from '@/hooks/use-races';
+import { useRaces, type RaceOption } from '@/hooks/use-races';
 import type { Race } from '@/generated/graphql';
 import { gql } from '@apollo/client';
 import { useMutation } from '@apollo/client/react';
@@ -76,6 +76,29 @@ export const STAT_FIELDS = [
 ] as const;
 
 export type StatKey = (typeof STAT_FIELDS)[number]['key'];
+
+const RACE_CAP_FIELDS = {
+  strength: 'maxStrength',
+  intelligence: 'maxIntelligence',
+  wisdom: 'maxWisdom',
+  dexterity: 'maxDexterity',
+  constitution: 'maxConstitution',
+  charisma: 'maxCharisma',
+} as const;
+
+/**
+ * The race's cap for `stat` (Races.max_*), or null when it has none (luck) or
+ * it is above anything a 3d6 roll can reach. The server clamps creation stats
+ * to this cap, same as the game.
+ */
+export function statCap(
+  race: RaceOption | undefined,
+  stat: StatKey
+): number | null {
+  if (!race || !(stat in RACE_CAP_FIELDS)) return null;
+  const cap = race[RACE_CAP_FIELDS[stat as keyof typeof RACE_CAP_FIELDS]];
+  return typeof cap === 'number' && cap < 18 ? cap : null;
+}
 
 /** Which rolled value (index into the roll) each attribute currently holds. */
 export type StatAssignment = Record<StatKey, number>;
@@ -158,6 +181,7 @@ export function CharacterCreationForm({
   const { races, loading: racesLoading } = useRaces();
   const { classes, loading: classesLoading } = useClasses();
   const playableRaces = races.filter(r => r.playable);
+  const selectedRace = races.find(r => r.race === formData.race);
 
   const genders = [
     { value: 'male', label: 'Male' },
@@ -430,31 +454,45 @@ export function CharacterCreationForm({
           {roll && (
             <CardContent>
               <div className='grid grid-cols-2 md:grid-cols-4 gap-4'>
-                {STAT_FIELDS.map(stat => (
-                  <div key={stat.key} className='space-y-2'>
-                    <Label htmlFor={stat.key}>{stat.label}</Label>
-                    <Select
-                      value={String(assignment[stat.key])}
-                      onValueChange={value =>
-                        setAssignment(prev =>
-                          assignRolledValue(prev, stat.key, Number(value))
-                        )
-                      }
-                      disabled={loading}
-                    >
-                      <SelectTrigger id={stat.key}>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {roll.values.map((value, index) => (
-                          <SelectItem key={index} value={String(index)}>
-                            {value}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                ))}
+                {STAT_FIELDS.map(stat => {
+                  const cap = statCap(selectedRace, stat.key);
+                  const rolled = roll.values[assignment[stat.key]] ?? 0;
+                  return (
+                    <div key={stat.key} className='space-y-2'>
+                      <Label htmlFor={stat.key}>{stat.label}</Label>
+                      <Select
+                        value={String(assignment[stat.key])}
+                        onValueChange={value =>
+                          setAssignment(prev =>
+                            assignRolledValue(prev, stat.key, Number(value))
+                          )
+                        }
+                        disabled={loading}
+                      >
+                        <SelectTrigger id={stat.key}>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {roll.values.map((value, index) => (
+                            <SelectItem key={index} value={String(index)}>
+                              {value}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      {cap !== null && (
+                        <p
+                          className='text-xs text-muted-foreground'
+                          data-testid={`cap-${stat.key}`}
+                        >
+                          {rolled > cap
+                            ? `Racial max ${cap}: ${rolled} becomes ${cap}`
+                            : `Racial max ${cap}`}
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
               </div>
               <div className='mt-4 text-sm text-muted-foreground'>
                 <p>

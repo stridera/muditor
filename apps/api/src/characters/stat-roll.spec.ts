@@ -2,6 +2,7 @@ import { BadRequestException } from '@nestjs/common';
 import {
   ROLLED_STATS,
   STAT_ROLL_TTL_SECONDS,
+  clampToRaceCaps,
   isAssignmentOfRoll,
   issueStatRoll,
   rollStatValues,
@@ -68,5 +69,32 @@ describe('stat-roll', () => {
     expect(isAssignmentOfRoll(block([16, 16, 9, 14, 11, 12, 8]), roll)).toBe(
       false
     );
+  });
+
+  it('clampToRaceCaps lowers only the stats above a race cap', () => {
+    const caps = {
+      strength: 76,
+      intelligence: 12,
+      wisdom: 76,
+      dexterity: 76,
+      constitution: 76,
+      charisma: 76,
+    };
+    const clamped = clampToRaceCaps(block([10, 18, 9, 14, 11, 12, 18]), caps);
+    expect(clamped.intelligence).toBe(12);
+    expect(clamped.strength).toBe(10);
+    // Luck has no race cap.
+    expect(clamped.luck).toBe(18);
+    // Default caps (76) never touch a 3d6 roll.
+    expect(
+      clampToRaceCaps(block([18, 18, 18, 18, 18, 18, 18]), {
+        strength: 76,
+        intelligence: 76,
+        wisdom: 76,
+        dexterity: 76,
+        constitution: 76,
+        charisma: 76,
+      })
+    ).toEqual(block([18, 18, 18, 18, 18, 18, 18]));
   });
 });
