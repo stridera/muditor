@@ -21,6 +21,9 @@ export class ClassDto {
   @Field({ nullable: true })
   primaryStat?: string;
 
+  @Field(() => Int)
+  alignmentBias: number;
+
   @Field()
   createdAt: Date;
 

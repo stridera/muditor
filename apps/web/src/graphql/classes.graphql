@@ -8,6 +8,7 @@ query GetClasses {
     description
     hitDice
     primaryStat
+    alignmentBias
   }
 }
 
@@ -54,6 +55,7 @@ mutation UpdateClass($id: ID!, $data: UpdateClassInput!) {
     description
     hitDice
     primaryStat
+    alignmentBias
   }
 }
 

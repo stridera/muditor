@@ -507,6 +507,7 @@ type ClassCircleDto {
 }
 
 type ClassDto {
+  alignmentBias: Int!
   createdAt: DateTime!
   description: String
   hitDice: String!
@@ -3553,6 +3554,7 @@ input UpdateClassCircleInput {
 }
 
 input UpdateClassInput {
+  alignmentBias: Int
   description: String
   hitDice: String
   name: String

@@ -1,5 +1,12 @@
 import { InputType, Field, Int } from '@nestjs/graphql';
-import { IsString, IsNotEmpty, IsInt, IsOptional, Min } from 'class-validator';
+import {
+  IsString,
+  IsNotEmpty,
+  IsInt,
+  IsOptional,
+  Min,
+  Max,
+} from 'class-validator';
 
 @InputType()
 export class CreateClassInput {
@@ -44,6 +51,14 @@ export class UpdateClassInput {
   @IsString()
   @IsOptional()
   primaryStat?: string;
+
+  /** Killer-class alignment bias for the kill alignment formula (-1000..1000). */
+  @Field(() => Int, { nullable: true })
+  @IsInt()
+  @Min(-1000)
+  @Max(1000)
+  @IsOptional()
+  alignmentBias?: number;
 }
 
 @InputType()

@@ -378,6 +378,12 @@ model CharacterClass {
   // init_exp_table) by this and truncates, like legacy exp_next_level.
   expGainFactor Float @default(1.0) @map("exp_gain_factor")
 
+  // Legacy killer-class alignment bias (class.cpp change_alignment): added to
+  // the killer's alignment before the kill alignment formula. Positive for
+  // "good" classes (Paladin/Priest +100, Ranger/Druid +50), negative for "bad"
+  // (Anti-Paladin/Diabolist/Necromancer -100, Thief/Assassin -50), 0 otherwise.
+  alignmentBias Int @default(0) @map("alignment_bias")
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")

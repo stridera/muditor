@@ -112,6 +112,9 @@ export class ClassesService {
         plainName: stripMarkup(data.name),
       }),
       ...(data.description !== undefined && { description: data.description }),
+      ...(data.alignmentBias !== undefined && {
+        alignmentBias: data.alignmentBias,
+      }),
     };
     return this.db.characterClass.update({ where: { id }, data: updateData });
   }

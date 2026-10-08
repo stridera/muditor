@@ -86,6 +86,7 @@ type ClassData = {
   description?: string | null;
   hitDice: string;
   primaryStat?: string | null;
+  alignmentBias: number;
 };
 
 // Derived type aliases for improved type safety
@@ -110,6 +111,7 @@ export default function ClassesPage() {
     description: '',
     hitDice: '',
     primaryStat: '',
+    alignmentBias: 0,
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -350,6 +352,7 @@ export default function ClassesPage() {
       description: cls.description || '',
       hitDice: cls.hitDice,
       primaryStat: cls.primaryStat || '',
+      alignmentBias: cls.alignmentBias,
     });
     setIsEditing(false);
     setActiveTab('details');
@@ -366,6 +369,7 @@ export default function ClassesPage() {
           description: formData.description || undefined,
           hitDice: formData.hitDice,
           primaryStat: formData.primaryStat || undefined,
+          alignmentBias: formData.alignmentBias,
         },
       },
     });
@@ -543,6 +547,7 @@ export default function ClassesPage() {
                                     hitDice: selectedClass.hitDice,
                                     primaryStat:
                                       selectedClass.primaryStat || '',
+                                    alignmentBias: selectedClass.alignmentBias,
                                   });
                                 }}
                               >
@@ -614,6 +619,30 @@ export default function ClassesPage() {
                         disabled={!isEditing}
                         placeholder='e.g., Strength'
                       />
+                    </div>
+
+                    <div className='grid gap-2'>
+                      <Label htmlFor='alignmentBias'>Alignment Bias</Label>
+                      <Input
+                        id='alignmentBias'
+                        type='number'
+                        min={-1000}
+                        max={1000}
+                        value={formData.alignmentBias}
+                        onChange={e =>
+                          setFormData({
+                            ...formData,
+                            alignmentBias:
+                              Number.parseInt(e.target.value, 10) || 0,
+                          })
+                        }
+                        disabled={!isEditing}
+                      />
+                      <p className='text-xs text-muted-foreground'>
+                        Added to a killer&apos;s alignment in the kill alignment
+                        formula. Positive for good classes, negative for evil
+                        ones (e.g. Paladin +100, Necromancer -100).
+                      </p>
                     </div>
 
                     <div className='grid gap-2'>
