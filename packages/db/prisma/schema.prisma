@@ -817,6 +817,13 @@ model Characters {
   // Round-trips the `IgnoreList` runtime component so a harassing
   // player can't resume contact after the target reconnects.
   ignoreList            Json?                @map("ignore_list")
+  // Per-character command grants/revokes (legacy `grant` / `revoke` /
+  // `ungrant`). A grant lets a character use a command above their rank; a
+  // revoke removes one they would otherwise have. JSON shape:
+  // { "grants": [{ "command", "grantor", "level" }], "revokes": [ ... ] }.
+  // `level` is the grantor's level: a lower-level staffer cannot undo it.
+  // Round-trips the `CommandGrants` runtime component.
+  commandGrants         Json?                @map("command_grants")
   // Active EffectInstances on this character at save time. JSON shape:
   // { saved_at_unix: <secs>, effects: [{ kind, name, strength,
   // remaining_secs, source, ability_id, modify_delta? }, ...] }.
