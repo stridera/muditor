@@ -15,7 +15,7 @@ A quest has three layers:
 ### Lifecycle
 
 1. You build the quest in the editor and save it.
-2. A player **gets offered** the quest. There is no automatic "talk to the giver" hook: the player types `qaccept <zone> <id>`, or a trigger (level, item, room, skill, event, auto-start) offers it or accepts it for them. See [Offering a quest](#offering-a-quest).
+2. A player **gets offered** the quest. The player asks the quest giver mob something, types `qaccept <zone> <id>`, or a trigger (level, item, room, skill, event, auto-start) offers it or accepts it for them. See [Offering a quest](#offering-a-quest).
 3. On acceptance the server checks the gates: Hidden, Min Level / Max Level, already in progress, already completed (and not Repeatable), cooldown, Exclusive Group, and Prerequisites. The player command `qaccept` also checks the Availability Requirement.
 4. The quest becomes **IN_PROGRESS**. If Time Limit (minutes) is set, the countdown starts.
 5. Player actions advance matching objectives. Each advance prints a line such as `Quest objective: Kill 5 sewer rats (2/5)`.
@@ -29,7 +29,7 @@ Goal: "Kill 5 sewer rats, then report back to the mayor." We use zone 30, quest 
 
 1. Open **Dashboard > Quests** and click **Create New Quest**.
 2. On the **Basic Info** tab fill in **Zone ID**, **Quest ID**, **Name** (for example `Rats in the Cellar`) and **Description** (this is what `questinfo` shows players). Set **Min Level** / **Max Level**.
-3. Under **Quest Trigger Configuration** set **Trigger Type** to **Manual**. (Do not pick **Mob Encounter** expecting the mob to hand the quest out: the game ignores the Quest Giver Mob. See [Offering a quest](#offering-a-quest).)
+3. Under **Quest Trigger Configuration** set **Trigger Type** to **Mob Encounter** and pick the mayor as the **Quest Giver Mob**. Players are offered the quest when they `ask` the mayor something. See [Offering a quest](#offering-a-quest).
 4. Click **Create Quest**. The editor reloads on the saved quest.
 5. Open the **Phases & Objectives** tab (it only works after the first save) and click **Add Phase**. Rename it `Clear the cellar`.
 6. Click **Add Objective** and set:
@@ -38,7 +38,7 @@ Goal: "Kill 5 sewer rats, then report back to the mayor." We use zone 30, quest 
    - target: search the rat mob in **Search target mob...**.
 7. Add a second objective in the same phase: type **Talk to NPC**, count `1`, description `Report to the mayor`, target the mayor mob. Players complete it with `ask mayor hello` once the mayor is in the room. With both objectives in one phase they can be done in either order; put them in two phases to force kill-then-report (see [Phases](#phases)).
 8. Click **Add Reward** under **Phase Rewards**. Choose **Experience**, **Amount** `500`; add another with **Gold** `100`.
-9. Make the quest discoverable. Attach a greeting or speech trigger to the mayor mob that tells players `Type qaccept 30 5 to take the job.`
+9. Nothing more is needed to make it discoverable: `ask mayor job` offers the quest and tells the player to type `qaccept 30 5`. (Tick **Auto-accept** on the Basic Info tab to put them on the quest straight away instead.)
 10. Test it (see [Testing a quest](#testing-a-quest)): `qload 30 5`, kill five rats, `ask mayor hello`, then `quests`.
 
 Basic Info and the availability expression are saved with **Create Quest** / **Save Changes**. Prerequisites, phases, objectives, rewards and dialogue are saved the moment you edit them (typed text a moment after you stop typing, dialogue text when you click away).
@@ -52,7 +52,7 @@ The **Trigger Type** decides how a player is told about the quest. What the game
 | Trigger Type (label) | Value    | What the game does                                                                                                                                             |
 | -------------------- | -------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Manual               | `MANUAL` | Nothing automatic. Staff assign it with `qload` / `qgive`; players can still `qaccept` it.                                                                     |
-| Mob Encounter        | `MOB`    | **Nothing.** The Quest Giver Mob is not read by the game. Players take the quest with `qaccept <zone> <id>`. Have the mob tell them the command.               |
+| Mob Encounter        | `MOB`    | Offered (or accepted, see below) when a character uses `ask` on the **Quest Giver Mob**, with any topic. See below for what the giver checks first.            |
 | Level Reached        | `LEVEL`  | When a character levels up to exactly **Trigger Level**, the quest is offered (or accepted, see below). Characters already past that level are not offered it. |
 | Item Obtained        | `ITEM`   | Offered when a character picks up the **Trigger Item** with `get`.                                                                                             |
 | Room Entered         | `ROOM`   | Offered when a character enters the **Trigger Room** (earlier visits do not matter; arriving by teleport counts, logging in there does not).                   |
@@ -60,7 +60,9 @@ The **Trigger Type** decides how a player is told about the quest. What the game
 | Event Active         | `EVENT`  | Offered to every player online when the game event is switched on (the server checks about once a minute). Players who log in later are not offered it.        |
 | Auto-Start           | `AUTO`   | Offered (or accepted) at every login until the character holds the quest.                                                                                      |
 
-For `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. Tick **Auto-accept** on the Basic Info tab to accept for the character; leave it off to only **offer**. A trigger never offers a quest the character has any record of (in progress, completed, failed or abandoned), and offers each quest at most **once per login session**, however often the trigger fires again. The quest's Availability Requirement is checked first, exactly as for `qaccept`: a character who fails it (or whose expression errors) is not offered or given the quest. Room-trigger quests are cached by the server and refreshed about once a minute, so a newly edited quest can take up to a minute to start triggering.
+For `MOB`, `LEVEL`, `ITEM`, `ROOM`, `SKILL`, `EVENT` and `AUTO`: if the quest's auto-accept flag is on, the character is put on the quest straight away; if it is off the character only sees `*** Quest available: <name> (<zone>, <id>) - type qaccept <zone> <id> to take it. ***`. Tick **Auto-accept** on the Basic Info tab to accept for the character; leave it off to only **offer**. A trigger never offers a quest the character has any record of (in progress, completed, failed or abandoned), and offers each quest at most **once per login session**, however often the trigger fires again. The quest's Availability Requirement is checked first, exactly as for `qaccept`: a character who fails it (or whose expression errors) is not offered or given the quest. Room-trigger and giver-mob quests are cached by the server and refreshed about once a minute, so a newly edited quest can take up to a minute to start triggering.
+
+**The quest giver is stricter.** Asking the giver also applies the acceptance gates up front (Min Level / Max Level, Prerequisites, Exclusive Group, already in progress, completed and not Repeatable, Cooldown), so a character who could not take the quest right now is told nothing and the session's one offer is kept for later. Unlike the other triggers, a character who has finished a Repeatable quest, or failed or abandoned it, is offered it again when they ask the giver and the gates pass. The giver only answers to `ask`; there is no separate greeting hook, so give the mob a speech trigger if you want it to tell players to ask.
 
 Whatever the trigger type, any player can type `qaccept <zone> <id>` for any quest that is not Hidden.
 
@@ -215,7 +217,7 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 
 ## Common mistakes
 
-- **Expecting the Quest Giver Mob to hand out the quest.** The game ignores it. Tell players the `qaccept` command in the mob's dialogue or in the quest Description.
+- **Quest Giver Mob without the Mob Encounter trigger type.** The giver is only read when the Trigger Type is **Mob Encounter**. Players must `ask` the mob (`say` and `greet` do nothing); tell them so in the mob's room description or the quest Description.
 - **Hidden left on.** Players cannot accept hidden quests at all.
 - **Availability expression typos.** They fail closed, so nobody can take the quest (check `syslog 100 lua`). Use `actor`, not `character`, and lower-case class and race names.
 - **Expecting early progress to carry over.** An objective only advances while its phase is current. A kill made in phase 1 does not count towards a phase 2 kill objective. Only carried Collect Item items are credited when a phase starts.
@@ -244,7 +246,7 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 | Cooldown (minutes)                                                           | Shown when Repeatable is ticked; minutes after completion before it can be accepted again.                      |
 | Trigger Type                                                                 | How the quest is offered. See [Offering a quest](#offering-a-quest).                                            |
 | Time Limit (minutes)                                                         | Expiry after acceptance; empty means none.                                                                      |
-| Quest Giver Mob                                                              | Stored but ignored by the game.                                                                                 |
+| Quest Giver Mob                                                              | Mob Encounter only: the mob players `ask` to be offered the quest.                                              |
 | Trigger Level, Trigger Item, Trigger Room, Trigger Ability, Trigger Event ID | The target for the matching trigger type.                                                                       |
 | Exclusive Group                                                              | Quests sharing a name are mutually exclusive.                                                                   |
 
@@ -292,4 +294,4 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 
 ### What the editor cannot set yet
 
-Every quest column the game reads can be set in the editor. Settings that run the other way (the editor offers them, the game does not act on them): the **Quest Giver Mob** and **Shareable**. The "Any response" dialogue match type is hidden because the game never matches it.
+Every quest column the game reads can be set in the editor. Settings that run the other way (the editor offers them, the game does not act on them): **Shareable**. The "Any response" dialogue match type is hidden because the game never matches it.

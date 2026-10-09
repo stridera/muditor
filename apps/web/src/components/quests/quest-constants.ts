@@ -96,7 +96,7 @@ export const TRIGGER_TYPES: {
     value: 'MOB' as QuestTriggerType,
     label: 'Mob Encounter',
     description:
-      'Not used by the game yet: players take it with qaccept <zone> <id>',
+      'Offered when a player asks the Quest Giver Mob something (ask <mob> <topic>)',
   },
   {
     value: 'LEVEL' as QuestTriggerType,

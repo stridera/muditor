@@ -1099,7 +1099,7 @@ function QuestEditorContent() {
                         topic='quests'
                         anchor={HELP.offering}
                         variant='icon'
-                        tip='Stored but not used by the game yet'
+                        tip='Players are offered the quest when they ask this mob something'
                       />
                     </label>
                     <EntityAutocomplete
@@ -1118,8 +1118,8 @@ function QuestEditorContent() {
                       placeholder='Search mob that gives quest (e.g., "helena" or "30:5")'
                     />
                     <p className='text-xs text-muted-foreground mt-1'>
-                      Not used by the game yet. Players take the quest with
-                      qaccept &lt;zone&gt; &lt;id&gt;; have this mob tell them.
+                      Players are offered the quest when they ask this mob
+                      something (ask &lt;mob&gt; &lt;topic&gt;).
                     </p>
                   </div>
                 )}
