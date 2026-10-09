@@ -59,6 +59,7 @@ model Ability {
 
   // --- Relationships ---
   effects             AbilityEffect[]
+  creationRecipes     CreationRecipe[]
   school              AbilitySchool?           @relation(fields: [schoolId], references: [id])
   characterAbilities  CharacterAbilities[]
   mobAbilities        MobAbilities[]
@@ -178,6 +179,33 @@ model EffectAura {
   sortOrder        Int      @default(0) @map("sort_order")
 
   @@map("EffectAura")
+}
+
+// What a creation spell (Minor Creation, Create Food, ...) conjures. One row
+// per option:
+//   - `keyword`: the word the caster types (`cast 'minor creation' dagger`),
+//     matched as an abbreviation in `id` order, as legacy did. NULL for spells
+//     that do not take a word.
+//   - `classId`: the row applies to that caster class only (Create Food picks
+//     its food zone by class). NULL is the default for every other class.
+//   - `objectId`: the Objects row to create. NULL means "any FOOD object in
+//     `objectZoneId`", picked by the caster's skill (Create Food's per-class
+//     zones).
+// No FK on the object: a partial world import must not block the seed, and the
+// game logs a missing proto. Postgres treats NULLs in the unique index as
+// distinct, so the SQL seeds guard with NOT EXISTS rather than ON CONFLICT.
+model CreationRecipe {
+  id             Int             @id @default(autoincrement())
+  abilityId      Int             @map("ability_id")
+  ability        Ability         @relation(fields: [abilityId], references: [id], onDelete: Cascade)
+  keyword        String?
+  classId        Int?            @map("class_id")
+  characterClass CharacterClass? @relation(fields: [classId], references: [id], onDelete: Cascade)
+  objectZoneId   Int             @map("object_zone_id")
+  objectId       Int?            @map("object_id")
+
+  @@unique([abilityId, keyword, classId])
+  @@map("CreationRecipe")
 }
 
 model AbilitySchool {
@@ -419,6 +447,7 @@ model CharacterClass {
   classSkills         ClassSkills[]
   classAbilities      ClassAbilities[]
   classAbilityCircles ClassAbilityCircles[]
+  creationRecipes     CreationRecipe[]
   mobs                Mobs[]
 
   @@map("Class")
