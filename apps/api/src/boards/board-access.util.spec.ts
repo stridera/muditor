@@ -77,3 +77,47 @@ describe('legacy level rules', () => {
     ).toBe(true);
   });
 });
+
+describe('level rules 2-99', () => {
+  const rule = [{ privilege: 'Read', level: 30, maxLevel: 60 }];
+  const as = (
+    characterLevels?: number[],
+    role: UserRole = UserRole.PLAYER
+  ) => ({
+    role,
+    characterLevels,
+  });
+
+  it('is not open to every logged-in account', () => {
+    expect(canReadBoard(rule, as([]))).toBe(false);
+    expect(canReadBoard(rule, as(undefined))).toBe(false);
+    expect(canReadBoard(rule, { role: UserRole.PLAYER })).toBe(false);
+    expect(canReadBoard(rule, null)).toBe(false);
+  });
+
+  it('needs one linked character in [level, maxLevel]', () => {
+    expect(canReadBoard(rule, as([29]))).toBe(false);
+    expect(canReadBoard(rule, as([61]))).toBe(false);
+    expect(canReadBoard(rule, as([1, 30]))).toBe(true);
+    expect(canReadBoard(rule, as([60]))).toBe(true);
+    // no single character in range even though min and max are both covered
+    expect(canReadBoard(rule, as([20, 70]))).toBe(false);
+  });
+
+  it('treats a missing maxLevel as unbounded', () => {
+    expect(canReadBoard([{ privilege: 'Read', level: 30 }], as([99]))).toBe(
+      true
+    );
+  });
+
+  it('lets staff through regardless of their characters', () => {
+    expect(canReadBoard(rule, as([], UserRole.IMMORTAL))).toBe(true);
+    expect(
+      hasBoardPrivilege(
+        [{ privilege: 'WriteNew', level: 30, maxLevel: 60 }],
+        BoardPrivilege.WRITE_NEW,
+        as([100], UserRole.IMMORTAL)
+      )
+    ).toBe(true);
+  });
+});

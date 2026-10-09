@@ -62,6 +62,52 @@ describe('RoomsService', () => {
     databaseService = module.get(DatabaseService);
   });
 
+  describe('findAll relation loading', () => {
+    const plan = (over = {}) => ({
+      lightweight: false,
+      exits: false,
+      extraDescs: false,
+      environmentalEffects: false,
+      mobs: false,
+      objects: false,
+      ...over,
+    });
+
+    it('includes only the planned relations', async () => {
+      const findMany = databaseService.room.findMany as jest.Mock;
+      findMany.mockResolvedValue([mockRoom]);
+      await service.findAll({ plan: plan({ mobs: true }) });
+      const include = findMany.mock.calls[0][0].include;
+      expect(Object.keys(include)).toEqual(['mobResets']);
+      findMany.mockClear();
+      await service.findAll({ plan: plan() });
+      expect(findMany.mock.calls[0][0].include).toEqual({});
+    });
+
+    it('loads every relation when no plan is given', async () => {
+      const findMany = databaseService.room.findMany as jest.Mock;
+      findMany.mockResolvedValue([mockRoom]);
+      await service.findAll({});
+      expect(Object.keys(findMany.mock.calls[0][0].include).sort()).toEqual([
+        'environmentalEffects',
+        'exits',
+        'mobResets',
+        'objectResets',
+        'roomExtraDescriptions',
+      ]);
+    });
+
+    it('uses the raw lightweight loader when the plan says so', async () => {
+      const queryRaw = jest.fn().mockResolvedValue([]);
+      (databaseService as unknown as { $queryRawUnsafe: jest.Mock })[
+        '$queryRawUnsafe'
+      ] = queryRaw;
+      await service.findAll({ plan: plan({ lightweight: true }) });
+      expect(queryRaw).toHaveBeenCalled();
+      expect(databaseService.room.findMany).not.toHaveBeenCalled();
+    });
+  });
+
   describe('findAll', () => {
     it('should return array of rooms', async () => {
       (databaseService.room.findMany as jest.Mock).mockResolvedValue([

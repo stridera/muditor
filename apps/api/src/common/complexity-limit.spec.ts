@@ -119,4 +119,63 @@ describe('complexityLimit', () => {
       expect(() => run(q)).not.toThrow();
     });
   });
+
+  describe('rooms relation loading', () => {
+    const roomsSchema = buildSchema(`
+      type Shop { id: Int }
+      type Exit { id: Int direction: String keywords: [String!]! }
+      type Room {
+        id: Int
+        name: String
+        exits: [Exit!]!
+        shops: [Shop!]!
+        mobs: [Shop!]!
+      }
+      type Query { rooms(take: Int, lightweight: Boolean): [Room!]! }
+    `);
+    const runRooms = (query: string) =>
+      validate(roomsSchema, parse(query), [complexityLimit()]);
+
+    it('charges heavy room shapes for the full world load', () => {
+      // 1 + 20000 * 20 (one relation) + 20000 * (1 + 10) = 620_001
+      expect(runRooms('{ rooms(take: 20000) { shops { id } } }')).toEqual([]);
+      // Eleven aliases of it used to cost ~2.4M; now ~6.8M
+      const many = Array.from(
+        { length: 11 },
+        (_, i) => `a${i}: rooms(take: 20000) { shops { id } }`
+      ).join(' ');
+      const errors = runRooms(`{ ${many} }`);
+      expect(errors.map(e => e.message)).toEqual([
+        expect.stringMatching(/exceeds the maximum allowed cost/),
+      ]);
+    });
+
+    it('keeps the lightweight world-map shape cheap', () => {
+      const map = '{ rooms(take: 20000) { id name exits { id direction } } }';
+      const variable =
+        'query Q($l: Boolean) { rooms(take: 20000, lightweight: $l) { id name exits { id direction } } }';
+      expect(runRooms(map)).toEqual([]);
+      expect(runRooms(variable)).toEqual([]);
+      // the map can be requested a few times without tripping the budget
+      const four = Array.from(
+        { length: 4 },
+        (_, i) => `a${i}: rooms(take: 20000) { id name exits { id direction } }`
+      ).join(' ');
+      expect(runRooms(`{ ${four} }`)).toEqual([]);
+    });
+
+    it('does not trust lightweight via a variable but trusts a literal true', () => {
+      const mk = (arg: string) =>
+        Array.from(
+          { length: 5 },
+          (_, i) =>
+            `a${i}: rooms(take: 20000, lightweight: ${arg}) { mobs { id } }`
+        ).join(' ');
+      expect(runRooms(`{ ${mk('false')} }`)).toHaveLength(1);
+      expect(runRooms(`{ ${mk('true')} }`)).toEqual([]);
+      expect(
+        runRooms(`{ ${mk('$l')} }`.replace('{ a0', 'query($l: Boolean) { a0'))
+      ).toHaveLength(1);
+    });
+  });
 });

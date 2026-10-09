@@ -18,6 +18,7 @@ import {
   type ValidationRule,
 } from 'graphql';
 import { FIELD_PAGE_CAPS, MAX_PAGE_SIZE } from './pagination';
+import { heavyRelationCount, planRoomLoad } from './room-selection';
 
 /** Most aliased fields one operation may contain (alias-flooding guard). */
 export const MAX_QUERY_ALIASES = 15;
@@ -28,6 +29,14 @@ export const MAX_FRAGMENT_SPREADS = 100;
 /** Assumed size of a list field that has no page argument. */
 const DEFAULT_LIST_SIZE = 10;
 const PAGE_ARGS = ['take', 'first', 'limit'];
+/**
+ * Extra cost per returned row, per relation the resolver has to load for it
+ * (rooms: exits, extraDescs, environmentalEffects, mobs/shops, objects), for
+ * root list fields whose loader fans out beyond the selection's own fields.
+ * 20000 rooms with one relation costs 400k; with all five, 2M.
+ */
+export const RELATION_ROW_COST = 20;
+const RELATION_HEAVY_FIELDS = new Set(['rooms']);
 
 export interface ComplexityLimits {
   maxAliases?: number;
@@ -39,6 +48,16 @@ type OperationNode = OperationDefinitionNode;
 interface Tally {
   cost: number;
   aliases: number;
+}
+
+/** True only for a literal `name: true` argument (a `$var` is untrusted). */
+function isLiteralTrue(field: FieldNode, name: string): boolean {
+  return (field.arguments ?? []).some(
+    a =>
+      a.name.value === name &&
+      a.value.kind === Kind.BOOLEAN &&
+      a.value.value === true
+  );
 }
 
 /**
@@ -53,6 +72,8 @@ interface Tally {
  *    validation time). Sizes are clamped to the cap the resolvers enforce. Other
  *    list fields are assumed to hold 10 items. Fragments are expanded once
  *    (memoised per fragment, so nesting cannot blow up); introspection is free.
+ *  - `rooms` additionally pays `RELATION_ROW_COST` per row per relation its
+ *    selection forces the loader to fetch (unless it is literally lightweight).
  */
 export function complexityLimit(limits: ComplexityLimits = {}): ValidationRule {
   const maxAliases = limits.maxAliases ?? MAX_QUERY_ALIASES;
@@ -139,7 +160,18 @@ export function complexityLimit(limits: ComplexityLimits = {}): ValidationRule {
                       def.args.some(a => PAGE_ARGS.includes(a.name))
                     )
                   : 1;
-              out.cost += 1 + multiplier * child.cost;
+              let loadCost = 0;
+              if (
+                parent === schema.getQueryType() &&
+                RELATION_HEAVY_FIELDS.has(sel.name.value) &&
+                !isLiteralTrue(sel, 'lightweight')
+              ) {
+                loadCost =
+                  multiplier *
+                  RELATION_ROW_COST *
+                  heavyRelationCount(planRoomLoad(sel, n => fragments.get(n)));
+              }
+              out.cost += 1 + loadCost + multiplier * child.cost;
               out.aliases += child.aliases;
             } else if (sel.kind === Kind.INLINE_FRAGMENT) {
               const on = sel.typeCondition

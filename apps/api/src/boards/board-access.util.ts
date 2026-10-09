@@ -32,7 +32,26 @@ const PRIVILEGE_BY_NAME: Record<string, BoardPrivilege> = {
   lock: 7,
 };
 
-type Viewer = { role?: UserRole | null | undefined } | null | undefined;
+/**
+ * Who is asking. `characterLevels` are the levels of the account's linked
+ * characters; level rules (2-99) are checked against them, so callers that
+ * evaluate boards for a logged-in player must supply them (absent = none).
+ */
+export type BoardViewer =
+  | {
+      role?: UserRole | null | undefined;
+      characterLevels?: readonly number[] | undefined;
+    }
+  | null
+  | undefined;
+type Viewer = BoardViewer;
+
+/** A `level <min> <max>` rule below the staff levels: needs a matching character. */
+interface LevelNeed {
+  minLevel: number;
+  maxLevel: number;
+}
+type Need = UserRole | true | null | LevelNeed;
 
 /** Normalise a rule's privilege slot: 0-7, or a name such as "Read" / "WRITE_NEW". */
 function privilegeOf(kind: unknown): BoardPrivilege | null {
@@ -53,9 +72,7 @@ const OPEN_LEVEL = 1;
  * that role or above, `null` = the rule cannot be evaluated here (class/clan/
  * name rules), which only staff satisfy.
  */
-function ruleRequirement(
-  rule: Record<string, unknown>
-): UserRole | true | null {
+function ruleRequirement(rule: Record<string, unknown>): Need {
   const minRole = rule.minRole;
   if (
     typeof minRole === 'string' &&
@@ -63,12 +80,20 @@ function ruleRequirement(
   ) {
     return minRole as UserRole;
   }
-  // Legacy `level <min> <max>` rule. The site role is derived from character
-  // level, so map the minimum level to the role that level grants.
+  // Legacy `level <min> <max>` rule. Staff levels map to the role that level
+  // grants (the site role is derived from character level). Levels 2-99 grant
+  // no role, so they need a linked character whose level is in [min, max].
   const level = rule.minLevel ?? rule.level;
   if (typeof level === 'number' && Number.isFinite(level)) {
     if (level <= OPEN_LEVEL) return true;
-    return calculateRoleFromLevel(level);
+    const role = calculateRoleFromLevel(level);
+    if (role !== UserRole.PLAYER) return role;
+    const max = rule.maxLevel ?? rule.max;
+    return {
+      minLevel: level,
+      maxLevel:
+        typeof max === 'number' && Number.isFinite(max) ? max : Infinity,
+    };
   }
   // A bare slot number or a rule with no restriction fields: open.
   if (rule.rule === undefined) return true;
@@ -78,7 +103,7 @@ function ruleRequirement(
 /** Slot and role requirement of one privilege entry, or null if malformed. */
 function parseEntry(
   entry: unknown
-): { priv: BoardPrivilege; need: UserRole | true | null } | null {
+): { priv: BoardPrivilege; need: Need } | null {
   if (typeof entry === 'number') {
     return entry >= 0 && entry <= 7
       ? { priv: entry as BoardPrivilege, need: true }
@@ -90,12 +115,23 @@ function parseEntry(
   return priv === null ? null : { priv, need: ruleRequirement(rule) };
 }
 
+function satisfies(need: true | UserRole | LevelNeed, viewer: Viewer): boolean {
+  if (need === true) return true;
+  if (typeof need === 'string') return roleAtLeast(viewer?.role, need);
+  if (!viewer) return false;
+  // Staff outrank every player-level rule, whatever their characters' levels.
+  if (isStaff(viewer.role)) return true;
+  return (viewer.characterLevels ?? []).some(
+    l => l >= need.minLevel && l <= need.maxLevel
+  );
+}
+
 /**
  * Whether `viewer` holds board privilege `priv`.
  *
  * The board's rules for that privilege decide: a rule is satisfied when the
  * viewer's role is at least the role its level/minRole maps to (level <= 1 is
- * open to everyone). Staff (IMMORTAL+) can always READ, and hold any other
+ * open to everyone; levels 2-99 need a linked character in the level range). Staff (IMMORTAL+) can always READ, and hold any other
  * privilege only where the board has no evaluable rule for it (a board with
  * no rule grants nothing to anyone else).
  */
@@ -111,9 +147,7 @@ export function hasBoardPrivilege(
     const parsed = parseEntry(entry);
     if (!parsed || parsed.priv !== priv || parsed.need === null) continue;
     evaluable = true;
-    if (parsed.need === true || roleAtLeast(viewer?.role, parsed.need)) {
-      return true;
-    }
+    if (satisfies(parsed.need, viewer)) return true;
   }
   return !evaluable && staff;
 }

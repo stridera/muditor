@@ -1,4 +1,5 @@
-import { UseGuards } from '@nestjs/common';
+import { Logger, UseGuards } from '@nestjs/common';
+import type { GraphQLResolveInfo } from 'graphql';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
@@ -6,6 +7,8 @@ import { hidesGodZones } from '../common/god-zone-visibility';
 import { zoneLookups } from '../common/decorators/zone-lookups';
 import {
   Args,
+  Context,
+  Info,
   Int,
   Mutation,
   Parent,
@@ -37,7 +40,18 @@ import { RoomsService } from './rooms.service';
 // Narrow mapper input to the actual shape returned by RoomsService (RoomServiceResult) plus relation arrays.
 // Use flexible mapper source type (optional relation arrays) matching `mapRoom` requirements.
 import type { RoomMapperSource } from '../common/mappers/types';
-import { MAX_BULK_PAGE_SIZE, clampSkip, clampTake } from '../common/pagination';
+import {
+  MAX_BULK_PAGE_SIZE,
+  MAX_PAGE_SIZE,
+  clampSkip,
+  clampTake,
+} from '../common/pagination';
+import {
+  needsRelationGraph,
+  planRoomLoad,
+  type RoomLoadPlan,
+} from '../common/room-selection';
+import { shopKeeperBatchFor } from './shop-keeper-batch';
 type RoomsMapperInput = RoomMapperSource;
 
 // Internal lightweight types used for field resolution to avoid `any`
@@ -90,6 +104,8 @@ interface RoomWithResets {
 
 @Resolver(() => RoomDto)
 export class RoomsResolver {
+  private readonly logger = new Logger(RoomsResolver.name);
+
   constructor(
     private readonly roomsService: RoomsService,
     private readonly shopsService: ShopsService
@@ -109,7 +125,8 @@ export class RoomsResolver {
       defaultValue: false,
     })
     lightweight?: boolean,
-    @CurrentUser() user?: Users | null
+    @CurrentUser() user?: Users | null,
+    @Info() info?: GraphQLResolveInfo
   ): Promise<RoomDto[]> {
     const params: {
       skip?: number;
@@ -117,12 +134,30 @@ export class RoomsResolver {
       zoneId?: number;
       lightweight?: boolean;
       hideGodZones: boolean;
+      plan?: RoomLoadPlan;
     } = { hideGodZones: hidesGodZones(user ?? null) };
+    // Load only what the selection reads: the cheap raw loader for the public
+    // map's shape, and just the selected relations otherwise.
+    const plan = info?.fieldNodes[0]
+      ? planRoomLoad(info.fieldNodes[0], n => info.fragments[n])
+      : undefined;
+    if (plan) params.plan = plan;
+    // The bulk cap exists for the lightweight world map. Anonymous callers who
+    // want per-room relation graphs (mobs, objects, shops, ...) get a page.
+    const cap =
+      !user && plan && needsRelationGraph(plan)
+        ? MAX_PAGE_SIZE
+        : MAX_BULK_PAGE_SIZE;
     if (skip !== undefined) params.skip = clampSkip(skip);
-    params.take = clampTake(take, MAX_BULK_PAGE_SIZE);
+    params.take = clampTake(take, cap);
     if (zoneId !== undefined) params.zoneId = zoneId;
     if (lightweight !== undefined) params.lightweight = lightweight;
     const rooms = await this.roomsService.findAll(params);
+    if (rooms.length >= MAX_BULK_PAGE_SIZE) {
+      this.logger.warn(
+        `rooms query hit the ${MAX_BULK_PAGE_SIZE}-row cap; results may be truncated (skip=${params.skip ?? 0}, zoneId=${zoneId ?? 'all'})`
+      );
+    }
     return rooms.map(r => mapRoom(r as unknown as RoomsMapperInput));
   }
 
@@ -323,7 +358,10 @@ export class RoomsResolver {
   }
 
   @ResolveField(() => [ShopDto])
-  async shops(@Parent() room: RoomWithResets): Promise<ShopDto[]> {
+  async shops(
+    @Parent() room: RoomWithResets,
+    @Context() context?: object
+  ): Promise<ShopDto[]> {
     // Support both snake_case (from raw SQL) and camelCase (from Prisma)
     const resets = room.mobResets || room.mob_resets;
     if (!resets || resets.length === 0) {
@@ -339,10 +377,14 @@ export class RoomsResolver {
       }
     });
 
-    // Find shops for each mob in the room
+    // Keepers are looked up through a per-request batch: one query for every
+    // room in the response rather than one per mob per room.
+    const batch = shopKeeperBatchFor(context, this.shopsService);
+    const found = await Promise.all(
+      [...uniqueMobs.values()].map(mob => batch.load(mob))
+    );
     const shops: ShopDto[] = [];
-    for (const mob of uniqueMobs.values()) {
-      const shop = await this.shopsService.findByKeeper(mob.zoneId, mob.id);
+    for (const shop of found) {
       if (shop) {
         const mapped: ShopDto = {
           id: shop.id,

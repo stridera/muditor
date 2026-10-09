@@ -1,7 +1,7 @@
 import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { ForbiddenException, NotFoundException } from '@nestjs/common';
-import { Prisma, UserRole, type Users } from '@muditor/db';
+import { Prisma, UserRole, type BoardMessage, type Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
@@ -19,6 +19,7 @@ import {
   BoardPrivilege,
   canReadBoard,
   hasBoardPrivilege,
+  type BoardViewer,
 } from './board-access.util';
 import { BoardsService } from './boards.service';
 import { clampSkip, clampTake } from '../common/pagination';
@@ -33,6 +34,11 @@ interface BoardWithCount {
   updatedAt: Date;
   messages?: unknown[];
   _count?: { messages: number };
+}
+
+interface MessageBoard {
+  privileges: unknown;
+  locked?: boolean;
 }
 
 interface MessageWithEdits {
@@ -54,6 +60,22 @@ function assertBuilder(user: Users): void {
   if (!roleAtLeast(user.role, UserRole.BUILDER)) {
     throw new ForbiddenException('Builder role or higher required');
   }
+}
+
+/**
+ * The caller as board rules see them: role plus linked character levels (level
+ * rules 2-99 need a character in range). Staff skip the lookup, they outrank
+ * every player-level rule.
+ */
+async function boardViewer(
+  boards: BoardsService,
+  user: Users | null
+): Promise<BoardViewer> {
+  if (!user) return null;
+  const characterLevels = isStaff(user.role)
+    ? []
+    : await boards.getCharacterLevels(user.id);
+  return { role: user.role, characterLevels };
 }
 
 @Resolver(() => BoardDto)
@@ -79,8 +101,9 @@ export class BoardsResolver {
     if (search !== undefined) args.search = search;
 
     // Visibility is decided per board, so page after filtering (boards are few).
+    const viewer = await boardViewer(this.boardsService, user);
     const boards = (await this.boardsService.findAllBoards(args)).filter(b =>
-      canReadBoard(b.privileges, user)
+      canReadBoard(b.privileges, viewer)
     );
     const start = clampSkip(skip);
     const page = boards.slice(start, start + clampTake(take));
@@ -100,7 +123,15 @@ export class BoardsResolver {
     } else if (alias) {
       board = await this.boardsService.findBoardByAlias(alias);
     }
-    if (!board || !canReadBoard(board.privileges, user)) return null;
+    if (
+      !board ||
+      !canReadBoard(
+        board.privileges,
+        await boardViewer(this.boardsService, user)
+      )
+    ) {
+      return null;
+    }
     return this.mapBoard(board as BoardWithCount);
   }
 
@@ -108,8 +139,9 @@ export class BoardsResolver {
   @UseGuards(OptionalJwtAuthGuard)
   async countBoards(@CurrentUser() user: Users | null): Promise<number> {
     if (isStaff(user?.role)) return this.boardsService.countBoards();
+    const viewer = await boardViewer(this.boardsService, user);
     const boards = await this.boardsService.findAllBoards();
-    return boards.filter(b => canReadBoard(b.privileges, user)).length;
+    return boards.filter(b => canReadBoard(b.privileges, viewer)).length;
   }
 
   @Mutation(() => BoardDto)
@@ -195,34 +227,58 @@ export class BoardsResolver {
 export class BoardMessagesResolver {
   constructor(private readonly boardsService: BoardsService) {}
 
-  /** Message author (matched against the caller's identity) or IMMORTAL+. */
-  private async assertAuthorOrStaff(
+  /**
+   * Gate for editing or deleting a message; returns it with its board.
+   *  - a locked board is closed to everyone below BUILDER (same as posting);
+   *  - the author may always modify their own message;
+   *  - anyone else must be IMMORTAL+ and hold the board's EditAny / RemoveAny
+   *    privilege (IMPLEMENTOR bypasses the board rules).
+   */
+  private async assertMayModify(
     messageId: number,
-    user: Users
-  ): Promise<void> {
+    user: Users,
+    kind: 'edit' | 'delete'
+  ): Promise<{ message: BoardMessage; board: MessageBoard | undefined }> {
     const message = await this.boardsService.findMessageById(messageId);
     if (!message) {
       throw new NotFoundException(`Board message ${messageId} not found`);
     }
-    if (isStaff(user.role)) return;
+    const board = (message as { board?: MessageBoard }).board;
+    if (board?.locked && !roleAtLeast(user.role, UserRole.BUILDER)) {
+      throw new ForbiddenException('This board is locked');
+    }
     const identity = await this.boardsService.getPosterIdentity(user);
     const isAuthor = identity.names.some(
       n => n.toLowerCase() === message.poster.toLowerCase()
     );
-    if (!isAuthor) {
+    if (isAuthor) return { message, board };
+    if (!isStaff(user.role)) {
       throw new ForbiddenException(
         'Only the author or staff may modify this message'
       );
     }
+    if (user.role !== UserRole.IMPLEMENTOR) {
+      const priv =
+        kind === 'edit' ? BoardPrivilege.EDIT_ANY : BoardPrivilege.REMOVE_ANY;
+      const viewer = await boardViewer(this.boardsService, user);
+      if (!hasBoardPrivilege(board?.privileges, priv, viewer)) {
+        throw new ForbiddenException(
+          `You may not ${kind} other people's messages on this board`
+        );
+      }
+    }
+    return { message, board };
   }
 
-  /** Sticky changes need the board's write-sticky privilege (staff always have it). */
-  private async assertMayStick(messageId: number, user: Users): Promise<void> {
-    const message = await this.boardsService.findMessageById(messageId);
-    if (message?.sticky) return; // already pinned: nothing to grant
-    const privileges = (message as { board?: { privileges: unknown } } | null)
-      ?.board?.privileges;
-    if (!hasBoardPrivilege(privileges, BoardPrivilege.WRITE_STICKY, user)) {
+  /** Pinning or unpinning needs the board's write-sticky privilege (staff have it unless the board says otherwise). */
+  private async assertMayChangeSticky(
+    board: MessageBoard | undefined,
+    user: Users
+  ): Promise<void> {
+    const viewer = await boardViewer(this.boardsService, user);
+    if (
+      !hasBoardPrivilege(board?.privileges, BoardPrivilege.WRITE_STICKY, viewer)
+    ) {
       throw new ForbiddenException('You may not change sticky messages here');
     }
   }
@@ -234,7 +290,12 @@ export class BoardMessagesResolver {
   ): Promise<boolean> {
     const board = await this.boardsService.findBoardPrivileges(boardId);
     if (!board) return false;
-    if (!canReadBoard(board.privileges, user)) {
+    if (
+      !canReadBoard(
+        board.privileges,
+        await boardViewer(this.boardsService, user)
+      )
+    ) {
       throw new ForbiddenException('You do not have access to this board');
     }
     return true;
@@ -271,7 +332,7 @@ export class BoardMessagesResolver {
       message &&
       !canReadBoard(
         (message as { board?: { privileges: unknown } }).board?.privileges,
-        user
+        await boardViewer(this.boardsService, user)
       )
     ) {
       return null;
@@ -290,9 +351,10 @@ export class BoardMessagesResolver {
       return this.boardsService.countMessages(boardId);
     }
     if (isStaff(user?.role)) return this.boardsService.countMessages();
+    const viewer = await boardViewer(this.boardsService, user);
     const boards = await this.boardsService.findAllBoards();
     return boards
-      .filter(b => canReadBoard(b.privileges, user))
+      .filter(b => canReadBoard(b.privileges, viewer))
       .reduce(
         (sum, b) => sum + ((b as BoardWithCount)._count?.messages ?? 0),
         0
@@ -322,12 +384,15 @@ export class BoardMessagesResolver {
     if (board.locked && !roleAtLeast(user.role, UserRole.BUILDER)) {
       throw new ForbiddenException('This board is locked');
     }
-    if (!hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_NEW, user)) {
+    const viewer = await boardViewer(this.boardsService, user);
+    if (
+      !hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_NEW, viewer)
+    ) {
       throw new ForbiddenException('You may not post on this board');
     }
     if (
       data.sticky &&
-      !hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_STICKY, user)
+      !hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_STICKY, viewer)
     ) {
       throw new ForbiddenException('You may not post sticky messages here');
     }
@@ -358,8 +423,15 @@ export class BoardMessagesResolver {
     _editor?: string
   ): Promise<BoardMessageDto> {
     void _editor; // kept for schema compatibility; client-supplied editor is never trusted
-    await this.assertAuthorOrStaff(id, user);
-    if (data.sticky) await this.assertMayStick(id, user);
+    const { message: current, board } = await this.assertMayModify(
+      id,
+      user,
+      'edit'
+    );
+    // Either direction counts: an author must not unpin a staff-pinned post.
+    if (data.sticky !== undefined && data.sticky !== current.sticky) {
+      await this.assertMayChangeSticky(board, user);
+    }
     const updateData: Prisma.BoardMessageUpdateInput = {};
     if (data.subject !== undefined) updateData.subject = data.subject;
     if (data.content !== undefined) updateData.content = data.content;
@@ -379,7 +451,7 @@ export class BoardMessagesResolver {
     @Args('id', { type: () => Int }) id: number,
     @CurrentUser() user: Users
   ): Promise<BoardMessageDto> {
-    await this.assertAuthorOrStaff(id, user);
+    await this.assertMayModify(id, user, 'delete');
     const message = await this.boardsService.deleteMessage(id);
     return this.mapMessage(message as MessageWithEdits);
   }

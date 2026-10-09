@@ -34,6 +34,7 @@ function makeService() {
     updateMessage: jest.fn().mockResolvedValue(message),
     deleteMessage: jest.fn().mockResolvedValue(message),
     createMessage: jest.fn().mockResolvedValue(message),
+    getCharacterLevels: jest.fn().mockResolvedValue([] as number[]),
     getPosterIdentity: jest.fn(async (u: Users) => ({
       names: [u.displayName],
       level: 102,
@@ -324,6 +325,7 @@ describe('board reads respect Board.privileges', () => {
         board: id === 10 ? publicBoard : godBoard,
       })),
       countMessages: jest.fn().mockResolvedValue(5),
+      getCharacterLevels: jest.fn().mockResolvedValue([] as number[]),
     };
     return {
       service,
@@ -384,5 +386,198 @@ describe('board reads respect Board.privileges', () => {
     );
     expect(await messages.countMessages(null)).toBe(2); // only the public board
     expect(await messages.countMessages(immortal)).toBe(5);
+  });
+});
+
+describe('edit / delete / unpin rules', () => {
+  const implementor = user('u-impl', 'Root', UserRole.IMPLEMENTOR);
+  const coder = user('u-coder', 'Dev', UserRole.CODER);
+  const msg = (extra: Record<string, unknown> = {}, board: unknown = {}) => ({
+    id: 7,
+    boardId: 1,
+    poster: 'Pat',
+    posterLevel: 1,
+    postedAt: new Date(),
+    subject: 's',
+    content: 'c',
+    sticky: false,
+    createdAt: new Date(),
+    updatedAt: new Date(),
+    edits: [],
+    ...extra,
+    board: { locked: false, privileges: [], ...(board as object) },
+  });
+  function setup(message: ReturnType<typeof msg>) {
+    const service = makeService();
+    service.findMessageById.mockResolvedValue(message);
+    service.updateMessage.mockResolvedValue(message);
+    service.deleteMessage.mockResolvedValue(message);
+    return {
+      service,
+      resolver: new BoardMessagesResolver(service as unknown as BoardsService),
+    };
+  }
+
+  describe('sticky', () => {
+    it('stops an author unpinning a staff-pinned post', async () => {
+      const { service, resolver } = setup(msg({ sticky: true }));
+      await expect(
+        resolver.updateBoardMessage(7, { sticky: false }, player)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.updateMessage).not.toHaveBeenCalled();
+    });
+
+    it('lets the author leave sticky untouched or resend its current value', async () => {
+      const pinned = setup(msg({ sticky: true }));
+      await pinned.resolver.updateBoardMessage(
+        7,
+        { content: 'x', sticky: true },
+        player
+      );
+      expect(pinned.service.updateMessage).toHaveBeenCalled();
+      const plain = setup(msg());
+      await plain.resolver.updateBoardMessage(
+        7,
+        { content: 'x', sticky: false },
+        player
+      );
+      expect(plain.service.updateMessage).toHaveBeenCalled();
+    });
+
+    it('lets someone with the sticky privilege unpin', async () => {
+      const { service, resolver } = setup(
+        msg(
+          { sticky: true },
+          { privileges: [{ privilege: 'WriteSticky', level: 0 }] }
+        )
+      );
+      await resolver.updateBoardMessage(7, { sticky: false }, player);
+      expect(service.updateMessage).toHaveBeenCalledWith(
+        7,
+        expect.objectContaining({ sticky: false }),
+        'Pat'
+      );
+    });
+  });
+
+  describe('locked boards', () => {
+    const locked = { locked: true };
+    it('blocks an author below BUILDER from editing or deleting', async () => {
+      const { service, resolver } = setup(msg({}, locked));
+      await expect(
+        resolver.updateBoardMessage(7, { content: 'x' }, player)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.deleteBoardMessage(7, player)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.updateMessage).not.toHaveBeenCalled();
+      expect(service.deleteMessage).not.toHaveBeenCalled();
+    });
+
+    it('blocks IMMORTAL staff but lets BUILDER+ through', async () => {
+      const { resolver } = setup(msg({}, locked));
+      await expect(
+        resolver.deleteBoardMessage(7, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      const open = setup(msg({}, { ...locked, privileges: [5, 4] }));
+      await open.resolver.deleteBoardMessage(7, coder);
+      expect(open.service.deleteMessage).toHaveBeenCalled();
+    });
+  });
+
+  describe('staff on other people’s messages follow EditAny / RemoveAny', () => {
+    const rules = (...privs: unknown[]) => ({
+      privileges: privs.map(p => ({ privilege: p, minRole: 'BUILDER' })),
+    });
+
+    it('refuses an IMMORTAL below the board’s RemoveAny level', async () => {
+      const { service, resolver } = setup(msg({}, rules('RemoveAny')));
+      await expect(
+        resolver.deleteBoardMessage(7, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.deleteMessage).not.toHaveBeenCalled();
+    });
+
+    it('lets a BUILDER meeting the rule delete; other slots are judged separately', async () => {
+      const builder = user('u-b', 'Bob', UserRole.BUILDER);
+      const { service, resolver } = setup(msg({}, rules('RemoveAny')));
+      await resolver.deleteBoardMessage(7, builder);
+      expect(service.deleteMessage).toHaveBeenCalled();
+      // no EditAny rule on this board: staff keep the default there
+      await resolver.updateBoardMessage(7, { content: 'x' }, immortal);
+      expect(service.updateMessage).toHaveBeenCalled();
+    });
+
+    it('applies EditAny to edits', async () => {
+      const { service, resolver } = setup(msg({}, rules('EditAny')));
+      await expect(
+        resolver.updateBoardMessage(7, { content: 'x' }, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await resolver.updateBoardMessage(
+        7,
+        { content: 'x' },
+        user('u-b', 'Bob', UserRole.BUILDER)
+      );
+      expect(service.updateMessage).toHaveBeenCalled();
+    });
+
+    it('IMPLEMENTOR bypasses the board rules', async () => {
+      const { service, resolver } = setup(
+        msg({}, rules('EditAny', 'RemoveAny'))
+      );
+      await resolver.updateBoardMessage(7, { content: 'x' }, implementor);
+      await resolver.deleteBoardMessage(7, implementor);
+      expect(service.updateMessage).toHaveBeenCalled();
+      expect(service.deleteMessage).toHaveBeenCalled();
+    });
+
+    it('staff on a board with no rule for the slot keep access', async () => {
+      const { service, resolver } = setup(msg());
+      await resolver.deleteBoardMessage(7, immortal);
+      expect(service.deleteMessage).toHaveBeenCalled();
+    });
+  });
+});
+
+describe('level rules 2-99 need a matching linked character', () => {
+  const input = {
+    boardId: 1,
+    poster: 'Pat',
+    posterLevel: 1,
+    subject: 's',
+    content: 'c',
+  };
+  function setup(levels: number[], rule: object) {
+    const service = makeService();
+    service.findBoardPrivileges.mockResolvedValue({
+      locked: false,
+      privileges: [rule],
+    });
+    service.getCharacterLevels.mockResolvedValue(levels);
+    return {
+      service,
+      resolver: new BoardMessagesResolver(service as unknown as BoardsService),
+    };
+  }
+
+  it('refuses an account with no characters, or only low ones', async () => {
+    const rule = { privilege: 'WriteNew', level: 30, maxLevel: 60 };
+    for (const levels of [[], [10], [75]]) {
+      const { service, resolver } = setup(levels, rule);
+      await expect(
+        resolver.createBoardMessage(input, player)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.createMessage).not.toHaveBeenCalled();
+    }
+  });
+
+  it('accepts a character inside [level, maxLevel]', async () => {
+    const { service, resolver } = setup([5, 45], {
+      privilege: 'WriteNew',
+      level: 30,
+      maxLevel: 60,
+    });
+    await resolver.createBoardMessage(input, player);
+    expect(service.createMessage).toHaveBeenCalled();
   });
 });

@@ -29,6 +29,15 @@ export class BoardsService {
     };
   }
 
+  /** Levels of the account's linked characters (for level-based board rules). */
+  async getCharacterLevels(userId: string): Promise<number[]> {
+    const characters = await this.database.characters.findMany({
+      where: { userId },
+      select: { level: true },
+    });
+    return characters.map(c => c.level);
+  }
+
   // Board operations
   async findAllBoards(args?: {
     skip?: number;

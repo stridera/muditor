@@ -5,6 +5,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { DatabaseService } from '../database/database.service';
+import type { RoomLoadPlan } from '../common/room-selection';
 import {
   BatchUpdateResult,
   CreateRoomExitInput,
@@ -213,14 +214,35 @@ export class RoomsService {
     }));
   }
 
+  /**
+   * Prisma `include` limited to the relations a selection needs. Without a
+   * plan every relation is loaded (`includeFull`).
+   */
+  private includeFor(plan?: RoomLoadPlan): typeof this.includeFull {
+    if (!plan) return this.includeFull;
+    // Typed as the full include: `mapRoom` treats absent relations as empty.
+    return {
+      ...(plan.exits && { exits: true as const }),
+      ...(plan.extraDescs && { roomExtraDescriptions: true as const }),
+      ...(plan.environmentalEffects && {
+        environmentalEffects: this.includeFull.environmentalEffects,
+      }),
+      ...(plan.mobs && { mobResets: this.includeFull.mobResets }),
+      ...(plan.objects && { objectResets: this.includeFull.objectResets }),
+    } as typeof this.includeFull;
+  }
+
   async findMany(params?: {
     skip?: number;
     take?: number;
     zoneId?: number;
     lightweight?: boolean;
     hideGodZones?: boolean;
+    /** Relations the caller will read; omitted = load everything. */
+    plan?: RoomLoadPlan;
   }): Promise<RoomServiceResult[]> {
-    const { skip, take, zoneId, lightweight, hideGodZones } = params || {};
+    const { skip, take, zoneId, hideGodZones, plan } = params || {};
+    const lightweight = params?.lightweight || plan?.lightweight;
     if (lightweight) {
       const clauses: string[] = [];
       if (zoneId !== undefined) clauses.push(`r.zone_id = ${zoneId}`);
@@ -326,7 +348,7 @@ export class RoomsService {
       where?: { zoneId?: number; zones?: { isGodZone: false } };
       skip?: number;
       take?: number;
-    } = { include: this.includeFull, orderBy: { id: 'asc' } };
+    } = { include: this.includeFor(plan), orderBy: { id: 'asc' } };
     if (zoneId !== undefined || hideGodZones) {
       query.where = {
         ...(zoneId !== undefined && { zoneId }),
@@ -341,13 +363,9 @@ export class RoomsService {
   }
 
   // Backward-compatible alias used by existing tests/specs
-  async findAll(params?: {
-    skip?: number;
-    take?: number;
-    zoneId?: number;
-    lightweight?: boolean;
-    hideGodZones?: boolean;
-  }): Promise<RoomServiceResult[]> {
+  async findAll(
+    params?: Parameters<RoomsService['findMany']>[0]
+  ): Promise<RoomServiceResult[]> {
     return this.findMany(params);
   }
 

@@ -3,6 +3,26 @@ import { Prisma } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 
+const SHOP_INCLUDE = {
+  mobs: {
+    select: { id: true, zoneId: true, name: true, keywords: true },
+  },
+  shopItems: {
+    include: {
+      objects: {
+        select: {
+          id: true,
+          zoneId: true,
+          name: true,
+          type: true,
+          cost: true,
+        },
+      },
+    },
+  },
+  shopAccepts: true,
+} as const;
+
 type ShopWithRelations = Prisma.ShopsGetPayload<{
   include: {
     mobs: {
@@ -145,6 +165,33 @@ export class ShopsService {
         shopAccepts: true,
       },
     });
+  }
+
+  /**
+   * One query for many keepers. Returns the first shop per `"zone-id"` key
+   * (same pick as {@link findByKeeper}); keepers without a shop are absent.
+   */
+  async findByKeepers(
+    keepers: ReadonlyArray<{ zoneId: number; id: number }>,
+    hideGodZones = false
+  ): Promise<Map<string, ShopWithRelations>> {
+    const result = new Map<string, ShopWithRelations>();
+    if (keepers.length === 0) return result;
+    const wanted = new Set(keepers.map(k => `${k.zoneId}-${k.id}`));
+    const shops = (await this.database.shops.findMany({
+      where: {
+        keeperZoneId: { in: [...new Set(keepers.map(k => k.zoneId))] },
+        keeperId: { in: [...new Set(keepers.map(k => k.id))] },
+        ...inVisibleZone(hideGodZones),
+      },
+      orderBy: { id: 'asc' },
+      include: SHOP_INCLUDE,
+    })) as unknown as ShopWithRelations[];
+    for (const shop of shops) {
+      const key = `${shop.keeperZoneId}-${shop.keeperId}`;
+      if (wanted.has(key) && !result.has(key)) result.set(key, shop);
+    }
+    return result;
   }
 
   async findByKeeper(
