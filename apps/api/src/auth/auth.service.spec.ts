@@ -512,6 +512,77 @@ describe('AuthService', () => {
     });
   });
 
+  describe('Google login email auto-link', () => {
+    const profile = {
+      googleId: 'g-123',
+      email: 'Victim@Example.com',
+      displayName: 'Victim',
+    };
+    let googleLink: { findUnique: jest.Mock; create: jest.Mock };
+
+    beforeEach(() => {
+      googleLink = { findUnique: jest.fn(), create: jest.fn() };
+      (databaseService as unknown as { googleLink: unknown }).googleLink =
+        googleLink;
+      googleLink.findUnique.mockResolvedValue(null);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      (databaseService.users.update as jest.Mock).mockResolvedValue({});
+      (jwtService.sign as jest.Mock).mockReturnValue('token');
+    });
+
+    it('refuses to auto-link an account created in game with an unverified email', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
+        id: 'game-user',
+        email: 'victim@example.com',
+        displayName: 'victim',
+        role: UserRole.PLAYER,
+        googleLink: null,
+        deletedAt: null,
+        preferences: { emailVerified: false },
+      });
+
+      await expect(service.handleGoogleLogin(profile)).rejects.toThrow(
+        ConflictException
+      );
+      expect(googleLink.create).not.toHaveBeenCalled();
+    });
+
+    it('still auto-links an account whose email is not marked unverified', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
+        id: 'web-user',
+        email: 'victim@example.com',
+        displayName: 'victim',
+        role: UserRole.PLAYER,
+        googleLink: null,
+        deletedAt: null,
+        preferences: {},
+      });
+
+      const result = await service.handleGoogleLogin(profile);
+
+      expect(googleLink.create).toHaveBeenCalledTimes(1);
+      expect(result.accessToken).toBe('token');
+    });
+
+    it('treats a missing preferences value as verified', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
+        id: 'legacy-user',
+        email: 'victim@example.com',
+        displayName: 'victim',
+        role: UserRole.PLAYER,
+        googleLink: null,
+        deletedAt: null,
+        preferences: null,
+      });
+
+      await service.handleGoogleLogin(profile);
+
+      expect(googleLink.create).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('soft-deleted accounts', () => {
     const deleted = {
       id: 'user-id',

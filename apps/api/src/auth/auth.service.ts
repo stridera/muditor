@@ -466,6 +466,15 @@ export class AuthService {
     return true;
   }
 
+  /** True when `Users.preferences` marks the email as never verified. */
+  private isEmailUnverified(preferences: unknown): boolean {
+    return (
+      typeof preferences === 'object' &&
+      preferences !== null &&
+      (preferences as Record<string, unknown>)['emailVerified'] === false
+    );
+  }
+
   async handleGoogleLogin(profile: GoogleProfile): Promise<{
     accessToken?: string;
     needsUsername?: boolean;
@@ -514,6 +523,21 @@ export class AuthService {
       }
 
       this.assertNotDeleted(existingUser);
+
+      // Accounts created at the game prompt carry an email nobody has
+      // proven (the game stores `preferences.emailVerified = false`).
+      // Linking by email would hand the real owner of that address an
+      // account whose characters (and game passwords) were set up by
+      // whoever typed it first, so refuse instead of auto-linking.
+      if (this.isEmailUnverified(existingUser.preferences)) {
+        this.logger.warn(
+          `Google login refused: ${existingUser.displayName} has an unverified in-game email`
+        );
+        throw new ConflictException(
+          'An account for this email was created in the game and its email has not been verified, so it cannot be linked to Google automatically. Contact staff to verify it.'
+        );
+      }
+
       const isBanned = await this.checkBanStatus(existingUser.id);
       if (isBanned) {
         throw new UnauthorizedException('Account is banned');
