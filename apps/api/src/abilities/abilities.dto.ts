@@ -204,6 +204,13 @@ export class Ability {
   @Field(() => Int)
   cooldownMs: number;
 
+  @Field(() => String, {
+    nullable: true,
+    description:
+      'Legacy %d<letter> prompt code whose cooldown bar tracks this ability',
+  })
+  promptLetter?: string | null;
+
   @Field()
   inCombatOnly: boolean;
 

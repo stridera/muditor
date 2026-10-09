@@ -1,0 +1,30 @@
+# Spell chant gibberish (syllable) operations
+
+query GetSpellSyllables {
+  spellSyllables {
+    id
+    sortOrder
+    syllable
+    replacement
+  }
+}
+
+mutation CreateSpellSyllable($data: CreateSpellSyllableInput!) {
+  createSpellSyllable(data: $data) {
+    id
+    syllable
+  }
+}
+
+mutation UpdateSpellSyllable($id: ID!, $data: UpdateSpellSyllableInput!) {
+  updateSpellSyllable(id: $id, data: $data) {
+    id
+    sortOrder
+    syllable
+    replacement
+  }
+}
+
+mutation DeleteSpellSyllable($id: ID!) {
+  deleteSpellSyllable(id: $id)
+}

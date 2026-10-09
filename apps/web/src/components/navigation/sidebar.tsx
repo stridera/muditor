@@ -17,14 +17,18 @@ import {
   FileCode,
   Flag,
   Gamepad2,
+  Gauge,
+  Hammer,
   HelpCircle,
   Home,
   Inbox,
+  Languages,
   LogOut,
   Mail,
   Map,
   Menu,
   MessageCircle,
+  MessageSquareText,
   Monitor,
   Newspaper,
   Package,
@@ -286,6 +290,34 @@ export function Sidebar() {
       href: '/dashboard/socials',
       icon: <MessageCircle className='h-4 w-4' />,
     });
+  }
+
+  if (isCoder) {
+    gameSystemsItems.push({
+      name: 'System Messages',
+      href: '/dashboard/system-messages',
+      icon: <MessageSquareText className='h-4 w-4' />,
+    });
+  }
+
+  if (isBuilder) {
+    gameSystemsItems.push(
+      {
+        name: 'Status Flag Values',
+        href: '/dashboard/status-flag-values',
+        icon: <Gauge className='h-4 w-4' />,
+      },
+      {
+        name: 'Spell Syllables',
+        href: '/dashboard/spell-syllables',
+        icon: <Languages className='h-4 w-4' />,
+      },
+      {
+        name: 'Creation Recipes',
+        href: '/dashboard/creation-recipes',
+        icon: <Hammer className='h-4 w-4' />,
+      }
+    );
   }
 
   gameSystemsItems.push(

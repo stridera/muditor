@@ -109,6 +109,7 @@ export class AbilitiesService {
       combatOk: data.combatOk,
       castTimeRounds: data.castTimeRounds,
       cooldownMs: data.cooldownMs,
+      promptLetter: data.promptLetter || null,
       inCombatOnly: data.inCombatOnly,
       isArea: data.isArea,
       memorizationTime: data.memorizationTime,
@@ -160,6 +161,8 @@ export class AbilitiesService {
     if (data.castTimeRounds !== undefined)
       updateData.castTimeRounds = data.castTimeRounds;
     if (data.cooldownMs !== undefined) updateData.cooldownMs = data.cooldownMs;
+    if (data.promptLetter !== undefined)
+      updateData.promptLetter = data.promptLetter || null;
     if (data.inCombatOnly !== undefined)
       updateData.inCombatOnly = data.inCombatOnly;
     if (data.isArea !== undefined) updateData.isArea = data.isArea;

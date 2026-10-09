@@ -22,6 +22,9 @@ type Ability {
   name: String!
   notes: String
   pages: Int
+
+  """Legacy %d<letter> prompt code whose cooldown bar tracks this ability"""
+  promptLetter: String
   questOnly: Boolean!
   restrictions: AbilityRestrictions
   savingThrows: [AbilitySavingThrow!]
@@ -653,6 +656,9 @@ input CreateAbilityInput {
   name: String!
   notes: String
   pages: Int
+
+  """Prompt cooldown-bar letter (%d<letter>); one ASCII letter"""
+  promptLetter: String
   questOnly: Boolean! = false
   schoolId: Int
   sphere: SpellSphere
@@ -770,6 +776,15 @@ input CreateClassInput {
   hitDice: String! = "1d8"
   name: String!
   primaryStat: String
+}
+
+"""Input for creating a creation recipe"""
+input CreateCreationRecipeInput {
+  abilityId: Int!
+  classId: Int
+  keyword: String
+  objectId: Int
+  objectZoneId: Int!
 }
 
 input CreateDialogueNodeInput {
@@ -1203,6 +1218,26 @@ input CreateSocialInput {
   victFound: String
 }
 
+"""Input for creating a spell syllable"""
+input CreateSpellSyllableInput {
+  replacement: String!
+  sortOrder: Int! = 0
+  syllable: String!
+}
+
+"""Input for creating a status flag value"""
+input CreateStatusFlagValueInput {
+  aiValue: Int! = 0
+  flag: String!
+}
+
+"""Input for creating a system message"""
+input CreateSystemMessageInput {
+  category: String!
+  key: String!
+  messages: [String!]!
+}
+
 """Input for creating system text"""
 input CreateSystemTextInput {
   """Text category"""
@@ -1242,6 +1277,49 @@ input CreateZoneInput {
   lifespan: Int! = 30
   name: String!
   resetMode: ResetMode! = NORMAL
+}
+
+"""Ability summary shown on a creation recipe"""
+type CreationRecipeAbilityDto {
+  id: ID!
+  name: String!
+}
+
+"""Class summary shown on a creation recipe"""
+type CreationRecipeClassDto {
+  id: ID!
+
+  """Display name (may contain color codes)"""
+  name: String!
+
+  """Plain text name"""
+  plainName: String!
+}
+
+"""What a creation spell (Minor Creation, Create Food, ...) conjures"""
+type CreationRecipeDto {
+  ability: CreationRecipeAbilityDto!
+  abilityId: Int!
+  characterClass: CreationRecipeClassDto
+
+  """
+  Applies to this caster class only; null is the default for every other class
+  """
+  classId: Int
+  id: ID!
+
+  """
+  Word the caster types (matched as an abbreviation in id order); null for spells that take no word
+  """
+  keyword: String
+
+  """
+  Local object id; null means any FOOD object in the zone, picked by caster skill
+  """
+  objectId: Int
+
+  """Zone of the object to create"""
+  objectZoneId: Int!
 }
 
 enum DamageType {
@@ -1992,6 +2070,9 @@ type Mutation {
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createClass(data: CreateClassInput!): ClassDto!
   createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
+
+  """Create a creation recipe"""
+  createCreationRecipe(data: CreateCreationRecipeInput!): CreationRecipeDto!
   createDialogueNode(data: CreateDialogueNodeInput!, treeId: Int!): DialogueNodeDto!
   createDialogueResponse(data: CreateDialogueResponseInput!, nodeId: Int!): DialogueResponseDto!
   createEffect(data: CreateEffectInput!): Effect!
@@ -2031,6 +2112,15 @@ type Mutation {
   """Create a new social command"""
   createSocial(data: CreateSocialInput!): SocialDto!
 
+  """Create a spell syllable"""
+  createSpellSyllable(data: CreateSpellSyllableInput!): SpellSyllableDto!
+
+  """Create a status flag AI value"""
+  createStatusFlagValue(data: CreateStatusFlagValueInput!): StatusFlagValueDto!
+
+  """Create a system message"""
+  createSystemMessage(data: CreateSystemMessageInput!): SystemMessageDto!
+
   """Create a new system text entry"""
   createSystemText(data: CreateSystemTextInput!): SystemTextDto!
   createTrigger(input: CreateTriggerInput!): TriggerDto!
@@ -2045,6 +2135,9 @@ type Mutation {
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
   deleteClass(id: ID!): Boolean!
+
+  """Delete a creation recipe"""
+  deleteCreationRecipe(id: ID!): Boolean!
   deleteDialogueNode(id: Int!): DialogueNodeDto!
   deleteDialogueResponse(id: Int!): DialogueResponseDto!
   deleteDialogueTree(id: Int!): DialogueTreeDto!
@@ -2082,6 +2175,15 @@ type Mutation {
 
   """Delete a social command"""
   deleteSocial(id: ID!): Boolean!
+
+  """Delete a spell syllable"""
+  deleteSpellSyllable(id: ID!): Boolean!
+
+  """Delete a status flag AI value"""
+  deleteStatusFlagValue(flag: String!): Boolean!
+
+  """Delete a system message"""
+  deleteSystemMessage(id: ID!): Boolean!
 
   """Delete a system text entry"""
   deleteSystemText(id: ID!): Boolean!
@@ -2164,6 +2266,9 @@ type Mutation {
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
   updateConsumableEffects(effects: [ConsumableEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
+
+  """Update a creation recipe"""
+  updateCreationRecipe(data: UpdateCreationRecipeInput!, id: ID!): CreationRecipeDto!
   updateDialogueNode(data: UpdateDialogueNodeInput!, id: Int!): DialogueNodeDto!
   updateDialogueResponse(data: UpdateDialogueResponseInput!, id: Int!): DialogueResponseDto!
   updateDialogueTree(data: UpdateDialogueTreeInput!, id: Int!): DialogueTreeDto!
@@ -2214,6 +2319,15 @@ type Mutation {
 
   """Update an existing social command"""
   updateSocial(data: UpdateSocialInput!, id: ID!): SocialDto!
+
+  """Update a spell syllable"""
+  updateSpellSyllable(data: UpdateSpellSyllableInput!, id: ID!): SpellSyllableDto!
+
+  """Update a status flag AI value"""
+  updateStatusFlagValue(data: UpdateStatusFlagValueInput!, flag: String!): StatusFlagValueDto!
+
+  """Update a system message"""
+  updateSystemMessage(data: UpdateSystemMessageInput!, id: ID!): SystemMessageDto!
 
   """Update a system text entry"""
   updateSystemText(data: UpdateSystemTextInput!, id: ID!): SystemTextDto!
@@ -2523,6 +2637,12 @@ type Query {
 
   """Get commands by category"""
   commandsByCategory(category: CommandCategory!): [CommandDto!]!
+
+  """Get a single creation recipe by ID"""
+  creationRecipe(id: ID!): CreationRecipeDto!
+
+  """Get all creation recipes, grouped by ability"""
+  creationRecipes: [CreationRecipeDto!]!
   dialogueTree(id: Int!): DialogueTreeDto
   effect(id: ID!): Effect!
 
@@ -2690,6 +2810,24 @@ type Query {
 
   """Get total count of socials"""
   socialsCount: Int!
+
+  """Get a single spell syllable by ID"""
+  spellSyllable(id: ID!): SpellSyllableDto!
+
+  """Get all spell syllables, in match order"""
+  spellSyllables: [SpellSyllableDto!]!
+
+  """Get a single status flag AI value"""
+  statusFlagValue(flag: String!): StatusFlagValueDto!
+
+  """Get all status flag AI values, ordered by flag"""
+  statusFlagValues: [StatusFlagValueDto!]!
+
+  """Get a single system message by ID"""
+  systemMessage(id: ID!): SystemMessageDto!
+
+  """Get all system messages, grouped by category"""
+  systemMessages: [SystemMessageDto!]!
 
   """Get a single system text entry by ID"""
   systemText(id: ID!): SystemTextDto!
@@ -3368,6 +3506,24 @@ enum SpellSphere {
   WATER
 }
 
+"""
+Spell chant gibberish: how a bystander who cannot place a spell hears its name
+"""
+type SpellSyllableDto {
+  id: ID!
+
+  """Gibberish heard in place of the matched syllable"""
+  replacement: String!
+
+  """
+  Match order (ascending): earlier rows win when several syllables prefix the remaining text
+  """
+  sortOrder: Int!
+
+  """Lowercase text to match at the current position of the spell name"""
+  syllable: String!
+}
+
 type StatRollDto {
   expiresAt: DateTime!
 
@@ -3378,6 +3534,15 @@ type StatRollDto {
   Rolled values (3d6 each); assign them to STR, INT, WIS, DEX, CON, CHA, LUCK in any order
   """
   values: [Int!]!
+}
+
+"""AI worth of a status flag: how much a mob wants gear that grants it"""
+type StatusFlagValueDto {
+  """AI value (negative for harmful flags; flags without a row are worth 0)"""
+  aiValue: Int!
+
+  """Status flag name (e.g., sanctuary)"""
+  flag: String!
 }
 
 type Subscription {
@@ -3407,6 +3572,25 @@ type Subscription {
 
   """Subscribe to events in a specific zone"""
   zoneEvents(zoneId: Int!): GameEvent!
+}
+
+"""
+Game message text with variants (experience progress, insults, month names, weather changes)
+"""
+type SystemMessageDto {
+  """Grouping (e.g., prompt, social, calendar, weather)"""
+  category: String!
+  createdAt: DateTime!
+  id: ID!
+
+  """Unique key the game looks the message up by"""
+  key: String!
+
+  """
+  Message variants (the game picks one or uses them in order, depending on the key)
+  """
+  messages: [String!]!
+  updatedAt: DateTime!
 }
 
 """Category of system text"""
@@ -3515,6 +3699,9 @@ input UpdateAbilityInput {
   name: String
   notes: String
   pages: Int
+
+  """Prompt cooldown-bar letter; pass null or empty to clear"""
+  promptLetter: String
   questOnly: Boolean
   schoolId: Int
   sphere: SpellSphere
@@ -3623,6 +3810,21 @@ input UpdateClassInput {
 
 input UpdateClassSkillInput {
   minLevel: Int
+}
+
+"""Input for updating a creation recipe"""
+input UpdateCreationRecipeInput {
+  abilityId: Int
+
+  """Pass null to clear"""
+  classId: Int
+
+  """Pass null or empty to clear"""
+  keyword: String
+
+  """Pass null to clear"""
+  objectId: Int
+  objectZoneId: Int
 }
 
 input UpdateDialogueNodeInput {
@@ -4080,6 +4282,24 @@ input UpdateSocialInput {
 
   """Message to target"""
   victFound: String
+}
+
+"""Input for updating a spell syllable"""
+input UpdateSpellSyllableInput {
+  replacement: String
+  sortOrder: Int
+  syllable: String
+}
+
+"""Input for updating a status flag value"""
+input UpdateStatusFlagValueInput {
+  aiValue: Int!
+}
+
+"""Input for updating a system message (the key cannot change)"""
+input UpdateSystemMessageInput {
+  category: String
+  messages: [String!]
 }
 
 """Input for updating system text"""

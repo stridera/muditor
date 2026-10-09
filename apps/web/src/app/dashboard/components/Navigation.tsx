@@ -34,6 +34,10 @@ import {
   ScrollText,
   Settings,
   Flag,
+  Gauge,
+  Hammer,
+  Languages,
+  MessageSquareText,
   Shield,
   ShoppingBag,
   Sparkles,
@@ -97,6 +101,22 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/socials': {
     name: 'Socials',
     icon: <MessageCircle className='h-5 w-5' />,
+  },
+  '/dashboard/system-messages': {
+    name: 'System Messages',
+    icon: <MessageSquareText className='h-5 w-5' />,
+  },
+  '/dashboard/status-flag-values': {
+    name: 'Status Flag Values',
+    icon: <Gauge className='h-5 w-5' />,
+  },
+  '/dashboard/spell-syllables': {
+    name: 'Spell Syllables',
+    icon: <Languages className='h-5 w-5' />,
+  },
+  '/dashboard/creation-recipes': {
+    name: 'Creation Recipes',
+    icon: <Hammer className='h-5 w-5' />,
   },
   '/dashboard/effect-auras': {
     name: 'Effect Auras',
@@ -411,6 +431,36 @@ export function Navigation() {
                             Socials
                           </Link>
                         </DropdownMenuItem>
+                      )}
+                      {isCoder && (
+                        <DropdownMenuItem asChild>
+                          <Link href='/dashboard/system-messages'>
+                            <MessageSquareText className='mr-2 h-4 w-4' />
+                            System Messages
+                          </Link>
+                        </DropdownMenuItem>
+                      )}
+                      {isBuilder && (
+                        <>
+                          <DropdownMenuItem asChild>
+                            <Link href='/dashboard/status-flag-values'>
+                              <Gauge className='mr-2 h-4 w-4' />
+                              Status Flag Values
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href='/dashboard/spell-syllables'>
+                              <Languages className='mr-2 h-4 w-4' />
+                              Spell Syllables
+                            </Link>
+                          </DropdownMenuItem>
+                          <DropdownMenuItem asChild>
+                            <Link href='/dashboard/creation-recipes'>
+                              <Hammer className='mr-2 h-4 w-4' />
+                              Creation Recipes
+                            </Link>
+                          </DropdownMenuItem>
+                        </>
                       )}
                       <DropdownMenuItem asChild>
                         <Link href='/dashboard/boards'>

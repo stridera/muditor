@@ -115,6 +115,7 @@ type AbilitySummary = Pick<
   | 'violent'
   | 'castTimeRounds'
   | 'cooldownMs'
+  | 'promptLetter'
   | 'inCombatOnly'
   | 'isArea'
   | 'notes'
@@ -141,6 +142,7 @@ interface AbilityFormData {
   combatOk: boolean;
   castTimeRounds: number;
   cooldownMs: number;
+  promptLetter: string;
   inCombatOnly: boolean;
   isArea: boolean;
   notes: string;
@@ -535,6 +537,8 @@ export default function AbilitiesPage() {
       combatOk: formData.combatOk,
       castTimeRounds: formData.castTimeRounds,
       cooldownMs: formData.cooldownMs,
+      // Empty string clears the letter on update; stored as NULL.
+      promptLetter: formData.promptLetter.trim() || null,
       inCombatOnly: formData.inCombatOnly,
       isArea: formData.isArea,
       notes: formData.notes || undefined,
@@ -2014,6 +2018,7 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
     combatOk: true,
     castTimeRounds: 1,
     cooldownMs: 0,
+    promptLetter: '',
     inCombatOnly: false,
     isArea: false,
     notes: '',
@@ -2041,6 +2046,7 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         combatOk: (ability as any).combatOk ?? true,
         castTimeRounds: ability.castTimeRounds,
         cooldownMs: ability.cooldownMs,
+        promptLetter: ability.promptLetter ?? '',
         inCombatOnly: ability.inCombatOnly,
         isArea: ability.isArea,
         notes: ability.notes || '',
@@ -2064,6 +2070,7 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
         combatOk: true,
         castTimeRounds: 1,
         cooldownMs: 0,
+        promptLetter: '',
         inCombatOnly: false,
         isArea: false,
         notes: '',
@@ -2212,6 +2219,29 @@ const AbilityFormDialog: FC<AbilityFormDialogProps> = ({
                   min={0}
                 />
               </div>
+            </div>
+
+            <div className='grid gap-2'>
+              <Label htmlFor='promptLetter'>Prompt Letter</Label>
+              <Input
+                id='promptLetter'
+                value={formData.promptLetter}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    promptLetter: e.target.value.slice(0, 1),
+                  })
+                }
+                maxLength={1}
+                pattern='[A-Za-z]'
+                placeholder='(none)'
+                className='w-20 font-mono'
+              />
+              <p className='text-xs text-muted-foreground'>
+                Single letter for the prompt cooldown bar (%d&lt;letter&gt;).
+                Abilities may share a letter (the breath weapons share one). The
+                game picks up changes on restart.
+              </p>
             </div>
 
             <div className='grid gap-2'>

@@ -1,0 +1,32 @@
+# System message (multi-variant game text) operations
+
+query GetSystemMessages {
+  systemMessages {
+    id
+    key
+    category
+    messages
+    updatedAt
+  }
+}
+
+mutation CreateSystemMessage($data: CreateSystemMessageInput!) {
+  createSystemMessage(data: $data) {
+    id
+    key
+  }
+}
+
+mutation UpdateSystemMessage($id: ID!, $data: UpdateSystemMessageInput!) {
+  updateSystemMessage(id: $id, data: $data) {
+    id
+    key
+    category
+    messages
+    updatedAt
+  }
+}
+
+mutation DeleteSystemMessage($id: ID!) {
+  deleteSystemMessage(id: $id)
+}

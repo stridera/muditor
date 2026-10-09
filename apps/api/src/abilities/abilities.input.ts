@@ -1,5 +1,6 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import GraphQLJSON from 'graphql-type-json';
+import { IsOptional, IsString, Matches } from 'class-validator';
 import {
   Position,
   Prisma,
@@ -9,6 +10,10 @@ import {
   SpellSphere,
   ElementType,
 } from '@muditor/db';
+
+// Empty string is accepted on update/create as "clear" (stored as NULL).
+const PROMPT_LETTER_PATTERN = /^[A-Za-z]?$/;
+const PROMPT_LETTER_MESSAGE = 'promptLetter must be a single letter';
 
 @InputType()
 export class CreateAbilityInput {
@@ -38,6 +43,15 @@ export class CreateAbilityInput {
 
   @Field(() => Int, { defaultValue: 0 })
   cooldownMs: number;
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'Prompt cooldown-bar letter (%d<letter>); one ASCII letter',
+  })
+  @IsString()
+  @IsOptional()
+  @Matches(PROMPT_LETTER_PATTERN, { message: PROMPT_LETTER_MESSAGE })
+  promptLetter?: string | null;
 
   @Field({ defaultValue: false })
   inCombatOnly: boolean;
@@ -102,6 +116,15 @@ export class UpdateAbilityInput {
 
   @Field(() => Int, { nullable: true })
   cooldownMs?: number;
+
+  @Field(() => String, {
+    nullable: true,
+    description: 'Prompt cooldown-bar letter; pass null or empty to clear',
+  })
+  @IsString()
+  @IsOptional()
+  @Matches(PROMPT_LETTER_PATTERN, { message: PROMPT_LETTER_MESSAGE })
+  promptLetter?: string | null;
 
   @Field({ nullable: true })
   inCombatOnly?: boolean;

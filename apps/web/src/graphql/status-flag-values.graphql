@@ -1,0 +1,29 @@
+# Status flag AI value operations
+
+query GetStatusFlagValues {
+  statusFlagValues {
+    flag
+    aiValue
+  }
+}
+
+mutation CreateStatusFlagValue($data: CreateStatusFlagValueInput!) {
+  createStatusFlagValue(data: $data) {
+    flag
+    aiValue
+  }
+}
+
+mutation UpdateStatusFlagValue(
+  $flag: String!
+  $data: UpdateStatusFlagValueInput!
+) {
+  updateStatusFlagValue(flag: $flag, data: $data) {
+    flag
+    aiValue
+  }
+}
+
+mutation DeleteStatusFlagValue($flag: String!) {
+  deleteStatusFlagValue(flag: $flag)
+}

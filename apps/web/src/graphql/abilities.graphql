@@ -20,6 +20,7 @@ query GetAbilities(
     violent
     castTimeRounds
     cooldownMs
+    promptLetter
     inCombatOnly
     isArea
     notes
@@ -50,6 +51,7 @@ query GetAbilityDetails($id: ID!) {
     combatOk
     castTimeRounds
     cooldownMs
+    promptLetter
     inCombatOnly
     isArea
     notes

@@ -1,0 +1,36 @@
+# Creation spell recipe operations
+
+query GetCreationRecipes {
+  creationRecipes {
+    id
+    abilityId
+    ability {
+      id
+      name
+    }
+    keyword
+    classId
+    characterClass {
+      id
+      plainName
+    }
+    objectZoneId
+    objectId
+  }
+}
+
+mutation CreateCreationRecipe($data: CreateCreationRecipeInput!) {
+  createCreationRecipe(data: $data) {
+    id
+  }
+}
+
+mutation UpdateCreationRecipe($id: ID!, $data: UpdateCreationRecipeInput!) {
+  updateCreationRecipe(id: $id, data: $data) {
+    id
+  }
+}
+
+mutation DeleteCreationRecipe($id: ID!) {
+  deleteCreationRecipe(id: $id)
+}

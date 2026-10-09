@@ -78,6 +78,7 @@ export class SettingsService {
       config.minValue,
       config.maxValue
     );
+    this.validateKnownConfigShape(category, key, data.value);
 
     return this.db.gameConfig.update({
       where: { category_key: { category, key } },
@@ -139,7 +140,44 @@ export class SettingsService {
         }
         break;
       }
-      // STRING and JSON are not validated
+      case 'JSON': {
+        try {
+          JSON.parse(value);
+        } catch {
+          throw new BadRequestException(`Value must be valid JSON`);
+        }
+        break;
+      }
+      // STRING is not validated
+    }
+  }
+
+  /**
+   * Shape checks for JSON configs the game parses into structures.
+   * `display.prompt_templates` is `[[name, template], ...]` (the `prompt list`
+   * menu); a malformed value would silently leave the menu empty.
+   */
+  private validateKnownConfigShape(
+    category: string,
+    key: string,
+    value: string
+  ) {
+    if (category !== 'display' || key !== 'prompt_templates') return;
+    const parsed: unknown = JSON.parse(value);
+    const ok =
+      Array.isArray(parsed) &&
+      parsed.every(
+        entry =>
+          Array.isArray(entry) &&
+          entry.length === 2 &&
+          typeof entry[0] === 'string' &&
+          entry[0].trim() !== '' &&
+          typeof entry[1] === 'string'
+      );
+    if (!ok) {
+      throw new BadRequestException(
+        'display.prompt_templates must be a JSON array of [name, template] string pairs'
+      );
     }
   }
 
