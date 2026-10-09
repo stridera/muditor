@@ -85,15 +85,10 @@ describe('RewardFields', () => {
     expect(screen.queryByLabelText('Amount')).not.toBeInTheDocument();
   });
 
-  it('Housing has no value fields and is marked not yet granted', () => {
+  it('Housing has no value fields and no warning', () => {
     renderReward({ rewardType: 'HOUSING' });
     expect(screen.queryByLabelText('Amount')).not.toBeInTheDocument();
     expect(screen.queryByLabelText('Quantity')).not.toBeInTheDocument();
-    expect(screen.getByText(/Not yet granted/)).toBeInTheDocument();
-  });
-
-  it('other reward types are not flagged as ungranted', () => {
-    renderReward({ rewardType: 'SKILL_POINTS' });
     expect(screen.queryByText(/Not yet granted/)).not.toBeInTheDocument();
   });
 

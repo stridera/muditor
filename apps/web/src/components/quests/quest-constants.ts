@@ -29,11 +29,6 @@ export const REWARD_TYPES: { value: QuestRewardType; label: string }[] = [
   { value: 'HOUSING' as QuestRewardType, label: 'Housing' },
 ];
 
-/** Reward types the game announces but does not actually grant yet. */
-export const UNGRANTED_REWARD_TYPES: QuestRewardType[] = [
-  'HOUSING' as QuestRewardType,
-];
-
 export const OBJECTIVE_SCOPES: {
   value: QuestObjectiveScope;
   label: string;

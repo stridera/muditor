@@ -5,7 +5,7 @@ import { QUESTS_HELP_ANCHORS as HELP } from '@/components/help/help-topics';
 import type { QuestRewardType } from '@/generated/graphql';
 import { AbilityPicker } from './AbilityPicker';
 import { EntityAutocomplete } from './EntityAutocomplete';
-import { REWARD_TYPES, UNGRANTED_REWARD_TYPES } from './quest-constants';
+import { REWARD_TYPES } from './quest-constants';
 import type { RewardFormData } from './quest-form';
 
 interface RewardFieldsProps {
@@ -21,14 +21,13 @@ const INPUT =
 /**
  * The editable body of one reward. Fields depend on the reward type:
  * Experience, Gold and Skill Points take an amount; Item takes an item and a
- * quantity; Ability takes a skill/spell; Housing takes nothing and is flagged
- * as not yet granted by the game. Choice group and condition apply to all.
+ * quantity; Ability takes a skill/spell; Housing takes nothing (it gives the
+ * character a house if they have none). Choice group and condition apply to all.
  */
 export function RewardFields({ reward, onChange }: RewardFieldsProps) {
   const type = reward.rewardType;
   const takesAmount =
     type === 'EXPERIENCE' || type === 'GOLD' || type === 'SKILL_POINTS';
-  const ungranted = UNGRANTED_REWARD_TYPES.includes(type);
 
   return (
     <div className='space-y-3'>
@@ -139,13 +138,6 @@ export function RewardFields({ reward, onChange }: RewardFieldsProps) {
           />
         </div>
       </div>
-
-      {ungranted && (
-        <p className='text-xs text-amber-600 dark:text-amber-400'>
-          Not yet granted: the game announces a Housing reward but does not give
-          the player anything.
-        </p>
-      )}
 
       <div>
         <label className={`${LABEL} flex items-center gap-1`}>

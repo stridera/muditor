@@ -116,14 +116,14 @@ The editor only shows the fields an objective type uses (Kill Mob: a mob picker;
 
 Rewards live on a phase in the editor, but the game pays **all of a quest's rewards when the quest completes**, whichever phase they were attached to. Put them on the last phase so the editor matches reality.
 
-| Editor type  | Value          | What the player gets                                                                    |
-| ------------ | -------------- | --------------------------------------------------------------------------------------- |
-| Experience   | `EXPERIENCE`   | **Amount** experience points.                                                           |
-| Gold         | `GOLD`         | **Amount** gold.                                                                        |
-| Item         | `ITEM`         | **Quantity** copies of the item (default 1) placed in the inventory.                    |
-| Ability      | `ABILITY`      | Teaches the chosen skill or spell as known.                                             |
-| Skill Points | `SKILL_POINTS` | **Amount** skill points.                                                                |
-| Housing      | `HOUSING`      | **Not yet granted.** The game only announces "housing access"; the player gets nothing. |
+| Editor type  | Value          | What the player gets                                                                                                                                                                    |
+| ------------ | -------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Experience   | `EXPERIENCE`   | **Amount** experience points.                                                                                                                                                           |
+| Gold         | `GOLD`         | **Amount** gold.                                                                                                                                                                        |
+| Item         | `ITEM`         | **Quantity** copies of the item (default 1) placed in the inventory.                                                                                                                    |
+| Ability      | `ABILITY`      | Teaches the chosen skill or spell as known.                                                                                                                                             |
+| Skill Points | `SKILL_POINTS` | **Amount** skill points.                                                                                                                                                                |
+| Housing      | `HOUSING`      | Gives the character a house of their own (a foyer, entered with `home`) if they have none; a character who already owns one gets nothing more. The entrance is their race's start room. |
 
 **Choice Group**: rewards that share a group number are a "pick one" set. They are **not** paid at completion. The player must type `qreward` to list the choices and `qreward <zone> <id> <reward id>` to pick one. The completion message does not mention choice rewards, so tell players about `qreward` in your NPC dialogue or quest description.
 
@@ -220,7 +220,6 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 - **Availability expression typos.** They fail closed, so nobody can take the quest (check `syslog 100 lua`). Use `actor`, not `character`, and lower-case class and race names.
 - **Expecting early progress to carry over.** An objective only advances while its phase is current. A kill made in phase 1 does not count towards a phase 2 kill objective. Only carried Collect Item items are credited when a phase starts.
 - **Talking with `say`.** Talk to NPC only counts `ask <mob> <topic>`, and with a dialogue the topic must match its keywords.
-- **Housing rewards.** The editor offers them but the game does not grant them yet.
 - **Collect Item takes the items.** Completing the objective removes the required items from the player. Do not use it for items the player must keep or later hand to someone (use Deliver Item for the hand-over), and remember a held count goes down if they drop one.
 - **Rewards on the first phase.** They are still paid only at completion. Attach them to the last phase to avoid confusion.
 - **Choice rewards nobody can find.** Players must know about `qreward`.
@@ -293,4 +292,4 @@ Starting over: `qreset <player> <zone> <id>` deletes the record, after which `ql
 
 ### What the editor cannot set yet
 
-Every quest column the game reads can be set in the editor. Settings that run the other way (the editor offers them, the game does not act on them): the **Quest Giver Mob**, **Shareable**, and **Housing** rewards. The "Any response" dialogue match type is hidden because the game never matches it.
+Every quest column the game reads can be set in the editor. Settings that run the other way (the editor offers them, the game does not act on them): the **Quest Giver Mob** and **Shareable**. The "Any response" dialogue match type is hidden because the game never matches it.
