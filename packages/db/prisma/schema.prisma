@@ -404,6 +404,11 @@ model CharacterClass {
   // (Anti-Paladin/Diabolist/Necromancer -100, Thief/Assassin -50), 0 otherwise.
   alignmentBias Int @default(0) @map("alignment_bias")
 
+  // Camp "fieldcraft" bonus: +1 rest tier at camp completion when the camper or
+  // a group member has a class with this set (Ranger and Druid). Read by the
+  // game server's camp tier computation; legacy has no camp tier.
+  campcraftBonus Boolean @default(false) @map("campcraft_bonus")
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")
