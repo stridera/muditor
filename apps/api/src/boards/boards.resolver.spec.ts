@@ -1,4 +1,4 @@
-import { ForbiddenException } from '@nestjs/common';
+import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { UserRole, type Users } from '@muditor/db';
 import { BoardMessagesResolver, BoardsResolver } from './boards.resolver';
 import type { BoardsService } from './boards.service';
@@ -26,6 +26,10 @@ function makeService() {
     edits: [],
   };
   return {
+    findBoardPrivileges: jest.fn().mockResolvedValue({
+      locked: false,
+      privileges: [{ privilege: 'WriteNew', level: 0 }],
+    }),
     findMessageById: jest.fn().mockResolvedValue(message),
     updateMessage: jest.fn().mockResolvedValue(message),
     deleteMessage: jest.fn().mockResolvedValue(message),
@@ -123,6 +127,130 @@ describe('BoardMessagesResolver authorization', () => {
     expect(service.createMessage).toHaveBeenCalledWith(
       expect.objectContaining({ poster: 'Alice', posterLevel: 102 })
     );
+  });
+});
+
+describe('createBoardMessage board privileges', () => {
+  const input = (extra = {}) => ({
+    boardId: 1,
+    poster: 'Pat',
+    posterLevel: 1,
+    subject: 's',
+    content: 'c',
+    ...extra,
+  });
+  const setup = (board: unknown) => {
+    const service = makeService();
+    service.findBoardPrivileges.mockResolvedValue(board);
+    return {
+      service,
+      resolver: new BoardMessagesResolver(service as unknown as BoardsService),
+    };
+  };
+
+  it('refuses posting on a board without a write rule (staff boards)', async () => {
+    const { service, resolver } = setup({ locked: false, privileges: [] });
+    await expect(
+      resolver.createBoardMessage(input(), player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(service.createMessage).not.toHaveBeenCalled();
+    // read-only board: READ alone is not enough
+    const readOnly = setup({
+      locked: false,
+      privileges: [{ privilege: 'Read', level: 0 }],
+    });
+    await expect(
+      readOnly.resolver.createBoardMessage(input(), player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('allows a player to post where the write rule is open', async () => {
+    const { service, resolver } = setup({
+      locked: false,
+      privileges: [{ privilege: 'WriteNew', level: 0, maxLevel: 105 }],
+    });
+    await resolver.createBoardMessage(input(), player);
+    expect(service.createMessage).toHaveBeenCalled();
+  });
+
+  it('refuses a rule whose level maps to a staff role', async () => {
+    const { resolver } = setup({
+      locked: false,
+      privileges: [{ privilege: 1, minLevel: 101 }],
+    });
+    await expect(
+      resolver.createBoardMessage(input(), player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('needs the sticky privilege for sticky posts', async () => {
+    const { service, resolver } = setup({
+      locked: false,
+      privileges: [{ privilege: 'WriteNew', level: 0 }],
+    });
+    await expect(
+      resolver.createBoardMessage(input({ sticky: true }), player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(service.createMessage).not.toHaveBeenCalled();
+    const open = setup({
+      locked: false,
+      privileges: [
+        { privilege: 'WriteNew', level: 0 },
+        { privilege: 'WriteSticky', level: 0 },
+      ],
+    });
+    await open.resolver.createBoardMessage(input({ sticky: true }), player);
+    expect(open.service.createMessage).toHaveBeenCalled();
+  });
+
+  it('refuses posts on a locked board below BUILDER, even with the write rule', async () => {
+    const board = {
+      locked: true,
+      privileges: [{ privilege: 'WriteNew', level: 0 }],
+    };
+    const { service, resolver } = setup(board);
+    await expect(
+      resolver.createBoardMessage(input(), player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(
+      resolver.createBoardMessage(input({ poster: 'Zeus' }), immortal)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(service.createMessage).not.toHaveBeenCalled();
+    await resolver.createBoardMessage(input({ poster: 'Alice' }), author);
+    expect(service.createMessage).toHaveBeenCalled();
+  });
+
+  it('404s on a missing board', async () => {
+    const { resolver } = setup(null);
+    await expect(
+      resolver.createBoardMessage(input(), player)
+    ).rejects.toBeInstanceOf(NotFoundException);
+  });
+
+  it('only staff or the sticky privilege may pin on edit', async () => {
+    const service = makeService();
+    const resolver = new BoardMessagesResolver(
+      service as unknown as BoardsService
+    );
+    service.findMessageById.mockResolvedValue({
+      id: 7,
+      poster: 'Pat',
+      sticky: false,
+      board: { privileges: [] },
+    });
+    await expect(
+      resolver.updateBoardMessage(7, { sticky: true }, player)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(service.updateMessage).not.toHaveBeenCalled();
+  });
+
+  it('existing posting tests still pass for authors on open boards', async () => {
+    const { service, resolver } = setup({
+      locked: false,
+      privileges: [{ privilege: 1, minLevel: 0 }],
+    });
+    await resolver.createBoardMessage(input(), player);
+    expect(service.createMessage).toHaveBeenCalled();
   });
 });
 

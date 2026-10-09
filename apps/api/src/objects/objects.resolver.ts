@@ -15,6 +15,7 @@ import {
   ConsumableEffectInput,
 } from './object-effects.dto';
 import { ObjectsService } from './objects.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ObjectDto)
 export class ObjectsResolver {
@@ -32,8 +33,8 @@ export class ObjectsResolver {
     const params: { skip?: number; take?: number; hideGodZones: boolean } = {
       hideGodZones: hidesGodZones(user ?? null),
     };
-    if (skip !== undefined) params.skip = skip;
-    if (take !== undefined) params.take = take;
+    if (skip !== undefined) params.skip = clampSkip(skip);
+    params.take = clampTake(take);
     const objects = await this.objectsService.findAll(params);
     return objects.map(o => mapObject(o));
   }

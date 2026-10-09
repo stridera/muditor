@@ -5,5 +5,7 @@ export interface JwtPayload {
   displayName: string;
   role: UserRole;
   iat?: number;
+  /** Unix seconds of the last real sign-in; preserved across token refreshes. */
+  authAt?: number;
   exp?: number;
 }

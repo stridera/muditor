@@ -124,7 +124,7 @@ export class UsersResolver {
 
   @Mutation(() => AdminUserAccount, {
     description:
-      'Set a user role. CODER: only below own role; IMPLEMENTOR: any (never demotes the last IMPLEMENTOR)',
+      'Set a user role. CODER: only below own role; IMPLEMENTOR: any role on lower ranks, never on another IMPLEMENTOR (never demotes the last IMPLEMENTOR)',
   })
   @Roles(UserRole.CODER)
   @UseGuards(GraphQLJwtAuthGuard, RolesGuard)

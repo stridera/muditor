@@ -424,6 +424,47 @@ describe('AuthService', () => {
       expect(databaseService.characters.updateMany).not.toHaveBeenCalled();
     });
 
+    describe('first password for a passwordless (Google-only) account', () => {
+      const nowSec = () => Math.floor(Date.now() / 1000);
+      beforeEach(() => {
+        (databaseService.users.findUnique as jest.Mock).mockResolvedValue({
+          ...user,
+          passwordHash: null,
+        });
+        (databaseService.characters.findMany as jest.Mock).mockResolvedValue(
+          []
+        );
+        (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$12$new');
+      });
+
+      it('rejects a stale or missing sign-in time', async () => {
+        await expect(
+          service.changePassword('user-id', '', 'brand-new-pass')
+        ).rejects.toThrow('sign in again');
+        await expect(
+          service.changePassword(
+            'user-id',
+            '',
+            'brand-new-pass',
+            nowSec() - 11 * 60
+          )
+        ).rejects.toThrow('sign in again');
+        expect(databaseService.users.update).not.toHaveBeenCalled();
+      });
+
+      it('accepts a sign-in from the last 10 minutes', async () => {
+        await expect(
+          service.changePassword(
+            'user-id',
+            '',
+            'brand-new-pass',
+            nowSec() - 9 * 60
+          )
+        ).resolves.toBe(true);
+        expect(databaseService.users.update).toHaveBeenCalled();
+      });
+    });
+
     it('resetPassword rejects a password matching a bcrypt game password', async () => {
       (databaseService.characters.findMany as jest.Mock).mockResolvedValue([
         { passwordHash: '$2b$12$game' },
@@ -731,6 +772,22 @@ describe('AuthService', () => {
         'Account is banned'
       );
       expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('refreshToken keeps the original sign-in time', async () => {
+      const sign = jwtService.sign.mockReturnValue('t');
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue({
+        id: 'user-id',
+        displayName: 'X',
+        role: UserRole.PLAYER,
+      });
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      await service.refreshToken('user-id', 1234);
+      expect(sign).toHaveBeenCalledWith(
+        expect.objectContaining({ authAt: 1234 })
+      );
     });
 
     it('refreshToken mints a token for an unbanned user', async () => {

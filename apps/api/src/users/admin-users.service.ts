@@ -63,8 +63,9 @@ export class AdminUsersService {
   }
 
   /**
-   * IMPLEMENTOR may set any role. CODER may only set roles strictly below
-   * CODER, and only on users currently below CODER. The last IMPLEMENTOR can
+   * IMPLEMENTOR may set any role on users below IMPLEMENTOR (or demote
+   * themselves). CODER may only set roles strictly below CODER, and only on
+   * users currently below CODER. The last IMPLEMENTOR can
    * never be demoted (by anyone, including themselves).
    */
   async setUserRole(
@@ -75,7 +76,14 @@ export class AdminUsersService {
     const actor = await this.requireActor(actorId);
     const target = await this.requireUser(userId);
 
-    if (actor.role !== UserRole.IMPLEMENTOR) {
+    if (actor.role === UserRole.IMPLEMENTOR && actorId !== userId) {
+      // IMPLEMENTORs may set any role on lower ranks, never on one another.
+      if (target.role === UserRole.IMPLEMENTOR) {
+        throw new ForbiddenException(
+          'You can only manage users with a role below your own'
+        );
+      }
+    } else if (actor.role !== UserRole.IMPLEMENTOR) {
       if (!roleAtLeast(actor.role, UserRole.CODER)) {
         throw new ForbiddenException('Insufficient role');
       }
@@ -115,7 +123,8 @@ export class AdminUsersService {
   ): Promise<AdminUserAccount> {
     const actor = await this.requireActor(actorId);
     const target = await this.requireUser(userId);
-    this.assertMayManage(actor, target);
+    // Self-delete gets its own error below; every other target must be outranked.
+    if (actorId !== userId) this.assertMayManage(actor, target);
 
     if (deleted) {
       const trimmed = reason?.trim();
@@ -220,12 +229,21 @@ export class AdminUsersService {
     this.assertMayManage(actor, target);
   }
 
-  /** IMPLEMENTOR manages anyone; others only users below their own role (or themselves). */
+  /**
+   * Strict outranking, for every role including IMPLEMENTOR: the actor must be
+   * at least CODER and rank strictly above the target. Acting on yourself is
+   * refused here too: self-service paths (updateProfile, changePassword)
+   * re-check the current password, which an admin mutation would skip.
+   */
   private assertMayManage(
     actor: { id: string; role: UserRole },
     target: { id: string; role: UserRole }
   ): void {
-    if (actor.role === UserRole.IMPLEMENTOR || actor.id === target.id) return;
+    if (actor.id === target.id) {
+      throw new ForbiddenException(
+        'Use your account settings to change your own account'
+      );
+    }
     if (
       !roleAtLeast(actor.role, UserRole.CODER) ||
       ROLE_RANK[target.role] >= ROLE_RANK[actor.role]

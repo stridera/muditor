@@ -165,18 +165,17 @@ export class AccountStorageService {
       throw new ForbiddenException('You do not own this character');
     }
 
-    // Check character has enough wealth
-    if (character.wealth < amount) {
-      throw new BadRequestException('Character does not have enough wealth');
-    }
-
     // Transfer wealth in a transaction
     const result = await this.database.$transaction(async tx => {
-      // Decrease character wealth
-      await tx.characters.update({
-        where: { id: characterId },
+      // Conditional decrement: the balance check and the write are one atomic
+      // statement, so concurrent deposits cannot both spend the same coins.
+      const debit = await tx.characters.updateMany({
+        where: { id: characterId, userId, wealth: { gte: amount } },
         data: { wealth: { decrement: amount } },
       });
+      if (debit.count !== 1) {
+        throw new BadRequestException('Character does not have enough wealth');
+      }
 
       // Increase account wealth
       const user = await tx.users.update({
@@ -208,22 +207,19 @@ export class AccountStorageService {
       throw new ForbiddenException('You do not own this character');
     }
 
-    // Check account has enough wealth
-    const user = await this.database.users.findUnique({
-      where: { id: userId },
-      select: { accountWealth: true },
-    });
-
-    if (!user || user.accountWealth < amount) {
-      throw new BadRequestException('Account does not have enough wealth');
-    }
-
     // Transfer wealth in a transaction
     const result = await this.database.$transaction(async tx => {
-      // Decrease account wealth
-      const updatedUser = await tx.users.update({
-        where: { id: userId },
+      // Conditional decrement: the balance check and the write are one atomic
+      // statement, so concurrent withdrawals cannot both spend the same coins.
+      const debit = await tx.users.updateMany({
+        where: { id: userId, accountWealth: { gte: amount } },
         data: { accountWealth: { decrement: amount } },
+      });
+      if (debit.count !== 1) {
+        throw new BadRequestException('Account does not have enough wealth');
+      }
+      const updatedUser = await tx.users.findUniqueOrThrow({
+        where: { id: userId },
         select: { accountWealth: true },
       });
 

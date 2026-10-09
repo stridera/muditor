@@ -24,35 +24,35 @@ export function depthLimit(maxDepth: number = MAX_QUERY_DEPTH): ValidationRule {
       }
     }
 
+    // Depth of a fragment's own selection set, relative to where it is spread.
+    // Memoised so nested double-spreading fragments cost O(fragments), not 2^n.
+    const memo = new Map<string, number>();
+    const visiting = new Set<string>();
+
     const selectionDepth = (
       selectionSet: SelectionSetNode | undefined,
-      depth: number,
-      visiting: Set<string>
+      depth: number
     ): number => {
       if (!selectionSet) return depth;
       let max = depth;
       for (const sel of selectionSet.selections) {
         if (sel.kind === Kind.FIELD) {
           if (sel.name.value.startsWith('__')) continue;
-          max = Math.max(
-            max,
-            selectionDepth(sel.selectionSet, depth + 1, visiting)
-          );
+          max = Math.max(max, selectionDepth(sel.selectionSet, depth + 1));
         } else if (sel.kind === Kind.INLINE_FRAGMENT) {
-          max = Math.max(
-            max,
-            selectionDepth(sel.selectionSet, depth, visiting)
-          );
+          max = Math.max(max, selectionDepth(sel.selectionSet, depth));
         } else {
           const name = sel.name.value;
           const frag = fragments.get(name);
           if (!frag || visiting.has(name)) continue;
-          visiting.add(name);
-          max = Math.max(
-            max,
-            selectionDepth(frag.selectionSet, depth, visiting)
-          );
-          visiting.delete(name);
+          let rel = memo.get(name);
+          if (rel === undefined) {
+            visiting.add(name);
+            rel = selectionDepth(frag.selectionSet, 0);
+            visiting.delete(name);
+            memo.set(name, rel);
+          }
+          max = Math.max(max, depth + rel);
         }
       }
       return max;
@@ -60,7 +60,7 @@ export function depthLimit(maxDepth: number = MAX_QUERY_DEPTH): ValidationRule {
 
     return {
       OperationDefinition(node: ASTNode & { selectionSet: SelectionSetNode }) {
-        const depth = selectionDepth(node.selectionSet, 0, new Set());
+        const depth = selectionDepth(node.selectionSet, 0);
         if (depth > maxDepth) {
           context.reportError(
             new GraphQLError(

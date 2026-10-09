@@ -25,6 +25,7 @@ import {
   UpdateEffectInput,
 } from './abilities.input';
 import { AbilitiesService } from './abilities.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => Ability)
 @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
@@ -52,7 +53,12 @@ export class AbilitiesResolver {
     @Args('search', { type: () => String, nullable: true })
     search?: string
   ) {
-    return this.abilitiesService.findAll(skip, take, abilityType, search);
+    return this.abilitiesService.findAll(
+      skip === undefined ? skip : clampSkip(skip),
+      clampTake(take),
+      abilityType,
+      search
+    );
   }
 
   @Query(() => Int, { name: 'abilitiesCount' })
@@ -203,7 +209,11 @@ export class AbilitiesResolver {
     @Args('take', { type: () => Int, nullable: true }) take?: number,
     @Args('search', { type: () => String, nullable: true }) search?: string
   ) {
-    return this.abilitiesService.findAllEffects(skip, take, search);
+    return this.abilitiesService.findAllEffects(
+      skip === undefined ? skip : clampSkip(skip),
+      clampTake(take),
+      search
+    );
   }
 
   @Query(() => Int, { name: 'effectsCount' })

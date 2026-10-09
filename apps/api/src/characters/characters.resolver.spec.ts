@@ -244,10 +244,18 @@ describe('CharactersResolver authorization', () => {
       expect(service.deleteCharacter).toHaveBeenCalledWith('c1');
     });
 
-    it('lets an IMPLEMENTOR manage any character without a lookup', async () => {
+    it('lets an IMPLEMENTOR manage lower ranks but not another IMPLEMENTOR', async () => {
+      ownedBy(UserRole.CODER, 104);
       await resolver.deleteCharacter('c1', implementor);
-      expect(service.deleteCharacter).toHaveBeenCalled();
-      expect(service.findCharacterRankInfo).not.toHaveBeenCalled();
+      expect(service.deleteCharacter).toHaveBeenCalledTimes(1);
+      ownedBy(UserRole.IMPLEMENTOR, 105);
+      await expect(
+        resolver.deleteCharacter('c2', implementor)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.updateCharacterItem(7, {} as never, implementor)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.deleteCharacter).toHaveBeenCalledTimes(1);
     });
 
     it('lets staff keep editing their own character', async () => {
@@ -265,12 +273,16 @@ describe('CharactersResolver authorization', () => {
       expect(service.updateCharacter).toHaveBeenCalled();
     });
 
-    it('for unowned characters requires the role the level maps to', async () => {
+    it('for unowned characters requires strictly outranking the role the level maps to', async () => {
       ownedBy(null, 104); // CODER-level legacy character
       await expect(
         resolver.deleteCharacter('c1', builder)
       ).rejects.toBeInstanceOf(ForbiddenException);
-      await resolver.deleteCharacter('c1', coder);
+      // equal rank is no longer enough
+      await expect(
+        resolver.deleteCharacter('c1', coder)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await resolver.deleteCharacter('c1', implementor);
       ownedBy(null, 30);
       await resolver.deleteCharacter('c1', immortal);
       expect(service.deleteCharacter).toHaveBeenCalledTimes(2);

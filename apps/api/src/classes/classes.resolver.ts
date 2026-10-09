@@ -15,6 +15,7 @@ import {
   UpdateClassCircleInput,
 } from './classes.input';
 import { ClassesService } from './classes.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ClassDto)
 export class ClassesResolver {
@@ -27,7 +28,10 @@ export class ClassesResolver {
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
   ) {
-    return this.classesService.findAll(skip, take);
+    return this.classesService.findAll(
+      skip === undefined ? skip : clampSkip(skip),
+      clampTake(take)
+    );
   }
 
   @Query(() => ClassDto, { name: 'class' })

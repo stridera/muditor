@@ -11,6 +11,7 @@ import { DialogueTreeResolver } from '../quests/dialogue-tree.resolver';
 import { QuestsResolver } from '../quests/quests.resolver';
 import { ShopsResolver } from '../shops/shops.resolver';
 import { TriggersResolver } from '../triggers/triggers.resolver';
+import { MAX_PAGE_SIZE } from './pagination';
 
 const anon = null;
 const player = { id: 'p', role: UserRole.PLAYER } as never;
@@ -84,9 +85,13 @@ describe('god-zone hiding is requested for anonymous and mortal callers only', (
     await r.findAll(undefined, undefined, anon);
     expect(svc.findAll).toHaveBeenLastCalledWith({
       where: { zones: { isGodZone: false } },
+      take: MAX_PAGE_SIZE,
     });
     await r.findAll(undefined, undefined, immortal);
-    expect(svc.findAll).toHaveBeenLastCalledWith({ where: {} });
+    expect(svc.findAll).toHaveBeenLastCalledWith({
+      where: {},
+      take: MAX_PAGE_SIZE,
+    });
     await r.findByZone(7, player);
     expect(svc.findByZone).toHaveBeenLastCalledWith(7, true);
     await r.count(immortal);
@@ -103,6 +108,7 @@ describe('god-zone hiding is requested for anonymous and mortal callers only', (
     await r.findAllQuests(undefined, undefined, undefined, anon);
     expect(svc.findAllQuests).toHaveBeenLastCalledWith({
       where: { zones: { isGodZone: false } },
+      take: MAX_PAGE_SIZE,
     });
     await r.findOneQuest(30, 1, player);
     expect(svc.findOneQuest).toHaveBeenLastCalledWith(30, 1, true);

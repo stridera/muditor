@@ -58,8 +58,10 @@ export class AuthResolver {
 
   @Mutation(() => String)
   @UseGuards(GraphQLJwtAuthGuard)
-  async refreshToken(@CurrentUser('id') userId: string): Promise<string> {
-    return this.authService.refreshToken(userId);
+  async refreshToken(
+    @CurrentUser() user: PrismaUser & { authAt?: number }
+  ): Promise<string> {
+    return this.authService.refreshToken(user.id, user.authAt);
   }
 
   @Mutation(() => PasswordResetResponse)
@@ -111,13 +113,14 @@ export class AuthResolver {
   @Mutation(() => PasswordResetResponse)
   @UseGuards(GraphQLJwtAuthGuard)
   async changePassword(
-    @CurrentUser('id') userId: string,
+    @CurrentUser() user: PrismaUser & { authAt?: number },
     @Args('input') input: ChangePasswordInput
   ): Promise<PasswordResetResponse> {
     const success = await this.authService.changePassword(
-      userId,
+      user.id,
       input.currentPassword,
-      input.newPassword
+      input.newPassword,
+      user.authAt
     );
     return {
       success,

@@ -38,6 +38,7 @@ import {
 } from './character.input';
 import { CharactersService } from './characters.service';
 import { issueStatRoll } from './stat-roll';
+import { clampSkip, clampTake } from '../common/pagination';
 
 /**
  * Fields of UpdateCharacterInput that the owner of a character may change on
@@ -124,22 +125,22 @@ export class CharactersResolver {
 
   /**
    * Staff-over-character rank rule for destructive/edit operations. The owner
-   * (and IMPLEMENTOR) always pass. Otherwise the caller must strictly outrank
-   * the character's owner's site role; for unowned characters the caller must
-   * be at least the role the character's level maps to. Non-staff owners are
-   * handled by the owner checks and never reach this.
+   * always passes. Otherwise the caller must strictly outrank the character's
+   * owner's site role (IMPLEMENTOR included: one cannot act on another's
+   * characters); for unowned characters the caller must strictly outrank the
+   * role the character's level maps to. Non-staff owners are handled by the
+   * owner checks and never reach this.
    */
   private async assertMayManageCharacter(
     user: Users,
     characterId: string
   ): Promise<void> {
-    if (user.role === UserRole.IMPLEMENTOR) return;
     const target =
       await this.charactersService.findCharacterRankInfo(characterId);
     if (target.ownerId === user.id) return;
     const allowed = target.ownerId
       ? roleRank(user.role) > roleRank(target.ownerRole)
-      : roleAtLeast(user.role, calculateRoleFromLevel(target.level));
+      : roleRank(user.role) > roleRank(calculateRoleFromLevel(target.level));
     if (!allowed) {
       throw new ForbiddenException(
         'You may not modify a character belonging to a user of equal or higher rank'
@@ -151,7 +152,6 @@ export class CharactersResolver {
     user: Users,
     itemId: number
   ): Promise<void> {
-    if (user.role === UserRole.IMPLEMENTOR) return;
     await this.assertMayManageCharacter(
       user,
       await this.charactersService.findCharacterItemCharacterId(Number(itemId))
@@ -162,7 +162,6 @@ export class CharactersResolver {
     user: Users,
     effectId: number
   ): Promise<void> {
-    if (user.role === UserRole.IMPLEMENTOR) return;
     await this.assertMayManageCharacter(
       user,
       await this.charactersService.findCharacterEffectCharacterId(
@@ -283,8 +282,8 @@ export class CharactersResolver {
   ) {
     // Non-staff only ever see their own characters.
     return this.charactersService.findAllCharacters(
-      skip,
-      take,
+      skip === undefined ? skip : clampSkip(skip),
+      clampTake(take),
       filter,
       isStaff(user?.role) ? undefined : (user?.id ?? NO_ACCESS_USER_ID)
     );

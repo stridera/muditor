@@ -34,6 +34,31 @@ describe('depthLimit', () => {
   });
 });
 
+describe('depthLimit fragment bombs', () => {
+  it('memoises fragments: 30 nested double-spreads validate quickly', () => {
+    const frags = Array.from({ length: 30 }, (_, i) =>
+      i === 29
+        ? `fragment F${i} on Node { name }`
+        : `fragment F${i} on Node { ...F${i + 1} ...F${i + 1} }`
+    );
+    const doc = parse(`{ node { ...F0 } } ${frags.join(' ')}`);
+    const start = performance.now();
+    const errors = validate(schema, doc, [depthLimit(10)]);
+    expect(performance.now() - start).toBeLessThan(50);
+    expect(errors).toHaveLength(0);
+  });
+
+  it('counts depth contributed through nested fragments', () => {
+    const doc = parse(`
+      { node { ...A } }
+      fragment A on Node { child { ...B } }
+      fragment B on Node { child { child { name } } }`);
+    // node(1) child(2) child(3) child(4) name(5)
+    expect(validate(schema, doc, [depthLimit(4)])).toHaveLength(1);
+    expect(validate(schema, doc, [depthLimit(5)])).toHaveLength(0);
+  });
+});
+
 describe('parseCorsOrigins', () => {
   it('defaults to the production + local allowlist', () => {
     expect(parseCorsOrigins(undefined)).toEqual(DEFAULT_CORS_ORIGINS);

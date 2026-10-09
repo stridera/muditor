@@ -27,6 +27,7 @@ import {
 } from './mob.dto';
 import { MobDefaultEffectInput } from './mob-effects.dto';
 import { MobsService } from './mobs.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 interface MobFieldSource {
   totalWealth?: number;
@@ -52,8 +53,8 @@ export class MobsResolver {
       search?: string;
       hideGodZones: boolean;
     } = { hideGodZones: hidesGodZones(user ?? null) };
-    if (skip !== undefined) params.skip = skip;
-    if (take !== undefined) params.take = take;
+    if (skip !== undefined) params.skip = clampSkip(skip);
+    params.take = clampTake(take);
     if (search !== undefined) params.search = search;
     const mobs = await this.mobsService.findAll(params);
     return mobs.map(m => mapMob(m));

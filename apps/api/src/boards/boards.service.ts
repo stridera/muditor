@@ -81,10 +81,10 @@ export class BoardsService {
   /** Privileges of a board (null when the board does not exist). */
   async findBoardPrivileges(
     id: number
-  ): Promise<{ privileges: unknown } | null> {
+  ): Promise<{ privileges: unknown; locked: boolean } | null> {
     return this.database.board.findUnique({
       where: { id },
-      select: { privileges: true },
+      select: { privileges: true, locked: true },
     });
   }
 

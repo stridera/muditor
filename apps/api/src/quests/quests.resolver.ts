@@ -30,6 +30,7 @@ import {
   QuestFilterInput,
 } from './quest.dto';
 import { QuestsService } from './quests.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => QuestDto)
 export class QuestsResolver {
@@ -79,8 +80,8 @@ export class QuestsResolver {
       take?: number;
     } = {};
     if (Object.keys(where).length > 0) args.where = where;
-    if (skip !== undefined) args.skip = skip;
-    if (take !== undefined) args.take = take;
+    if (skip !== undefined) args.skip = clampSkip(skip);
+    args.take = clampTake(take);
 
     return this.questsService.findAllQuests(args) as Promise<QuestDto[]>;
   }

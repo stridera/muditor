@@ -23,6 +23,8 @@ import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import type { GoogleProfile } from './strategies/google.strategy';
 
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000; // 15 minutes
+/** How recent a sign-in must be to set a first password without a current one. */
+const REAUTH_WINDOW_SECONDS = 10 * 60;
 const ADMIN_PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour (handed over out of band)
 
 // Sanitized user returned by auth operations (no password or reset tokens)
@@ -219,7 +221,7 @@ export class AuthService {
     return result as Users;
   }
 
-  async refreshToken(userId: string): Promise<string> {
+  async refreshToken(userId: string, authAt?: number): Promise<string> {
     const user = await this.databaseService.users.findUnique({
       where: { id: userId },
     });
@@ -234,7 +236,8 @@ export class AuthService {
       throw new UnauthorizedException('Account is banned');
     }
 
-    return this.generateToken(user.id, user.displayName, user.role);
+    // A refresh must not launder an old session into a "recent" sign-in.
+    return this.generateToken(user.id, user.displayName, user.role, authAt);
   }
 
   async requestPasswordReset(email: string): Promise<boolean> {
@@ -429,7 +432,8 @@ export class AuthService {
   async changePassword(
     userId: string,
     currentPassword: string,
-    newPassword: string
+    newPassword: string,
+    authAt?: number
   ): Promise<boolean> {
     const user = await this.databaseService.users.findUnique({
       where: { id: userId },
@@ -439,8 +443,17 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    // Verify current password (skip for Google-only users setting their first password)
-    if (user.passwordHash) {
+    // Google-only users setting their first password have no current password
+    // to verify, so require a recent sign-in instead (a stolen session token
+    // must not be able to add a password and lock the owner in).
+    if (!user.passwordHash) {
+      const age = Math.floor(Date.now() / 1000) - (authAt ?? 0);
+      if (authAt === undefined || age > REAUTH_WINDOW_SECONDS || age < -60) {
+        throw new UnauthorizedException(
+          'Please sign in again before setting a password'
+        );
+      }
+    } else {
       const isCurrentPasswordValid = await bcrypt.compare(
         currentPassword,
         user.passwordHash
@@ -760,13 +773,16 @@ export class AuthService {
   private generateToken(
     userId: string,
     displayName: string,
-    role: UserRole
+    role: UserRole,
+    authAt?: number
   ): string {
+    const now = Math.floor(Date.now() / 1000);
     const payload: JwtPayload = {
       sub: userId,
       displayName,
       role,
-      iat: Math.floor(Date.now() / 1000),
+      iat: now,
+      authAt: authAt ?? now,
     };
 
     return this.jwtService.sign(payload);

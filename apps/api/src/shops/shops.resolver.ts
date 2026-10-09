@@ -15,6 +15,7 @@ import {
   UpdateShopInventoryInput,
 } from './shop.dto';
 import { ShopsService } from './shops.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ShopDto)
 export class ShopsResolver {
@@ -148,8 +149,8 @@ export class ShopsResolver {
   ): Promise<ShopDto[]> {
     const shops = await this.shopsService.findAll({
       where: { ...inVisibleZone(hidesGodZones(user ?? null)) },
-      ...(typeof skip === 'number' ? { skip } : {}),
-      ...(typeof take === 'number' ? { take } : {}),
+      ...(typeof skip === 'number' ? { skip: clampSkip(skip) } : {}),
+      take: clampTake(take),
     });
     return shops.map(shop => this.mapShopToDto(shop));
   }

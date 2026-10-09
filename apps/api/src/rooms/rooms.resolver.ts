@@ -37,6 +37,7 @@ import { RoomsService } from './rooms.service';
 // Narrow mapper input to the actual shape returned by RoomsService (RoomServiceResult) plus relation arrays.
 // Use flexible mapper source type (optional relation arrays) matching `mapRoom` requirements.
 import type { RoomMapperSource } from '../common/mappers/types';
+import { MAX_BULK_PAGE_SIZE, clampSkip, clampTake } from '../common/pagination';
 type RoomsMapperInput = RoomMapperSource;
 
 // Internal lightweight types used for field resolution to avoid `any`
@@ -117,8 +118,8 @@ export class RoomsResolver {
       lightweight?: boolean;
       hideGodZones: boolean;
     } = { hideGodZones: hidesGodZones(user ?? null) };
-    if (skip !== undefined) params.skip = skip;
-    if (take !== undefined) params.take = take;
+    if (skip !== undefined) params.skip = clampSkip(skip);
+    params.take = clampTake(take, MAX_BULK_PAGE_SIZE);
     if (zoneId !== undefined) params.zoneId = zoneId;
     if (lightweight !== undefined) params.lightweight = lightweight;
     const rooms = await this.roomsService.findAll(params);

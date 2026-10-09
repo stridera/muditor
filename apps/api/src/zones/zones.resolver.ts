@@ -9,6 +9,7 @@ import { hidesGodZones } from '../common/god-zone-visibility';
 import { GrantsService } from '../grants/grants.service';
 import { CreateZoneInput, UpdateZoneInput, ZoneDto } from './zone.dto';
 import { ZonesService } from './zones.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ZoneDto)
 export class ZonesResolver {
@@ -29,8 +30,8 @@ export class ZonesResolver {
     const params: { skip?: number; take?: number; hideGodZones: boolean } = {
       hideGodZones: hidesGodZones(user ?? null),
     };
-    if (skip !== undefined) params.skip = skip;
-    if (take !== undefined) params.take = take;
+    if (skip !== undefined) params.skip = clampSkip(skip);
+    params.take = clampTake(take);
     return this.zonesService.findAll(params);
   }
 

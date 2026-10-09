@@ -197,6 +197,53 @@ describe('AdminUsersService', () => {
       expect(auth.createAdminPasswordResetLink).not.toHaveBeenCalled();
     });
   });
+
+  describe('strict outranking (including IMPLEMENTOR)', () => {
+    beforeEach(() => addUser('impl2', UserRole.IMPLEMENTOR));
+
+    it('blocks one IMPLEMENTOR from acting on another', async () => {
+      await expect(
+        service.assertActorMayManageUser('impl', 'impl2')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.setUserRole('impl', 'impl2', UserRole.PLAYER)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.setUserDeleted('impl', 'impl2', true, 'x')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.createPasswordResetLink('impl', 'impl2')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      db.characters.findUnique.mockResolvedValue({
+        id: 'c9',
+        name: 'Peer',
+        userId: 'impl2',
+      });
+      await expect(
+        service.unlinkCharacter('impl', 'c9')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(auth.createAdminPasswordResetLink).not.toHaveBeenCalled();
+      expect(users.impl2?.role).toBe(UserRole.IMPLEMENTOR);
+    });
+
+    it('still lets an IMPLEMENTOR manage lower ranks', async () => {
+      await expect(
+        service.assertActorMayManageUser('impl', 'coder')
+      ).resolves.toBeUndefined();
+    });
+
+    it('rejects self-targets in the admin gate (self-service needs the password)', async () => {
+      await expect(
+        service.assertActorMayManageUser('coder', 'coder')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.assertActorMayManageUser('impl', 'impl')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        service.createPasswordResetLink('coder', 'coder')
+      ).rejects.toBeInstanceOf(ForbiddenException);
+    });
+  });
 });
 
 describe('AdminUsersService.assertActorMayManageUser (updateUser rank gate)', () => {

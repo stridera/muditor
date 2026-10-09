@@ -15,8 +15,13 @@ import {
   UpdateBoardInput,
   UpdateBoardMessageInput,
 } from './board.dto';
-import { canReadBoard } from './board-access.util';
+import {
+  BoardPrivilege,
+  canReadBoard,
+  hasBoardPrivilege,
+} from './board-access.util';
 import { BoardsService } from './boards.service';
+import { clampSkip, clampTake } from '../common/pagination';
 
 interface BoardWithCount {
   id: number;
@@ -77,11 +82,8 @@ export class BoardsResolver {
     const boards = (await this.boardsService.findAllBoards(args)).filter(b =>
       canReadBoard(b.privileges, user)
     );
-    const start = skip ?? 0;
-    const page = boards.slice(
-      start,
-      take !== undefined ? start + take : undefined
-    );
+    const start = clampSkip(skip);
+    const page = boards.slice(start, start + clampTake(take));
     return page.map((b: BoardWithCount) => this.mapBoard(b));
   }
 
@@ -214,6 +216,17 @@ export class BoardMessagesResolver {
     }
   }
 
+  /** Sticky changes need the board's write-sticky privilege (staff always have it). */
+  private async assertMayStick(messageId: number, user: Users): Promise<void> {
+    const message = await this.boardsService.findMessageById(messageId);
+    if (message?.sticky) return; // already pinned: nothing to grant
+    const privileges = (message as { board?: { privileges: unknown } } | null)
+      ?.board?.privileges;
+    if (!hasBoardPrivilege(privileges, BoardPrivilege.WRITE_STICKY, user)) {
+      throw new ForbiddenException('You may not change sticky messages here');
+    }
+  }
+
   /** Throws unless the caller may read the board. Missing boards read as empty. */
   private async assertCanReadBoard(
     boardId: number,
@@ -237,8 +250,8 @@ export class BoardMessagesResolver {
   ): Promise<BoardMessageDto[]> {
     if (!(await this.assertCanReadBoard(boardId, user))) return [];
     const args: { skip?: number; take?: number } = {};
-    if (skip !== undefined) args.skip = skip;
-    if (take !== undefined) args.take = take;
+    if (skip !== undefined) args.skip = clampSkip(skip);
+    args.take = clampTake(take);
 
     const messages = await this.boardsService.findMessagesByBoard(
       boardId,
@@ -301,6 +314,23 @@ export class BoardMessagesResolver {
     if (!poster) {
       throw new ForbiddenException('You can only post as yourself');
     }
+    // Write / sticky privileges come from the board's rules, like READ does.
+    const board = await this.boardsService.findBoardPrivileges(data.boardId);
+    if (!board) {
+      throw new NotFoundException(`Board ${data.boardId} not found`);
+    }
+    if (board.locked && !roleAtLeast(user.role, UserRole.BUILDER)) {
+      throw new ForbiddenException('This board is locked');
+    }
+    if (!hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_NEW, user)) {
+      throw new ForbiddenException('You may not post on this board');
+    }
+    if (
+      data.sticky &&
+      !hasBoardPrivilege(board.privileges, BoardPrivilege.WRITE_STICKY, user)
+    ) {
+      throw new ForbiddenException('You may not post sticky messages here');
+    }
     const createData: Prisma.BoardMessageCreateInput = {
       board: { connect: { id: data.boardId } },
       poster,
@@ -329,6 +359,7 @@ export class BoardMessagesResolver {
   ): Promise<BoardMessageDto> {
     void _editor; // kept for schema compatibility; client-supplied editor is never trusted
     await this.assertAuthorOrStaff(id, user);
+    if (data.sticky) await this.assertMayStick(id, user);
     const updateData: Prisma.BoardMessageUpdateInput = {};
     if (data.subject !== undefined) updateData.subject = data.subject;
     if (data.content !== undefined) updateData.content = data.content;
