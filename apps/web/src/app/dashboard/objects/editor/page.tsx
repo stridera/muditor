@@ -220,6 +220,7 @@ const OBJECT_FLAGS = [
   'BUOYANT', // Floats in water
   'VEHICLE', // Can carry passengers
   'SOULBOUND', // Cannot trade/drop
+  'NO_FALL', // Unaffected by gravity (hovering)
 ];
 
 // Object behavioral restrictions

@@ -2010,6 +2010,7 @@ enum ObjectFlag {
   BUOYANT // Floats in water (boats)
   VEHICLE // Can carry passengers
   SOULBOUND // Persists through death, cannot trade/drop
+  NO_FALL // Unaffected by gravity; shown as "(hovering)" (legacy ITEM_NOFALL)
 }
 
 // Object behavioral restrictions - what CAN'T be done with the object

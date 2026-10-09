@@ -594,6 +594,7 @@ export enum ObjectFlag {
   BUOYANT = 'BUOYANT', // Floats in water
   VEHICLE = 'VEHICLE', // Can carry passengers
   SOULBOUND = 'SOULBOUND', // Cannot trade/drop, persists through death
+  NO_FALL = 'NO_FALL', // Unaffected by gravity (hovering)
 }
 
 // ObjectRestriction - behavioral restrictions on what can be done with the object
