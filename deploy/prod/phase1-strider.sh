@@ -63,8 +63,12 @@ TLS_KEY_PATH=/opt/NEXT/certs/server.key
 ADMIN_LISTEN_ADDR=127.0.0.1:8080
 ADMIN_TOKEN=${ADMIN_TOKEN}
 RUST_LOG=info
+# Production marker: with it the server refuses MUD_DEV_MODE, requires ADMIN_TOKEN and
+# turns off dev-only commands. The file is rewritten whole on every run, so this line
+# is always present and never duplicated.
+MUD_ENV=production
 ENVEOF
-note "env/fierymud-rs.env: written"
+note "env/fierymud-rs.env: written (MUD_ENV=production)"
 
 # Redis is optional. The API only talks to Redis when REDIS_URL is set (it
 # enables the game-event/Discord bridge and cross-process rate limits).

@@ -3763,6 +3763,11 @@ model PlayerHouseItem {
   objectId     Int    @map("object_id")
 
   condition    Int    @default(100)
+  // Per-instance state, same layout as CharacterItems: custom_values keeps the
+  // `keywords` override and the `curse` key (restriction changes, Enchant Weapon
+  // applies/flags/barred alignments); the text columns hold labels and examine text.
+  customName               String? @map("custom_name")
+  customExamineDescription String? @map("custom_examine_description")
   customValues Json   @default("{}") @map("custom_values")
 
   placedAt     DateTime @default(now()) @map("placed_at")

@@ -46,6 +46,10 @@ ssh fierymud 'sudo -n systemctl restart muditorNT-api muditorNT-web'    # mudito
 - `update.sh muditor` rebuilds in place, so the web app is briefly unavailable until restart. The `chgrp` step is non-fatal.
 - Rust builds need `.sqlx/` offline data (gitignored): generate on a dev box with `cargo sqlx prepare --workspace` and
   rsync to `/opt/NEXT/fierymud-rs/.sqlx`, or provide a reachable `DATABASE_URL`. A release build takes ~8 min at 2 jobs.
+- `env/fierymud-rs.env` must contain `MUD_ENV=production` (written by `phase1-strider.sh`). It is what makes the
+  server refuse `MUD_DEV_MODE`, require `ADMIN_TOKEN` and hide dev-only commands. A host set up before this was added
+  has no such line: re-run `phase1-strider.sh` (it keeps existing secrets and rewrites the env files, so the line is
+  never duplicated) or append `MUD_ENV=production` once, then restart `fieryNT`.
 - The web build bakes `NEXT_PUBLIC_*` from `/opt/NEXT/.env` at build time.
 - python-prisma `disconnect()` hangs on this host; `/opt/NEXT/logs/watch*.sh` kill the idle query-engine.
 
