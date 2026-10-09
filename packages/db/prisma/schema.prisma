@@ -28,6 +28,9 @@ model Ability {
   violent        Boolean  @default(false)
   castTimeRounds Int      @default(1) @map("cast_time_rounds")
   cooldownMs     Int      @default(0) @map("cooldown_ms")
+  // Legacy `%d<letter>` prompt code whose cooldown bar tracks this ability.
+  // Several abilities may share a letter (the five breath weapons share `b`).
+  promptLetter   String?  @map("prompt_letter") @db.VarChar(1)
   inCombatOnly   Boolean  @default(false) @map("in_combat_only")
   combatOk       Boolean  @default(true) @map("combat_ok") // Can be used during combat
   isArea         Boolean  @default(false) @map("is_area")
@@ -3273,6 +3276,30 @@ model SystemMessage {
 
   @@index([category])
   @@map("SystemMessage")
+}
+
+/// AI worth of a status flag (the flag names carried by `status` effects), the
+/// legacy `value_spell_effect` table mob_ai reads when deciding whether a
+/// monster wants a piece of gear. Flags without a row are worth 0.
+model StatusFlagValue {
+  flag    String @id // status flag name, e.g. "sanctuary"
+  aiValue Int    @default(0) @map("ai_value")
+
+  @@map("StatusFlagValue")
+}
+
+/// Spell chant gibberish: how a bystander who cannot place a spell hears its
+/// name. Rows are tried in `sortOrder` at each position of the lowercased spell
+/// name (whole syllables first, then the single-letter cipher); the first
+/// `syllable` that prefixes the remaining text is replaced by `replacement`.
+model SpellSyllable {
+  id          Int    @id @default(autoincrement())
+  sortOrder   Int    @map("sort_order")
+  syllable    String @unique
+  replacement String
+
+  @@index([sortOrder])
+  @@map("SpellSyllable")
 }
 
 // ============================================================================
