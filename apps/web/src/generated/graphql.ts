@@ -3329,6 +3329,7 @@ export type Query = {
   boardMessage?: Maybe<BoardMessageDto>;
   boardMessages: Array<BoardMessageDto>;
   boardMessagesCount: Scalars['Int']['output'];
+  /** Boards the caller may read (anonymous: public boards only) */
   boards: Array<BoardDto>;
   boardsCount: Scalars['Int']['output'];
   /** Get the FieryMUD bridge connection status */
@@ -5153,6 +5154,8 @@ export type UpdatePreferencesInput = {
 };
 
 export type UpdateProfileInput = {
+  /** Required when changing the email address */
+  currentPassword?: InputMaybe<Scalars['String']['input']>;
   email?: InputMaybe<Scalars['String']['input']>;
 };
 

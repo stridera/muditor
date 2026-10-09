@@ -207,6 +207,19 @@ export class AdminUsersService {
     return link;
   }
 
+  /**
+   * Gate for any write to another user's account (email, role, ...). Same
+   * rank rule as every other admin action; checks the CURRENT roles in the DB.
+   */
+  async assertActorMayManageUser(
+    actorId: string,
+    userId: string
+  ): Promise<void> {
+    const actor = await this.requireActor(actorId);
+    const target = await this.requireUser(userId);
+    this.assertMayManage(actor, target);
+  }
+
   /** IMPLEMENTOR manages anyone; others only users below their own role (or themselves). */
   private assertMayManage(
     actor: { id: string; role: UserRole },

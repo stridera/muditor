@@ -148,3 +148,113 @@ describe('BoardsResolver authorization', () => {
     expect(service.createBoard).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('board reads respect Board.privileges', () => {
+  const now = new Date();
+  const board = (id: number, privileges: unknown) => ({
+    id,
+    alias: `b${id}`,
+    title: `Board ${id}`,
+    locked: false,
+    privileges,
+    createdAt: now,
+    updatedAt: now,
+    _count: { messages: 2 },
+  });
+  const publicBoard = board(1, [0, 1, 2, 3, 4, 5, 6, 7]);
+  const godBoard = board(2, []);
+  const message = (boardId: number) => ({
+    id: boardId * 10,
+    boardId,
+    poster: 'x',
+    posterLevel: 1,
+    postedAt: now,
+    subject: 's',
+    content: 'c',
+    sticky: false,
+    createdAt: now,
+    updatedAt: now,
+    edits: [],
+  });
+
+  function build() {
+    const service = {
+      findAllBoards: jest.fn().mockResolvedValue([publicBoard, godBoard]),
+      findBoardById: jest.fn(async (id: number) =>
+        id === 1 ? publicBoard : godBoard
+      ),
+      findBoardByAlias: jest.fn(async (a: string) =>
+        a === 'b1' ? publicBoard : godBoard
+      ),
+      countBoards: jest.fn().mockResolvedValue(2),
+      findBoardPrivileges: jest.fn(async (id: number) =>
+        id === 1 ? publicBoard : id === 2 ? godBoard : null
+      ),
+      findMessagesByBoard: jest.fn(async (id: number) => [message(id)]),
+      findMessageById: jest.fn(async (id: number) => ({
+        ...message(id / 10),
+        board: id === 10 ? publicBoard : godBoard,
+      })),
+      countMessages: jest.fn().mockResolvedValue(5),
+    };
+    return {
+      service,
+      boards: new BoardsResolver(service as unknown as BoardsService),
+      messages: new BoardMessagesResolver(service as unknown as BoardsService),
+    };
+  }
+
+  it('anonymous callers only see public boards', async () => {
+    const { boards } = build();
+    const list = await boards.findAllBoards(null);
+    expect(list.map(b => b.id)).toEqual([1]);
+    expect(await boards.countBoards(null)).toBe(1);
+    expect(await boards.findBoard(null, 1)).not.toBeNull();
+    expect(await boards.findBoard(null, 2)).toBeNull();
+    expect(await boards.findBoard(null, undefined, 'b2')).toBeNull();
+  });
+
+  it('players do not see staff boards but IMMORTAL+ see everything', async () => {
+    const { boards } = build();
+    expect((await boards.findAllBoards(player)).map(b => b.id)).toEqual([1]);
+    expect((await boards.findAllBoards(immortal)).map(b => b.id)).toEqual([
+      1, 2,
+    ]);
+    expect(await boards.findBoard(immortal, 2)).not.toBeNull();
+    expect(await boards.countBoards(immortal)).toBe(2);
+  });
+
+  it('pages after filtering', async () => {
+    const { boards } = build();
+    const page = await boards.findAllBoards(immortal, 1, 1);
+    expect(page.map(b => b.id)).toEqual([2]);
+  });
+
+  it('boardMessages: forbids anonymous reads of a staff board, allows public', async () => {
+    const { messages, service } = build();
+    await expect(messages.findMessages(null, 2)).rejects.toBeInstanceOf(
+      ForbiddenException
+    );
+    expect(service.findMessagesByBoard).not.toHaveBeenCalled();
+    expect(await messages.findMessages(null, 1)).toHaveLength(1);
+    expect(await messages.findMessages(immortal, 2)).toHaveLength(1);
+    expect(await messages.findMessages(null, 99)).toEqual([]);
+  });
+
+  it('boardMessage hides messages of staff boards from the public', async () => {
+    const { messages } = build();
+    expect(await messages.findMessage(null, 20)).toBeNull();
+    expect(await messages.findMessage(player, 20)).toBeNull();
+    expect(await messages.findMessage(null, 10)).not.toBeNull();
+    expect(await messages.findMessage(immortal, 20)).not.toBeNull();
+  });
+
+  it('boardMessagesCount does not leak staff board counts', async () => {
+    const { messages } = build();
+    await expect(messages.countMessages(null, 2)).rejects.toBeInstanceOf(
+      ForbiddenException
+    );
+    expect(await messages.countMessages(null)).toBe(2); // only the public board
+    expect(await messages.countMessages(immortal)).toBe(5);
+  });
+});

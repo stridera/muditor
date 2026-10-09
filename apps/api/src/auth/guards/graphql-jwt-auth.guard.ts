@@ -38,10 +38,12 @@ export class GraphQLJwtAuthGuard {
           role: true,
           createdAt: true,
           updatedAt: true,
+          deletedAt: true,
         },
       });
 
-      if (!user) {
+      // Soft-deleted accounts keep a valid signed token until it expires.
+      if (!user || user.deletedAt) {
         throw new UnauthorizedException('Invalid token');
       }
 

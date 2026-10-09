@@ -6,6 +6,8 @@ import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { isStaff } from '../auth/role.util';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones, inVisibleZone } from '../common/god-zone-visibility';
 import {
   QuestDto,
   QuestPhaseDto,
@@ -49,13 +51,19 @@ export class QuestsResolver {
   // Quest Queries
   // ============================================================================
 
+  // Quest reads are public; quests in god zones are hidden from anonymous
+  // callers and mortal accounts (IMMORTAL+ still see them).
   @Query(() => [QuestDto], { name: 'quests' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAllQuests(
     @Args('filter', { nullable: true }) filter?: QuestFilterInput,
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number
+    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<QuestDto[]> {
-    const where: Record<string, unknown> = {};
+    const where: Record<string, unknown> = {
+      ...inVisibleZone(hidesGodZones(user ?? null)),
+    };
     if (filter?.zoneId !== undefined) where.zoneId = filter.zoneId;
     if (filter?.hidden !== undefined) where.hidden = filter.hidden;
     if (filter?.minLevel !== undefined)
@@ -78,28 +86,41 @@ export class QuestsResolver {
   }
 
   @Query(() => [QuestDto], { name: 'questsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findQuestsByZone(
-    @Args('zoneId', { type: () => Int }) zoneId: number
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @CurrentUser() user?: Users | null
   ): Promise<QuestDto[]> {
-    return this.questsService.findQuestsByZone(zoneId) as Promise<QuestDto[]>;
+    return this.questsService.findQuestsByZone(
+      zoneId,
+      hidesGodZones(user ?? null)
+    ) as Promise<QuestDto[]>;
   }
 
   @Query(() => QuestDto, { name: 'quest', nullable: true })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOneQuest(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<QuestDto | null> {
     return this.questsService.findOneQuest(
       zoneId,
-      id
+      id,
+      hidesGodZones(user ?? null)
     ) as Promise<QuestDto | null>;
   }
 
   @Query(() => Int, { name: 'questsCount' })
+  @UseGuards(OptionalJwtAuthGuard)
   async countQuests(
-    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number
+    @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<number> {
-    return this.questsService.countQuests(zoneId ? { zoneId } : undefined);
+    return this.questsService.countQuests({
+      ...(zoneId ? { zoneId } : {}),
+      ...inVisibleZone(hidesGodZones(user ?? null)),
+    });
   }
 
   // ============================================================================

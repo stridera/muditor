@@ -26,7 +26,8 @@ describe('DialogueTreeService', () => {
       create: jest.fn(),
       update: jest.fn(),
     },
-    questDialogue: { findUnique: jest.fn() },
+    questDialogue: { findUnique: jest.fn(), findMany: jest.fn() },
+    zones: { count: jest.fn() },
     $transaction: jest.fn(),
   };
 
@@ -185,6 +186,29 @@ describe('DialogueTreeService', () => {
       await expect(
         service.updateResponse(4, { matchKeywords: [] })
       ).rejects.toThrow(/keyword/);
+    });
+  });
+
+  describe('isTreeInVisibleZone', () => {
+    it('is false for unused trees and trees used in god zones', async () => {
+      db.questDialogue.findMany.mockResolvedValueOnce([]);
+      expect(await service.isTreeInVisibleZone(1)).toBe(false);
+
+      db.questDialogue.findMany.mockResolvedValueOnce([{ questZoneId: 5 }]);
+      db.zones.count.mockResolvedValueOnce(1);
+      expect(await service.isTreeInVisibleZone(1)).toBe(false);
+    });
+
+    it('is true when every using quest lives in a non-god zone', async () => {
+      db.questDialogue.findMany.mockResolvedValueOnce([
+        { questZoneId: 30 },
+        { questZoneId: 30 },
+      ]);
+      db.zones.count.mockResolvedValueOnce(0);
+      expect(await service.isTreeInVisibleZone(1)).toBe(true);
+      expect(db.zones.count).toHaveBeenCalledWith({
+        where: { id: { in: [30] }, isGodZone: true },
+      });
     });
   });
 });

@@ -1,4 +1,9 @@
+import { UseGuards } from '@nestjs/common';
+import type { Users } from '@muditor/db';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones } from '../common/god-zone-visibility';
 import { zoneLookups } from '../common/decorators/zone-lookups';
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
 import {
@@ -23,9 +28,17 @@ export class DialogueTreeResolver {
   constructor(private readonly trees: DialogueTreeService) {}
 
   @Query(() => DialogueTreeDto, { name: 'dialogueTree', nullable: true })
+  @UseGuards(OptionalJwtAuthGuard)
   async findDialogueTree(
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<DialogueTreeDto | null> {
+    if (
+      hidesGodZones(user ?? null) &&
+      !(await this.trees.isTreeInVisibleZone(id))
+    ) {
+      return null;
+    }
     return this.trees.findTree(id) as Promise<DialogueTreeDto | null>;
   }
 

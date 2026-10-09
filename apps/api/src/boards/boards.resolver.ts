@@ -4,6 +4,7 @@ import { ForbiddenException, NotFoundException } from '@nestjs/common';
 import { Prisma, UserRole, type Users } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { isStaff, roleAtLeast } from '../auth/role.util';
 import {
   BoardDto,
@@ -14,6 +15,7 @@ import {
   UpdateBoardInput,
   UpdateBoardMessageInput,
 } from './board.dto';
+import { canReadBoard } from './board-access.util';
 import { BoardsService } from './boards.service';
 
 interface BoardWithCount {
@@ -53,8 +55,13 @@ function assertBuilder(user: Users): void {
 export class BoardsResolver {
   constructor(private readonly boardsService: BoardsService) {}
 
-  @Query(() => [BoardDto], { name: 'boards' })
+  @Query(() => [BoardDto], {
+    name: 'boards',
+    description: 'Boards the caller may read (anonymous: public boards only)',
+  })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAllBoards(
+    @CurrentUser() user: Users | null,
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number,
     @Args('search', { type: () => String, nullable: true }) search?: string
@@ -64,33 +71,43 @@ export class BoardsResolver {
       take?: number;
       search?: string;
     } = {};
-    if (skip !== undefined) args.skip = skip;
-    if (take !== undefined) args.take = take;
     if (search !== undefined) args.search = search;
 
-    const boards = await this.boardsService.findAllBoards(args);
-    return boards.map((b: BoardWithCount) => this.mapBoard(b));
+    // Visibility is decided per board, so page after filtering (boards are few).
+    const boards = (await this.boardsService.findAllBoards(args)).filter(b =>
+      canReadBoard(b.privileges, user)
+    );
+    const start = skip ?? 0;
+    const page = boards.slice(
+      start,
+      take !== undefined ? start + take : undefined
+    );
+    return page.map((b: BoardWithCount) => this.mapBoard(b));
   }
 
   @Query(() => BoardDto, { name: 'board', nullable: true })
+  @UseGuards(OptionalJwtAuthGuard)
   async findBoard(
+    @CurrentUser() user: Users | null,
     @Args('id', { type: () => Int, nullable: true }) id?: number,
     @Args('alias', { type: () => String, nullable: true }) alias?: string
   ): Promise<BoardDto | null> {
+    let board: Awaited<ReturnType<BoardsService['findBoardById']>> = null;
     if (id) {
-      const board = await this.boardsService.findBoardById(id);
-      return board ? this.mapBoard(board as BoardWithCount) : null;
+      board = await this.boardsService.findBoardById(id);
+    } else if (alias) {
+      board = await this.boardsService.findBoardByAlias(alias);
     }
-    if (alias) {
-      const board = await this.boardsService.findBoardByAlias(alias);
-      return board ? this.mapBoard(board as BoardWithCount) : null;
-    }
-    return null;
+    if (!board || !canReadBoard(board.privileges, user)) return null;
+    return this.mapBoard(board as BoardWithCount);
   }
 
   @Query(() => Int, { name: 'boardsCount' })
-  async countBoards(): Promise<number> {
-    return this.boardsService.countBoards();
+  @UseGuards(OptionalJwtAuthGuard)
+  async countBoards(@CurrentUser() user: Users | null): Promise<number> {
+    if (isStaff(user?.role)) return this.boardsService.countBoards();
+    const boards = await this.boardsService.findAllBoards();
+    return boards.filter(b => canReadBoard(b.privileges, user)).length;
   }
 
   @Mutation(() => BoardDto)
@@ -197,12 +214,28 @@ export class BoardMessagesResolver {
     }
   }
 
+  /** Throws unless the caller may read the board. Missing boards read as empty. */
+  private async assertCanReadBoard(
+    boardId: number,
+    user: Users | null
+  ): Promise<boolean> {
+    const board = await this.boardsService.findBoardPrivileges(boardId);
+    if (!board) return false;
+    if (!canReadBoard(board.privileges, user)) {
+      throw new ForbiddenException('You do not have access to this board');
+    }
+    return true;
+  }
+
   @Query(() => [BoardMessageDto], { name: 'boardMessages' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findMessages(
+    @CurrentUser() user: Users | null,
     @Args('boardId', { type: () => Int }) boardId: number,
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
     @Args('take', { type: () => Int, nullable: true }) take?: number
   ): Promise<BoardMessageDto[]> {
+    if (!(await this.assertCanReadBoard(boardId, user))) return [];
     const args: { skip?: number; take?: number } = {};
     if (skip !== undefined) args.skip = skip;
     if (take !== undefined) args.take = take;
@@ -215,18 +248,42 @@ export class BoardMessagesResolver {
   }
 
   @Query(() => BoardMessageDto, { name: 'boardMessage', nullable: true })
+  @UseGuards(OptionalJwtAuthGuard)
   async findMessage(
+    @CurrentUser() user: Users | null,
     @Args('id', { type: () => Int }) id: number
   ): Promise<BoardMessageDto | null> {
     const message = await this.boardsService.findMessageById(id);
+    if (
+      message &&
+      !canReadBoard(
+        (message as { board?: { privileges: unknown } }).board?.privileges,
+        user
+      )
+    ) {
+      return null;
+    }
     return message ? this.mapMessage(message as MessageWithEdits) : null;
   }
 
   @Query(() => Int, { name: 'boardMessagesCount' })
+  @UseGuards(OptionalJwtAuthGuard)
   async countMessages(
+    @CurrentUser() user: Users | null,
     @Args('boardId', { type: () => Int, nullable: true }) boardId?: number
   ): Promise<number> {
-    return this.boardsService.countMessages(boardId);
+    if (boardId !== undefined && boardId !== null) {
+      if (!(await this.assertCanReadBoard(boardId, user))) return 0;
+      return this.boardsService.countMessages(boardId);
+    }
+    if (isStaff(user?.role)) return this.boardsService.countMessages();
+    const boards = await this.boardsService.findAllBoards();
+    return boards
+      .filter(b => canReadBoard(b.privileges, user))
+      .reduce(
+        (sum, b) => sum + ((b as BoardWithCount)._count?.messages ?? 0),
+        0
+      );
   }
 
   @Mutation(() => BoardMessageDto)

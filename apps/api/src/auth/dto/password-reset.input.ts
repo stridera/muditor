@@ -1,5 +1,11 @@
 import { InputType, Field, ObjectType } from '@nestjs/graphql';
-import { IsEmail, IsNotEmpty, MinLength, IsString } from 'class-validator';
+import {
+  IsEmail,
+  IsNotEmpty,
+  IsOptional,
+  MinLength,
+  IsString,
+} from 'class-validator';
 
 @InputType()
 export class RequestPasswordResetInput {
@@ -39,6 +45,14 @@ export class UpdateProfileInput {
   @Field({ nullable: true })
   @IsEmail({}, { message: 'Please provide a valid email address' })
   email?: string;
+
+  @Field({
+    nullable: true,
+    description: 'Required when changing the email address',
+  })
+  @IsOptional()
+  @IsString()
+  currentPassword?: string;
 }
 
 @ObjectType()

@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   ConflictException,
+  ForbiddenException,
   Injectable,
   Logger,
   NotFoundException,
@@ -374,10 +375,35 @@ export class AuthService {
 
   async updateProfile(
     userId: string,
-    data: { email?: string }
+    data: { email?: string; currentPassword?: string }
   ): Promise<Users> {
-    // Check if email is already taken by another user (case-insensitive)
-    if (data.email) {
+    const current = await this.databaseService.users.findUnique({
+      where: { id: userId },
+    });
+    if (!current) {
+      throw new NotFoundException('User not found');
+    }
+
+    const update: { email?: string } = {};
+    const emailChanged =
+      !!data.email && data.email.toLowerCase() !== current.email.toLowerCase();
+
+    if (emailChanged && data.email) {
+      // The email is the account-recovery channel: changing it is an account
+      // takeover step, so a stolen token alone must not be enough.
+      if (!current.passwordHash) {
+        throw new ForbiddenException(
+          'Set a password before changing your email address'
+        );
+      }
+      if (
+        !data.currentPassword ||
+        !(await bcrypt.compare(data.currentPassword, current.passwordHash))
+      ) {
+        throw new UnauthorizedException('Current password is incorrect');
+      }
+
+      // Check if email is already taken by another user (case-insensitive)
       const existingUser = await this.databaseService.users.findFirst({
         where: {
           email: { equals: data.email, mode: 'insensitive' },
@@ -388,11 +414,12 @@ export class AuthService {
       if (existingUser) {
         throw new ConflictException('Email already exists');
       }
+      update.email = data.email;
     }
 
     const user = await this.databaseService.users.update({
       where: { id: userId },
-      data,
+      data: update,
     });
 
     const { passwordHash, resetToken, resetTokenExpiry, ...result } = user;

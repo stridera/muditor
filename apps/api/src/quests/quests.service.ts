@@ -4,6 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Prisma } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateQuestInput,
@@ -53,13 +54,15 @@ export class QuestsService {
     });
   }
 
-  async findQuestsByZone(zoneId: number) {
-    return this.findAllQuests({ where: { zoneId } });
+  async findQuestsByZone(zoneId: number, hideGodZones = false) {
+    return this.findAllQuests({
+      where: { zoneId, ...inVisibleZone(hideGodZones) },
+    });
   }
 
-  async findOneQuest(zoneId: number, id: number) {
+  async findOneQuest(zoneId: number, id: number, hideGodZones = false) {
     return this.database.quests.findUnique({
-      where: { zoneId_id: { zoneId, id } },
+      where: { zoneId_id: { zoneId, id }, ...inVisibleZone(hideGodZones) },
       include: {
         phases: {
           orderBy: { order: 'asc' },

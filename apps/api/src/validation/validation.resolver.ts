@@ -1,11 +1,19 @@
+import { UseGuards } from '@nestjs/common';
 import { Resolver, Query, Args, Int } from '@nestjs/graphql';
+import { UserRole } from '@muditor/db';
+import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import { ValidationService, type ValidationReport } from './validation.service';
 import {
   ValidationReportType,
   ValidationSummaryType,
 } from './validation.types';
 
+// Each query scans whole zones, so it is login + BUILDER+ (never anonymous).
 @Resolver()
+@UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
+@MinimumRole(UserRole.BUILDER)
 export class ValidationResolver {
   constructor(private readonly validationService: ValidationService) {}
 

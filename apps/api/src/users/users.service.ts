@@ -1,11 +1,12 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
 import { UserRole, type Users } from '@muditor/db';
 import * as crypto from 'crypto';
-import { roleAtLeast } from '../auth/role.util';
+import { roleAtLeast, roleRank } from '../auth/role.util';
 import { DatabaseService } from '../database/database.service';
 import { BanUserInput } from './dto/ban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -99,11 +100,33 @@ export class UsersService {
     };
   }
 
+  /**
+   * Moderation actions need strict outranking: the actor's CURRENT role (from
+   * the database, not the JWT) must be above the target's. Prevents a low
+   * staff member from banning or unbanning gods.
+   */
+  private async assertOutranks(
+    actorId: string,
+    target: { id: string; role: UserRole },
+    action: string
+  ): Promise<void> {
+    const actor = await this.findOne(actorId);
+    if (roleRank(actor.role) <= roleRank(target.role)) {
+      throw new ForbiddenException(
+        `You can only ${action} users with a role below your own`
+      );
+    }
+  }
+
   async banUser(input: BanUserInput, bannedById: string) {
     const { userId, reason, expiresAt } = input;
 
     // Verify user exists
-    await this.findOne(userId);
+    const target = await this.findOne(userId);
+    if (userId === bannedById) {
+      throw new BadRequestException('You cannot ban yourself');
+    }
+    await this.assertOutranks(bannedById, target, 'ban');
 
     // Check if user is already banned
     const existingBan = await this.databaseService.banRecords.findFirst({
@@ -159,7 +182,8 @@ export class UsersService {
 
   async unbanUser(userId: string, unbannedById: string) {
     // Verify user exists
-    await this.findOne(userId);
+    const target = await this.findOne(userId);
+    await this.assertOutranks(unbannedById, target, 'unban');
 
     // Find active ban
     const activeBan = await this.databaseService.banRecords.findFirst({
@@ -171,6 +195,18 @@ export class UsersService {
 
     if (!activeBan) {
       throw new BadRequestException('User is not currently banned');
+    }
+
+    // Whoever lifts a ban must rank at least as high as whoever issued it.
+    const issuer = await this.databaseService.users.findUnique({
+      where: { id: activeBan.bannedBy },
+      select: { role: true },
+    });
+    const actor = await this.findOne(unbannedById);
+    if (issuer && roleRank(actor.role) < roleRank(issuer.role)) {
+      throw new ForbiddenException(
+        'This ban was issued by a higher-ranked user than you'
+      );
     }
 
     const updatedBanRecord = await this.databaseService.banRecords.update({

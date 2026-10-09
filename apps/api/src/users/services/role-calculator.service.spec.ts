@@ -38,4 +38,16 @@ describe('RoleCalculatorService.updateUserRole (escalation rule)', () => {
     );
     expect(db.users.update).toHaveBeenCalledTimes(1);
   });
+
+  it('never lowers a role on link (allowLower: false), only raises', async () => {
+    db.characters.findMany.mockResolvedValue([{ level: 10 }]);
+    db.users.findUnique.mockResolvedValue({ role: UserRole.BUILDER });
+    const opts = { allowRaise: true, allowLower: false };
+    expect(await service.updateUserRole('u1', opts)).toBe(UserRole.BUILDER);
+    expect(db.users.update).not.toHaveBeenCalled();
+
+    db.characters.findMany.mockResolvedValue([{ level: 104 }]);
+    expect(await service.updateUserRole('u1', opts)).toBe(UserRole.CODER);
+    expect(db.users.update).toHaveBeenCalledTimes(1);
+  });
 });

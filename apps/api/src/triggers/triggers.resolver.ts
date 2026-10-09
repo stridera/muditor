@@ -1,8 +1,11 @@
 import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { UseGuards } from '@nestjs/common';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import type { Users } from '@muditor/db';
 import { ScriptType } from '@muditor/db';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { hidesGodZones } from '../common/god-zone-visibility';
 import {
   AttachTriggerInput,
   CreateTriggerInput,
@@ -15,48 +18,73 @@ import { TriggersService } from './triggers.service';
 export class TriggersResolver {
   constructor(private readonly triggersService: TriggersService) {}
 
+  // Trigger reads are public; triggers in god zones are hidden from anonymous
+  // callers and mortal accounts (IMMORTAL+ still see them).
   @Query(() => [TriggerDto], { name: 'triggers' })
-  async findAll() {
-    const triggers = await this.triggersService.findAll();
+  @UseGuards(OptionalJwtAuthGuard)
+  async findAll(@CurrentUser() user?: Users | null) {
+    const triggers = await this.triggersService.findAll(
+      hidesGodZones(user ?? null)
+    );
     return triggers;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByZone' })
-  async findByZone(@Args('zoneId', { type: () => Int }) zoneId: number) {
-    const triggers = await this.triggersService.findByZone(zoneId);
+  @UseGuards(OptionalJwtAuthGuard)
+  async findByZone(
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @CurrentUser() user?: Users | null
+  ) {
+    const triggers = await this.triggersService.findByZone(
+      zoneId,
+      hidesGodZones(user ?? null)
+    );
     return triggers;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersNeedingReview' })
-  async findNeedingReview() {
-    const triggers = await this.triggersService.findNeedingReview();
+  @UseGuards(OptionalJwtAuthGuard)
+  async findNeedingReview(@CurrentUser() user?: Users | null) {
+    const triggers = await this.triggersService.findNeedingReview(
+      hidesGodZones(user ?? null)
+    );
     return triggers;
   }
 
   @Query(() => Int, { name: 'triggersNeedingReviewCount' })
-  async countNeedingReview() {
-    return this.triggersService.countNeedingReview();
+  @UseGuards(OptionalJwtAuthGuard)
+  async countNeedingReview(@CurrentUser() user?: Users | null) {
+    return this.triggersService.countNeedingReview(hidesGodZones(user ?? null));
   }
 
   @Query(() => TriggerDto, { name: 'trigger' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ) {
-    const trigger = await this.triggersService.findOne(zoneId, id);
+    const trigger = await this.triggersService.findOne(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return trigger;
   }
 
   @Query(() => [TriggerDto], { name: 'triggersByAttachment' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByAttachment(
     @Args('attachType', { type: () => ScriptType }) attachType: ScriptType,
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('entityId', { type: () => Int }) entityId: number
+    @Args('entityId', { type: () => Int }) entityId: number,
+    @CurrentUser() user?: Users | null
   ) {
     const triggers = await this.triggersService.findByAttachment(
       attachType,
       zoneId,
-      entityId
+      entityId,
+      hidesGodZones(user ?? null)
     );
     return triggers;
   }

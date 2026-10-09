@@ -6,6 +6,7 @@ import {
 import { Prisma, ScriptType, TriggerFlag } from '@muditor/db';
 import { lintLua, lintLuaWithEntities } from '@muditor/types';
 import type { EntityDatabase } from '@muditor/types';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 import {
   AttachTriggerInput,
@@ -21,8 +22,9 @@ export class TriggersService {
 
   constructor(private prisma: DatabaseService) {}
 
-  async findAll() {
+  async findAll(hideGodZones = false) {
     return this.prisma.triggers.findMany({
+      where: { ...inVisibleZone(hideGodZones) },
       include: {
         zones: {
           select: {
@@ -35,9 +37,9 @@ export class TriggersService {
     });
   }
 
-  async findByZone(zoneId: number) {
+  async findByZone(zoneId: number, hideGodZones = false) {
     return this.prisma.triggers.findMany({
-      where: { zoneId },
+      where: { zoneId, ...inVisibleZone(hideGodZones) },
       include: {
         zones: {
           select: {
@@ -50,10 +52,11 @@ export class TriggersService {
     });
   }
 
-  async findNeedingReview() {
+  async findNeedingReview(hideGodZones = false) {
     return this.prisma.triggers.findMany({
       where: {
         needsReview: true,
+        ...inVisibleZone(hideGodZones),
       },
       include: {
         zones: {
@@ -67,10 +70,11 @@ export class TriggersService {
     });
   }
 
-  async countNeedingReview() {
+  async countNeedingReview(hideGodZones = false) {
     return this.prisma.triggers.count({
       where: {
         needsReview: true,
+        ...inVisibleZone(hideGodZones),
       },
     });
   }
@@ -86,9 +90,9 @@ export class TriggersService {
     });
   }
 
-  async findOne(zoneId: number, id: number) {
+  async findOne(zoneId: number, id: number, hideGodZones = false) {
     const trigger = await this.prisma.triggers.findUnique({
-      where: { zoneId_id: { zoneId, id } },
+      where: { zoneId_id: { zoneId, id }, ...inVisibleZone(hideGodZones) },
       include: {
         zones: {
           select: {
@@ -133,7 +137,8 @@ export class TriggersService {
   async findByAttachment(
     attachType: ScriptType,
     zoneId: number,
-    entityId: number
+    entityId: number,
+    hideGodZones = false
   ) {
     const whereClause = this.buildWhereClauseForAttachment(
       attachType,
@@ -142,7 +147,7 @@ export class TriggersService {
     );
 
     return this.prisma.triggers.findMany({
-      where: whereClause,
+      where: { AND: [whereClause, inVisibleZone(hideGodZones)] },
       include: {
         zones: {
           select: {

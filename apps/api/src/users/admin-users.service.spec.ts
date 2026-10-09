@@ -198,3 +198,41 @@ describe('AdminUsersService', () => {
     });
   });
 });
+
+describe('AdminUsersService.assertActorMayManageUser (updateUser rank gate)', () => {
+  const roles: Record<string, UserRole> = {
+    impl: UserRole.IMPLEMENTOR,
+    coder: UserRole.CODER,
+    coder2: UserRole.CODER,
+    builder: UserRole.BUILDER,
+  };
+  const service = new AdminUsersService(
+    {
+      users: {
+        findUnique: jest.fn(async ({ where }) =>
+          roles[where.id] ? { id: where.id, role: roles[where.id] } : null
+        ),
+      },
+    } as unknown as DatabaseService,
+    {} as RoleCalculatorService,
+    {} as AuthService
+  );
+
+  it('denies a CODER touching an IMPLEMENTOR or an equal-rank CODER', async () => {
+    await expect(
+      service.assertActorMayManageUser('coder', 'impl')
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(
+      service.assertActorMayManageUser('coder', 'coder2')
+    ).rejects.toBeInstanceOf(ForbiddenException);
+  });
+
+  it('allows a CODER over a lower rank and an IMPLEMENTOR over anyone', async () => {
+    await expect(
+      service.assertActorMayManageUser('coder', 'builder')
+    ).resolves.toBeUndefined();
+    await expect(
+      service.assertActorMayManageUser('impl', 'coder')
+    ).resolves.toBeUndefined();
+  });
+});

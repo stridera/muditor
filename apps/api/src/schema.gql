@@ -2484,6 +2484,8 @@ type Query {
   boardMessage(id: Int!): BoardMessageDto
   boardMessages(boardId: Int!, skip: Int, take: Int): [BoardMessageDto!]!
   boardMessagesCount(boardId: Int): Int!
+
+  """Boards the caller may read (anonymous: public boards only)"""
   boards(search: String, skip: Int, take: Int): [BoardDto!]!
   boardsCount: Int!
 
@@ -3875,6 +3877,8 @@ input UpdatePreferencesInput {
 }
 
 input UpdateProfileInput {
+  """Required when changing the email address"""
+  currentPassword: String
   email: String
 }
 

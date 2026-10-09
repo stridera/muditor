@@ -53,6 +53,26 @@ export class DialogueTreeService {
   // Trees
   // ==========================================================================
 
+  /**
+   * Trees have no zone of their own: visible to the public only when every
+   * quest dialogue using them lives in a non-god zone (unused trees are
+   * builder work-in-progress and stay hidden).
+   */
+  async isTreeInVisibleZone(id: number): Promise<boolean> {
+    const links = await this.database.questDialogue.findMany({
+      where: { dialogueTreeId: id },
+      select: { questZoneId: true },
+    });
+    if (links.length === 0) return false;
+    const godZones = await this.database.zones.count({
+      where: {
+        id: { in: [...new Set(links.map(l => l.questZoneId))] },
+        isGodZone: true,
+      },
+    });
+    return godZones === 0;
+  }
+
   async findTree(id: number) {
     return this.database.dialogueTrees.findUnique({
       where: { id },

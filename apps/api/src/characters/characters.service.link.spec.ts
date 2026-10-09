@@ -118,6 +118,7 @@ describe('CharactersService.linkCharacterToUser', () => {
     expect(db.characters.update).not.toHaveBeenCalled();
     expect(roleCalculator.updateUserRole).toHaveBeenCalledWith(CALLER_ID, {
       allowRaise: true,
+      allowLower: false,
     });
   });
 

@@ -24,6 +24,7 @@ import type {
   PlayerFlag,
   Prisma,
   Race,
+  UserRole,
 } from '@muditor/db';
 import { GameAdminService } from '../bridge/game-admin.service';
 import { DatabaseService } from '../database/database.service';
@@ -244,6 +245,56 @@ export class CharactersService implements OnModuleDestroy {
       throw new NotFoundException(`Character with ID ${id} not found`);
     }
     return character.userId ?? null;
+  }
+
+  /**
+   * Who a character belongs to and how senior it is, for staff-over-staff
+   * rank checks: owner id, the owner's site role (null if unlinked) and the
+   * character level. NotFound when the character is missing.
+   */
+  async findCharacterRankInfo(id: string): Promise<{
+    ownerId: string | null;
+    ownerRole: UserRole | null;
+    level: number;
+  }> {
+    const character = await this.db.characters.findUnique({
+      where: { id },
+      select: { userId: true, level: true, users: { select: { role: true } } },
+    });
+    if (!character) {
+      throw new NotFoundException(`Character with ID ${id} not found`);
+    }
+    return {
+      ownerId: character.userId ?? null,
+      ownerRole: character.users?.role ?? null,
+      level: character.level,
+    };
+  }
+
+  /** Character id holding an item; NotFound when the item is missing. */
+  async findCharacterItemCharacterId(itemId: number): Promise<string> {
+    const item = await this.db.characterItems.findUnique({
+      where: { id: itemId },
+      select: { characterId: true },
+    });
+    if (!item) {
+      throw new NotFoundException(`Character item with ID ${itemId} not found`);
+    }
+    return item.characterId;
+  }
+
+  /** Character id an effect is on; NotFound when the effect is missing. */
+  async findCharacterEffectCharacterId(effectId: number): Promise<string> {
+    const effect = await this.db.characterEffects.findUnique({
+      where: { id: effectId },
+      select: { characterId: true },
+    });
+    if (!effect) {
+      throw new NotFoundException(
+        `Character effect with ID ${effectId} not found`
+      );
+    }
+    return effect.characterId;
   }
 
   /** Owning user id of the character holding an item (null if unlinked); NotFound when the item is missing. */
@@ -1047,8 +1098,12 @@ export class CharactersService implements OnModuleDestroy {
   /** Recalculate the user's role after a character link has been committed. */
   async refreshRoleAfterLink(userId: string): Promise<void> {
     // Raising is allowed here only: the caller proved ownership with the
-    // character's password (legacy staff characters).
-    await this.roleCalculator.updateUserRole(userId, { allowRaise: true });
+    // character's password (legacy staff characters). Never lowers: a role
+    // set by hand must survive linking a low-level character.
+    await this.roleCalculator.updateUserRole(userId, {
+      allowRaise: true,
+      allowLower: false,
+    });
   }
 
   /**

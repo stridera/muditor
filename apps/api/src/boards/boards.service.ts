@@ -78,6 +78,16 @@ export class BoardsService {
     });
   }
 
+  /** Privileges of a board (null when the board does not exist). */
+  async findBoardPrivileges(
+    id: number
+  ): Promise<{ privileges: unknown } | null> {
+    return this.database.board.findUnique({
+      where: { id },
+      select: { privileges: true },
+    });
+  }
+
   async findBoardByAlias(alias: string): Promise<Board | null> {
     return this.database.board.findUnique({
       where: { alias },

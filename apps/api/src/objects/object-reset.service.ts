@@ -4,6 +4,7 @@ import {
   ObjectType as ObjectTypeEnum,
   Prisma,
 } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateObjectResetInput,
@@ -27,16 +28,30 @@ interface ObjectResetWithRelations extends ObjectResets {
   containedResets?: ObjectResetWithRelations[];
 }
 
+/**
+ * A reset is hidden from the public when its zone, the room it spawns into or
+ * the object it spawns lives in a god zone.
+ */
+function resetVisibility(hide: boolean): Prisma.ObjectResetsWhereInput {
+  if (!hide) return {};
+  return {
+    ...inVisibleZone(true),
+    rooms: { zones: { isGodZone: false } },
+    objects: { zones: { isGodZone: false } },
+  };
+}
+
 @Injectable()
 export class ObjectResetService {
   constructor(private prisma: DatabaseService) {}
 
   async findByRoom(
     roomZoneId: number,
-    roomId: number
+    roomId: number,
+    hideGodZones = false
   ): Promise<ObjectResetDto[]> {
     const resets = await this.prisma.objectResets.findMany({
-      where: { roomZoneId, roomId },
+      where: { roomZoneId, roomId, ...resetVisibility(hideGodZones) },
       include: {
         objects: {
           select: {
@@ -59,9 +74,12 @@ export class ObjectResetService {
     return resets.map(this.mapToDto);
   }
 
-  async findByZone(zoneId: number): Promise<ObjectResetDto[]> {
+  async findByZone(
+    zoneId: number,
+    hideGodZones = false
+  ): Promise<ObjectResetDto[]> {
     const resets = await this.prisma.objectResets.findMany({
-      where: { zoneId },
+      where: { zoneId, ...resetVisibility(hideGodZones) },
       include: {
         objects: {
           select: {
@@ -84,9 +102,12 @@ export class ObjectResetService {
     return resets.map(this.mapToDto);
   }
 
-  async findOne(id: number): Promise<ObjectResetDto | null> {
-    const reset = await this.prisma.objectResets.findUnique({
-      where: { id },
+  async findOne(
+    id: number,
+    hideGodZones = false
+  ): Promise<ObjectResetDto | null> {
+    const reset = await this.prisma.objectResets.findFirst({
+      where: { AND: [{ id }, resetVisibility(hideGodZones)] },
       include: {
         objects: {
           select: {

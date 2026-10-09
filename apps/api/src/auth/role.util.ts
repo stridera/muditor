@@ -9,6 +9,12 @@ const ROLE_RANK: Record<UserRole, number> = {
   [UserRole.IMPLEMENTOR]: 5,
 };
 
+/** Numeric rank of a role; unknown or missing roles rank below PLAYER. */
+export function roleRank(role: UserRole | null | undefined): number {
+  if (!role) return -1;
+  return ROLE_RANK[role] ?? -1;
+}
+
 /** True when `role` is at or above `minimum` in the role hierarchy. */
 export function roleAtLeast(
   role: UserRole | null | undefined,

@@ -35,6 +35,12 @@ describe('CharactersResolver authorization', () => {
       | 'getActiveEffects'
       | 'findCharacterEffectById'
       | 'findCharacterEffectOwnerId'
+      | 'findCharacterRankInfo'
+      | 'findCharacterItemCharacterId'
+      | 'findCharacterEffectCharacterId'
+      | 'updateCharacterItem'
+      | 'deleteCharacterItem'
+      | 'createCharacterEffect'
       | 'getCharactersCount'
     >
   >;
@@ -59,6 +65,16 @@ describe('CharactersResolver authorization', () => {
       findCharacterEffectById: jest.fn().mockResolvedValue({ id: 3 }),
       findCharacterEffectOwnerId: jest.fn().mockResolvedValue('player-1'),
       getCharactersCount: jest.fn().mockResolvedValue(0),
+      findCharacterRankInfo: jest.fn().mockResolvedValue({
+        ownerId: 'player-1',
+        ownerRole: UserRole.PLAYER,
+        level: 10,
+      }),
+      findCharacterItemCharacterId: jest.fn().mockResolvedValue('c1'),
+      findCharacterEffectCharacterId: jest.fn().mockResolvedValue('c1'),
+      updateCharacterItem: jest.fn().mockResolvedValue({ id: 7 }),
+      deleteCharacterItem: jest.fn().mockResolvedValue({ id: 7 }),
+      createCharacterEffect: jest.fn().mockResolvedValue({ id: 3 }),
     };
     resolver = new CharactersResolver(service as unknown as CharactersService);
   });
@@ -189,6 +205,108 @@ describe('CharactersResolver authorization', () => {
         )
       ).rejects.toBeInstanceOf(ForbiddenException);
       expect(service.createCharacter).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('staff-over-character rank rule', () => {
+    const builder = user('bld-1', UserRole.BUILDER);
+    const coder = user('coder-1', UserRole.CODER);
+    const implementor = user('impl-1', UserRole.IMPLEMENTOR);
+    const ownedBy = (ownerRole: UserRole | null, level = 10) =>
+      service.findCharacterRankInfo.mockResolvedValue({
+        ownerId: ownerRole ? 'owner-1' : null,
+        ownerRole,
+        level,
+      });
+
+    it('forbids an IMMORTAL deleting or editing a character owned by an IMPLEMENTOR', async () => {
+      ownedBy(UserRole.IMPLEMENTOR, 105);
+      await expect(
+        resolver.deleteCharacter('c1', immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.updateCharacter(
+          'c1',
+          { title: 'x' } as UpdateCharacterInput,
+          immortal
+        )
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.deleteCharacter).not.toHaveBeenCalled();
+      expect(service.updateCharacter).not.toHaveBeenCalled();
+    });
+
+    it('forbids equal rank but allows a higher rank over the owner', async () => {
+      ownedBy(UserRole.BUILDER, 101);
+      await expect(
+        resolver.deleteCharacter('c1', builder)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await resolver.deleteCharacter('c1', coder);
+      expect(service.deleteCharacter).toHaveBeenCalledWith('c1');
+    });
+
+    it('lets an IMPLEMENTOR manage any character without a lookup', async () => {
+      await resolver.deleteCharacter('c1', implementor);
+      expect(service.deleteCharacter).toHaveBeenCalled();
+      expect(service.findCharacterRankInfo).not.toHaveBeenCalled();
+    });
+
+    it('lets staff keep editing their own character', async () => {
+      service.findCharacterRankInfo.mockResolvedValue({
+        ownerId: 'imm-1',
+        ownerRole: UserRole.IMMORTAL,
+        level: 100,
+      });
+      service.findCharacterOwnerId.mockResolvedValue('imm-1');
+      await resolver.updateCharacter(
+        'c1',
+        { title: 'me' } as UpdateCharacterInput,
+        immortal
+      );
+      expect(service.updateCharacter).toHaveBeenCalled();
+    });
+
+    it('for unowned characters requires the role the level maps to', async () => {
+      ownedBy(null, 104); // CODER-level legacy character
+      await expect(
+        resolver.deleteCharacter('c1', builder)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await resolver.deleteCharacter('c1', coder);
+      ownedBy(null, 30);
+      await resolver.deleteCharacter('c1', immortal);
+      expect(service.deleteCharacter).toHaveBeenCalledTimes(2);
+    });
+
+    it('applies the rule to item and effect mutations', async () => {
+      ownedBy(UserRole.CODER, 104);
+      await expect(
+        resolver.updateCharacterItem(7, {} as never, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.deleteCharacterItem(7, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.createCharacterEffect({ characterId: 'c1' } as never, immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      await expect(
+        resolver.removeExpiredEffects('c1', immortal)
+      ).rejects.toBeInstanceOf(ForbiddenException);
+      expect(service.updateCharacterItem).not.toHaveBeenCalled();
+      expect(service.deleteCharacterItem).not.toHaveBeenCalled();
+      expect(service.createCharacterEffect).not.toHaveBeenCalled();
+
+      ownedBy(UserRole.PLAYER, 10);
+      await resolver.deleteCharacterItem(7, immortal);
+      expect(service.deleteCharacterItem).toHaveBeenCalled();
+    });
+
+    it('still lets a player edit their own allowed fields', async () => {
+      await resolver.updateCharacter(
+        'c1',
+        { title: 't' } as UpdateCharacterInput,
+        player
+      );
+      expect(service.updateCharacter).toHaveBeenCalled();
+      expect(service.findCharacterRankInfo).not.toHaveBeenCalled();
     });
   });
 

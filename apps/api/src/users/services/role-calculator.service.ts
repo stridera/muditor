@@ -65,10 +65,14 @@ export class RoleCalculatorService {
    * legacy character with its password). Unlink and every other trigger
    * (character create/update by staff) can never promote anyone, so staff
    * cannot mint a high-level character and then link/unlink it to escalate.
+   *
+   * Linking is the mirror case: it may only RAISE (`allowLower: false`), so a
+   * manually granted role (e.g. a BUILDER with no staff character) is never
+   * demoted just because a lower-level character was linked.
    */
   async updateUserRole(
     userId: string,
-    options: { allowRaise?: boolean } = {}
+    options: { allowRaise?: boolean; allowLower?: boolean } = {}
   ): Promise<UserRole> {
     const calculated = await this.calculateRoleFromCharacters(userId);
     const user = await this.db.users.findUnique({
@@ -79,6 +83,9 @@ export class RoleCalculatorService {
 
     const isRaise = !roleAtLeast(user.role, calculated);
     if (isRaise && !options.allowRaise) {
+      return user.role;
+    }
+    if (!isRaise && options.allowLower === false) {
       return user.role;
     }
     if (calculated === user.role) return user.role;

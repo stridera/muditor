@@ -1,5 +1,8 @@
 import { UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
+import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
+import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
 import { hidesGodZones } from '../common/god-zone-visibility';
 import { EntityKeyInput } from '../common/dto/entity-key.input';
@@ -13,7 +16,7 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Prisma, Race, type Users } from '@muditor/db'; // all enums already registered in mob.dto
+import { Prisma, Race, UserRole, type Users } from '@muditor/db'; // all enums already registered in mob.dto
 import { calculateMobCombatDefaults } from '../common/dice-formulas';
 import { mapMob } from '../common/mappers/mob.mapper';
 import {
@@ -116,6 +119,8 @@ export class MobsResolver {
    * Uses legacy FieryMUD formulas for proper game balance.
    */
   @Query(() => MobCombatDefaultsDto, { name: 'mobCombatDefaults' })
+  @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
+  @MinimumRole(UserRole.BUILDER)
   async getMobCombatDefaults(
     @Args('level', { type: () => Int, defaultValue: 1 }) level: number,
     @Args('race', { type: () => Race, defaultValue: Race.HUMANOID }) race: Race,

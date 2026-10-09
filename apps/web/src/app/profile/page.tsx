@@ -76,6 +76,7 @@ function ProfileContent() {
   // Profile editing state
   const [isEditingProfile, setIsEditingProfile] = useState(false);
   const [email, setEmail] = useState(user?.email || '');
+  const [emailPassword, setEmailPassword] = useState('');
   const [profileLoading, setProfileLoading] = useState(false);
   const [profileSuccess, setProfileSuccess] = useState('');
   const [profileError, setProfileError] = useState('');
@@ -103,7 +104,10 @@ function ProfileContent() {
       await apolloClient.mutate({
         mutation: UPDATE_PROFILE_MUTATION,
         variables: {
-          input: { email },
+          input:
+            email !== user.email
+              ? { email, currentPassword: emailPassword }
+              : { email },
         },
       });
 
@@ -310,6 +314,25 @@ function ProfileContent() {
                             className={isEditingProfile ? '' : 'bg-card'}
                           />
                         </div>
+
+                        {isEditingProfile && email !== user.email && (
+                          <div className='space-y-2'>
+                            <Label htmlFor='emailPassword'>
+                              Current password
+                            </Label>
+                            <Input
+                              id='emailPassword'
+                              type='password'
+                              value={emailPassword}
+                              onChange={e => setEmailPassword(e.target.value)}
+                              disabled={profileLoading}
+                              autoComplete='current-password'
+                            />
+                            <p className='text-xs text-muted-foreground'>
+                              Required to change your email address
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       <div className='pt-4 flex flex-col sm:flex-row gap-2'>
@@ -335,6 +358,7 @@ function ProfileContent() {
                               onClick={() => {
                                 setIsEditingProfile(false);
                                 setEmail(user.email);
+                                setEmailPassword('');
                                 setProfileError('');
                                 setProfileSuccess('');
                               }}

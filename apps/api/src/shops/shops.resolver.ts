@@ -1,5 +1,10 @@
-import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { UseGuards } from '@nestjs/common';
+import type { Users } from '@muditor/db';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
+import { CurrentUser } from '../auth/decorators/current-user.decorator';
+import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
+import { RequireZoneWrite } from '../common/decorators/zone-scope.decorator';
+import { hidesGodZones, inVisibleZone } from '../common/god-zone-visibility';
 import {
   CreateShopInput,
   KeeperDto,
@@ -132,12 +137,17 @@ export class ShopsResolver {
     return result as ShopDto;
   }
 
+  // Shop reads are public; shops in god zones are hidden from anonymous
+  // callers and mortal accounts (IMMORTAL+ still see them).
   @Query(() => [ShopDto], { name: 'shops' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findAll(
     @Args('skip', { type: () => Int, nullable: true }) skip?: number,
-    @Args('take', { type: () => Int, nullable: true }) take?: number
+    @Args('take', { type: () => Int, nullable: true }) take?: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ShopDto[]> {
     const shops = await this.shopsService.findAll({
+      where: { ...inVisibleZone(hidesGodZones(user ?? null)) },
       ...(typeof skip === 'number' ? { skip } : {}),
       ...(typeof take === 'number' ? { take } : {}),
     });
@@ -145,34 +155,54 @@ export class ShopsResolver {
   }
 
   @Query(() => ShopDto, { name: 'shop' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findOne(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ShopDto | null> {
-    const shop = await this.shopsService.findOne(zoneId, id);
+    const shop = await this.shopsService.findOne(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return shop ? this.mapShopToDto(shop) : null;
   }
 
   @Query(() => [ShopDto], { name: 'shopsByZone' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByZone(
-    @Args('zoneId', { type: () => Int }) zoneId: number
+    @Args('zoneId', { type: () => Int }) zoneId: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ShopDto[]> {
-    const shops = await this.shopsService.findByZone(zoneId);
+    const shops = await this.shopsService.findByZone(
+      zoneId,
+      hidesGodZones(user ?? null)
+    );
     return shops.map(shop => this.mapShopToDto(shop));
   }
 
   @Query(() => ShopDto, { name: 'shopByKeeper' })
+  @UseGuards(OptionalJwtAuthGuard)
   async findByKeeper(
     @Args('zoneId', { type: () => Int }) zoneId: number,
-    @Args('id', { type: () => Int }) id: number
+    @Args('id', { type: () => Int }) id: number,
+    @CurrentUser() user?: Users | null
   ): Promise<ShopDto | null> {
-    const shop = await this.shopsService.findByKeeper(zoneId, id);
+    const shop = await this.shopsService.findByKeeper(
+      zoneId,
+      id,
+      hidesGodZones(user ?? null)
+    );
     return shop ? this.mapShopToDto(shop) : null;
   }
 
   @Query(() => Int, { name: 'shopsCount' })
-  async count(): Promise<number> {
-    return this.shopsService.count();
+  @UseGuards(OptionalJwtAuthGuard)
+  async count(@CurrentUser() user?: Users | null): Promise<number> {
+    return this.shopsService.count({
+      ...inVisibleZone(hidesGodZones(user ?? null)),
+    });
   }
 
   @Mutation(() => ShopDto)

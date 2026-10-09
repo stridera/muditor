@@ -179,3 +179,44 @@ describe('UsersResolver user(id) access', () => {
     ).toThrow(ForbiddenException);
   });
 });
+
+describe('UsersResolver.updateUser rank gate', () => {
+  it('checks the actor outranks the target before any field write', async () => {
+    const calls: string[] = [];
+    const resolver = new UsersResolver(
+      {
+        updateUser: jest.fn(async () => {
+          calls.push('write');
+          return {};
+        }),
+      } as never,
+      {
+        assertActorMayManageUser: jest.fn(async () => {
+          calls.push('gate');
+          throw new ForbiddenException('nope');
+        }),
+        setUserRole: jest.fn(),
+      } as never
+    );
+    await expect(
+      resolver.updateUser(
+        { id: 'impl-1', email: 'evil@x.test' },
+        { id: 'coder-1', role: UserRole.CODER }
+      )
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(calls).toEqual(['gate']);
+  });
+
+  it('writes after the gate passes', async () => {
+    const updateUser = jest.fn(async () => ({}));
+    const resolver = new UsersResolver(
+      { updateUser } as never,
+      { assertActorMayManageUser: jest.fn(async () => undefined) } as never
+    );
+    await resolver.updateUser(
+      { id: 'b-1', email: 'ok@x.test' },
+      { id: 'coder-1', role: UserRole.CODER }
+    );
+    expect(updateUser).toHaveBeenCalled();
+  });
+});

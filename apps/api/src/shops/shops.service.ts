@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 
 type ShopWithRelations = Prisma.ShopsGetPayload<{
@@ -70,13 +71,18 @@ export class ShopsService {
     ) as unknown as ShopWithRelations[];
   }
 
-  async findOne(zoneId: number, id: number): Promise<ShopWithRelations | null> {
+  async findOne(
+    zoneId: number,
+    id: number,
+    hideGodZones = false
+  ): Promise<ShopWithRelations | null> {
     return this.database.shops.findUnique({
       where: {
         zoneId_id: {
           zoneId,
           id,
         },
+        ...inVisibleZone(hideGodZones),
       },
       include: {
         mobs: {
@@ -105,10 +111,14 @@ export class ShopsService {
     });
   }
 
-  async findByZone(zoneId: number): Promise<ShopWithRelations[]> {
+  async findByZone(
+    zoneId: number,
+    hideGodZones = false
+  ): Promise<ShopWithRelations[]> {
     return this.database.shops.findMany({
       where: {
         zoneId: zoneId,
+        ...inVisibleZone(hideGodZones),
       },
       include: {
         mobs: {
@@ -139,12 +149,14 @@ export class ShopsService {
 
   async findByKeeper(
     keeperZoneId: number,
-    keeperId: number
+    keeperId: number,
+    hideGodZones = false
   ): Promise<ShopWithRelations | null> {
     return this.database.shops.findFirst({
       where: {
         keeperZoneId,
         keeperId,
+        ...inVisibleZone(hideGodZones),
       },
       include: {
         mobs: {

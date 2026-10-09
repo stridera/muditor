@@ -109,6 +109,26 @@ describe('GraphQLJwtAuthGuard ban check', () => {
     expect(req.user).toEqual(user);
   });
 
+  it('rejects a soft-deleted account that still holds a valid token', async () => {
+    const { guard } = build(null, { ...user, deletedAt: new Date() });
+    const req: Record<string, unknown> = {
+      headers: { authorization: 'Bearer tok' },
+    };
+    await expect(guard.canActivate(gqlContext(req))).rejects.toBeInstanceOf(
+      UnauthorizedException
+    );
+    expect(req).not.toHaveProperty('user');
+  });
+
+  it('allows an account whose deletedAt is null', async () => {
+    const { guard } = build(null, { ...user, deletedAt: null });
+    await expect(
+      guard.canActivate(
+        gqlContext({ headers: { authorization: 'Bearer tok' } })
+      )
+    ).resolves.toBe(true);
+  });
+
   it('still rejects missing / unknown users as Unauthorized', async () => {
     const { guard } = build(null, null);
     await expect(

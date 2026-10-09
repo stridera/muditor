@@ -5,6 +5,7 @@ import {
   Prisma,
   WearFlag,
 } from '@muditor/db';
+import { inVisibleZone } from '../common/god-zone-visibility';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateMobResetInput,
@@ -29,13 +30,30 @@ interface MobResetWithRelations extends MobResets {
   rooms?: { id: number; zoneId: number; name: string } | null;
 }
 
+/**
+ * A reset is hidden from the public when its zone, the room it spawns into or
+ * the mob it spawns lives in a god zone.
+ */
+function resetVisibility(hide: boolean): Prisma.MobResetsWhereInput {
+  if (!hide) return {};
+  return {
+    ...inVisibleZone(true),
+    rooms: { zones: { isGodZone: false } },
+    mobs: { zones: { isGodZone: false } },
+  };
+}
+
 @Injectable()
 export class MobResetService {
   constructor(private prisma: DatabaseService) {}
 
-  async findByMob(mobZoneId: number, mobId: number): Promise<MobResetDto[]> {
+  async findByMob(
+    mobZoneId: number,
+    mobId: number,
+    hideGodZones = false
+  ): Promise<MobResetDto[]> {
     const resets = await this.prisma.mobResets.findMany({
-      where: { mobZoneId, mobId },
+      where: { mobZoneId, mobId, ...resetVisibility(hideGodZones) },
       include: {
         mobResetEquipment: {
           include: {
@@ -69,9 +87,9 @@ export class MobResetService {
     return resets.map(this.mapToDto);
   }
 
-  async findOne(id: number): Promise<MobResetDto | null> {
-    const reset = await this.prisma.mobResets.findUnique({
-      where: { id },
+  async findOne(id: number, hideGodZones = false): Promise<MobResetDto | null> {
+    const reset = await this.prisma.mobResets.findFirst({
+      where: { AND: [{ id }, resetVisibility(hideGodZones)] },
       include: {
         mobResetEquipment: {
           include: {

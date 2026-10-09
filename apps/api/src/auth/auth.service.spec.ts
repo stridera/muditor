@@ -547,6 +547,70 @@ describe('AuthService', () => {
     });
   });
 
+  describe('updateProfile email change', () => {
+    const current = {
+      id: 'user-id',
+      email: 'old@x.test',
+      passwordHash: 'hash',
+    };
+    const users = () =>
+      databaseService.users as unknown as Record<string, jest.Mock>;
+
+    beforeEach(() => {
+      users().findUnique!.mockResolvedValue(current);
+      users().findFirst!.mockResolvedValue(null);
+      users().update!.mockImplementation(async ({ data }) => ({
+        ...current,
+        ...data,
+      }));
+    });
+
+    it('requires the current password to change the email', async () => {
+      await expect(
+        service.updateProfile('user-id', { email: 'new@x.test' })
+      ).rejects.toThrow('Current password is incorrect');
+      (bcrypt.compare as jest.Mock).mockResolvedValue(false);
+      await expect(
+        service.updateProfile('user-id', {
+          email: 'new@x.test',
+          currentPassword: 'wrong',
+        })
+      ).rejects.toThrow('Current password is incorrect');
+      expect(users().update).not.toHaveBeenCalled();
+    });
+
+    it('changes the email when the current password is right', async () => {
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      const result = await service.updateProfile('user-id', {
+        email: 'new@x.test',
+        currentPassword: 'right',
+      });
+      expect(result.email).toBe('new@x.test');
+      expect(users().update).toHaveBeenCalledWith({
+        where: { id: 'user-id' },
+        data: { email: 'new@x.test' },
+      });
+    });
+
+    it('refuses an email change for accounts without a password', async () => {
+      users().findUnique!.mockResolvedValue({ ...current, passwordHash: null });
+      await expect(
+        service.updateProfile('user-id', {
+          email: 'new@x.test',
+          currentPassword: 'x',
+        })
+      ).rejects.toThrow('Set a password');
+    });
+
+    it('does not ask for a password when the email is unchanged', async () => {
+      await service.updateProfile('user-id', { email: 'OLD@x.test' });
+      expect(users().update).toHaveBeenCalledWith({
+        where: { id: 'user-id' },
+        data: {},
+      });
+    });
+  });
+
   describe('ban enforcement on token use', () => {
     const dbUser = {
       id: 'user-id',

@@ -10,7 +10,7 @@ import {
   Resolver,
 } from '@nestjs/graphql';
 import { UserRole, type Characters, type Users } from '@muditor/db';
-import { isStaff, roleAtLeast } from '../auth/role.util';
+import { isStaff, roleAtLeast, roleRank } from '../auth/role.util';
 import { calculateRoleFromLevel } from '../users/services/role-calculator.service';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
@@ -120,6 +120,55 @@ export class CharactersResolver {
         'You may not set a character level that grants a role above your own'
       );
     }
+  }
+
+  /**
+   * Staff-over-character rank rule for destructive/edit operations. The owner
+   * (and IMPLEMENTOR) always pass. Otherwise the caller must strictly outrank
+   * the character's owner's site role; for unowned characters the caller must
+   * be at least the role the character's level maps to. Non-staff owners are
+   * handled by the owner checks and never reach this.
+   */
+  private async assertMayManageCharacter(
+    user: Users,
+    characterId: string
+  ): Promise<void> {
+    if (user.role === UserRole.IMPLEMENTOR) return;
+    const target =
+      await this.charactersService.findCharacterRankInfo(characterId);
+    if (target.ownerId === user.id) return;
+    const allowed = target.ownerId
+      ? roleRank(user.role) > roleRank(target.ownerRole)
+      : roleAtLeast(user.role, calculateRoleFromLevel(target.level));
+    if (!allowed) {
+      throw new ForbiddenException(
+        'You may not modify a character belonging to a user of equal or higher rank'
+      );
+    }
+  }
+
+  private async assertMayManageItemCharacter(
+    user: Users,
+    itemId: number
+  ): Promise<void> {
+    if (user.role === UserRole.IMPLEMENTOR) return;
+    await this.assertMayManageCharacter(
+      user,
+      await this.charactersService.findCharacterItemCharacterId(Number(itemId))
+    );
+  }
+
+  private async assertMayManageEffectCharacter(
+    user: Users,
+    effectId: number
+  ): Promise<void> {
+    if (user.role === UserRole.IMPLEMENTOR) return;
+    await this.assertMayManageCharacter(
+      user,
+      await this.charactersService.findCharacterEffectCharacterId(
+        Number(effectId)
+      )
+    );
   }
 
   private assertStaff(user: Users): void {
@@ -304,6 +353,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     await this.assertOwnerOrStaff(user, id);
+    if (isStaff(user.role)) await this.assertMayManageCharacter(user, id);
     this.assertMayAssignLevel(user, data.level);
     if (!isStaff(user.role)) {
       const forbidden = Object.entries(data)
@@ -329,6 +379,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     await this.assertOwnerOrStaff(user, id);
+    if (isStaff(user.role)) await this.assertMayManageCharacter(user, id);
     return this.charactersService.deleteCharacter(id);
   }
 
@@ -359,6 +410,7 @@ export class CharactersResolver {
   ) {
     // Minting items from arbitrary object ids is staff-only, even on own characters.
     this.assertStaff(user);
+    await this.assertMayManageCharacter(user, data.characterId);
     return this.charactersService.createCharacterItem(data);
   }
 
@@ -369,6 +421,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     this.assertStaff(user);
+    await this.assertMayManageItemCharacter(user, id);
     return this.charactersService.updateCharacterItem(id, data);
   }
 
@@ -378,6 +431,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     this.assertStaff(user);
+    await this.assertMayManageItemCharacter(user, id);
     await this.charactersService.deleteCharacterItem(id);
     return true;
   }
@@ -417,6 +471,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     this.assertStaff(user);
+    await this.assertMayManageCharacter(user, data.characterId);
     return this.charactersService.createCharacterEffect(data);
   }
 
@@ -427,6 +482,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     this.assertStaff(user);
+    await this.assertMayManageEffectCharacter(user, id);
     return this.charactersService.updateCharacterEffect(id, data);
   }
 
@@ -436,6 +492,7 @@ export class CharactersResolver {
     @CurrentUser() user: Users
   ) {
     this.assertStaff(user);
+    await this.assertMayManageEffectCharacter(user, id);
     await this.charactersService.deleteCharacterEffect(id);
     return true;
   }
@@ -450,6 +507,9 @@ export class CharactersResolver {
   ) {
     if (characterId) {
       await this.assertOwnerOrStaff(user, characterId);
+      if (isStaff(user.role)) {
+        await this.assertMayManageCharacter(user, characterId);
+      }
     } else {
       this.assertStaff(user);
     }

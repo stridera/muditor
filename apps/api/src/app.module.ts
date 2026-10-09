@@ -33,6 +33,7 @@ import { AccountStorageModule } from './account-storage/account-storage.module';
 import { BoardsModule } from './boards/boards.module';
 import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
+import { complexityLimit } from './common/complexity-limit';
 import { depthLimit, MAX_QUERY_DEPTH } from './common/depth-limit';
 import { getJwtSecret } from './auth/jwt-secret';
 import * as jwt from 'jsonwebtoken';
@@ -58,7 +59,7 @@ import * as jwt from 'jsonwebtoken';
         process.env.GRAPHQL_PLAYGROUND === 'true',
       // Introspection (Apollo Sandbox) only outside production
       introspection: process.env.NODE_ENV !== 'production',
-      validationRules: [depthLimit(MAX_QUERY_DEPTH)],
+      validationRules: [depthLimit(MAX_QUERY_DEPTH), complexityLimit()],
       debug:
         process.env.NODE_ENV !== 'production' &&
         process.env.GRAPHQL_DEBUG === 'true',

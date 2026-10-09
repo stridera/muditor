@@ -204,6 +204,11 @@ export class UsersResolver {
     @Args('input') input: UpdateUserInput,
     @CurrentUser() currentUser: CurrentUserContext
   ): Promise<User> {
+    // Rank check before ANY field write (email change = account takeover).
+    await this.adminUsersService.assertActorMayManageUser(
+      currentUser.id,
+      input.id
+    );
     // Role changes go through the same rank rules as the admin users page
     // (a CODER must not be able to mint IMPLEMENTORs through this mutation).
     if (input.role) {
