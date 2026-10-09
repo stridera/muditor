@@ -5035,7 +5035,9 @@ export type UpdateAbilityInput = {
   castTimeRounds?: InputMaybe<Scalars['Int']['input']>;
   combatOk?: InputMaybe<Scalars['Boolean']['input']>;
   cooldownMs?: InputMaybe<Scalars['Int']['input']>;
+  /** Omit to leave unchanged; null clears */
   damageType?: InputMaybe<ElementType>;
+  /** Omit to leave unchanged; null clears */
   description?: InputMaybe<Scalars['String']['input']>;
   humanoidOnly?: InputMaybe<Scalars['Boolean']['input']>;
   inCombatOnly?: InputMaybe<Scalars['Boolean']['input']>;
@@ -5044,12 +5046,16 @@ export type UpdateAbilityInput = {
   memorizationTime?: InputMaybe<Scalars['Int']['input']>;
   minPosition?: InputMaybe<Position>;
   name?: InputMaybe<Scalars['String']['input']>;
+  /** Omit to leave unchanged; null clears */
   notes?: InputMaybe<Scalars['String']['input']>;
+  /** Omit to leave unchanged; null clears */
   pages?: InputMaybe<Scalars['Int']['input']>;
   /** Prompt cooldown-bar letter; pass null or empty to clear */
   promptLetter?: InputMaybe<Scalars['String']['input']>;
   questOnly?: InputMaybe<Scalars['Boolean']['input']>;
+  /** Omit to leave unchanged; null clears */
   schoolId?: InputMaybe<Scalars['Int']['input']>;
+  /** Omit to leave unchanged; null clears */
   sphere?: InputMaybe<SpellSphere>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
   violent?: InputMaybe<Scalars['Boolean']['input']>;

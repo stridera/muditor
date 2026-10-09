@@ -3688,7 +3688,11 @@ input UpdateAbilityInput {
   castTimeRounds: Int
   combatOk: Boolean
   cooldownMs: Int
+
+  """Omit to leave unchanged; null clears"""
   damageType: ElementType
+
+  """Omit to leave unchanged; null clears"""
   description: String
   humanoidOnly: Boolean
   inCombatOnly: Boolean
@@ -3697,13 +3701,21 @@ input UpdateAbilityInput {
   memorizationTime: Int
   minPosition: Position
   name: String
+
+  """Omit to leave unchanged; null clears"""
   notes: String
+
+  """Omit to leave unchanged; null clears"""
   pages: Int
 
   """Prompt cooldown-bar letter; pass null or empty to clear"""
   promptLetter: String
   questOnly: Boolean
+
+  """Omit to leave unchanged; null clears"""
   schoolId: Int
+
+  """Omit to leave unchanged; null clears"""
   sphere: SpellSphere
   tags: [String!]
   violent: Boolean

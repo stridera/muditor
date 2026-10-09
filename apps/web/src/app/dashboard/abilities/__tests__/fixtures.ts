@@ -1,0 +1,27 @@
+import type { AbilityFormSource } from '../ability-form';
+
+export const fullAbility = {
+  __typename: 'Ability',
+  id: '7',
+  name: 'Fireball',
+  abilityType: 'SPELL',
+  description: 'Burns things',
+  minPosition: 'STANDING',
+  violent: true,
+  combatOk: false,
+  castTimeRounds: 2,
+  cooldownMs: 1500,
+  promptLetter: 'F',
+  inCombatOnly: false,
+  isArea: true,
+  notes: 'tuned',
+  tags: ['fire'],
+  luaScript: null,
+  sphere: 'FIRE',
+  damageType: 'FIRE',
+  pages: 4,
+  memorizationTime: 9,
+  questOnly: true,
+  humanoidOnly: true,
+  school: { __typename: 'AbilitySchool', id: '3', name: 'Evocation' },
+} as unknown as AbilityFormSource;

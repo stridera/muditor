@@ -93,14 +93,20 @@ export class UpdateAbilityInput {
   @Field({ nullable: true })
   name?: string;
 
-  @Field({ nullable: true })
-  description?: string;
+  @Field(() => String, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  description?: string | null;
 
   @Field({ nullable: true })
   abilityType?: string;
 
-  @Field(() => Int, { nullable: true })
-  schoolId?: number;
+  @Field(() => Int, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  schoolId?: number | null;
 
   @Field(() => Position, { nullable: true })
   minPosition?: Position;
@@ -132,8 +138,11 @@ export class UpdateAbilityInput {
   @Field({ nullable: true })
   isArea?: boolean;
 
-  @Field({ nullable: true })
-  notes?: string;
+  @Field(() => String, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  notes?: string | null;
 
   @Field(() => [String], { nullable: true })
   tags?: string[];
@@ -142,14 +151,23 @@ export class UpdateAbilityInput {
   luaScript?: string;
 
   // Spell metadata
-  @Field(() => SpellSphere, { nullable: true })
-  sphere?: SpellSphere;
+  @Field(() => SpellSphere, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  sphere?: SpellSphere | null;
 
-  @Field(() => ElementType, { nullable: true })
-  damageType?: ElementType;
+  @Field(() => ElementType, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  damageType?: ElementType | null;
 
-  @Field(() => Int, { nullable: true })
-  pages?: number;
+  @Field(() => Int, {
+    nullable: true,
+    description: 'Omit to leave unchanged; null clears',
+  })
+  pages?: number | null;
 
   @Field(() => Int, { nullable: true })
   memorizationTime?: number;
