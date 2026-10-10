@@ -690,7 +690,7 @@ model CharacterItems {
   characters               Characters       @relation(fields: [characterId], references: [id], onDelete: Cascade)
   container                CharacterItems?  @relation("itemContainer", fields: [containerId], references: [id])
   containedItems           CharacterItems[] @relation("itemContainer")
-  objects                  Objects          @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  objects                  Objects          @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Restrict)
   // Set while the item sits in a dead player's corpse (characterId stays the
   // corpse owner). Cleared when the item is looted into an inventory.
   corpseId                 Int?             @map("corpse_id")
@@ -916,7 +916,7 @@ model CharacterPets {
 
   // Relationships
   character    Characters @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  mobPrototype Mobs       @relation(fields: [mobPrototypeZoneId, mobPrototypeId], references: [zoneId, id], onDelete: Cascade)
+  mobPrototype Mobs       @relation(fields: [mobPrototypeZoneId, mobPrototypeId], references: [zoneId, id], onDelete: Restrict)
 
   @@index([characterId])
   @@index([mobPrototypeZoneId, mobPrototypeId])

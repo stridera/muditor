@@ -51,3 +51,59 @@ describe('TriggersService.detachFromEntity', () => {
     expect(prisma.objectTriggers.deleteMany).not.toHaveBeenCalled();
   });
 });
+
+describe('TriggersService.attachToEntity', () => {
+  const prisma = {
+    mobTriggers: { upsert: jest.fn().mockResolvedValue({}) },
+    objectTriggers: { upsert: jest.fn().mockResolvedValue({}) },
+    triggers: { update: jest.fn().mockResolvedValue({ id: 5, zoneId: 30 }) },
+  };
+  let service: TriggersService;
+
+  beforeEach(() => {
+    jest.clearAllMocks();
+    service = new TriggersService(prisma as never);
+  });
+
+  it('writes the link row for mob id 0', async () => {
+    await service.attachToEntity({
+      triggerZoneId: 30,
+      triggerId: 5,
+      attachType: 'MOB',
+      mobZoneId: 30,
+      mobId: 0,
+    } as never);
+    expect(prisma.mobTriggers.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: {
+          mobZoneId: 30,
+          mobId: 0,
+          triggerZoneId: 30,
+          triggerId: 5,
+        },
+      })
+    );
+  });
+
+  it('writes the link row for object id 0', async () => {
+    await service.attachToEntity({
+      triggerZoneId: 30,
+      triggerId: 5,
+      attachType: 'OBJECT',
+      objectZoneId: 30,
+      objectId: 0,
+    } as never);
+    expect(prisma.objectTriggers.upsert).toHaveBeenCalledTimes(1);
+  });
+
+  it('errors instead of reporting success when the entity ref is missing', async () => {
+    await expect(
+      service.attachToEntity({
+        triggerZoneId: 30,
+        triggerId: 5,
+        attachType: 'MOB',
+      } as never)
+    ).rejects.toBeInstanceOf(BadRequestException);
+    expect(prisma.triggers.update).not.toHaveBeenCalled();
+  });
+});

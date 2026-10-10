@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { type Mobs, Prisma } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
+import { assertNoPlayerPets, rethrowAsInUse } from '../common/proto-references';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -119,7 +120,7 @@ export class MobsService {
 
     // Build WHERE clause using plaintext fields
     const where: Prisma.MobsWhereInput = {
-      ...(zoneId && { zoneId }),
+      ...(zoneId != null && { zoneId }),
       ...inVisibleZone(hideGodZones),
       OR: [
         // Check ID if numeric
@@ -181,9 +182,14 @@ export class MobsService {
   }
 
   async delete(zoneId: number, id: number): Promise<Mobs> {
-    return this.database.mobs.delete({
-      where: { zoneId_id: { zoneId, id } },
-    });
+    await assertNoPlayerPets(this.database, [{ zoneId, id }]);
+    try {
+      return await this.database.mobs.delete({
+        where: { zoneId_id: { zoneId, id } },
+      });
+    } catch (error) {
+      rethrowAsInUse(error, [{ zoneId, id }]);
+    }
   }
 
   /**
@@ -194,10 +200,15 @@ export class MobsService {
     keys: Array<{ zoneId: number; id: number }>
   ): Promise<number> {
     if (keys.length === 0) return 0;
-    const result = await this.database.mobs.deleteMany({
-      where: { OR: keys.map(({ zoneId, id }) => ({ zoneId, id })) },
-    });
-    return result.count;
+    await assertNoPlayerPets(this.database, keys);
+    try {
+      const result = await this.database.mobs.deleteMany({
+        where: { OR: keys.map(({ zoneId, id }) => ({ zoneId, id })) },
+      });
+      return result.count;
+    } catch (error) {
+      rethrowAsInUse(error, keys);
+    }
   }
 
   /**

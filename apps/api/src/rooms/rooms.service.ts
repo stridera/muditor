@@ -10,6 +10,7 @@ import {
   BatchUpdateResult,
   CreateRoomExitInput,
   CreateRoomInput,
+  UpdateRoomExitInput,
   UpdateRoomInput,
   UpdateRoomPositionInput,
 } from './room.dto';
@@ -507,12 +508,57 @@ export class RoomsService {
         toRoomId,
         keyZoneId: data.keyZoneId ?? null,
         keyId: data.keyId ?? null,
-        flags: [],
+        flags: data.flags ?? [],
         defaultState: data.defaultState ?? ('OPEN' as ExitState),
         hitPoints: data.hitPoints ?? null,
       },
     });
     return exit as RoomExitResult;
+  }
+
+  /**
+   * Update an exit in place. `undefined` leaves a column alone, `null` clears
+   * it (arrays become empty, defaultState becomes OPEN). Never delete+recreate:
+   * that loses flags/defaultState/hitPoints that the caller did not resend.
+   */
+  async updateExit(data: UpdateRoomExitInput): Promise<RoomExitResult> {
+    const patch: Record<string, unknown> = {};
+    if (data.description !== undefined) patch.description = data.description;
+    if (data.keywords !== undefined) {
+      patch.keywords = (data.keywords ?? []).filter(
+        k => !!k && k.trim().length > 0
+      );
+    }
+    if (data.flags !== undefined) patch.flags = data.flags ?? [];
+    if (data.keyZoneId !== undefined) patch.keyZoneId = data.keyZoneId;
+    if (data.keyId !== undefined) patch.keyId = data.keyId;
+    if (data.toZoneId !== undefined) patch.toZoneId = data.toZoneId;
+    if (data.toRoomId !== undefined) patch.toRoomId = data.toRoomId;
+    if (data.defaultState !== undefined) {
+      patch.defaultState = data.defaultState ?? ('OPEN' as ExitState);
+    }
+    if (data.hitPoints !== undefined) patch.hitPoints = data.hitPoints;
+
+    try {
+      const exit = await this.db.roomExit.update({
+        where: {
+          roomZoneId_roomId_direction: {
+            roomZoneId: data.roomZoneId,
+            roomId: data.roomId,
+            direction: data.direction,
+          },
+        },
+        data: patch,
+      });
+      return exit as RoomExitResult;
+    } catch (error) {
+      if ((error as { code?: string }).code === 'P2025') {
+        throw new NotFoundException(
+          `No ${data.direction} exit in room ${data.roomZoneId}:${data.roomId}`
+        );
+      }
+      throw error;
+    }
   }
 
   async deleteExit(exitId: number): Promise<RoomExitResult> {

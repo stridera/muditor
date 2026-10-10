@@ -7,6 +7,10 @@ import {
   WearFlag,
 } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
+import {
+  assertNoPlayerItems,
+  rethrowAsInUse,
+} from '../common/proto-references';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -146,7 +150,7 @@ export class ObjectsService {
 
     // Build WHERE clause using plaintext fields
     const where: Prisma.ObjectsWhereInput = {
-      ...(zoneId && { zoneId }),
+      ...(zoneId != null && { zoneId }),
       ...inVisibleZone(hideGodZones),
       OR: [
         // Check ID if numeric
@@ -205,9 +209,14 @@ export class ObjectsService {
   }
 
   async delete(zoneId: number, id: number): Promise<Objects> {
-    return this.database.objects.delete({
-      where: { zoneId_id: { zoneId, id } },
-    });
+    await assertNoPlayerItems(this.database, [{ zoneId, id }]);
+    try {
+      return await this.database.objects.delete({
+        where: { zoneId_id: { zoneId, id } },
+      });
+    } catch (error) {
+      rethrowAsInUse(error, [{ zoneId, id }]);
+    }
   }
 
   /**
@@ -218,10 +227,15 @@ export class ObjectsService {
     keys: Array<{ zoneId: number; id: number }>
   ): Promise<number> {
     if (keys.length === 0) return 0;
-    const result = await this.database.objects.deleteMany({
-      where: { OR: keys.map(({ zoneId, id }) => ({ zoneId, id })) },
-    });
-    return result.count;
+    await assertNoPlayerItems(this.database, keys);
+    try {
+      const result = await this.database.objects.deleteMany({
+        where: { OR: keys.map(({ zoneId, id }) => ({ zoneId, id })) },
+      });
+      return result.count;
+    } catch (error) {
+      rethrowAsInUse(error, keys);
+    }
   }
 
   async updateObjectEffects(

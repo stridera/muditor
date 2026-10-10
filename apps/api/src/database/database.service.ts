@@ -282,6 +282,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.characterItems;
   }
 
+  get characterPets() {
+    return this.client.characterPets;
+  }
+
   get auditLogs() {
     return this.client.auditLogs;
   }

@@ -125,8 +125,8 @@ export class MobResetService {
 
   async create(data: CreateMobResetInput): Promise<MobResetDto> {
     const baseData: Prisma.MobResetsUncheckedCreateInput = {
-      maxInstances: data.maxInstances || 1,
-      probability: data.probability || 1.0,
+      maxInstances: data.maxInstances ?? 1,
+      probability: data.probability ?? 1.0,
       comment: data.comment ?? null,
       mobZoneId: data.mobZoneId,
       mobId: data.mobId,
@@ -142,8 +142,8 @@ export class MobResetService {
               objectZoneId: eq.objectZoneId,
               objectId: eq.objectId,
               wearLocation: eq.wearLocation ?? null,
-              maxInstances: eq.maxInstances || 1,
-              probability: eq.probability || 1.0,
+              maxInstances: eq.maxInstances ?? 1,
+              probability: eq.probability ?? 1.0,
             })),
           }
         : undefined;
@@ -194,8 +194,8 @@ export class MobResetService {
           objectId: eq.objectId!,
           resetId: id,
           wearLocation: eq.wearLocation ?? null,
-          maxInstances: eq.maxInstances || 1,
-          probability: eq.probability || 1.0,
+          maxInstances: eq.maxInstances ?? 1,
+          probability: eq.probability ?? 1.0,
         },
       });
     });
@@ -266,8 +266,8 @@ export class MobResetService {
         objectZoneId: equipment.objectZoneId,
         objectId: equipment.objectId,
         wearLocation: equipment.wearLocation ?? null,
-        maxInstances: equipment.maxInstances || 1,
-        probability: equipment.probability || 1.0,
+        maxInstances: equipment.maxInstances ?? 1,
+        probability: equipment.probability ?? 1.0,
       },
     });
 

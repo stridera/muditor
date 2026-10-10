@@ -28,6 +28,7 @@ import {
   BatchUpdateResult,
   BatchUpdateRoomPositionsInput,
   CreateRoomExitInput,
+  UpdateRoomExitInput,
   CreateRoomInput,
   RoomDto,
   RoomExitDto,
@@ -100,6 +101,40 @@ interface RoomWithResets {
   mob_resets?: MobReset[];
   objectResets?: ObjectReset[];
   object_resets?: ObjectReset[];
+}
+
+interface ExitRow {
+  id: number;
+  direction: string;
+  keywords?: string[] | null;
+  flags?: string[] | null;
+  defaultState: string;
+  roomZoneId: number;
+  roomId: number;
+  description?: string | null;
+  keyZoneId?: number | null;
+  keyId?: number | null;
+  toZoneId?: number | null;
+  toRoomId?: number | null;
+  hitPoints?: number | null;
+}
+
+function toExitDto(exit: ExitRow): RoomExitDto {
+  return {
+    id: String(exit.id),
+    direction: exit.direction as Direction,
+    keywords: exit.keywords ?? [],
+    flags: (exit.flags ?? []) as ExitFlag[],
+    defaultState: exit.defaultState as ExitState,
+    roomZoneId: exit.roomZoneId,
+    roomId: exit.roomId,
+    ...(exit.description != null ? { description: exit.description } : {}),
+    ...(exit.keyZoneId != null ? { keyZoneId: exit.keyZoneId } : {}),
+    ...(exit.keyId != null ? { keyId: exit.keyId } : {}),
+    ...(exit.toZoneId != null ? { toZoneId: exit.toZoneId } : {}),
+    ...(exit.toRoomId != null ? { toRoomId: exit.toRoomId } : {}),
+    ...(exit.hitPoints != null ? { hitPoints: exit.hitPoints } : {}),
+  };
 }
 
 @Resolver(() => RoomDto)
@@ -238,45 +273,24 @@ export class RoomsResolver {
   async createRoomExit(
     @Args('data') data: CreateRoomExitInput
   ): Promise<RoomExitDto> {
-    const exit = await this.roomsService.createExit(data);
-    const exitDto: RoomExitDto = {
-      id: String(exit.id),
-      direction: exit.direction as Direction,
-      keywords: exit.keywords ?? [],
-      flags: (exit.flags ?? []) as ExitFlag[],
-      defaultState: exit.defaultState as ExitState,
-      roomZoneId: exit.roomZoneId,
-      roomId: exit.roomId,
-      ...(exit.description != null ? { description: exit.description } : {}),
-      ...(exit.keyZoneId != null ? { keyZoneId: exit.keyZoneId } : {}),
-      ...(exit.keyId != null ? { keyId: exit.keyId } : {}),
-      ...(exit.toZoneId != null ? { toZoneId: exit.toZoneId } : {}),
-      ...(exit.toRoomId != null ? { toRoomId: exit.toRoomId } : {}),
-      ...(exit.hitPoints != null ? { hitPoints: exit.hitPoints } : {}),
-    };
-    return exitDto;
+    return toExitDto(await this.roomsService.createExit(data));
+  }
+
+  @Mutation(() => RoomExitDto, {
+    description:
+      'Update an exit in place by (roomZoneId, roomId, direction). Omitted fields are unchanged; null clears.',
+  })
+  @RequireZoneWrite({ keys: ['roomZoneId'] })
+  async updateRoomExit(
+    @Args('data') data: UpdateRoomExitInput
+  ): Promise<RoomExitDto> {
+    return toExitDto(await this.roomsService.updateExit(data));
   }
 
   @Mutation(() => RoomExitDto)
   @RequireZoneWrite({ lookup: zoneLookups.roomExit('exitId') })
   async deleteRoomExit(@Args('exitId') exitId: number): Promise<RoomExitDto> {
-    const exit = await this.roomsService.deleteExit(exitId);
-    const exitDto: RoomExitDto = {
-      id: String(exit.id),
-      direction: exit.direction as Direction,
-      keywords: exit.keywords ?? [],
-      flags: (exit.flags ?? []) as ExitFlag[],
-      defaultState: exit.defaultState as ExitState,
-      roomZoneId: exit.roomZoneId,
-      roomId: exit.roomId,
-      ...(exit.description != null ? { description: exit.description } : {}),
-      ...(exit.keyZoneId != null ? { keyZoneId: exit.keyZoneId } : {}),
-      ...(exit.keyId != null ? { keyId: exit.keyId } : {}),
-      ...(exit.toZoneId != null ? { toZoneId: exit.toZoneId } : {}),
-      ...(exit.toRoomId != null ? { toRoomId: exit.toRoomId } : {}),
-      ...(exit.hitPoints != null ? { hitPoints: exit.hitPoints } : {}),
-    };
-    return exitDto;
+    return toExitDto(await this.roomsService.deleteExit(exitId));
   }
 
   @Mutation(() => RoomDto)

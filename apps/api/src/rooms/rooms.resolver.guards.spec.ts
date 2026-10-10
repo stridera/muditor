@@ -8,6 +8,7 @@ describe('RoomsResolver guards', () => {
       'updateRoom',
       'deleteRoom',
       'createRoomExit',
+      'updateRoomExit',
       'deleteRoomExit',
       'updateRoomPosition',
       'batchUpdateRoomPositions',

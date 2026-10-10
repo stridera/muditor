@@ -1,5 +1,7 @@
 import type Blockly from 'blockly';
 import type { AbilityEffectOutput } from './json-generator';
+import { getFieldNamesForBlockType } from './json-generator';
+import { cloneJson, stringifyFieldValue, writeBlockData } from './block-data';
 import {
   formatZoneId,
   getBlockTypeForEffectId,
@@ -151,11 +153,10 @@ function createBlockFromEffect(
   }
 
   // Handle mobRef for summon
-  if (blockType === 'effect_summon' && params['mobZoneId'] !== undefined) {
-    const mobRef = formatZoneId(
-      Number(params['mobZoneId']),
-      Number(params['mobId'] || 0)
-    );
+  // (older imports spelled the zone key `mobZone`)
+  const mobZone = params['mobZoneId'] ?? params['mobZone'];
+  if (blockType === 'effect_summon' && mobZone !== undefined) {
+    const mobRef = formatZoneId(Number(mobZone), Number(params['mobId'] || 0));
     setBlockField(block, 'mobRef', mobRef);
   }
 
@@ -191,6 +192,31 @@ function createBlockFromEffect(
       chanceField.setValue(String(effect.chancePct));
     }
   }
+
+  // Remember what was stored so JSON generation can preserve every key the
+  // visual editor does not model and keep untouched fields byte-identical.
+  const originalParams = cloneJson(params) as Record<string, unknown>;
+  if (effect.gateType) {
+    delete originalParams['onPass'];
+    delete originalParams['onFail'];
+  }
+  const baseline: Record<string, string> = {};
+  for (const name of [
+    ...getFieldNamesForBlockType(blockType),
+    'trigger',
+    'chancePct',
+  ]) {
+    if (block.getField(name)) {
+      baseline[name] = stringifyFieldValue(block.getFieldValue(name));
+    }
+  }
+  writeBlockData(block, {
+    originalParams,
+    baseline,
+    trigger: effect.trigger,
+    chancePct: effect.chancePct,
+    condition: effect.condition,
+  });
 
   // Initialize the block (required for proper rendering)
   block.initSvg();

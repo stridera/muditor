@@ -42,16 +42,19 @@ import { PortalNode } from './PortalNode';
 import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
+import { updateExitInPlace } from './exit-update';
 import { zoneEditorFetch } from './zone-editor-fetch';
 import { graphqlRequestBody } from '@/lib/authenticated-fetch';
 import {
   ZoneEditorCreateRoomDocument,
   ZoneEditorCreateRoomExitDocument,
   ZoneEditorDeleteRoomExitDocument,
+  ZoneEditorUpdateRoomExitDocument,
   ZoneEditorGetRoomsDocument,
   ZoneEditorUpdateRoomDocument,
   ZoneEditorUpdateRoomPositionDocument,
   ZoneEditorWorldMapDocument,
+  type UpdateRoomExitInput,
 } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
 import { EntityPanel, type Mob, type GameObject } from './EntityPanel';
@@ -2484,80 +2487,34 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
   const handleUpdateExit = useCallback(
     async (exitId: string, exitPatch: Partial<RoomExit>) => {
       if (!selectedRoom) return;
-      setManagingExits(true);
       const room = selectedRoom;
       const existing = room.exits?.find(e => e.id === exitId);
-      if (!existing) {
-        setManagingExits(false);
-        return;
-      }
-      const previous = rooms;
+      if (!existing) return;
+      setManagingExits(true);
       try {
-        // Delete existing
-        const numericId = parseInt(exitId, 10);
-        await authenticatedFetch('/graphql', {
-          method: 'POST',
-          body: graphqlRequestBody(ZoneEditorDeleteRoomExitDocument, {
-            exitId: numericId,
-          }),
+        const result = await updateExitInPlace<RoomExit, Room>({
+          room,
+          existing,
+          patch: exitPatch,
+          setRooms,
+          send: async variables => {
+            const response = await authenticatedFetch('/graphql', {
+              method: 'POST',
+              body: graphqlRequestBody(ZoneEditorUpdateRoomExitDocument, {
+                data: variables as UpdateRoomExitInput,
+              }),
+            });
+            return { ok: response.ok, json: await response.json() };
+          },
         });
-        // Create new exit with updated metadata
-        const response = await authenticatedFetch('/graphql', {
-          method: 'POST',
-          body: graphqlRequestBody(ZoneEditorCreateRoomExitDocument, {
-            data: {
-              roomId: room.id,
-              roomZoneId: room.zoneId,
-              direction: existing.direction,
-              toZoneId: existing.toZoneId ?? undefined,
-              toRoomId: existing.toRoomId ?? undefined,
-              description:
-                exitPatch.description ?? existing.description ?? undefined,
-              keywords: exitPatch.keywords ?? existing.keywords ?? undefined,
-              keyZoneId: exitPatch.keyZoneId ?? existing.keyZoneId ?? undefined,
-              keyId: exitPatch.keyId ?? existing.keyId ?? undefined,
-            },
-          }),
-        });
-        const json = await response.json();
-        if (response.ok && !json.errors) {
-          const created = json.data.createRoomExit;
-          setRooms(rs =>
-            rs.map(r =>
-              r.id === room.id
-                ? {
-                    ...r,
-                    exits: (r.exits || [])
-                      .filter(e => e.id !== exitId)
-                      .concat([
-                        {
-                          id: created.id,
-                          direction: created.direction,
-                          toZoneId: created.toZoneId ?? null,
-                          toRoomId: created.toRoomId ?? null,
-                          description: created.description ?? null,
-                          keywords: created.keywords || [],
-                          keyZoneId: created.keyZoneId ?? null,
-                          keyId: created.keyId ?? null,
-                          flags: created.flags || [],
-                          defaultState: created.defaultState ?? 'OPEN',
-                          hitPoints: created.hitPoints ?? null,
-                        },
-                      ]),
-                  }
-                : r
-            )
-          );
-        } else {
-          setRooms(previous);
+        if (!result.ok) {
+          toast.error(result.error ?? 'Failed to update exit');
         }
-      } catch {
-        setRooms(previous);
       } finally {
         setManagingExits(false);
       }
     },
-    [selectedRoom, rooms, authenticatedFetch]
+    [selectedRoom, authenticatedFetch]
   );
 
   const nodeTypes = useMemo(

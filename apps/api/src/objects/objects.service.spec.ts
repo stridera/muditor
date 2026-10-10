@@ -49,13 +49,15 @@ describe('ObjectsService findByType', () => {
 describe('ObjectsService.deleteMany', () => {
   let service: ObjectsService;
   const objects = { deleteMany: jest.fn() };
+  const characterItems = { groupBy: jest.fn().mockResolvedValue([]) };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    characterItems.groupBy.mockResolvedValue([]);
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         ObjectsService,
-        { provide: DatabaseService, useValue: { objects } },
+        { provide: DatabaseService, useValue: { objects, characterItems } },
       ],
     }).compile();
     service = module.get(ObjectsService);

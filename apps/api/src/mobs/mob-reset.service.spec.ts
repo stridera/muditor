@@ -131,4 +131,46 @@ describe('MobResetService mapping', () => {
     const result = await service.findByMob(5, 23);
     expect(result[0]!.equipment[0]!.wearLocation).toBe(WearFlag.MAINHAND);
   });
+
+  it('keeps explicit 0 for probability and maxInstances on create (not 1)', async () => {
+    (db.mobResets.create as jest.Mock).mockResolvedValue({
+      id: 1,
+      zoneId: 5,
+      mobZoneId: 5,
+      mobId: 0,
+      roomZoneId: 5,
+      roomId: 100,
+      maxInstances: 0,
+      probability: 0,
+      comment: null,
+      mobResetEquipment: [],
+      mobs: null,
+      rooms: null,
+    } satisfies MockMobReset);
+
+    await service.create({
+      zoneId: 5,
+      mobZoneId: 5,
+      mobId: 0,
+      roomZoneId: 5,
+      roomId: 100,
+      maxInstances: 0,
+      probability: 0,
+      equipment: [
+        {
+          objectZoneId: 5,
+          objectId: 0,
+          maxInstances: 0,
+          probability: 0,
+        },
+      ],
+    } as never);
+
+    const { data } = (db.mobResets.create as jest.Mock).mock.calls[0]![0];
+    expect(data.maxInstances).toBe(0);
+    expect(data.probability).toBe(0);
+    expect(data.mobResetEquipment.create[0]).toEqual(
+      expect.objectContaining({ maxInstances: 0, probability: 0 })
+    );
+  });
 });

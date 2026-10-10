@@ -96,6 +96,7 @@ import {
   Trash2,
   Zap,
 } from 'lucide-react';
+import { planEffectSave } from '@/components/EffectEditor/generators/save-payload';
 import { useEffect, useState } from 'react';
 import {
   ABILITY_TYPES,
@@ -364,27 +365,24 @@ export default function AbilitiesPage() {
     setDeleteAbility(ability);
   };
 
+  const loadStoredEffects = (): AbilityEffectOutput[] =>
+    [...(abilityDetailsData?.ability?.effects ?? [])]
+      .sort((a, b) => a.order - b.order)
+      .map(effect => ({
+        effectId:
+          typeof effect.effectId === 'string'
+            ? parseInt(effect.effectId, 10)
+            : effect.effectId,
+        overrideParams:
+          (effect.overrideParams as Record<string, unknown>) || {},
+        order: effect.order,
+        trigger: effect.trigger || undefined,
+        chancePct: effect.chancePct,
+        condition: effect.condition || undefined,
+      }));
+
   const handleEditEffects = () => {
-    if (abilityDetailsData?.ability?.effects) {
-      setEditedEffects(
-        abilityDetailsData.ability.effects
-          .sort((a, b) => a.order - b.order)
-          .map(effect => ({
-            effectId:
-              typeof effect.effectId === 'string'
-                ? parseInt(effect.effectId, 10)
-                : effect.effectId,
-            overrideParams:
-              (effect.overrideParams as Record<string, unknown>) || {},
-            order: effect.order,
-            trigger: effect.trigger || undefined,
-            chancePct: effect.chancePct,
-            condition: effect.condition || undefined,
-          }))
-      );
-    } else {
-      setEditedEffects([]);
-    }
+    setEditedEffects(loadStoredEffects());
     setEditingEffects(true);
   };
 
@@ -394,25 +392,28 @@ export default function AbilitiesPage() {
   };
 
   const handleSaveEffects = () => {
-    if (viewingAbilityId) {
-      updateAbilityEffectsMutation({
-        variables: {
-          abilityId: parseInt(viewingAbilityId, 10),
-          data: {
-            effects: editedEffects
-              .filter(effect => effect.effectId != null)
-              .map(effect => ({
-                effectId: effect.effectId!,
-                overrideParams: effect.overrideParams,
-                order: effect.order,
-                trigger: effect.trigger ?? null,
-                chancePct: effect.chancePct,
-                condition: effect.condition ?? null,
-              })),
-          },
-        },
-      });
+    if (!viewingAbilityId) return;
+    const plan = planEffectSave(editedEffects, loadStoredEffects());
+    if (plan.gateCount > 0) {
+      // Gates have no effectId and cannot be stored; never drop them silently.
+      setErrorMessage(
+        `Cannot save: ${plan.gateCount} top-level gate block(s) cannot be stored on an ability. Remove them or wrap them in effects.`
+      );
+      setSuccessMessage('');
+      return;
     }
+    if (plan.unchanged) {
+      setEditingEffects(false);
+      setSuccessMessage('No effect changes to save');
+      setTimeout(() => setSuccessMessage(''), 5000);
+      return;
+    }
+    updateAbilityEffectsMutation({
+      variables: {
+        abilityId: parseInt(viewingAbilityId, 10),
+        data: { effects: plan.effects },
+      },
+    });
   };
 
   const handleEditMessages = () => {

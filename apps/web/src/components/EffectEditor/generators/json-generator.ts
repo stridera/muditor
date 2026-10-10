@@ -6,6 +6,13 @@ import {
   hasEffectsLoaded,
   getFieldNamesForEffect,
 } from '../blocks/data-registry';
+import {
+  cloneJson,
+  coerceLike,
+  readBlockData,
+  stringifyFieldValue,
+  type BlockRoundTripData,
+} from './block-data';
 
 /**
  * Output format for ability effects and gates
@@ -106,59 +113,76 @@ function extractDamageComponents(
 }
 
 /**
- * Extract parameters from a block based on its type
+ * Extract parameters from a block based on its type.
+ *
+ * Starts from the block's original stored params (see block-data.ts) so keys
+ * the visual editor does not model survive untouched, then overwrites only the
+ * fields the builder actually edited.
  */
 function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
-  const params: Record<string, unknown> = {};
+  const data = readBlockData(block);
+  const originalParams = data?.originalParams ?? {};
+  const baseline = data?.baseline ?? {};
+  const params: Record<string, unknown> = cloneJson(originalParams);
   const blockType = block.type;
+
+  // Gate branches are regenerated from the connected blocks below.
+  if (blockType.startsWith('gate_')) {
+    delete params['onPass'];
+    delete params['onFail'];
+  }
 
   // Get all field values from the block
   const fieldNames = getFieldNamesForBlockType(blockType);
 
   for (const fieldName of fieldNames) {
     const value = block.getFieldValue(fieldName);
-    if (value !== null && value !== undefined) {
-      // Handle combined "zoneId:id" ref fields - split them into separate fields
-      // Skip empty refs (e.g., "(No specific mob)" which has value '')
-      if (fieldName === 'mobRef' && typeof value === 'string') {
-        if (value && value !== '') {
-          const { zoneId, id } = parseZoneId(value);
-          params['mobZoneId'] = zoneId;
-          params['mobId'] = id;
-        }
-        // Don't add anything if mobRef is empty - mob is optional
-      } else if (
-        fieldName === 'objectRef' &&
-        typeof value === 'string' &&
-        value !== ''
-      ) {
+    if (value === null || value === undefined) continue;
+
+    // Untouched since load: keep the stored value exactly as it was.
+    if (
+      fieldName in baseline &&
+      baseline[fieldName] === stringifyFieldValue(value)
+    ) {
+      continue;
+    }
+
+    if (fieldName === 'mobRef' || fieldName === 'objectRef') {
+      // Combined "zoneId:id" ref fields - split them into separate params.
+      const prefix = fieldName === 'mobRef' ? 'mob' : 'object';
+      if (typeof value === 'string' && value !== '') {
         const { zoneId, id } = parseZoneId(value);
-        params['objectZoneId'] = zoneId;
-        params['objectId'] = id;
-      } else if (
-        fieldName === 'targetRoomZoneId' ||
-        fieldName === 'targetRoomId'
-      ) {
-        // Nest teleport target room fields into targetRoom object
-        if (!params['targetRoom']) {
-          params['targetRoom'] = { zoneId: 0, id: 0 };
-        }
-        const targetRoom = params['targetRoom'] as {
-          zoneId: number;
-          id: number;
-        };
-        if (fieldName === 'targetRoomZoneId') {
-          targetRoom.zoneId = Number(value);
-        } else {
-          targetRoom.id = Number(value);
-        }
+        params[`${prefix}ZoneId`] = zoneId;
+        params[`${prefix}Id`] = id;
+        // Legacy spelling written by older imports; keep it in sync.
+        if (`${prefix}Zone` in params) params[`${prefix}Zone`] = zoneId;
       } else {
-        // Skip empty string values for optional fields
-        if (value === '' && isOptionalField(blockType, fieldName)) {
-          continue;
-        }
-        params[fieldName] = value;
+        // Ref cleared (e.g. "(No specific mob)"): the link is optional.
+        delete params[`${prefix}ZoneId`];
+        delete params[`${prefix}Id`];
+        delete params[`${prefix}Zone`];
       }
+    } else if (
+      fieldName === 'targetRoomZoneId' ||
+      fieldName === 'targetRoomId'
+    ) {
+      // Nest teleport target room fields into targetRoom object
+      const existing = params['targetRoom'];
+      const targetRoom =
+        existing && typeof existing === 'object'
+          ? (existing as { zoneId: number; id: number })
+          : { zoneId: 0, id: 0 };
+      params['targetRoom'] = targetRoom;
+      if (fieldName === 'targetRoomZoneId') {
+        targetRoom.zoneId = Number(value);
+      } else {
+        targetRoom.id = Number(value);
+      }
+    } else if (value === '' && isOptionalField(blockType, fieldName)) {
+      // Optional field cleared by the builder: remove the key.
+      delete params[fieldName];
+    } else {
+      params[fieldName] = coerceLike(originalParams[fieldName], value);
     }
   }
 
@@ -176,6 +200,29 @@ function extractBlockParams(block: Blockly.Block): Record<string, unknown> {
   }
 
   return params;
+}
+
+/**
+ * Resolve trigger / chancePct: keep the stored value unless the builder
+ * changed the dropdown (the dropdown cannot represent every stored trigger).
+ */
+function resolveCommonField<T>(
+  block: Blockly.Block,
+  data: BlockRoundTripData | null,
+  fieldName: 'trigger' | 'chancePct',
+  stored: T | undefined,
+  convert: (raw: unknown) => T
+): T | undefined {
+  const raw = block.getFieldValue(fieldName);
+  if (raw === null || raw === undefined || raw === '') return stored;
+  if (
+    data &&
+    fieldName in data.baseline &&
+    data.baseline[fieldName] === stringifyFieldValue(raw)
+  ) {
+    return stored;
+  }
+  return convert(raw);
 }
 
 /**
@@ -222,7 +269,7 @@ const GATE_FIELDS: Record<string, string[]> = {
  * Get field names for a specific block type
  * Loads effect fields from database param_schema, with UI-specific overrides
  */
-function getFieldNamesForBlockType(blockType: string): string[] {
+export function getFieldNamesForBlockType(blockType: string): string[] {
   // Gate blocks have hardcoded fields (not in Effect table)
   if (blockType.startsWith('gate_')) {
     return GATE_FIELDS[blockType] || [];
@@ -295,15 +342,19 @@ function processBlockChain(
         }
 
         // Create gate output
+        const data = readBlockData(currentBlock);
         const gate: AbilityEffectOutput = {
           gateType,
           overrideParams: params,
           order: orderRef.value++,
-          chancePct: 100,
+          chancePct: data?.chancePct ?? 100,
         };
+        if (data?.trigger) gate.trigger = data.trigger;
+        if (data?.condition) gate.condition = data.condition;
         effects.push(gate);
       } else if (effectId !== undefined) {
         // Create effect output
+        const data = readBlockData(currentBlock);
         const effect: AbilityEffectOutput = {
           effectId,
           overrideParams: params,
@@ -311,16 +362,31 @@ function processBlockChain(
           chancePct: 100,
         };
 
-        // Check for trigger field (on effect blocks)
-        const trigger = currentBlock.getFieldValue('trigger');
+        // Trigger / chance (on effect blocks)
+        const trigger = resolveCommonField(
+          currentBlock,
+          data,
+          'trigger',
+          data?.trigger,
+          raw => String(raw)
+        );
         if (trigger) {
           effect.trigger = trigger;
         }
+        const chance = resolveCommonField(
+          currentBlock,
+          data,
+          'chancePct',
+          data?.chancePct,
+          raw => Number(raw)
+        );
+        if (chance !== undefined) {
+          effect.chancePct = chance;
+        }
 
-        // Check for chance field (on effect blocks)
-        const chance = currentBlock.getFieldValue('chancePct');
-        if (chance !== null && chance !== undefined) {
-          effect.chancePct = Number(chance);
+        // Lua condition is not editable in blocks; pass it through.
+        if (data?.condition) {
+          effect.condition = data.condition;
         }
 
         effects.push(effect);

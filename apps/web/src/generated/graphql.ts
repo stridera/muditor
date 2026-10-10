@@ -1132,6 +1132,7 @@ export type CreateRoomExitInput = {
   defaultState?: InputMaybe<ExitState>;
   description?: InputMaybe<Scalars['String']['input']>;
   direction: Direction;
+  flags?: InputMaybe<Array<ExitFlag>>;
   hitPoints?: InputMaybe<Scalars['Int']['input']>;
   keyId?: InputMaybe<Scalars['Int']['input']>;
   keyZoneId?: InputMaybe<Scalars['Int']['input']>;
@@ -2159,6 +2160,8 @@ export type Mutation = {
   updateReport: Report;
   updateRoom: RoomDto;
   updateRoomEnvironmentalEffects: RoomDto;
+  /** Update an exit in place by (roomZoneId, roomId, direction). Omitted fields are unchanged; null clears. */
+  updateRoomExit: RoomExitDto;
   updateRoomPosition: RoomDto;
   updateShop: ShopDto;
   updateShopInventory: ShopDto;
@@ -3138,6 +3141,11 @@ export type MutationUpdateRoomEnvironmentalEffectsArgs = {
   effects: Array<RoomEnvironmentalEffectInput>;
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
+};
+
+
+export type MutationUpdateRoomExitArgs = {
+  data: UpdateRoomExitInput;
 };
 
 
@@ -5514,6 +5522,21 @@ export type UpdateReportInput = {
   resolution?: InputMaybe<Scalars['String']['input']>;
   status?: InputMaybe<ReportStatus>;
   tags?: InputMaybe<Array<Scalars['String']['input']>>;
+};
+
+export type UpdateRoomExitInput = {
+  defaultState?: InputMaybe<ExitState>;
+  description?: InputMaybe<Scalars['String']['input']>;
+  direction: Direction;
+  flags?: InputMaybe<Array<ExitFlag>>;
+  hitPoints?: InputMaybe<Scalars['Int']['input']>;
+  keyId?: InputMaybe<Scalars['Int']['input']>;
+  keyZoneId?: InputMaybe<Scalars['Int']['input']>;
+  keywords?: InputMaybe<Array<Scalars['String']['input']>>;
+  roomId: Scalars['Int']['input'];
+  roomZoneId: Scalars['Int']['input'];
+  toRoomId?: InputMaybe<Scalars['Int']['input']>;
+  toZoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateRoomInput = {
@@ -7963,6 +7986,13 @@ export type ZoneEditorCreateRoomExitMutationVariables = Exact<{
 
 export type ZoneEditorCreateRoomExitMutation = { __typename?: 'Mutation', createRoomExit: { __typename?: 'RoomExitDto', id: string, direction: Direction, toZoneId?: number | null, toRoomId?: number | null, description?: string | null, keywords: Array<string>, keyZoneId?: number | null, keyId?: number | null, flags: Array<ExitFlag>, defaultState: ExitState, hitPoints?: number | null } };
 
+export type ZoneEditorUpdateRoomExitMutationVariables = Exact<{
+  data: UpdateRoomExitInput;
+}>;
+
+
+export type ZoneEditorUpdateRoomExitMutation = { __typename?: 'Mutation', updateRoomExit: { __typename?: 'RoomExitDto', id: string, direction: Direction, toZoneId?: number | null, toRoomId?: number | null, description?: string | null, keywords: Array<string>, keyZoneId?: number | null, keyId?: number | null, flags: Array<ExitFlag>, defaultState: ExitState, hitPoints?: number | null } };
+
 export type ZoneEditorDeleteRoomExitMutationVariables = Exact<{
   exitId: Scalars['Float']['input'];
 }>;
@@ -8381,6 +8411,7 @@ export const ZoneEditorUpdateRoomPositionDocument = {"kind":"Document","definiti
 export const ZoneEditorBatchUpdateRoomPositionsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ZoneEditorBatchUpdateRoomPositions"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"input"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"BatchUpdateRoomPositionsInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"batchUpdateRoomPositions"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"input"},"value":{"kind":"Variable","name":{"kind":"Name","value":"input"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updatedCount"}},{"kind":"Field","name":{"kind":"Name","value":"errors"}}]}}]}}]} as unknown as DocumentNode<ZoneEditorBatchUpdateRoomPositionsMutation, ZoneEditorBatchUpdateRoomPositionsMutationVariables>;
 export const ZoneEditorCreateRoomDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ZoneEditorCreateRoom"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateRoomInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createRoom"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"sector"}}]}}]}}]} as unknown as DocumentNode<ZoneEditorCreateRoomMutation, ZoneEditorCreateRoomMutationVariables>;
 export const ZoneEditorCreateRoomExitDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ZoneEditorCreateRoomExit"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateRoomExitInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createRoomExit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ZoneEditorExit"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ZoneEditorExit"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RoomExitDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"toZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"toRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"keyZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keyId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"defaultState"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}}]}}]} as unknown as DocumentNode<ZoneEditorCreateRoomExitMutation, ZoneEditorCreateRoomExitMutationVariables>;
+export const ZoneEditorUpdateRoomExitDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ZoneEditorUpdateRoomExit"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateRoomExitInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateRoomExit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ZoneEditorExit"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ZoneEditorExit"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"RoomExitDto"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"direction"}},{"kind":"Field","name":{"kind":"Name","value":"toZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"toRoomId"}},{"kind":"Field","name":{"kind":"Name","value":"description"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"keyZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keyId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"defaultState"}},{"kind":"Field","name":{"kind":"Name","value":"hitPoints"}}]}}]} as unknown as DocumentNode<ZoneEditorUpdateRoomExitMutation, ZoneEditorUpdateRoomExitMutationVariables>;
 export const ZoneEditorDeleteRoomExitDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ZoneEditorDeleteRoomExit"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"exitId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Float"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteRoomExit"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"exitId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"exitId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<ZoneEditorDeleteRoomExitMutation, ZoneEditorDeleteRoomExitMutationVariables>;
 export const EntityPanelUpdateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EntityPanelUpdateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<EntityPanelUpdateMobMutation, EntityPanelUpdateMobMutationVariables>;
 export const EntityPanelUpdateObjectDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"EntityPanelUpdateObject"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateObjectInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateObject"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}}]}}]}}]} as unknown as DocumentNode<EntityPanelUpdateObjectMutation, EntityPanelUpdateObjectMutationVariables>;

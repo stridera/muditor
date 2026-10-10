@@ -260,7 +260,28 @@ export class TriggersService {
   async attachToEntity(data: AttachTriggerInput, userId?: string) {
     // Triggers no longer carry direct mob/object FKs — attachments live in
     // MobTriggers/ObjectTriggers junction tables. Create the link rows.
-    if (data.mobId && data.mobZoneId && data.attachType === ScriptType.MOB) {
+    // Id 0 is a valid entity id (zone 30, id 0): test for null, never truthiness.
+    if (
+      data.attachType === ScriptType.MOB &&
+      (data.mobId == null || data.mobZoneId == null)
+    ) {
+      throw new BadRequestException(
+        'Attaching to a mob requires mobZoneId and mobId'
+      );
+    }
+    if (
+      data.attachType === ScriptType.OBJECT &&
+      (data.objectId == null || data.objectZoneId == null)
+    ) {
+      throw new BadRequestException(
+        'Attaching to an object requires objectZoneId and objectId'
+      );
+    }
+    if (
+      data.mobId != null &&
+      data.mobZoneId != null &&
+      data.attachType === ScriptType.MOB
+    ) {
       await this.prisma.mobTriggers.upsert({
         where: {
           mobZoneId_mobId_triggerZoneId_triggerId: {
@@ -279,8 +300,8 @@ export class TriggersService {
         update: {},
       });
     } else if (
-      data.objectId &&
-      data.objectZoneId &&
+      data.objectId != null &&
+      data.objectZoneId != null &&
       data.attachType === ScriptType.OBJECT
     ) {
       await this.prisma.objectTriggers.upsert({

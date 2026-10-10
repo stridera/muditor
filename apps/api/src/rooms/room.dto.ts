@@ -461,8 +461,83 @@ export class CreateRoomExitInput {
   @IsEnum(ExitState)
   defaultState?: ExitState;
 
+  @Field(() => [ExitFlag], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(ExitFlag, { each: true })
+  flags?: ExitFlag[];
+
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsInt()
   hitPoints?: number;
+}
+
+/**
+ * Update an exit in place, addressed by its composite key
+ * (room zone, room id, direction).
+ *
+ * Every field is optional: omitted = leave unchanged, explicit null = clear
+ * (arrays reset to empty, defaultState resets to OPEN).
+ */
+@InputType()
+export class UpdateRoomExitInput {
+  @Field(() => Int)
+  @IsInt()
+  roomZoneId: number;
+
+  @Field(() => Int)
+  @IsInt()
+  roomId: number;
+
+  @Field(() => Direction)
+  @IsEnum(Direction)
+  direction: Direction;
+
+  @Field(() => String, { nullable: true })
+  @IsOptional()
+  @IsString()
+  description?: string | null;
+
+  @Field(() => [String], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsString({ each: true })
+  keywords?: string[] | null;
+
+  @Field(() => [ExitFlag], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @IsEnum(ExitFlag, { each: true })
+  flags?: ExitFlag[] | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  keyZoneId?: number | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  keyId?: number | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  toZoneId?: number | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  toRoomId?: number | null;
+
+  @Field(() => ExitState, { nullable: true })
+  @IsOptional()
+  @IsEnum(ExitState)
+  defaultState?: ExitState | null;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  hitPoints?: number | null;
 }

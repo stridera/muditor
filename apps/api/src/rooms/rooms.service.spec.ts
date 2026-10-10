@@ -1,5 +1,5 @@
-import { Sector } from '@muditor/db';
-import { ConflictException } from '@nestjs/common';
+import { Direction, ExitFlag, ExitState, Sector } from '@muditor/db';
+import { ConflictException, NotFoundException } from '@nestjs/common';
 import { Test, TestingModule } from '@nestjs/testing';
 import { DatabaseService } from '../database/database.service';
 import {
@@ -48,6 +48,10 @@ describe('RoomsService', () => {
       roomExits: {
         create: jest.fn(),
         delete: jest.fn(),
+      },
+      roomExit: {
+        create: jest.fn(),
+        update: jest.fn(),
       },
     } as unknown as jest.Mocked<DatabaseService>;
 
@@ -302,6 +306,96 @@ describe('RoomsService', () => {
         data: expect.any(Object),
         include: expect.any(Object),
       });
+    });
+  });
+
+  describe('exits', () => {
+    const exitDb = () =>
+      (databaseService as unknown as { roomExit: Record<string, jest.Mock> })
+        .roomExit;
+
+    it('createExit persists flags instead of forcing an empty list', async () => {
+      exitDb().create!.mockResolvedValue({ id: 1 });
+      await service.createExit({
+        roomZoneId: 30,
+        roomId: 1,
+        direction: Direction.NORTH,
+        flags: [ExitFlag.PICKPROOF],
+        defaultState: ExitState.LOCKED,
+        hitPoints: 40,
+      });
+      expect(exitDb().create).toHaveBeenCalledWith({
+        data: expect.objectContaining({
+          flags: [ExitFlag.PICKPROOF],
+          defaultState: ExitState.LOCKED,
+          hitPoints: 40,
+        }),
+      });
+    });
+
+    it('updateExit updates in place by composite key, never deleting', async () => {
+      exitDb().update!.mockResolvedValue({ id: 1 });
+      await service.updateExit({
+        roomZoneId: 30,
+        roomId: 1,
+        direction: Direction.NORTH,
+        flags: [ExitFlag.PICKPROOF],
+        defaultState: ExitState.LOCKED,
+        hitPoints: 40,
+      });
+      expect(exitDb().update).toHaveBeenCalledWith({
+        where: {
+          roomZoneId_roomId_direction: {
+            roomZoneId: 30,
+            roomId: 1,
+            direction: Direction.NORTH,
+          },
+        },
+        data: {
+          flags: [ExitFlag.PICKPROOF],
+          defaultState: ExitState.LOCKED,
+          hitPoints: 40,
+        },
+      });
+    });
+
+    it('updateExit leaves omitted fields alone and clears explicit nulls', async () => {
+      exitDb().update!.mockResolvedValue({ id: 1 });
+      await service.updateExit({
+        roomZoneId: 30,
+        roomId: 1,
+        direction: Direction.EAST,
+        keyZoneId: null,
+        keyId: null,
+        description: null,
+        keywords: null,
+        flags: null,
+        defaultState: null,
+        hitPoints: null,
+      });
+      const data = exitDb().update!.mock.calls[0]![0].data;
+      expect(data).toEqual({
+        keyZoneId: null,
+        keyId: null,
+        description: null,
+        keywords: [],
+        flags: [],
+        defaultState: 'OPEN',
+        hitPoints: null,
+      });
+      expect(data).not.toHaveProperty('toZoneId');
+      expect(data).not.toHaveProperty('toRoomId');
+    });
+
+    it('updateExit reports a missing exit as NotFound', async () => {
+      exitDb().update!.mockRejectedValue({ code: 'P2025' });
+      await expect(
+        service.updateExit({
+          roomZoneId: 30,
+          roomId: 1,
+          direction: Direction.UP,
+        })
+      ).rejects.toBeInstanceOf(NotFoundException);
     });
   });
 });

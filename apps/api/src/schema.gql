@@ -1125,6 +1125,7 @@ input CreateRoomExitInput {
   defaultState: ExitState = OPEN
   description: String
   direction: Direction!
+  flags: [ExitFlag!]
   hitPoints: Int
   keyId: Int
   keyZoneId: Int
@@ -2310,6 +2311,11 @@ type Mutation {
   updateReport(data: UpdateReportInput!, id: ID!): Report!
   updateRoom(data: UpdateRoomInput!, id: Int!, zoneId: Int!): RoomDto!
   updateRoomEnvironmentalEffects(effects: [RoomEnvironmentalEffectInput!]!, id: Int!, zoneId: Int!): RoomDto!
+
+  """
+  Update an exit in place by (roomZoneId, roomId, direction). Omitted fields are unchanged; null clears.
+  """
+  updateRoomExit(data: UpdateRoomExitInput!): RoomExitDto!
   updateRoomPosition(id: Int!, position: UpdateRoomPositionInput!, zoneId: Int!): RoomDto!
   updateShop(data: UpdateShopInput!, id: Int!, zoneId: Int!): ShopDto!
   updateShopInventory(data: UpdateShopInventoryInput!, id: Int!, zoneId: Int!): ShopDto!
@@ -4206,6 +4212,21 @@ input UpdateReportInput {
   resolution: String
   status: ReportStatus
   tags: [String!]
+}
+
+input UpdateRoomExitInput {
+  defaultState: ExitState
+  description: String
+  direction: Direction!
+  flags: [ExitFlag!]
+  hitPoints: Int
+  keyId: Int
+  keyZoneId: Int
+  keywords: [String!]
+  roomId: Int!
+  roomZoneId: Int!
+  toRoomId: Int
+  toZoneId: Int
 }
 
 input UpdateRoomInput {

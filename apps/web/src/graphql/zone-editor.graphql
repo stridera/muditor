@@ -209,6 +209,12 @@ mutation ZoneEditorCreateRoomExit($data: CreateRoomExitInput!) {
   }
 }
 
+mutation ZoneEditorUpdateRoomExit($data: UpdateRoomExitInput!) {
+  updateRoomExit(data: $data) {
+    ...ZoneEditorExit
+  }
+}
+
 mutation ZoneEditorDeleteRoomExit($exitId: Float!) {
   deleteRoomExit(exitId: $exitId) {
     id

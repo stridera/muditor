@@ -5,13 +5,15 @@ import { MobsService } from './mobs.service';
 describe('MobsService.deleteMany', () => {
   let service: MobsService;
   const mobs = { deleteMany: jest.fn() };
+  const characterPets = { groupBy: jest.fn().mockResolvedValue([]) };
 
   beforeEach(async () => {
     jest.clearAllMocks();
+    characterPets.groupBy.mockResolvedValue([]);
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         MobsService,
-        { provide: DatabaseService, useValue: { mobs } },
+        { provide: DatabaseService, useValue: { mobs, characterPets } },
       ],
     }).compile();
     service = module.get(MobsService);

@@ -293,9 +293,12 @@ function ObjectsContent() {
     try {
       await deleteObject({ variables: { id: obj.id, zoneId: obj.zoneId } });
       await refetch();
-    } catch {
+    } catch (err) {
       /* LoggingService.error('Error deleting object'); */
-      alert('Failed to delete object. Please try again.');
+      // Surface the API's reason (e.g. "3 player items still reference this object").
+      alert(
+        `Failed to delete object: ${err instanceof Error ? err.message : 'Please try again.'}`
+      );
     } finally {
       setDeletingId(null);
     }
