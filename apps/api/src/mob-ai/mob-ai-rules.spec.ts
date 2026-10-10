@@ -22,10 +22,22 @@ describe('validateConditions', () => {
       target_lifeforce: 'undead',
       align: 'Evil',
       telegraph: true,
+      cooldown_group: 'self_heal',
     };
     expect(Object.keys(all).sort()).toEqual(Object.keys(CONDITION_KEYS).sort());
     // align is stored canonical (trimmed, lowercase)
     expect(validateConditions(all)).toEqual({ ...all, align: 'evil' });
+  });
+
+  it('cooldown_group needs a non-empty string and is stored trimmed', () => {
+    expect(validateConditions({ cooldown_group: ' self_heal ' })).toEqual({
+      cooldown_group: 'self_heal',
+    });
+    for (const bad of ['', '   ', 3, true, null]) {
+      expect(() => validateConditions({ cooldown_group: bad })).toThrow(
+        BadRequestException
+      );
+    }
   });
 
   it('treats null, undefined and {} as no conditions', () => {

@@ -43,6 +43,22 @@ describe('mob AI conditions round-trip', () => {
     });
   });
 
+  it('cooldown group reads, writes, clears and summarises', () => {
+    const stored = { in_combat: true, cooldown_group: 'self_heal' };
+    const form = conditionsToForm(stored);
+    expect(form.cooldownGroup).toBe('self_heal');
+    expect(extraConditionKeys(stored)).toEqual([]);
+    expect(summarizeConditions(stored)).toContain('cooldown group self_heal');
+    // Untouched form round-trips; edits write and clear the key.
+    expect(applyConditionEdits(stored, form)).toEqual(stored);
+    expect(
+      applyConditionEdits(stored, { ...form, cooldownGroup: 'heals' })
+    ).toEqual({ in_combat: true, cooldown_group: 'heals' });
+    expect(
+      applyConditionEdits(stored, { ...form, cooldownGroup: undefined })
+    ).toEqual({ in_combat: true });
+  });
+
   it('clearing a field drops just that key', () => {
     const stored = { self_hp_below: 50, align: 'evil', phase: 1 };
     const form = { ...conditionsToForm(stored), align: undefined };

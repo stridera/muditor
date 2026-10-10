@@ -179,7 +179,23 @@ export function ConditionEditor({ value, onChange, disabled }: Props) {
           disabled={disabled}
           onSet={v => set({ allyHpBelow: v })}
         />
-        <div />
+        <div>
+          <Label htmlFor='cond-cooldown-group' className='text-xs'>
+            Cooldown group
+          </Label>
+          <Input
+            id='cond-cooldown-group'
+            placeholder='none'
+            maxLength={40}
+            value={form.cooldownGroup ?? ''}
+            disabled={disabled}
+            onChange={e => set({ cooldownGroup: e.target.value || undefined })}
+          />
+          <p className='text-xs text-muted-foreground mt-1'>
+            Rules sharing a group share one cooldown (several heals that should
+            fire once per cooldown, not one after another).
+          </p>
+        </div>
         <div>
           <Label htmlFor='cond-lifeforce' className='text-xs'>
             Target life force

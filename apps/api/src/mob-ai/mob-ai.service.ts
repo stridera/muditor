@@ -31,6 +31,21 @@ function jsonOrNull(
   return v === null ? Prisma.DbNull : (v as Prisma.InputJsonValue);
 }
 
+/** Key-order-insensitive JSON equality (jsonb does not keep key order). */
+function jsonEqual(a: unknown, b: unknown): boolean {
+  const norm = (v: unknown): unknown =>
+    Array.isArray(v)
+      ? v.map(norm)
+      : v && typeof v === 'object'
+        ? Object.fromEntries(
+            Object.entries(v as Record<string, unknown>)
+              .sort(([x], [y]) => (x < y ? -1 : x > y ? 1 : 0))
+              .map(([k, x]) => [k, norm(x)])
+          )
+        : v;
+  return JSON.stringify(norm(a ?? null)) === JSON.stringify(norm(b ?? null));
+}
+
 function isUniqueViolation(e: unknown): boolean {
   return (
     typeof e === 'object' &&
@@ -164,53 +179,68 @@ export class MobAiService {
     const current = await this.db.classAiRules.findUnique({ where: { id } });
     if (!current) throw new NotFoundException(`Class AI rule ${id} not found`);
 
+    // Only fields whose value actually differs are written: saving the edit
+    // form unchanged must not hand a seed-owned row to the builder.
     const patch: Prisma.ClassAiRulesUncheckedUpdateInput = {};
     if (data.abilityId != null && data.abilityId !== current.abilityId) {
       await this.assertAbility(data.abilityId);
       patch.abilityId = data.abilityId;
     }
     if (data.priority != null) {
-      patch.priority = assertIntInRange(
+      const priority = assertIntInRange(
         'priority',
         data.priority,
         RULE_LIMITS.priority
       );
+      if (priority !== current.priority) patch.priority = priority;
     }
     if (data.chancePct != null) {
-      patch.chancePct = assertIntInRange(
+      const chancePct = assertIntInRange(
         'chancePct',
         data.chancePct,
         RULE_LIMITS.chancePct
       );
+      if (chancePct !== current.chancePct) patch.chancePct = chancePct;
     }
     if (data.cooldownS != null) {
-      patch.cooldownS = assertIntInRange(
+      const cooldownS = assertIntInRange(
         'cooldownS',
         data.cooldownS,
         RULE_LIMITS.cooldownS
       );
+      if (cooldownS !== current.cooldownS) patch.cooldownS = cooldownS;
     }
     if (data.conditions !== undefined) {
       // Keys already on the rule are kept even if this API does not know them.
-      patch.conditions = jsonOrNull(
-        validateConditions(
-          data.conditions,
-          storedConditionKeys(current.conditions)
-        )
+      const conditions = validateConditions(
+        data.conditions,
+        storedConditionKeys(current.conditions)
       );
+      if (!jsonEqual(conditions, current.conditions)) {
+        patch.conditions = jsonOrNull(conditions);
+      }
     }
-    if (data.target != null) patch.target = normalizeTarget(data.target);
+    if (data.target != null) {
+      const target = normalizeTarget(data.target);
+      // Seeded rows store the selector lowercase: same selector, no change.
+      if (target !== canonicalTargetOrRaw(current.target)) {
+        patch.target = target;
+      }
+    }
     if (data.minLevel !== undefined) {
-      patch.minLevel =
+      const minLevel =
         data.minLevel === null
           ? null
           : assertIntInRange('minLevel', data.minLevel, RULE_LIMITS.minLevel);
+      if (minLevel !== current.minLevel) patch.minLevel = minLevel;
     }
     // A content edit hands the row to the builder: clearing seedHash tells the
     // fierylib seeder never to overwrite it again. Toggling `enabled` alone
     // keeps the row seed-owned (enabled is not part of the hash).
     if (Object.keys(patch).length > 0) patch.seedHash = null;
-    if (data.enabled != null) patch.enabled = data.enabled;
+    if (data.enabled != null && data.enabled !== current.enabled) {
+      patch.enabled = data.enabled;
+    }
 
     try {
       const updated = await this.db.classAiRules.update({
@@ -231,9 +261,18 @@ export class MobAiService {
   async deleteClassRule(id: number): Promise<void> {
     const found = await this.db.classAiRules.findUnique({
       where: { id },
-      select: { id: true },
+      select: { id: true, seedKey: true },
     });
     if (!found) throw new NotFoundException(`Class AI rule ${id} not found`);
+    if (found.seedKey != null) {
+      // A seed-owned rule would simply be re-created by the next seed run, so
+      // switch it off and hand it to the builder (no hash = never overwritten).
+      await this.db.classAiRules.update({
+        where: { id },
+        data: { enabled: false, seedHash: null },
+      });
+      return;
+    }
     await this.db.classAiRules.delete({ where: { id } });
   }
 

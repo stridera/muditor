@@ -16,6 +16,7 @@ type ClassRule = {
   minLevel: number | null;
   enabled: boolean;
   seedHash?: string | null;
+  seedKey?: string | null;
 };
 type MobRule = {
   id: number;
@@ -362,6 +363,63 @@ describe('MobAiService class rules', () => {
     expect(cls[1]).toMatchObject({ enabled: false, seedHash: 'def' });
   });
 
+  it('saving the form unchanged keeps the row seed-owned', async () => {
+    const stored = classRule({
+      seedHash: 'abc',
+      seedKey: 'Cleric/cleric:HEAL',
+      chancePct: 60,
+      cooldownS: 12,
+      priority: 10,
+      minLevel: 5,
+      target: 'weakest_attacker',
+      conditions: { self_hp_below: 60, in_combat: true },
+    });
+    const { db, cls, raw } = makeDb({ cls: [stored] });
+    const svc = new MobAiService(db);
+    // What the edit form sends back untouched (target upper-cased, key order differs).
+    await svc.updateClassRule(1, {
+      abilityId: 5,
+      priority: 10,
+      chancePct: 60,
+      cooldownS: 12,
+      minLevel: 5,
+      target: MobAiTarget.WEAKEST_ATTACKER,
+      conditions: { in_combat: true, self_hp_below: 60 },
+      enabled: true,
+    });
+    expect(raw.classAiRules.update).toHaveBeenCalledWith(
+      expect.objectContaining({ data: {} })
+    );
+    expect(cls[0]).toMatchObject({
+      seedHash: 'abc',
+      target: 'weakest_attacker',
+    });
+  });
+
+  it('writes only the fields that differ; enabled alone keeps the hash', async () => {
+    const { db, cls, raw } = makeDb({
+      cls: [classRule({ seedHash: 'abc', chancePct: 60, cooldownS: 12 })],
+    });
+    const svc = new MobAiService(db);
+    await svc.updateClassRule(1, {
+      chancePct: 60,
+      cooldownS: 30,
+      enabled: false,
+    });
+    expect(raw.classAiRules.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        data: { cooldownS: 30, seedHash: null, enabled: false },
+      })
+    );
+    expect(cls[0]).toMatchObject({ cooldownS: 30, seedHash: null });
+    const again = makeDb({ cls: [classRule({ seedHash: 'abc' })] });
+    await new MobAiService(again.db).updateClassRule(1, { enabled: false });
+    expect(again.raw.classAiRules.update).toHaveBeenLastCalledWith(
+      expect.objectContaining({ data: { enabled: false } })
+    );
+    expect(again.cls[0]!.seedHash).toBe('abc');
+  });
+
   it('maps a unique-index violation to a clear error', async () => {
     const { db, raw } = makeDb({ cls: [classRule()] });
     raw.classAiRules.update.mockRejectedValueOnce(
@@ -399,6 +457,24 @@ describe('MobAiService class rules', () => {
     await expect(svc.deleteClassRule(9)).rejects.toBeInstanceOf(
       NotFoundException
     );
+  });
+
+  it('deleting a seed-owned rule disables it and hands it to the builder', async () => {
+    const { db, cls, raw } = makeDb({
+      cls: [
+        classRule({ id: 1, seedKey: 'Cleric/cleric:HEAL', seedHash: 'abc' }),
+        classRule({ id: 2, priority: 20, seedKey: null }),
+      ],
+    });
+    const svc = new MobAiService(db);
+    await svc.deleteClassRule(1);
+    expect(raw.classAiRules.delete).not.toHaveBeenCalled();
+    expect(cls).toHaveLength(2);
+    expect(cls[0]).toMatchObject({ enabled: false, seedHash: null });
+    // A builder-created rule is really deleted.
+    await svc.deleteClassRule(2);
+    expect(raw.classAiRules.delete).toHaveBeenCalledTimes(1);
+    expect(cls.map(r => r.id)).toEqual([1]);
   });
 
   it('reorder renumbers 10, 20, 30 via negative parking priorities', async () => {

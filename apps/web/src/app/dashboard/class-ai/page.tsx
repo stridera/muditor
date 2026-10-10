@@ -170,7 +170,9 @@ function ClassAiContent() {
     if (!deleting) return;
     try {
       await deleteRule({ variables: { id: deleting.id } });
-      ok('Rule deleted');
+      ok(
+        'Rule removed (rules from the built-in seed are disabled, not deleted)'
+      );
       await refetch();
     } catch (e) {
       fail(e);
@@ -282,6 +284,10 @@ function ClassAiContent() {
               {deleting?.abilityName} will no longer be used by{' '}
               {selected?.plainName ?? 'this class'} mobs after the next game
               restart.
+              <br />
+              Rules that came from the built-in seed are disabled instead of
+              deleted, because the next seed would only bring them back. They
+              stay in the list, switched off, and you can enable them again.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

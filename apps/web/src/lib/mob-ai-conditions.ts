@@ -67,6 +67,7 @@ export interface ConditionForm {
   targetHasBuff: boolean;
   selfHasDebuff: boolean;
   telegraph: boolean;
+  cooldownGroup: string | undefined;
   targetLifeforce: string | undefined;
   align: string | undefined;
 }
@@ -81,6 +82,7 @@ export const EMPTY_FORM: ConditionForm = {
   targetHasBuff: false,
   selfHasDebuff: false,
   telegraph: false,
+  cooldownGroup: undefined,
   targetLifeforce: undefined,
   align: undefined,
 };
@@ -97,6 +99,7 @@ export const KNOWN_CONDITION_KEYS = [
   'target_has_buff',
   'self_has_debuff',
   'telegraph',
+  'cooldown_group',
   'target_lifeforce',
   'align',
 ] as const;
@@ -140,6 +143,10 @@ export function conditionsToForm(value: unknown): ConditionForm {
     targetHasBuff: c.target_has_buff === true,
     selfHasDebuff: c.self_has_debuff === true,
     telegraph: c.telegraph === true,
+    cooldownGroup:
+      typeof c.cooldown_group === 'string' && c.cooldown_group.trim() !== ''
+        ? c.cooldown_group.trim()
+        : undefined,
     targetLifeforce:
       typeof c.target_lifeforce === 'string'
         ? c.target_lifeforce.toUpperCase()
@@ -198,6 +205,8 @@ export function applyConditionEdits(
   if (!same(was, next, 'selfHasDebuff'))
     setOrDrop('self_has_debuff', next.selfHasDebuff);
   if (!same(was, next, 'telegraph')) setOrDrop('telegraph', next.telegraph);
+  if (!same(was, next, 'cooldownGroup'))
+    setOrDrop('cooldown_group', next.cooldownGroup?.trim() || undefined);
   if (!same(was, next, 'targetLifeforce'))
     setOrDrop('target_lifeforce', next.targetLifeforce);
   if (!same(was, next, 'align')) setOrDrop('align', next.align);
@@ -234,6 +243,7 @@ export function summarizeConditions(value: unknown): string {
   if (form.targetHasBuff) parts.push('target buffed');
   if (form.selfHasDebuff) parts.push('self debuffed');
   if (form.telegraph) parts.push('telegraphed');
+  if (form.cooldownGroup) parts.push(`cooldown group ${form.cooldownGroup}`);
   if (form.targetLifeforce) parts.push(`target ${form.targetLifeforce}`);
   if (form.align) parts.push(`${form.align} alignment`);
   const extras = extraConditionKeys(c);

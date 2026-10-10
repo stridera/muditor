@@ -35,7 +35,8 @@ export type ConditionKind =
   | 'percent' // integer 0..100
   | 'count' // integer >= 1, or true (= 2), or false (no constraint)
   | 'lifeforce'
-  | 'align';
+  | 'align'
+  | 'group'; // non-empty cooldown group name
 
 /** Null-prototype so `constructor` / `__proto__` are never "known" keys. */
 export const CONDITION_KEYS: Record<string, ConditionKind> = Object.assign(
@@ -53,6 +54,7 @@ export const CONDITION_KEYS: Record<string, ConditionKind> = Object.assign(
     target_lifeforce: 'lifeforce',
     align: 'align',
     telegraph: 'flag',
+    cooldown_group: 'group',
   }
 );
 
@@ -157,6 +159,11 @@ function checkValue(key: string, kind: ConditionKind, value: unknown): void {
         bad(`must be one of ${AI_LIFEFORCES.join(', ')}`);
       }
       return;
+    case 'group':
+      if (typeof value !== 'string' || value.trim() === '') {
+        bad('must be a non-empty group name');
+      }
+      return;
     case 'align':
       if (
         typeof value !== 'string' ||
@@ -211,7 +218,11 @@ export function validateConditions(
   return Object.fromEntries(
     entries.map(([k, v]) => [
       k,
-      k === 'align' && typeof v === 'string' ? v.trim().toLowerCase() : v,
+      k === 'align' && typeof v === 'string'
+        ? v.trim().toLowerCase()
+        : k === 'cooldown_group' && typeof v === 'string'
+          ? v.trim()
+          : v,
     ])
   );
 }
