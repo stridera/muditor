@@ -1302,6 +1302,8 @@ model RaceAbilities {
   /// Optional stat (STR/DEX/CON/INT/WIS/CHA) whose legacy "small skill bonus" is subtracted from cooldownHours
   /// (Arborean barkskin: 20 - CON bonus). Null = fixed cooldown.
   cooldownStat   String?       @map("cooldown_stat")
+  /// Refusal text while on cooldown: "You're too tired right now. You can <cooldownPhrase> again in N seconds."
+  cooldownPhrase String?       @map("cooldown_phrase")
   raceData       Races         @relation(fields: [race], references: [race], onDelete: Cascade)
   ability        Ability       @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
