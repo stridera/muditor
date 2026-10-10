@@ -11,6 +11,7 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import {
   Aperture,
   Box,
+  Brain,
   ChevronLeft,
   ChevronRight,
   Clipboard,
@@ -281,6 +282,11 @@ export function Sidebar() {
       name: 'Abilities',
       href: '/dashboard/abilities',
       icon: <Sparkles className='h-4 w-4' />,
+    },
+    {
+      name: 'Class AI',
+      href: '/dashboard/class-ai',
+      icon: <Brain className='h-4 w-4' />,
     },
   ];
 

@@ -266,6 +266,9 @@ export function Breadcrumb({ items: customItems }: BreadcrumbProps) {
       } else if (pathname.startsWith('/dashboard/abilities')) {
         breadcrumbs.push({ label: 'Game Systems', href: '/dashboard' });
         breadcrumbs.push({ label: 'Abilities', href: '/dashboard/abilities' });
+      } else if (pathname.startsWith('/dashboard/class-ai')) {
+        breadcrumbs.push({ label: 'Game Systems', href: '/dashboard' });
+        breadcrumbs.push({ label: 'Class AI', href: '/dashboard/class-ai' });
       }
       // Player character pages
       else if (pathname.startsWith('/dashboard/player/characters')) {

@@ -219,6 +219,13 @@ export type AdminUserAccountCharacter = {
   name: Scalars['String']['output'];
 };
 
+export type AiRuleAbilityDto = {
+  __typename?: 'AiRuleAbilityDto';
+  abilityType: Scalars['String']['output'];
+  id: Scalars['Int']['output'];
+  name: Scalars['String']['output'];
+};
+
 export type Alignment =
   | 'EVIL'
   | 'GOOD'
@@ -537,6 +544,24 @@ export type CircleSpellDto = {
   spellName: Scalars['String']['output'];
 };
 
+/** One AI rule shared by every mob of a class */
+export type ClassAiRuleDto = {
+  __typename?: 'ClassAiRuleDto';
+  ability: AiRuleAbilityDto;
+  abilityId: Scalars['Int']['output'];
+  chancePct: Scalars['Int']['output'];
+  classId: Scalars['Int']['output'];
+  conditions?: Maybe<Scalars['JSON']['output']>;
+  cooldownS: Scalars['Int']['output'];
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['Int']['output'];
+  minLevel?: Maybe<Scalars['Int']['output']>;
+  /** Lower runs first */
+  priority: Scalars['Int']['output'];
+  /** Raw stored selector (see MobAiTarget) */
+  target: Scalars['String']['output'];
+};
+
 export type ClassCircleDto = {
   __typename?: 'ClassCircleDto';
   circle: Scalars['Int']['output'];
@@ -793,6 +818,19 @@ export type CreateCharacterItemInput = {
   objectZoneId: Scalars['Int']['input'];
 };
 
+export type CreateClassAiRuleInput = {
+  abilityId: Scalars['Int']['input'];
+  chancePct?: Scalars['Int']['input'];
+  classId: Scalars['Int']['input'];
+  conditions?: InputMaybe<Scalars['JSON']['input']>;
+  cooldownS?: Scalars['Int']['input'];
+  enabled?: Scalars['Boolean']['input'];
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  /** Defaults to after the last rule of the class */
+  priority?: InputMaybe<Scalars['Int']['input']>;
+  target?: MobAiTarget;
+};
+
 export type CreateClassCircleInput = {
   circle: Scalars['Int']['input'];
   classId: Scalars['Int']['input'];
@@ -896,6 +934,7 @@ export type CreateMobInput = {
   activityRestrictions?: InputMaybe<Scalars['String']['input']>;
   /** Lua formula for aggression targeting */
   aggressionFormula?: InputMaybe<Scalars['String']['input']>;
+  aiMode?: MobAiMode;
   alignment?: Scalars['Int']['input'];
   armorRating?: Scalars['Int']['input'];
   attackPower?: Scalars['Int']['input'];
@@ -1747,6 +1786,41 @@ export type LoginStage =
   | 'TOO_MANY_ATTEMPTS'
   | 'WELCOME_BANNER';
 
+/** Where a mob takes its spell/skill AI from: its class rules, its own rules, or none */
+export type MobAiMode =
+  | 'CLASS'
+  | 'CUSTOM'
+  | 'NONE';
+
+/** One AI rule of a single mob (MobAbilities row) */
+export type MobAiRuleDto = {
+  __typename?: 'MobAiRuleDto';
+  ability: AiRuleAbilityDto;
+  abilityId: Scalars['Int']['output'];
+  chancePct: Scalars['Int']['output'];
+  conditions?: Maybe<Scalars['JSON']['output']>;
+  cooldownS: Scalars['Int']['output'];
+  /** MobAbilities.known; the runtime skips disabled rows */
+  enabled: Scalars['Boolean']['output'];
+  id: Scalars['Int']['output'];
+  mobId: Scalars['Int']['output'];
+  mobZoneId: Scalars['Int']['output'];
+  /** Lower runs first */
+  priority: Scalars['Int']['output'];
+  /** Raw stored selector; null means AUTO */
+  target?: Maybe<Scalars['String']['output']>;
+};
+
+export type MobAiTarget =
+  | 'AUTO'
+  | 'CASTER'
+  | 'LOWEST_ALLY'
+  | 'MOST_BUFFED'
+  | 'ROOM'
+  | 'SELF'
+  | 'TANK'
+  | 'WEAKEST_ATTACKER';
+
 export type MobBehavior =
   | 'AWARE'
   | 'FAST_TRACK'
@@ -1804,6 +1878,7 @@ export type MobDto = {
   activityRestrictions?: Maybe<Scalars['String']['output']>;
   /** Lua formula for aggression targeting */
   aggressionFormula?: Maybe<Scalars['String']['output']>;
+  aiMode: MobAiMode;
   alignment: Scalars['Int']['output'];
   armorRating: Scalars['Int']['output'];
   attackPower: Scalars['Int']['output'];
@@ -1970,6 +2045,7 @@ export type Mutation = {
   createCharacterEffect: CharacterEffectDto;
   createCharacterItem: CharacterItemDto;
   createClass: ClassDto;
+  createClassAiRule: ClassAiRuleDto;
   createClassCircle: ClassCircleDto;
   /** Create a creation recipe */
   createCreationRecipe: CreationRecipeDto;
@@ -2023,6 +2099,7 @@ export type Mutation = {
   deleteCharacterEffect: Scalars['Boolean']['output'];
   deleteCharacterItem: Scalars['Boolean']['output'];
   deleteClass: Scalars['Boolean']['output'];
+  deleteClassAiRule: Scalars['Boolean']['output'];
   /** Delete a creation recipe */
   deleteCreationRecipe: Scalars['Boolean']['output'];
   deleteDialogueNode: DialogueNodeDto;
@@ -2037,6 +2114,7 @@ export type Mutation = {
   /** Delete a login message */
   deleteLoginMessage: Scalars['Boolean']['output'];
   deleteMob: MobDto;
+  deleteMobAiRule: Scalars['Boolean']['output'];
   deleteMobReset: Scalars['Boolean']['output'];
   deleteMobResetEquipment: Scalars['Boolean']['output'];
   deleteMobs: Scalars['Int']['output'];
@@ -2092,6 +2170,10 @@ export type Mutation = {
   /** Remove expired effects for a character or all characters */
   removeExpiredEffects: Scalars['Int']['output'];
   removeRaceSkill: Scalars['Boolean']['output'];
+  /** Renumber the class rules to follow ruleIds, which must list every rule of the class once */
+  reorderClassAiRules: Array<ClassAiRuleDto>;
+  /** Renumber the mob rules to follow abilityIds, which must list every rule of the mob once */
+  reorderMobAiRules: Array<MobAiRuleDto>;
   /** Set the phase order: phaseIds lists every phase of the quest once, in the new order */
   reorderQuestPhases: Array<QuestPhaseDto>;
   requestPasswordReset: PasswordResetResponse;
@@ -2099,6 +2181,8 @@ export type Mutation = {
   /** Revoke zone access from a user */
   revokeZoneAccess: Scalars['Boolean']['output'];
   rollCharacterStats: StatRollDto;
+  /** Create or update the rule for one ability on a mob; omitted fields are left alone */
+  saveMobAiRule: MobAiRuleDto;
   /** Send a chat message in-game as a linked character */
   sendGameChat: CommandResultType;
   setCharacterOffline: Scalars['Boolean']['output'];
@@ -2120,6 +2204,7 @@ export type Mutation = {
   updateCharacterEffect: CharacterEffectDto;
   updateCharacterItem: CharacterItemDto;
   updateClass: ClassDto;
+  updateClassAiRule: ClassAiRuleDto;
   updateClassCircle: ClassCircleDto;
   updateClassSkill: ClassSkillDto;
   updateConsumableEffects: ObjectDto;
@@ -2318,6 +2403,11 @@ export type MutationCreateCharacterItemArgs = {
 
 export type MutationCreateClassArgs = {
   data: CreateClassInput;
+};
+
+
+export type MutationCreateClassAiRuleArgs = {
+  data: CreateClassAiRuleInput;
 };
 
 
@@ -2534,6 +2624,11 @@ export type MutationDeleteClassArgs = {
 };
 
 
+export type MutationDeleteClassAiRuleArgs = {
+  id: Scalars['Int']['input'];
+};
+
+
 export type MutationDeleteCreationRecipeArgs = {
   id: Scalars['ID']['input'];
 };
@@ -2581,6 +2676,13 @@ export type MutationDeleteLoginMessageArgs = {
 
 export type MutationDeleteMobArgs = {
   id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+
+export type MutationDeleteMobAiRuleArgs = {
+  abilityId: Scalars['Int']['input'];
+  mobId: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 };
 
@@ -2808,6 +2910,19 @@ export type MutationRemoveRaceSkillArgs = {
 };
 
 
+export type MutationReorderClassAiRulesArgs = {
+  classId: Scalars['Int']['input'];
+  ruleIds: Array<Scalars['Int']['input']>;
+};
+
+
+export type MutationReorderMobAiRulesArgs = {
+  abilityIds: Array<Scalars['Int']['input']>;
+  mobId: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+
 export type MutationReorderQuestPhasesArgs = {
   phaseIds: Array<Scalars['Int']['input']>;
   questId: Scalars['Int']['input'];
@@ -2828,6 +2943,13 @@ export type MutationResetPasswordArgs = {
 export type MutationRevokeZoneAccessArgs = {
   userId: Scalars['String']['input'];
   zoneId: Scalars['Float']['input'];
+};
+
+
+export type MutationSaveMobAiRuleArgs = {
+  data: SaveMobAiRuleInput;
+  mobId: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
 };
 
 
@@ -2927,6 +3049,12 @@ export type MutationUpdateCharacterItemArgs = {
 export type MutationUpdateClassArgs = {
   data: UpdateClassInput;
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateClassAiRuleArgs = {
+  data: UpdateClassAiRuleInput;
+  id: Scalars['Int']['input'];
 };
 
 
@@ -3509,6 +3637,8 @@ export type Query = {
   characters: Array<CharacterDto>;
   charactersCount: Scalars['Int']['output'];
   class: ClassDto;
+  /** AI rules of a class in priority order */
+  classAiRules: Array<ClassAiRuleDto>;
   classByName?: Maybe<ClassDto>;
   /** Get all spell circles for a class */
   classCirclesList: Array<ClassCircleDto>;
@@ -3582,6 +3712,8 @@ export type Query = {
   loginMessagesByStage: Array<LoginMessageDto>;
   me: User;
   mob: MobDto;
+  /** A mob's own AI rules in priority order */
+  mobAiRules: Array<MobAiRuleDto>;
   mobCombatDefaults: MobCombatDefaultsDto;
   mobReset?: Maybe<MobResetDto>;
   mobResets: Array<MobResetDto>;
@@ -3825,6 +3957,11 @@ export type QueryClassArgs = {
 };
 
 
+export type QueryClassAiRulesArgs = {
+  classId: Scalars['Int']['input'];
+};
+
+
 export type QueryClassByNameArgs = {
   name: Scalars['String']['input'];
 };
@@ -3952,6 +4089,12 @@ export type QueryLoginMessagesByStageArgs = {
 
 export type QueryMobArgs = {
   id: Scalars['Int']['input'];
+  zoneId: Scalars['Int']['input'];
+};
+
+
+export type QueryMobAiRulesArgs = {
+  mobId: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
 };
 
@@ -4667,6 +4810,17 @@ export type RoomSummaryDto = {
   zoneId: Scalars['Int']['output'];
 };
 
+/** Create or update the rule for one ability on a mob (one rule per mob and ability). On update omitted fields are left alone. */
+export type SaveMobAiRuleInput = {
+  abilityId: Scalars['Int']['input'];
+  chancePct?: InputMaybe<Scalars['Int']['input']>;
+  conditions?: InputMaybe<Scalars['JSON']['input']>;
+  cooldownS?: InputMaybe<Scalars['Int']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  priority?: InputMaybe<Scalars['Int']['input']>;
+  target?: InputMaybe<MobAiTarget>;
+};
+
 export type SaveType =
   | 'FORTITUDE'
   | 'REFLEX'
@@ -5168,6 +5322,18 @@ export type UpdateCharacterItemInput = {
   instanceFlags?: InputMaybe<Array<Scalars['String']['input']>>;
 };
 
+/** Partial update; omitted fields are left alone. conditions replaces the stored object, so send the full merged object (unknown keys the rule already has are accepted). */
+export type UpdateClassAiRuleInput = {
+  abilityId?: InputMaybe<Scalars['Int']['input']>;
+  chancePct?: InputMaybe<Scalars['Int']['input']>;
+  conditions?: InputMaybe<Scalars['JSON']['input']>;
+  cooldownS?: InputMaybe<Scalars['Int']['input']>;
+  enabled?: InputMaybe<Scalars['Boolean']['input']>;
+  minLevel?: InputMaybe<Scalars['Int']['input']>;
+  priority?: InputMaybe<Scalars['Int']['input']>;
+  target?: InputMaybe<MobAiTarget>;
+};
+
 export type UpdateClassCircleInput = {
   circle?: InputMaybe<Scalars['Int']['input']>;
   minLevel?: InputMaybe<Scalars['Int']['input']>;
@@ -5305,6 +5471,7 @@ export type UpdateMobInput = {
   activityRestrictions?: InputMaybe<Scalars['String']['input']>;
   /** Lua formula for aggression targeting */
   aggressionFormula?: InputMaybe<Scalars['String']['input']>;
+  aiMode?: InputMaybe<MobAiMode>;
   alignment?: InputMaybe<Scalars['Int']['input']>;
   armorRating?: InputMaybe<Scalars['Int']['input']>;
   attackPower?: InputMaybe<Scalars['Int']['input']>;
@@ -6960,6 +7127,86 @@ export type DeleteZoneGrantMutationVariables = Exact<{
 
 export type DeleteZoneGrantMutation = { __typename?: 'Mutation', deleteGrant: boolean };
 
+export type GetClassAiRulesQueryVariables = Exact<{
+  classId: Scalars['Int']['input'];
+}>;
+
+
+export type GetClassAiRulesQuery = { __typename?: 'Query', classAiRules: Array<{ __typename?: 'ClassAiRuleDto', id: number, classId: number, abilityId: number, priority: number, chancePct: number, cooldownS: number, conditions?: any | null, target: string, minLevel?: number | null, enabled: boolean, ability: { __typename?: 'AiRuleAbilityDto', id: number, name: string, abilityType: string } }> };
+
+export type CreateClassAiRuleMutationVariables = Exact<{
+  data: CreateClassAiRuleInput;
+}>;
+
+
+export type CreateClassAiRuleMutation = { __typename?: 'Mutation', createClassAiRule: { __typename?: 'ClassAiRuleDto', id: number } };
+
+export type UpdateClassAiRuleMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+  data: UpdateClassAiRuleInput;
+}>;
+
+
+export type UpdateClassAiRuleMutation = { __typename?: 'Mutation', updateClassAiRule: { __typename?: 'ClassAiRuleDto', id: number } };
+
+export type DeleteClassAiRuleMutationVariables = Exact<{
+  id: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteClassAiRuleMutation = { __typename?: 'Mutation', deleteClassAiRule: boolean };
+
+export type ReorderClassAiRulesMutationVariables = Exact<{
+  classId: Scalars['Int']['input'];
+  ruleIds: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+}>;
+
+
+export type ReorderClassAiRulesMutation = { __typename?: 'Mutation', reorderClassAiRules: Array<{ __typename?: 'ClassAiRuleDto', id: number, priority: number }> };
+
+export type GetMobAiRulesQueryVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  mobId: Scalars['Int']['input'];
+}>;
+
+
+export type GetMobAiRulesQuery = { __typename?: 'Query', mobAiRules: Array<{ __typename?: 'MobAiRuleDto', id: number, abilityId: number, priority: number, chancePct: number, cooldownS: number, conditions?: any | null, target?: string | null, enabled: boolean, ability: { __typename?: 'AiRuleAbilityDto', id: number, name: string, abilityType: string } }> };
+
+export type SaveMobAiRuleMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  mobId: Scalars['Int']['input'];
+  data: SaveMobAiRuleInput;
+}>;
+
+
+export type SaveMobAiRuleMutation = { __typename?: 'Mutation', saveMobAiRule: { __typename?: 'MobAiRuleDto', id: number } };
+
+export type DeleteMobAiRuleMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  mobId: Scalars['Int']['input'];
+  abilityId: Scalars['Int']['input'];
+}>;
+
+
+export type DeleteMobAiRuleMutation = { __typename?: 'Mutation', deleteMobAiRule: boolean };
+
+export type ReorderMobAiRulesMutationVariables = Exact<{
+  zoneId: Scalars['Int']['input'];
+  mobId: Scalars['Int']['input'];
+  abilityIds: Array<Scalars['Int']['input']> | Scalars['Int']['input'];
+}>;
+
+
+export type ReorderMobAiRulesMutation = { __typename?: 'Mutation', reorderMobAiRules: Array<{ __typename?: 'MobAiRuleDto', id: number, priority: number }> };
+
+export type SearchAbilitiesForAiQueryVariables = Exact<{
+  search?: InputMaybe<Scalars['String']['input']>;
+  take?: InputMaybe<Scalars['Int']['input']>;
+}>;
+
+
+export type SearchAbilitiesForAiQuery = { __typename?: 'Query', abilities: Array<{ __typename?: 'Ability', id: string, name: string, abilityType: string }> };
+
 export type UpdateMobMutationVariables = Exact<{
   zoneId: Scalars['Int']['input'];
   id: Scalars['Int']['input'];
@@ -7209,7 +7456,7 @@ export type GetMobQueryVariables = Exact<{
 }>;
 
 
-export type GetMobQuery = { __typename?: 'Query', mob: { __typename?: 'MobDto', id: number, zoneId: number, keywords: Array<string>, name: string, roomDescription: string, examineDescription: string, level: number, role: MobRole, alignment: number, accuracy: number, attackPower: number, spellPower: number, penetrationFlat: number, penetrationPercent: number, evasion: number, armorRating: number, damageReductionPercent: number, soak: number, hardness: number, wardPercent: number, resistanceFire: number, resistanceCold: number, resistanceLightning: number, resistanceAcid: number, resistancePoison: number, hpDice: string, damageDice: string, damageType: DamageType, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, perception: number, concealment: number, wealth?: number | null, race: Race, gender: Gender, size: Size, lifeForce: LifeForce, composition: Composition, traits: Array<MobTrait>, behaviors: Array<MobBehavior>, professions: Array<MobProfession>, aggressionFormula?: string | null, activityRestrictions?: string | null, riderPresenceMessage?: string | null, defaultPosition: Position, movementMode: MovementMode, defaultMovementMode: MovementMode, createdAt: any, updatedAt: any, defaultEffects: Array<{ __typename?: 'MobDefaultEffectDto', id: number, effectId: number, strength: number, modifierData: any, effect: { __typename?: 'Effect', id: string, name: string, effectType: string } }> } };
+export type GetMobQuery = { __typename?: 'Query', mob: { __typename?: 'MobDto', id: number, zoneId: number, keywords: Array<string>, name: string, roomDescription: string, examineDescription: string, level: number, role: MobRole, aiMode: MobAiMode, classId?: number | null, alignment: number, accuracy: number, attackPower: number, spellPower: number, penetrationFlat: number, penetrationPercent: number, evasion: number, armorRating: number, damageReductionPercent: number, soak: number, hardness: number, wardPercent: number, resistanceFire: number, resistanceCold: number, resistanceLightning: number, resistanceAcid: number, resistancePoison: number, hpDice: string, damageDice: string, damageType: DamageType, strength: number, intelligence: number, wisdom: number, dexterity: number, constitution: number, charisma: number, perception: number, concealment: number, wealth?: number | null, race: Race, gender: Gender, size: Size, lifeForce: LifeForce, composition: Composition, traits: Array<MobTrait>, behaviors: Array<MobBehavior>, professions: Array<MobProfession>, aggressionFormula?: string | null, activityRestrictions?: string | null, riderPresenceMessage?: string | null, defaultPosition: Position, movementMode: MovementMode, defaultMovementMode: MovementMode, createdAt: any, updatedAt: any, defaultEffects: Array<{ __typename?: 'MobDefaultEffectDto', id: number, effectId: number, strength: number, modifierData: any, effect: { __typename?: 'Effect', id: string, name: string, effectType: string } }> } };
 
 export type GetMobsQueryVariables = Exact<{
   skip?: InputMaybe<Scalars['Int']['input']>;
@@ -8301,6 +8548,16 @@ export const GrantsAdminUsersDocument = {"kind":"Document","definitions":[{"kind
 export const GrantsAdminZoneGrantsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GrantsAdminZoneGrants"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"grants"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"resourceType"},"value":{"kind":"EnumValue","value":"ZONE"}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"resourceId"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}},{"kind":"Field","name":{"kind":"Name","value":"displayName"}},{"kind":"Field","name":{"kind":"Name","value":"grantedByDisplayName"}},{"kind":"Field","name":{"kind":"Name","value":"grantedAt"}},{"kind":"Field","name":{"kind":"Name","value":"expiresAt"}},{"kind":"Field","name":{"kind":"Name","value":"notes"}}]}}]}}]} as unknown as DocumentNode<GrantsAdminZoneGrantsQuery, GrantsAdminZoneGrantsQueryVariables>;
 export const CreateZoneGrantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateZoneGrant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateGrantInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createGrant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"userId"}},{"kind":"Field","name":{"kind":"Name","value":"resourceId"}},{"kind":"Field","name":{"kind":"Name","value":"permissions"}}]}}]}}]} as unknown as DocumentNode<CreateZoneGrantMutation, CreateZoneGrantMutationVariables>;
 export const DeleteZoneGrantDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteZoneGrant"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteGrant"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteZoneGrantMutation, DeleteZoneGrantMutationVariables>;
+export const GetClassAiRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetClassAiRules"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classAiRules"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"classId"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}},{"kind":"Field","name":{"kind":"Name","value":"ability"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"chancePct"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownS"}},{"kind":"Field","name":{"kind":"Name","value":"conditions"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}}]}}]} as unknown as DocumentNode<GetClassAiRulesQuery, GetClassAiRulesQueryVariables>;
+export const CreateClassAiRuleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateClassAiRule"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateClassAiRuleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createClassAiRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateClassAiRuleMutation, CreateClassAiRuleMutationVariables>;
+export const UpdateClassAiRuleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateClassAiRule"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateClassAiRuleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateClassAiRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateClassAiRuleMutation, UpdateClassAiRuleMutationVariables>;
+export const DeleteClassAiRuleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteClassAiRule"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteClassAiRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteClassAiRuleMutation, DeleteClassAiRuleMutationVariables>;
+export const ReorderClassAiRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderClassAiRules"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ruleIds"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderClassAiRules"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}},{"kind":"Argument","name":{"kind":"Name","value":"ruleIds"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ruleIds"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}}]}}]}}]} as unknown as DocumentNode<ReorderClassAiRulesMutation, ReorderClassAiRulesMutationVariables>;
+export const GetMobAiRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobAiRules"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobAiRules"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}},{"kind":"Field","name":{"kind":"Name","value":"ability"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"chancePct"}},{"kind":"Field","name":{"kind":"Name","value":"cooldownS"}},{"kind":"Field","name":{"kind":"Name","value":"conditions"}},{"kind":"Field","name":{"kind":"Name","value":"target"}},{"kind":"Field","name":{"kind":"Name","value":"enabled"}}]}}]}}]} as unknown as DocumentNode<GetMobAiRulesQuery, GetMobAiRulesQueryVariables>;
+export const SaveMobAiRuleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"SaveMobAiRule"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"SaveMobAiRuleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"saveMobAiRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<SaveMobAiRuleMutation, SaveMobAiRuleMutationVariables>;
+export const DeleteMobAiRuleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMobAiRule"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"abilityId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMobAiRule"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"abilityId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"abilityId"}}}]}]}}]} as unknown as DocumentNode<DeleteMobAiRuleMutation, DeleteMobAiRuleMutationVariables>;
+export const ReorderMobAiRulesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"ReorderMobAiRules"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"abilityIds"}},"type":{"kind":"NonNullType","type":{"kind":"ListType","type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reorderMobAiRules"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"mobId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"mobId"}}},{"kind":"Argument","name":{"kind":"Name","value":"abilityIds"},"value":{"kind":"Variable","name":{"kind":"Name","value":"abilityIds"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}}]}}]}}]} as unknown as DocumentNode<ReorderMobAiRulesMutation, ReorderMobAiRulesMutationVariables>;
+export const SearchAbilitiesForAiDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SearchAbilitiesForAi"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"abilities"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"abilityType"}}]}}]}}]} as unknown as DocumentNode<SearchAbilitiesForAiQuery, SearchAbilitiesForAiQueryVariables>;
 export const UpdateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"aggressionFormula"}},{"kind":"Field","name":{"kind":"Name","value":"activityRestrictions"}},{"kind":"Field","name":{"kind":"Name","value":"riderPresenceMessage"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPosition"}},{"kind":"Field","name":{"kind":"Name","value":"movementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultMovementMode"}}]}}]}}]} as unknown as DocumentNode<UpdateMobMutation, UpdateMobMutationVariables>;
 export const CreateMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateMobInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"aggressionFormula"}},{"kind":"Field","name":{"kind":"Name","value":"activityRestrictions"}},{"kind":"Field","name":{"kind":"Name","value":"riderPresenceMessage"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPosition"}},{"kind":"Field","name":{"kind":"Name","value":"movementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultMovementMode"}}]}}]}}]} as unknown as DocumentNode<CreateMobMutation, CreateMobMutationVariables>;
 export const DeleteMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteMob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}}]}}]} as unknown as DocumentNode<DeleteMobMutation, DeleteMobMutationVariables>;
@@ -8333,7 +8590,7 @@ export const PublicServerStatusDocument = {"kind":"Document","definitions":[{"ki
 export const PublicClassSkillsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PublicClassSkills"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classSkills"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"skillId"}},{"kind":"Field","name":{"kind":"Name","value":"skillName"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"maxLevel"}}]}}]}}]} as unknown as DocumentNode<PublicClassSkillsQuery, PublicClassSkillsQueryVariables>;
 export const PublicClassCirclesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PublicClassCircles"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"classId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"classCirclesList"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"classId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"classId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"circle"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}},{"kind":"Field","name":{"kind":"Name","value":"spells"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"spellId"}},{"kind":"Field","name":{"kind":"Name","value":"spellName"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}}]}}]}}]}}]} as unknown as DocumentNode<PublicClassCirclesQuery, PublicClassCirclesQueryVariables>;
 export const PublicRaceSkillsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"PublicRaceSkills"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"race"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Race"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"raceSkills"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"race"},"value":{"kind":"Variable","name":{"kind":"Name","value":"race"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"skillId"}},{"kind":"Field","name":{"kind":"Name","value":"skillName"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"bonus"}}]}}]}}]} as unknown as DocumentNode<PublicRaceSkillsQuery, PublicRaceSkillsQueryVariables>;
-export const GetMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"accuracy"}},{"kind":"Field","name":{"kind":"Name","value":"attackPower"}},{"kind":"Field","name":{"kind":"Name","value":"spellPower"}},{"kind":"Field","name":{"kind":"Name","value":"penetrationFlat"}},{"kind":"Field","name":{"kind":"Name","value":"penetrationPercent"}},{"kind":"Field","name":{"kind":"Name","value":"evasion"}},{"kind":"Field","name":{"kind":"Name","value":"armorRating"}},{"kind":"Field","name":{"kind":"Name","value":"damageReductionPercent"}},{"kind":"Field","name":{"kind":"Name","value":"soak"}},{"kind":"Field","name":{"kind":"Name","value":"hardness"}},{"kind":"Field","name":{"kind":"Name","value":"wardPercent"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceFire"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceCold"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceLightning"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceAcid"}},{"kind":"Field","name":{"kind":"Name","value":"resistancePoison"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"aggressionFormula"}},{"kind":"Field","name":{"kind":"Name","value":"activityRestrictions"}},{"kind":"Field","name":{"kind":"Name","value":"riderPresenceMessage"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPosition"}},{"kind":"Field","name":{"kind":"Name","value":"movementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultMovementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultEffects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"effectId"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"modifierData"}},{"kind":"Field","name":{"kind":"Name","value":"effect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetMobQuery, GetMobQueryVariables>;
+export const GetMobDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMob"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mob"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"role"}},{"kind":"Field","name":{"kind":"Name","value":"aiMode"}},{"kind":"Field","name":{"kind":"Name","value":"classId"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"accuracy"}},{"kind":"Field","name":{"kind":"Name","value":"attackPower"}},{"kind":"Field","name":{"kind":"Name","value":"spellPower"}},{"kind":"Field","name":{"kind":"Name","value":"penetrationFlat"}},{"kind":"Field","name":{"kind":"Name","value":"penetrationPercent"}},{"kind":"Field","name":{"kind":"Name","value":"evasion"}},{"kind":"Field","name":{"kind":"Name","value":"armorRating"}},{"kind":"Field","name":{"kind":"Name","value":"damageReductionPercent"}},{"kind":"Field","name":{"kind":"Name","value":"soak"}},{"kind":"Field","name":{"kind":"Name","value":"hardness"}},{"kind":"Field","name":{"kind":"Name","value":"wardPercent"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceFire"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceCold"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceLightning"}},{"kind":"Field","name":{"kind":"Name","value":"resistanceAcid"}},{"kind":"Field","name":{"kind":"Name","value":"resistancePoison"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"perception"}},{"kind":"Field","name":{"kind":"Name","value":"concealment"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"gender"}},{"kind":"Field","name":{"kind":"Name","value":"size"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"composition"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"aggressionFormula"}},{"kind":"Field","name":{"kind":"Name","value":"activityRestrictions"}},{"kind":"Field","name":{"kind":"Name","value":"riderPresenceMessage"}},{"kind":"Field","name":{"kind":"Name","value":"defaultPosition"}},{"kind":"Field","name":{"kind":"Name","value":"movementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultMovementMode"}},{"kind":"Field","name":{"kind":"Name","value":"defaultEffects"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"effectId"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"modifierData"}},{"kind":"Field","name":{"kind":"Name","value":"effect"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"effectType"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetMobQuery, GetMobQueryVariables>;
 export const GetMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"skip"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"take"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"skip"},"value":{"kind":"Variable","name":{"kind":"Name","value":"skip"}}},{"kind":"Argument","name":{"kind":"Name","value":"take"},"value":{"kind":"Variable","name":{"kind":"Name","value":"take"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}}]}}]}}]} as unknown as DocumentNode<GetMobsQuery, GetMobsQueryVariables>;
 export const GetMobsByZoneDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetMobsByZone"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"mobsByZone"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"examineDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"alignment"}},{"kind":"Field","name":{"kind":"Name","value":"race"}},{"kind":"Field","name":{"kind":"Name","value":"damageType"}},{"kind":"Field","name":{"kind":"Name","value":"strength"}},{"kind":"Field","name":{"kind":"Name","value":"intelligence"}},{"kind":"Field","name":{"kind":"Name","value":"wisdom"}},{"kind":"Field","name":{"kind":"Name","value":"dexterity"}},{"kind":"Field","name":{"kind":"Name","value":"constitution"}},{"kind":"Field","name":{"kind":"Name","value":"charisma"}},{"kind":"Field","name":{"kind":"Name","value":"wealth"}},{"kind":"Field","name":{"kind":"Name","value":"hpDice"}},{"kind":"Field","name":{"kind":"Name","value":"damageDice"}},{"kind":"Field","name":{"kind":"Name","value":"traits"}},{"kind":"Field","name":{"kind":"Name","value":"behaviors"}},{"kind":"Field","name":{"kind":"Name","value":"professions"}},{"kind":"Field","name":{"kind":"Name","value":"lifeForce"}}]}}]}}]} as unknown as DocumentNode<GetMobsByZoneQuery, GetMobsByZoneQueryVariables>;
 export const SearchMobsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"SearchMobs"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"search"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"limit"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"searchMobs"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"search"},"value":{"kind":"Variable","name":{"kind":"Name","value":"search"}}},{"kind":"Argument","name":{"kind":"Name","value":"limit"},"value":{"kind":"Variable","name":{"kind":"Name","value":"limit"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}},{"kind":"Field","name":{"kind":"Name","value":"roomDescription"}},{"kind":"Field","name":{"kind":"Name","value":"level"}},{"kind":"Field","name":{"kind":"Name","value":"race"}}]}}]}}]} as unknown as DocumentNode<SearchMobsQuery, SearchMobsQueryVariables>;

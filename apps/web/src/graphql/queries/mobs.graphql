@@ -8,6 +8,8 @@ query GetMob($id: Int!, $zoneId: Int!) {
     examineDescription
     level
     role
+    aiMode
+    classId
     alignment
     accuracy
     attackPower

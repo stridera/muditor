@@ -358,6 +358,14 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.effectAura;
   }
 
+  get classAiRules() {
+    return this.client.classAiRules;
+  }
+
+  get mobAbilities() {
+    return this.client.mobAbilities;
+  }
+
   get statusFlagValue() {
     return this.client.statusFlagValue;
   }

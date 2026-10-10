@@ -10,6 +10,7 @@ import {
   DamageType,
   Gender,
   LifeForce,
+  MobAiMode,
   MobBehavior,
   MobProfession,
   MobRole,
@@ -40,6 +41,11 @@ registerEnumType(LifeForce, { name: 'LifeForce' });
 registerEnumType(Composition, { name: 'Composition' });
 registerEnumType(Size, { name: 'Size' });
 registerEnumType(MobRole, { name: 'MobRole' });
+registerEnumType(MobAiMode, {
+  name: 'MobAiMode',
+  description:
+    'Where a mob takes its spell/skill AI from: its class rules, its own rules, or none',
+});
 registerEnumType(MobTrait, { name: 'MobTrait' });
 registerEnumType(MobBehavior, { name: 'MobBehavior' });
 registerEnumType(MobProfession, { name: 'MobProfession' });
@@ -80,6 +86,9 @@ export class MobDto {
 
   @Field(() => MobRole)
   role: MobRole;
+
+  @Field(() => MobAiMode)
+  aiMode: MobAiMode;
 
   @Field(() => Int)
   alignment: number;
@@ -273,6 +282,11 @@ export class CreateMobInput {
   @IsOptional()
   @IsEnum(MobRole)
   role?: MobRole;
+
+  @Field(() => MobAiMode, { defaultValue: MobAiMode.CLASS })
+  @IsOptional()
+  @IsEnum(MobAiMode)
+  aiMode?: MobAiMode;
 
   @Field(() => Int, { defaultValue: 0 })
   @IsOptional()
@@ -580,6 +594,11 @@ export class UpdateMobInput {
   @IsOptional()
   @IsEnum(MobRole)
   role?: MobRole;
+
+  @Field(() => MobAiMode, { nullable: true })
+  @IsOptional()
+  @IsEnum(MobAiMode)
+  aiMode?: MobAiMode;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()

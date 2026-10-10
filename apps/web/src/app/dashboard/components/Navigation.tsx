@@ -21,23 +21,24 @@ import { useMutation } from '@apollo/client/react';
 import {
   Aperture,
   Box,
+  Brain,
   Clipboard,
   FileCode,
+  Flag,
+  Gauge,
+  Hammer,
   HelpCircle,
   Home,
   Inbox,
+  Languages,
   LogOut,
   Mail,
   Map,
   MessageCircle,
+  MessageSquareText,
   Newspaper,
   ScrollText,
   Settings,
-  Flag,
-  Gauge,
-  Hammer,
-  Languages,
-  MessageSquareText,
   Shield,
   ShoppingBag,
   Sparkles,
@@ -97,6 +98,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/abilities': {
     name: 'Abilities',
     icon: <Sparkles className='h-5 w-5' />,
+  },
+  '/dashboard/class-ai': {
+    name: 'Class AI',
+    icon: <Brain className='h-5 w-5' />,
   },
   '/dashboard/socials': {
     name: 'Socials',
@@ -422,6 +427,12 @@ export function Navigation() {
                         <Link href='/dashboard/abilities'>
                           <Sparkles className='mr-2 h-4 w-4' />
                           Abilities
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/class-ai'>
+                          <Brain className='mr-2 h-4 w-4' />
+                          Class AI
                         </Link>
                       </DropdownMenuItem>
                       {isCoder && (

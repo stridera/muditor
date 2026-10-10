@@ -187,6 +187,12 @@ type AdminUserAccountCharacter {
   name: String!
 }
 
+type AiRuleAbilityDto {
+  abilityType: String!
+  id: Int!
+  name: String!
+}
+
 enum Alignment {
   EVIL
   GOOD
@@ -496,6 +502,25 @@ type CircleSpellDto {
   spellName: String!
 }
 
+"""One AI rule shared by every mob of a class"""
+type ClassAiRuleDto {
+  ability: AiRuleAbilityDto!
+  abilityId: Int!
+  chancePct: Int!
+  classId: Int!
+  conditions: JSON
+  cooldownS: Int!
+  enabled: Boolean!
+  id: Int!
+  minLevel: Int
+
+  """Lower runs first"""
+  priority: Int!
+
+  """Raw stored selector (see MobAiTarget)"""
+  target: String!
+}
+
 type ClassCircleDto {
   circle: Int!
   classId: Int!
@@ -765,6 +790,20 @@ input CreateCharacterItemInput {
   objectZoneId: Int!
 }
 
+input CreateClassAiRuleInput {
+  abilityId: Int!
+  chancePct: Int! = 100
+  classId: Int!
+  conditions: JSON
+  cooldownS: Int! = 0
+  enabled: Boolean! = true
+  minLevel: Int
+
+  """Defaults to after the last rule of the class"""
+  priority: Int
+  target: MobAiTarget! = AUTO
+}
+
 input CreateClassCircleInput {
   circle: Int!
   classId: Int!
@@ -881,6 +920,7 @@ input CreateMobInput {
 
   """Lua formula for aggression targeting"""
   aggressionFormula: String
+  aiMode: MobAiMode! = CLASS
   alignment: Int! = 0
   armorRating: Int! = 0
   attackPower: Int! = 0
@@ -1828,6 +1868,47 @@ enum LoginStage {
   WELCOME_BANNER
 }
 
+"""
+Where a mob takes its spell/skill AI from: its class rules, its own rules, or none
+"""
+enum MobAiMode {
+  CLASS
+  CUSTOM
+  NONE
+}
+
+"""One AI rule of a single mob (MobAbilities row)"""
+type MobAiRuleDto {
+  ability: AiRuleAbilityDto!
+  abilityId: Int!
+  chancePct: Int!
+  conditions: JSON
+  cooldownS: Int!
+
+  """MobAbilities.known; the runtime skips disabled rows"""
+  enabled: Boolean!
+  id: Int!
+  mobId: Int!
+  mobZoneId: Int!
+
+  """Lower runs first"""
+  priority: Int!
+
+  """Raw stored selector; null means AUTO"""
+  target: String
+}
+
+enum MobAiTarget {
+  AUTO
+  CASTER
+  LOWEST_ALLY
+  MOST_BUFFED
+  ROOM
+  SELF
+  TANK
+  WEAKEST_ATTACKER
+}
+
 enum MobBehavior {
   AWARE
   FAST_TRACK
@@ -1885,6 +1966,7 @@ type MobDto {
 
   """Lua formula for aggression targeting"""
   aggressionFormula: String
+  aiMode: MobAiMode!
   alignment: Int!
   armorRating: Int!
   attackPower: Int!
@@ -2070,6 +2152,7 @@ type Mutation {
   createCharacterEffect(data: CreateCharacterEffectInput!): CharacterEffectDto!
   createCharacterItem(data: CreateCharacterItemInput!): CharacterItemDto!
   createClass(data: CreateClassInput!): ClassDto!
+  createClassAiRule(data: CreateClassAiRuleInput!): ClassAiRuleDto!
   createClassCircle(data: CreateClassCircleInput!): ClassCircleDto!
 
   """Create a creation recipe"""
@@ -2136,6 +2219,7 @@ type Mutation {
   deleteCharacterEffect(id: ID!): Boolean!
   deleteCharacterItem(id: ID!): Boolean!
   deleteClass(id: ID!): Boolean!
+  deleteClassAiRule(id: Int!): Boolean!
 
   """Delete a creation recipe"""
   deleteCreationRecipe(id: ID!): Boolean!
@@ -2154,6 +2238,7 @@ type Mutation {
   """Delete a login message"""
   deleteLoginMessage(id: ID!): Boolean!
   deleteMob(id: Int!, zoneId: Int!): MobDto!
+  deleteMobAiRule(abilityId: Int!, mobId: Int!, zoneId: Int!): Boolean!
   deleteMobReset(id: ID!): Boolean!
   deleteMobResetEquipment(id: ID!): Boolean!
   deleteMobs(keys: [EntityKeyInput!]!): Int!
@@ -2229,6 +2314,16 @@ type Mutation {
   removeRaceSkill(id: ID!): Boolean!
 
   """
+  Renumber the class rules to follow ruleIds, which must list every rule of the class once
+  """
+  reorderClassAiRules(classId: Int!, ruleIds: [Int!]!): [ClassAiRuleDto!]!
+
+  """
+  Renumber the mob rules to follow abilityIds, which must list every rule of the mob once
+  """
+  reorderMobAiRules(abilityIds: [Int!]!, mobId: Int!, zoneId: Int!): [MobAiRuleDto!]!
+
+  """
   Set the phase order: phaseIds lists every phase of the quest once, in the new order
   """
   reorderQuestPhases(phaseIds: [Int!]!, questId: Int!, questZoneId: Int!): [QuestPhaseDto!]!
@@ -2238,6 +2333,11 @@ type Mutation {
   """Revoke zone access from a user"""
   revokeZoneAccess(userId: String!, zoneId: Float!): Boolean!
   rollCharacterStats: StatRollDto!
+
+  """
+  Create or update the rule for one ability on a mob; omitted fields are left alone
+  """
+  saveMobAiRule(data: SaveMobAiRuleInput!, mobId: Int!, zoneId: Int!): MobAiRuleDto!
 
   """Send a chat message in-game as a linked character"""
   sendGameChat(channel: String!, characterName: String!, message: String!): CommandResultType!
@@ -2264,6 +2364,7 @@ type Mutation {
   updateCharacterEffect(data: UpdateCharacterEffectInput!, id: ID!): CharacterEffectDto!
   updateCharacterItem(data: UpdateCharacterItemInput!, id: ID!): CharacterItemDto!
   updateClass(data: UpdateClassInput!, id: ID!): ClassDto!
+  updateClassAiRule(data: UpdateClassAiRuleInput!, id: Int!): ClassAiRuleDto!
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
   updateConsumableEffects(effects: [ConsumableEffectInput!]!, id: Int!, zoneId: Int!): ObjectDto!
@@ -2622,6 +2723,9 @@ type Query {
   characters(filter: CharacterFilterInput, skip: Int, take: Int): [CharacterDto!]!
   charactersCount(filter: CharacterFilterInput): Int!
   class(id: ID!): ClassDto!
+
+  """AI rules of a class in priority order"""
+  classAiRules(classId: Int!): [ClassAiRuleDto!]!
   classByName(name: String!): ClassDto
 
   """Get all spell circles for a class"""
@@ -2727,6 +2831,9 @@ type Query {
   loginMessagesByStage(stage: LoginStage!): [LoginMessageDto!]!
   me: User!
   mob(id: Int!, zoneId: Int!): MobDto!
+
+  """A mob's own AI rules in priority order"""
+  mobAiRules(mobId: Int!, zoneId: Int!): [MobAiRuleDto!]!
   mobCombatDefaults(classId: Int, level: Int! = 1, race: Race! = HUMANOID): MobCombatDefaultsDto!
   mobReset(id: ID!): MobResetDto
   mobResets(mobId: Int!, mobZoneId: Int!): [MobResetDto!]!
@@ -3290,6 +3397,19 @@ type RoomSummaryDto {
   zoneId: Int!
 }
 
+"""
+Create or update the rule for one ability on a mob (one rule per mob and ability). On update omitted fields are left alone.
+"""
+input SaveMobAiRuleInput {
+  abilityId: Int!
+  chancePct: Int
+  conditions: JSON
+  cooldownS: Int
+  enabled: Boolean
+  priority: Int
+  target: MobAiTarget
+}
+
 enum SaveType {
   FORTITUDE
   REFLEX
@@ -3821,6 +3941,20 @@ input UpdateCharacterItemInput {
   instanceFlags: [String!]
 }
 
+"""
+Partial update; omitted fields are left alone. conditions replaces the stored object, so send the full merged object (unknown keys the rule already has are accepted).
+"""
+input UpdateClassAiRuleInput {
+  abilityId: Int
+  chancePct: Int
+  conditions: JSON
+  cooldownS: Int
+  enabled: Boolean
+  minLevel: Int
+  priority: Int
+  target: MobAiTarget
+}
+
 input UpdateClassCircleInput {
   circle: Int
   minLevel: Int
@@ -3981,6 +4115,7 @@ input UpdateMobInput {
 
   """Lua formula for aggression targeting"""
   aggressionFormula: String
+  aiMode: MobAiMode
   alignment: Int
   armorRating: Int
   attackPower: Int

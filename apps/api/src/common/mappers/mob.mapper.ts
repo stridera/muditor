@@ -49,6 +49,7 @@ export function mapMob(db: MobMapperSource): MobDto {
     name: db.name,
     plainName: db.plainName,
     role: db.role,
+    aiMode: db.aiMode,
     roomDescription: db.roomDescription,
     plainRoomDescription: db.plainRoomDescription,
     examineDescription: db.examineDescription,

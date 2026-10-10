@@ -18,6 +18,7 @@ import {
   type Gender,
   type GetMobQuery,
   type LifeForce,
+  type MobAiMode,
   type MobBehavior,
   type MobProfession,
   type MobRole,
@@ -45,6 +46,8 @@ import { DiceInput } from '../../../../components/dice-input';
 import { NumberSpinner } from '../../../../components/number-spinner';
 import { generateMobStats } from '../../../../utils/mob-stat-generator';
 import { MobCombatStatsTab } from '../../../../components/mob-combat-stats-tab';
+import { MobAiTab } from '@/components/mob-ai/MobAiTab';
+import { usePermissions } from '@/hooks/use-permissions';
 
 interface MobFormData {
   keywords: string;
@@ -55,6 +58,7 @@ interface MobFormData {
   alignment: number;
   level: number;
   role: string;
+  aiMode: string;
   accuracy: number;
   attackPower: number;
   spellPower: number;
@@ -158,6 +162,8 @@ function MobEditorContent() {
   const zoneId = searchParams.get('zone');
   const isNew = !mobId || !zoneId;
 
+  const { isBuilder } = usePermissions();
+
   // Fetch classes dynamically
   const { classes, loading: classesLoading } = useClasses();
 
@@ -171,6 +177,7 @@ function MobEditorContent() {
     alignment: 0,
     level: 1,
     role: 'NORMAL',
+    aiMode: 'CLASS',
     accuracy: 0,
     attackPower: 0,
     spellPower: 0,
@@ -312,6 +319,7 @@ function MobEditorContent() {
         alignment: mob.alignment,
         level: mob.level,
         role: mob.role || 'NORMAL',
+        aiMode: mob.aiMode || 'CLASS',
         accuracy: mob.accuracy || 0,
         attackPower: mob.attackPower || 0,
         spellPower: mob.spellPower || 0,
@@ -427,6 +435,7 @@ function MobEditorContent() {
         examineDescription: formData.examineDescription,
         level: formData.level,
         role: formData.role as MobRole,
+        aiMode: formData.aiMode as MobAiMode,
         alignment: formData.alignment,
         accuracy: formData.accuracy,
         attackPower: formData.attackPower,
@@ -558,6 +567,7 @@ function MobEditorContent() {
     { id: 'stats', label: 'Combat Stats' },
     { id: 'attributes', label: 'Attributes' },
     { id: 'effects', label: 'Default Effects' },
+    { id: 'ai', label: 'AI' },
     { id: 'equipment', label: 'Equipment & Resets' },
   ];
 
@@ -1460,6 +1470,33 @@ function MobEditorContent() {
               <p className='mt-1 text-sm text-muted-foreground'>
                 You need to save this mob before you can configure its default
                 effects.
+              </p>
+            </div>
+          </div>
+        )}
+
+        {/* AI Tab */}
+        {activeTab === 'ai' && !isNew && (
+          <MobAiTab
+            zoneId={parseInt(zoneId!)}
+            mobId={parseInt(mobId!)}
+            aiMode={formData.aiMode}
+            onAiModeChange={mode => handleInputChange('aiMode', mode)}
+            classId={data?.mob?.classId ?? null}
+            canEdit={isBuilder}
+          />
+        )}
+
+        {/* AI Tab - New Mob Warning */}
+        {activeTab === 'ai' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6'>
+            <div className='text-center py-8'>
+              <h3 className='text-sm font-medium text-card-foreground'>
+                Save mob first
+              </h3>
+              <p className='mt-1 text-sm text-muted-foreground'>
+                You need to save this mob before you can configure its spell and
+                skill AI. New mobs use their class rules.
               </p>
             </div>
           </div>

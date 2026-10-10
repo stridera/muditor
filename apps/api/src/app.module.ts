@@ -17,6 +17,7 @@ import { SiteContentModule } from './site-content/site-content.module';
 import { ReportsModule } from './reports/reports.module';
 import { GameLoginModule } from './game-login/game-login.module';
 import { MobsModule } from './mobs/mobs.module';
+import { MobAiModule } from './mob-ai/mob-ai.module';
 import { ObjectsModule } from './objects/objects.module';
 import { QuestsModule } from './quests/quests.module';
 import { RacesModule } from './races/races.module';
@@ -111,6 +112,7 @@ import * as jwt from 'jsonwebtoken';
     ZonesModule,
     RoomsModule,
     MobsModule,
+    MobAiModule,
     ObjectsModule,
     QuestsModule,
     ShopsModule,

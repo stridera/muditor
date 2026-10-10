@@ -1,0 +1,92 @@
+# Mob AI rule operations (class rules + per-mob rules)
+
+query GetClassAiRules($classId: Int!) {
+  classAiRules(classId: $classId) {
+    id
+    classId
+    abilityId
+    ability {
+      id
+      name
+      abilityType
+    }
+    priority
+    chancePct
+    cooldownS
+    conditions
+    target
+    minLevel
+    enabled
+  }
+}
+
+mutation CreateClassAiRule($data: CreateClassAiRuleInput!) {
+  createClassAiRule(data: $data) {
+    id
+  }
+}
+
+mutation UpdateClassAiRule($id: Int!, $data: UpdateClassAiRuleInput!) {
+  updateClassAiRule(id: $id, data: $data) {
+    id
+  }
+}
+
+mutation DeleteClassAiRule($id: Int!) {
+  deleteClassAiRule(id: $id)
+}
+
+mutation ReorderClassAiRules($classId: Int!, $ruleIds: [Int!]!) {
+  reorderClassAiRules(classId: $classId, ruleIds: $ruleIds) {
+    id
+    priority
+  }
+}
+
+query GetMobAiRules($zoneId: Int!, $mobId: Int!) {
+  mobAiRules(zoneId: $zoneId, mobId: $mobId) {
+    id
+    abilityId
+    ability {
+      id
+      name
+      abilityType
+    }
+    priority
+    chancePct
+    cooldownS
+    conditions
+    target
+    enabled
+  }
+}
+
+mutation SaveMobAiRule(
+  $zoneId: Int!
+  $mobId: Int!
+  $data: SaveMobAiRuleInput!
+) {
+  saveMobAiRule(zoneId: $zoneId, mobId: $mobId, data: $data) {
+    id
+  }
+}
+
+mutation DeleteMobAiRule($zoneId: Int!, $mobId: Int!, $abilityId: Int!) {
+  deleteMobAiRule(zoneId: $zoneId, mobId: $mobId, abilityId: $abilityId)
+}
+
+mutation ReorderMobAiRules($zoneId: Int!, $mobId: Int!, $abilityIds: [Int!]!) {
+  reorderMobAiRules(zoneId: $zoneId, mobId: $mobId, abilityIds: $abilityIds) {
+    id
+    priority
+  }
+}
+
+# Slim ability search for the rule ability picker
+query SearchAbilitiesForAi($search: String, $take: Int) {
+  abilities(search: $search, take: $take) {
+    id
+    name
+    abilityType
+  }
+}
