@@ -41,7 +41,7 @@ interface ShopFormData {
 
 import type { ShopItem, ShopQueryResult } from '@/lib/shopMapping';
 import { mapShopItems } from '@/lib/shopMapping';
-import { buildShopSavePayload } from '@/lib/shopPayload';
+import { buildShopSavePayload, type ShopKeeperRef } from '@/lib/shopPayload';
 
 interface MessageListProps {
   title: string;
@@ -256,6 +256,11 @@ function ShopEditorContent() {
     fetchPolicy: 'network-only',
   });
 
+  // Keeper the shop had when loaded; unchanged keepers are not re-sent on save.
+  const [initialKeeper, setInitialKeeper] = useState<ShopKeeperRef | null>(
+    null
+  );
+
   const [updateShop, { loading: updateLoading }] = useMutation(
     UpdateShopEditorDocument
   );
@@ -279,6 +284,15 @@ function ShopEditorContent() {
         tradesWithFlags?: ShopTradesWith[];
       };
       const shop: RawShop = data.shop as unknown as RawShop;
+      const loadedKeeperZoneId =
+        typeof shop.keeperId === 'number' &&
+        typeof data.shop.keeper?.zoneId === 'number'
+          ? data.shop.keeper.zoneId
+          : null;
+      setInitialKeeper({
+        keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
+        keeperZoneId: loadedKeeperZoneId,
+      });
       // Transform array-based messages into individual editable fields
       setFormData({
         id: shop.id ?? 0,
@@ -286,11 +300,7 @@ function ShopEditorContent() {
         sellProfit: typeof shop.sellProfit === 'number' ? shop.sellProfit : 1.0,
         temper: typeof shop.temper === 'number' ? shop.temper : 0,
         keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
-        keeperZoneId:
-          typeof shop.keeperId === 'number' &&
-          typeof data.shop.keeper?.zoneId === 'number'
-            ? data.shop.keeper.zoneId
-            : null,
+        keeperZoneId: loadedKeeperZoneId,
         zoneId: typeof shop.zoneId === 'number' ? shop.zoneId : formData.zoneId,
       });
       setNoSuchItemMessages(
@@ -485,7 +495,8 @@ function ShopEditorContent() {
         sellMessages,
         noSuchItemMessages,
         doNotBuyMessages,
-        missingCashMessages
+        missingCashMessages,
+        isNew ? undefined : initialKeeper
       );
 
       if (isNew) {

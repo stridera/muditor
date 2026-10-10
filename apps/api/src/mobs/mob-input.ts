@@ -48,9 +48,10 @@ export type ResistanceInput = Partial<
  * Fold the five editor resistance fields into the stored resistances JSON.
  * Keys the editor does not render (charm, sleep, ...) are preserved.
  *
- * In the stored scale 0 means immune and an absent key means normal damage,
- * but the editor shows an absent key as 0. So a 0 for a key that is not stored
- * is treated as "untouched" rather than silently making the mob immune.
+ * In the stored scale 0 means normal damage (100 is immune, negative is
+ * vulnerable) and an absent key also means normal damage. The editor shows an
+ * absent key as 0, so a 0 for a key that is not stored is treated as
+ * "untouched" instead of writing a redundant entry.
  *
  * Returns undefined when nothing needs to be written.
  */

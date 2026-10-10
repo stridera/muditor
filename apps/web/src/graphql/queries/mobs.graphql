@@ -133,3 +133,7 @@ query SearchMobs($search: String!, $limit: Int, $zoneId: Int) {
     race
   }
 }
+
+query NextMobId($zoneId: Int!) {
+  nextMobId(zoneId: $zoneId)
+}

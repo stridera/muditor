@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck -- Test file intentionally bypasses exhaustive Prisma model typing.
 import { Test, TestingModule } from '@nestjs/testing';
-import { BadRequestException } from '@nestjs/common';
+import { BadRequestException, ConflictException } from '@nestjs/common';
 import { MobsResolver } from '../mobs.resolver';
 import { MobsService } from '../mobs.service';
 import { OptionalJwtAuthGuard } from '../../auth/guards/optional-jwt-auth.guard';
@@ -48,6 +48,7 @@ describe('MobsResolver save payloads', () => {
     findClassById: jest.fn(),
     create: jest.fn(),
     update: jest.fn(),
+    assertIdFree: jest.fn(),
   };
 
   beforeEach(async () => {
@@ -119,7 +120,7 @@ describe('MobsResolver save payloads', () => {
       await resolver.updateMob(30, 5, editorPayload);
       const data = service.update.mock.calls[0][2];
       // FIRE/ACID set; COLD (stored) overwritten with 0; untouched 0s for
-      // absent keys (LIGHTNING/POISON) are not written as "immune".
+      // absent keys (LIGHTNING/POISON) stay absent (0 is normal, not immune).
       expect(data.resistances).toEqual({
         COLD: 0,
         FIRE: 40,
@@ -158,6 +159,15 @@ describe('MobsResolver save payloads', () => {
       expect(data.resistances).toEqual({ FIRE: 40, ACID: 25 });
       expect(data.wealth).toBe(0n);
       expect(data.zones).toEqual({ connect: { id: 30 } });
+    });
+
+    it('rejects an id that is already used in the zone and does not create', async () => {
+      service.assertIdFree.mockRejectedValue(new ConflictException('dup'));
+      await expect(
+        resolver.createMob({ ...editorPayload, id: 5, zoneId: 30 })
+      ).rejects.toBeInstanceOf(ConflictException);
+      expect(service.assertIdFree).toHaveBeenCalledWith(30, 5);
+      expect(service.create).not.toHaveBeenCalled();
     });
   });
 });

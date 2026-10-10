@@ -196,13 +196,17 @@ type Values = Record<string, unknown>;
 
 /**
  * camelCase keys earlier editor versions wrote next to (or instead of) the
- * game's keys. The same mapping is applied to stored data by
+ * game's keys (`type` picks Spell vs Spells for spellName). The same mapping is applied to stored data by
  * fierylib/data/sql/2026-10-10-object-values-camelcase-cleanup.sql.
  */
+/** Object types whose single spell lives in `Spell` (the rest use `Spells`). */
+const SINGLE_SPELL_TYPES = ['WAND', 'STAFF', 'INSTRUMENT'];
+
 const LEGACY_ALIASES: Array<{
   alias: string;
-  key: string;
-  convert?: (v: unknown) => unknown;
+  /** Game key; may depend on the object type */
+  key: string | ((type: string | undefined) => string);
+  convert?: (v: unknown, type: string | undefined) => unknown;
 }> = [
   { alias: 'capacity', key: 'Capacity' },
   { alias: 'liquidCapacity', key: 'Capacity' },
@@ -213,9 +217,14 @@ const LEGACY_ALIASES: Array<{
   { alias: 'spellLevel', key: 'Level' },
   {
     alias: 'spellName',
-    key: 'Spells',
-    convert: v =>
-      typeof v === 'string' && v.trim() ? [v.trim().toUpperCase()] : undefined,
+    // WAND/STAFF/INSTRUMENT: "Spell" (string); POTION/SCROLL: "Spells" (array)
+    key: type =>
+      type && SINGLE_SPELL_TYPES.includes(type) ? 'Spell' : 'Spells',
+    convert: (v, type) => {
+      if (typeof v !== 'string' || !v.trim()) return undefined;
+      const name = v.trim().toUpperCase();
+      return type && SINGLE_SPELL_TYPES.includes(type) ? name : [name];
+    },
   },
   {
     alias: 'liquidType',
@@ -246,15 +255,16 @@ const LEGACY_ALIASES: Array<{
  * never persists both spellings. An existing game key always wins. Keys that
  * are not aliases are returned untouched.
  */
-export function normalizeObjectValues(values: unknown): Values {
+export function normalizeObjectValues(values: unknown, type?: string): Values {
   if (!values || typeof values !== 'object' || Array.isArray(values)) return {};
   const out: Values = { ...(values as Values) };
-  for (const { alias, key, convert } of LEGACY_ALIASES) {
+  for (const { alias, key: keyOrFn, convert } of LEGACY_ALIASES) {
     if (!(alias in out)) continue;
     const raw = out[alias];
     delete out[alias];
+    const key = typeof keyOrFn === 'function' ? keyOrFn(type) : keyOrFn;
     if (key in out) continue;
-    const converted = convert ? convert(raw) : raw;
+    const converted = convert ? convert(raw, type) : raw;
     if (converted !== undefined && converted !== null) out[key] = converted;
   }
   return out;

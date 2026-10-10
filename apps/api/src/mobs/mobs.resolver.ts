@@ -142,6 +142,18 @@ export class MobsResolver {
     return calculateMobCombatDefaults(level, race, className);
   }
 
+  @Query(() => Int, {
+    name: 'nextMobId',
+    description:
+      'Lowest id above the highest mob id in the zone (0 for an empty zone).',
+  })
+  @RequireZoneWrite()
+  async nextMobId(
+    @Args('zoneId', { type: () => Int }) zoneId: number
+  ): Promise<number> {
+    return this.mobsService.nextFreeId(zoneId);
+  }
+
   @Mutation(() => MobDto)
   @RequireZoneWrite()
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
@@ -159,6 +171,8 @@ export class MobsResolver {
       resistancePoison,
       ...rest
     } = data;
+
+    await this.mobsService.assertIdFree(zoneId, rest.id);
 
     // Get class name for formula calculation if classId provided
     let className: string | undefined;

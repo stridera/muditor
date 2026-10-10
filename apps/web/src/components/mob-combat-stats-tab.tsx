@@ -669,8 +669,9 @@ export function MobCombatStatsTab({
 
             <div className='mt-4 p-3 bg-muted/50 rounded-md'>
               <p className='text-xs text-muted-foreground'>
-                <strong>Note:</strong> Negative values indicate vulnerability.
-                Range: -50 (very vulnerable) to 100 (immune)
+                <strong>Note:</strong> 0 is normal damage. Negative values
+                indicate vulnerability. Range: -50 (very vulnerable) to 100
+                (immune)
               </p>
             </div>
           </div>

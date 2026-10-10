@@ -2218,6 +2218,8 @@ type Query {
   myOnlineCharacters: [OnlineCharacterDto!]!
   myPermissions: UserPermissions!
   myZoneGrants: [ZoneGrantDto!]!
+  """Lowest id above the highest mob id in the zone (0 for an empty zone)."""
+  nextMobId(zoneId: Int!): Int!
   """Lowest id above the highest object id in the zone (0 for an empty zone)."""
   nextObjectId(zoneId: Int!): Int!
   object(id: Int!, zoneId: Int!): ObjectDto!

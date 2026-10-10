@@ -96,3 +96,52 @@ describe('buildShopSavePayload', () => {
     expect(payload.keeperZoneId).toBeNull();
   });
 });
+
+describe('buildShopSavePayload keeper change detection', () => {
+  const base = { id: 5, buyProfit: 1, sellProfit: 1, temper: 0, zoneId: 1 };
+  const build = (
+    keeperId: number | null,
+    keeperZoneId: number | null,
+    initial?: { keeperId: number | null; keeperZoneId: number | null } | null
+  ) =>
+    buildShopSavePayload(
+      { ...base, keeperId, keeperZoneId },
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      [],
+      initial
+    );
+
+  it('omits the keeper fields when the keeper is unchanged', () => {
+    const payload = build(99, 40, { keeperId: 99, keeperZoneId: 40 });
+    expect(payload).not.toHaveProperty('keeperId');
+    expect(payload).not.toHaveProperty('keeperZoneId');
+    expect(payload.buyProfit).toBe(1);
+  });
+
+  it('omits the keeper fields when there was and still is no keeper', () => {
+    const payload = build(null, null, { keeperId: null, keeperZoneId: null });
+    expect(payload).not.toHaveProperty('keeperId');
+    expect(payload).not.toHaveProperty('keeperZoneId');
+  });
+
+  it('sends both keeper fields when the keeper id or zone changed', () => {
+    const initial = { keeperId: 99, keeperZoneId: 40 };
+    const otherMob = build(100, 40, initial);
+    expect(otherMob.keeperId).toBe(100);
+    expect(otherMob.keeperZoneId).toBe(40);
+    const otherZone = build(99, 41, initial);
+    expect(otherZone.keeperId).toBe(99);
+    expect(otherZone.keeperZoneId).toBe(41);
+  });
+
+  it('always sends the keeper when no initial keeper is given (create)', () => {
+    const payload = build(99, 40);
+    expect(payload.keeperId).toBe(99);
+    expect(payload.keeperZoneId).toBe(40);
+  });
+});

@@ -23,9 +23,11 @@ import GraphQLJSON from 'graphql-type-json';
 import {
   IsArray,
   IsEnum,
+  IsInt,
   IsNumber,
   IsOptional,
   IsString,
+  Min,
 } from 'class-validator';
 import { MobDefaultEffectDto } from './mob-effects.dto';
 
@@ -238,7 +240,8 @@ export class MobDto {
 @InputType()
 export class CreateMobInput {
   @Field(() => Int)
-  @IsNumber()
+  @IsInt()
+  @Min(0)
   id: number;
 
   @Field(() => Int)

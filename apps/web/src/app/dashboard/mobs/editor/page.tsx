@@ -10,6 +10,7 @@ import {
   CreateMobDocument,
   GetEffectsDocument,
   GetMobDocument,
+  NextMobIdDocument,
   UpdateMobDocument,
   UpdateMobDefaultEffectsDocument,
   type Composition,
@@ -26,6 +27,7 @@ import {
   type Race,
   type Size,
 } from '@/generated/graphql';
+import { parseEntityId } from '@/lib/entityId';
 import { parseKeywords } from '@/lib/keywords';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -229,6 +231,21 @@ function MobEditorContent() {
   // Separate state for general/save errors
   const [generalError, setGeneralError] = useState<string>('');
 
+  // New mobs: the API suggests the next free id in the chosen zone; the
+  // builder can override it (the API rejects an id that is already taken).
+  const [newId, setNewId] = useState<string>('');
+  const [newIdTouched, setNewIdTouched] = useState(false);
+  const { data: nextIdData } = useQuery(NextMobIdDocument, {
+    variables: { zoneId: formData.zoneId },
+    skip: !isNew,
+    fetchPolicy: 'network-only',
+  });
+  useEffect(() => {
+    if (isNew && !newIdTouched && nextIdData) {
+      setNewId(String(nextIdData.nextMobId));
+    }
+  }, [isNew, newIdTouched, nextIdData]);
+
   const { loading, error, data } = useQuery(GetMobDocument, {
     variables: {
       zoneId: parseInt(zoneId || '0'),
@@ -395,6 +412,12 @@ function MobEditorContent() {
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    const createId = isNew ? parseEntityId(newId) : null;
+    if (isNew && createId === null) {
+      setGeneralError('Mob ID must be a non-negative whole number.');
+      return;
+    }
+
     try {
       // Convert form data to backend format
       const saveData = {
@@ -454,7 +477,7 @@ function MobEditorContent() {
           variables: {
             data: {
               ...saveData,
-              id: parseInt(mobId || '1'), // Use provided ID or default to 1 for new mobs
+              id: createId!,
               zoneId: formData.zoneId,
             },
           },
@@ -473,7 +496,10 @@ function MobEditorContent() {
       window.location.href = '/dashboard/mobs';
     } catch (err) {
       console.error('Error saving mob:', err);
-      setGeneralError('Failed to save mob. Please try again.');
+      // Surface the API's reason (e.g. "Mob 5 already exists in zone 30").
+      const reason =
+        err instanceof Error && err.message ? ` ${err.message}` : '';
+      setGeneralError(`Failed to save mob.${reason}`);
     }
   };
 
@@ -1197,6 +1223,34 @@ function MobEditorContent() {
                     className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>
+
+                {isNew && (
+                  <div>
+                    <label
+                      htmlFor='mobId'
+                      className='block text-sm font-medium text-card-foreground mb-1'
+                    >
+                      Mob ID
+                    </label>
+                    <input
+                      type='number'
+                      id='mobId'
+                      value={newId}
+                      onChange={e => {
+                        setNewIdTouched(true);
+                        setNewId(e.target.value);
+                      }}
+                      min='0'
+                      step='1'
+                      title='Suggested: next free ID in this zone. Must be unique within the zone.'
+                      className='block w-full rounded-md border border-input bg-background shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                    />
+                    <p className='mt-1 text-xs text-muted-foreground'>
+                      Next free ID in zone {formData.zoneId} is suggested; edit
+                      to override.
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <label

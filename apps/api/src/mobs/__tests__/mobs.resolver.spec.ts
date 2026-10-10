@@ -27,6 +27,8 @@ describe('MobsResolver', () => {
             findByZone: jest.fn(),
             count: jest.fn(),
             create: jest.fn(),
+            assertIdFree: jest.fn(),
+            nextFreeId: jest.fn(),
             update: jest.fn(),
             delete: jest.fn(),
             deleteMany: jest.fn(),

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import { type Mobs, Prisma } from '@muditor/db';
 import { inVisibleZone } from '../common/god-zone-visibility';
 import { assertNoPlayerPets, rethrowAsInUse } from '../common/proto-references';
@@ -158,6 +158,26 @@ export class MobsService {
         },
       },
     });
+  }
+
+  /** Next unused mob id in a zone: highest id + 1, or 0 for an empty zone. */
+  async nextFreeId(zoneId: number): Promise<number> {
+    const { _max } = await this.database.mobs.aggregate({
+      where: { zoneId },
+      _max: { id: true },
+    });
+    return _max.id === null || _max.id === undefined ? 0 : _max.id + 1;
+  }
+
+  /** Throws ConflictException when (zoneId, id) already exists. */
+  async assertIdFree(zoneId: number, id: number): Promise<void> {
+    const existing = await this.database.mobs.findUnique({
+      where: { zoneId_id: { zoneId, id } },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictException(`Mob ${id} already exists in zone ${zoneId}`);
+    }
   }
 
   async create(data: Prisma.MobsCreateInput): Promise<Mobs> {

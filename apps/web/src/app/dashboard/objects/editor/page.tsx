@@ -478,7 +478,7 @@ function ObjectEditorContent() {
         level: object.level || 1,
         concealment: object.concealment || 0,
         // Fold legacy camelCase keys into the game's keys; keep everything else
-        values: normalizeObjectValues(object.values),
+        values: normalizeObjectValues(object.values, object.type),
         zoneId: object.zoneId ?? 511,
       });
       setSelectedFlags(object.flags || []);

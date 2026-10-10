@@ -66,6 +66,25 @@ describe('normalizeObjectValues', () => {
     });
   });
 
+  it('maps spellName per type: Spell for WAND/STAFF/INSTRUMENT, Spells otherwise', () => {
+    for (const type of ['WAND', 'STAFF', 'INSTRUMENT']) {
+      expect(
+        normalizeObjectValues({ spellName: ' bless ', spellLevel: 5 }, type)
+      ).toEqual({ Spell: 'BLESS', Level: 5 });
+    }
+    for (const type of ['POTION', 'SCROLL']) {
+      expect(normalizeObjectValues({ spellName: 'bless' }, type)).toEqual({
+        Spells: ['BLESS'],
+      });
+    }
+  });
+
+  it('an existing Spell key wins over spellName on a WAND', () => {
+    expect(
+      normalizeObjectValues({ Spell: 'ARMOR', spellName: 'bless' }, 'WAND')
+    ).toEqual({ Spell: 'ARMOR' });
+  });
+
   it('preserves keys the form does not render', () => {
     const input = { 'Is_Lit:': false, IsCorpse: false, Extra: [1, 2] };
     expect(normalizeObjectValues(input)).toEqual(input);

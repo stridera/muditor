@@ -1,5 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Prisma, type Zones } from '@muditor/db';
+import {
+  assertNoPlayerItems,
+  assertNoPlayerPets,
+  rethrowAsInUse,
+} from '../common/proto-references';
 import { DatabaseService } from '../database/database.service';
 
 @Injectable()
@@ -84,9 +89,19 @@ export class ZonesService {
     });
   }
 
+  /**
+   * Deleting a zone removes its objects and mobs, which players' items and
+   * pets still reference (ON DELETE RESTRICT). Refuse up front with counts.
+   */
   async delete(id: number): Promise<Zones> {
-    return this.database.zones.delete({
-      where: { id },
-    });
+    await assertNoPlayerItems(this.database, [{ zoneId: id }]);
+    await assertNoPlayerPets(this.database, [{ zoneId: id }]);
+    try {
+      return await this.database.zones.delete({
+        where: { id },
+      });
+    } catch (error) {
+      rethrowAsInUse(error, [{ zoneId: id }]);
+    }
   }
 }

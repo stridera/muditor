@@ -9,12 +9,21 @@ import type { DatabaseService } from '../database/database.service';
  * delete never half-succeeds.
  */
 
+/** A prototype `(zoneId, id)`, or every prototype in a zone when `id` is omitted. */
 interface ProtoKey {
   zoneId: number;
-  id: number;
+  id?: number;
 }
 
-const label = (k: ProtoKey) => `${k.zoneId}:${k.id}`;
+const label = (k: ProtoKey) =>
+  k.id === undefined ? `zone ${k.zoneId}` : `${k.zoneId}:${k.id}`;
+
+/** Keep the message readable when a whole zone is referenced. */
+const MAX_LISTED = 5;
+const listed = (parts: string[]) =>
+  parts.length <= MAX_LISTED
+    ? parts.join(', ')
+    : `${parts.slice(0, MAX_LISTED).join(', ')}, and ${parts.length - MAX_LISTED} more`;
 
 export function isForeignKeyViolation(error: unknown): boolean {
   return (error as { code?: string } | null)?.code === 'P2003';
@@ -28,15 +37,18 @@ export async function assertNoPlayerItems(
   const rows = await db.characterItems.groupBy({
     by: ['objectZoneId', 'objectId'],
     where: {
-      OR: keys.map(k => ({ objectZoneId: k.zoneId, objectId: k.id })),
+      OR: keys.map(k => ({
+        objectZoneId: k.zoneId,
+        ...(k.id === undefined ? {} : { objectId: k.id }),
+      })),
     },
     _count: { _all: true },
   });
   if (rows.length === 0) return;
   const total = rows.reduce((n, r) => n + r._count._all, 0);
-  const which = rows
-    .map(r => `${r.objectZoneId}:${r.objectId} (${r._count._all})`)
-    .join(', ');
+  const which = listed(
+    rows.map(r => `${r.objectZoneId}:${r.objectId} (${r._count._all})`)
+  );
   throw new ConflictException(
     `Cannot delete: ${total} player item${total === 1 ? '' : 's'} still reference ${rows.length === 1 ? 'this object' : 'these objects'} [${which}]. Players' items are never deleted with their prototype; remove or replace them first.`
   );
@@ -52,16 +64,18 @@ export async function assertNoPlayerPets(
     where: {
       OR: keys.map(k => ({
         mobPrototypeZoneId: k.zoneId,
-        mobPrototypeId: k.id,
+        ...(k.id === undefined ? {} : { mobPrototypeId: k.id }),
       })),
     },
     _count: { _all: true },
   });
   if (rows.length === 0) return;
   const total = rows.reduce((n, r) => n + r._count._all, 0);
-  const which = rows
-    .map(r => `${r.mobPrototypeZoneId}:${r.mobPrototypeId} (${r._count._all})`)
-    .join(', ');
+  const which = listed(
+    rows.map(
+      r => `${r.mobPrototypeZoneId}:${r.mobPrototypeId} (${r._count._all})`
+    )
+  );
   throw new ConflictException(
     `Cannot delete: ${total} player pet${total === 1 ? '' : 's'} still reference ${rows.length === 1 ? 'this mob' : 'these mobs'} [${which}]. Players' pets are never deleted with their prototype; remove them first.`
   );

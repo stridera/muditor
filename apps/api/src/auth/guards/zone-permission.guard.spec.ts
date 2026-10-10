@@ -109,6 +109,35 @@ describe('ZonePermissionGuard', () => {
     ).toBe(true);
   });
 
+  it('only checks the shop keeper zone when keeper fields are present', async () => {
+    const opts = { keys: ['zoneId', 'keeperZoneId'] };
+    // Unchanged keeper: the web omits (or nulls) the keeper fields.
+    expect(
+      await guard.canActivate(
+        ctx(UserRole.BUILDER, { zoneId: 30, id: 1, data: {} }, opts)
+      )
+    ).toBe(true);
+    expect(
+      await guard.canActivate(
+        ctx(
+          UserRole.BUILDER,
+          { zoneId: 30, id: 1, data: { keeperId: null, keeperZoneId: null } },
+          opts
+        )
+      )
+    ).toBe(true);
+    // Changed keeper in a zone the builder cannot write is still rejected.
+    expect(
+      await guard.canActivate(
+        ctx(
+          UserRole.BUILDER,
+          { zoneId: 30, id: 1, data: { keeperId: 5, keeperZoneId: 31 } },
+          opts
+        )
+      )
+    ).toBe(false);
+  });
+
   it('reads the zone from input objects (data.zoneId / input.zoneId)', async () => {
     expect(
       await guard.canActivate(
