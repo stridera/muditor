@@ -20,6 +20,7 @@ import {
   type GetMobAiRulesQuery,
   type MobAiTarget,
 } from '@/generated/graphql';
+import { normalizeAiTarget } from '@/lib/mob-ai-conditions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { Plus, XCircle } from 'lucide-react';
 import Link from 'next/link';
@@ -41,7 +42,7 @@ function toRow(r: MobRule): AiRuleRow {
     chancePct: r.chancePct,
     cooldownS: r.cooldownS,
     conditions: r.conditions,
-    target: r.target ?? null,
+    target: normalizeAiTarget(r.target),
     enabled: r.enabled,
   };
 }

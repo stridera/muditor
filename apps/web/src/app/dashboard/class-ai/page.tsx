@@ -26,6 +26,7 @@ import {
   type GetClassAiRulesQuery,
   type MobAiTarget,
 } from '@/generated/graphql';
+import { normalizeAiTarget } from '@/lib/mob-ai-conditions';
 import { useClasses } from '@/hooks/use-classes';
 import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
@@ -45,14 +46,14 @@ function toRow(r: ClassRule): AiRuleRow {
     chancePct: r.chancePct,
     cooldownS: r.cooldownS,
     conditions: r.conditions,
-    target: r.target,
+    target: normalizeAiTarget(r.target),
     minLevel: r.minLevel ?? null,
     enabled: r.enabled,
   };
 }
 
 function ClassAiContent() {
-  const { isBuilder } = usePermissions();
+  const { isHeadBuilder } = usePermissions();
   const searchParams = useSearchParams();
   const { classes, loading: classesLoading } = useClasses();
 
@@ -228,7 +229,7 @@ function ClassAiContent() {
             ))}
           </select>
         </div>
-        {isBuilder && classId && (
+        {isHeadBuilder && classId && (
           <Button onClick={openAdd}>
             <Plus className='h-4 w-4 mr-2' />
             Add rule
@@ -251,7 +252,7 @@ function ClassAiContent() {
         <RuleTable
           rules={rules}
           kind='class'
-          canEdit={isBuilder}
+          canEdit={isHeadBuilder}
           busy={busy}
           onEdit={openEdit}
           onDelete={setDeleting}

@@ -3,6 +3,7 @@ import {
   applyConditionEdits,
   conditionsToForm,
   extraConditionKeys,
+  normalizeAiTarget,
   removeConditionKey,
   summarizeConditions,
 } from '../mob-ai-conditions';
@@ -101,5 +102,18 @@ describe('mob AI conditions round-trip', () => {
     expect(
       summarizeConditions({ in_combat: true, self_hp_below: 30, x: 1 })
     ).toBe('in combat, self HP < 30%, +1 other');
+  });
+});
+
+describe('normalizeAiTarget', () => {
+  it('uppercases seeded lowercase selectors', () => {
+    expect(normalizeAiTarget('weakest_attacker')).toBe('WEAKEST_ATTACKER');
+    expect(normalizeAiTarget('self')).toBe('SELF');
+    expect(normalizeAiTarget(' most-buffed ')).toBe('MOST_BUFFED');
+  });
+
+  it('treats null and empty as AUTO', () => {
+    expect(normalizeAiTarget(null)).toBe('AUTO');
+    expect(normalizeAiTarget('')).toBe('AUTO');
   });
 });

@@ -9,6 +9,7 @@ import {
   PRIORITY_STEP,
   RULE_LIMITS,
   assertIntInRange,
+  canonicalTargetOrRaw,
   normalizeTarget,
   storedConditionKeys,
   validateConditions,
@@ -71,9 +72,14 @@ function toMobRule(row: MobRuleRow): MobAiRuleDto {
     chancePct: row.chancePct,
     cooldownS: row.cooldownS,
     conditions: row.conditions,
-    target: row.target,
+    target: canonicalTargetOrRaw(row.target),
     enabled: row.known,
   };
+}
+
+/** Class rule row with its stored selector canonicalised (seeded rows are lowercase). */
+function toClassRule<T extends { target: string }>(row: T): T {
+  return { ...row, target: canonicalTargetOrRaw(row.target) as string };
 }
 
 @Injectable()
@@ -95,11 +101,12 @@ export class MobAiService {
   // ----------------------------------------------------------- class rules
 
   async listClassRules(classId: number) {
-    return this.db.classAiRules.findMany({
+    const rows = await this.db.classAiRules.findMany({
       where: { classId },
       include: WITH_ABILITY,
       orderBy: [{ priority: 'asc' }, { id: 'asc' }],
     });
+    return rows.map(toClassRule);
   }
 
   async createClassRule(data: CreateClassAiRuleInput) {
@@ -133,7 +140,7 @@ export class MobAiService {
     const target = normalizeTarget(data.target);
 
     try {
-      return await this.db.classAiRules.create({
+      const created = await this.db.classAiRules.create({
         data: {
           classId: data.classId,
           abilityId: data.abilityId,
@@ -147,8 +154,9 @@ export class MobAiService {
         },
         include: WITH_ABILITY,
       });
+      return toClassRule(created);
     } catch (e) {
-      throw this.mapClassUnique(e, priority);
+      throw this.mapClassUnique(e, priority, data.abilityId);
     }
   }
 
@@ -201,13 +209,18 @@ export class MobAiService {
     if (data.enabled != null) patch.enabled = data.enabled;
 
     try {
-      return await this.db.classAiRules.update({
+      const updated = await this.db.classAiRules.update({
         where: { id },
         data: patch,
         include: WITH_ABILITY,
       });
+      return toClassRule(updated);
     } catch (e) {
-      throw this.mapClassUnique(e, data.priority ?? current.priority);
+      throw this.mapClassUnique(
+        e,
+        data.priority ?? current.priority,
+        data.abilityId ?? current.abilityId
+      );
     }
   }
 
@@ -226,16 +239,16 @@ export class MobAiService {
    * index never sees a transient duplicate.
    */
   async reorderClassRules(classId: number, ruleIds: number[]) {
-    const rows = await this.db.classAiRules.findMany({
-      where: { classId },
-      select: { id: true },
-    });
-    assertPermutation(
-      'ruleIds',
-      rows.map(r => r.id),
-      ruleIds
-    );
     await this.db.$transaction(async tx => {
+      const rows = await tx.classAiRules.findMany({
+        where: { classId },
+        select: { id: true },
+      });
+      assertPermutation(
+        'ruleIds',
+        rows.map(r => r.id),
+        ruleIds
+      );
       for (const [i, id] of ruleIds.entries()) {
         await tx.classAiRules.update({
           where: { id },
@@ -252,10 +265,14 @@ export class MobAiService {
     return this.listClassRules(classId);
   }
 
-  private mapClassUnique(e: unknown, priority: number): unknown {
+  private mapClassUnique(
+    e: unknown,
+    priority: number,
+    abilityId: number
+  ): unknown {
     if (isUniqueViolation(e)) {
       return new BadRequestException(
-        `This class already has a rule for that ability at priority ${priority}`
+        `This class already has a rule for ability ${abilityId} at priority ${priority}`
       );
     }
     return e;

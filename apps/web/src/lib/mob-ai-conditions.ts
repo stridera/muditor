@@ -22,6 +22,20 @@ export const AI_TARGET_OPTIONS = [
   { value: 'ROOM', label: 'Whole room' },
 ] as const;
 
+/**
+ * Canonical selector for a stored target. Seeded rows are lowercase
+ * (`weakest_attacker`); the GraphQL enum and the dialog select want uppercase.
+ * Null / empty means AUTO; unrecognised values are returned normalised so they
+ * stay visible instead of being silently rewritten.
+ */
+export function normalizeAiTarget(raw: string | null | undefined): string {
+  const norm = (raw ?? '')
+    .trim()
+    .replace(/[-\s]+/g, '_')
+    .toUpperCase();
+  return norm === '' ? 'AUTO' : norm;
+}
+
 export const AI_LIFEFORCES = [
   'LIFE',
   'UNDEAD',

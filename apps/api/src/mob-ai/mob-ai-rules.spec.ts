@@ -1,6 +1,7 @@
 import { BadRequestException } from '@nestjs/common';
 import {
   CONDITION_KEYS,
+  canonicalTargetOrRaw,
   normalizeTarget,
   storedConditionKeys,
   validateConditions,
@@ -23,7 +24,8 @@ describe('validateConditions', () => {
       telegraph: true,
     };
     expect(Object.keys(all).sort()).toEqual(Object.keys(CONDITION_KEYS).sort());
-    expect(validateConditions(all)).toEqual(all);
+    // align is stored canonical (trimmed, lowercase)
+    expect(validateConditions(all)).toEqual({ ...all, align: 'evil' });
   });
 
   it('treats null, undefined and {} as no conditions', () => {
@@ -63,6 +65,27 @@ describe('validateConditions', () => {
     expect(() => validateConditions(value)).toThrow(message);
   });
 
+  it.each(['constructor', 'toString', 'hasOwnProperty'])(
+    'rejects prototype key %s',
+    key => {
+      expect(() => validateConditions({ [key]: true })).toThrow(
+        /Unknown condition key/
+      );
+    }
+  );
+
+  it('rejects an own __proto__ key', () => {
+    const evil = JSON.parse('{"__proto__": {"in_combat": true}}');
+    expect(() => validateConditions(evil)).toThrow(/Unknown condition key/);
+  });
+
+  it('stores align trimmed and lowercased', () => {
+    expect(validateConditions({ align: ' Evil ', in_combat: true })).toEqual({
+      align: 'evil',
+      in_combat: true,
+    });
+  });
+
   it('rejects non-object conditions', () => {
     expect(() => validateConditions([1])).toThrow(/object/);
     expect(() => validateConditions('x')).toThrow(/object/);
@@ -78,6 +101,15 @@ describe('normalizeTarget', () => {
 
   it('rejects unknown selectors', () => {
     expect(() => normalizeTarget('nobody')).toThrow(/Valid targets/);
+  });
+});
+
+describe('canonicalTargetOrRaw', () => {
+  it('uppercases stored selectors and keeps null / unknown as stored', () => {
+    expect(canonicalTargetOrRaw('weakest_attacker')).toBe('WEAKEST_ATTACKER');
+    expect(canonicalTargetOrRaw('auto')).toBe('AUTO');
+    expect(canonicalTargetOrRaw('weird')).toBe('weird');
+    expect(canonicalTargetOrRaw(null)).toBeNull();
   });
 });
 

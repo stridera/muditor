@@ -13,7 +13,7 @@ import { MobAiService } from './mob-ai.service';
 
 /**
  * Class-wide mob AI rules. Not zone content, so there is no zone scope:
- * IMMORTAL+ may read, BUILDER+ may write.
+ * IMMORTAL+ may read, HEAD_BUILDER+ may write (like class editing).
  */
 @Resolver(() => ClassAiRuleDto)
 @UseGuards(GraphQLJwtAuthGuard, MinimumRoleGuard)
@@ -32,7 +32,7 @@ export class ClassAiRulesResolver {
   }
 
   @Mutation(() => ClassAiRuleDto)
-  @MinimumRole(UserRole.BUILDER)
+  @MinimumRole(UserRole.HEAD_BUILDER)
   async createClassAiRule(
     @Args('data') data: CreateClassAiRuleInput
   ): Promise<ClassAiRuleDto> {
@@ -40,7 +40,7 @@ export class ClassAiRulesResolver {
   }
 
   @Mutation(() => ClassAiRuleDto)
-  @MinimumRole(UserRole.BUILDER)
+  @MinimumRole(UserRole.HEAD_BUILDER)
   async updateClassAiRule(
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateClassAiRuleInput
@@ -49,7 +49,7 @@ export class ClassAiRulesResolver {
   }
 
   @Mutation(() => Boolean)
-  @MinimumRole(UserRole.BUILDER)
+  @MinimumRole(UserRole.HEAD_BUILDER)
   async deleteClassAiRule(
     @Args('id', { type: () => Int }) id: number
   ): Promise<boolean> {
@@ -61,7 +61,7 @@ export class ClassAiRulesResolver {
     description:
       'Renumber the class rules to follow ruleIds, which must list every rule of the class once',
   })
-  @MinimumRole(UserRole.BUILDER)
+  @MinimumRole(UserRole.HEAD_BUILDER)
   async reorderClassAiRules(
     @Args('classId', { type: () => Int }) classId: number,
     @Args('ruleIds', { type: () => [Int] }) ruleIds: number[]

@@ -15,6 +15,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
   AI_TARGET_OPTIONS,
+  normalizeAiTarget,
   RULE_LIMITS,
   type ConditionsJson,
 } from '@/lib/mob-ai-conditions';
@@ -87,7 +88,7 @@ export function RuleDialog({
     );
     setChance(String(rule?.chancePct ?? 100));
     setCooldown(String(rule?.cooldownS ?? 0));
-    setTarget(rule?.target ?? 'AUTO');
+    setTarget(normalizeAiTarget(rule?.target));
     setMinLevel(rule?.minLevel != null ? String(rule.minLevel) : '');
     setEnabled(rule?.enabled ?? true);
     // Edits merge into the stored object, so start from it untouched.

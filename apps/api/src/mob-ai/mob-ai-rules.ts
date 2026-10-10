@@ -37,20 +37,24 @@ export type ConditionKind =
   | 'lifeforce'
   | 'align';
 
-export const CONDITION_KEYS: Record<string, ConditionKind> = {
-  in_combat: 'bool',
-  out_of_combat: 'bool',
-  self_hp_below: 'percent',
-  target_hp_below: 'percent',
-  ally_hp_below: 'percent',
-  grouped_targets: 'count',
-  target_casting: 'flag',
-  target_has_buff: 'flag',
-  self_has_debuff: 'flag',
-  target_lifeforce: 'lifeforce',
-  align: 'align',
-  telegraph: 'flag',
-};
+/** Null-prototype so `constructor` / `__proto__` are never "known" keys. */
+export const CONDITION_KEYS: Record<string, ConditionKind> = Object.assign(
+  Object.create(null) as Record<string, ConditionKind>,
+  {
+    in_combat: 'bool',
+    out_of_combat: 'bool',
+    self_hp_below: 'percent',
+    target_hp_below: 'percent',
+    ally_hp_below: 'percent',
+    grouped_targets: 'count',
+    target_casting: 'flag',
+    target_has_buff: 'flag',
+    self_has_debuff: 'flag',
+    target_lifeforce: 'lifeforce',
+    align: 'align',
+    telegraph: 'flag',
+  }
+);
 
 export const RULE_LIMITS = {
   priority: { min: 0, max: 9999 },
@@ -96,6 +100,20 @@ export function normalizeTarget(raw: string): AiTarget {
     fail(`Unknown target "${raw}". Valid targets: ${AI_TARGETS.join(', ')}`);
   }
   return hit;
+}
+
+/**
+ * Canonical target for output: uppercase enum name. Unlike
+ * {@link normalizeTarget} this never throws, so an odd stored row cannot break
+ * a whole listing; unrecognised values are returned as stored. Null stays null.
+ */
+export function canonicalTargetOrRaw(raw: string | null): string | null {
+  if (raw === null) return null;
+  const norm = raw
+    .trim()
+    .replace(/[-\s]+/g, '_')
+    .toUpperCase();
+  return AI_TARGETS.find(t => t === norm) ?? raw;
 }
 
 function checkValue(key: string, kind: ConditionKind, value: unknown): void {
@@ -174,7 +192,7 @@ export function validateConditions(
   const entries = Object.entries(value as Record<string, unknown>);
   const unknown = entries
     .map(([k]) => k)
-    .filter(k => !(k in CONDITION_KEYS) && !preserved.has(k));
+    .filter(k => !Object.hasOwn(CONDITION_KEYS, k) && !preserved.has(k));
   if (unknown.length > 0) {
     fail(
       `Unknown condition key${unknown.length > 1 ? 's' : ''}: ${unknown
@@ -183,10 +201,19 @@ export function validateConditions(
     );
   }
   for (const [key, v] of entries) {
-    const kind = CONDITION_KEYS[key];
+    const kind = Object.hasOwn(CONDITION_KEYS, key)
+      ? CONDITION_KEYS[key]
+      : undefined;
     if (kind) checkValue(key, kind, v);
   }
-  return entries.length === 0 ? null : (value as Record<string, unknown>);
+  if (entries.length === 0) return null;
+  // Store the canonical form the Rust parser expects (it does not trim align).
+  return Object.fromEntries(
+    entries.map(([k, v]) => [
+      k,
+      k === 'align' && typeof v === 'string' ? v.trim().toLowerCase() : v,
+    ])
+  );
 }
 
 /** Keys of a stored `conditions` JSON value (empty for null / non-objects). */

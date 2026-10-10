@@ -46,7 +46,7 @@ function expectRole(
 }
 
 describe('ClassAiRulesResolver guards', () => {
-  it('reads need IMMORTAL, every mutation needs BUILDER', () => {
+  it('reads need IMMORTAL, every mutation needs HEAD_BUILDER', () => {
     expect(methodsOfType(ClassAiRulesResolver, 'Query')).toEqual([
       'classAiRules',
     ]);
@@ -59,7 +59,7 @@ describe('ClassAiRulesResolver guards', () => {
       'updateClassAiRule',
     ]);
     for (const m of mutations) {
-      expectRole(ClassAiRulesResolver, m, UserRole.BUILDER);
+      expectRole(ClassAiRulesResolver, m, UserRole.HEAD_BUILDER);
     }
   });
 });

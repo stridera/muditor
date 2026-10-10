@@ -353,7 +353,25 @@ describe('MobAiService class rules', () => {
     );
     await expect(
       new MobAiService(db).updateClassRule(1, { priority: 20 })
-    ).rejects.toThrow(/already has a rule for that ability at priority 20/);
+    ).rejects.toThrow(/already has a rule for ability 5 at priority 20/);
+  });
+
+  it('names the new ability in the unique-index error when it changes', async () => {
+    const { db, raw } = makeDb({ cls: [classRule()] });
+    raw.classAiRules.update.mockRejectedValueOnce(
+      Object.assign(new Error('dup'), { code: 'P2002' })
+    );
+    await expect(
+      new MobAiService(db).updateClassRule(1, { abilityId: 8 })
+    ).rejects.toThrow(/ability 8 at priority 10/);
+  });
+
+  it('returns lowercase seeded targets as canonical enum names', async () => {
+    const { db } = makeDb({
+      cls: [classRule({ target: 'weakest_attacker' })],
+    });
+    const out = await new MobAiService(db).listClassRules(3);
+    expect(out[0]?.target).toBe('WEAKEST_ATTACKER');
   });
 
   it('404s for a missing rule', async () => {
