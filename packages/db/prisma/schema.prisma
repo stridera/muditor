@@ -399,6 +399,8 @@ model ClassAiRules {
   target         String // Target selector: SELF, TANK, WEAKEST_ATTACKER, CASTER, MOST_BUFFED, LOWEST_ALLY, ROOM
   minLevel       Int?           @map("min_level") // Mob level gate; null = none
   enabled        Boolean        @default(true)
+  seedKey        String?        @unique @map("seed_key") // Stable id of the fierylib seed rule ("<Class>/<family>:<ABILITY>"); null = builder-created
+  seedHash       String?        @map("seed_hash") // Hash of the values the seeder last wrote; null once a builder edits the row (the seeder then leaves it alone)
   characterClass CharacterClass @relation(fields: [classId], references: [id], onDelete: Cascade)
   ability        Ability        @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
@@ -418,7 +420,10 @@ model RaceAiRules {
   cooldownS  Int     @default(0) @map("cooldown_s") // Seconds between uses
   conditions Json? // Same grammar as ClassAiRules.conditions
   target     String // Target selector, same values as ClassAiRules.target
+  minLevel   Int?    @map("min_level") // Mob level gate; null = none
   enabled    Boolean @default(true)
+  seedKey    String? @unique @map("seed_key") // Stable id of the fierylib seed rule ("DEMON:BREATHE_FIRE"); null = builder-created
+  seedHash   String? @map("seed_hash") // Hash of the values the seeder last wrote; null once a builder edits the row
   raceData   Races   @relation(fields: [race], references: [race], onDelete: Cascade)
   ability    Ability @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 

@@ -15,6 +15,7 @@ type ClassRule = {
   target: string;
   minLevel: number | null;
   enabled: boolean;
+  seedHash?: string | null;
 };
 type MobRule = {
   id: number;
@@ -346,6 +347,21 @@ describe('MobAiService class rules', () => {
     expect(cls[0]).toMatchObject({ conditions: null, minLevel: null });
   });
 
+  it('a content edit clears seedHash so the seeder leaves the row alone', async () => {
+    const { db, cls } = makeDb({
+      cls: [
+        classRule({ seedHash: 'abc' }),
+        classRule({ id: 2, seedHash: 'def', priority: 20 }),
+      ],
+    });
+    const svc = new MobAiService(db);
+    await svc.updateClassRule(1, { chancePct: 25 });
+    expect(cls[0]!.seedHash).toBeNull();
+    // Toggling enabled alone keeps the row seed-owned (enabled is not hashed).
+    await svc.updateClassRule(2, { enabled: false });
+    expect(cls[1]).toMatchObject({ enabled: false, seedHash: 'def' });
+  });
+
   it('maps a unique-index violation to a clear error', async () => {
     const { db, raw } = makeDb({ cls: [classRule()] });
     raw.classAiRules.update.mockRejectedValueOnce(
@@ -404,6 +420,17 @@ describe('MobAiService class rules', () => {
       .map(c => c[0].data.priority as number)
       .filter(p => p < 0);
     expect(parked).toHaveLength(3);
+  });
+
+  it('reorder clears seedHash on the renumbered rules', async () => {
+    const { db, cls } = makeDb({
+      cls: [
+        classRule({ id: 1, priority: 10, seedHash: 'a' }),
+        classRule({ id: 2, priority: 20, seedHash: 'b' }),
+      ],
+    });
+    await new MobAiService(db).reorderClassRules(3, [2, 1]);
+    expect(cls.map(r => r.seedHash)).toEqual([null, null]);
   });
 
   it('reorder rejects a list that is not a permutation of the rules', async () => {

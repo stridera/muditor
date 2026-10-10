@@ -206,6 +206,10 @@ export class MobAiService {
           ? null
           : assertIntInRange('minLevel', data.minLevel, RULE_LIMITS.minLevel);
     }
+    // A content edit hands the row to the builder: clearing seedHash tells the
+    // fierylib seeder never to overwrite it again. Toggling `enabled` alone
+    // keeps the row seed-owned (enabled is not part of the hash).
+    if (Object.keys(patch).length > 0) patch.seedHash = null;
     if (data.enabled != null) patch.enabled = data.enabled;
 
     try {
@@ -258,7 +262,7 @@ export class MobAiService {
       for (const [i, id] of ruleIds.entries()) {
         await tx.classAiRules.update({
           where: { id },
-          data: { priority: (i + 1) * PRIORITY_STEP },
+          data: { priority: (i + 1) * PRIORITY_STEP, seedHash: null },
         });
       }
     });
