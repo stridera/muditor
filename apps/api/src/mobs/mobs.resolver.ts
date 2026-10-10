@@ -27,9 +27,11 @@ import {
 } from './mob.dto';
 import { MobDefaultEffectInput } from './mob-effects.dto';
 import { MobsService } from './mobs.service';
+import { mergeResistances, parseDice, parseDiceOrThrow } from './mob-input';
 import { clampSkip, clampTake } from '../common/pagination';
 
 interface MobFieldSource {
+  wealth?: number | null;
   totalWealth?: number;
 }
 
@@ -143,22 +145,20 @@ export class MobsResolver {
   @Mutation(() => MobDto)
   @RequireZoneWrite()
   async createMob(@Args('data') data: CreateMobInput): Promise<MobDto> {
-    // Exclude wealth from direct persistence; it's derived (totalWealth) in DB
-    const { zoneId, race, hpDice, damageDice, wealth, classId, ...rest } = data;
-
-    // Parse dice strings (e.g., "2d8+3" -> num=2, size=8, bonus=3)
-    const parseDice = (diceStr: string) => {
-      const match = /^(\d+)d(\d+)([+-]\d+)?$/.exec(diceStr);
-      if (!match) return null;
-      const numStr = match[1]!;
-      const sizeStr = match[2]!;
-      const bonusStr = match[3];
-      return {
-        num: parseInt(numStr, 10),
-        size: parseInt(sizeStr, 10),
-        bonus: bonusStr ? parseInt(bonusStr, 10) : 0,
-      };
-    };
+    const {
+      zoneId,
+      race,
+      hpDice,
+      damageDice,
+      wealth,
+      classId,
+      resistanceFire,
+      resistanceCold,
+      resistanceLightning,
+      resistanceAcid,
+      resistancePoison,
+      ...rest
+    } = data;
 
     // Get class name for formula calculation if classId provided
     let className: string | undefined;
@@ -177,6 +177,16 @@ export class MobsResolver {
     // Use provided dice or fall back to calculated defaults
     const hp = hpDice ? parseDice(hpDice) : null;
     const dmg = damageDice ? parseDice(damageDice) : null;
+    const resistances = mergeResistances(
+      {},
+      {
+        resistanceFire,
+        resistanceCold,
+        resistanceLightning,
+        resistanceAcid,
+        resistancePoison,
+      }
+    );
 
     const createData: Prisma.MobsCreateInput = {
       ...rest,
@@ -189,6 +199,12 @@ export class MobsResolver {
       damageDiceBonus: dmg?.bonus ?? defaults.damageDiceBonus,
       zones: { connect: { id: zoneId } },
     };
+    if (resistances) {
+      createData.resistances = resistances;
+    }
+    if (wealth != null) {
+      createData.wealth = BigInt(wealth);
+    }
     if (race) {
       createData.race = race as Race;
     }
@@ -206,10 +222,56 @@ export class MobsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateMobInput
   ): Promise<MobDto> {
-    const { race, ...rest } = data;
+    // hpDice/damageDice/resistance*/wealth are API-only fields, not Mobs
+    // columns: translate them rather than passing them through to Prisma.
+    const {
+      race,
+      hpDice,
+      damageDice,
+      wealth,
+      resistanceFire,
+      resistanceCold,
+      resistanceLightning,
+      resistanceAcid,
+      resistancePoison,
+      ...rest
+    } = data;
     const updateData: Prisma.MobsUpdateInput = { ...rest };
     if (race) {
       updateData.race = race as Race;
+    }
+    if (hpDice) {
+      const hp = parseDiceOrThrow('hpDice', hpDice);
+      updateData.hpDiceNum = hp.num;
+      updateData.hpDiceSize = hp.size;
+      updateData.hpDiceBonus = hp.bonus;
+    }
+    if (damageDice) {
+      const dmg = parseDiceOrThrow('damageDice', damageDice);
+      updateData.damageDiceNum = dmg.num;
+      updateData.damageDiceSize = dmg.size;
+      updateData.damageDiceBonus = dmg.bonus;
+    }
+    if (wealth != null) {
+      updateData.wealth = BigInt(wealth);
+    }
+    const resistanceInput = {
+      resistanceFire,
+      resistanceCold,
+      resistanceLightning,
+      resistanceAcid,
+      resistancePoison,
+    };
+    // Only read the stored JSON when the payload actually touches it;
+    // `resistances` supplied directly in the payload wins as the base.
+    if (Object.values(resistanceInput).some(v => v != null)) {
+      const stored =
+        rest.resistances ??
+        (await this.mobsService.findOne(zoneId, id))?.resistances;
+      const merged = mergeResistances(stored, resistanceInput);
+      if (merged) {
+        updateData.resistances = merged;
+      }
     }
     const updated = await this.mobsService.update(zoneId, id, updateData);
     return mapMob(updated);
@@ -240,8 +302,9 @@ export class MobsResolver {
 
   @ResolveField(() => Int, { nullable: true })
   wealth(@Parent() mob: MobFieldSource): number | null {
-    // Map totalWealth from database to wealth in DTO
-    return mob.totalWealth ?? null;
+    // The parent is normally the already-mapped MobDto (wealth set by mapMob);
+    // totalWealth covers raw aggregate rows.
+    return mob.wealth ?? mob.totalWealth ?? null;
   }
 
   @Mutation(() => MobDto)

@@ -5548,13 +5548,13 @@ export type UpdateShopInput = {
   doNotBuyMessages?: InputMaybe<Array<Scalars['String']['input']>>;
   flags?: InputMaybe<Array<ShopFlag>>;
   keeperId?: InputMaybe<Scalars['Int']['input']>;
+  keeperZoneId?: InputMaybe<Scalars['Int']['input']>;
   missingCashMessages?: InputMaybe<Array<Scalars['String']['input']>>;
   noSuchItemMessages?: InputMaybe<Array<Scalars['String']['input']>>;
   sellMessages?: InputMaybe<Array<Scalars['String']['input']>>;
   sellProfit?: InputMaybe<Scalars['Float']['input']>;
   temper?: InputMaybe<Scalars['Int']['input']>;
   tradesWithFlags?: InputMaybe<Array<ShopTradesWith>>;
-  zoneId?: InputMaybe<Scalars['Int']['input']>;
 };
 
 export type UpdateShopInventoryInput = {

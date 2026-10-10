@@ -1,5 +1,5 @@
-import { UseGuards } from '@nestjs/common';
-import type { Users } from '@muditor/db';
+import { BadRequestException, UseGuards } from '@nestjs/common';
+import type { Prisma, Users } from '@muditor/db';
 import { Args, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { OptionalJwtAuthGuard } from '../auth/guards/optional-jwt-auth.guard';
@@ -233,13 +233,26 @@ export class ShopsResolver {
   }
 
   @Mutation(() => ShopDto)
-  @RequireZoneWrite()
+  // The (possibly new) keeper mob's zone must be writable as well.
+  @RequireZoneWrite({ keys: ['zoneId', 'keeperZoneId'] })
   async updateShop(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateShopInput
   ): Promise<ShopDto> {
-    const shop = await this.shopsService.update(zoneId, id, data);
+    const { keeperId, keeperZoneId, ...rest } = data;
+    const updateData: Prisma.ShopsUpdateInput = { ...rest };
+    if ((keeperId == null) !== (keeperZoneId == null)) {
+      throw new BadRequestException(
+        'keeperId and keeperZoneId must be supplied together'
+      );
+    }
+    if (keeperId != null && keeperZoneId != null) {
+      updateData.mobs = {
+        connect: { zoneId_id: { zoneId: keeperZoneId, id: keeperId } },
+      };
+    }
+    const shop = await this.shopsService.update(zoneId, id, updateData);
     return this.mapShopToDto(shop);
   }
 

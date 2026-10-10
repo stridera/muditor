@@ -26,9 +26,21 @@ function getResistance(resistances: unknown, key: string): number {
   return typeof value === 'number' ? value : 0;
 }
 
+// Prefer an aggregated totalWealth; otherwise fall back to the Mobs.wealth
+// column (BigInt copper), clamped to the GraphQL Int range.
+function mobWealth(db: MobMapperSource): number | undefined {
+  if (db.totalWealth !== null && db.totalWealth !== undefined) {
+    return db.totalWealth;
+  }
+  const raw = (db as { wealth?: bigint | number | null }).wealth;
+  if (raw === null || raw === undefined) return undefined;
+  return Math.min(Number(raw), 2147483647);
+}
+
 export function mapMob(db: MobMapperSource): MobDto {
   // Parse resistances JSON field
   const resistances = db.resistances ?? {};
+  const wealth = mobWealth(db);
 
   const dto: MobDto = {
     id: db.id,
@@ -74,8 +86,7 @@ export function mapMob(db: MobMapperSource): MobDto {
     charisma: db.charisma,
     perception: db.perception,
     concealment: db.concealment,
-    ...(db.totalWealth !== null &&
-      db.totalWealth !== undefined && { wealth: db.totalWealth }),
+    ...(wealth !== undefined && { wealth }),
     race: db.race,
     gender: db.gender,
     size: db.size,

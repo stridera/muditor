@@ -3407,13 +3407,13 @@ input UpdateShopInput {
   doNotBuyMessages: [String!]
   flags: [ShopFlag!]
   keeperId: Int
+  keeperZoneId: Int
   missingCashMessages: [String!]
   noSuchItemMessages: [String!]
   sellMessages: [String!]
   sellProfit: Float
   temper: Int
   tradesWithFlags: [ShopTradesWith!]
-  zoneId: Int
 }
 
 input UpdateShopInventoryInput {

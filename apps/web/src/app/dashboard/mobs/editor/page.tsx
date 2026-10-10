@@ -445,15 +445,10 @@ function MobEditorContent() {
         movementMode: formData.movementMode as MovementMode,
         defaultMovementMode: formData.defaultMovementMode as MovementMode,
         defaultPosition: formData.defaultPosition as Position,
-        ...(formData.riderPresenceMessage
-          ? { riderPresenceMessage: formData.riderPresenceMessage }
-          : {}),
-        ...(formData.aggressionFormula
-          ? { aggressionFormula: formData.aggressionFormula }
-          : {}),
-        ...(formData.activityRestrictions
-          ? { activityRestrictions: formData.activityRestrictions }
-          : {}),
+        // Cleared fields are sent as null so they actually clear on update
+        riderPresenceMessage: formData.riderPresenceMessage || null,
+        aggressionFormula: formData.aggressionFormula || null,
+        activityRestrictions: formData.activityRestrictions || null,
       };
 
       if (isNew) {

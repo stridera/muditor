@@ -348,21 +348,48 @@ export class ShopsService {
     id: number,
     items: Array<{ amount: number; objectZoneId: number; objectId: number }>
   ): Promise<ShopWithRelations> {
-    // Strategy: delete existing items then recreate
-    await this.database.shopItems.deleteMany({
-      where: { shopZoneId: zoneId, shopId: id },
-    });
-    if (items.length) {
-      await this.database.shopItems.createMany({
-        data: items.map(i => ({
-          shopZoneId: zoneId,
-          shopId: id,
-          amount: i.amount,
-          objectZoneId: i.objectZoneId,
-          objectId: i.objectId,
-        })),
-      });
+    // The same object listed twice would create duplicate rows; the last
+    // occurrence wins.
+    const unique = new Map<string, (typeof items)[number]>();
+    for (const item of items) {
+      unique.set(`${item.objectZoneId}:${item.objectId}`, item);
     }
+
+    // Delete + recreate must be atomic: a failure between the two steps would
+    // otherwise leave the shop with no stock.
+    await this.database.$transaction(async tx => {
+      // The editor only knows amount/object; carry over per-item price and
+      // spawn/visibility settings for objects that stay in the shop.
+      const existing = await tx.shopItems.findMany({
+        where: { shopZoneId: zoneId, shopId: id },
+      });
+      const previous = new Map(
+        existing.map(e => [`${e.objectZoneId}:${e.objectId}`, e])
+      );
+      await tx.shopItems.deleteMany({
+        where: { shopZoneId: zoneId, shopId: id },
+      });
+      if (unique.size) {
+        await tx.shopItems.createMany({
+          data: [...unique.entries()].map(([key, i]) => {
+            const prev = previous.get(key);
+            return {
+              shopZoneId: zoneId,
+              shopId: id,
+              amount: i.amount,
+              objectZoneId: i.objectZoneId,
+              objectId: i.objectId,
+              ...(prev && {
+                price: prev.price,
+                spawnChance: prev.spawnChance,
+                visibilityRequirement: prev.visibilityRequirement,
+                purchaseRequirement: prev.purchaseRequirement,
+              }),
+            };
+          }),
+        });
+      }
+    });
     return this.findOne(zoneId, id) as Promise<ShopWithRelations>;
   }
 }

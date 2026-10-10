@@ -10,6 +10,7 @@ import {
   GetAvailableMobsDocument,
   GetAvailableObjectsDocument,
   GetShopEditorDocument,
+  SearchMobsDocument,
   GetZonesEditorDocument,
   UpdateShopEditorDocument,
   UpdateShopInventoryEditorDocument,
@@ -34,6 +35,7 @@ interface ShopFormData {
   sellProfit: number;
   temper: number;
   keeperId: number | null;
+  keeperZoneId: number | null;
   zoneId: number;
 }
 
@@ -180,6 +182,7 @@ function ShopEditorContent() {
     sellProfit: 1.0,
     temper: 0,
     keeperId: null,
+    keeperZoneId: null,
     zoneId: 511,
   });
   const [buyMessages, setBuyMessages] = useState<string[]>(['']);
@@ -219,8 +222,8 @@ function ShopEditorContent() {
   const effectiveZoneId = (() => {
     const raw = data?.shop as ShopQueryResult | undefined;
     return (
-      (typeof raw?.zoneId === 'number' ? raw.zoneId : undefined) ||
       parseInt(zoneId || '0') ||
+      (typeof raw?.zoneId === 'number' ? raw.zoneId : undefined) ||
       formData.zoneId
     );
   })();
@@ -233,6 +236,13 @@ function ShopEditorContent() {
   const { data: mobsData } = useQuery(GetAvailableMobsDocument, {
     variables: { zoneId: effectiveZoneId },
     skip: !effectiveZoneId,
+  });
+
+  // Keeper search across all zones (the keeper need not live in the shop's zone)
+  const [keeperSearch, setKeeperSearch] = useState('');
+  const { data: keeperSearchData } = useQuery(SearchMobsDocument, {
+    variables: { search: keeperSearch.trim(), limit: 20 },
+    skip: keeperSearch.trim().length < 2,
   });
 
   // Query for zones (for modal)
@@ -276,6 +286,11 @@ function ShopEditorContent() {
         sellProfit: typeof shop.sellProfit === 'number' ? shop.sellProfit : 1.0,
         temper: typeof shop.temper === 'number' ? shop.temper : 0,
         keeperId: typeof shop.keeperId === 'number' ? shop.keeperId : null,
+        keeperZoneId:
+          typeof shop.keeperId === 'number' &&
+          typeof data.shop.keeper?.zoneId === 'number'
+            ? data.shop.keeper.zoneId
+            : null,
         zoneId: typeof shop.zoneId === 'number' ? shop.zoneId : formData.zoneId,
       });
       setNoSuchItemMessages(
@@ -347,6 +362,38 @@ function ShopEditorContent() {
     // Trigger real-time validation for this field
     validateField(field, value, updatedFormData);
   };
+
+  // The keeper is a (zone, id) pair; the dropdown value encodes both.
+  const handleKeeperChange = (value: string) => {
+    const [kz, ki] = value.split(':').map(v => parseInt(v, 10));
+    setFormData(prev => ({
+      ...prev,
+      keeperId: ki != null && !Number.isNaN(ki) ? ki : null,
+      keeperZoneId: kz != null && !Number.isNaN(kz) ? kz : null,
+    }));
+    if (generalError) setGeneralError('');
+  };
+
+  const keeperOptions = (() => {
+    const byKey = new Map<
+      string,
+      { zoneId: number; id: number; name: string }
+    >();
+    const add = (m: { zoneId: number; id: number; name: string }) =>
+      byKey.set(`${m.zoneId}:${m.id}`, m);
+    // Always include the current keeper, even when it lives in another zone
+    if (formData.keeperId != null && formData.keeperZoneId != null) {
+      const k = data?.shop?.keeper;
+      add({
+        zoneId: formData.keeperZoneId,
+        id: formData.keeperId,
+        name: k?.name ?? 'Current keeper',
+      });
+    }
+    mobsData?.mobsByZone?.forEach(add);
+    keeperSearchData?.searchMobs?.forEach(add);
+    return [...byKey.values()];
+  })();
 
   const handleFlagToggle = (flag: string, flagType: 'shop' | 'tradesWith') => {
     if (flagType === 'shop') {
@@ -456,7 +503,8 @@ function ShopEditorContent() {
               id: formData.id,
               ...saveData,
               keeperId: formData.keeperId,
-              keeperZoneId: formData.zoneId,
+              keeperZoneId: formData.keeperZoneId ?? formData.zoneId,
+              zoneId: formData.zoneId,
             },
           },
         });
@@ -489,11 +537,13 @@ function ShopEditorContent() {
           });
         }
       } else {
+        // The record key comes from the URL, never from the (editable) form.
         const numericId = parseInt(shopId!);
+        const recordZoneId = parseInt(zoneId!);
         await updateShop({
           variables: {
             id: numericId,
-            zoneId: formData.zoneId,
+            zoneId: recordZoneId,
             data: saveData,
           },
         });
@@ -501,7 +551,7 @@ function ShopEditorContent() {
         await updateInventory({
           variables: {
             id: numericId,
-            zoneId: formData.zoneId,
+            zoneId: recordZoneId,
             items: shopItems.map(i => ({
               amount: i.amount,
               objectZoneId: i.objectZoneId,
@@ -741,28 +791,33 @@ function ShopEditorContent() {
                   >
                     Shopkeeper
                   </label>
+                  <input
+                    type='search'
+                    aria-label='Search mobs in any zone'
+                    placeholder='Search mobs in any zone...'
+                    value={keeperSearch}
+                    onChange={e => setKeeperSearch(e.target.value)}
+                    className='mb-2 block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
+                  />
                   <select
                     id='keeperId'
-                    value={formData.keeperId || ''}
-                    onChange={e =>
-                      handleInputChange(
-                        'keeperId',
-                        parseInt(e.target.value) || 0
-                      )
+                    value={
+                      formData.keeperId != null && formData.keeperZoneId != null
+                        ? `${formData.keeperZoneId}:${formData.keeperId}`
+                        : ''
                     }
+                    onChange={e => handleKeeperChange(e.target.value)}
                     className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   >
                     <option value=''>No shopkeeper</option>
-                    {mobsData?.mobsByZone?.map(
-                      (
-                        mob: (typeof mobsData.mobsByZone)[number],
-                        index: number
-                      ) => (
-                        <option key={index} value={mob.id}>
-                          {mob.name} (#{mob.zoneId}:{mob.id})
-                        </option>
-                      )
-                    )}
+                    {keeperOptions.map(mob => (
+                      <option
+                        key={`${mob.zoneId}:${mob.id}`}
+                        value={`${mob.zoneId}:${mob.id}`}
+                      >
+                        {mob.name} (#{mob.zoneId}:{mob.id})
+                      </option>
+                    ))}
                   </select>
                 </div>
 
@@ -783,6 +838,7 @@ function ShopEditorContent() {
                         parseInt(e.target.value) || 511
                       )
                     }
+                    disabled={!isNew}
                     className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm'
                   />
                 </div>

@@ -14,6 +14,12 @@ import {
   UpdateConsumableEffectsDocument,
   type WearFlag,
 } from '@/generated/graphql';
+import { TypeValueInput } from '@/components/objects/TypeValueInput';
+import { keywordsToInput, parseKeywords } from '@/lib/keywords';
+import {
+  normalizeObjectValues,
+  TYPE_VALUE_FIELDS,
+} from '@/lib/objectTypeValues';
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
@@ -435,7 +441,8 @@ function ObjectEditorContent() {
       const object = typedData.object;
       setFormData({
         type: object.type || 'NOTHING',
-        keywords: object.keywords || '',
+        // The API returns a string[]; the TagInput edits a comma-joined string
+        keywords: keywordsToInput(object.keywords),
         name: object.name || '',
         examineDescription: object.examineDescription || '',
         actionDescription: object.actionDescription || '',
@@ -445,7 +452,8 @@ function ObjectEditorContent() {
         decomposeTimer: object.decomposeTimer || 0,
         level: object.level || 1,
         concealment: object.concealment || 0,
-        values: object.values || {},
+        // Fold legacy camelCase keys into the game's keys; keep everything else
+        values: normalizeObjectValues(object.values),
         zoneId: object.zoneId ?? 511,
       });
       setSelectedFlags(object.flags || []);
@@ -549,8 +557,11 @@ function ObjectEditorContent() {
     if (!validateForm()) return;
 
     try {
+      // zoneId is the record key, never part of an update payload.
+      const { zoneId: formZoneId, keywords, ...fields } = formData;
       const saveData = {
-        ...formData,
+        ...fields,
+        keywords: parseKeywords(keywords),
         flags: selectedFlags,
         wearFlags: selectedWearFlags,
         restrictions: selectedRestrictions,
@@ -558,23 +569,24 @@ function ObjectEditorContent() {
         restrictedRaces,
         allowedRaces,
         restrictedClassIds,
-        ...(minSize ? { minSize } : {}),
-        ...(maxSize ? { maxSize } : {}),
-        ...(passengerCapacity > 0 ? { passengerCapacity } : {}),
-        ...(presenceOverride ? { presenceOverride } : {}),
+        // Cleared fields are sent as null so they actually clear
+        minSize: minSize || null,
+        maxSize: maxSize || null,
+        passengerCapacity: passengerCapacity > 0 ? passengerCapacity : null,
+        presenceOverride: presenceOverride || null,
       };
 
       if (isNew) {
         await createObject({
           variables: {
-            data: saveData,
+            data: { ...saveData, zoneId: formZoneId },
           },
         });
       } else {
         await updateObject({
           variables: {
             id: parseInt(objectId!),
-            zoneId: saveData.zoneId,
+            zoneId: parseInt(zoneIdParam!),
             data: saveData,
           },
         });
@@ -945,6 +957,12 @@ function ObjectEditorContent() {
                         'zoneId',
                         parseInt(e.target.value) || 511
                       )
+                    }
+                    disabled={!isNew}
+                    title={
+                      isNew
+                        ? undefined
+                        : 'The zone of an existing object cannot be changed'
                     }
                     className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
@@ -1927,386 +1945,32 @@ function ObjectEditorContent() {
                 requirements.
               </p>
 
-              {/* Type-specific value editors */}
+              {/* Type-specific value editors: keys are the game's own (loader.rs) */}
               <div className='space-y-4'>
-                {formData.type === 'WEAPON' && (
-                  <div className='grid grid-cols-3 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Damage Dice Number
-                      </label>
-                      <input
-                        type='number'
-                        min='1'
-                        value={getValueSafe(
-                          formData.values,
-                          'damageDiceNum',
-                          1
-                        )}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'damageDiceNum',
-                            parseInt(e.target.value) || 1
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Number of dice'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Damage Dice Size
-                      </label>
-                      <input
-                        type='number'
-                        min='1'
-                        value={getValueSafe(
-                          formData.values,
-                          'damageDiceSize',
-                          6
-                        )}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'damageDiceSize',
-                            parseInt(e.target.value) || 6
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Dice size (e.g., 6 for d6)'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Damage Bonus
-                      </label>
-                      <input
-                        type='number'
-                        value={getValueSafe(formData.values, 'damageBonus', 0)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'damageBonus',
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Damage bonus'
-                      />
-                    </div>
-                    <div className='col-span-3 mt-2'>
-                      <p className='text-sm text-muted-foreground'>
-                        Average damage: ~
-                        {Math.floor(
-                          (getValueSafe(formData.values, 'damageDiceNum', 1) *
-                            (getValueSafe(
-                              formData.values,
-                              'damageDiceSize',
-                              6
-                            ) +
-                              1)) /
-                            2 +
-                            getValueSafe(formData.values, 'damageBonus', 0)
-                        )}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {formData.type === 'ARMOR' && (
+                {TYPE_VALUE_FIELDS[formData.type] ? (
                   <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Max Dex Bonus
-                      </label>
-                      <input
-                        type='number'
-                        value={getValueSafe(formData.values, 'maxDexBonus', 10)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'maxDexBonus',
-                            parseInt(e.target.value) || 10
-                          )
-                        }
-                        min='0'
-                        max='10'
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Max dexterity bonus'
+                    {TYPE_VALUE_FIELDS[formData.type]!.map(field => (
+                      <TypeValueInput
+                        key={`${formData.type}:${field.key}`}
+                        field={field}
+                        values={formData.values}
+                        onChange={handleTypeValueChange}
                       />
-                    </div>
+                    ))}
                   </div>
-                )}
-
-                {formData.type === 'CONTAINER' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Max Weight Capacity
-                      </label>
-                      <input
-                        type='number'
-                        min='0'
-                        value={getValueSafe(formData.values, 'capacity', 0)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'capacity',
-                            parseFloat(e.target.value) || 0
-                          )
-                        }
-                        step='0.1'
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Weight capacity in lbs'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Container Key ID (Optional)
-                      </label>
-                      <input
-                        type='number'
-                        value={getValueSafe(formData.values, 'keyId', '')}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'keyId',
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        min='0'
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Object ID of key (if locked)'
-                      />
-                    </div>
-                    <div className='col-span-2'>
-                      <label className='block text-sm font-medium text-muted-foreground mb-2'>
-                        Container Flags
-                      </label>
-                      <div className='grid grid-cols-2 gap-2'>
-                        {['CLOSEABLE', 'PICKPROOF', 'CLOSED', 'LOCKED'].map(
-                          flag => (
-                            <label key={flag} className='flex items-center'>
-                              <input
-                                type='checkbox'
-                                checked={getValueSafe(
-                                  formData.values,
-                                  'containerFlags',
-                                  [] as string[]
-                                ).includes(flag)}
-                                onChange={e => {
-                                  const flags = getValueSafe(
-                                    formData.values,
-                                    'containerFlags',
-                                    [] as string[]
-                                  );
-                                  if (e.target.checked) {
-                                    handleTypeValueChange('containerFlags', [
-                                      ...flags,
-                                      flag,
-                                    ]);
-                                  } else {
-                                    handleTypeValueChange(
-                                      'containerFlags',
-                                      flags.filter((f: string) => f !== flag)
-                                    );
-                                  }
-                                }}
-                                className='rounded border-input text-primary shadow-sm focus:border-ring focus:ring focus:ring-ring focus:ring-opacity-50'
-                              />
-                              <span className='ml-2 text-sm text-foreground'>
-                                {flag}
-                              </span>
-                            </label>
-                          )
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {formData.type === 'LIGHT' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Light Hours Remaining
-                      </label>
-                      <input
-                        type='number'
-                        min='0'
-                        value={getValueSafe(formData.values, 'lightHours', 0)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'lightHours',
-                            parseInt(e.target.value) || 0
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Hours of light (-1 for infinite)'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Light Brightness
-                      </label>
-                      <select
-                        value={getValueSafe(
-                          formData.values,
-                          'brightness',
-                          'normal'
-                        )}
-                        onChange={e =>
-                          handleTypeValueChange('brightness', e.target.value)
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                      >
-                        <option value='dim'>Dim</option>
-                        <option value='normal'>Normal</option>
-                        <option value='bright'>Bright</option>
-                        <option value='brilliant'>Brilliant</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                {formData.type === 'FOOD' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Hours of Nourishment
-                      </label>
-                      <input
-                        type='number'
-                        min='0'
-                        value={getValueSafe(formData.values, 'foodHours', 4)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'foodHours',
-                            parseInt(e.target.value) || 4
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Hours of hunger satisfied'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Poisoned?
-                      </label>
-                      <select
-                        value={
-                          getValueSafe(formData.values, 'poisoned', false)
-                            ? 'true'
-                            : 'false'
-                        }
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'poisoned',
-                            e.target.value === 'true'
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                      >
-                        <option value='false'>Safe</option>
-                        <option value='true'>Poisoned</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                {formData.type === 'LIQUID_CONTAINER' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Liquid Capacity
-                      </label>
-                      <input
-                        type='number'
-                        min='0'
-                        value={getValueSafe(
-                          formData.values,
-                          'liquidCapacity',
-                          10
-                        )}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'liquidCapacity',
-                            parseInt(e.target.value) || 10
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Maximum liquid units'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Current Liquid
-                      </label>
-                      <select
-                        value={getValueSafe(
-                          formData.values,
-                          'liquidType',
-                          'water'
-                        )}
-                        onChange={e =>
-                          handleTypeValueChange('liquidType', e.target.value)
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                      >
-                        <option value='water'>Water</option>
-                        <option value='beer'>Beer</option>
-                        <option value='wine'>Wine</option>
-                        <option value='ale'>Ale</option>
-                        <option value='whisky'>Whisky</option>
-                        <option value='milk'>Milk</option>
-                        <option value='tea'>Tea</option>
-                        <option value='coffee'>Coffee</option>
-                        <option value='blood'>Blood</option>
-                        <option value='salt water'>Salt Water</option>
-                      </select>
-                    </div>
-                  </div>
-                )}
-
-                {formData.type === 'POTION' && (
-                  <div className='grid grid-cols-2 gap-4'>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Spell Level
-                      </label>
-                      <input
-                        type='number'
-                        min='1'
-                        max='9'
-                        value={getValueSafe(formData.values, 'spellLevel', 1)}
-                        onChange={e =>
-                          handleTypeValueChange(
-                            'spellLevel',
-                            parseInt(e.target.value) || 1
-                          )
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Spell level (1-9)'
-                      />
-                    </div>
-                    <div>
-                      <label className='block text-sm font-medium text-muted-foreground mb-1'>
-                        Spell Name
-                      </label>
-                      <input
-                        type='text'
-                        value={getValueSafe(formData.values, 'spellName', '')}
-                        onChange={e =>
-                          handleTypeValueChange('spellName', e.target.value)
-                        }
-                        className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
-                        placeholder='Name of spell effect'
-                      />
-                    </div>
-                  </div>
+                ) : (
+                  <p className='text-sm text-muted-foreground'>
+                    No editable type-specific values for {formData.type}. Any
+                    existing values are kept as they are.
+                  </p>
                 )}
 
                 <div className='mt-6 p-4 bg-muted border border-border rounded-lg'>
                   <p className='text-sm text-muted-foreground'>
                     <strong>Note:</strong> Type-specific values are stored as
-                    JSON and interpreted by the MUD server. Consult your MUD's
-                    documentation for specific value requirements for each
-                    object type.
+                    JSON using the game's own keys. Weapon dice and armor are
+                    typed columns and are not edited here; values this tab does
+                    not show are preserved when you save.
                   </p>
                 </div>
               </div>

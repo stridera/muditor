@@ -8,6 +8,7 @@ export interface BasicShopFormData {
   sellProfit: number;
   temper: number;
   keeperId: number | null;
+  keeperZoneId?: number | null;
   zoneId: number;
 }
 
@@ -24,6 +25,7 @@ export function buildShopSavePayload(
   // Trim empties
   const trim = (arr: string[]) =>
     arr.map(m => m.trim()).filter(m => m.length > 0);
+  const hasKeeper = formData.keeperId != null && formData.keeperZoneId != null;
   return {
     buyProfit: formData.buyProfit,
     sellProfit: formData.sellProfit,
@@ -35,8 +37,11 @@ export function buildShopSavePayload(
     noSuchItemMessages: trim(noSuchItemMessages),
     doNotBuyMessages: trim(doNotBuyMessages),
     missingCashMessages: trim(missingCashMessages),
-    keeperId: formData.keeperId ?? undefined,
-    zoneId: formData.zoneId,
+    // A keeper is a (zone, id) pair: send both or neither, and null (never 0)
+    // when there is no keeper selected. zoneId is deliberately not part of the
+    // payload: the record's zone is its key and is passed separately.
+    keeperId: hasKeeper ? formData.keeperId : null,
+    keeperZoneId: hasKeeper ? formData.keeperZoneId : null,
   };
 }
 

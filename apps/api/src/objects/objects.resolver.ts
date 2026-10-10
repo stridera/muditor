@@ -131,7 +131,9 @@ export class ObjectsResolver {
     @Args('id', { type: () => Int }) id: number,
     @Args('data') data: UpdateObjectInput
   ): Promise<ObjectDto> {
-    const { values, ...rest } = data;
+    // The record's zone is its key (from the zoneId arg); a zoneId inside the
+    // payload must never move the object, so it is dropped here.
+    const { values, zoneId: _payloadZoneId, ...rest } = data;
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
     const updateData: Prisma.ObjectsUpdateInput = {

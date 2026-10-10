@@ -218,15 +218,17 @@ export class UpdateShopInput {
   @IsArray()
   sellMessages?: string[];
 
+  // Keeper is a (zone, id) pair: send both or neither. null/omitted leaves the
+  // current keeper unchanged (a shop always needs a keeper mob).
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  keeperId?: number;
+  keeperId?: number | null;
 
   @Field(() => Int, { nullable: true })
   @IsOptional()
   @IsNumber()
-  zoneId?: number;
+  keeperZoneId?: number | null;
 }
 
 @ObjectType()
