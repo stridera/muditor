@@ -15,6 +15,7 @@ import {
   type WearFlag,
 } from '@/generated/graphql';
 import { TypeValueInput } from '@/components/objects/TypeValueInput';
+import { parseEntityId } from '@/lib/entityId';
 import { keywordsToInput, parseKeywords } from '@/lib/keywords';
 import {
   normalizeObjectValues,
@@ -119,6 +120,12 @@ const CREATE_OBJECT = gql`
       keywords
       name
     }
+  }
+`;
+
+const NEXT_OBJECT_ID = gql`
+  query NextObjectId($zoneId: Int!) {
+    nextObjectId(zoneId: $zoneId)
   }
 `;
 
@@ -345,6 +352,24 @@ function ObjectEditorContent() {
   const [passengerCapacity, setPassengerCapacity] = useState<number>(0);
   const [presenceOverride, setPresenceOverride] = useState<string>('');
 
+  // New objects: the API suggests the next free id in the chosen zone; the
+  // builder can override it (the API rejects an id that is already taken).
+  const [newId, setNewId] = useState<string>('');
+  const [newIdTouched, setNewIdTouched] = useState(false);
+  const { data: nextIdData } = useQuery<{ nextObjectId: number }>(
+    NEXT_OBJECT_ID,
+    {
+      variables: { zoneId: formData.zoneId },
+      skip: !isNew,
+      fetchPolicy: 'network-only',
+    }
+  );
+  useEffect(() => {
+    if (isNew && !newIdTouched && nextIdData) {
+      setNewId(String(nextIdData.nextObjectId));
+    }
+  }, [isNew, newIdTouched, nextIdData]);
+
   const { loading, error, data } = useQuery(GET_OBJECT, {
     variables: {
       id: parseInt(objectId || '0'),
@@ -556,6 +581,12 @@ function ObjectEditorContent() {
   const handleSave = async () => {
     if (!validateForm()) return;
 
+    const createId = isNew ? parseEntityId(newId) : null;
+    if (isNew && createId === null) {
+      setGeneralError('Object ID must be a non-negative whole number.');
+      return;
+    }
+
     try {
       // zoneId is the record key, never part of an update payload.
       const { zoneId: formZoneId, keywords, ...fields } = formData;
@@ -579,7 +610,7 @@ function ObjectEditorContent() {
       if (isNew) {
         await createObject({
           variables: {
-            data: { ...saveData, zoneId: formZoneId },
+            data: { ...saveData, id: createId!, zoneId: formZoneId },
           },
         });
       } else {
@@ -595,8 +626,10 @@ function ObjectEditorContent() {
       // Redirect back to objects list
       window.location.href = '/dashboard/objects';
     } catch (err) {
-      void err; // LoggingService.error('Error saving object', { error: err, objectId });
-      setGeneralError('Failed to save object. Please try again.');
+      // Surface the API's reason (e.g. "Object 5 already exists in zone 30").
+      const reason =
+        err instanceof Error && err.message ? ` ${err.message}` : '';
+      setGeneralError(`Failed to save object.${reason}`);
     }
   };
 
@@ -940,6 +973,34 @@ function ObjectEditorContent() {
                     className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
                   />
                 </div>
+
+                {isNew && (
+                  <div>
+                    <label
+                      htmlFor='objectId'
+                      className='block text-sm font-medium text-muted-foreground mb-1'
+                    >
+                      Object ID
+                    </label>
+                    <input
+                      type='number'
+                      id='objectId'
+                      value={newId}
+                      onChange={e => {
+                        setNewIdTouched(true);
+                        setNewId(e.target.value);
+                      }}
+                      min='0'
+                      step='1'
+                      title='Suggested: next free ID in this zone. Must be unique within the zone.'
+                      className='block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground'
+                    />
+                    <p className='mt-1 text-xs text-muted-foreground'>
+                      Next free ID in zone {formData.zoneId} is suggested; edit
+                      to override.
+                    </p>
+                  </div>
+                )}
 
                 <div>
                   <label

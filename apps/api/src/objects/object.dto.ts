@@ -12,6 +12,8 @@ import {
   IsNumber,
   IsEnum,
   IsArray,
+  IsInt,
+  Min,
 } from 'class-validator';
 import {
   Alignment,
@@ -148,7 +150,8 @@ export class ObjectDto {
 @InputType()
 export class CreateObjectInput {
   @Field(() => Int)
-  @IsNumber()
+  @IsInt()
+  @Min(0)
   id: number;
 
   @Field(() => Int)

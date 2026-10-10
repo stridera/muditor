@@ -105,12 +105,25 @@ export class ObjectsResolver {
     return objects.map(o => mapObject(o));
   }
 
+  @Query(() => Int, {
+    name: 'nextObjectId',
+    description:
+      'Lowest id above the highest object id in the zone (0 for an empty zone).',
+  })
+  @RequireZoneWrite()
+  async nextObjectId(
+    @Args('zoneId', { type: () => Int }) zoneId: number
+  ): Promise<number> {
+    return this.objectsService.nextFreeId(zoneId);
+  }
+
   @Mutation(() => ObjectDto)
   @RequireZoneWrite()
   async createObject(
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
     const { zoneId, values, ...objectData } = data;
+    await this.objectsService.assertIdFree(zoneId, objectData.id);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
     const createData: Prisma.ObjectsCreateInput = {

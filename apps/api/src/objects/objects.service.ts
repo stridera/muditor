@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { ConflictException, Injectable } from '@nestjs/common';
 import {
   type Objects,
   ObjectType,
@@ -191,6 +191,28 @@ export class ObjectsService {
         },
       },
     });
+  }
+
+  /** Next unused object id in a zone: highest id + 1, or 0 for an empty zone. */
+  async nextFreeId(zoneId: number): Promise<number> {
+    const { _max } = await this.database.objects.aggregate({
+      where: { zoneId },
+      _max: { id: true },
+    });
+    return _max.id === null || _max.id === undefined ? 0 : _max.id + 1;
+  }
+
+  /** Throws ConflictException when (zoneId, id) already exists. */
+  async assertIdFree(zoneId: number, id: number): Promise<void> {
+    const existing = await this.database.objects.findUnique({
+      where: { zoneId_id: { zoneId, id } },
+      select: { id: true },
+    });
+    if (existing) {
+      throw new ConflictException(
+        `Object ${id} already exists in zone ${zoneId}`
+      );
+    }
   }
 
   async create(data: Prisma.ObjectsCreateInput): Promise<Objects> {

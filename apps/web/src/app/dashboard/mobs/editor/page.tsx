@@ -26,6 +26,7 @@ import {
   type Race,
   type Size,
 } from '@/generated/graphql';
+import { parseKeywords } from '@/lib/keywords';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
@@ -397,10 +398,7 @@ function MobEditorContent() {
     try {
       // Convert form data to backend format
       const saveData = {
-        keywords: formData.keywords
-          .split(',')
-          .map(k => k.trim())
-          .filter(k => k.length > 0),
+        keywords: parseKeywords(formData.keywords),
         name: formData.name,
         roomDescription: formData.roomDescription,
         examineDescription: formData.examineDescription,
