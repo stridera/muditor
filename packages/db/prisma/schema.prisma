@@ -1296,6 +1296,12 @@ model RaceAbilities {
   category       SkillCategory @default(SECONDARY)
   bonus          Int           @default(0)
   proficiencyCap Int           @default(100) @map("proficiency_cap") // Max trainable proficiency (0-100)
+  /// Racial active (`innate <ability>`): MUD hours (75 real seconds each) before the same character may use it
+  /// again. Null = no cooldown. Separate from Ability.cooldownMs, which would also gate the normal spell.
+  cooldownHours  Int?          @map("cooldown_hours")
+  /// Optional stat (STR/DEX/CON/INT/WIS/CHA) whose legacy "small skill bonus" is subtracted from cooldownHours
+  /// (Arborean barkskin: 20 - CON bonus). Null = fixed cooldown.
+  cooldownStat   String?       @map("cooldown_stat")
   raceData       Races         @relation(fields: [race], references: [race], onDelete: Cascade)
   ability        Ability       @relation(fields: [abilityId], references: [id], onDelete: Cascade)
 
