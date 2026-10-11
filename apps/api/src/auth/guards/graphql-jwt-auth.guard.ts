@@ -67,6 +67,8 @@ export class GraphQLJwtAuthGuard {
       req.user = Object.assign(user, {
         authAt: payload.authAt ?? payload.iat,
         tokenVersionClaim: tokenVersionOf(payload),
+        // JWT expiry (epoch seconds); long-lived subscriptions end when it passes.
+        tokenExp: payload.exp as number | undefined,
       });
       return true;
     } catch (error) {

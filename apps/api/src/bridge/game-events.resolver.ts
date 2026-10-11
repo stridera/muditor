@@ -9,7 +9,7 @@ import {
   Field,
 } from '@nestjs/graphql';
 import { UserRole, type Users } from '@muditor/db';
-import { filter, type Observable } from 'rxjs';
+import { filter, finalize, type Observable } from 'rxjs';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
@@ -152,23 +152,36 @@ export class GameEventsResolver {
    * that subscriber only. Every REVALIDATE_MS the subscriber is re-checked
    * (deleted, banned, token revoked, role/characters changed) so a long-lived
    * socket cannot outlive a ban or role change; a failed check ends the stream.
+   * A stream also ends once the JWT it was opened with expires (`tokenExp`).
    */
   private async streamFor(
-    user: Users & { tokenVersionClaim?: number },
+    user: Users & { tokenVersionClaim?: number; tokenExp?: number },
     source: Observable<GameEvent>
   ): Promise<AsyncIterableIterator<GameEvent>> {
     let viewer = await this.loadViewer(user);
     const claim = user.tokenVersionClaim ?? user.tokenVersion ?? 0;
+    const expiresAtMs =
+      typeof user.tokenExp === 'number' ? user.tokenExp * 1000 : null;
+    const isExpired = () => expiresAtMs !== null && Date.now() >= expiresAtMs;
     let revoked = false;
 
     const timer = setInterval(() => {
+      if (isExpired()) {
+        revoked = true;
+        clearInterval(timer);
+        return;
+      }
       void this.revalidate(user.id, claim).then(
         next => {
           if (next) viewer = next;
-          else revoked = true;
+          else {
+            revoked = true;
+            clearInterval(timer);
+          }
         },
         () => {
           revoked = true;
+          clearInterval(timer);
         }
       );
     }, REVALIDATE_MS);
@@ -177,9 +190,15 @@ export class GameEventsResolver {
     const iterator = toAsyncIterable(
       source.pipe(
         filter(event => {
-          if (revoked) throw new UnauthorizedException('Session revoked');
+          if (isExpired()) revoked = true;
+          if (revoked) {
+            clearInterval(timer);
+            throw new UnauthorizedException('Session revoked');
+          }
           return canViewEvent(viewer, event);
-        })
+        }),
+        // Runs on error, complete and unsubscribe, so the interval never leaks.
+        finalize(() => clearInterval(timer))
       )
     );
     const originalReturn = iterator.return!.bind(iterator);
