@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import {
   type MobResetEquipment,
+  type MobResetEquipmentContents,
   type MobResets,
   Prisma,
   WearFlag,
@@ -24,6 +25,11 @@ interface MobResetWithRelations extends MobResets {
         name: string;
         type: string;
       };
+      contents?: Array<
+        MobResetEquipmentContents & {
+          objects: { id: number; zoneId: number; name: string; type: string };
+        }
+      >;
     }
   >;
   mobs?: { id: number; zoneId: number; name: string } | null;
@@ -65,6 +71,14 @@ export class MobResetService {
                 type: true,
               },
             },
+            contents: {
+              orderBy: { id: 'asc' as const },
+              include: {
+                objects: {
+                  select: { id: true, zoneId: true, name: true, type: true },
+                },
+              },
+            },
           },
         },
         mobs: {
@@ -99,6 +113,14 @@ export class MobResetService {
                 zoneId: true,
                 name: true,
                 type: true,
+              },
+            },
+            contents: {
+              orderBy: { id: 'asc' as const },
+              include: {
+                objects: {
+                  select: { id: true, zoneId: true, name: true, type: true },
+                },
               },
             },
           },
@@ -158,6 +180,14 @@ export class MobResetService {
           include: {
             objects: {
               select: { id: true, zoneId: true, name: true, type: true },
+            },
+            contents: {
+              orderBy: { id: 'asc' as const },
+              include: {
+                objects: {
+                  select: { id: true, zoneId: true, name: true, type: true },
+                },
+              },
             },
           },
         },
@@ -327,6 +357,20 @@ export class MobResetService {
           name: eq.objects.name,
           type: eq.objects.type,
         },
+        contents: (eq.contents ?? []).map(c => ({
+          id: c.id,
+          parentContentId: c.parentContentId ?? undefined,
+          objectZoneId: c.objectZoneId,
+          objectId: c.objectId,
+          quantity: c.quantity,
+          maxInstances: c.maxInstances,
+          object: {
+            id: c.objects.id,
+            zoneId: c.objects.zoneId,
+            name: c.objects.name,
+            type: c.objects.type,
+          },
+        })),
       })) as MobResetEquipmentDto[],
     };
     if (reset.mobs) {

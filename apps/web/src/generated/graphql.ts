@@ -1969,8 +1969,23 @@ export type MobResetDto = {
   zoneId: Scalars['Int']['output'];
 };
 
+export type MobResetEquipmentContentDto = {
+  __typename?: 'MobResetEquipmentContentDto';
+  id: Scalars['ID']['output'];
+  /** World-wide cap on live copies of this object (legacy P max) */
+  maxInstances: Scalars['Int']['output'];
+  object: ObjectSummaryDto;
+  objectId: Scalars['Int']['output'];
+  objectZoneId: Scalars['Int']['output'];
+  /** Id of the content row this one sits inside; null = directly inside the equipment item */
+  parentContentId?: Maybe<Scalars['Int']['output']>;
+  quantity: Scalars['Int']['output'];
+};
+
 export type MobResetEquipmentDto = {
   __typename?: 'MobResetEquipmentDto';
+  /** Items spawned inside this carried or worn container (flat list, nested via parentContentId) */
+  contents: Array<MobResetEquipmentContentDto>;
   id: Scalars['ID']['output'];
   maxInstances: Scalars['Int']['output'];
   /** The object being equipped */

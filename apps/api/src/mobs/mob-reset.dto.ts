@@ -88,6 +88,36 @@ export class RoomSummaryDto {
 }
 
 @ObjectType()
+export class MobResetEquipmentContentDto {
+  @Field(() => ID)
+  id: number;
+
+  @Field(() => Int, {
+    nullable: true,
+    description:
+      'Id of the content row this one sits inside; null = directly inside the equipment item',
+  })
+  parentContentId?: number;
+
+  @Field(() => Int)
+  objectZoneId: number;
+
+  @Field(() => Int)
+  objectId: number;
+
+  @Field(() => Int)
+  quantity: number;
+
+  @Field(() => Int, {
+    description: 'World-wide cap on live copies of this object (legacy P max)',
+  })
+  maxInstances: number;
+
+  @Field(() => ObjectSummaryDto)
+  object: ObjectSummaryDto;
+}
+
+@ObjectType()
 export class MobResetEquipmentDto {
   @Field(() => ID)
   id: number;
@@ -109,6 +139,12 @@ export class MobResetEquipmentDto {
 
   @Field(() => ObjectSummaryDto, { description: 'The object being equipped' })
   object: ObjectSummaryDto;
+
+  @Field(() => [MobResetEquipmentContentDto], {
+    description:
+      'Items spawned inside this carried or worn container (flat list, nested via parentContentId)',
+  })
+  contents: MobResetEquipmentContentDto[];
 }
 
 @ObjectType()

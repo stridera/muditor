@@ -982,19 +982,39 @@ model CharacterPets {
 }
 
 model MobResetEquipment {
-  id           Int       @id @default(autoincrement())
-  maxInstances Int       @default(1) @map("max_instances")
-  wearLocation String?   @map("wear_location")
-  objectZoneId Int       @map("object_zone_id")
-  objectId     Int       @map("object_id")
-  resetId      Int       @map("reset_id")
-  probability  Float     @default(1.0)
+  id           Int                         @id @default(autoincrement())
+  maxInstances Int                         @default(1) @map("max_instances")
+  wearLocation String?                     @map("wear_location")
+  objectZoneId Int                         @map("object_zone_id")
+  objectId     Int                         @map("object_id")
+  resetId      Int                         @map("reset_id")
+  probability  Float                       @default(1.0)
   // When true, equipment is decorative only - cannot be looted from corpse or stolen
   // Allows mobs to appear fully equipped without dropping piles of gear
   // Different from TEMPORARY object flag (which IS lootable but doesn't persist through logout)
-  decorative   Boolean   @default(false)
-  objects      Objects   @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
-  mob_resets   MobResets @relation(fields: [resetId], references: [id], onDelete: Cascade)
+  decorative   Boolean                     @default(false)
+  objects      Objects                     @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
+  mob_resets   MobResets                   @relation(fields: [resetId], references: [id], onDelete: Cascade)
+  contents     MobResetEquipmentContents[] // Objects that spawn inside this carried/worn container
+}
+
+// MobResetEquipmentContents: Objects that spawn inside a container a mob carries or wears
+// (legacy `G`/`E` followed by `P`). Same shape as ObjectResetContents, hung off the equipment row.
+model MobResetEquipmentContents {
+  id              Int     @id @default(autoincrement())
+  equipmentId     Int     @map("equipment_id")
+  parentContentId Int?    @map("parent_content_id") // NULL = direct child of the equipment row's object
+  objectZoneId    Int     @map("object_zone_id")
+  objectId        Int     @map("object_id")
+  quantity        Int     @default(1)
+  // Legacy `P` max: world-wide cap on live copies of this object (all containers).
+  maxInstances    Int     @default(1) @map("max_instances")
+  comment         String?
+
+  equipment     MobResetEquipment           @relation(fields: [equipmentId], references: [id], onDelete: Cascade)
+  parentContent MobResetEquipmentContents?  @relation("mobGearContentNesting", fields: [parentContentId], references: [id], onDelete: Cascade)
+  childContents MobResetEquipmentContents[] @relation("mobGearContentNesting")
+  objects       Objects                     @relation(fields: [objectZoneId, objectId], references: [zoneId, id], onDelete: Cascade)
 }
 
 model MobResets {
@@ -1270,28 +1290,29 @@ model Objects {
   // Consumed by `camp <kit-name>`; bonus stacks into `restTier` per design.
   campKitTier Int? @map("camp_kit_tier")
 
-  characterItems          CharacterItems[]
-  mobResetEquipment       MobResetEquipment[]
-  objectExtraDescriptions ObjectExtraDescriptions[]
-  objectResets            ObjectResets[]
-  objectResetContents     ObjectResetContents[]
-  objectResistances       ObjectResistance[] // Resistance bonuses granted by this item
-  grantedEffects          ObjectEffects[] // Effects granted when worn/held
-  zones                   Zones                     @relation(fields: [zoneId], references: [id], onDelete: Cascade)
-  shopItems               ShopItems[]
-  objectTriggers          ObjectTriggers[] // Trigger attachments via junction table
-  objectAbilities         ObjectAbilities[] // Cast spells (quaff potion → cast spell)
-  consumableEffects       ConsumableEffect[] // Direct effects (eat food → apply effect)
-  accountItems            AccountItems[]
+  characterItems            CharacterItems[]
+  mobResetEquipment         MobResetEquipment[]
+  objectExtraDescriptions   ObjectExtraDescriptions[]
+  objectResets              ObjectResets[]
+  objectResetContents       ObjectResetContents[]
+  mobResetEquipmentContents MobResetEquipmentContents[]
+  objectResistances         ObjectResistance[] // Resistance bonuses granted by this item
+  grantedEffects            ObjectEffects[] // Effects granted when worn/held
+  zones                     Zones                       @relation(fields: [zoneId], references: [id], onDelete: Cascade)
+  shopItems                 ShopItems[]
+  objectTriggers            ObjectTriggers[] // Trigger attachments via junction table
+  objectAbilities           ObjectAbilities[] // Cast spells (quaff potion → cast spell)
+  consumableEffects         ConsumableEffect[] // Direct effects (eat food → apply effect)
+  accountItems              AccountItems[]
   // Quest system relations
-  questRewards            QuestRewards[]
-  objectiveTargetObject   QuestObjectives[]         @relation("objectiveTargetObject")
-  questTriggerItem        Quests[]                  @relation("questTriggerItem")
-  playerHouseItems        PlayerHouseItem[]
-  roomExitKeys            RoomExit[]                @relation("roomExitKey")
+  questRewards              QuestRewards[]
+  objectiveTargetObject     QuestObjectives[]           @relation("objectiveTargetObject")
+  questTriggerItem          Quests[]                    @relation("questTriggerItem")
+  playerHouseItems          PlayerHouseItem[]
+  roomExitKeys              RoomExit[]                  @relation("roomExitKey")
   // Wake Effect attachments scheduled by this object (consumed camp kit, or
   // bed in a HOUSE-owned room) at the first XP gain after waking.
-  wakeEffects             ObjectWakeEffects[]
+  wakeEffects               ObjectWakeEffects[]
 
   @@id([zoneId, id])
   @@index([name])

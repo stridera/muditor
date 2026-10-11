@@ -2059,7 +2059,27 @@ type MobResetDto {
   zoneId: Int!
 }
 
+type MobResetEquipmentContentDto {
+  id: ID!
+
+  """World-wide cap on live copies of this object (legacy P max)"""
+  maxInstances: Int!
+  object: ObjectSummaryDto!
+  objectId: Int!
+  objectZoneId: Int!
+
+  """
+  Id of the content row this one sits inside; null = directly inside the equipment item
+  """
+  parentContentId: Int
+  quantity: Int!
+}
+
 type MobResetEquipmentDto {
+  """
+  Items spawned inside this carried or worn container (flat list, nested via parentContentId)
+  """
+  contents: [MobResetEquipmentContentDto!]!
   id: ID!
   maxInstances: Int!
 
