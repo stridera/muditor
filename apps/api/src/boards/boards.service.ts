@@ -12,19 +12,21 @@ export class BoardsService {
   constructor(private readonly database: DatabaseService) {}
 
   /**
-   * Names the user may post as (display name + linked character names) and the
-   * poster level (highest linked character level, minimum 1).
+   * Names the user may post as and the poster level (highest linked character
+   * level, minimum 1). Identities are ONLY the names of characters linked to
+   * the account (Characters.user_id); an account display name is not an
+   * identity, otherwise anyone could register as "Strider" and post or edit as
+   * that character.
    */
   async getPosterIdentity(user: {
     id: string;
-    displayName: string;
   }): Promise<{ names: string[]; level: number }> {
     const characters = await this.database.characters.findMany({
       where: { userId: user.id },
       select: { name: true, level: true },
     });
     return {
-      names: [user.displayName, ...characters.map(c => c.name)],
+      names: characters.map(c => c.name),
       level: Math.max(1, ...characters.map(c => c.level)),
     };
   }

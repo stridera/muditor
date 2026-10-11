@@ -10,6 +10,8 @@ const author = user('u-author', 'Alice', UserRole.BUILDER);
 const stranger = user('u-stranger', 'Mallory', UserRole.PLAYER);
 const immortal = user('u-imm', 'Zeus', UserRole.IMMORTAL);
 const player = user('u-player', 'Pat', UserRole.PLAYER);
+// Registered with a display name equal to someone's character but owns none.
+const impostor = user('u-impostor', 'Alice', UserRole.PLAYER);
 
 function makeService() {
   const message = {
@@ -35,8 +37,10 @@ function makeService() {
     deleteMessage: jest.fn().mockResolvedValue(message),
     createMessage: jest.fn().mockResolvedValue(message),
     getCharacterLevels: jest.fn().mockResolvedValue([] as number[]),
+    // Identities are linked character names only; here each test user owns a
+    // character named like their display name, except `impostor`.
     getPosterIdentity: jest.fn(async (u: Users) => ({
-      names: [u.displayName],
+      names: u.id === 'u-impostor' ? [] : [u.displayName],
       level: 102,
     })),
     createBoard: jest.fn().mockResolvedValue({
@@ -99,6 +103,30 @@ describe('BoardMessagesResolver authorization', () => {
       'Zeus'
     );
     expect(service.deleteMessage).toHaveBeenCalledWith(7);
+  });
+
+  it('a bare display name is not an identity: cannot post, edit or delete as that character', async () => {
+    await expect(
+      resolver.createBoardMessage(
+        {
+          boardId: 1,
+          poster: 'Alice',
+          posterLevel: 1,
+          subject: 's',
+          content: 'c',
+        },
+        impostor
+      )
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(
+      resolver.updateBoardMessage(7, { content: 'defaced' }, impostor)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    await expect(
+      resolver.deleteBoardMessage(7, impostor)
+    ).rejects.toBeInstanceOf(ForbiddenException);
+    expect(service.createMessage).not.toHaveBeenCalled();
+    expect(service.updateMessage).not.toHaveBeenCalled();
+    expect(service.deleteMessage).not.toHaveBeenCalled();
   });
 
   it('forbids posting under a name the caller does not own, and derives level server-side', async () => {

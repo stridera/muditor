@@ -86,6 +86,30 @@ export class AuthService {
     return null;
   }
 
+  /**
+   * A display name must not equal a character name (case-insensitive) that the
+   * account does not own, so a display name can never pass as another player's
+   * character. Pass the account id when renaming an existing user; their own
+   * characters are exempt.
+   */
+  async assertDisplayNameNotCharacter(
+    displayName: string,
+    ownerUserId?: string
+  ): Promise<void> {
+    const clash = await this.databaseService.characters.findFirst({
+      where: {
+        name: { equals: displayName, mode: 'insensitive' },
+        ...(ownerUserId
+          ? { OR: [{ userId: null }, { userId: { not: ownerUserId } }] }
+          : {}),
+      },
+      select: { id: true },
+    });
+    if (clash) {
+      throw new ConflictException('Display name already exists');
+    }
+  }
+
   async register(registerInput: RegisterInput): Promise<AuthPayload> {
     const { displayName, email, password } = registerInput;
 
@@ -109,6 +133,8 @@ export class AuthService {
         throw new ConflictException('Email already exists');
       }
     }
+
+    await this.assertDisplayNameNotCharacter(displayName);
 
     // Hash password
     const saltRounds = 12;
@@ -695,6 +721,7 @@ export class AuthService {
       }
       throw new ConflictException('Email already exists');
     }
+    await this.assertDisplayNameNotCharacter(displayName);
 
     // Check if googleId was claimed in the meantime
     const existingLink = await this.databaseService.googleLink.findUnique({

@@ -32,6 +32,7 @@ describe('AuthService', () => {
         findFirst: jest.fn(),
       },
       characters: {
+        findFirst: jest.fn().mockResolvedValue(null),
         findMany: jest.fn(),
         updateMany: jest.fn(),
       },
@@ -180,6 +181,36 @@ describe('AuthService', () => {
 
       await expect(service.register(registerInput)).rejects.toThrow(
         new ConflictException('Display name already exists')
+      );
+    });
+
+    it('rejects a display name that matches an existing character name', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
+      (databaseService.characters.findFirst as jest.Mock).mockResolvedValueOnce(
+        { id: 'char-1' }
+      );
+
+      await expect(
+        service.register({ ...registerInput, displayName: 'Strider' })
+      ).rejects.toThrow(new ConflictException('Display name already exists'));
+      expect(databaseService.characters.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            name: { equals: 'Strider', mode: 'insensitive' },
+          }),
+        })
+      );
+      expect(databaseService.users.create).not.toHaveBeenCalled();
+    });
+
+    it('exempts the owner own characters when checking a display name', async () => {
+      await service.assertDisplayNameNotCharacter('Strider', 'u1');
+      expect(databaseService.characters.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          where: expect.objectContaining({
+            OR: [{ userId: null }, { userId: { not: 'u1' } }],
+          }),
+        })
       );
     });
 

@@ -1,7 +1,6 @@
 'use client';
 
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
@@ -9,24 +8,7 @@ import {
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '@/components/ui/dialog';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Loading } from '@/components/ui/loading';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
 import {
   Table,
   TableBody,
@@ -36,64 +18,31 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import {
-  DepositWealthDocument,
   GetMyAccountStorageDocument,
   GetMyAccountWealthDisplayDocument,
-  GetMyCharactersDocument,
   type GetMyAccountStorageQuery,
   type GetMyAccountWealthDisplayQuery,
-  type GetMyCharactersQuery,
 } from '@/generated/graphql';
-import { useErrorHandler } from '@/lib/error-utils';
-import { useMutation, useQuery } from '@apollo/client/react';
-import { Coins, Package, PiggyBank, Vault } from 'lucide-react';
-import { useState } from 'react';
-import { toast } from 'sonner';
+import { useQuery } from '@apollo/client/react';
+import { Coins, Package, Vault } from 'lucide-react';
 
 type AccountItem = NonNullable<
   GetMyAccountStorageQuery['myAccountStorage']
 >['items'][0];
-type Character = NonNullable<GetMyCharactersQuery['myCharacters']>[0];
 
 export default function AccountStoragePage() {
-  const [depositDialogOpen, setDepositDialogOpen] = useState(false);
+  const { data: storageData, loading: storageLoading } =
+    useQuery<GetMyAccountStorageQuery>(GetMyAccountStorageDocument);
 
-  const { data: charactersData, loading: charactersLoading } =
-    useQuery<GetMyCharactersQuery>(GetMyCharactersDocument);
+  const { data: wealthDisplayData } = useQuery<GetMyAccountWealthDisplayQuery>(
+    GetMyAccountWealthDisplayDocument
+  );
 
-  const {
-    data: storageData,
-    loading: storageLoading,
-    refetch: refetchStorage,
-  } = useQuery<GetMyAccountStorageQuery>(GetMyAccountStorageDocument);
-
-  const { data: wealthDisplayData, refetch: refetchWealth } =
-    useQuery<GetMyAccountWealthDisplayQuery>(GetMyAccountWealthDisplayDocument);
-
-  const [depositWealth] = useMutation(DepositWealthDocument);
-  const { handleError } = useErrorHandler();
-
-  const characters = charactersData?.myCharacters || [];
   const storage = storageData?.myAccountStorage;
   const wealthDisplay = wealthDisplayData?.myAccountWealthDisplay;
   const items = storage?.items || [];
 
-  const handleDepositWealth = async (characterId: string, amount: bigint) => {
-    try {
-      await depositWealth({
-        variables: { characterId, amount: amount.toString() },
-      });
-      toast.success('Wealth deposited to account storage!');
-      setDepositDialogOpen(false);
-      refetchStorage();
-      refetchWealth();
-    } catch (err) {
-      const errorDisplay = handleError(err, 'depositing wealth');
-      toast.error(errorDisplay.message);
-    }
-  };
-
-  if (charactersLoading || storageLoading) {
+  if (storageLoading) {
     return <Loading text='Loading account storage...' />;
   }
 
@@ -109,20 +58,14 @@ export default function AccountStoragePage() {
             Shared storage for wealth and items across all your characters
           </p>
         </div>
-        <Dialog open={depositDialogOpen} onOpenChange={setDepositDialogOpen}>
-          <DialogTrigger asChild>
-            <Button>
-              <PiggyBank className='h-4 w-4 mr-2' />
-              Deposit Wealth
-            </Button>
-          </DialogTrigger>
-          <DepositWealthDialog
-            characters={characters}
-            onDeposit={handleDepositWealth}
-            onClose={() => setDepositDialogOpen(false)}
-          />
-        </Dialog>
       </div>
+
+      <Card>
+        <CardContent className='py-4 text-sm text-muted-foreground'>
+          This page is read-only. To move items or coins, use the chest and bank
+          commands in game.
+        </CardContent>
+      </Card>
 
       <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
         <Card>
@@ -290,122 +233,5 @@ export default function AccountStoragePage() {
         </Card>
       )}
     </div>
-  );
-}
-
-function DepositWealthDialog({
-  characters,
-  onDeposit,
-  onClose,
-}: {
-  characters: Character[];
-  onDeposit: (characterId: string, amount: bigint) => void;
-  onClose: () => void;
-}) {
-  const [selectedCharacterId, setSelectedCharacterId] = useState<string>('');
-  const [copper, setCopper] = useState(0);
-  const [silver, setSilver] = useState(0);
-  const [gold, setGold] = useState(0);
-  const [platinum, setPlatinum] = useState(0);
-
-  const totalCopper = copper + silver * 10 + gold * 100 + platinum * 1000;
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!selectedCharacterId || totalCopper <= 0) {
-      toast.error('Please select a character and enter an amount');
-      return;
-    }
-    onDeposit(selectedCharacterId, BigInt(totalCopper));
-  };
-
-  return (
-    <DialogContent>
-      <DialogHeader>
-        <DialogTitle className='flex items-center gap-2'>
-          <PiggyBank className='h-5 w-5' />
-          Deposit Wealth
-        </DialogTitle>
-        <DialogDescription>
-          Transfer coins from a character to your account storage
-        </DialogDescription>
-      </DialogHeader>
-      <form onSubmit={handleSubmit} className='space-y-4'>
-        <div>
-          <Label htmlFor='character'>From Character</Label>
-          <Select
-            value={selectedCharacterId}
-            onValueChange={setSelectedCharacterId}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder='Select a character' />
-            </SelectTrigger>
-            <SelectContent>
-              {characters.map(char => (
-                <SelectItem key={char.id} value={char.id}>
-                  {char.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label>Amount to Deposit</Label>
-          <div className='grid grid-cols-4 gap-2 mt-1'>
-            <div>
-              <Label className='text-xs'>Copper</Label>
-              <Input
-                type='number'
-                min={0}
-                value={copper}
-                onChange={e => setCopper(parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div>
-              <Label className='text-xs'>Silver</Label>
-              <Input
-                type='number'
-                min={0}
-                value={silver}
-                onChange={e => setSilver(parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div>
-              <Label className='text-xs'>Gold</Label>
-              <Input
-                type='number'
-                min={0}
-                value={gold}
-                onChange={e => setGold(parseInt(e.target.value) || 0)}
-              />
-            </div>
-            <div>
-              <Label className='text-xs'>Platinum</Label>
-              <Input
-                type='number'
-                min={0}
-                value={platinum}
-                onChange={e => setPlatinum(parseInt(e.target.value) || 0)}
-              />
-            </div>
-          </div>
-          <p className='text-sm text-muted-foreground mt-2'>
-            Total: {totalCopper.toLocaleString()} copper
-          </p>
-        </div>
-        <div className='flex justify-end gap-2'>
-          <Button type='button' variant='outline' onClick={onClose}>
-            Cancel
-          </Button>
-          <Button
-            type='submit'
-            disabled={!selectedCharacterId || totalCopper <= 0}
-          >
-            <Coins className='h-4 w-4 mr-2' />
-            Deposit
-          </Button>
-        </div>
-      </form>
-    </DialogContent>
   );
 }

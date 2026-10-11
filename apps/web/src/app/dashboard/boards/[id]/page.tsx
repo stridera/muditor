@@ -64,6 +64,15 @@ const GET_BOARD = gql`
   }
 `;
 
+const MY_CHARACTER_NAMES = gql`
+  query BoardPageMyCharacters {
+    myCharacters {
+      id
+      name
+    }
+  }
+`;
+
 const CREATE_MESSAGE = gql`
   mutation CreateBoardMessagePage($data: CreateBoardMessageInput!) {
     createBoardMessage(data: $data) {
@@ -142,6 +151,16 @@ export default function BoardDetailPage() {
   const [subject, setSubject] = useState('');
   const [content, setContent] = useState('');
   const [sticky, setSticky] = useState(false);
+  const [posterName, setPosterName] = useState('');
+
+  // Posting identities are the account's linked characters, never the display name.
+  const { data: charactersData } = useQuery<{
+    myCharacters: { id: string; name: string }[];
+  }>(MY_CHARACTER_NAMES);
+  const characterNames = (charactersData?.myCharacters ?? []).map(c => c.name);
+  const activePoster = characterNames.includes(posterName)
+    ? posterName
+    : (characterNames[0] ?? '');
 
   const { data, loading, error, refetch } = useQuery<GetBoardQueryResult>(
     GET_BOARD,
@@ -224,11 +243,15 @@ export default function BoardDetailPage() {
 
   const handleSubmitCompose = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!activePoster) {
+      setErrorMessage('Link a character to your account to post on boards');
+      return;
+    }
     await createMessage({
       variables: {
         data: {
           boardId,
-          poster: user?.displayName || 'Anonymous',
+          poster: activePoster,
           posterLevel: rolePosterLevel(user?.role),
           subject,
           content,
@@ -271,7 +294,7 @@ export default function BoardDetailPage() {
   const canPost = isBuilder || isCoder;
   const canEdit = (message: BoardMessage) => {
     if (isCoder) return true;
-    if (isBuilder && message.poster === user?.displayName) return true;
+    if (isBuilder && characterNames.includes(message.poster)) return true;
     return false;
   };
 
@@ -440,6 +463,25 @@ export default function BoardDetailPage() {
             </DialogHeader>
 
             <div className='space-y-4 mt-4'>
+              <div>
+                <Label htmlFor='poster'>Post as</Label>
+                <select
+                  id='poster'
+                  className='w-full rounded-md border bg-background px-3 py-2 text-sm'
+                  value={activePoster}
+                  onChange={e => setPosterName(e.target.value)}
+                  required
+                >
+                  {characterNames.length === 0 && (
+                    <option value=''>No linked characters</option>
+                  )}
+                  {characterNames.map(name => (
+                    <option key={name} value={name}>
+                      {name}
+                    </option>
+                  ))}
+                </select>
+              </div>
               <div>
                 <Label htmlFor='subject'>Subject</Label>
                 <Input

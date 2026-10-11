@@ -6,12 +6,16 @@ import { LoggingService } from './logging/logging.service';
 import { ClientErrorsController } from './client-errors.controller';
 import { TestController } from './test/test.controller';
 
+// The test controller exposes unauthenticated error/log probes: mount it only
+// when explicitly enabled, never merely because NODE_ENV=development (the dev
+// API is publicly reachable).
+const testEndpointsEnabled = process.env.ENABLE_TEST_ENDPOINTS === 'true';
+
 @Global()
 @Module({
-  controllers:
-    process.env.NODE_ENV === 'development'
-      ? [ClientErrorsController, TestController]
-      : [ClientErrorsController],
+  controllers: testEndpointsEnabled
+    ? [ClientErrorsController, TestController]
+    : [ClientErrorsController],
   providers: [
     LoggingService,
     GraphQLErrorLoggingPlugin,

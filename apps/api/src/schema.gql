@@ -2278,8 +2278,6 @@ type Mutation {
 
   """Deny a pending game login request"""
   denyGameLogin(code: String!): Boolean!
-  depositItem(characterId: String!, objectId: Int!, objectZoneId: Int!, quantity: Int! = 1): AccountItemDto!
-  depositWealth(amount: BigInt!, characterId: String!): BigInt!
 
   """
   Detach a trigger from ONE mob (mobZoneId+mobId) or ONE object (objectZoneId+objectId)
@@ -2442,8 +2440,6 @@ type Mutation {
   updateUser(input: UpdateUserInput!): User!
   updateUserPreferences(input: UpdatePreferencesInput!): User!
   updateZone(data: UpdateZoneInput!, id: Int!): ZoneDto!
-  withdrawItem(accountItemId: Int!, characterId: String!): Boolean!
-  withdrawWealth(amount: BigInt!, characterId: String!): BigInt!
 }
 
 type ObjectAffectDto {

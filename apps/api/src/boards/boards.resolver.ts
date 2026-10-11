@@ -367,14 +367,16 @@ export class BoardMessagesResolver {
     @Args('data') data: CreateBoardMessageInput,
     @CurrentUser() user: Users
   ): Promise<BoardMessageDto> {
-    // Never trust client-supplied identity: poster must be the caller's own
-    // display name or one of their characters, and the level is derived server-side.
+    // Never trust client-supplied identity: poster must be one of the caller's
+    // linked characters (never a bare display name), and the level is derived server-side.
     const identity = await this.boardsService.getPosterIdentity(user);
     const poster = identity.names.find(
       n => n.toLowerCase() === data.poster.toLowerCase()
     );
     if (!poster) {
-      throw new ForbiddenException('You can only post as yourself');
+      throw new ForbiddenException(
+        'You can only post as one of your own characters'
+      );
     }
     // Write / sticky privileges come from the board's rules, like READ does.
     const board = await this.boardsService.findBoardPrivileges(data.boardId);
