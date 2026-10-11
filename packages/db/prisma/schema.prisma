@@ -3394,6 +3394,19 @@ model SpellSyllable {
   @@map("SpellSyllable")
 }
 
+/// Words that may not be used as a character name (and so are refused at
+/// character creation): staff/system voices and generic mob words. Lowercase;
+/// the game compares case-insensitively. The command-grammar words
+/// (all/self/me/...) are NOT here: they are fixed in the game's code.
+model ReservedNames {
+  id        Int      @id @default(autoincrement())
+  name      String   @unique
+  reason    String?
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("ReservedNames")
+}
+
 // ============================================================================
 // QUEST SYSTEM
 // ============================================================================

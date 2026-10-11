@@ -1161,6 +1161,12 @@ input CreateRaceInput {
   raceAlign: RaceAlign! = GOOD
 }
 
+"""Input for reserving a character name"""
+input CreateReservedNameInput {
+  name: String!
+  reason: String
+}
+
 input CreateRoomExitInput {
   defaultState: ExitState = OPEN
   description: String
@@ -2186,6 +2192,9 @@ type Mutation {
   createQuestPrerequisite(data: CreateQuestPrerequisiteInput!): QuestPrerequisiteDto!
   createQuestReward(data: CreateQuestRewardInput!): QuestRewardDto!
   createRace(data: CreateRaceInput!): RaceDto!
+
+  """Reserve a character name"""
+  createReservedName(data: CreateReservedNameInput!): ReservedNameDto!
   createRoom(data: CreateRoomInput!): RoomDto!
   createRoomExit(data: CreateRoomExitInput!): RoomExitDto!
   createShop(data: CreateShopInput!): ShopDto!
@@ -2252,6 +2261,9 @@ type Mutation {
   deleteQuestPrerequisite(id: Int!): QuestPrerequisiteDto!
   deleteQuestReward(id: Int!): QuestRewardDto!
   deleteRace(race: Race!): Boolean!
+
+  """Remove a reserved character name"""
+  deleteReservedName(id: ID!): Boolean!
   deleteRoom(id: Int!, zoneId: Int!): RoomDto!
   deleteRoomExit(exitId: Float!): RoomExitDto!
   deleteShop(id: Int!, zoneId: Int!): ShopDto!
@@ -2893,6 +2905,9 @@ type Query {
 
   """List player reports with computed rank and score"""
   reports(filter: ReportFilterInput, skip: Int! = 0, sort: ReportSort = RANK, take: Int! = 50): ReportPage!
+
+  """Get all reserved character names, alphabetically"""
+  reservedNames: [ReservedNameDto!]!
   room(id: Int!, zoneId: Int!): RoomDto!
   rooms(lightweight: Boolean = false, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
@@ -3307,6 +3322,20 @@ enum ReportType {
 
 input RequestPasswordResetInput {
   email: String!
+}
+
+"""
+A word refused as a character name (staff/system voices, generic mob words)
+"""
+type ReservedNameDto {
+  createdAt: DateTime!
+  id: ID!
+
+  """Lowercase word; the game compares character names case-insensitively"""
+  name: String!
+
+  """Why the word is reserved (builder-facing note)"""
+  reason: String
 }
 
 enum ResetMode {

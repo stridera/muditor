@@ -1167,6 +1167,12 @@ export type CreateRaceInput = {
   raceAlign?: RaceAlign;
 };
 
+/** Input for reserving a character name */
+export type CreateReservedNameInput = {
+  name: Scalars['String']['input'];
+  reason?: InputMaybe<Scalars['String']['input']>;
+};
+
 export type CreateRoomExitInput = {
   defaultState?: InputMaybe<ExitState>;
   description?: InputMaybe<Scalars['String']['input']>;
@@ -2072,6 +2078,8 @@ export type Mutation = {
   createQuestPrerequisite: QuestPrerequisiteDto;
   createQuestReward: QuestRewardDto;
   createRace: RaceDto;
+  /** Reserve a character name */
+  createReservedName: ReservedNameDto;
   createRoom: RoomDto;
   createRoomExit: RoomExitDto;
   createShop: ShopDto;
@@ -2128,6 +2136,8 @@ export type Mutation = {
   deleteQuestPrerequisite: QuestPrerequisiteDto;
   deleteQuestReward: QuestRewardDto;
   deleteRace: Scalars['Boolean']['output'];
+  /** Remove a reserved character name */
+  deleteReservedName: Scalars['Boolean']['output'];
   deleteRoom: RoomDto;
   deleteRoomExit: RoomExitDto;
   deleteShop: ShopDto;
@@ -2517,6 +2527,11 @@ export type MutationCreateRaceArgs = {
 };
 
 
+export type MutationCreateReservedNameArgs = {
+  data: CreateReservedNameInput;
+};
+
+
 export type MutationCreateRoomArgs = {
   data: CreateRoomInput;
 };
@@ -2754,6 +2769,11 @@ export type MutationDeleteQuestRewardArgs = {
 
 export type MutationDeleteRaceArgs = {
   race: Race;
+};
+
+
+export type MutationDeleteReservedNameArgs = {
+  id: Scalars['ID']['input'];
 };
 
 
@@ -3746,6 +3766,8 @@ export type Query = {
   reportOpenCount: Scalars['Int']['output'];
   /** List player reports with computed rank and score */
   reports: ReportPage;
+  /** Get all reserved character names, alphabetically */
+  reservedNames: Array<ReservedNameDto>;
   room: RoomDto;
   rooms: Array<RoomDto>;
   roomsByZone: Array<RoomDto>;
@@ -4697,6 +4719,17 @@ export type ReportType =
 
 export type RequestPasswordResetInput = {
   email: Scalars['String']['input'];
+};
+
+/** A word refused as a character name (staff/system voices, generic mob words) */
+export type ReservedNameDto = {
+  __typename?: 'ReservedNameDto';
+  createdAt: Scalars['DateTime']['output'];
+  id: Scalars['ID']['output'];
+  /** Lowercase word; the game compares character names case-insensitively */
+  name: Scalars['String']['output'];
+  /** Why the word is reserved (builder-facing note) */
+  reason?: Maybe<Scalars['String']['output']>;
 };
 
 export type ResetMode =
@@ -7804,6 +7837,25 @@ export type MarkReportDuplicateMutationVariables = Exact<{
 
 export type MarkReportDuplicateMutation = { __typename?: 'Mutation', markDuplicate: { __typename?: 'Report', id: string, reportType: ReportType, status: ReportStatus, reporterName: string, roomZoneId?: number | null, roomId?: number | null, message: string, resolvedBy?: string | null, resolvedAt?: any | null, resolution?: string | null, priority?: number | null, duplicateOfId?: string | null, tags: Array<string>, assignedTo?: string | null, createdAt: any, score: number, rank: number, similarCount: number } };
 
+export type GetReservedNamesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetReservedNamesQuery = { __typename?: 'Query', reservedNames: Array<{ __typename?: 'ReservedNameDto', id: string, name: string, reason?: string | null, createdAt: any }> };
+
+export type CreateReservedNameMutationVariables = Exact<{
+  data: CreateReservedNameInput;
+}>;
+
+
+export type CreateReservedNameMutation = { __typename?: 'Mutation', createReservedName: { __typename?: 'ReservedNameDto', id: string, name: string } };
+
+export type DeleteReservedNameMutationVariables = Exact<{
+  id: Scalars['ID']['input'];
+}>;
+
+
+export type DeleteReservedNameMutation = { __typename?: 'Mutation', deleteReservedName: boolean };
+
 export type GetShopEditorQueryVariables = Exact<{
   id: Scalars['Int']['input'];
   zoneId: Scalars['Int']['input'];
@@ -8627,6 +8679,9 @@ export const ReportsListDocument = {"kind":"Document","definitions":[{"kind":"Op
 export const ReportOpenCountDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"ReportOpenCount"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reportOpenCount"}}]}}]} as unknown as DocumentNode<ReportOpenCountQuery, ReportOpenCountQueryVariables>;
 export const UpdateReportDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateReport"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateReportInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateReport"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ReportFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ReportFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Report"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reportType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"reporterName"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"resolvedBy"}},{"kind":"Field","name":{"kind":"Name","value":"resolvedAt"}},{"kind":"Field","name":{"kind":"Name","value":"resolution"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"duplicateOfId"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"assignedTo"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"rank"}},{"kind":"Field","name":{"kind":"Name","value":"similarCount"}}]}}]} as unknown as DocumentNode<UpdateReportMutation, UpdateReportMutationVariables>;
 export const MarkReportDuplicateDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"MarkReportDuplicate"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"ofId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"markDuplicate"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"ofId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"ofId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"FragmentSpread","name":{"kind":"Name","value":"ReportFields"}}]}}]}},{"kind":"FragmentDefinition","name":{"kind":"Name","value":"ReportFields"},"typeCondition":{"kind":"NamedType","name":{"kind":"Name","value":"Report"}},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"reportType"}},{"kind":"Field","name":{"kind":"Name","value":"status"}},{"kind":"Field","name":{"kind":"Name","value":"reporterName"}},{"kind":"Field","name":{"kind":"Name","value":"roomZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"roomId"}},{"kind":"Field","name":{"kind":"Name","value":"message"}},{"kind":"Field","name":{"kind":"Name","value":"resolvedBy"}},{"kind":"Field","name":{"kind":"Name","value":"resolvedAt"}},{"kind":"Field","name":{"kind":"Name","value":"resolution"}},{"kind":"Field","name":{"kind":"Name","value":"priority"}},{"kind":"Field","name":{"kind":"Name","value":"duplicateOfId"}},{"kind":"Field","name":{"kind":"Name","value":"tags"}},{"kind":"Field","name":{"kind":"Name","value":"assignedTo"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}},{"kind":"Field","name":{"kind":"Name","value":"score"}},{"kind":"Field","name":{"kind":"Name","value":"rank"}},{"kind":"Field","name":{"kind":"Name","value":"similarCount"}}]}}]} as unknown as DocumentNode<MarkReportDuplicateMutation, MarkReportDuplicateMutationVariables>;
+export const GetReservedNamesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetReservedNames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"reservedNames"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"reason"}},{"kind":"Field","name":{"kind":"Name","value":"createdAt"}}]}}]}}]} as unknown as DocumentNode<GetReservedNamesQuery, GetReservedNamesQueryVariables>;
+export const CreateReservedNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateReservedName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateReservedNameInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createReservedName"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}}]}}]} as unknown as DocumentNode<CreateReservedNameMutation, CreateReservedNameMutationVariables>;
+export const DeleteReservedNameDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"DeleteReservedName"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"deleteReservedName"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<DeleteReservedNameMutation, DeleteReservedNameMutationVariables>;
 export const GetShopEditorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetShopEditor"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"shop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}},{"kind":"Field","name":{"kind":"Name","value":"temper"}},{"kind":"Field","name":{"kind":"Name","value":"noSuchItemMessages"}},{"kind":"Field","name":{"kind":"Name","value":"doNotBuyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"missingCashMessages"}},{"kind":"Field","name":{"kind":"Name","value":"buyMessages"}},{"kind":"Field","name":{"kind":"Name","value":"sellMessages"}},{"kind":"Field","name":{"kind":"Name","value":"keeperId"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}},{"kind":"Field","name":{"kind":"Name","value":"flags"}},{"kind":"Field","name":{"kind":"Name","value":"tradesWithFlags"}},{"kind":"Field","name":{"kind":"Name","value":"keeper"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"zoneId"}}]}},{"kind":"Field","name":{"kind":"Name","value":"items"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"amount"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"object"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"cost"}}]}}]}},{"kind":"Field","name":{"kind":"Name","value":"accepts"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"type"}},{"kind":"Field","name":{"kind":"Name","value":"keywords"}}]}}]}}]}}]} as unknown as DocumentNode<GetShopEditorQuery, GetShopEditorQueryVariables>;
 export const UpdateShopEditorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateShopEditor"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"Int"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"zoneId"},"value":{"kind":"Variable","name":{"kind":"Name","value":"zoneId"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<UpdateShopEditorMutation, UpdateShopEditorMutationVariables>;
 export const CreateShopEditorDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateShopEditor"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateShopInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createShop"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"buyProfit"}},{"kind":"Field","name":{"kind":"Name","value":"sellProfit"}}]}}]}}]} as unknown as DocumentNode<CreateShopEditorMutation, CreateShopEditorMutationVariables>;

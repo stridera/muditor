@@ -20,6 +20,7 @@ import { useZoneContext } from '@/hooks/use-zone-context';
 import { useMutation } from '@apollo/client/react';
 import {
   Aperture,
+  Ban,
   Box,
   Brain,
   Clipboard,
@@ -159,6 +160,10 @@ const routeInfo: Record<string, { name: string; icon: React.ReactNode }> = {
   '/dashboard/admin/grants': {
     name: 'Zone Grants',
     icon: <Shield className='h-5 w-5' />,
+  },
+  '/dashboard/admin/reserved-names': {
+    name: 'Reserved Names',
+    icon: <Ban className='h-5 w-5' />,
   },
   '/dashboard/player/storage': {
     name: 'Account Storage',
@@ -518,6 +523,12 @@ export function Navigation() {
                         <Link href='/dashboard/admin/grants'>
                           <Shield className='mr-2 h-4 w-4' />
                           Zone Grants
+                        </Link>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem asChild>
+                        <Link href='/dashboard/admin/reserved-names'>
+                          <Ban className='mr-2 h-4 w-4' />
+                          Reserved Names
                         </Link>
                       </DropdownMenuItem>
                     </>

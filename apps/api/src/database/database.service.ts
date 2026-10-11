@@ -374,6 +374,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.spellSyllable;
   }
 
+  get reservedNames() {
+    return this.client.reservedNames;
+  }
+
   get creationRecipe() {
     return this.client.creationRecipe;
   }

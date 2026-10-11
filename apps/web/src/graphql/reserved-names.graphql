@@ -1,0 +1,21 @@
+# Reserved character names (words refused at character creation)
+
+query GetReservedNames {
+  reservedNames {
+    id
+    name
+    reason
+    createdAt
+  }
+}
+
+mutation CreateReservedName($data: CreateReservedNameInput!) {
+  createReservedName(data: $data) {
+    id
+    name
+  }
+}
+
+mutation DeleteReservedName($id: ID!) {
+  deleteReservedName(id: $id)
+}

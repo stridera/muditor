@@ -10,6 +10,7 @@ import { usePermissions } from '@/hooks/use-permissions';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
   Aperture,
+  Ban,
   Box,
   Brain,
   ChevronLeft,
@@ -357,6 +358,11 @@ export function Sidebar() {
       name: 'Zone Grants',
       href: '/dashboard/admin/grants',
       icon: <Shield className='h-4 w-4' />,
+    });
+    adminItems.push({
+      name: 'Reserved Names',
+      href: '/dashboard/admin/reserved-names',
+      icon: <Ban className='h-4 w-4' />,
     });
   }
   adminItems.push({
