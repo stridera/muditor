@@ -102,8 +102,15 @@ secrets/cert/bun and preserves file modes.
 
 ## Update procedure
 
-`/opt/NEXT/deploy/update.sh [mud|muditor|all]` pulls (ff-only) and rebuilds, then prints the restart
-lines to run yourself (the build rewrites `.next`/`dist` in place, so NEXT-web may blip until restarted): `sudo systemctl restart fieryNT` and/or `sudo systemctl restart muditorNT-api muditorNT-web`.
+**Game server:** build on the dev box and deploy with `deploy/prod/deploy-game.sh <sha>` (local zigbuild for glibc 2.39,
+versioned `/opt/NEXT/releases/<sha>/mud-server` + `current` symlink, backup, health checks, auto-rollback; `--rollback`
+to go back). Full description: `docs/PROD.md`. Never build Rust on the prod host (`update.sh mud` is retired). The unit
+runs `/opt/NEXT/releases/current/mud-server`; switching an existing host to this layout is the one-time
+`deploy-game.sh <sha> --install-units`.
+
+**Muditor:** `/opt/NEXT/deploy/update.sh [muditor|all]` pulls (ff-only) and rebuilds (niced; refuses to start if cargo/rustc
+runs or load > 4), then prints the restart lines to run yourself (the build rewrites `.next`/`dist` in place, so NEXT-web
+may blip until restarted): `sudo systemctl restart muditorNT-api muditorNT-web`.
 
 ### Schema push and SQL seeds (muditor target)
 
@@ -124,7 +131,8 @@ Anything else that reads new columns outside the app (the digest's `reports-rank
 
 ## Logs and status
 
-- `journalctl -u fieryNT -f`, `journalctl -u muditorNT-api -f`, `journalctl -u muditorNT-web -f`
+- Always bounded, never `-f`: `timeout 20 journalctl -u fieryNT --since "30 min ago" --no-pager -n 200` (same for `muditorNT-api`,
+  `muditorNT-web`). An unbounded or followed `journalctl` left behind by an agent's grep once pinned a core for hours.
 - `/opt/NEXT/logs/` (import.log, build-muditor.log, API LOG_DIR), Apache: `/var/log/apache2/muditor-*.log`
 - `systemctl status fieryNT muditorNT-api muditorNT-web`
 
@@ -133,13 +141,13 @@ Anything else that reads new columns outside the app (the digest's `reports-rank
 Every error a user sees should also be in a server log:
 
 - **Muditor API (GraphQL errors, including validation failures) and browser errors** both land in the API journal under
-  greppable prefixes: `journalctl -u muditorNT-api -o cat | grep -E '\[(gql|client)-error\]'`.
+  greppable prefixes: `timeout 20 journalctl -u muditorNT-api --since '2 hours ago' --no-pager -n 2000 -o cat | grep -E '\[(gql|client)-error\]'`.
   `[gql-error]` lines carry op, code, path, user, request id and the page route (variable names only, never values);
   client-class errors (validation, auth, not found) are WARN, everything else is ERROR with a stack. `[client-error]`
   lines come from `POST /api/client-errors` (window errors, unhandled rejections, React error boundary, Apollo errors).
 - **API log files** (JSON lines, same entries as the journal): `$LOG_DIR` = `/opt/NEXT/logs/` (`error.log`, `warn.log`,
   `info.log`, `combined.log`; rotated at 10 MB, 10 files kept).
-- **Game server (Rust)**: `journalctl -u fieryNT`.
+- **Game server (Rust)**: `timeout 20 journalctl -u fieryNT --since '1 hour ago' --no-pager -n 500` (always bounded, never `-f`).
 - **Lua trigger errors**: the `ScriptErrorLog` model, i.e. table `script_error_log` (`psql ... -c 'SELECT * FROM script_error_log ORDER BY occurred_at DESC LIMIT 20;'`).
 
 ## Rollback

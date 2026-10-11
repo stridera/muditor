@@ -17,7 +17,9 @@ PrivateTmp=true
 NoNewPrivileges=true
 InaccessiblePaths=-/opt/PRODUCTION -/opt/TEST -/opt/DEV @BACKUP_PATHS@
 ReadWritePaths=/opt/NEXT/logs /opt/NEXT/run /opt/NEXT/fierymud-rs/state
-ExecStart=/opt/NEXT/fierymud-rs/target/release/mud-server
+# Versioned releases built on the dev box and uploaded by deploy-game.sh; `current` is a symlink to
+# /opt/NEXT/releases/<sha>/. WorkingDirectory stays the checkout (state/ lives there). Never build Rust on this host.
+ExecStart=/opt/NEXT/releases/current/mud-server
 Restart=always
 RestartSec=15
 # The server saves players on SIGTERM; give it time to finish.

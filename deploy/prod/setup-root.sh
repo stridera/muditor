@@ -355,7 +355,7 @@ do_start() {
   step "listening sockets"
   ss -ltn | awk 'NR==1 || $4 ~ /:(4003|4443|8080|3000|3001)$/'
   echo
-  echo "Logs: journalctl -u fieryNT -u muditorNT-api -u muditorNT-web -f"
+  echo "Logs: timeout 20 journalctl -u fieryNT -u muditorNT-api -u muditorNT-web --since '10 min ago' --no-pager -n 200"
 }
 
 case "${1:-}" in

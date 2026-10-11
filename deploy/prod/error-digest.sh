@@ -118,7 +118,7 @@ journal_tsv() {
   cat "$cache"
 }
 journal_fetch() {
-  journalctl -u "$1" --since "@$SINCE_EPOCH" --no-pager --all -o short-iso --utc 2>/dev/null |
+  timeout 60 journalctl -u "$1" --since "@$SINCE_EPOCH" --no-pager --all -o short-iso --utc 2>/dev/null |
     sed -nE 's/^([0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2})[+-][0-9:]+ [^ ]+ ([^ :[]+)(\[[0-9]+\])?: (.*)$/\1\t\2\t\4/p' |
     strip_ansi | tr -d '\r' || true
 }
