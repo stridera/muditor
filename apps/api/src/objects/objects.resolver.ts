@@ -15,6 +15,7 @@ import {
   ConsumableEffectInput,
 } from './object-effects.dto';
 import { ObjectsService } from './objects.service';
+import { assertValidObjectValues } from './object-values';
 import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ObjectDto)
@@ -123,6 +124,7 @@ export class ObjectsResolver {
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
     const { zoneId, values, ...objectData } = data;
+    assertValidObjectValues(values);
     await this.objectsService.assertIdFree(zoneId, objectData.id);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
@@ -147,6 +149,7 @@ export class ObjectsResolver {
     // The record's zone is its key (from the zoneId arg); a zoneId inside the
     // payload must never move the object, so it is dropped here.
     const { values, zoneId: _payloadZoneId, ...rest } = data;
+    assertValidObjectValues(values);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
     const updateData: Prisma.ObjectsUpdateInput = {

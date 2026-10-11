@@ -75,4 +75,75 @@ describe('TypeValueInput', () => {
     fireEvent.blur(input);
     expect(onChange).toHaveBeenCalledWith('Spells', ['BLESS', 'ARMOR']);
   });
+  describe('container Key (composite object ref)', () => {
+    const keyField = () => field('CONTAINER', 'Key');
+
+    it('shows a stored composite key in zone and id boxes', () => {
+      render(
+        <TypeValueInput
+          field={keyField()}
+          values={{ Key: { zone: 23, id: 2 } }}
+          onChange={jest.fn()}
+        />
+      );
+      expect(screen.getByLabelText('Container Key zone')).toHaveValue(23);
+      expect(screen.getByLabelText('Container Key id')).toHaveValue(2);
+      expect(screen.queryByRole('alert')).toBeNull();
+    });
+
+    it('writes the composite form once zone and id are both set', () => {
+      const onChange = jest.fn();
+      render(
+        <TypeValueInput field={keyField()} values={{}} onChange={onChange} />
+      );
+      fireEvent.change(screen.getByLabelText('Container Key zone'), {
+        target: { value: '23' },
+      });
+      expect(onChange).not.toHaveBeenCalled();
+      fireEvent.change(screen.getByLabelText('Container Key id'), {
+        target: { value: '2' },
+      });
+      expect(onChange).toHaveBeenCalledWith('Key', { zone: 23, id: 2 });
+    });
+
+    it('shows a legacy int key with a warning and never writes an int', () => {
+      const onChange = jest.fn();
+      render(
+        <TypeValueInput
+          field={keyField()}
+          values={{ Key: 2302 }}
+          onChange={onChange}
+        />
+      );
+      expect(screen.getByRole('alert')).toHaveTextContent('legacy number 2302');
+      expect(screen.getByLabelText('Container Key zone')).toHaveValue(null);
+      fireEvent.change(screen.getByLabelText('Container Key zone'), {
+        target: { value: '23' },
+      });
+      fireEvent.change(screen.getByLabelText('Container Key id'), {
+        target: { value: '2' },
+      });
+      expect(onChange).toHaveBeenCalledTimes(1);
+      expect(onChange).toHaveBeenCalledWith('Key', { zone: 23, id: 2 });
+    });
+
+    it('treats -1 as no key and clearing both boxes writes -1', () => {
+      const onChange = jest.fn();
+      render(
+        <TypeValueInput
+          field={keyField()}
+          values={{ Key: { zone: 23, id: 2 } }}
+          onChange={onChange}
+        />
+      );
+      fireEvent.change(screen.getByLabelText('Container Key zone'), {
+        target: { value: '' },
+      });
+      expect(onChange).not.toHaveBeenCalled();
+      fireEvent.change(screen.getByLabelText('Container Key id'), {
+        target: { value: '' },
+      });
+      expect(onChange).toHaveBeenCalledWith('Key', -1);
+    });
+  });
 });

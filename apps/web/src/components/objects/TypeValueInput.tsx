@@ -1,12 +1,18 @@
 'use client';
 
-import { getTypeValue, type ValueField } from '@/lib/objectTypeValues';
+import {
+  getTypeValue,
+  NO_KEY,
+  readObjectRef,
+  type ObjectRef,
+  type ValueField,
+} from '@/lib/objectTypeValues';
 import { useEffect, useState } from 'react';
 
 const INPUT_CLASS =
   'block w-full rounded-md border-input shadow-sm focus:ring-ring focus:border-ring sm:text-sm bg-background text-foreground';
 
-export type TypeValue = string | number | boolean | string[];
+export type TypeValue = string | number | boolean | string[] | ObjectRef;
 
 interface TypeValueInputProps {
   field: ValueField;
@@ -44,6 +50,94 @@ function ListInput({
       }
       className={INPUT_CLASS}
     />
+  );
+}
+
+/**
+ * Composite (zone, id) reference. Always writes `{zone, id}`; a legacy vnum
+ * integer is only shown (with a warning) and is replaced once both boxes are
+ * filled in. Both boxes empty writes the no-reference sentinel.
+ */
+function ObjectRefInput({
+  field,
+  current,
+  onChange,
+}: {
+  field: ValueField;
+  current: unknown;
+  onChange: (key: string, value: TypeValue) => void;
+}) {
+  const read = readObjectRef(current);
+  const storedZone = read && 'ref' in read ? String(read.ref.zone) : '';
+  const storedId = read && 'ref' in read ? String(read.ref.id) : '';
+  const [zone, setZone] = useState(storedZone);
+  const [id, setId] = useState(storedId);
+  useEffect(() => {
+    setZone(storedZone);
+    setId(storedId);
+  }, [storedZone, storedId]);
+
+  const commit = (z: string, i: string) => {
+    if (z.trim() === '' && i.trim() === '') {
+      onChange(field.key, NO_KEY);
+      return;
+    }
+    const zn = Number(z);
+    const idn = Number(i);
+    if (
+      z.trim() !== '' &&
+      i.trim() !== '' &&
+      Number.isInteger(zn) &&
+      Number.isInteger(idn) &&
+      zn >= 0 &&
+      idn >= 0
+    ) {
+      onChange(field.key, { zone: zn, id: idn });
+    }
+  };
+
+  const incomplete = (zone.trim() === '') !== (id.trim() === '');
+  return (
+    <div>
+      <div className='grid grid-cols-2 gap-2'>
+        <input
+          type='number'
+          aria-label={`${field.label} zone`}
+          placeholder='zone'
+          min={0}
+          step={1}
+          value={zone}
+          onChange={e => {
+            setZone(e.target.value);
+            commit(e.target.value, id);
+          }}
+          className={INPUT_CLASS}
+        />
+        <input
+          type='number'
+          aria-label={`${field.label} id`}
+          placeholder='id'
+          min={0}
+          step={1}
+          value={id}
+          onChange={e => {
+            setId(e.target.value);
+            commit(zone, e.target.value);
+          }}
+          className={INPUT_CLASS}
+        />
+      </div>
+      {read && 'legacy' in read ? (
+        <p role='alert' className='mt-1 text-xs text-destructive'>
+          Stored as legacy number {read.legacy}. Enter the key's zone and id to
+          replace it; the old number cannot be saved.
+        </p>
+      ) : incomplete ? (
+        <p className='mt-1 text-xs text-muted-foreground'>
+          Enter both zone and id (or clear both for no key).
+        </p>
+      ) : null}
+    </div>
   );
 }
 
@@ -166,6 +260,17 @@ export function TypeValueInput({
         </div>
       );
     }
+    case 'objectRef':
+      return (
+        <div>
+          {label}
+          <ObjectRefInput
+            field={field}
+            current={values?.[field.key]}
+            onChange={onChange}
+          />
+        </div>
+      );
     case 'list':
       return (
         <div className='col-span-2'>

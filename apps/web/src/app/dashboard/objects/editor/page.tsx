@@ -14,7 +14,10 @@ import {
   UpdateConsumableEffectsDocument,
   type WearFlag,
 } from '@/generated/graphql';
-import { TypeValueInput } from '@/components/objects/TypeValueInput';
+import {
+  TypeValueInput,
+  type TypeValue,
+} from '@/components/objects/TypeValueInput';
 import { parseEntityId } from '@/lib/entityId';
 import { keywordsToInput, parseKeywords } from '@/lib/keywords';
 import {
@@ -548,10 +551,7 @@ function ObjectEditorContent() {
     validateField(field, value, updatedFormData);
   };
 
-  const handleTypeValueChange = (
-    key: string,
-    value: string | number | boolean | string[] | number[]
-  ) => {
+  const handleTypeValueChange = (key: string, value: TypeValue | number[]) => {
     setFormData(prev => ({
       ...prev,
       values: {

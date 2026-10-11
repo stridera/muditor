@@ -1,6 +1,7 @@
 import { keywordsToInput, parseKeywords } from '../lib/keywords';
 import {
   normalizeObjectValues,
+  readObjectRef,
   TYPE_VALUE_FIELDS,
 } from '../lib/objectTypeValues';
 
@@ -123,6 +124,22 @@ describe('TYPE_VALUE_FIELDS', () => {
   it('has no camelCase keys', () => {
     for (const fields of Object.values(TYPE_VALUE_FIELDS)) {
       for (const f of fields) expect(f.key).toMatch(/^[A-Z]/);
+    }
+  });
+});
+
+describe('readObjectRef', () => {
+  it('reads the composite form', () => {
+    expect(readObjectRef({ zone: 23, id: 2 })).toEqual({
+      ref: { zone: 23, id: 2 },
+    });
+  });
+  it('reads a legacy vnum for display only', () => {
+    expect(readObjectRef(2302)).toEqual({ legacy: 2302 });
+  });
+  it('treats no key, <= 0 and junk as empty', () => {
+    for (const v of [undefined, null, -1, 0, 'x', [1, 2], { zone: 1 }]) {
+      expect(readObjectRef(v)).toBeNull();
     }
   });
 });

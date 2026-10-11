@@ -11,7 +11,8 @@ export type ValueFieldKind =
   | 'text'
   | 'list'
   | 'select'
-  | 'flags';
+  | 'flags'
+  | 'objectRef';
 
 export interface ValueField {
   /** Exact JSON key used by the game */
@@ -131,10 +132,10 @@ export const TYPE_VALUE_FIELDS: Record<string, ValueField[]> = {
     },
     {
       key: 'Key',
-      label: 'Container Key ID',
-      kind: 'int',
-      fallback: -1,
-      help: '-1 = no key',
+      label: 'Container Key',
+      kind: 'objectRef',
+      fallback: null,
+      help: 'zone + id of the key object; leave both empty for no key',
     },
     {
       key: 'Weight Reduction',
@@ -268,6 +269,38 @@ export function normalizeObjectValues(values: unknown, type?: string): Values {
     if (converted !== undefined && converted !== null) out[key] = converted;
   }
   return out;
+}
+
+/** A (zoneId, id) reference to another world entity, as stored in `values`. */
+export interface ObjectRef {
+  zone: number;
+  id: number;
+}
+
+/** What `Key` holds when the container has no key (the importer leaves keys <= 0 alone). */
+export const NO_KEY = -1;
+
+const isWholeNumber = (n: unknown): n is number =>
+  typeof n === 'number' && Number.isInteger(n);
+
+/**
+ * Read a stored reference for display. Accepts the composite `{zone, id}`
+ * form and the legacy vnum integer (`{ legacy }`, never converted: a vnum
+ * cannot be mapped to (zone, id) without the zone ranges). Anything else,
+ * and integers <= 0, mean "no reference".
+ */
+export function readObjectRef(
+  raw: unknown
+): { ref: ObjectRef } | { legacy: number } | null {
+  if (raw && typeof raw === 'object' && !Array.isArray(raw)) {
+    const { zone, id } = raw as Record<string, unknown>;
+    if (isWholeNumber(zone) && isWholeNumber(id) && zone >= 0 && id >= 0) {
+      return { ref: { zone, id } };
+    }
+    return null;
+  }
+  if (isWholeNumber(raw) && raw > 0) return { legacy: raw };
+  return null;
 }
 
 export function getTypeValue<T>(values: Values, field: ValueField): T {
