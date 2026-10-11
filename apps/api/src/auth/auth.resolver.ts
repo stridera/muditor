@@ -178,6 +178,24 @@ export class AuthResolver {
     return this.oauthCodes.redeem(code, state);
   }
 
+  /**
+   * Redeems the one-time code from the Google redirect for the pending
+   * registration token, which `completeGoogleRegistration` then consumes.
+   */
+  @Mutation(() => String)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({
+    limit: 10,
+    windowSeconds: 60,
+    keyPrefix: 'auth:exchangeGooglePendingCode',
+  })
+  exchangeGooglePendingCode(
+    @Args('code') code: string,
+    @Args('state') state: string
+  ): string {
+    return this.oauthCodes.redeem(code, state, 'pending-registration');
+  }
+
   @Mutation(() => Boolean)
   @UseGuards(GraphQLJwtAuthGuard)
   async unlinkGoogle(@CurrentUser('id') userId: string): Promise<boolean> {

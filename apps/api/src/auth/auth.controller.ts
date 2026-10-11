@@ -30,25 +30,34 @@ export class AuthController {
   @UseGuards(GoogleAuthGuard)
   async googleCallback(@Req() req: Request, @Res() res: Response) {
     try {
+      // Neither the session JWT nor the pending-registration JWT goes in the
+      // URL (proxy logs, history, Referer). The web redeems a one-time code,
+      // proving it holds the `state` it generated when it started the flow.
+      const state = req.query['state'];
+      if (typeof state !== 'string' || !OAUTH_STATE_PATTERN.test(state)) {
+        throw new Error('Sign-in state missing or invalid');
+      }
+
+      // Checked before handleGoogleLogin, which can auto-link or create accounts.
       const profile = req.user as GoogleProfile;
       const result = await this.authService.handleGoogleLogin(profile);
 
       if (result.needsUsername) {
+        if (result.pendingToken === undefined) {
+          throw new Error('Registration token missing');
+        }
+        const code = this.oauthCodes.issue(
+          result.pendingToken,
+          state,
+          'pending-registration'
+        );
         return res.redirect(
-          `${this.frontendUrl}/auth/google/choose-display-name?token=${result.pendingToken}`
+          `${this.frontendUrl}/auth/google/choose-display-name?code=${encodeURIComponent(code)}`
         );
       }
 
-      // The JWT never goes in the URL (proxy logs, history, Referer). The web
-      // callback redeems this one-time code, proving it holds the `state` it
-      // generated when it started the flow.
-      const state = req.query['state'];
-      if (
-        result.accessToken === undefined ||
-        typeof state !== 'string' ||
-        !OAUTH_STATE_PATTERN.test(state)
-      ) {
-        throw new Error('Sign-in state missing or invalid');
+      if (result.accessToken === undefined) {
+        throw new Error('Sign-in token missing');
       }
       const code = this.oauthCodes.issue(result.accessToken, state);
       return res.redirect(

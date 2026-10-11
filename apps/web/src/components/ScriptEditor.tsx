@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect, useCallback } from 'react';
-import Editor from '@monaco-editor/react';
+import Editor from './MonacoEditor';
 import type { editor } from 'monaco-editor';
 import { useTheme } from 'next-themes';
 import { ChevronLeft, ChevronRight, Settings2 } from 'lucide-react';
@@ -630,7 +630,7 @@ export default function ScriptEditor({
 
     const model = editor.getModel();
     if (model && typeof window !== 'undefined') {
-      import('monaco-editor').then(monaco => {
+      import('@/lib/monaco-setup').then(({ monaco }) => {
         monacoRef.current = monaco;
         monaco.editor.setModelLanguage(model, 'lua');
       });
@@ -639,7 +639,7 @@ export default function ScriptEditor({
 
   useEffect(() => {
     if (mounted && editorRef.current && typeof window !== 'undefined') {
-      import('monaco-editor').then(monaco => {
+      import('@/lib/monaco-setup').then(({ monaco }) => {
         const themeName =
           resolvedTheme === 'dark' ? 'muditor-dark' : 'muditor-light';
         monaco.editor.setTheme(themeName);

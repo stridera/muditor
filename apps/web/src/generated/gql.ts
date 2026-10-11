@@ -15,6 +15,7 @@ import type { TypedDocumentNode as DocumentNode } from '@graphql-typed-document-
  */
 type Documents = {
     "\n  mutation CompleteGoogleRegistration($token: String!, $displayName: String!) {\n    completeGoogleRegistration(token: $token, displayName: $displayName) {\n      accessToken\n      user {\n        id\n        displayName\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": typeof types.CompleteGoogleRegistrationDocument,
+    "\n  mutation ExchangeGooglePendingCode($code: String!, $state: String!) {\n    exchangeGooglePendingCode(code: $code, state: $state)\n  }\n": typeof types.ExchangeGooglePendingCodeDocument,
     "\n  query GetGameConfigs {\n    gameConfigs {\n      id\n      category\n      key\n      value\n      valueType\n      description\n      minValue\n      maxValue\n      isSecret\n      restartReq\n    }\n    gameConfigCategories\n  }\n": typeof types.GetGameConfigsDocument,
     "\n  mutation UpdateGameConfig(\n    $category: String!\n    $key: String!\n    $data: UpdateGameConfigInput!\n  ) {\n    updateGameConfig(category: $category, key: $key, data: $data) {\n      id\n      value\n    }\n  }\n": typeof types.UpdateGameConfigDocument,
     "\n  query GetLevelDefinitions {\n    levelDefinitions {\n      level\n      name\n      expRequired\n      hpGain\n      staminaGain\n      isImmortal\n      permissions\n    }\n    availablePermissions\n  }\n": typeof types.GetLevelDefinitionsDocument,
@@ -147,6 +148,7 @@ type Documents = {
 };
 const documents: Documents = {
     "\n  mutation CompleteGoogleRegistration($token: String!, $displayName: String!) {\n    completeGoogleRegistration(token: $token, displayName: $displayName) {\n      accessToken\n      user {\n        id\n        displayName\n        email\n        role\n        createdAt\n      }\n    }\n  }\n": types.CompleteGoogleRegistrationDocument,
+    "\n  mutation ExchangeGooglePendingCode($code: String!, $state: String!) {\n    exchangeGooglePendingCode(code: $code, state: $state)\n  }\n": types.ExchangeGooglePendingCodeDocument,
     "\n  query GetGameConfigs {\n    gameConfigs {\n      id\n      category\n      key\n      value\n      valueType\n      description\n      minValue\n      maxValue\n      isSecret\n      restartReq\n    }\n    gameConfigCategories\n  }\n": types.GetGameConfigsDocument,
     "\n  mutation UpdateGameConfig(\n    $category: String!\n    $key: String!\n    $data: UpdateGameConfigInput!\n  ) {\n    updateGameConfig(category: $category, key: $key, data: $data) {\n      id\n      value\n    }\n  }\n": types.UpdateGameConfigDocument,
     "\n  query GetLevelDefinitions {\n    levelDefinitions {\n      level\n      name\n      expRequired\n      hpGain\n      staminaGain\n      isImmortal\n      permissions\n    }\n    availablePermissions\n  }\n": types.GetLevelDefinitionsDocument,
@@ -296,6 +298,10 @@ export function gql(source: string): unknown;
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(source: "\n  mutation CompleteGoogleRegistration($token: String!, $displayName: String!) {\n    completeGoogleRegistration(token: $token, displayName: $displayName) {\n      accessToken\n      user {\n        id\n        displayName\n        email\n        role\n        createdAt\n      }\n    }\n  }\n"): (typeof documents)["\n  mutation CompleteGoogleRegistration($token: String!, $displayName: String!) {\n    completeGoogleRegistration(token: $token, displayName: $displayName) {\n      accessToken\n      user {\n        id\n        displayName\n        email\n        role\n        createdAt\n      }\n    }\n  }\n"];
+/**
+ * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
+ */
+export function gql(source: "\n  mutation ExchangeGooglePendingCode($code: String!, $state: String!) {\n    exchangeGooglePendingCode(code: $code, state: $state)\n  }\n"): (typeof documents)["\n  mutation ExchangeGooglePendingCode($code: String!, $state: String!) {\n    exchangeGooglePendingCode(code: $code, state: $state)\n  }\n"];
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

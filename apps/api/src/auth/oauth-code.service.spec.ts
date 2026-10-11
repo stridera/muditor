@@ -48,4 +48,29 @@ describe('OAuthCodeService', () => {
   it('issues distinct codes', () => {
     expect(service.issue('a', STATE)).not.toBe(service.issue('a', STATE));
   });
+
+  it('keeps pending-registration codes separate from login codes', () => {
+    const pending = service.issue('pending-jwt', STATE, 'pending-registration');
+    expect(() => service.redeem(pending, STATE, 'login')).toThrow(
+      UnauthorizedException
+    );
+    // the failed attempt burned it
+    expect(() =>
+      service.redeem(pending, STATE, 'pending-registration')
+    ).toThrow(UnauthorizedException);
+
+    const pending2 = service.issue(
+      'pending-jwt',
+      STATE,
+      'pending-registration'
+    );
+    expect(service.redeem(pending2, STATE, 'pending-registration')).toBe(
+      'pending-jwt'
+    );
+
+    const login = service.issue('jwt', STATE);
+    expect(() => service.redeem(login, STATE, 'pending-registration')).toThrow(
+      UnauthorizedException
+    );
+  });
 });

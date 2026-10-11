@@ -7,8 +7,15 @@ const MAX_PENDING_CODES = 1000;
 /** Shape the web client must send as the OAuth `state` (and later exchange). */
 export const OAUTH_STATE_PATTERN = /^[A-Za-z0-9_-]{16,128}$/;
 
+/**
+ * What a code stands for. A code can only be redeemed as the kind it was
+ * issued as, so a pending-registration code can never yield a session JWT.
+ */
+export type OAuthCodeKind = 'login' | 'pending-registration';
+
 interface PendingCode {
-  accessToken: string;
+  kind: OAuthCodeKind;
+  accessToken: string; // JWT, or the pending-registration JWT for that kind
   state: string;
   expiresAt: number;
 }
@@ -30,7 +37,11 @@ interface PendingCode {
 export class OAuthCodeService {
   private readonly codes = new Map<string, PendingCode>();
 
-  issue(accessToken: string, state: string): string {
+  issue(
+    accessToken: string,
+    state: string,
+    kind: OAuthCodeKind = 'login'
+  ): string {
     this.sweep();
     if (this.codes.size >= MAX_PENDING_CODES) {
       // Drop the oldest entry (Map preserves insertion order).
@@ -39,6 +50,7 @@ export class OAuthCodeService {
     }
     const code = randomBytes(32).toString('base64url');
     this.codes.set(code, {
+      kind,
       accessToken,
       state,
       expiresAt: Date.now() + OAUTH_CODE_TTL_MS,
@@ -47,11 +59,11 @@ export class OAuthCodeService {
   }
 
   /** Single use: the code is removed on the first attempt, right or wrong. */
-  redeem(code: string, state: string): string {
+  redeem(code: string, state: string, kind: OAuthCodeKind = 'login'): string {
     this.sweep();
     const entry = this.codes.get(code);
     this.codes.delete(code);
-    if (!entry || entry.expiresAt < Date.now()) {
+    if (!entry || entry.kind !== kind || entry.expiresAt < Date.now()) {
       throw new UnauthorizedException('Invalid or expired sign-in code');
     }
     const a = Buffer.from(entry.state);

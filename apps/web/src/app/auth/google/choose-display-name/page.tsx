@@ -11,13 +11,13 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/auth-context';
+import { GOOGLE_OAUTH_STATE_KEY, useAuth } from '@/contexts/auth-context';
 import { apolloClient } from '@/lib/apollo-client';
 import { gql } from '@apollo/client';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { Suspense, useState } from 'react';
+import { Suspense, useEffect, useRef, useState } from 'react';
 
 const COMPLETE_GOOGLE_REGISTRATION = gql`
   mutation CompleteGoogleRegistration($token: String!, $displayName: String!) {
@@ -34,6 +34,12 @@ const COMPLETE_GOOGLE_REGISTRATION = gql`
   }
 `;
 
+const EXCHANGE_GOOGLE_PENDING_CODE = gql`
+  mutation ExchangeGooglePendingCode($code: String!, $state: String!) {
+    exchangeGooglePendingCode(code: $code, state: $state)
+  }
+`;
+
 function ChooseDisplayNameContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
@@ -42,11 +48,43 @@ function ChooseDisplayNameContent() {
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  const token = searchParams.get('token');
+  // The redirect carries a one-time code, not the registration token. Redeem
+  // it once with the state this browser generated when it started sign-in.
+  const code = searchParams.get('code');
+  const [token, setToken] = useState<string | null>(null);
+  const redeemed = useRef(false);
+
+  useEffect(() => {
+    if (redeemed.current) return;
+    redeemed.current = true;
+
+    const state = sessionStorage.getItem(GOOGLE_OAUTH_STATE_KEY);
+    sessionStorage.removeItem(GOOGLE_OAUTH_STATE_KEY);
+    if (!code || !state) {
+      router.replace('/login?error=Missing registration code');
+      return;
+    }
+    apolloClient
+      .mutate({
+        mutation: EXCHANGE_GOOGLE_PENDING_CODE,
+        variables: { code, state },
+      })
+      .then(result => {
+        const pending = (result.data as any)?.exchangeGooglePendingCode;
+        if (!pending) throw new Error('rejected');
+        setToken(pending as string);
+      })
+      .catch(() => {
+        router.replace('/login?error=Registration link expired');
+      });
+  }, [code, router]);
 
   if (!token) {
-    router.replace('/login?error=Missing registration token');
-    return null;
+    return (
+      <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>
+        <Loader2 className='h-8 w-8 animate-spin text-primary' />
+      </div>
+    );
   }
 
   const handleSubmit = async (e: React.FormEvent) => {

@@ -170,8 +170,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   // in this browser when the flow started (startGoogleLogin); the API only
   // releases the token if it matches the state the code was issued under.
   const loginWithOAuthCode = async (code: string) => {
-    const state = sessionStorage.getItem(OAUTH_STATE_KEY);
-    sessionStorage.removeItem(OAUTH_STATE_KEY);
+    const state = sessionStorage.getItem(GOOGLE_OAUTH_STATE_KEY);
+    sessionStorage.removeItem(GOOGLE_OAUTH_STATE_KEY);
     if (!state) throw new Error('Missing sign-in state');
     const result = await apolloClient.mutate({
       mutation: EXCHANGE_OAUTH_CODE_MUTATION,
@@ -261,7 +261,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 // in sessionStorage so password, Google, and registration flows all return to it.
 const POST_LOGIN_KEY = 'post-login-redirect';
 
-const OAUTH_STATE_KEY = 'google-oauth-state';
+export const GOOGLE_OAUTH_STATE_KEY = 'google-oauth-state';
 
 const EXCHANGE_OAUTH_CODE_MUTATION = gql`
   mutation ExchangeOAuthCode($code: String!, $state: String!) {
@@ -278,7 +278,7 @@ export const startGoogleLogin = (apiUrl: string): void => {
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
-  sessionStorage.setItem(OAUTH_STATE_KEY, state);
+  sessionStorage.setItem(GOOGLE_OAUTH_STATE_KEY, state);
   window.location.href = `${apiUrl}/api/auth/google?state=${encodeURIComponent(state)}`;
 };
 
