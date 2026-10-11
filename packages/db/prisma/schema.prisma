@@ -773,6 +773,10 @@ model PlayerCorpses {
   @@index([decayAt])
 }
 
+// Case-insensitive name uniqueness is enforced by a unique index on lower(name) that Prisma cannot express:
+//   CREATE UNIQUE INDEX characters_name_lower_key ON "Characters" (lower(name));
+// It lives in deploy/prod/sql/060-characters-name-lower-key.sql (and fierylib/data/sql/). Prisma ignores
+// expression indexes, so `prisma db push` / `migrate diff` neither create nor drop it.
 model Characters {
   id           String @id
   name         String @unique
