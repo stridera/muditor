@@ -1042,7 +1042,7 @@ BEGIN
     prompt                  show your current template
     prompt list             show the ready-made templates
     prompt compact          adopt one by name
-    prompt [%h/%H hp %v/%V mv]    or write your own
+    prompt [%h/%H hp %v/%V st]    or write your own
 
   Ready-made names: classic, compact, bars, vitals, verbose, location,
   worldclock, combat, minimal.
@@ -1090,7 +1090,7 @@ See also: NEWBIE, CHANNELS.$help$,
     prompt                  show your current template
     prompt list             show the ready-made templates
     prompt compact          adopt one by name
-    prompt [%h/%H hp %v/%V mv]    or write your own
+    prompt [%h/%H hp %v/%V st]    or write your own
 
   Ready-made names: classic, compact, bars, vitals, verbose, location,
   worldclock, combat, minimal.

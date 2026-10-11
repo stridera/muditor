@@ -479,11 +479,11 @@ export function CharacterEditForm({
           </Card>
         )}
 
-        {/* Health & Movement */}
+        {/* Health & Stamina */}
         {isStaff && (
           <Card>
             <CardHeader>
-              <CardTitle>Health & Movement</CardTitle>
+              <CardTitle>Health & Stamina</CardTitle>
             </CardHeader>
             <CardContent>
               <div className='grid grid-cols-2 gap-4'>
@@ -522,7 +522,7 @@ export function CharacterEditForm({
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='movement'>Current Movement</Label>
+                  <Label htmlFor='movement'>Current Stamina</Label>
                   <Input
                     id='movement'
                     type='number'
@@ -539,7 +539,7 @@ export function CharacterEditForm({
                   />
                 </div>
                 <div className='space-y-2'>
-                  <Label htmlFor='movementMax'>Max Movement</Label>
+                  <Label htmlFor='movementMax'>Max Stamina</Label>
                   <Input
                     id='movementMax'
                     type='number'

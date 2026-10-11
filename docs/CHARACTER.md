@@ -107,7 +107,7 @@ Fields are grouped logically. Unless otherwise stated, fields are persisted and 
 | Field           | Type                 | Description                                             |
 | --------------- | -------------------- | ------------------------------------------------------- |
 | `hit_points`    | int or None          | Current (or saved) hit points.                          |
-| `move`          | int or None          | Current movement points (stamina).                      |
+| `move`          | int or None          | Current stamina.                                        |
 | `damage_roll`   | int or None          | Damage roll modifier.                                   |
 | `hit_roll`      | int or None          | Hit roll / accuracy modifier.                           |
 | `armor_class`   | int or None          | Armor Class (lower usually better in many MUD systems). |

@@ -331,7 +331,7 @@ export function CharacterDetails({
                 <div className='flex items-center justify-between'>
                   <div className='flex items-center gap-2'>
                     <Zap className='h-4 w-4 text-blue-500' />
-                    <span>Movement</span>
+                    <span>Stamina</span>
                   </div>
                   <span className='font-mono'>
                     {character.movement}/{character.movementMax}

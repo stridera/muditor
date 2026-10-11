@@ -838,7 +838,7 @@ model Characters {
   drunkenness       Int          @default(0)
   description       String?
   title             String?
-  prompt            String       @default("<%h/%Hhp %v/%Vmv>")
+  prompt            String       @default("<%h/%Hhp %v/%Vst>")
   playerFlags       PlayerFlag[] @default([]) @map("player_flags")
   permissions       Permission[] @default([]) @map("permissions") // Direct permission grants beyond level
   invisLevel        Int          @default(0) @map("invis_level")
