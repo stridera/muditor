@@ -11,6 +11,8 @@ jest.mock('bcrypt', () => ({
   hash: jest.fn(),
 }));
 
+const nowSec = () => Math.floor(Date.now() / 1000);
+
 describe('AuthService', () => {
   let service: AuthService;
   let databaseService: jest.Mocked<DatabaseService>;
@@ -692,9 +694,9 @@ describe('AuthService', () => {
           role: UserRole.PLAYER,
         })
       ).rejects.toThrow('Account is deactivated');
-      await expect(service.refreshToken('user-id')).rejects.toThrow(
-        'Account is deactivated'
-      );
+      await expect(
+        service.refreshToken('user-id', nowSec(), 0)
+      ).rejects.toThrow('Account is deactivated');
     });
   });
 
@@ -814,7 +816,7 @@ describe('AuthService', () => {
 
     it('stamps the current version into issued tokens (refresh)', async () => {
       jwtService.sign.mockReturnValue('t');
-      await service.refreshToken('user-id');
+      await service.refreshToken('user-id', nowSec(), 3);
       expect(jwtService.sign).toHaveBeenCalledWith(
         expect.objectContaining({ tokenVersion: 3 })
       );
@@ -894,9 +896,9 @@ describe('AuthService', () => {
       });
       (jwtService.sign as jest.Mock).mockReturnValue('new-token');
 
-      await expect(service.refreshToken('user-id')).rejects.toThrow(
-        'Account is banned'
-      );
+      await expect(
+        service.refreshToken('user-id', nowSec(), 0)
+      ).rejects.toThrow('Account is banned');
       expect(jwtService.sign).not.toHaveBeenCalled();
     });
 
@@ -910,10 +912,66 @@ describe('AuthService', () => {
       (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
         null
       );
-      await service.refreshToken('user-id', 1234);
-      expect(sign).toHaveBeenCalledWith(
-        expect.objectContaining({ authAt: 1234 })
+      const authAt = nowSec() - 3600;
+      await service.refreshToken('user-id', authAt, 0);
+      expect(sign).toHaveBeenCalledWith(expect.objectContaining({ authAt }));
+    });
+
+    it('refreshToken refuses when the incoming token version differs from the row (race)', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
       );
+      await expect(
+        service.refreshToken('user-id', nowSec(), 2)
+      ).rejects.toThrow('Token has been revoked');
+      expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('refreshToken refuses once the session is older than the max age', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      const thirtyOneDays = 31 * 24 * 60 * 60;
+      await expect(
+        service.refreshToken('user-id', nowSec() - thirtyOneDays, 0)
+      ).rejects.toThrow('Session expired');
+      await expect(
+        service.refreshToken('user-id', undefined, 0)
+      ).rejects.toThrow('Please sign in again');
+      expect(jwtService.sign).not.toHaveBeenCalled();
+    });
+
+    it('a refreshed token cannot launder authAt into a recent sign-in', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue({
+        ...dbUser,
+        passwordHash: null,
+      });
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      jwtService.sign.mockReturnValue('refreshed');
+      const oldSignIn = nowSec() - 3 * 24 * 60 * 60;
+      await service.refreshToken('user-id', oldSignIn, 0);
+      const minted = jwtService.sign.mock.calls[0]![0] as { authAt: number };
+      expect(minted.authAt).toBe(oldSignIn);
+      // ...so a Google-only user holding it is still refused a first password
+      await expect(
+        service.changePassword('user-id', '', 'brand-new-pass', minted.authAt)
+      ).rejects.toThrow('sign in again');
+    });
+
+    it('a Google-only user who signed in recently can set a first password', async () => {
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue({
+        ...dbUser,
+        passwordHash: null,
+      });
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$12$new');
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([]);
+      await expect(
+        service.changePassword('user-id', '', 'brand-new-pass', nowSec() - 60)
+      ).resolves.toBe(true);
     });
 
     it('refreshToken mints a token for an unbanned user', async () => {
@@ -923,7 +981,9 @@ describe('AuthService', () => {
       );
       (jwtService.sign as jest.Mock).mockReturnValue('new-token');
 
-      await expect(service.refreshToken('user-id')).resolves.toBe('new-token');
+      await expect(service.refreshToken('user-id', nowSec(), 0)).resolves.toBe(
+        'new-token'
+      );
     });
   });
 });

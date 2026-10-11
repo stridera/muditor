@@ -40,8 +40,8 @@ import { BridgeModule } from './bridge/bridge.module';
 import { DiscordModule } from './discord/discord.module';
 import { complexityLimit } from './common/complexity-limit';
 import { depthLimit, MAX_QUERY_DEPTH } from './common/depth-limit';
-import { getJwtSecret } from './auth/jwt-secret';
-import * as jwt from 'jsonwebtoken';
+import { AuthService } from './auth/auth.service';
+import { createWsOnConnect, isWsContext, wsContext } from './auth/ws-auth';
 
 @Module({
   imports: [
@@ -54,57 +54,40 @@ import * as jwt from 'jsonwebtoken';
           : ['.env', '../../.env', '../../.env.development'],
     }),
     CommonModule,
-    GraphQLModule.forRoot<ApolloDriverConfig>({
+    GraphQLModule.forRootAsync<ApolloDriverConfig>({
       driver: ApolloDriver,
-      autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
-      sortSchema: true,
-      // Never enabled in production, regardless of GRAPHQL_PLAYGROUND
-      playground:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.GRAPHQL_PLAYGROUND === 'true',
-      // Introspection (Apollo Sandbox) only outside production
-      introspection: process.env.NODE_ENV !== 'production',
-      validationRules: [depthLimit(MAX_QUERY_DEPTH), complexityLimit()],
-      debug:
-        process.env.NODE_ENV !== 'production' &&
-        process.env.GRAPHQL_DEBUG === 'true',
-      context: ({ req, res }: { req: Request; res: Response }) => ({
-        req,
-        res,
-      }),
-      // Apollo Server 5 uses graphql-ws by default for subscriptions
-      subscriptions: {
-        'graphql-ws': {
-          onConnect: ctx => {
-            const params = (ctx.connectionParams || {}) as Record<
-              string,
-              unknown
-            >;
-            const auth = (params['Authorization'] ||
-              params['authorization']) as string | undefined;
-            if (auth) {
-              try {
-                const token = auth.replace('Bearer ', '');
-                const decoded = jwt.verify(
-                  token,
-                  getJwtSecret()
-                ) as jwt.JwtPayload;
-                return {
-                  req: {
-                    headers: {
-                      authorization: auth,
-                      userId: decoded.sub,
-                    },
-                  },
-                };
-              } catch {
-                // Invalid token — fall through with auth header only
-              }
-            }
-            return { req: { headers: { authorization: auth } } };
+      imports: [AuthModule],
+      inject: [AuthService],
+      useFactory: (authService: AuthService) => ({
+        autoSchemaFile: join(process.cwd(), 'src/schema.gql'),
+        sortSchema: true,
+        // Never enabled in production, regardless of GRAPHQL_PLAYGROUND
+        playground:
+          process.env.NODE_ENV !== 'production' &&
+          process.env.GRAPHQL_PLAYGROUND === 'true',
+        // Introspection (Apollo Sandbox) only outside production
+        introspection: process.env.NODE_ENV !== 'production',
+        validationRules: [depthLimit(MAX_QUERY_DEPTH), complexityLimit()],
+        debug:
+          process.env.NODE_ENV !== 'production' &&
+          process.env.GRAPHQL_DEBUG === 'true',
+        context: (arg: { req: Request; res: Response } | object) =>
+          // Subscriptions arrive over graphql-ws, not HTTP: rebuild the request
+          // context from the authenticated handshake.
+          isWsContext(arg)
+            ? wsContext(arg)
+            : {
+                req: (arg as { req: Request }).req,
+                res: (arg as { res: Response }).res,
+              },
+        // Apollo Server 5 uses graphql-ws by default for subscriptions
+        subscriptions: {
+          'graphql-ws': {
+            // Anonymous, banned, deleted and revoked users never get a socket
+            onConnect: createWsOnConnect(authService),
           },
         },
-      },
+      }),
     }),
     DatabaseModule,
     AuthModule,

@@ -36,7 +36,11 @@ describe('RoleCalculatorService.updateUserRole (escalation rule)', () => {
     expect(await service.updateUserRole('u1', { allowRaise: true })).toBe(
       UserRole.HEAD_BUILDER
     );
-    expect(db.users.update).toHaveBeenCalledTimes(1);
+    // a user-triggered raise must not revoke the user's own token
+    expect(db.users.update).toHaveBeenCalledWith({
+      where: { id: 'u1' },
+      data: { role: UserRole.HEAD_BUILDER },
+    });
   });
 
   it('never lowers a role on link (allowLower: false), only raises', async () => {

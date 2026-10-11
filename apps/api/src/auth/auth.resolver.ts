@@ -59,9 +59,14 @@ export class AuthResolver {
   @Mutation(() => String)
   @UseGuards(GraphQLJwtAuthGuard)
   async refreshToken(
-    @CurrentUser() user: PrismaUser & { authAt?: number }
+    @CurrentUser()
+    user: PrismaUser & { authAt?: number; tokenVersionClaim?: number }
   ): Promise<string> {
-    return this.authService.refreshToken(user.id, user.authAt);
+    return this.authService.refreshToken(
+      user.id,
+      user.authAt,
+      user.tokenVersionClaim
+    );
   }
 
   @Mutation(() => PasswordResetResponse)
@@ -125,7 +130,10 @@ export class AuthResolver {
     // The change bumped tokenVersion, killing the caller's own token too;
     // hand back a fresh one so this session carries on (all others end).
     const accessToken = success
-      ? await this.authService.refreshToken(user.id, user.authAt)
+      ? await this.authService.reissueAfterCredentialChange(
+          user.id,
+          user.authAt
+        )
       : undefined;
     return {
       success,

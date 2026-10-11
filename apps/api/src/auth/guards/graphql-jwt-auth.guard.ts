@@ -8,7 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 import { DatabaseService } from '../../database/database.service';
 import { hasActiveBan } from '../ban.util';
-import { isTokenVersionCurrent } from '../token-version.util';
+import { isTokenVersionCurrent, tokenVersionOf } from '../token-version.util';
 
 @Injectable()
 export class GraphQLJwtAuthGuard {
@@ -60,7 +60,14 @@ export class GraphQLJwtAuthGuard {
         throw new UnauthorizedException('Account is banned');
       }
 
-      req.user = user;
+      // authAt = last real sign-in (refreshes keep it); lets sensitive
+      // mutations demand a recent authentication and caps refresh chains.
+      // tokenVersionClaim is the incoming token's version, re-checked by
+      // refreshToken against the row it reads.
+      req.user = Object.assign(user, {
+        authAt: payload.authAt ?? payload.iat,
+        tokenVersionClaim: tokenVersionOf(payload),
+      });
       return true;
     } catch (error) {
       if (

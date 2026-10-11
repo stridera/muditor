@@ -29,6 +29,14 @@ import {
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000; // 15 minutes
 /** How recent a sign-in must be to set a first password without a current one. */
 const REAUTH_WINDOW_SECONDS = 10 * 60;
+/**
+ * Longest a session may be kept alive by refreshing, measured from the last
+ * real sign-in (`authAt`). Override with MAX_SESSION_AGE_DAYS.
+ */
+export function maxSessionAgeSeconds(): number {
+  const days = Number(process.env.MAX_SESSION_AGE_DAYS);
+  return (Number.isFinite(days) && days > 0 ? days : 30) * 24 * 60 * 60;
+}
 const ADMIN_PASSWORD_RESET_TTL_MS = 60 * 60 * 1000; // 1 hour (handed over out of band)
 
 // Sanitized user returned by auth operations (no password or reset tokens)
@@ -221,7 +229,20 @@ export class AuthService {
     return result as Users;
   }
 
-  async refreshToken(userId: string, authAt?: number): Promise<string> {
+  /**
+   * Mint a fresh token for the holder of a still-valid one.
+   *
+   * `authAt` (last real sign-in) is carried over, never reset, and a session
+   * older than the max session age cannot be refreshed. `tokenVersion` is the
+   * claim of the incoming token: it is re-checked against the row read here,
+   * so a password change/ban/role change landing between the guard and this
+   * read cannot be outrun by a refresh.
+   */
+  async refreshToken(
+    userId: string,
+    authAt: number | undefined,
+    tokenVersion: number | undefined
+  ): Promise<string> {
     const user = await this.databaseService.users.findUnique({
       where: { id: userId },
     });
@@ -232,11 +253,46 @@ export class AuthService {
 
     this.assertNotDeleted(user);
 
+    if (!isTokenVersionCurrent({ tokenVersion: tokenVersion ?? 0 }, user)) {
+      throw new UnauthorizedException('Token has been revoked');
+    }
+
     if (await this.checkBanStatus(user.id)) {
       throw new UnauthorizedException('Account is banned');
     }
 
-    // A refresh must not launder an old session into a "recent" sign-in.
+    // A refresh must not launder an old session into a "recent" sign-in, and
+    // a chain of refreshes must not outlive the max session age.
+    if (authAt === undefined) {
+      throw new UnauthorizedException('Please sign in again');
+    }
+    if (Math.floor(Date.now() / 1000) - authAt > maxSessionAgeSeconds()) {
+      throw new UnauthorizedException('Session expired, please sign in again');
+    }
+
+    return this.generateToken(user, authAt);
+  }
+
+  /**
+   * New token for the caller right after THEY changed their own credentials
+   * (the change bumped tokenVersion, killing the token they used). Skips the
+   * version comparison of `refreshToken` because the bump is the point; still
+   * refuses deleted/banned accounts and keeps `authAt`.
+   */
+  async reissueAfterCredentialChange(
+    userId: string,
+    authAt: number | undefined
+  ): Promise<string> {
+    const user = await this.databaseService.users.findUnique({
+      where: { id: userId },
+    });
+    if (!user) {
+      throw new UnauthorizedException('User not found');
+    }
+    this.assertNotDeleted(user);
+    if (await this.checkBanStatus(user.id)) {
+      throw new UnauthorizedException('Account is banned');
+    }
     return this.generateToken(user, authAt);
   }
 

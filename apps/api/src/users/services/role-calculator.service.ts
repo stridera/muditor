@@ -91,9 +91,15 @@ export class RoleCalculatorService {
     }
     if (calculated === user.role) return user.role;
 
+    // Only a lowering revokes outstanding tokens. A raise the user triggered
+    // themselves (linking a character) must not log them out: authorization
+    // reads the role from the DB row on every request, so the old token
+    // simply sees the new role.
     await this.db.users.update({
       where: { id: userId },
-      data: { role: calculated, ...BUMP_TOKEN_VERSION },
+      data: isRaise
+        ? { role: calculated }
+        : { role: calculated, ...BUMP_TOKEN_VERSION },
     });
 
     return calculated;
