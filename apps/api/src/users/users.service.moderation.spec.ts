@@ -23,6 +23,7 @@ describe('UsersService ban/unban rank rules', () => {
     db = {
       users: {
         findUnique: jest.fn(async ({ where }) => users[where.id] ?? null),
+        update: jest.fn().mockResolvedValue({}),
       },
       banRecords: {
         findFirst: jest.fn(
@@ -71,6 +72,14 @@ describe('UsersService ban/unban rank rules', () => {
       await ban('coder', 'builder');
       await ban('impl', 'coder');
       expect(db.banRecords.create).toHaveBeenCalledTimes(3);
+    });
+
+    it('bumps the banned user token version so open sessions die at once', async () => {
+      await ban('imm', 'player');
+      expect(db.users.update).toHaveBeenCalledWith({
+        where: { id: 'player' },
+        data: { tokenVersion: { increment: 1 } },
+      });
     });
 
     it('denies an IMPLEMENTOR banning another IMPLEMENTOR (strictly above)', async () => {

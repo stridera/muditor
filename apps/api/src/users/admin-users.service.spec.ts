@@ -87,6 +87,10 @@ describe('AdminUsersService', () => {
       );
       expect(out.role).toBe(UserRole.IMMORTAL);
       expect(db.auditLogs.create).toHaveBeenCalledTimes(1);
+      expect(db.users.update).toHaveBeenCalledWith({
+        where: { id: 'builder' },
+        data: { role: UserRole.IMMORTAL, tokenVersion: { increment: 1 } },
+      });
     });
 
     it('stops a CODER from granting CODER or higher', async () => {
@@ -140,6 +144,10 @@ describe('AdminUsersService', () => {
       );
       expect(del.deletedAt).toBeInstanceOf(Date);
       expect(del.deletionReason).toBe('spam');
+      expect(db.users.update).toHaveBeenCalledWith({
+        where: { id: 'builder' },
+        data: expect.objectContaining({ tokenVersion: { increment: 1 } }),
+      });
       const res = await service.setUserDeleted('coder', 'builder', false);
       expect(res.deletedAt).toBeNull();
       expect(res.deletionReason).toBeNull();

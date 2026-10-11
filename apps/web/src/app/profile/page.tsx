@@ -29,6 +29,7 @@ const CHANGE_PASSWORD_MUTATION = gql`
     changePassword(input: $input) {
       success
       message
+      accessToken
     }
   }
 `;
@@ -67,7 +68,7 @@ export default function ProfilePage() {
 }
 
 function ProfileContent() {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   // Fetch linked characters
   const { data: charactersData } = useQuery(GET_MY_CHARACTERS);
@@ -114,8 +115,14 @@ function ProfileContent() {
       setProfileSuccess('Profile updated successfully!');
       setIsEditingProfile(false);
 
-      // Refresh user context
-      window.location.reload();
+      if (email !== user.email) {
+        // Changing the email revokes every session token (including this
+        // one), so sign in again with the new address on file.
+        logout();
+      } else {
+        // Refresh user context
+        window.location.reload();
+      }
     } catch (err: any) {
       const errorMessage =
         err.graphQLErrors?.[0]?.message ||
@@ -156,12 +163,16 @@ function ProfileContent() {
         },
       });
 
-      const { success, message } = (result.data as any)?.changePassword || {
+      const { success, message, accessToken } = (result.data as any)
+        ?.changePassword || {
         success: false,
         message: '',
       };
       if (success) {
         setPasswordSuccess(message || 'Password changed successfully!');
+        // The change revoked every older token; adopt the fresh one so this
+        // session continues while all other sessions are signed out.
+        if (accessToken) localStorage.setItem('auth-token', accessToken);
       } else {
         setPasswordError(message || 'Failed to change password');
         return;

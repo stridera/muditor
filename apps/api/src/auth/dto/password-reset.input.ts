@@ -62,4 +62,11 @@ export class PasswordResetResponse {
 
   @Field()
   message: string;
+
+  @Field(() => String, {
+    nullable: true,
+    description:
+      'Fresh session token, returned by changePassword (the password change revokes every older token)',
+  })
+  accessToken?: string;
 }

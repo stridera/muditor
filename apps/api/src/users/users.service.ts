@@ -7,6 +7,7 @@ import {
 import { UserRole, type Users } from '@muditor/db';
 import * as crypto from 'crypto';
 import { roleAtLeast, roleRank } from '../auth/role.util';
+import { BUMP_TOKEN_VERSION } from '../auth/token-version.util';
 import { DatabaseService } from '../database/database.service';
 import { BanUserInput } from './dto/ban-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
@@ -51,7 +52,7 @@ export class UsersService {
 
     return this.databaseService.users.update({
       where: { id },
-      data: { role },
+      data: { role, ...BUMP_TOKEN_VERSION },
     });
   }
 
@@ -88,7 +89,13 @@ export class UsersService {
 
     const updatedUser = await this.databaseService.users.update({
       where: { id },
-      data: updateData,
+      data: {
+        ...updateData,
+        // Email or role change: revoke outstanding tokens; a new address is
+        // unproven until it is verified again.
+        ...(updateData.email || updateData.role ? BUMP_TOKEN_VERSION : {}),
+        ...(updateData.email ? { emailVerified: false } : {}),
+      },
     });
 
     // Return with isBanned field
@@ -157,6 +164,12 @@ export class UsersService {
         user: true,
         bannedByUser: true,
       },
+    });
+
+    // Kill the banned user's outstanding tokens right away.
+    await this.databaseService.users.update({
+      where: { id: userId },
+      data: BUMP_TOKEN_VERSION,
     });
 
     // Return with proper User entity typing

@@ -10,6 +10,8 @@ import {
 export interface GoogleProfile {
   googleId: string;
   email: string;
+  /** Google asserts the address is verified (`email_verified`). */
+  emailVerified: boolean;
   displayName: string;
   avatarUrl?: string;
 }
@@ -36,7 +38,8 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     profile: Profile,
     done: VerifyCallback
   ): void {
-    const email = profile.emails?.[0]?.value;
+    const emailEntry = profile.emails?.[0];
+    const email = emailEntry?.value;
     if (!email) {
       return done(new Error('No email found in Google profile'), undefined);
     }
@@ -44,6 +47,7 @@ export class GoogleStrategy extends PassportStrategy(Strategy, 'google') {
     const googleProfile: GoogleProfile = {
       googleId: profile.id,
       email,
+      emailVerified: emailEntry?.verified === true,
       displayName: profile.displayName,
       ...(avatarUrl != null && { avatarUrl }),
     };

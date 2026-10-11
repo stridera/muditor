@@ -20,6 +20,7 @@ mutation ChangePassword($currentPassword: String!, $newPassword: String!) {
   ) {
     success
     message
+    accessToken
   }
 }
 

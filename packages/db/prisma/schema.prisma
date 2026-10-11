@@ -1759,6 +1759,13 @@ model Users {
   lastFailedLogin     DateTime?       @map("last_failed_login")
   preferences         Json?           @default("{}")
   accountWealth       BigInt          @default(0) @map("account_wealth") // Shared account bank in copper
+  // Bumped on password change/reset, email change, role change, ban and delete.
+  // Stamped into the JWT at sign time; a token whose claim differs (missing = 0) is rejected.
+  tokenVersion        Int             @default(0) @map("token_version")
+  // True only when the address is proven (Google-verified OAuth signup). Game- and
+  // password-created accounts carry an address nobody has proven, so OAuth never
+  // auto-links to them.
+  emailVerified       Boolean         @default(false) @map("email_verified")
   auditLogs           AuditLogs[]
   banRecordsIssued    BanRecords[]    @relation("bannedByUser")
   banRecords          BanRecords[]    @relation("userBanRecords")

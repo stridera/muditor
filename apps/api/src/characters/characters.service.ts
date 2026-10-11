@@ -26,6 +26,7 @@ import type {
   Race,
   UserRole,
 } from '@muditor/db';
+import { BUMP_TOKEN_VERSION } from '../auth/token-version.util';
 import { GameAdminService } from '../bridge/game-admin.service';
 import { DatabaseService } from '../database/database.service';
 import { RacesService } from '../races/races.service';
@@ -1161,6 +1162,7 @@ export class CharactersService implements OnModuleDestroy {
             passwordHash: null,
             resetToken: null,
             resetTokenExpiry: null,
+            ...BUMP_TOKEN_VERSION,
           },
         });
         this.logger.log(

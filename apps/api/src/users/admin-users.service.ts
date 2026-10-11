@@ -8,6 +8,7 @@ import {
 import { UserRole, type Prisma } from '@muditor/db';
 import * as crypto from 'crypto';
 import { AuthService } from '../auth/auth.service';
+import { BUMP_TOKEN_VERSION } from '../auth/token-version.util';
 import { roleAtLeast } from '../auth/role.util';
 import { DatabaseService } from '../database/database.service';
 import type {
@@ -106,7 +107,10 @@ export class AdminUsersService {
     }
 
     if (target.role !== role) {
-      await this.db.users.update({ where: { id: userId }, data: { role } });
+      await this.db.users.update({
+        where: { id: userId },
+        data: { role, ...BUMP_TOKEN_VERSION },
+      });
       await this.audit(actorId, 'ADMIN_SET_USER_ROLE', userId, {
         oldValues: { role: target.role },
         newValues: { role },
@@ -142,7 +146,11 @@ export class AdminUsersService {
       }
       await this.db.users.update({
         where: { id: userId },
-        data: { deletedAt: new Date(), deletionReason: trimmed },
+        data: {
+          deletedAt: new Date(),
+          deletionReason: trimmed,
+          ...BUMP_TOKEN_VERSION,
+        },
       });
       await this.audit(actorId, 'ADMIN_DELETE_USER', userId, {
         newValues: { reason: trimmed },

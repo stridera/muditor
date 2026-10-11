@@ -122,11 +122,17 @@ export class AuthResolver {
       input.newPassword,
       user.authAt
     );
+    // The change bumped tokenVersion, killing the caller's own token too;
+    // hand back a fresh one so this session carries on (all others end).
+    const accessToken = success
+      ? await this.authService.refreshToken(user.id, user.authAt)
+      : undefined;
     return {
       success,
       message: success
         ? 'Password changed successfully'
         : 'Failed to change password',
+      ...(accessToken !== undefined && { accessToken }),
     };
   }
 

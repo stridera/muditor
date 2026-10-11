@@ -8,6 +8,7 @@ import { JwtService } from '@nestjs/jwt';
 import type { Request } from 'express';
 import { DatabaseService } from '../../database/database.service';
 import { hasActiveBan } from '../ban.util';
+import { isTokenVersionCurrent } from '../token-version.util';
 
 @Injectable()
 export class GraphQLJwtAuthGuard {
@@ -39,11 +40,18 @@ export class GraphQLJwtAuthGuard {
           createdAt: true,
           updatedAt: true,
           deletedAt: true,
+          tokenVersion: true,
         },
       });
 
       // Soft-deleted accounts keep a valid signed token until it expires.
       if (!user || user.deletedAt) {
+        throw new UnauthorizedException('Invalid token');
+      }
+
+      // Password/email/role change, ban or delete bumps the version and
+      // kills every token minted before it.
+      if (!isTokenVersionCurrent(payload, user)) {
         throw new UnauthorizedException('Invalid token');
       }
 

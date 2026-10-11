@@ -9,6 +9,7 @@ import { Test } from '@nestjs/testing';
 import { RateLimit } from '../bridge/rate-limit.guard';
 import { AuthRateLimitGuard } from './guards/auth-rate-limit.guard';
 import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
+import { OptionalJwtAuthGuard } from './guards/optional-jwt-auth.guard';
 import { getJwtSecret, jwtModuleOptionsFactory } from './jwt-secret';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import type { AuthService } from './auth.service';
@@ -75,15 +76,23 @@ describe('GraphQLJwtAuthGuard ban check', () => {
     role: 'PLAYER',
   };
 
-  function build(activeBan: unknown, foundUser: unknown = user) {
+  function build(
+    activeBan: unknown,
+    foundUser: unknown = user,
+    claims: Record<string, unknown> = { sub: 'u1' }
+  ) {
     const db = {
       users: { findUnique: jest.fn().mockResolvedValue(foundUser) },
       banRecords: { findFirst: jest.fn().mockResolvedValue(activeBan) },
     } as unknown as DatabaseService;
     const jwt = {
-      verify: jest.fn().mockReturnValue({ sub: 'u1' }),
+      verify: jest.fn().mockReturnValue(claims),
     } as unknown as JwtService;
-    return { guard: new GraphQLJwtAuthGuard(jwt, db), db };
+    return {
+      guard: new GraphQLJwtAuthGuard(jwt, db),
+      optional: new OptionalJwtAuthGuard(jwt, db),
+      db,
+    };
   }
 
   it('rejects a banned user with a valid token', async () => {
@@ -127,6 +136,67 @@ describe('GraphQLJwtAuthGuard ban check', () => {
         gqlContext({ headers: { authorization: 'Bearer tok' } })
       )
     ).resolves.toBe(true);
+  });
+
+  it('rejects a token whose version predates a bump (password/role/ban/delete)', async () => {
+    const { guard } = build(
+      null,
+      { ...user, tokenVersion: 2 },
+      {
+        sub: 'u1',
+        tokenVersion: 1,
+      }
+    );
+    const req: Record<string, unknown> = {
+      headers: { authorization: 'Bearer tok' },
+    };
+    await expect(guard.canActivate(gqlContext(req))).rejects.toBeInstanceOf(
+      UnauthorizedException
+    );
+    expect(req).not.toHaveProperty('user');
+  });
+
+  it('accepts a matching version, and a claim-less token for version 0', async () => {
+    const matching = build(
+      null,
+      { ...user, tokenVersion: 2 },
+      {
+        sub: 'u1',
+        tokenVersion: 2,
+      }
+    );
+    await expect(
+      matching.guard.canActivate(
+        gqlContext({ headers: { authorization: 'Bearer tok' } })
+      )
+    ).resolves.toBe(true);
+    const legacy = build(null, { ...user, tokenVersion: 0 });
+    await expect(
+      legacy.guard.canActivate(
+        gqlContext({ headers: { authorization: 'Bearer tok' } })
+      )
+    ).resolves.toBe(true);
+    const staleLegacy = build(null, { ...user, tokenVersion: 1 });
+    await expect(
+      staleLegacy.guard.canActivate(
+        gqlContext({ headers: { authorization: 'Bearer tok' } })
+      )
+    ).rejects.toBeInstanceOf(UnauthorizedException);
+  });
+
+  it('OptionalJwtAuthGuard treats deleted and revoked users as anonymous', async () => {
+    for (const found of [
+      { ...user, deletedAt: new Date() },
+      { ...user, tokenVersion: 5 },
+      null,
+    ]) {
+      const { optional } = build(null, found);
+      const req: Record<string, unknown> = {
+        headers: { authorization: 'Bearer tok' },
+      };
+      await expect(optional.canActivate(gqlContext(req))).resolves.toBe(true);
+      expect(req.user).toBeNull();
+    }
   });
 
   it('still rejects missing / unknown users as Unauthorized', async () => {

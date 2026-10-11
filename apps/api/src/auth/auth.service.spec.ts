@@ -243,6 +243,8 @@ describe('AuthService', () => {
       lastFailedLogin: null,
       preferences: {},
       accountWealth: 0n,
+      tokenVersion: 0,
+      emailVerified: false,
     };
 
     beforeEach(() => {
@@ -557,6 +559,7 @@ describe('AuthService', () => {
     const profile = {
       googleId: 'g-123',
       email: 'Victim@Example.com',
+      emailVerified: true,
       displayName: 'Victim',
     };
     let googleLink: { findUnique: jest.Mock; create: jest.Mock };
@@ -573,33 +576,45 @@ describe('AuthService', () => {
       (jwtService.sign as jest.Mock).mockReturnValue('token');
     });
 
-    it('refuses to auto-link an account created in game with an unverified email', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
-        id: 'game-user',
-        email: 'victim@example.com',
-        displayName: 'victim',
-        role: UserRole.PLAYER,
-        googleLink: null,
-        deletedAt: null,
-        preferences: { emailVerified: false },
-      });
+    const existing = (extra: Record<string, unknown> = {}) => ({
+      id: 'web-user',
+      email: 'victim@example.com',
+      displayName: 'victim',
+      role: UserRole.PLAYER,
+      googleLink: null,
+      deletedAt: null,
+      tokenVersion: 0,
+      emailVerified: true,
+      ...extra,
+    });
+
+    it('refuses to auto-link an account whose email is unverified (game-created)', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        existing({ emailVerified: false })
+      );
 
       await expect(service.handleGoogleLogin(profile)).rejects.toThrow(
         ConflictException
       );
       expect(googleLink.create).not.toHaveBeenCalled();
+      expect(jwtService.sign).not.toHaveBeenCalled();
     });
 
-    it('still auto-links an account whose email is not marked unverified', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
-        id: 'web-user',
-        email: 'victim@example.com',
-        displayName: 'victim',
-        role: UserRole.PLAYER,
-        googleLink: null,
-        deletedAt: null,
-        preferences: {},
-      });
+    it('refuses to auto-link when Google does not vouch for the address', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        existing()
+      );
+
+      await expect(
+        service.handleGoogleLogin({ ...profile, emailVerified: false })
+      ).rejects.toThrow(ConflictException);
+      expect(googleLink.create).not.toHaveBeenCalled();
+    });
+
+    it('auto-links an account whose email is verified', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(
+        existing()
+      );
 
       const result = await service.handleGoogleLogin(profile);
 
@@ -607,20 +622,44 @@ describe('AuthService', () => {
       expect(result.accessToken).toBe('token');
     });
 
-    it('treats a missing preferences value as verified', async () => {
-      (databaseService.users.findFirst as jest.Mock).mockResolvedValue({
-        id: 'legacy-user',
-        email: 'victim@example.com',
-        displayName: 'victim',
-        role: UserRole.PLAYER,
-        googleLink: null,
-        deletedAt: null,
-        preferences: null,
-      });
-
+    it('a new Google signup carries the provider-verified flag into the pending token and the created user', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
       await service.handleGoogleLogin(profile);
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'google-pending',
+          emailVerified: true,
+        }),
+        expect.anything()
+      );
 
-      expect(googleLink.create).toHaveBeenCalledTimes(1);
+      const txUsersCreate = jest.fn().mockResolvedValue({
+        id: 'new',
+        displayName: 'NewGuy',
+        role: UserRole.PLAYER,
+        tokenVersion: 0,
+      });
+      (databaseService as unknown as { $transaction: unknown }).$transaction =
+        jest.fn(async (fn: (tx: unknown) => unknown) =>
+          fn({
+            users: { create: txUsersCreate },
+            googleLink: { create: jest.fn() },
+          })
+        );
+      (jwtService as unknown as { verify: jest.Mock }).verify = jest
+        .fn()
+        .mockReturnValue({
+          type: 'google-pending',
+          googleId: 'g-123',
+          email: 'new@example.com',
+          emailVerified: true,
+          displayName: 'New Guy',
+        });
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(null);
+      await service.completeGoogleRegistration('pending', 'NewGuy');
+      expect(txUsersCreate).toHaveBeenCalledWith({
+        data: expect.objectContaining({ emailVerified: true }),
+      });
     });
   });
 
@@ -698,9 +737,14 @@ describe('AuthService', () => {
         currentPassword: 'right',
       });
       expect(result.email).toBe('new@x.test');
+      // New address is unproven and every older token is revoked.
       expect(users().update).toHaveBeenCalledWith({
         where: { id: 'user-id' },
-        data: { email: 'new@x.test' },
+        data: {
+          email: 'new@x.test',
+          emailVerified: false,
+          tokenVersion: { increment: 1 },
+        },
       });
     });
 
@@ -719,6 +763,88 @@ describe('AuthService', () => {
       expect(users().update).toHaveBeenCalledWith({
         where: { id: 'user-id' },
         data: {},
+      });
+    });
+  });
+
+  describe('token version', () => {
+    const dbUser = {
+      id: 'user-id',
+      displayName: 'Tester',
+      role: UserRole.PLAYER,
+      passwordHash: 'hash',
+      tokenVersion: 3,
+      deletedAt: null,
+    };
+    const payload = {
+      sub: 'user-id',
+      displayName: 'Tester',
+      role: UserRole.PLAYER,
+    };
+
+    beforeEach(() => {
+      (databaseService.banRecords.findFirst as jest.Mock).mockResolvedValue(
+        null
+      );
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue(dbUser);
+    });
+
+    it('rejects a token minted before the version was bumped', async () => {
+      await expect(
+        service.validateJwtPayload({ ...payload, tokenVersion: 2 })
+      ).rejects.toThrow('Token has been revoked');
+      // old tokens carry no claim: they count as version 0, which is stale here
+      await expect(service.validateJwtPayload(payload)).rejects.toThrow(
+        'Token has been revoked'
+      );
+    });
+
+    it('accepts a token at the current version; no claim == version 0', async () => {
+      await expect(
+        service.validateJwtPayload({ ...payload, tokenVersion: 3 })
+      ).resolves.toMatchObject({ id: 'user-id' });
+      (databaseService.users.findUnique as jest.Mock).mockResolvedValue({
+        ...dbUser,
+        tokenVersion: 0,
+      });
+      await expect(service.validateJwtPayload(payload)).resolves.toMatchObject({
+        id: 'user-id',
+      });
+    });
+
+    it('stamps the current version into issued tokens (refresh)', async () => {
+      jwtService.sign.mockReturnValue('t');
+      await service.refreshToken('user-id');
+      expect(jwtService.sign).toHaveBeenCalledWith(
+        expect.objectContaining({ tokenVersion: 3 })
+      );
+    });
+
+    it('changePassword bumps the version', async () => {
+      (bcrypt.compare as jest.Mock).mockResolvedValue(true);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$12$new');
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([]);
+      await service.changePassword('user-id', 'cur', 'brand-new-pass');
+      expect(databaseService.users.update).toHaveBeenCalledWith({
+        where: { id: 'user-id' },
+        data: {
+          passwordHash: '$2b$12$new',
+          tokenVersion: { increment: 1 },
+        },
+      });
+    });
+
+    it('resetPassword bumps the version', async () => {
+      (databaseService.users.findFirst as jest.Mock).mockResolvedValue(dbUser);
+      (bcrypt.hash as jest.Mock).mockResolvedValue('$2b$12$new');
+      (databaseService.characters.findMany as jest.Mock).mockResolvedValue([]);
+      await service.resetPassword('tok', 'brand-new-pass');
+      expect(databaseService.users.update).toHaveBeenCalledWith({
+        where: { id: 'user-id' },
+        data: expect.objectContaining({
+          resetToken: null,
+          tokenVersion: { increment: 1 },
+        }),
       });
     });
   });

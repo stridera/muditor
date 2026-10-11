@@ -26,7 +26,7 @@ describe('RoleCalculatorService.updateUserRole (escalation rule)', () => {
     expect(await service.updateUserRole('u1')).toBe(UserRole.PLAYER);
     expect(db.users.update).toHaveBeenCalledWith({
       where: { id: 'u1' },
-      data: { role: UserRole.PLAYER },
+      data: { role: UserRole.PLAYER, tokenVersion: { increment: 1 } },
     });
   });
 

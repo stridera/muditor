@@ -8,7 +8,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { UserRole, type Users } from '@muditor/db';
+import { UserRole, type Prisma, type Users } from '@muditor/db';
 import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { DatabaseService } from '../database/database.service';
@@ -21,6 +21,10 @@ import { LoginInput } from './dto/login.input';
 import { RegisterInput } from './dto/register.input';
 import type { JwtPayload } from './interfaces/jwt-payload.interface';
 import type { GoogleProfile } from './strategies/google.strategy';
+import {
+  BUMP_TOKEN_VERSION,
+  isTokenVersionCurrent,
+} from './token-version.util';
 
 const PASSWORD_RESET_TTL_MS = 15 * 60 * 1000; // 15 minutes
 /** How recent a sign-in must be to set a first password without a current one. */
@@ -114,11 +118,7 @@ export class AuthService {
     });
 
     // Generate JWT token
-    const accessToken = this.generateToken(
-      user.id,
-      user.displayName,
-      user.role
-    );
+    const accessToken = this.generateToken(user);
 
     // Send welcome email
     try {
@@ -167,11 +167,7 @@ export class AuthService {
       throw new UnauthorizedException('Account is banned');
     }
 
-    const accessToken = this.generateToken(
-      user.id,
-      user.displayName,
-      user.role
-    );
+    const accessToken = this.generateToken(user);
 
     // Update last login timestamp
     await this.databaseService.users.update({
@@ -213,6 +209,10 @@ export class AuthService {
 
     this.assertNotDeleted(user);
 
+    if (!isTokenVersionCurrent(payload, user)) {
+      throw new UnauthorizedException('Token has been revoked');
+    }
+
     if (await this.checkBanStatus(user.id)) {
       throw new UnauthorizedException('Account is banned');
     }
@@ -237,7 +237,7 @@ export class AuthService {
     }
 
     // A refresh must not launder an old session into a "recent" sign-in.
-    return this.generateToken(user.id, user.displayName, user.role, authAt);
+    return this.generateToken(user, authAt);
   }
 
   async requestPasswordReset(email: string): Promise<boolean> {
@@ -368,6 +368,7 @@ export class AuthService {
         passwordHash,
         resetToken: null,
         resetTokenExpiry: null,
+        ...BUMP_TOKEN_VERSION,
       },
     });
 
@@ -387,7 +388,7 @@ export class AuthService {
       throw new NotFoundException('User not found');
     }
 
-    const update: { email?: string } = {};
+    const update: Prisma.UsersUpdateInput = {};
     const emailChanged =
       !!data.email && data.email.toLowerCase() !== current.email.toLowerCase();
 
@@ -418,6 +419,10 @@ export class AuthService {
         throw new ConflictException('Email already exists');
       }
       update.email = data.email;
+      // The new address is unproven (no email transport to verify it), and
+      // every outstanding token was issued against the old one.
+      update.emailVerified = false;
+      update.tokenVersion = { increment: 1 };
     }
 
     const user = await this.databaseService.users.update({
@@ -471,21 +476,12 @@ export class AuthService {
 
     await this.databaseService.users.update({
       where: { id: userId },
-      data: { passwordHash },
+      data: { passwordHash, ...BUMP_TOKEN_VERSION },
     });
 
     this.logger.log(`Password changed for user: ${user.displayName}`);
 
     return true;
-  }
-
-  /** True when `Users.preferences` marks the email as never verified. */
-  private isEmailUnverified(preferences: unknown): boolean {
-    return (
-      typeof preferences === 'object' &&
-      preferences !== null &&
-      (preferences as Record<string, unknown>)['emailVerified'] === false
-    );
   }
 
   async handleGoogleLogin(profile: GoogleProfile): Promise<{
@@ -513,11 +509,7 @@ export class AuthService {
         data: { lastLoginAt: new Date() },
       });
 
-      const accessToken = this.generateToken(
-        user.id,
-        user.displayName,
-        user.role
-      );
+      const accessToken = this.generateToken(user);
       this.logger.log(`Google login: ${user.displayName}`);
       return { accessToken, user: this.sanitizeUser(user) };
     }
@@ -537,17 +529,19 @@ export class AuthService {
 
       this.assertNotDeleted(existingUser);
 
-      // Accounts created at the game prompt carry an email nobody has
-      // proven (the game stores `preferences.emailVerified = false`).
-      // Linking by email would hand the real owner of that address an
-      // account whose characters (and game passwords) were set up by
-      // whoever typed it first, so refuse instead of auto-linking.
-      if (this.isEmailUnverified(existingUser.preferences)) {
+      // Auto-link only when BOTH sides have proven the address: Google says
+      // it is verified, and the local account's email is verified too.
+      // Accounts created at the game prompt or by the register form carry an
+      // address nobody has proven; linking by email would hand the real
+      // owner of that address an account (characters, game passwords) set up
+      // by whoever typed it first. Email is unique, so a separate account
+      // is impossible: refuse and send them to the password login instead.
+      if (!profile.emailVerified || !existingUser.emailVerified) {
         this.logger.warn(
-          `Google login refused: ${existingUser.displayName} has an unverified in-game email`
+          `Google login refused: ${existingUser.displayName} has an unverified email, no auto-link`
         );
         throw new ConflictException(
-          'An account for this email was created in the game and its email has not been verified, so it cannot be linked to Google automatically. Contact staff to verify it.'
+          'An account with this email already exists but its email address has not been verified, so it cannot be linked to Google automatically. Sign in with your account password instead, or contact staff.'
         );
       }
 
@@ -571,11 +565,7 @@ export class AuthService {
         data: { lastLoginAt: new Date() },
       });
 
-      const accessToken = this.generateToken(
-        existingUser.id,
-        existingUser.displayName,
-        existingUser.role
-      );
+      const accessToken = this.generateToken(existingUser);
       this.logger.log(
         `Google auto-linked to existing user: ${existingUser.displayName}`
       );
@@ -587,6 +577,7 @@ export class AuthService {
       type: 'google-pending',
       googleId: profile.googleId,
       email: profile.email,
+      emailVerified: profile.emailVerified,
       displayName: profile.displayName,
       avatarUrl: profile.avatarUrl,
     };
@@ -605,6 +596,7 @@ export class AuthService {
       type: string;
       googleId: string;
       email: string;
+      emailVerified?: boolean;
       displayName: string;
       avatarUrl?: string;
     };
@@ -666,6 +658,7 @@ export class AuthService {
           id: userId,
           displayName,
           email: payload.email,
+          emailVerified: payload.emailVerified === true,
           role: UserRole.PLAYER,
         },
       });
@@ -681,11 +674,7 @@ export class AuthService {
       return newUser;
     });
 
-    const accessToken = this.generateToken(
-      user.id,
-      user.displayName,
-      user.role
-    );
+    const accessToken = this.generateToken(user);
 
     // Send welcome email
     try {
@@ -771,18 +760,17 @@ export class AuthService {
   }
 
   private generateToken(
-    userId: string,
-    displayName: string,
-    role: UserRole,
+    user: Pick<Users, 'id' | 'displayName' | 'role' | 'tokenVersion'>,
     authAt?: number
   ): string {
     const now = Math.floor(Date.now() / 1000);
     const payload: JwtPayload = {
-      sub: userId,
-      displayName,
-      role,
+      sub: user.id,
+      displayName: user.displayName,
+      role: user.role,
       iat: now,
       authAt: authAt ?? now,
+      tokenVersion: user.tokenVersion ?? 0,
     };
 
     return this.jwtService.sign(payload);

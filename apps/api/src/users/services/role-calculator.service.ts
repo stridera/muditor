@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { UserRole } from '@muditor/db';
 import { DatabaseService } from '../../database/database.service';
 import { roleAtLeast } from '../../auth/role.util';
+import { BUMP_TOKEN_VERSION } from '../../auth/token-version.util';
 
 /**
  * Pure level -> role mapping (see class doc for the table). Exported so
@@ -92,7 +93,7 @@ export class RoleCalculatorService {
 
     await this.db.users.update({
       where: { id: userId },
-      data: { role: calculated },
+      data: { role: calculated, ...BUMP_TOKEN_VERSION },
     });
 
     return calculated;

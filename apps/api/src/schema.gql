@@ -2641,6 +2641,10 @@ type PasswordResetLink {
 }
 
 type PasswordResetResponse {
+  """
+  Fresh session token, returned by changePassword (the password change revokes every older token)
+  """
+  accessToken: String
   message: String!
   success: Boolean!
 }
