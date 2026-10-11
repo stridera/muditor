@@ -62,6 +62,7 @@ export interface AuthContextType {
   loading: boolean;
   login: (identifier: string, password: string) => Promise<void>;
   loginWithToken: (token: string) => Promise<void>;
+  loginWithOAuthCode: (code: string) => Promise<void>;
   register: (
     displayName: string,
     email: string,
@@ -165,6 +166,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  // Redeem the one-time code from the Google redirect. The state was generated
+  // in this browser when the flow started (startGoogleLogin); the API only
+  // releases the token if it matches the state the code was issued under.
+  const loginWithOAuthCode = async (code: string) => {
+    const state = sessionStorage.getItem(OAUTH_STATE_KEY);
+    sessionStorage.removeItem(OAUTH_STATE_KEY);
+    if (!state) throw new Error('Missing sign-in state');
+    const result = await apolloClient.mutate({
+      mutation: EXCHANGE_OAUTH_CODE_MUTATION,
+      variables: { code, state },
+    });
+    const token = (result.data as any)?.exchangeOAuthCode as string | undefined;
+    if (!token) throw new Error('Sign-in code was rejected');
+    await loginWithToken(token);
+  };
+
   const register = async (
     displayName: string,
     email: string,
@@ -228,6 +245,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading,
         login,
         loginWithToken,
+        loginWithOAuthCode,
         register,
         logout,
         refetchUser,
@@ -243,14 +261,46 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 // in sessionStorage so password, Google, and registration flows all return to it.
 const POST_LOGIN_KEY = 'post-login-redirect';
 
+const OAUTH_STATE_KEY = 'google-oauth-state';
+
+const EXCHANGE_OAUTH_CODE_MUTATION = gql`
+  mutation ExchangeOAuthCode($code: String!, $state: String!) {
+    exchangeOAuthCode(code: $code, state: $state)
+  }
+`;
+
+// Begin Google sign-in: generate a random state, remember it in this tab, and
+// send it through the OAuth round trip. The callback page must present it back
+// to redeem the code, so a callback URL forged by someone else is rejected.
+export const startGoogleLogin = (apiUrl: string): void => {
+  const bytes = crypto.getRandomValues(new Uint8Array(32));
+  const state = btoa(String.fromCharCode(...bytes))
+    .replace(/\+/g, '-')
+    .replace(/\//g, '_')
+    .replace(/=+$/, '');
+  sessionStorage.setItem(OAUTH_STATE_KEY, state);
+  window.location.href = `${apiUrl}/api/auth/google?state=${encodeURIComponent(state)}`;
+};
+
 // Resolve against our own origin; anything that leaves it (or fails to parse)
 // is rejected. Returns the normalised same-origin path + query, or null.
+//
+// The result is checked after normalisation, because URL parsing happily turns
+// `/.//evil.com` or `/%2e//evil.com` into `//evil.com`, which router.push would
+// treat as a protocol-relative (off-site) URL.
 export const safeRedirectPath = (path: string | null): string | null => {
   if (!path || typeof window === 'undefined') return null;
+  // eslint-disable-next-line no-control-regex -- deliberately rejecting control characters
+  if (/[\\\u0000-\u001f\u007f]/.test(path)) return null;
   try {
     const u = new URL(path, window.location.origin);
     if (u.origin !== window.location.origin) return null;
-    return u.pathname + u.search;
+    const result = u.pathname + u.search;
+    // Exactly one leading slash, followed by something other than / or \.
+    if (!/^\/(?![/\\])/.test(result)) return null;
+    // eslint-disable-next-line no-control-regex
+    if (/[\\\u0000-\u001f\u007f]/.test(result)) return null;
+    return result;
   } catch {
     return null;
   }

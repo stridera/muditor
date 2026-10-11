@@ -4,6 +4,7 @@ import { PassportModule } from '@nestjs/passport';
 import { AuthController } from './auth.controller';
 import { AuthService } from './auth.service';
 import { AuthPayloadResolver, AuthResolver } from './auth.resolver';
+import { OAuthCodeService } from './oauth-code.service';
 import { GoogleStrategy } from './strategies/google.strategy';
 import { JwtStrategy } from './strategies/jwt.strategy';
 import { LocalStrategy } from './strategies/local.strategy';
@@ -25,6 +26,7 @@ import { EmailModule } from '../email/email.module';
   controllers: [AuthController],
   providers: [
     AuthService,
+    OAuthCodeService,
     AuthResolver,
     AuthPayloadResolver,
     GoogleStrategy,

@@ -8,14 +8,14 @@ import { Suspense, useEffect, useRef } from 'react';
 function GoogleCallbackContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { loginWithToken } = useAuth();
+  const { loginWithOAuthCode } = useAuth();
   const processed = useRef(false);
 
   useEffect(() => {
     if (processed.current) return;
     processed.current = true;
 
-    const token = searchParams.get('token');
+    const code = searchParams.get('code');
     const error = searchParams.get('error');
 
     if (error) {
@@ -23,15 +23,15 @@ function GoogleCallbackContent() {
       return;
     }
 
-    if (!token) {
-      router.replace('/login?error=Missing authentication token');
+    if (!code) {
+      router.replace('/login?error=Missing authentication code');
       return;
     }
 
-    loginWithToken(token).catch(() => {
+    loginWithOAuthCode(code).catch(() => {
       router.replace('/login?error=Authentication failed');
     });
-  }, [searchParams, router, loginWithToken]);
+  }, [searchParams, router, loginWithOAuthCode]);
 
   return (
     <div className='min-h-screen flex items-center justify-center bg-background text-foreground'>

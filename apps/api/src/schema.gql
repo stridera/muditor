@@ -2283,6 +2283,7 @@ type Mutation {
   Detach a trigger from ONE mob (mobZoneId+mobId) or ONE object (objectZoneId+objectId)
   """
   detachTrigger(id: Int!, mobId: Int, mobZoneId: Int, objectId: Int, objectZoneId: Int, zoneId: Int!): TriggerDto!
+  exchangeOAuthCode(code: String!, state: String!): String!
 
   """Execute a god command on FieryMUD"""
   executeGameCommand(command: String!, executor: String): CommandResultType!

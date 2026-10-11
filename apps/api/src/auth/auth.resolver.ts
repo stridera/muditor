@@ -12,6 +12,7 @@ import { User } from '../users/entities/user.entity';
 import { markSelfAuthenticated } from '../users/user-access.util';
 import { UsersService } from '../users/users.service';
 import { AuthService } from './auth.service';
+import { OAuthCodeService } from './oauth-code.service';
 import { CurrentUser } from './decorators/current-user.decorator';
 import { AuthPayload } from './dto/auth.payload';
 import { LoginInput } from './dto/login.input';
@@ -31,7 +32,8 @@ import { GraphQLJwtAuthGuard } from './guards/graphql-jwt-auth.guard';
 export class AuthResolver {
   constructor(
     private authService: AuthService,
-    private usersService: UsersService
+    private usersService: UsersService,
+    private oauthCodes: OAuthCodeService
   ) {}
 
   @Mutation(() => AuthPayload)
@@ -156,6 +158,24 @@ export class AuthResolver {
     @Args('displayName') displayName: string
   ): Promise<AuthPayload> {
     return this.authService.completeGoogleRegistration(token, displayName);
+  }
+
+  /**
+   * Redeems the one-time code from the Google OAuth redirect for the JWT.
+   * `state` must be the value the browser generated when starting the flow.
+   */
+  @Mutation(() => String)
+  @UseGuards(AuthRateLimitGuard)
+  @RateLimit({
+    limit: 10,
+    windowSeconds: 60,
+    keyPrefix: 'auth:exchangeOAuthCode',
+  })
+  exchangeOAuthCode(
+    @Args('code') code: string,
+    @Args('state') state: string
+  ): string {
+    return this.oauthCodes.redeem(code, state);
   }
 
   @Mutation(() => Boolean)

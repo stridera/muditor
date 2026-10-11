@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useAuth } from '@/contexts/auth-context';
+import { startGoogleLogin, useAuth } from '@/contexts/auth-context';
 import { Loader2 } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -195,7 +195,7 @@ export default function RegisterPage() {
               variant='outline'
               className='w-full'
               onClick={() => {
-                window.location.href = `${API_URL}/api/auth/google`;
+                startGoogleLogin(API_URL);
               }}
             >
               <svg className='mr-2 h-4 w-4' viewBox='0 0 24 24'>
