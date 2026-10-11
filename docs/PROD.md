@@ -43,6 +43,8 @@ cd ~/Code/mud/muditor/deploy/prod
 ./deploy-game.sh <sha> --sql a.sql b.sql    # apply SQL (as postgres) after the backup, before the switch
 ./deploy-game.sh --rollback                 # repoint current -> previous and restart (or: --rollback <release>)
 ./deploy-game.sh --status                   # releases, unit ExecStart, who is online
+./deploy-game.sh --health [secs]            # read-only: the post-restart health checks against the live server
+./deploy-game.sh --backup                   # take + verify a DB backup now
 ```
 
 Other flags: `--skip-tests`, `--force` (restart although players other than Strider/Chinok are online),

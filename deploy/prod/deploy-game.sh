@@ -10,6 +10,8 @@
 #   deploy-game.sh <sha|ref> [options]
 #   deploy-game.sh --rollback [release]        repoint `current` to `previous` (or the named release) + restart
 #   deploy-game.sh --status                    show releases, unit ExecStart, players (no changes)
+#   deploy-game.sh --health [secs]             run the post-restart health checks against the live server (read-only)
+#   deploy-game.sh --backup                    take + verify a DB backup now (pre-game-manual-*.dump)
 #
 # Options:
 #   --stage-only        build, upload and verify the binary on the host; do NOT switch or restart
@@ -46,6 +48,7 @@ HEALTH_SECS="${DEPLOY_HEALTH_SECS:-120}"
 OK_PLAYERS_RE='^(strider|chinok)$'
 
 # ---- args -------------------------------------------------------------------------------------------
+HEALTH_ONLY_SECS=10
 REF="" MODE=deploy ROLLBACK_TO="" STAGE_ONLY=0 SKIP_TESTS=0 FORCE=0 INSTALL_UNITS=0 IGNORE_SCHEMA=0
 ALLOW_UNPUSHED=0 NO_BACKUP=0
 SQL_FILES=()
@@ -60,6 +63,8 @@ while (($#)); do
     --allow-unpushed) ALLOW_UNPUSHED=1 ;;
     --no-backup) NO_BACKUP=1 ;;
     --status) MODE=status ;;
+    --health) MODE=health; if [[ ${2:-} =~ ^[0-9]+$ ]]; then HEALTH_ONLY_SECS="$2"; shift; fi ;;
+    --backup) MODE=backup ;;
     --rollback) MODE=rollback; if [[ ${2:-} && $2 != -* ]]; then ROLLBACK_TO="$2"; shift; fi ;;
     --sql) shift; while (($#)) && [[ $1 != -* ]]; do SQL_FILES+=("$1"); shift; done; continue ;;
     -h|--help) usage; exit 0 ;;
@@ -96,7 +101,7 @@ rbash() { local a; a="$(printf ' %q' "$@")"; RT="${RT:-180}" rssh "bash -s --$a"
 ADMIN_PRE='TOK=$(tr -d "\r\n" < /opt/NEXT/.secrets/admin_token); printf "header = \"Authorization: Bearer %s\"\n" "$TOK" | curl -s -m 10 -K - '
 admin_get() { RT=30 rssh "$ADMIN_PRE http://127.0.0.1:8080$1"; }
 
-CURRENT_SHA="" PREVIOUS_SHA=""
+CURRENT_SHA="" PREVIOUS_SHA="" BASE_PID="" BASE_NR=""
 SUMMARY=()
 
 load_release_state() {
@@ -248,14 +253,19 @@ EOF
 
 # Restart fieryNT; sets RESTART_TS (host-local time, for journalctl --since).
 restart_game() {
-  RESTART_TS=""
+  RESTART_TS=""; BASE_PID=""; BASE_NR=""
   RESTART_TS="$(rssh "date '+%Y-%m-%d %H:%M:%S'")"
-  RT=90 rssh 'sudo -n systemctl restart fieryNT'
+  RT=90 rssh 'sudo -n systemctl restart fieryNT' || return 1
+  # Baseline taken right after the restart so a crash in the first seconds is not mistaken for the "normal" process.
+  local base
+  base="$(rssh 'systemctl show -p MainPID --value fieryNT; systemctl show -p NRestarts --value fieryNT' 2>/dev/null || true)"
+  BASE_PID="$(sed -n 1p <<<"$base")"; BASE_NR="$(sed -n 2p <<<"$base")"
+  say "restarted fieryNT (host time $RESTART_TS, MainPID ${BASE_PID:-?})"
 }
 
 # Health window. Returns 0 healthy, 1 not. Reasons to stderr/stdout.
 health_check() {
-  local want_secs="$1" t0 now line active pid nr st pid0="" nr0="" ok_status=0 fail="" sshfail=0
+  local want_secs="$1" t0 now line active pid nr st pid0="${BASE_PID:-}" nr0="${BASE_NR:-}" ok_status=0 fail="" sshfail=0
   t0=$(date +%s)
   step "health checks (${want_secs}s)"
   while :; do
@@ -276,7 +286,7 @@ health_check() {
       if [[ $active == activating && $((now - t0)) -lt 20 ]]; then :
       else fail="unit is '$active' at +$((now - t0))s"; break; fi
     else
-      if [[ -z $pid0 ]]; then pid0="$pid"; nr0="$nr"; fi
+      if [[ -z $pid0 || $pid0 == 0 ]]; then pid0="$pid"; nr0="$nr"; fi
       if [[ $pid != "$pid0" ]]; then fail="crash loop: MainPID changed $pid0 -> $pid at +$((now - t0))s"; break; fi
       if [[ $nr != "$nr0" ]]; then fail="crash loop: NRestarts $nr0 -> $nr at +$((now - t0))s"; break; fi
       if [[ $st == 200 ]]; then
@@ -324,6 +334,16 @@ if [[ $MODE == status ]]; then
   rssh "ls -lt $REL 2>/dev/null | head -12; echo; systemctl show -p ExecStart --value fieryNT | cut -c1-120; systemctl is-active fieryNT; uptime"
   admin_get /api/admin/players | jq -c '{count, names: [.players[].name]}'
   exit 0
+fi
+
+if [[ $MODE == health ]]; then
+  RESTART_TS="$(rssh "date -d '15 minutes ago' '+%Y-%m-%d %H:%M:%S'")"; BASE_PID=""; BASE_NR=""
+  health_check "$HEALTH_ONLY_SECS"
+  exit $?
+fi
+
+if [[ $MODE == backup ]]; then
+  SHORT=manual; backup_db; exit 0
 fi
 
 if [[ $MODE == rollback ]]; then
