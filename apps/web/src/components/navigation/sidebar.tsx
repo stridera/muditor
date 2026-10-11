@@ -4,9 +4,11 @@ import { ThemeToggle } from '@/components/theme-toggle';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/contexts/auth-context';
+import { useZone } from '@/contexts/zone-context';
 import { gql } from '@/generated/gql';
 import { ReportOpenCountDocument } from '@/generated/graphql';
 import { usePermissions } from '@/hooks/use-permissions';
+import { hrefWithZone } from '@/lib/zone-nav';
 import { useMutation, useQuery } from '@apollo/client/react';
 import {
   Aperture,
@@ -82,6 +84,7 @@ export function Sidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const { user, logout } = useAuth();
+  const { selectedZone } = useZone();
   const { isImmortal, isBuilder, isHeadBuilder, isCoder } = usePermissions();
   const [updatePreferences] = useMutation(UPDATE_PREFERENCES);
   const { data: openReportsData } = useQuery(ReportOpenCountDocument, {
@@ -416,7 +419,7 @@ export function Sidebar() {
   const renderNavItem = (item: NavItem) => {
     const active = isActive(item.href);
     return (
-      <Link key={item.href} href={item.href}>
+      <Link key={item.href} href={hrefWithZone(item.href, selectedZone)}>
         <div
           className={`group flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-all duration-150 ${
             active

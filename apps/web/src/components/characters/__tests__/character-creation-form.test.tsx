@@ -107,6 +107,30 @@ describe('CharacterCreationForm', () => {
     ).toBeEnabled();
   });
 
+  it('explains the 3-18 to 100-point scale conversion before and after rolling', async () => {
+    mockRoll.mockResolvedValue({
+      data: {
+        rollCharacterStats: {
+          token: 'tok',
+          values: [15, 12, 9, 14, 11, 16, 8],
+          expiresAt: '2026-01-01T00:00:00Z',
+        },
+      },
+    });
+    render(<CharacterCreationForm onCharacterCreated={jest.fn()} />);
+    expect(screen.getByTestId('stat-scale-note')).toHaveTextContent(
+      /3-18.*100-point/
+    );
+    expect(screen.queryByText(/use the dropdowns to swap stats/i)).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: /roll stats/i }));
+    await waitFor(() =>
+      expect(
+        screen.getByText(/use the dropdowns to swap stats/i)
+      ).toBeInTheDocument()
+    );
+    expect(screen.getByTestId('stat-scale-note')).toBeVisible();
+  });
+
   it('shows a racial cap next to a capped attribute only', async () => {
     mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 12 };
     mockRoll.mockResolvedValue({

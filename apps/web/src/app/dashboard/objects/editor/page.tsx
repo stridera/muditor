@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import { newEntityZone } from '@/lib/zone-nav';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 import { TagInput } from '@/components/ui/tag-input';
 import { ColoredTextEditor } from '@/components/ColoredTextEditor';
@@ -330,7 +331,7 @@ function ObjectEditorContent() {
     level: 1,
     concealment: 0,
     values: {},
-    zoneId: 511,
+    zoneId: newEntityZone(zoneIdParam, 511),
   });
 
   // Initialize real-time validation

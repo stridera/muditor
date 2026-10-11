@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import { newEntityZone } from '@/lib/zone-nav';
 import { PermissionGuard } from '@/components/auth/permission-guard';
 // Apollo hooks imported via generated code; direct useMutation/useQuery unused now
 import type { ShopFlag, ShopTradesWith } from '@/generated/graphql';
@@ -183,7 +184,7 @@ function ShopEditorContent() {
     temper: 0,
     keeperId: null,
     keeperZoneId: null,
-    zoneId: 511,
+    zoneId: newEntityZone(zoneId, 511),
   });
   const [buyMessages, setBuyMessages] = useState<string[]>(['']);
   const [sellMessages, setSellMessages] = useState<string[]>(['']);

@@ -496,12 +496,21 @@ export function CharacterCreationForm({
               </div>
               <div className='mt-4 text-sm text-muted-foreground'>
                 <p>
-                  Picking a value already used by another attribute swaps the
-                  two.
+                  Use the dropdowns to swap stats. Picking a value already used
+                  by another attribute swaps the two.
                 </p>
               </div>
             </CardContent>
           )}
+          <CardContent className={roll ? 'pt-0' : undefined}>
+            <p
+              className='text-xs text-muted-foreground'
+              data-testid='stat-scale-note'
+            >
+              Note: stats are rolled on the classic 3-18 scale and converted to
+              the game&apos;s 100-point scale for gameplay.
+            </p>
+          </CardContent>
         </Card>
 
         {/* Submit */}

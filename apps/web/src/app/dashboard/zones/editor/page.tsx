@@ -2,6 +2,7 @@
 
 export const dynamic = 'force-dynamic';
 
+import { ZoneEditorHeaderActions } from '@/components/ZoneEditor/ZoneEditorHeaderActions';
 import { ZoneEditorOrchestrator } from '@/components/ZoneEditor/ZoneEditorOrchestrator';
 import { WorldMapCanvas } from '@/components/WorldMap/WorldMapCanvas';
 import { PermissionGuard } from '@/components/auth/permission-guard';
@@ -95,22 +96,7 @@ function ZoneEditorContent() {
               {worldMapMode ? 'World Map' : `Zone ${zoneId} Editor`}
             </h1>
           </div>
-          <div className='flex items-center gap-3'>
-            {!worldMapMode && (
-              <Link
-                href={`/dashboard/zones/${zoneId}`}
-                className='text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm px-3 py-1 bg-blue-50 dark:bg-blue-900/20 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded transition-colors'
-              >
-                📄 Zone Details
-              </Link>
-            )}
-            <Link
-              href='/dashboard/zones'
-              className='text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 text-sm px-3 py-1 bg-gray-100 dark:bg-gray-700 hover:bg-gray-200 dark:hover:bg-gray-600 rounded transition-colors'
-            >
-              📋 All Zones
-            </Link>
-          </div>
+          <ZoneEditorHeaderActions zoneId={worldMapMode ? null : zoneId} />
         </div>
       </div>
 
