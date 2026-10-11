@@ -172,7 +172,7 @@ describe('CharactersResolver authorization', () => {
     it('issues a roll bound to the caller that only the caller can redeem', () => {
       process.env.JWT_SECRET = 'test-secret-for-stat-rolls';
       const roll = resolver.rollCharacterStats(player);
-      expect(roll.values).toHaveLength(7);
+      expect(roll.values).toHaveLength(6);
       expect(verifyStatRoll(roll.token, player.id)).toEqual(roll.values);
       expect(() => verifyStatRoll(roll.token, immortal.id)).toThrow();
     });

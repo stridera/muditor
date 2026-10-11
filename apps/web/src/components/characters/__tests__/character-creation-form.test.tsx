@@ -56,8 +56,8 @@ const sorted = (a: number[]) => [...a].sort((x, y) => x - y);
 describe('assignRolledValue', () => {
   it('always keeps the assignment a permutation of the roll', () => {
     let a = defaultAssignment();
-    a = assignRolledValue(a, 'strength', 6);
-    a = assignRolledValue(a, 'luck', 6);
+    a = assignRolledValue(a, 'strength', 5);
+    a = assignRolledValue(a, 'charisma', 5);
     a = assignRolledValue(a, 'wisdom', 0);
     expect(sorted(Object.values(a))).toEqual(
       sorted(STAT_FIELDS.map((_, i) => i))
@@ -91,7 +91,7 @@ describe('CharacterCreationForm', () => {
       data: {
         rollCharacterStats: {
           token: 'tok',
-          values: [15, 12, 9, 14, 11, 16, 8],
+          values: [75, 60, 46, 82, 68, 90],
           expiresAt: '2026-01-01T00:00:00Z',
         },
       },
@@ -107,19 +107,19 @@ describe('CharacterCreationForm', () => {
     ).toBeEnabled();
   });
 
-  it('explains the 3-18 to 100-point scale conversion before and after rolling', async () => {
+  it('states the 0-100 stat scale before and after rolling', async () => {
     mockRoll.mockResolvedValue({
       data: {
         rollCharacterStats: {
           token: 'tok',
-          values: [15, 12, 9, 14, 11, 16, 8],
+          values: [75, 60, 46, 82, 68, 90],
           expiresAt: '2026-01-01T00:00:00Z',
         },
       },
     });
     render(<CharacterCreationForm onCharacterCreated={jest.fn()} />);
     expect(screen.getByTestId('stat-scale-note')).toHaveTextContent(
-      /3-18.*100-point/
+      /0-100 scale/
     );
     expect(screen.queryByText(/use the dropdowns to swap stats/i)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: /roll stats/i }));
@@ -129,15 +129,18 @@ describe('CharacterCreationForm', () => {
       ).toBeInTheDocument()
     );
     expect(screen.getByTestId('stat-scale-note')).toBeVisible();
+    expect(screen.getByTestId('stat-scale-note')).not.toHaveTextContent(
+      /3-18|converted/
+    );
   });
 
-  it('shows a racial cap next to a capped attribute only', async () => {
-    mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 12 };
+  it('shows each racial cap, and says when a rolled value is lowered', async () => {
+    mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 64 };
     mockRoll.mockResolvedValue({
       data: {
         rollCharacterStats: {
           token: 'tok',
-          values: [15, 16, 9, 14, 11, 12, 8],
+          values: [75, 90, 46, 82, 68, 60],
           expiresAt: '2026-01-01T00:00:00Z',
         },
       },
@@ -147,21 +150,29 @@ describe('CharacterCreationForm', () => {
     await waitFor(() =>
       expect(screen.getByTestId('cap-intelligence')).toBeInTheDocument()
     );
-    // INT holds the rolled 16 by default, above the cap of 12.
+    // INT holds the rolled 90 by default, above the cap of 64.
     expect(screen.getByTestId('cap-intelligence')).toHaveTextContent(
-      'Racial max 12: 16 becomes 12'
+      'Racial max 64: 90 becomes 64'
     );
-    expect(screen.queryByTestId('cap-strength')).toBeNull();
+    // STR holds the rolled 75, under the human cap of 76: shown, not lowered.
+    expect(screen.getByTestId('cap-strength')).toHaveTextContent(
+      'Racial max 76'
+    );
+    expect(screen.getByTestId('cap-strength')).not.toHaveTextContent('becomes');
     mockRaces[0] = { ...mockRaces[0]!, maxIntelligence: 76 };
   });
 });
 
 describe('statCap', () => {
   const human = mockRaces[0] as never;
-  it('ignores default caps and luck', () => {
-    expect(statCap(human, 'strength')).toBeNull();
-    expect(statCap(human, 'luck')).toBeNull();
+  it('reports the race cap on the 0-100 scale', () => {
+    expect(statCap(human, 'strength')).toBe(76);
     expect(statCap(undefined, 'strength')).toBeNull();
+  });
+  it('ignores a cap at the top of the scale', () => {
+    expect(
+      statCap({ ...(human as object), maxStrength: 100 } as never, 'strength')
+    ).toBeNull();
   });
   it('reports lowered caps', () => {
     expect(

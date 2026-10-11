@@ -46,7 +46,6 @@ const CREATE_CHARACTER_MUTATION = gql`
       dexterity
       constitution
       charisma
-      luck
     }
   }
 `;
@@ -65,6 +64,9 @@ interface RollStatsMutationResult {
   rollCharacterStats: { token: string; values: number[]; expiresAt: string };
 }
 
+/** Top of the game's stat scale (matches the API's STAT_SCALE_MAX). */
+export const STAT_SCALE_MAX = 100;
+
 export const STAT_FIELDS = [
   { key: 'strength', label: 'Strength (STR)' },
   { key: 'intelligence', label: 'Intelligence (INT)' },
@@ -72,7 +74,6 @@ export const STAT_FIELDS = [
   { key: 'dexterity', label: 'Dexterity (DEX)' },
   { key: 'constitution', label: 'Constitution (CON)' },
   { key: 'charisma', label: 'Charisma (CHA)' },
-  { key: 'luck', label: 'Luck (LCK)' },
 ] as const;
 
 export type StatKey = (typeof STAT_FIELDS)[number]['key'];
@@ -87,9 +88,9 @@ const RACE_CAP_FIELDS = {
 } as const;
 
 /**
- * The race's cap for `stat` (Races.max_*), or null when it has none (luck) or
- * it is above anything a 3d6 roll can reach. The server clamps creation stats
- * to this cap, same as the game.
+ * The race's cap for `stat` (Races.max_*), or null when it has none or it is at
+ * the top of the 0-100 scale (so it can never lower a roll). The server clamps
+ * creation stats to this cap, same as the game.
  */
 export function statCap(
   race: RaceOption | undefined,
@@ -97,7 +98,7 @@ export function statCap(
 ): number | null {
   if (!race || !(stat in RACE_CAP_FIELDS)) return null;
   const cap = race[RACE_CAP_FIELDS[stat as keyof typeof RACE_CAP_FIELDS]];
-  return typeof cap === 'number' && cap < 18 ? cap : null;
+  return typeof cap === 'number' && cap < STAT_SCALE_MAX ? cap : null;
 }
 
 /** Which rolled value (index into the roll) each attribute currently holds. */
@@ -144,7 +145,6 @@ interface CreateCharacterMutationResult {
     dexterity: number;
     constitution: number;
     charisma: number;
-    luck: number;
   };
 }
 
@@ -202,8 +202,8 @@ export function CharacterCreationForm({
   const [rollStats, { loading: rolling }] =
     useMutation<RollStatsMutationResult>(ROLL_STATS_MUTATION);
 
-  // Stats are rolled by the server (3d6 each); the player only chooses which
-  // rolled value goes to which attribute.
+  // Stats are rolled by the server on the game's 0-100 scale; the player only
+  // chooses which rolled value goes to which attribute.
   const handleRoll = async () => {
     setError(null);
     try {
@@ -433,7 +433,7 @@ export function CharacterCreationForm({
                 <CardDescription>
                   {roll
                     ? `Rolled ${roll.values.join(', ')} (total ${getTotalStatPoints()}). Assign each rolled value to an attribute, or reroll.`
-                    : 'Stats are rolled randomly (3d6 each). Roll, then assign the results to your attributes.'}
+                    : "Stats are rolled randomly on the game's 0-100 scale. Roll, then assign the results to your attributes."}
                 </CardDescription>
               </div>
               <Button
@@ -507,8 +507,9 @@ export function CharacterCreationForm({
               className='text-xs text-muted-foreground'
               data-testid='stat-scale-note'
             >
-              Note: stats are rolled on the classic 3-18 scale and converted to
-              the game&apos;s 100-point scale for gameplay.
+              Note: stats are on the game&apos;s 0-100 scale (50 is average).
+              Your race caps each stat at its racial max; a rolled value above
+              it is lowered to the cap.
             </p>
           </CardContent>
         </Card>

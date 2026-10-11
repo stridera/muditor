@@ -317,7 +317,7 @@ export class CharactersResolver {
   // Character mutations
 
   /**
-   * Roll starting stats (3d6 per attribute). The values are signed into a
+   * Roll starting stats (legacy 0-100 natural-stat roll, six values). The values are signed into a
    * token bound to the caller; createCharacter only accepts an assignment of
    * these values from non-staff. Rerolling is allowed, like the in-game flow.
    */

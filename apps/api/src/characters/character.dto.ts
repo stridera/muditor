@@ -388,7 +388,7 @@ export class StatRollDto {
 
   @Field(() => [Int], {
     description:
-      'Rolled values (3d6 each); assign them to STR, INT, WIS, DEX, CON, CHA, LUCK in any order',
+      'Rolled values (0-100, the stat scale used in game); assign them to STR, INT, WIS, DEX, CON, CHA in any order',
   })
   values: number[];
 

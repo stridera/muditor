@@ -5087,7 +5087,7 @@ export type StatRollDto = {
   expiresAt: Scalars['DateTime']['output'];
   /** Pass as statRollToken to createCharacter */
   token: Scalars['String']['output'];
-  /** Rolled values (3d6 each); assign them to STR, INT, WIS, DEX, CON, CHA, LUCK in any order */
+  /** Rolled values (0-100, the stat scale used in game); assign them to STR, INT, WIS, DEX, CON, CHA in any order */
   values: Array<Scalars['Int']['output']>;
 };
 

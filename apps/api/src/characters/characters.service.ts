@@ -44,6 +44,7 @@ import {
   clampToRaceCaps,
   isAssignmentOfRoll,
   raceStatCaps,
+  STARTING_LUCK,
   verifyStatRoll,
 } from './stat-roll';
 
@@ -386,10 +387,14 @@ export class CharactersService implements OnModuleDestroy {
     if (!options.isStaff) {
       this.assertStatsFromRoll(data, userId);
       data = await this.applyRaceStatCaps(data);
+      data = { ...data, luck: STARTING_LUCK };
     }
 
-    const hitPoints = Math.max(50, data.constitution * 5 + data.level * 10);
-    const stamina = Math.max(100, data.constitution * 8 + data.level * 5);
+    // Stats are on the 0..100 scale, so they no longer feed these starting
+    // pools (con * 5 would hand a level 1 character ~385 HP). The floors match
+    // the 100 HP / 100 stamina a character created in game starts with.
+    const hitPoints = Math.max(100, data.level * 10);
+    const stamina = Math.max(100, data.level * 5);
     const createData: Prisma.CharactersCreateInput = {
       id: crypto.randomUUID(),
       name: data.name,

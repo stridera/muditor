@@ -29,9 +29,10 @@ jest.mock('ioredis', () => {
   }));
 });
 
-// Rolled values for user-1; createInput() assigns them in roll order.
-const ROLL: [number, number, number, number, number, number, number] = [
-  15, 12, 9, 14, 11, 16, 8,
+// Rolled values for user-1 (0..100 scale); createInput() assigns them in roll
+// order.
+const ROLL: [number, number, number, number, number, number] = [
+  75, 60, 46, 82, 68, 90,
 ];
 type InputOverrides = {
   [K in keyof CreateCharacterInput]?: CreateCharacterInput[K] | undefined;
@@ -47,7 +48,7 @@ const createInput = (overrides: InputOverrides = {}): CreateCharacterInput => {
     dexterity: ROLL[3],
     constitution: ROLL[4],
     charisma: ROLL[5],
-    luck: ROLL[6],
+    luck: 13,
     gender: 'neutral',
     race: Race.ELF,
     classId: 7,
@@ -65,12 +66,12 @@ const createInput = (overrides: InputOverrides = {}): CreateCharacterInput => {
 // Races row with the schema-default caps (76); override to lower specific ones.
 const raceRow = (caps: Record<string, number> = {}) => ({
   playable: true,
-  maxStrength: 76,
-  maxDexterity: 76,
-  maxIntelligence: 76,
-  maxWisdom: 76,
-  maxConstitution: 76,
-  maxCharisma: 76,
+  maxStrength: 100,
+  maxDexterity: 100,
+  maxIntelligence: 100,
+  maxWisdom: 100,
+  maxConstitution: 100,
+  maxCharisma: 100,
   ...caps,
 });
 
@@ -135,13 +136,12 @@ describe('CharactersService race/class handling', () => {
           service.createCharacter(
             createInput({
               statRollToken: undefined,
-              strength: 18,
-              intelligence: 18,
-              wisdom: 18,
-              dexterity: 18,
-              constitution: 18,
-              charisma: 18,
-              luck: 18,
+              strength: 100,
+              intelligence: 100,
+              wisdom: 100,
+              dexterity: 100,
+              constitution: 100,
+              charisma: 100,
             }),
             'user-1'
           )
@@ -151,7 +151,7 @@ describe('CharactersService race/class handling', () => {
 
       it('rejects stats that are not a permutation of the issued roll', async () => {
         await expect(
-          service.createCharacter(createInput({ strength: 18 }), 'user-1')
+          service.createCharacter(createInput({ strength: 100 }), 'user-1')
         ).rejects.toBeInstanceOf(BadRequestException);
         expect(db.characters.create).not.toHaveBeenCalled();
       });
@@ -166,20 +166,19 @@ describe('CharactersService race/class handling', () => {
       it('rejects a tampered roll token', async () => {
         const token = issueStatRoll(
           'user-1',
-          [18, 18, 18, 18, 18, 18, 18]
+          [100, 100, 100, 100, 100, 100]
         ).token;
         const forged = `${token.split('.')[0]}.${'A'.repeat(43)}`;
         await expect(
           service.createCharacter(
             createInput({
               statRollToken: forged,
-              strength: 18,
-              intelligence: 18,
-              wisdom: 18,
-              dexterity: 18,
-              constitution: 18,
-              charisma: 18,
-              luck: 18,
+              strength: 100,
+              intelligence: 100,
+              wisdom: 100,
+              dexterity: 100,
+              constitution: 100,
+              charisma: 100,
             }),
             'user-1'
           )
@@ -188,33 +187,33 @@ describe('CharactersService race/class handling', () => {
 
       it('accepts any assignment (permutation) of the issued roll', async () => {
         const swapped = createInput({
-          strength: ROLL[6],
-          luck: ROLL[0],
+          strength: ROLL[3],
+          dexterity: ROLL[0],
           intelligence: ROLL[5],
           charisma: ROLL[1],
         });
         await service.createCharacter(swapped, 'user-1');
         const { data } = db.characters.create.mock.calls[0][0];
         expect(data).toMatchObject({
-          strength: 8,
-          luck: 15,
-          intelligence: 16,
-          charisma: 12,
+          strength: 82,
+          dexterity: 75,
+          intelligence: 90,
+          charisma: 60,
         });
       });
 
       it('clamps a stat above the race cap, as the game does at creation', async () => {
-        // Brute-style race: INT capped at 12. Player puts the rolled 16 there.
+        // Brute-style race: INT capped at 40. Player puts the rolled 90 there.
         racesService.findOne.mockResolvedValue(
-          raceRow({ maxIntelligence: 12 })
+          raceRow({ maxIntelligence: 40 })
         );
         await service.createCharacter(
           createInput({ intelligence: ROLL[5], charisma: ROLL[1] }),
           'user-1'
         );
         const { data } = db.characters.create.mock.calls[0][0];
-        expect(data.intelligence).toBe(12);
-        expect(data.charisma).toBe(12);
+        expect(data.intelligence).toBe(40);
+        expect(data.charisma).toBe(60);
         // Uncapped stats keep their rolled values.
         expect(data.strength).toBe(ROLL[0]);
       });
@@ -229,16 +228,33 @@ describe('CharactersService race/class handling', () => {
           dexterity: ROLL[3],
           constitution: ROLL[4],
           charisma: ROLL[5],
-          luck: ROLL[6],
+          luck: 13,
         });
       });
 
       it('still rejects a non-permutation before looking at race caps', async () => {
         racesService.findOne.mockResolvedValue(raceRow({ maxStrength: 10 }));
         await expect(
-          service.createCharacter(createInput({ strength: 18 }), 'user-1')
+          service.createCharacter(createInput({ strength: 100 }), 'user-1')
         ).rejects.toBeInstanceOf(BadRequestException);
         expect(db.characters.create).not.toHaveBeenCalled();
+      });
+
+      it('forces the starting luck for players regardless of what is sent', async () => {
+        await service.createCharacter(createInput({ luck: 99 }), 'user-1');
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data.luck).toBe(13);
+      });
+
+      it('starts a level 1 character with the in-game default pools, not a stat-scaled one', async () => {
+        await service.createCharacter(createInput(), 'user-1');
+        const { data } = db.characters.create.mock.calls[0][0];
+        expect(data).toMatchObject({
+          hitPoints: 100,
+          hitPointsMax: 100,
+          stamina: 100,
+          staminaMax: 100,
+        });
       });
 
       it('lets staff exceed race caps', async () => {

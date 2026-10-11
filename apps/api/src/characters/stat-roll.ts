@@ -5,11 +5,19 @@ import { getJwtSecret } from '../auth/jwt-secret';
 /**
  * Server-issued stat rolls for character creation.
  *
- * Players do not choose their stats: the server rolls 3d6 per attribute (the
- * same roll the in-game creation flow uses) and signs the result into an
- * opaque token bound to the requesting user. The player may only assign the
- * rolled values to attributes (any permutation); createCharacter verifies the
- * submitted stats against the token. Staff may bypass this entirely.
+ * Players do not choose their stats: the server rolls them and signs the
+ * result into an opaque token bound to the requesting user. The player may
+ * only assign the rolled values to attributes (any permutation);
+ * createCharacter verifies the submitted stats against the token. Staff may
+ * bypass this entirely.
+ *
+ * Stats live on the game's 0..100 scale (`CoreStats::bonus` in fierymud-rs is
+ * `(score - 50) / 5`; legacy-imported characters carry natural scores of
+ * 30..100 and fierylib imports them unchanged). The roll is therefore the
+ * legacy `roll_natural_abils` (fierymud_legacy/src/chars.cpp), NOT 3d6, which
+ * would leave every new character with a -8..-10 bonus on every stat. The
+ * in-game flow rolls the same way: fierymud-rs
+ * `crates/mud-world/src/stat_roll.rs`. Keep the two in step.
  */
 
 /** Attributes that receive a rolled value, in roll order. */
@@ -20,10 +28,23 @@ export const ROLLED_STATS = [
   'dexterity',
   'constitution',
   'charisma',
-  'luck',
 ] as const;
 export type RolledStat = (typeof ROLLED_STATS)[number];
 export type StatBlock = Record<RolledStat, number>;
+
+/** Top of the stat scale. */
+export const STAT_SCALE_MAX = 100;
+
+/**
+ * Luck is not rolled: the game never reads it and every character (legacy
+ * imports included) holds the schema default, so new characters do too.
+ */
+export const STARTING_LUCK = 13;
+
+/** Legacy floor: the six rolled values are topped up until they sum above this. */
+const MIN_TOTAL_EXCLUSIVE = 450;
+/** Legacy only adds +5 to a stat that is at or below this value. */
+const BONUS_STEP_CEILING = 95;
 
 export const STAT_ROLL_TTL_SECONDS = 60 * 60;
 
@@ -58,12 +79,39 @@ function sign(body: string): string {
     .digest('base64url');
 }
 
-/** One 3d6 roll per rolled attribute. */
-export function rollStatValues(): number[] {
-  return ROLLED_STATS.map(
-    () =>
-      crypto.randomInt(1, 7) + crypto.randomInt(1, 7) + crypto.randomInt(1, 7)
-  );
+/** Inclusive integer in [lo, hi]; injectable so tests can be deterministic. */
+export type RandomInt = (lo: number, hi: number) => number;
+
+const cryptoRandomInt: RandomInt = (lo, hi) => crypto.randomInt(lo, hi + 1);
+
+/**
+ * Port of legacy `roll_natural_abils`: each stat is 2 * (best 5 of 6 rolls of
+ * d3..d10), range 30..100. If the six sum to 450 or less, +5 goes to random
+ * stats (never above 100) until the sum exceeds 450. The values come back in
+ * random order (legacy assigned them by class priority; there is no class
+ * priority table in the DB yet, and the player reassigns them anyway).
+ */
+export function rollStatValues(
+  randomInt: RandomInt = cryptoRandomInt
+): number[] {
+  const values = ROLLED_STATS.map(() => {
+    const dice = Array.from({ length: 6 }, () => randomInt(3, 10));
+    const total = dice.reduce((sum, d) => sum + d, 0) - Math.min(...dice);
+    return total * 2;
+  });
+  let total = values.reduce((sum, v) => sum + v, 0);
+  while (total <= MIN_TOTAL_EXCLUSIVE) {
+    const j = randomInt(0, values.length - 1);
+    if (values[j]! <= BONUS_STEP_CEILING) {
+      values[j]! += 5;
+      total += 5;
+    }
+  }
+  for (let i = values.length - 1; i > 0; i--) {
+    const j = randomInt(0, i);
+    [values[i], values[j]] = [values[j]!, values[i]!];
+  }
+  return values;
 }
 
 export function issueStatRoll(
@@ -131,7 +179,7 @@ export function isAssignmentOfRoll(
 }
 
 /**
- * Races columns holding the per-attribute caps. Luck has no race cap. These
+ * Races columns holding the per-attribute caps. These
  * are the same `Races.max_*` columns the game reads at character creation
  * (fierymud-rs `roll_starting_stats` via `RaceCatalog::stat_cap`).
  */
@@ -162,8 +210,8 @@ export function raceStatCaps(
 
 /**
  * Clamp each capped attribute to the race's cap (`min(value, cap)`), exactly
- * as the game does to freshly rolled stats at creation. Uncapped attributes
- * (luck) pass through.
+ * as the game does to freshly rolled stats at creation. Attributes without a cap
+ * pass through.
  */
 export function clampToRaceCaps<T extends Partial<StatBlock>>(
   stats: T,
@@ -173,7 +221,11 @@ export function clampToRaceCaps<T extends Partial<StatBlock>>(
   for (const key of Object.keys(caps) as (keyof RaceStatCaps)[]) {
     const value = out[key];
     if (typeof value === 'number') {
-      (out as Partial<StatBlock>)[key] = Math.min(value, caps[key]);
+      (out as Partial<StatBlock>)[key] = Math.min(
+        value,
+        caps[key],
+        STAT_SCALE_MAX
+      );
     }
   }
   return out;

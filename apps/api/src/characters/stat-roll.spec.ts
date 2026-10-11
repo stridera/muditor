@@ -15,16 +15,54 @@ process.env.JWT_SECRET = 'test-secret-for-stat-rolls';
 const block = (values: number[]): StatBlock =>
   Object.fromEntries(ROLLED_STATS.map((k, i) => [k, values[i]])) as StatBlock;
 
+const ROLL = [75, 60, 46, 82, 68, 90];
+
+/** Deterministic randomInt: always the same face. */
+const always =
+  (face: number | ((lo: number, hi: number) => number)) =>
+  (lo: number, hi: number) =>
+    typeof face === 'number' ? Math.min(Math.max(face, lo), hi) : face(lo, hi);
+
 describe('stat-roll', () => {
-  it('rolls 3d6 for every rolled attribute', () => {
-    for (let i = 0; i < 50; i++) {
+  it('rolls the legacy 0..100 natural stats (not 3d6)', () => {
+    for (let i = 0; i < 500; i++) {
       const values = rollStatValues();
       expect(values).toHaveLength(ROLLED_STATS.length);
       for (const v of values) {
-        expect(v).toBeGreaterThanOrEqual(3);
-        expect(v).toBeLessThanOrEqual(18);
+        expect(v).toBeGreaterThanOrEqual(30);
+        expect(v).toBeLessThanOrEqual(100);
+      }
+      // Legacy floor: the total is topped up to more than 450.
+      expect(values.reduce((a, b) => a + b, 0)).toBeGreaterThan(450);
+    }
+  });
+
+  it('gives an average new character a positive bonus, as in game', () => {
+    // CoreStats::bonus = clamp((score - 50) / 5, -10, 10), truncating.
+    const bonus = (n: number) =>
+      Math.max(-10, Math.min(10, Math.trunc((n - 50) / 5)));
+    let sum = 0;
+    let count = 0;
+    for (let i = 0; i < 500; i++) {
+      for (const v of rollStatValues()) {
+        sum += bonus(v);
+        count++;
       }
     }
+    expect(sum / count).toBeGreaterThan(1);
+  });
+
+  it('matches the legacy extremes (parity with fierymud-rs stat_roll.rs)', () => {
+    // Best dice: 2 * (5 * 10) = 100 on every stat.
+    expect(rollStatValues(always(10))).toEqual([100, 100, 100, 100, 100, 100]);
+    // Worst dice: 2 * 5 * 3 = 30 each (total 180) is topped up above 450.
+    let n = 0;
+    const worst = rollStatValues((lo, hi) =>
+      lo === 3 && hi === 10 ? 3 : lo + (n++ % (hi - lo + 1))
+    );
+    expect(worst.reduce((a, b) => a + b, 0)).toBeGreaterThan(450);
+    expect(Math.max(...worst)).toBeLessThanOrEqual(100);
+    expect(Math.min(...worst)).toBeGreaterThanOrEqual(30);
   });
 
   it('round-trips a token for the same user', () => {
@@ -44,10 +82,10 @@ describe('stat-roll', () => {
   });
 
   it('is not an access token: payload tampering breaks the signature', () => {
-    const { token } = issueStatRoll('u1', [3, 3, 3, 3, 3, 3, 3]);
+    const { token } = issueStatRoll('u1', [30, 30, 30, 30, 30, 30]);
     const [body, mac] = token.split('.') as [string, string];
     const payload = JSON.parse(Buffer.from(body, 'base64url').toString());
-    payload.v = [18, 18, 18, 18, 18, 18, 18];
+    payload.v = [100, 100, 100, 100, 100, 100];
     const forgedBody = Buffer.from(JSON.stringify(payload)).toString(
       'base64url'
     );
@@ -57,44 +95,34 @@ describe('stat-roll', () => {
   });
 
   it('isAssignmentOfRoll accepts permutations only', () => {
-    const roll = [15, 12, 9, 14, 11, 16, 8];
-    expect(isAssignmentOfRoll(block(roll), roll)).toBe(true);
-    expect(isAssignmentOfRoll(block([8, 16, 11, 14, 9, 12, 15]), roll)).toBe(
+    expect(isAssignmentOfRoll(block(ROLL), ROLL)).toBe(true);
+    expect(isAssignmentOfRoll(block([90, 68, 82, 46, 60, 75]), ROLL)).toBe(
       true
     );
-    expect(isAssignmentOfRoll(block([18, 12, 9, 14, 11, 16, 8]), roll)).toBe(
+    expect(isAssignmentOfRoll(block([100, 60, 46, 82, 68, 90]), ROLL)).toBe(
       false
     );
     // Duplicating a high value while dropping another is not a permutation.
-    expect(isAssignmentOfRoll(block([16, 16, 9, 14, 11, 12, 8]), roll)).toBe(
+    expect(isAssignmentOfRoll(block([90, 90, 46, 82, 68, 60]), ROLL)).toBe(
       false
     );
   });
 
   it('clampToRaceCaps lowers only the stats above a race cap', () => {
     const caps = {
-      strength: 76,
-      intelligence: 12,
-      wisdom: 76,
-      dexterity: 76,
-      constitution: 76,
-      charisma: 76,
+      strength: 100,
+      intelligence: 64,
+      wisdom: 100,
+      dexterity: 100,
+      constitution: 100,
+      charisma: 100,
     };
-    const clamped = clampToRaceCaps(block([10, 18, 9, 14, 11, 12, 18]), caps);
-    expect(clamped.intelligence).toBe(12);
-    expect(clamped.strength).toBe(10);
-    // Luck has no race cap.
-    expect(clamped.luck).toBe(18);
-    // Default caps (76) never touch a 3d6 roll.
-    expect(
-      clampToRaceCaps(block([18, 18, 18, 18, 18, 18, 18]), {
-        strength: 76,
-        intelligence: 76,
-        wisdom: 76,
-        dexterity: 76,
-        constitution: 76,
-        charisma: 76,
-      })
-    ).toEqual(block([18, 18, 18, 18, 18, 18, 18]));
+    const clamped = clampToRaceCaps(block([75, 90, 46, 82, 68, 60]), caps);
+    expect(clamped.intelligence).toBe(64);
+    expect(clamped.strength).toBe(75);
+    // A cap of 100 never touches a legacy-scale roll.
+    expect(clampToRaceCaps(block([100, 99, 98, 97, 96, 95]), caps)).toEqual(
+      block([100, 64, 98, 97, 96, 95])
+    );
   });
 });
