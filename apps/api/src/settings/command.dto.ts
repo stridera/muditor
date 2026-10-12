@@ -33,6 +33,20 @@ export class CommandDto {
   @Field({ nullable: true, description: 'Usage syntax example' })
   usage?: string;
 
+  @Field({
+    nullable: true,
+    description:
+      'One-line summary shown by in-game help (empty = built-in text)',
+  })
+  helpSummary?: string;
+
+  @Field({
+    nullable: true,
+    description:
+      'Long help paragraph shown by in-game help (empty = built-in text)',
+  })
+  helpText?: string;
+
   @Field({ description: 'Whether this command requires an immortal level' })
   immortalOnly: boolean;
 

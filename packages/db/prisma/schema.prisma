@@ -3060,6 +3060,10 @@ model Command {
   category     CommandCategory @default(SYSTEM)
   description  String? // Brief help text
   usage        String? // Syntax: "shutdown [delay]"
+  // In-game `help <command>` text. NULL/empty = the server's built-in string. The Rust server
+  // reads these two (not description/usage, which are the older Muditor-facing catalog text).
+  helpSummary  String?         @map("help_summary") // One-line summary shown under the command name
+  helpText     String?         @map("help_text") @db.Text // Long paragraph shown after Usage
   immortalOnly Boolean         @default(false) @map("immortal_only") // Requires isImmortal level
   permissions  Permission[]    @default([]) // Required permission flags
 

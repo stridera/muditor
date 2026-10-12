@@ -607,6 +607,12 @@ type CommandDto {
   """Brief description of what the command does"""
   description: String
 
+  """One-line summary shown by in-game help (empty = built-in text)"""
+  helpSummary: String
+
+  """Long help paragraph shown by in-game help (empty = built-in text)"""
+  helpText: String
+
   """Whether this command requires an immortal level"""
   immortalOnly: Boolean!
 

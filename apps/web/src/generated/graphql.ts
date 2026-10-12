@@ -642,6 +642,10 @@ export type CommandDto = {
   createdAt: Scalars['DateTime']['output'];
   /** Brief description of what the command does */
   description?: Maybe<Scalars['String']['output']>;
+  /** One-line summary shown by in-game help (empty = built-in text) */
+  helpSummary?: Maybe<Scalars['String']['output']>;
+  /** Long help paragraph shown by in-game help (empty = built-in text) */
+  helpText?: Maybe<Scalars['String']['output']>;
   /** Whether this command requires an immortal level */
   immortalOnly: Scalars['Boolean']['output'];
   /** Primary command name */
