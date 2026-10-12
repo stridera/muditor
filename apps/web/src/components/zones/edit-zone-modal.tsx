@@ -20,6 +20,7 @@ interface ZoneData {
   hemisphere: Hemisphere;
   climate: Climate;
   isGodZone: boolean;
+  mobsSleepAtNight: boolean;
 }
 
 interface EditZoneModalProps {
@@ -65,6 +66,7 @@ export function EditZoneModal({
     resetMode: zone.resetMode,
     hemisphere: zone.hemisphere,
     climate: zone.climate,
+    mobsSleepAtNight: zone.mobsSleepAtNight,
   });
   const [isGodZone, setIsGodZone] = useState(zone.isGodZone);
 
@@ -222,6 +224,36 @@ export function EditZoneModal({
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Mobs sleep at night (off by default) */}
+          <div>
+            <label
+              htmlFor='mobsSleepAtNight'
+              className='flex items-start gap-2 text-sm font-medium text-muted-foreground'
+            >
+              <input
+                id='mobsSleepAtNight'
+                type='checkbox'
+                className='mt-1 rounded border-border'
+                checked={formData.mobsSleepAtNight}
+                onChange={e =>
+                  setFormData({
+                    ...formData,
+                    mobsSleepAtNight: e.target.checked,
+                  })
+                }
+              />
+              <span>
+                Mobs sleep at night
+                <span className='block text-xs font-normal'>
+                  Mobs of this zone lie down in outdoor rooms between 22:00 and
+                  05:00 and wake at dawn. Never mid-fight, while hunting or with
+                  an enemy in the room. Off by default; the Sleeps at night /
+                  Awake at night mob behaviors override it per mob.
+                </span>
+              </span>
+            </label>
           </div>
 
           {/* God zone (HEAD_BUILDER+) */}

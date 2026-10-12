@@ -27,6 +27,7 @@ interface ZoneDetail {
   resetMode: ResetMode;
   hemisphere: Hemisphere;
   isGodZone: boolean;
+  mobsSleepAtNight: boolean;
   _count: {
     rooms: number;
     mobs: number;
@@ -308,6 +309,7 @@ function ZoneDetailContent() {
             hemisphere: zone.hemisphere,
             climate: zone.climate,
             isGodZone: zone.isGodZone,
+            mobsSleepAtNight: zone.mobsSleepAtNight,
           }}
           isOpen={isEditModalOpen}
           onClose={() => setIsEditModalOpen(false)}

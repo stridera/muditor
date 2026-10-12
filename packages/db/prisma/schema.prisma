@@ -1875,30 +1875,34 @@ model Events {
 }
 
 model Zones {
-  id           Int            @id
-  name         String
-  lifespan     Int            @default(30)
-  resetMode    ResetMode      @default(NORMAL)
-  hemisphere   Hemisphere     @default(NORTHWEST)
-  climate      Climate        @default(NONE)
+  id               Int            @id
+  name             String
+  lifespan         Int            @default(30)
+  resetMode        ResetMode      @default(NORMAL)
+  hemisphere       Hemisphere     @default(NORTHWEST)
+  climate          Climate        @default(NONE)
   // God zones are staff-only content: hidden from mortals (game commands,
   // public website, world map), grant no exploration achievements, and are
   // never picked as a random teleport destination. HEAD_BUILDER+ only.
-  isGodZone    Boolean        @default(false) @map("is_god_zone")
-  createdAt    DateTime       @default(now()) @map("created_at")
-  updatedAt    DateTime       @updatedAt @map("updated_at")
-  deletedAt    DateTime?      @map("deleted_at")
-  createdBy    String?        @map("created_by")
-  updatedBy    String?        @map("updated_by")
-  mobResets    MobResets[]
-  mobs         Mobs[]
-  objectResets ObjectResets[]
-  objects      Objects[]
-  rooms        Room[]
-  shops        Shops[]
-  triggers     Triggers[]
+  isGodZone        Boolean        @default(false) @map("is_god_zone")
+  // Mobs of this zone lie down to sleep at night (game hours 22-04, outdoor
+  // rooms, never mid-fight) and wake at dawn. Off by default; a mob can
+  // override it with the SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors.
+  mobsSleepAtNight Boolean        @default(false) @map("mobs_sleep_at_night")
+  createdAt        DateTime       @default(now()) @map("created_at")
+  updatedAt        DateTime       @updatedAt @map("updated_at")
+  deletedAt        DateTime?      @map("deleted_at")
+  createdBy        String?        @map("created_by")
+  updatedBy        String?        @map("updated_by")
+  mobResets        MobResets[]
+  mobs             Mobs[]
+  objectResets     ObjectResets[]
+  objects          Objects[]
+  rooms            Room[]
+  shops            Shops[]
+  triggers         Triggers[]
   // Quest system
-  quests       Quests[]
+  quests           Quests[]
 }
 
 // ============================================================================
@@ -2100,6 +2104,9 @@ enum MobBehavior {
   // Combat behavior
   PEACEFUL // Cannot be attacked
   NO_KILL // Fights but won't deliver killing blow
+  // Day/night cycle (per-mob override of Zones.mobsSleepAtNight)
+  SLEEPS_AT_NIGHT // Lies down at night even if its zone does not
+  AWAKE_AT_NIGHT // Stays up at night even if its zone sleeps
 }
 
 // Room magic affinity - affects spell power and creature comfort

@@ -138,6 +138,7 @@ query ZoneDetail($id: Int!) {
     resetMode
     hemisphere
     isGodZone
+    mobsSleepAtNight
     _count {
       rooms
       mobs

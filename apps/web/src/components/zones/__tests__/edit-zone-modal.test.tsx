@@ -1,6 +1,7 @@
 /**
  * The god zone checkbox: editable by HEAD_BUILDER and above only (the API
  * enforces the same rule); lower roles see it disabled and never send the flag.
+ * The mobs-sleep-at-night checkbox is open to any zone editor and starts off.
  */
 import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
@@ -26,6 +27,7 @@ const zone = {
   hemisphere: 'NORTHWEST' as const,
   climate: 'NONE' as const,
   isGodZone: false,
+  mobsSleepAtNight: false,
 };
 
 const renderModal = () =>
@@ -74,5 +76,35 @@ describe('EditZoneModal god zone checkbox', () => {
     expect(mockUpdateZone.mock.calls[0]![0].variables.data).not.toHaveProperty(
       'isGodZone'
     );
+  });
+});
+
+describe('EditZoneModal mobs sleep at night checkbox', () => {
+  const sleepLabel = /Mobs sleep at night/;
+  beforeEach(() => mockUpdateZone.mockClear());
+
+  it('starts unticked and is editable by a BUILDER', () => {
+    mockRole = 'BUILDER';
+    renderModal();
+    const box = screen.getByLabelText(sleepLabel);
+    expect(box).not.toBeChecked();
+    expect(box).toBeEnabled();
+  });
+
+  it('sends mobsSleepAtNight: false untouched and true once ticked', async () => {
+    mockRole = 'BUILDER';
+    renderModal();
+    fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+    await waitFor(() => expect(mockUpdateZone).toHaveBeenCalledTimes(1));
+    expect(mockUpdateZone.mock.calls[0]![0].variables.data).toMatchObject({
+      mobsSleepAtNight: false,
+    });
+
+    fireEvent.click(screen.getByLabelText(sleepLabel));
+    fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+    await waitFor(() => expect(mockUpdateZone).toHaveBeenCalledTimes(2));
+    expect(mockUpdateZone.mock.calls[1]![0].variables.data).toMatchObject({
+      mobsSleepAtNight: true,
+    });
   });
 });

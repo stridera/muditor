@@ -44,6 +44,8 @@ const mockSchema = buildSchema(`
     NO_CLASS_AI
     PEACEFUL
     NO_KILL
+    SLEEPS_AT_NIGHT
+    AWAKE_AT_NIGHT
   }
 
   enum MobProfession {

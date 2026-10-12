@@ -885,6 +885,7 @@ function MobEditorContent() {
               <div className='grid grid-cols-3 sm:grid-cols-4 gap-3'>
                 {(
                   [
+                    'AWAKE_AT_NIGHT',
                     'AWARE',
                     'FAST_TRACK',
                     'HELPER',
@@ -901,6 +902,7 @@ function MobEditorContent() {
                     'PROTECTOR',
                     'SCAVENGER',
                     'SENTINEL',
+                    'SLEEPS_AT_NIGHT',
                     'SLOW_TRACK',
                     'STAY_ZONE',
                     'TEACHER',

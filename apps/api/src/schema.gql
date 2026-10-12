@@ -1916,6 +1916,7 @@ enum MobAiTarget {
 }
 
 enum MobBehavior {
+  AWAKE_AT_NIGHT
   AWARE
   FAST_TRACK
   HELPER
@@ -1932,6 +1933,7 @@ enum MobBehavior {
   PROTECTOR
   SCAVENGER
   SENTINEL
+  SLEEPS_AT_NIGHT
   SLOW_TRACK
   STAY_ZONE
   TEACHER
@@ -4569,6 +4571,9 @@ input UpdateZoneInput {
   """Requires HEAD_BUILDER or above (checked by the resolver)"""
   isGodZone: Boolean
   lifespan: Int
+
+  """Mobs of this zone sleep at night (default off)"""
+  mobsSleepAtNight: Boolean
   name: String
   resetMode: ResetMode
   top: Int
@@ -4770,6 +4775,11 @@ type ZoneDto {
   """
   isGodZone: Boolean!
   lifespan: Int!
+
+  """
+  Mobs of this zone lie down to sleep at night (off by default; per-mob SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors override it)
+  """
+  mobsSleepAtNight: Boolean!
   name: String!
   resetMode: ResetMode!
   rooms: [ZoneRoomDto!]

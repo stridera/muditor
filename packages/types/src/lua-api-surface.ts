@@ -240,6 +240,8 @@ export const ENUM_MEMBERS: Record<string, Set<string>> = {
     'NoClassAi',
     'Peaceful',
     'NoKill',
+    'SleepsAtNight',
+    'AwakeAtNight',
   ]),
   MobProfession: new Set([
     'Banker',

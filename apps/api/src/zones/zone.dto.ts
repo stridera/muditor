@@ -100,6 +100,12 @@ export class ZoneDto {
   })
   isGodZone: boolean;
 
+  @Field({
+    description:
+      'Mobs of this zone lie down to sleep at night (off by default; per-mob SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors override it)',
+  })
+  mobsSleepAtNight: boolean;
+
   @Field(() => Date)
   createdAt: Date;
 
@@ -183,4 +189,12 @@ export class UpdateZoneInput {
   @IsOptional()
   @IsBoolean()
   isGodZone?: boolean;
+
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Mobs of this zone sleep at night (default off)',
+  })
+  @IsOptional()
+  @IsBoolean()
+  mobsSleepAtNight?: boolean;
 }
