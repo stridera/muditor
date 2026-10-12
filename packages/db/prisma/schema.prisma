@@ -3067,6 +3067,14 @@ model Command {
   immortalOnly Boolean         @default(false) @map("immortal_only") // Requires isImmortal level
   permissions  Permission[]    @default([]) // Required permission flags
 
+  // Per-command policy flags read by the Rust server at boot (legacy CMD_* flags). Mechanics,
+  // not text: edit with care. A command with no row, or a database without these columns, uses
+  // the server's built-in lists.
+  allowedWhileCasting   Boolean @default(false) @map("allowed_while_casting") // Runs mid-cast without aborting it (legacy CMD_CAST)
+  allowedWhileParalyzed Boolean @default(false) @map("allowed_while_paralyzed") // Runs while paralyzed (legacy CMD_MINOR_PARA)
+  keepsHidden           Boolean @default(false) @map("keeps_hidden") // Does not reveal a hiding character (legacy CMD_HIDE)
+  heldByCastLag         Boolean @default(false) @map("held_by_cast_lag") // Held back while a broken-off cast's lag runs
+
   // Optional link to ability for skill/spell/chant/song commands
   // If set, executing this command triggers the linked ability's effects
   abilityId Int?     @map("ability_id")

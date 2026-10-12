@@ -347,4 +347,32 @@ export class SettingsResolver {
   ) {
     return this.settingsService.updateCommandHelp(name, helpSummary, helpText);
   }
+
+  // ============================================
+  // Command policy flags Mutation
+  // ============================================
+
+  @Mutation(() => CommandDto, {
+    description:
+      'Update the per-command policy flags (allowed while casting / paralyzed, keeps hidden, held by cast lag). Mechanics, so a higher role than help text.',
+  })
+  @MinimumRole(UserRole.CODER)
+  async updateCommandFlags(
+    @Args('name') name: string,
+    @Args('allowedWhileCasting', { type: () => Boolean, nullable: true })
+    allowedWhileCasting?: boolean | null,
+    @Args('allowedWhileParalyzed', { type: () => Boolean, nullable: true })
+    allowedWhileParalyzed?: boolean | null,
+    @Args('keepsHidden', { type: () => Boolean, nullable: true })
+    keepsHidden?: boolean | null,
+    @Args('heldByCastLag', { type: () => Boolean, nullable: true })
+    heldByCastLag?: boolean | null
+  ) {
+    return this.settingsService.updateCommandFlags(name, {
+      allowedWhileCasting,
+      allowedWhileParalyzed,
+      keepsHidden,
+      heldByCastLag,
+    });
+  }
 }

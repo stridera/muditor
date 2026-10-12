@@ -21,9 +21,11 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Textarea } from '@/components/ui/textarea';
 import {
   GetCommandHelpDocument,
+  UpdateCommandFlagsDocument,
   UpdateCommandHelpDocument,
   type GetCommandHelpQuery,
 } from '@/generated/graphql';
@@ -32,18 +34,22 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import { CheckCircle, Loader2, Pencil, XCircle } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import {
+  FLAG_FIELDS,
   SUMMARY_MAX,
   TEXT_MAX,
+  flagsChanged,
+  flagsOf,
   matchesQuery,
   toMutationVars,
   validateHelpForm,
+  type FlagsFormData,
   type HelpFormData,
 } from './command-help';
 
 type CommandRow = GetCommandHelpQuery['commands'][number];
 
 export default function CommandsPage() {
-  const { isBuilder } = usePermissions();
+  const { isBuilder, isCoder } = usePermissions();
   const canEdit = isBuilder;
 
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -52,6 +58,7 @@ export default function CommandsPage() {
     helpSummary: '',
     helpText: '',
   });
+  const [flagsData, setFlagsData] = useState<FlagsFormData>(flagsOf({}));
   const [formError, setFormError] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -82,6 +89,14 @@ export default function CommandsPage() {
     }
   );
 
+  const [updateFlags] = useMutation(UpdateCommandFlagsDocument, {
+    onError: e => {
+      setFormError(e.message);
+      setErrorMessage(e.message);
+      setSuccessMessage('');
+    },
+  });
+
   const rows = useMemo(
     () => (data?.commands ?? []).filter(c => matchesQuery(c, searchQuery)),
     [data, searchQuery]
@@ -93,6 +108,7 @@ export default function CommandsPage() {
       helpSummary: row.helpSummary ?? '',
       helpText: row.helpText ?? '',
     });
+    setFlagsData(flagsOf(row));
     setFormError('');
     setIsFormOpen(true);
   };
@@ -106,6 +122,14 @@ export default function CommandsPage() {
       return;
     }
     setFormError('');
+    // Flags are mechanics: only a coder may change them, and a builder's save
+    // never sends them (the API enforces the same).
+    if (isCoder && flagsChanged(flagsOf(editing), flagsData)) {
+      const res = await updateFlags({
+        variables: { name: editing.name, ...flagsData },
+      });
+      if (!res?.data) return;
+    }
     await updateHelp({
       variables: { name: editing.name, ...toMutationVars(formData) },
     });
@@ -285,6 +309,34 @@ export default function CommandsPage() {
                   used). Line breaks are kept.
                 </p>
               </div>
+
+              <fieldset className='space-y-2 rounded-md border p-3'>
+                <legend className='px-1 text-sm font-medium'>
+                  Policy flags
+                </legend>
+                <p className='text-xs text-muted-foreground'>
+                  Game mechanics, not text.{' '}
+                  {isCoder
+                    ? 'Changes apply on the next game restart.'
+                    : 'Only coders can change these.'}
+                </p>
+                {FLAG_FIELDS.map(f => (
+                  <div key={f.key} className='flex items-start gap-2'>
+                    <Checkbox
+                      id={`cmd-flag-${f.key}`}
+                      checked={flagsData[f.key]}
+                      disabled={!isCoder}
+                      onCheckedChange={v =>
+                        setFlagsData({ ...flagsData, [f.key]: v === true })
+                      }
+                    />
+                    <div className='grid gap-0.5 leading-none'>
+                      <Label htmlFor={`cmd-flag-${f.key}`}>{f.label}</Label>
+                      <p className='text-xs text-muted-foreground'>{f.hint}</p>
+                    </div>
+                  </div>
+                ))}
+              </fieldset>
             </div>
 
             <DialogFooter className='mt-6'>

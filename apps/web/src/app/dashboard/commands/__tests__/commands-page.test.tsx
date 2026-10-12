@@ -2,6 +2,7 @@ import '@testing-library/jest-dom';
 import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import {
   GetCommandHelpDocument,
+  UpdateCommandFlagsDocument,
   UpdateCommandHelpDocument,
 } from '@/generated/graphql';
 import CommandsPage from '../page';
@@ -14,7 +15,9 @@ import {
 } from '../command-help';
 
 const mockUpdate = jest.fn();
+const mockUpdateFlags = jest.fn();
 const mockRefetch = jest.fn();
+let mockIsCoder = false;
 
 const commands = [
   {
@@ -23,6 +26,10 @@ const commands = [
     category: 'INFORMATION',
     helpSummary: 'Look around.',
     helpText: null,
+    allowedWhileCasting: true,
+    allowedWhileParalyzed: true,
+    keepsHidden: true,
+    heldByCastLag: false,
     updatedAt: '2026-10-12T00:00:00Z',
   },
   {
@@ -31,12 +38,16 @@ const commands = [
     category: 'IMMORTAL',
     helpSummary: null,
     helpText: null,
+    allowedWhileCasting: false,
+    allowedWhileParalyzed: false,
+    keepsHidden: false,
+    heldByCastLag: false,
     updatedAt: '2026-10-12T00:00:00Z',
   },
 ];
 
 jest.mock('@/hooks/use-permissions', () => ({
-  usePermissions: () => ({ isBuilder: true }),
+  usePermissions: () => ({ isBuilder: true, isCoder: mockIsCoder }),
 }));
 jest.mock('@apollo/client/react', () => ({
   useQuery: (doc: unknown) =>
@@ -46,7 +57,9 @@ jest.mock('@apollo/client/react', () => ({
   useMutation: (doc: unknown) =>
     doc === UpdateCommandHelpDocument
       ? [mockUpdate, { loading: false }]
-      : [jest.fn(), { loading: false }],
+      : doc === UpdateCommandFlagsDocument
+        ? [mockUpdateFlags, { loading: false }]
+        : [jest.fn(), { loading: false }],
 }));
 
 describe('command help form helpers', () => {
@@ -87,7 +100,9 @@ describe('command help form helpers', () => {
 describe('Commands page', () => {
   beforeEach(() => {
     jest.clearAllMocks();
+    mockIsCoder = false;
     mockUpdate.mockResolvedValue({});
+    mockUpdateFlags.mockResolvedValue({ data: {} });
   });
 
   it('lists commands and filters by search', () => {
@@ -119,5 +134,45 @@ describe('Commands page', () => {
         },
       })
     );
+  });
+
+  it('shows the flags read-only to a builder and never sends them', async () => {
+    render(<CommandsPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit look' }));
+    const box = screen.getByRole('checkbox', { name: /Keeps you hidden/ });
+    expect(box).toBeDisabled();
+    expect(box).toBeChecked();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(mockUpdate).toHaveBeenCalled());
+    expect(mockUpdateFlags).not.toHaveBeenCalled();
+  });
+
+  it('lets a coder change flags through updateCommandFlags', async () => {
+    mockIsCoder = true;
+    render(<CommandsPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit look' }));
+    fireEvent.click(screen.getByRole('checkbox', { name: /Held by cast lag/ }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() =>
+      expect(mockUpdateFlags).toHaveBeenCalledWith({
+        variables: {
+          name: 'look',
+          allowedWhileCasting: true,
+          allowedWhileParalyzed: true,
+          keepsHidden: true,
+          heldByCastLag: true,
+        },
+      })
+    );
+    await waitFor(() => expect(mockUpdate).toHaveBeenCalled());
+  });
+
+  it('does not call updateCommandFlags when a coder left them alone', async () => {
+    mockIsCoder = true;
+    render(<CommandsPage />);
+    fireEvent.click(screen.getByRole('button', { name: 'Edit look' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(mockUpdate).toHaveBeenCalled());
+    expect(mockUpdateFlags).not.toHaveBeenCalled();
   });
 });

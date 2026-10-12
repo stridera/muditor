@@ -40,3 +40,43 @@ export function matchesQuery(
     (cmd.helpSummary ?? '').toLowerCase().includes(q)
   );
 }
+
+/** Per-command policy flags (mechanics; editing needs CODER, unlike help text). */
+export const FLAG_FIELDS = [
+  {
+    key: 'allowedWhileCasting',
+    label: 'Allowed while casting',
+    hint: 'Runs mid-cast without interrupting the spell.',
+  },
+  {
+    key: 'allowedWhileParalyzed',
+    label: 'Allowed while paralyzed',
+    hint: 'A paralyzed character can still run it.',
+  },
+  {
+    key: 'keepsHidden',
+    label: 'Keeps you hidden',
+    hint: 'Running it does not reveal a hiding character.',
+  },
+  {
+    key: 'heldByCastLag',
+    label: 'Held by cast lag',
+    hint: "Held back while a broken-off cast's lag runs.",
+  },
+] as const;
+
+export type FlagKey = (typeof FLAG_FIELDS)[number]['key'];
+export type FlagsFormData = Record<FlagKey, boolean>;
+
+export function flagsOf(cmd: Partial<FlagsFormData>): FlagsFormData {
+  return {
+    allowedWhileCasting: !!cmd.allowedWhileCasting,
+    allowedWhileParalyzed: !!cmd.allowedWhileParalyzed,
+    keepsHidden: !!cmd.keepsHidden,
+    heldByCastLag: !!cmd.heldByCastLag,
+  };
+}
+
+export function flagsChanged(a: FlagsFormData, b: FlagsFormData): boolean {
+  return FLAG_FIELDS.some(f => a[f.key] !== b[f.key]);
+}

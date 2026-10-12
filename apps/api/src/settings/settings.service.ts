@@ -22,6 +22,17 @@ import {
 export const COMMAND_HELP_SUMMARY_MAX = 200;
 export const COMMAND_HELP_TEXT_MAX = 8000;
 
+export const COMMAND_FLAG_KEYS = [
+  'allowedWhileCasting',
+  'allowedWhileParalyzed',
+  'keepsHidden',
+  'heldByCastLag',
+] as const;
+
+export type CommandFlagsInput = {
+  [K in (typeof COMMAND_FLAG_KEYS)[number]]?: boolean | null | undefined;
+};
+
 @Injectable()
 export class SettingsService {
   constructor(private readonly db: DatabaseService) {}
@@ -496,6 +507,25 @@ export class SettingsService {
       data.helpText = text === '' ? null : text;
     }
 
+    await this.findCommand(name); // Ensure exists
+    return this.db.command.update({ where: { name }, data });
+  }
+
+  /**
+   * Update the per-command policy flags the game reads at boot. Arguments left
+   * undefined are not touched. Mechanics, not text: the resolver demands a higher
+   * role than updateCommandHelp.
+   */
+  async updateCommandFlags(name: string, flags: CommandFlagsInput) {
+    const data: { [K in keyof CommandFlagsInput]?: boolean } = {};
+    for (const key of COMMAND_FLAG_KEYS) {
+      const value = flags[key];
+      if (value === undefined || value === null) continue;
+      if (typeof value !== 'boolean') {
+        throw new BadRequestException(`${key} must be true or false`);
+      }
+      data[key] = value;
+    }
     await this.findCommand(name); // Ensure exists
     return this.db.command.update({ where: { name }, data });
   }

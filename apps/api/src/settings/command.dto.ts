@@ -55,6 +55,30 @@ export class CommandDto {
   })
   permissions: string[];
 
+  @Field({
+    description:
+      'Runs while the caster winds up a spell, without interrupting it (legacy CMD_CAST)',
+  })
+  allowedWhileCasting: boolean;
+
+  @Field({
+    description:
+      'Runs while the character is paralyzed (legacy CMD_MINOR_PARA)',
+  })
+  allowedWhileParalyzed: boolean;
+
+  @Field({
+    description:
+      'Does not reveal a hiding character when run (legacy CMD_HIDE)',
+  })
+  keepsHidden: boolean;
+
+  @Field({
+    description:
+      'Held back while the lag of a broken-off cast runs (casts and the item verbs that cast)',
+  })
+  heldByCastLag: boolean;
+
   @Field()
   createdAt: Date;
 

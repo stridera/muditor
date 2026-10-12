@@ -7,6 +7,10 @@ query GetCommandHelp {
     category
     helpSummary
     helpText
+    allowedWhileCasting
+    allowedWhileParalyzed
+    keepsHidden
+    heldByCastLag
     updatedAt
   }
 }
@@ -24,6 +28,29 @@ mutation UpdateCommandHelp(
     name
     helpSummary
     helpText
+    updatedAt
+  }
+}
+
+mutation UpdateCommandFlags(
+  $name: String!
+  $allowedWhileCasting: Boolean
+  $allowedWhileParalyzed: Boolean
+  $keepsHidden: Boolean
+  $heldByCastLag: Boolean
+) {
+  updateCommandFlags(
+    name: $name
+    allowedWhileCasting: $allowedWhileCasting
+    allowedWhileParalyzed: $allowedWhileParalyzed
+    keepsHidden: $keepsHidden
+    heldByCastLag: $heldByCastLag
+  ) {
+    name
+    allowedWhileCasting
+    allowedWhileParalyzed
+    keepsHidden
+    heldByCastLag
     updatedAt
   }
 }

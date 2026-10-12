@@ -600,12 +600,25 @@ type CommandDto {
   """Alternative names/aliases for the command"""
   aliases: [String!]!
 
+  """
+  Runs while the caster winds up a spell, without interrupting it (legacy CMD_CAST)
+  """
+  allowedWhileCasting: Boolean!
+
+  """Runs while the character is paralyzed (legacy CMD_MINOR_PARA)"""
+  allowedWhileParalyzed: Boolean!
+
   """Command category for organization"""
   category: CommandCategory!
   createdAt: DateTime!
 
   """Brief description of what the command does"""
   description: String
+
+  """
+  Held back while the lag of a broken-off cast runs (casts and the item verbs that cast)
+  """
+  heldByCastLag: Boolean!
 
   """One-line summary shown by in-game help (empty = built-in text)"""
   helpSummary: String
@@ -615,6 +628,9 @@ type CommandDto {
 
   """Whether this command requires an immortal level"""
   immortalOnly: Boolean!
+
+  """Does not reveal a hiding character when run (legacy CMD_HIDE)"""
+  keepsHidden: Boolean!
 
   """Primary command name"""
   name: String!
@@ -2456,6 +2472,11 @@ type Mutation {
   updateClassAiRule(data: UpdateClassAiRuleInput!, id: Int!): ClassAiRuleDto!
   updateClassCircle(data: UpdateClassCircleInput!, id: ID!): ClassCircleDto!
   updateClassSkill(data: UpdateClassSkillInput!, id: ID!): ClassSkillDto!
+
+  """
+  Update the per-command policy flags (allowed while casting / paralyzed, keeps hidden, held by cast lag). Mechanics, so a higher role than help text.
+  """
+  updateCommandFlags(allowedWhileCasting: Boolean, allowedWhileParalyzed: Boolean, heldByCastLag: Boolean, keepsHidden: Boolean, name: String!): CommandDto!
 
   """
   Update the in-game help summary/text of a command (empty clears it, falling back to the built-in text)

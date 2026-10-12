@@ -637,17 +637,25 @@ export type CommandDto = {
   __typename?: 'CommandDto';
   /** Alternative names/aliases for the command */
   aliases: Array<Scalars['String']['output']>;
+  /** Runs while the caster winds up a spell, without interrupting it (legacy CMD_CAST) */
+  allowedWhileCasting: Scalars['Boolean']['output'];
+  /** Runs while the character is paralyzed (legacy CMD_MINOR_PARA) */
+  allowedWhileParalyzed: Scalars['Boolean']['output'];
   /** Command category for organization */
   category: CommandCategory;
   createdAt: Scalars['DateTime']['output'];
   /** Brief description of what the command does */
   description?: Maybe<Scalars['String']['output']>;
+  /** Held back while the lag of a broken-off cast runs (casts and the item verbs that cast) */
+  heldByCastLag: Scalars['Boolean']['output'];
   /** One-line summary shown by in-game help (empty = built-in text) */
   helpSummary?: Maybe<Scalars['String']['output']>;
   /** Long help paragraph shown by in-game help (empty = built-in text) */
   helpText?: Maybe<Scalars['String']['output']>;
   /** Whether this command requires an immortal level */
   immortalOnly: Scalars['Boolean']['output'];
+  /** Does not reveal a hiding character when run (legacy CMD_HIDE) */
+  keepsHidden: Scalars['Boolean']['output'];
   /** Primary command name */
   name: Scalars['String']['output'];
   /** Permission flags required to use this command */
@@ -2278,6 +2286,8 @@ export type Mutation = {
   updateClassAiRule: ClassAiRuleDto;
   updateClassCircle: ClassCircleDto;
   updateClassSkill: ClassSkillDto;
+  /** Update the per-command policy flags (allowed while casting / paralyzed, keeps hidden, held by cast lag). Mechanics, so a higher role than help text. */
+  updateCommandFlags: CommandDto;
   /** Update the in-game help summary/text of a command (empty clears it, falling back to the built-in text) */
   updateCommandHelp: CommandDto;
   updateConsumableEffects: ObjectDto;
@@ -3192,6 +3202,15 @@ export type MutationUpdateClassCircleArgs = {
 export type MutationUpdateClassSkillArgs = {
   data: UpdateClassSkillInput;
   id: Scalars['ID']['input'];
+};
+
+
+export type MutationUpdateCommandFlagsArgs = {
+  allowedWhileCasting?: InputMaybe<Scalars['Boolean']['input']>;
+  allowedWhileParalyzed?: InputMaybe<Scalars['Boolean']['input']>;
+  heldByCastLag?: InputMaybe<Scalars['Boolean']['input']>;
+  keepsHidden?: InputMaybe<Scalars['Boolean']['input']>;
+  name: Scalars['String']['input'];
 };
 
 
@@ -7230,7 +7249,7 @@ export type RemoveClassCircleMutation = { __typename?: 'Mutation', removeClassCi
 export type GetCommandHelpQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCommandHelpQuery = { __typename?: 'Query', commands: Array<{ __typename?: 'CommandDto', name: string, aliases: Array<string>, category: CommandCategory, helpSummary?: string | null, helpText?: string | null, updatedAt: any }> };
+export type GetCommandHelpQuery = { __typename?: 'Query', commands: Array<{ __typename?: 'CommandDto', name: string, aliases: Array<string>, category: CommandCategory, helpSummary?: string | null, helpText?: string | null, allowedWhileCasting: boolean, allowedWhileParalyzed: boolean, keepsHidden: boolean, heldByCastLag: boolean, updatedAt: any }> };
 
 export type UpdateCommandHelpMutationVariables = Exact<{
   name: Scalars['String']['input'];
@@ -7240,6 +7259,17 @@ export type UpdateCommandHelpMutationVariables = Exact<{
 
 
 export type UpdateCommandHelpMutation = { __typename?: 'Mutation', updateCommandHelp: { __typename?: 'CommandDto', name: string, helpSummary?: string | null, helpText?: string | null, updatedAt: any } };
+
+export type UpdateCommandFlagsMutationVariables = Exact<{
+  name: Scalars['String']['input'];
+  allowedWhileCasting?: InputMaybe<Scalars['Boolean']['input']>;
+  allowedWhileParalyzed?: InputMaybe<Scalars['Boolean']['input']>;
+  keepsHidden?: InputMaybe<Scalars['Boolean']['input']>;
+  heldByCastLag?: InputMaybe<Scalars['Boolean']['input']>;
+}>;
+
+
+export type UpdateCommandFlagsMutation = { __typename?: 'Mutation', updateCommandFlags: { __typename?: 'CommandDto', name: string, allowedWhileCasting: boolean, allowedWhileParalyzed: boolean, keepsHidden: boolean, heldByCastLag: boolean, updatedAt: any } };
 
 export type GetCreationRecipesQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9090,8 +9120,9 @@ export const AssignSkillToClassDocument = {"kind":"Document","definitions":[{"ki
 export const RemoveClassSkillDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassSkill"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassSkill"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassSkillMutation, RemoveClassSkillMutationVariables>;
 export const CreateClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateClassCircleInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"circle"}},{"kind":"Field","name":{"kind":"Name","value":"minLevel"}}]}}]}}]} as unknown as DocumentNode<CreateClassCircleMutation, CreateClassCircleMutationVariables>;
 export const RemoveClassCircleDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"RemoveClassCircle"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"removeClassCircle"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}}]}]}}]} as unknown as DocumentNode<RemoveClassCircleMutation, RemoveClassCircleMutationVariables>;
-export const GetCommandHelpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCommandHelp"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commands"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"aliases"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"helpSummary"}},{"kind":"Field","name":{"kind":"Name","value":"helpText"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetCommandHelpQuery, GetCommandHelpQueryVariables>;
+export const GetCommandHelpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCommandHelp"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"commands"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"aliases"}},{"kind":"Field","name":{"kind":"Name","value":"category"}},{"kind":"Field","name":{"kind":"Name","value":"helpSummary"}},{"kind":"Field","name":{"kind":"Name","value":"helpText"}},{"kind":"Field","name":{"kind":"Name","value":"allowedWhileCasting"}},{"kind":"Field","name":{"kind":"Name","value":"allowedWhileParalyzed"}},{"kind":"Field","name":{"kind":"Name","value":"keepsHidden"}},{"kind":"Field","name":{"kind":"Name","value":"heldByCastLag"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<GetCommandHelpQuery, GetCommandHelpQueryVariables>;
 export const UpdateCommandHelpDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCommandHelp"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"helpSummary"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"helpText"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCommandHelp"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"helpSummary"},"value":{"kind":"Variable","name":{"kind":"Name","value":"helpSummary"}}},{"kind":"Argument","name":{"kind":"Name","value":"helpText"},"value":{"kind":"Variable","name":{"kind":"Name","value":"helpText"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"helpSummary"}},{"kind":"Field","name":{"kind":"Name","value":"helpText"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateCommandHelpMutation, UpdateCommandHelpMutationVariables>;
+export const UpdateCommandFlagsDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCommandFlags"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"name"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"String"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"allowedWhileCasting"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"allowedWhileParalyzed"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"keepsHidden"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"heldByCastLag"}},"type":{"kind":"NamedType","name":{"kind":"Name","value":"Boolean"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCommandFlags"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"name"},"value":{"kind":"Variable","name":{"kind":"Name","value":"name"}}},{"kind":"Argument","name":{"kind":"Name","value":"allowedWhileCasting"},"value":{"kind":"Variable","name":{"kind":"Name","value":"allowedWhileCasting"}}},{"kind":"Argument","name":{"kind":"Name","value":"allowedWhileParalyzed"},"value":{"kind":"Variable","name":{"kind":"Name","value":"allowedWhileParalyzed"}}},{"kind":"Argument","name":{"kind":"Name","value":"keepsHidden"},"value":{"kind":"Variable","name":{"kind":"Name","value":"keepsHidden"}}},{"kind":"Argument","name":{"kind":"Name","value":"heldByCastLag"},"value":{"kind":"Variable","name":{"kind":"Name","value":"heldByCastLag"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"name"}},{"kind":"Field","name":{"kind":"Name","value":"allowedWhileCasting"}},{"kind":"Field","name":{"kind":"Name","value":"allowedWhileParalyzed"}},{"kind":"Field","name":{"kind":"Name","value":"keepsHidden"}},{"kind":"Field","name":{"kind":"Name","value":"heldByCastLag"}},{"kind":"Field","name":{"kind":"Name","value":"updatedAt"}}]}}]}}]} as unknown as DocumentNode<UpdateCommandFlagsMutation, UpdateCommandFlagsMutationVariables>;
 export const GetCreationRecipesDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"query","name":{"kind":"Name","value":"GetCreationRecipes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"creationRecipes"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"abilityId"}},{"kind":"Field","name":{"kind":"Name","value":"ability"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"name"}}]}},{"kind":"Field","name":{"kind":"Name","value":"keyword"}},{"kind":"Field","name":{"kind":"Name","value":"classId"}},{"kind":"Field","name":{"kind":"Name","value":"characterClass"},"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}},{"kind":"Field","name":{"kind":"Name","value":"plainName"}}]}},{"kind":"Field","name":{"kind":"Name","value":"objectZoneId"}},{"kind":"Field","name":{"kind":"Name","value":"objectId"}}]}}]}}]} as unknown as DocumentNode<GetCreationRecipesQuery, GetCreationRecipesQueryVariables>;
 export const CreateCreationRecipeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"CreateCreationRecipe"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"CreateCreationRecipeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"createCreationRecipe"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<CreateCreationRecipeMutation, CreateCreationRecipeMutationVariables>;
 export const UpdateCreationRecipeDocument = {"kind":"Document","definitions":[{"kind":"OperationDefinition","operation":"mutation","name":{"kind":"Name","value":"UpdateCreationRecipe"},"variableDefinitions":[{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"id"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"ID"}}}},{"kind":"VariableDefinition","variable":{"kind":"Variable","name":{"kind":"Name","value":"data"}},"type":{"kind":"NonNullType","type":{"kind":"NamedType","name":{"kind":"Name","value":"UpdateCreationRecipeInput"}}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"updateCreationRecipe"},"arguments":[{"kind":"Argument","name":{"kind":"Name","value":"id"},"value":{"kind":"Variable","name":{"kind":"Name","value":"id"}}},{"kind":"Argument","name":{"kind":"Name","value":"data"},"value":{"kind":"Variable","name":{"kind":"Name","value":"data"}}}],"selectionSet":{"kind":"SelectionSet","selections":[{"kind":"Field","name":{"kind":"Name","value":"id"}}]}}]}}]} as unknown as DocumentNode<UpdateCreationRecipeMutation, UpdateCreationRecipeMutationVariables>;
