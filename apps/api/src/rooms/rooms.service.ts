@@ -639,12 +639,30 @@ export class RoomsService {
     if (data.keyId !== undefined) patch.keyId = data.keyId;
     if (data.toZoneId !== undefined) patch.toZoneId = data.toZoneId;
     if (data.toRoomId !== undefined) patch.toRoomId = data.toRoomId;
-    if (data.toZoneId !== undefined && data.toRoomId !== undefined) {
+    if (data.toZoneId !== undefined || data.toRoomId !== undefined) {
+      // Merge with the stored destination so a partial update (only one half
+      // of the target) is still checked against the exit's final value.
+      let toZoneId = data.toZoneId;
+      let toRoomId = data.toRoomId;
+      if (toZoneId === undefined || toRoomId === undefined) {
+        const existing = await this.db.roomExit.findUnique({
+          where: {
+            roomZoneId_roomId_direction: {
+              roomZoneId: data.roomZoneId,
+              roomId: data.roomId,
+              direction: data.direction,
+            },
+          },
+          select: { toZoneId: true, toRoomId: true },
+        });
+        if (toZoneId === undefined) toZoneId = existing?.toZoneId;
+        if (toRoomId === undefined) toRoomId = existing?.toRoomId;
+      }
       this.assertNotSelfExit(
         data.roomZoneId,
         data.roomId,
-        data.toZoneId,
-        data.toRoomId
+        toZoneId ?? null,
+        toRoomId ?? null
       );
     }
     if (data.defaultState !== undefined) {

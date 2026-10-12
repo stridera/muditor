@@ -1,5 +1,6 @@
 import {
   buildUpdateRoomExitInput,
+  createLinkedExits,
   normalizeExitEdit,
   updateExitInPlace,
   type ExitLike,
@@ -157,5 +158,41 @@ describe('normalizeExitEdit', () => {
   it('keeps an open exit as it is', () => {
     const out = normalizeExitEdit({ flags: ['HIDDEN'] });
     expect(out).toEqual({ flags: ['HIDDEN'], defaultState: 'OPEN' });
+  });
+});
+
+describe('createLinkedExits', () => {
+  it('reports a clean link when both exits succeed', async () => {
+    const fwd = jest.fn().mockResolvedValue(undefined);
+    const rev = jest.fn().mockResolvedValue(undefined);
+    await expect(createLinkedExits(fwd, rev)).resolves.toEqual({
+      status: 'linked',
+      reverse: true,
+    });
+  });
+
+  it('skips the return exit when none is requested', async () => {
+    const fwd = jest.fn().mockResolvedValue(undefined);
+    await expect(createLinkedExits(fwd, null)).resolves.toEqual({
+      status: 'linked',
+      reverse: false,
+    });
+  });
+
+  it('throws on forward failure and never tries the return exit', async () => {
+    const fwd = jest.fn().mockRejectedValue(new Error('nope'));
+    const rev = jest.fn();
+    await expect(createLinkedExits(fwd, rev)).rejects.toThrow('nope');
+    expect(rev).not.toHaveBeenCalled();
+  });
+
+  it('reports a return failure without throwing, after the forward succeeded', async () => {
+    const fwd = jest.fn().mockResolvedValue(undefined);
+    const rev = jest.fn().mockRejectedValue(new Error('Exit already exists'));
+    await expect(createLinkedExits(fwd, rev)).resolves.toEqual({
+      status: 'reverse-failed',
+      message: 'Exit already exists',
+    });
+    expect(fwd).toHaveBeenCalledTimes(1);
   });
 });

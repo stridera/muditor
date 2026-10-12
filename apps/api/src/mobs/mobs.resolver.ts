@@ -1,4 +1,4 @@
-import { UseGuards } from '@nestjs/common';
+import { BadRequestException, UseGuards } from '@nestjs/common';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
@@ -178,9 +178,10 @@ export class MobsResolver {
     let className: string | undefined;
     if (classId) {
       const charClass = await this.mobsService.findClassById(classId);
-      if (charClass) {
-        className = charClass.plainName;
+      if (!charClass) {
+        throw new BadRequestException(`Class ${classId} does not exist`);
       }
+      className = charClass.plainName;
     }
 
     // Calculate defaults using legacy formulas
@@ -257,6 +258,9 @@ export class MobsResolver {
     if (classId === null) {
       updateData.characterClass = { disconnect: true };
     } else if (classId !== undefined) {
+      if (!(await this.mobsService.findClassById(classId))) {
+        throw new BadRequestException(`Class ${classId} does not exist`);
+      }
       updateData.characterClass = { connect: { id: classId } };
     }
     if (race) {

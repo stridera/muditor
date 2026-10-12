@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
 // @ts-nocheck -- Test file intentionally bypasses exhaustive Prisma model typing; we only validate resolver mapping logic.
 import { Test, TestingModule } from '@nestjs/testing';
+import { BadRequestException } from '@nestjs/common';
 import { DamageType, Race } from '@muditor/db';
 import { MobsResolver } from '../mobs.resolver';
 import { MobsService } from '../mobs.service';
@@ -25,6 +26,7 @@ describe('MobsResolver', () => {
             findAll: jest.fn(),
             findOne: jest.fn(),
             findByZone: jest.fn(),
+            findClassById: jest.fn(),
             count: jest.fn(),
             create: jest.fn(),
             assertIdFree: jest.fn(),
@@ -212,9 +214,21 @@ describe('MobsResolver', () => {
     };
 
     it('connects the class relation instead of passing the scalar FK', async () => {
+      jest
+        .spyOn(service, 'findClassById')
+        .mockResolvedValue({ id: 4, plainName: 'Warrior' });
       const updateData = await run({ classId: 4 });
       expect(updateData.characterClass).toEqual({ connect: { id: 4 } });
       expect(updateData).not.toHaveProperty('classId');
+    });
+
+    it('rejects a nonexistent class with a clean BadRequest and does not update', async () => {
+      jest.spyOn(service, 'findClassById').mockResolvedValue(null);
+      const update = jest.spyOn(service, 'update');
+      await expect(
+        resolver.updateMob(30, 1, { classId: 999 } as never)
+      ).rejects.toThrow(new BadRequestException('Class 999 does not exist'));
+      expect(update).not.toHaveBeenCalled();
     });
 
     it('disconnects the class when classId is null', async () => {

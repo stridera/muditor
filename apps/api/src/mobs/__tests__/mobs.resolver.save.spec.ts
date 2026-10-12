@@ -161,6 +161,19 @@ describe('MobsResolver save payloads', () => {
       expect(data.zones).toEqual({ connect: { id: 30 } });
     });
 
+    it('rejects a nonexistent class with a clean BadRequest and does not create', async () => {
+      service.findClassById.mockResolvedValue(null);
+      await expect(
+        resolver.createMob({
+          ...editorPayload,
+          id: 5,
+          zoneId: 30,
+          classId: 999,
+        })
+      ).rejects.toThrow(new BadRequestException('Class 999 does not exist'));
+      expect(service.create).not.toHaveBeenCalled();
+    });
+
     it('rejects an id that is already used in the zone and does not create', async () => {
       service.assertIdFree.mockRejectedValue(new ConflictException('dup'));
       await expect(

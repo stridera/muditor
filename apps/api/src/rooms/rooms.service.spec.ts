@@ -52,6 +52,7 @@ describe('RoomsService', () => {
       roomExit: {
         create: jest.fn(),
         update: jest.fn(),
+        findUnique: jest.fn(),
       },
     } as unknown as jest.Mocked<DatabaseService>;
 
@@ -352,6 +353,40 @@ describe('RoomsService', () => {
           toRoomId: 5,
         } as never)
       ).rejects.toThrow('same room');
+    });
+
+    it('updateExit rejects a partial update that makes the stored exit a self-exit', async () => {
+      exitDb().findUnique!.mockResolvedValue({ toZoneId: 30, toRoomId: 9 });
+      await expect(
+        service.updateExit({
+          roomZoneId: 30,
+          roomId: 5,
+          direction: 'NORTH',
+          toRoomId: 5,
+        } as never)
+      ).rejects.toThrow('same room');
+      exitDb().findUnique!.mockResolvedValue({ toZoneId: 7, toRoomId: 5 });
+      await expect(
+        service.updateExit({
+          roomZoneId: 30,
+          roomId: 5,
+          direction: 'NORTH',
+          toZoneId: 30,
+        } as never)
+      ).rejects.toThrow('same room');
+      expect(exitDb().update).not.toHaveBeenCalled();
+    });
+
+    it('updateExit allows a partial retarget that is not a self-exit', async () => {
+      exitDb().findUnique!.mockResolvedValue({ toZoneId: 30, toRoomId: 9 });
+      exitDb().update!.mockResolvedValue({ id: 1 });
+      await service.updateExit({
+        roomZoneId: 30,
+        roomId: 5,
+        direction: 'NORTH',
+        toRoomId: 6,
+      } as never);
+      expect(exitDb().update).toHaveBeenCalled();
     });
 
     it('updateExit updates in place by composite key, never deleting', async () => {

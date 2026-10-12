@@ -208,3 +208,30 @@ export function normalizeExitEdit<
   }
   return { ...edit, flags, defaultState };
 }
+
+export type LinkExitsOutcome =
+  | { status: 'linked'; reverse: boolean }
+  | { status: 'reverse-failed'; message: string };
+
+/**
+ * Create a forward exit and, optionally, its return exit. A forward failure
+ * throws (nothing was created). A return failure does NOT throw: the forward
+ * exit already exists and is in editor state, so the caller must tell the
+ * builder it was created and only the return exit failed.
+ */
+export async function createLinkedExits(
+  sendForward: () => Promise<void>,
+  sendReverse: (() => Promise<void>) | null
+): Promise<LinkExitsOutcome> {
+  await sendForward();
+  if (!sendReverse) return { status: 'linked', reverse: false };
+  try {
+    await sendReverse();
+  } catch (err) {
+    return {
+      status: 'reverse-failed',
+      message: err instanceof Error ? err.message : 'Failed to create exit',
+    };
+  }
+  return { status: 'linked', reverse: true };
+}

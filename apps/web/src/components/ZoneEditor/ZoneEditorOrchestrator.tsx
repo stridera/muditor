@@ -45,7 +45,7 @@ import { PortalNode } from './PortalNode';
 import { OverlapPanel } from './OverlapPanel';
 import { PropertyPanel } from './PropertyPanel';
 import { RoomNode } from './RoomNode';
-import { updateExitInPlace } from './exit-update';
+import { createLinkedExits, updateExitInPlace } from './exit-update';
 import { zoneEditorFetch } from './zone-editor-fetch';
 import { graphqlRequestBody } from '@/lib/authenticated-fetch';
 import {
@@ -2783,13 +2783,21 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
 
       setManagingExits(true);
       try {
-        await send(from, direction, to);
-        if (addReverse) await send(to, reverse, from);
-        toast.success(
-          addReverse
-            ? `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id} (and ${reverse.toLowerCase()} back).`
-            : `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id}.`
+        const outcome = await createLinkedExits(
+          () => send(from, direction, to),
+          addReverse ? () => send(to, reverse, from) : null
         );
+        if (outcome.status === 'reverse-failed') {
+          toast.error(
+            `Created room ${from.id} ${direction.toLowerCase()} to room ${to.id}, but the return exit (${reverse.toLowerCase()} from room ${to.id}) failed: ${outcome.message}`
+          );
+        } else {
+          toast.success(
+            outcome.reverse
+              ? `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id} (and ${reverse.toLowerCase()} back).`
+              : `Linked room ${from.id} ${direction.toLowerCase()} to room ${to.id}.`
+          );
+        }
       } catch (err) {
         toast.error(
           err instanceof Error ? err.message : 'Failed to create exit'
