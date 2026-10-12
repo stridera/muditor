@@ -20,7 +20,8 @@ import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Plus, Save, Trash2, X } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { toast } from 'sonner';
 import { Suspense, useEffect, useState } from 'react';
 import type { ValidationRules } from '../../../../hooks/useRealTimeValidation';
 import {
@@ -40,6 +41,7 @@ interface ShopFormData {
   zoneId: number;
 }
 
+import { extractErrorMessage } from '@/lib/error-utils';
 import type { ShopItem, ShopQueryResult } from '@/lib/shopMapping';
 import { mapShopItems } from '@/lib/shopMapping';
 import { buildShopSavePayload, type ShopKeeperRef } from '@/lib/shopPayload';
@@ -176,6 +178,7 @@ function ShopEditorContent() {
   const zoneId = searchParams.get('zone');
   const isNew = !shopId;
 
+  const router = useRouter();
   const [activeTab, setActiveTab] = useState('basic');
   const [formData, setFormData] = useState<ShopFormData>({
     id: 0,
@@ -485,7 +488,13 @@ function ShopEditorContent() {
   };
 
   const handleSave = async () => {
-    if (!validateForm()) return;
+    // Field errors only render on the Basic Info tab, so bring the user there
+    // instead of silently doing nothing from another tab.
+    if (!validateForm()) {
+      setActiveTab('basic');
+      setGeneralError('Fix the highlighted fields on the Basic Info tab.');
+      return;
+    }
 
     try {
       const saveData = buildShopSavePayload(
@@ -502,11 +511,13 @@ function ShopEditorContent() {
 
       if (isNew) {
         if (formData.id == null) {
+          setActiveTab('basic');
           setGeneralError('Shop ID is required for creation');
           return;
         }
         if (formData.keeperId == null) {
-          setGeneralError('Keeper mob is required for creation');
+          setActiveTab('basic');
+          setGeneralError('Choose a keeper mob before creating the shop.');
           return;
         }
         const createResult = await createShop({
@@ -520,33 +531,46 @@ function ShopEditorContent() {
             },
           },
         });
-        const newId = createResult.data?.createShop?.id;
-        if (newId && shopItems.length) {
-          await updateInventory({
-            variables: {
-              id: newId,
-              zoneId: formData.zoneId,
-              items: shopItems.map(i => ({
-                amount: i.amount,
-                objectZoneId: i.objectZoneId,
-                objectId: i.objectId,
-              })),
-            },
-            optimisticResponse: {
-              updateShopInventory: {
+        const newId = createResult.data?.createShop?.id ?? formData.id;
+        if (shopItems.length) {
+          try {
+            await updateInventory({
+              variables: {
                 id: newId,
-                items: shopItems.map((i, idx) => ({
-                  id: String(idx),
+                zoneId: formData.zoneId,
+                items: shopItems.map(i => ({
                   amount: i.amount,
-                  objectId: i.objectId,
                   objectZoneId: i.objectZoneId,
-                  object: null,
-                  __typename: 'ShopItemDto',
+                  objectId: i.objectId,
                 })),
-                __typename: 'ShopDto',
               },
-            },
-          });
+              optimisticResponse: {
+                updateShopInventory: {
+                  id: newId,
+                  items: shopItems.map((i, idx) => ({
+                    id: String(idx),
+                    amount: i.amount,
+                    objectId: i.objectId,
+                    objectZoneId: i.objectZoneId,
+                    object: null,
+                    __typename: 'ShopItemDto',
+                  })),
+                  __typename: 'ShopDto',
+                },
+              },
+            });
+          } catch (inventoryErr) {
+            // The shop row exists now; send the builder to its editor so a
+            // retry updates it instead of colliding on the id.
+            console.error('Shop created but inventory failed:', inventoryErr);
+            toast.error(
+              `Shop created, but its inventory was not saved: ${extractErrorMessage(inventoryErr)}`
+            );
+            router.push(
+              `/dashboard/shops/editor?id=${newId}&zone=${formData.zoneId}`
+            );
+            return;
+          }
         }
       } else {
         // The record key comes from the URL, never from the (editable) form.
@@ -591,7 +615,7 @@ function ShopEditorContent() {
       window.location.href = '/dashboard/shops';
     } catch (err) {
       console.error('Error saving shop:', err);
-      setGeneralError('Failed to save shop. Please try again.');
+      setGeneralError(`Failed to save shop. ${extractErrorMessage(err)}`);
     }
   };
 
@@ -1088,7 +1112,7 @@ function ShopEditorContent() {
 
       {/* Add Item Modal */}
       {showAddItemModal && (
-        <div className='fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50'>
+        <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50'>
           <div className='bg-card rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[90vh] overflow-y-auto'>
             <div className='flex items-center justify-between mb-4'>
               <h2 className='text-xl font-semibold text-foreground'>

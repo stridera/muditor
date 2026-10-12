@@ -31,6 +31,7 @@ import {
 } from '@/generated/graphql';
 import { parseEntityId } from '@/lib/entityId';
 import { parseKeywords } from '@/lib/keywords';
+import { stripMarkup } from '@/utils/xmlLiteParser';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
@@ -49,6 +50,7 @@ import { generateMobStats } from '../../../../utils/mob-stat-generator';
 import { MobCombatStatsTab } from '../../../../components/mob-combat-stats-tab';
 import { MobAiTab } from '@/components/mob-ai/MobAiTab';
 import { usePermissions } from '@/hooks/use-permissions';
+import TriggerManager from '@/components/TriggerManager';
 
 interface MobFormData {
   keywords: string;
@@ -570,6 +572,7 @@ function MobEditorContent() {
     { id: 'effects', label: 'Default Effects' },
     { id: 'ai', label: 'AI' },
     { id: 'equipment', label: 'Equipment & Resets' },
+    { id: 'scripts', label: 'Scripts' },
   ];
 
   return (
@@ -689,11 +692,18 @@ function MobEditorContent() {
                   >
                     <option value=''>N/A (No Class)</option>
                     {classes.map(cls => (
-                      <option key={cls.id} value={cls.name}>
-                        {cls.name.charAt(0).toUpperCase() + cls.name.slice(1)}
+                      <option
+                        key={cls.id}
+                        value={cls.plainName || stripMarkup(cls.name)}
+                      >
+                        {cls.plainName ? cls.plainName : stripMarkup(cls.name)}
                       </option>
                     ))}
                   </select>
+                  <p className='text-xs text-muted-foreground mt-1'>
+                    Only used by the stat generator; the mob&apos;s class is not
+                    saved.
+                  </p>
                 </div>
               </div>
 
@@ -918,8 +928,18 @@ function MobEditorContent() {
                       type='checkbox'
                       checked={formData.behaviors.includes(behavior)}
                       onChange={e => {
+                        // Sleeping and staying awake at night contradict each other
+                        const opposite =
+                          behavior === 'SLEEPS_AT_NIGHT'
+                            ? 'AWAKE_AT_NIGHT'
+                            : behavior === 'AWAKE_AT_NIGHT'
+                              ? 'SLEEPS_AT_NIGHT'
+                              : null;
                         const next = e.target.checked
-                          ? [...formData.behaviors, behavior]
+                          ? [
+                              ...formData.behaviors.filter(b => b !== opposite),
+                              behavior,
+                            ]
                           : formData.behaviors.filter(b => b !== behavior);
                         handleInputChange('behaviors', next);
                       }}
@@ -1502,6 +1522,29 @@ function MobEditorContent() {
                 skill AI. New mobs use their class rules.
               </p>
             </div>
+          </div>
+        )}
+
+        {/* Scripts Tab */}
+        {activeTab === 'scripts' && !isNew && (
+          <div className='bg-card shadow rounded-lg p-6'>
+            <TriggerManager
+              entityType='MOB'
+              entityZoneId={parseInt(zoneId!)}
+              entityId={parseInt(mobId!)}
+              entityName={`Mob ${zoneId}:${mobId}`}
+            />
+          </div>
+        )}
+        {activeTab === 'scripts' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6 text-center py-8'>
+            <h3 className='text-sm font-medium text-card-foreground'>
+              Save mob first
+            </h3>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              Scripts attach to a saved mob. Create the mob, then come back to
+              this tab.
+            </p>
           </div>
         )}
 

@@ -45,6 +45,9 @@ export default function NewZonePage() {
   );
 }
 
+/** Highest zone id the API accepts (zone 0 is stored as 1000). */
+const MAX_ZONE_ID = 9999;
+
 function NewZoneForm() {
   const router = useRouter();
   const { data: zonesData } = useQuery(GetZonesForSelectorDocument);
@@ -65,9 +68,15 @@ function NewZoneForm() {
   });
 
   const parsedId = /^\d+$/.test(zoneId) ? Number(zoneId) : null;
+  const idOutOfRange = parsedId !== null && parsedId > MAX_ZONE_ID;
+  const idMalformed = zoneId !== '' && parsedId === null;
   const idTaken = parsedId !== null && existingIds.has(parsedId);
   const canSubmit =
-    parsedId !== null && !idTaken && name.trim().length > 0 && !loading;
+    parsedId !== null &&
+    !idOutOfRange &&
+    !idTaken &&
+    name.trim().length > 0 &&
+    !loading;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -112,6 +121,16 @@ function NewZoneForm() {
             className={inputClass}
             required
           />
+          {idMalformed && (
+            <p className='text-sm text-destructive mt-1'>
+              Zone ID must be a whole number from 0 to {MAX_ZONE_ID}.
+            </p>
+          )}
+          {idOutOfRange && (
+            <p className='text-sm text-destructive mt-1'>
+              Zone ID cannot be above {MAX_ZONE_ID}.
+            </p>
+          )}
           {idTaken && (
             <p className='text-sm text-destructive mt-1'>
               Zone {parsedId} already exists.

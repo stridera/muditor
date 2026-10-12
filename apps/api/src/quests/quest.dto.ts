@@ -7,6 +7,7 @@ import {
   ID,
 } from '@nestjs/graphql';
 import {
+  IsNotEmpty,
   IsOptional,
   IsString,
   IsNumber,
@@ -375,6 +376,7 @@ export class CreateQuestInput {
 
   @Field()
   @IsString()
+  @IsNotEmpty({ message: 'Quest name is required' })
   name: string;
 
   @Field({ nullable: true })

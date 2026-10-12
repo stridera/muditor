@@ -109,3 +109,89 @@ describe('ObjectsResolver createObject id handling', () => {
     expect(mockService.create).not.toHaveBeenCalled();
   });
 });
+
+describe('ObjectsResolver createObject roomDescription default', () => {
+  let resolver: ObjectsResolver;
+  const mockService = {
+    assertIdFree: jest.fn(),
+    create: jest.fn(),
+  };
+
+  beforeEach(async () => {
+    jest.resetAllMocks();
+    mockService.assertIdFree.mockResolvedValue(undefined);
+    mockService.create.mockImplementation(async data => ({
+      ...data,
+      zoneId: 30,
+      keywords: [],
+    }));
+    const module: TestingModule = await Test.createTestingModule({
+      providers: [
+        ObjectsResolver,
+        { provide: ObjectsService, useValue: mockService },
+      ],
+    })
+      .overrideGuard(OptionalJwtAuthGuard)
+      .useValue(allowAll)
+      .overrideGuard(GraphQLJwtAuthGuard)
+      .useValue(allowAll)
+      .overrideGuard(MinimumRoleGuard)
+      .useValue(allowAll)
+      .overrideGuard(ZonePermissionGuard)
+      .useValue(allowAll)
+      .compile();
+    resolver = module.get(ObjectsResolver);
+  });
+
+  const base = {
+    id: 7,
+    zoneId: 30,
+    keywords: ['sword'],
+    name: 'a long iron sword',
+    examineDescription: '',
+  };
+
+  it('derives ground text from the name when none is supplied', async () => {
+    await resolver.createObject(base as unknown as CreateObjectInput);
+    expect(mockService.create.mock.calls[0]![0].roomDescription).toBe(
+      'A long iron sword lies here.'
+    );
+  });
+
+  it('treats blank ground text as missing', async () => {
+    await resolver.createObject({
+      ...base,
+      roomDescription: '   ',
+    } as unknown as CreateObjectInput);
+    expect(mockService.create.mock.calls[0]![0].roomDescription).toBe(
+      'A long iron sword lies here.'
+    );
+  });
+
+  it('keeps ground text the builder wrote', async () => {
+    await resolver.createObject({
+      ...base,
+      roomDescription: 'A blade gleams in the dust.',
+    } as unknown as CreateObjectInput);
+    expect(mockService.create.mock.calls[0]![0].roomDescription).toBe(
+      'A blade gleams in the dust.'
+    );
+  });
+});
+
+describe('CreateObjectInput validation', () => {
+  it('no longer requires roomDescription', async () => {
+    const { plainToInstance } = await import('class-transformer');
+    const { validate } = await import('class-validator');
+    const dto = plainToInstance(CreateObjectInput, {
+      id: 1,
+      zoneId: 30,
+      keywords: ['key'],
+      name: 'a key',
+      examineDescription: '',
+    });
+    expect(
+      await validate(dto, { whitelist: true, forbidNonWhitelisted: true })
+    ).toHaveLength(0);
+  });
+});

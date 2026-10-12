@@ -29,3 +29,18 @@ export function assertValidObjectValues(values: unknown): void {
     `values.Key must be a composite {"zone": N, "id": M} with whole numbers >= 0 (got ${JSON.stringify(key)})`
   );
 }
+
+/**
+ * Ground text for a new object. Builders may leave it blank; fall back to
+ * "<name> lies here." so the object is never invisible in a room.
+ */
+export function defaultRoomDescription(
+  roomDescription: string | null | undefined,
+  name: string
+): string {
+  const trimmed = roomDescription?.trim();
+  if (trimmed) return roomDescription as string;
+  const base = name.trim();
+  if (!base) return 'Something lies here.';
+  return `${base.charAt(0).toUpperCase()}${base.slice(1)} lies here.`;
+}

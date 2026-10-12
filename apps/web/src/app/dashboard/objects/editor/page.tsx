@@ -28,6 +28,7 @@ import {
 import { gql } from '@apollo/client';
 import { useMutation, useQuery } from '@apollo/client/react';
 import { ArrowLeft, Save } from 'lucide-react';
+import TriggerManager from '@/components/TriggerManager';
 import { useListReturnHref } from '@/hooks/use-list-state';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
@@ -45,6 +46,7 @@ const GET_OBJECT = gql`
       type
       keywords
       name
+      roomDescription
       examineDescription
       actionDescription
       weight
@@ -137,6 +139,7 @@ interface ObjectFormData {
   type: string;
   keywords: string;
   name: string;
+  roomDescription: string;
   examineDescription: string;
   actionDescription: string;
   weight: number;
@@ -322,6 +325,7 @@ function ObjectEditorContent() {
     type: 'NOTHING',
     keywords: '',
     name: '',
+    roomDescription: '',
     examineDescription: '',
     actionDescription: '',
     weight: 0,
@@ -473,6 +477,7 @@ function ObjectEditorContent() {
         // The API returns a string[]; the TagInput edits a comma-joined string
         keywords: keywordsToInput(object.keywords),
         name: object.name || '',
+        roomDescription: object.roomDescription || '',
         examineDescription: object.examineDescription || '',
         actionDescription: object.actionDescription || '',
         weight: object.weight || 0,
@@ -645,6 +650,7 @@ function ObjectEditorContent() {
     { id: 'restrictions', label: 'Restrictions' },
     { id: 'effects', label: 'Effects' },
     { id: 'values', label: 'Type Values' },
+    { id: 'scripts', label: 'Scripts' },
   ];
 
   return (
@@ -781,6 +787,23 @@ function ObjectEditorContent() {
                 {errors.name && (
                   <p className='text-destructive text-xs mt-1'>{errors.name}</p>
                 )}
+              </div>
+
+              <div>
+                <label
+                  htmlFor='roomDescription'
+                  className='block text-sm font-medium text-muted-foreground mb-1'
+                >
+                  Room Description (ground text)
+                </label>
+                <ColoredTextEditor
+                  value={formData.roomDescription}
+                  onChange={value =>
+                    handleInputChange('roomDescription', value)
+                  }
+                  placeholder='Shown when it lies on the ground, e.g. A long iron sword lies here. (blank = "<name> lies here.")'
+                  showPreview={true}
+                />
               </div>
 
               <div>
@@ -1976,6 +1999,29 @@ function ObjectEditorContent() {
                 </button>
               </div>
             </div>
+          </div>
+        )}
+
+        {/* Scripts Tab */}
+        {activeTab === 'scripts' && !isNew && (
+          <div className='bg-card shadow rounded-lg p-6 border border-border'>
+            <TriggerManager
+              entityType='OBJECT'
+              entityZoneId={parseInt(zoneIdParam!)}
+              entityId={parseInt(objectId!)}
+              entityName={`Object ${zoneIdParam}:${objectId}`}
+            />
+          </div>
+        )}
+        {activeTab === 'scripts' && isNew && (
+          <div className='bg-card shadow rounded-lg p-6 border border-border text-center py-8'>
+            <h3 className='text-sm font-medium text-foreground'>
+              Save object first
+            </h3>
+            <p className='mt-1 text-sm text-muted-foreground'>
+              Scripts attach to a saved object. Create it, then come back to
+              this tab.
+            </p>
           </div>
         )}
 

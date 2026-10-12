@@ -20,6 +20,7 @@ import { RewardFields } from '@/components/quests/RewardFields';
 import { TRIGGER_TYPES } from '@/components/quests/quest-constants';
 import {
   movePhase,
+  validateQuestName,
   type DialogueFormData,
   type ObjectiveFormData,
   type PhaseFormData,
@@ -62,6 +63,8 @@ import {
   Trash2,
 } from 'lucide-react';
 import { useListReturnHref } from '@/hooks/use-list-state';
+import { extractErrorMessage } from '@/lib/error-utils';
+import { stripMarkup } from '@/utils/xmlLiteParser';
 import Link from 'next/link';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { Suspense, useEffect, useState } from 'react';
@@ -284,6 +287,12 @@ function QuestEditorContent() {
   };
 
   const handleSaveQuest = async () => {
+    const nameProblem = validateQuestName(formData.name, stripMarkup);
+    if (nameProblem) {
+      setActiveTab('basic');
+      setGeneralError(nameProblem);
+      return;
+    }
     try {
       if (isNew) {
         await createQuest({
@@ -364,7 +373,7 @@ function QuestEditorContent() {
       }
     } catch (err) {
       console.error('Error saving quest:', err);
-      setGeneralError('Failed to save quest. Please try again.');
+      setGeneralError(`Failed to save quest. ${extractErrorMessage(err)}`);
     }
   };
 

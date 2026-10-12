@@ -168,4 +168,14 @@ export class AttachTriggerInput {
   @IsOptional()
   @IsNumber()
   objectId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  roomZoneId?: number;
+
+  @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  roomId?: number;
 }

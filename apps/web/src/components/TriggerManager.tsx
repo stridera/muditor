@@ -30,6 +30,8 @@ import {
   Zap,
 } from 'lucide-react';
 import { useState } from 'react';
+import { toast } from 'sonner';
+import { extractErrorMessage } from '@/lib/error-utils';
 import ScriptEditor, { type Script } from './ScriptEditor';
 
 const GET_TRIGGERS = gql`
@@ -127,6 +129,8 @@ const DETACH_TRIGGER = gql`
     $mobId: Int
     $objectZoneId: Int
     $objectId: Int
+    $roomZoneId: Int
+    $roomId: Int
   ) {
     detachTrigger(
       zoneId: $zoneId
@@ -135,6 +139,8 @@ const DETACH_TRIGGER = gql`
       mobId: $mobId
       objectZoneId: $objectZoneId
       objectId: $objectId
+      roomZoneId: $roomZoneId
+      roomId: $roomId
     ) {
       id
       zoneId
@@ -142,6 +148,22 @@ const DETACH_TRIGGER = gql`
     }
   }
 `;
+
+/** Which junction row a trigger attaches through: mob, object, or room (WORLD). */
+function entityKeyInput(
+  entityType: 'MOB' | 'OBJECT' | 'WORLD',
+  zoneId: number,
+  id: number
+): Record<string, number> {
+  switch (entityType) {
+    case 'MOB':
+      return { mobZoneId: zoneId, mobId: id };
+    case 'OBJECT':
+      return { objectZoneId: zoneId, objectId: id };
+    case 'WORLD':
+      return { roomZoneId: zoneId, roomId: id };
+  }
+}
 
 interface TriggerData {
   id: number;
@@ -171,6 +193,9 @@ export default function TriggerManager({
   entityName,
   onTriggerChange,
 }: TriggerManagerProps) {
+  // Room scripts are WORLD triggers in the data model
+  const entityLabel =
+    entityType === 'WORLD' ? 'room' : entityType.toLowerCase();
   const [selectedTrigger, setSelectedTrigger] = useState<TriggerData | null>(
     null
   );
@@ -234,20 +259,17 @@ export default function TriggerManager({
         | null
         | undefined
     )?.createTrigger;
-    if (created && (entityType === 'MOB' || entityType === 'OBJECT')) {
-      const attachInput: Record<string, unknown> = {
-        triggerZoneId: created.zoneId,
-        triggerId: created.id,
-        attachType: entityType,
-      };
-      if (entityType === 'MOB') {
-        attachInput.mobZoneId = entityZoneId;
-        attachInput.mobId = entityId;
-      } else {
-        attachInput.objectZoneId = entityZoneId;
-        attachInput.objectId = entityId;
-      }
-      await attachTrigger({ variables: { input: attachInput } });
+    if (created) {
+      await attachTrigger({
+        variables: {
+          input: {
+            triggerZoneId: created.zoneId,
+            triggerId: created.id,
+            attachType: entityType,
+            ...entityKeyInput(entityType, entityZoneId, entityId),
+          },
+        },
+      });
     }
   };
 
@@ -271,6 +293,9 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error creating trigger:', error);
+      toast.error(
+        `Could not create the trigger: ${extractErrorMessage(error)}`
+      );
     }
   };
 
@@ -300,6 +325,9 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error updating trigger:', error);
+      toast.error(
+        `Could not update the trigger: ${extractErrorMessage(error)}`
+      );
     }
   };
 
@@ -315,24 +343,20 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error deleting trigger:', error);
+      toast.error(
+        `Could not delete the trigger: ${extractErrorMessage(error)}`
+      );
     }
   };
 
   const handleAttachTrigger = async (trigger: TriggerData) => {
     try {
-      const input: any = {
+      const input = {
         triggerZoneId: trigger.zoneId,
         triggerId: trigger.id,
         attachType: entityType,
+        ...entityKeyInput(entityType, entityZoneId, entityId),
       };
-
-      if (entityType === 'MOB') {
-        input.mobZoneId = entityZoneId;
-        input.mobId = entityId;
-      } else if (entityType === 'OBJECT') {
-        input.objectZoneId = entityZoneId;
-        input.objectId = entityId;
-      }
 
       await attachTrigger({ variables: { input } });
       refetchAttached();
@@ -340,6 +364,9 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error attaching trigger:', error);
+      toast.error(
+        `Could not attach the trigger: ${extractErrorMessage(error)}`
+      );
     }
   };
 
@@ -350,12 +377,7 @@ export default function TriggerManager({
         variables: {
           zoneId: trigger.zoneId,
           id: trigger.id,
-          ...(entityType === 'MOB'
-            ? { mobZoneId: entityZoneId, mobId: entityId }
-            : {}),
-          ...(entityType === 'OBJECT'
-            ? { objectZoneId: entityZoneId, objectId: entityId }
-            : {}),
+          ...entityKeyInput(entityType, entityZoneId, entityId),
         },
       });
       refetchAttached();
@@ -363,6 +385,9 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error detaching trigger:', error);
+      toast.error(
+        `Could not detach the trigger: ${extractErrorMessage(error)}`
+      );
     }
   };
 
@@ -384,6 +409,7 @@ export default function TriggerManager({
       onTriggerChange?.();
     } catch (error) {
       console.error('Error copying trigger:', error);
+      toast.error(`Could not copy the trigger: ${extractErrorMessage(error)}`);
     }
   };
 
@@ -449,7 +475,7 @@ export default function TriggerManager({
               <span className='font-medium'>
                 {allTriggers.filter(t => t.attachType === entityType).length}
               </span>{' '}
-              total {entityType.toLowerCase()} triggers
+              total {entityLabel} triggers
             </div>
           </div>
         </div>
@@ -472,8 +498,8 @@ export default function TriggerManager({
               <DialogHeader>
                 <DialogTitle>Attach Trigger</DialogTitle>
                 <DialogDescription>
-                  Select an existing {entityType.toLowerCase()} trigger to
-                  attach to {entityName}
+                  Select an existing {entityLabel} trigger to attach to{' '}
+                  {entityName}
                 </DialogDescription>
               </DialogHeader>
 
@@ -487,8 +513,7 @@ export default function TriggerManager({
                 <div className='max-h-96 overflow-y-auto space-y-2'>
                   {availableForAttachment.length === 0 ? (
                     <div className='text-center text-gray-500 py-8'>
-                      No {entityType.toLowerCase()} triggers available for
-                      attachment
+                      No {entityLabel} triggers available for attachment
                     </div>
                   ) : (
                     availableForAttachment.map(trigger => (
@@ -534,8 +559,8 @@ export default function TriggerManager({
         <Alert>
           <AlertCircle className='h-4 w-4' />
           <AlertDescription>
-            No triggers attached to this {entityType.toLowerCase()}. Create a
-            new trigger or attach an existing one.
+            No triggers attached to this {entityLabel}. Create a new trigger or
+            attach an existing one.
           </AlertDescription>
         </Alert>
       ) : (
@@ -650,7 +675,7 @@ export default function TriggerManager({
             </DialogTitle>
             <DialogDescription>
               {isCreating
-                ? `Create a new ${entityType.toLowerCase()} trigger for ${entityName}`
+                ? `Create a new ${entityLabel} trigger for ${entityName}`
                 : `Edit the trigger script and properties`}
             </DialogDescription>
           </DialogHeader>

@@ -218,6 +218,8 @@ input AttachTriggerInput {
   mobZoneId: Int
   objectId: Int
   objectZoneId: Int
+  roomId: Int
+  roomZoneId: Int
   triggerId: Int!
   triggerZoneId: Int!
 }
@@ -1025,7 +1027,7 @@ input CreateObjectInput {
   restrictedClassIds: [Int!]! = []
   restrictedRaces: [Race!]! = []
   restrictions: [ObjectRestriction!]! = []
-  roomDescription: String!
+  roomDescription: String
   timer: Int! = 0
   type: ObjectType! = NOTHING
   values: JSON
@@ -2314,9 +2316,9 @@ type Mutation {
   denyGameLogin(code: String!): Boolean!
 
   """
-  Detach a trigger from ONE mob (mobZoneId+mobId) or ONE object (objectZoneId+objectId)
+  Detach a trigger from ONE mob (mobZoneId+mobId), ONE object (objectZoneId+objectId) or ONE room (roomZoneId+roomId)
   """
-  detachTrigger(id: Int!, mobId: Int, mobZoneId: Int, objectId: Int, objectZoneId: Int, zoneId: Int!): TriggerDto!
+  detachTrigger(id: Int!, mobId: Int, mobZoneId: Int, objectId: Int, objectZoneId: Int, roomId: Int, roomZoneId: Int, zoneId: Int!): TriggerDto!
   exchangeGooglePendingCode(code: String!, state: String!): String!
   exchangeOAuthCode(code: String!, state: String!): String!
 
@@ -2931,9 +2933,9 @@ type Query {
   """Get all reserved character names, alphabetically"""
   reservedNames: [ReservedNameDto!]!
   room(id: Int!, zoneId: Int!): RoomDto!
-  rooms(lightweight: Boolean = false, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
+  rooms(lightweight: Boolean = false, search: String, sector: Sector, skip: Int, take: Int, zoneId: Int): [RoomDto!]!
   roomsByZone(lightweight: Boolean = false, zoneId: Int!): [RoomDto!]!
-  roomsCount(zoneId: Int): Int!
+  roomsCount(search: String, sector: Sector, zoneId: Int): Int!
 
   """Search help entries by keyword, title, or content"""
   searchHelp(filter: HelpEntryFilterInput, query: String!): [HelpEntryDto!]!

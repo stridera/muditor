@@ -70,8 +70,8 @@ const getAlignmentIcon = (alignment?: string) => {
 };
 
 export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const style = getDifficultyStyle(data.difficulty, isDark);
   const alignmentIcon = getAlignmentIcon(data.alignment);
   const [isHovered, setIsHovered] = useState(false);
@@ -164,7 +164,7 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
                 </div>
                 {data.difficulty && (
                   <span
-                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     {data.difficulty}
                   </span>
@@ -178,14 +178,14 @@ export const MobNode: React.FC<NodeProps<MobData>> = ({ data, selected }) => {
               <div className='flex flex-wrap gap-1 mb-2'>
                 {data.race && (
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     {data.race}
                   </span>
                 )}
                 {data.mobClass && (
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     {data.mobClass}
                   </span>

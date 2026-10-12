@@ -5,6 +5,7 @@ import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
 import type { CreatedRoom } from '@/hooks/use-create-room';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { toast } from 'sonner';
+import { friendlyGraphQLMessage } from '@/lib/error-utils';
 import React, {
   useCallback,
   useEffect,
@@ -2380,11 +2381,32 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
       direction: string;
       toZoneId: number;
       toRoomId: number;
+      description?: string;
+      keywords?: string[];
     }) => {
       if (!selectedRoom) return;
+      // A room linked to itself draws its edge across the node and blocks
+      // selecting it, and is never a useful exit.
+      if (
+        exitData.toZoneId === selectedRoom.zoneId &&
+        exitData.toRoomId === selectedRoom.id
+      ) {
+        toast.error('An exit cannot lead back to the same room.');
+        return;
+      }
       setManagingExits(true);
+      const description = exitData.description?.trim() || null;
+      const keywords = exitData.keywords ?? [];
       // Optimistic temp exit
       const tempId = `temp-${Date.now()}-${Math.random().toString(36).slice(2)}`;
+      const rollback = () =>
+        setRooms(rs =>
+          rs.map(r =>
+            r.id === selectedRoom.id
+              ? { ...r, exits: (r.exits || []).filter(e => e.id !== tempId) }
+              : r
+          )
+        );
       setRooms(rs =>
         rs.map(r =>
           r.id === selectedRoom.id
@@ -2397,6 +2419,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
                     direction: exitData.direction,
                     toZoneId: exitData.toZoneId,
                     toRoomId: exitData.toRoomId,
+                    description,
+                    keywords,
                   },
                 ],
               }
@@ -2413,6 +2437,8 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
               direction: exitData.direction,
               toZoneId: exitData.toZoneId,
               toRoomId: exitData.toRoomId,
+              ...(description ? { description } : {}),
+              ...(keywords.length > 0 ? { keywords } : {}),
             },
           }),
         });
@@ -2446,22 +2472,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
             )
           );
         } else {
-          // Rollback optimistic exit
-          setRooms(rs =>
-            rs.map(r =>
-              r.id === selectedRoom.id
-                ? { ...r, exits: (r.exits || []).filter(e => e.id !== tempId) }
-                : r
+          rollback();
+          toast.error(
+            friendlyGraphQLMessage(
+              json.errors?.[0]?.message ?? 'Failed to create exit'
             )
           );
         }
-      } catch {
-        setRooms(rs =>
-          rs.map(r =>
-            r.id === selectedRoom.id
-              ? { ...r, exits: (r.exits || []).filter(e => e.id !== tempId) }
-              : r
-          )
+      } catch (err) {
+        rollback();
+        toast.error(
+          err instanceof Error ? err.message : 'Failed to create exit'
         );
       } finally {
         setManagingExits(false);
@@ -2495,9 +2516,17 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
         const json = await response.json();
         if (!response.ok || json.errors) {
           setRooms(previous); // rollback
+          toast.error(
+            friendlyGraphQLMessage(
+              json.errors?.[0]?.message ?? 'Failed to delete exit'
+            )
+          );
         }
-      } catch {
+      } catch (err) {
         setRooms(previous);
+        toast.error(
+          err instanceof Error ? err.message : 'Failed to delete exit'
+        );
       } finally {
         setManagingExits(false);
       }
@@ -2529,7 +2558,9 @@ const ZoneEditorOrchestratorFlow: React.FC<ZoneEditorOrchestratorProps> = ({
           },
         });
         if (!result.ok) {
-          toast.error(result.error ?? 'Failed to update exit');
+          toast.error(
+            friendlyGraphQLMessage(result.error ?? 'Failed to update exit')
+          );
         }
       } finally {
         setManagingExits(false);

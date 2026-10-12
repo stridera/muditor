@@ -171,9 +171,11 @@ export class CreateObjectInput {
   @IsString()
   name: string;
 
-  @Field()
+  /** Ground text. Optional: the resolver derives "<name> lies here." when blank. */
+  @Field({ nullable: true })
+  @IsOptional()
   @IsString()
-  roomDescription: string;
+  roomDescription?: string;
 
   @Field()
   @IsString()

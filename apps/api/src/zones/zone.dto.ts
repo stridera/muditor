@@ -7,10 +7,13 @@ import {
 } from '@nestjs/graphql';
 import {
   IsBoolean,
+  IsInt,
   IsOptional,
   IsString,
   IsNumber,
   IsEnum,
+  Max,
+  Min,
 } from 'class-validator';
 import { ResetMode, Hemisphere, Climate } from '@muditor/db';
 
@@ -122,7 +125,9 @@ export class ZoneDto {
 @InputType()
 export class CreateZoneInput {
   @Field(() => Int)
-  @IsNumber()
+  @IsInt({ message: 'Zone id must be a whole number' })
+  @Min(0, { message: 'Zone id must be between 0 and 9999' })
+  @Max(9999, { message: 'Zone id must be between 0 and 9999' })
   id: number;
 
   @Field()

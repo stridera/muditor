@@ -15,7 +15,10 @@ import {
   ConsumableEffectInput,
 } from './object-effects.dto';
 import { ObjectsService } from './objects.service';
-import { assertValidObjectValues } from './object-values';
+import {
+  assertValidObjectValues,
+  defaultRoomDescription,
+} from './object-values';
 import { clampSkip, clampTake } from '../common/pagination';
 
 @Resolver(() => ObjectDto)
@@ -123,13 +126,14 @@ export class ObjectsResolver {
   async createObject(
     @Args('data') data: CreateObjectInput
   ): Promise<ObjectDto> {
-    const { zoneId, values, ...objectData } = data;
+    const { zoneId, values, roomDescription, ...objectData } = data;
     assertValidObjectValues(values);
     await this.objectsService.assertIdFree(zoneId, objectData.id);
     const valuesInput =
       values === null ? Prisma.JsonNull : (values ?? undefined);
     const createData: Prisma.ObjectsCreateInput = {
       ...objectData,
+      roomDescription: defaultRoomDescription(roomDescription, objectData.name),
       ...(valuesInput !== undefined ? { values: valuesInput } : {}),
       zones: {
         connect: { id: zoneId },

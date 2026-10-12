@@ -8,6 +8,8 @@ import {
 import { ColoredTextEditor } from '@/components/ColoredTextEditor';
 import { ColoredTextInline } from '@/components/ColoredTextViewer';
 import { useTheme } from 'next-themes';
+import TriggerManager from '@/components/TriggerManager';
+import { normalizeExitEdit } from './exit-update';
 import React, { useEffect, useState } from 'react';
 
 interface Room {
@@ -67,6 +69,16 @@ interface RoomExit {
   hitPoints?: number | null;
 }
 
+// ExitFlag enum values only. CLOSED and LOCKED are ExitState values and are
+// edited through the "Default state" select.
+const EXIT_FLAG_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: 'IS_DOOR', label: '🚪 Door' },
+  { value: 'PICKPROOF', label: '🛡️ Pickproof' },
+  { value: 'HIDDEN', label: '👁️ Hidden' },
+  { value: 'BASHABLE', label: '🔨 Bashable' },
+  { value: 'MAGICPROOF', label: '✨ Magicproof' },
+];
+
 interface PropertyPanelProps {
   room: Room;
   allRooms: Room[];
@@ -80,6 +92,8 @@ interface PropertyPanelProps {
     direction: string;
     toZoneId: number;
     toRoomId: number;
+    description?: string;
+    keywords?: string[];
   }) => void;
   onDeleteExit: (exitId: string) => void;
   onUpdateExit: (exitId: string, exitData: Partial<RoomExit>) => void;
@@ -141,11 +155,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
   viewMode,
   onEntityClick,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
 
   const [activeTab, setActiveTab] = useState<
-    'basic' | 'exits' | 'entities' | 'advanced'
+    'basic' | 'exits' | 'entities' | 'advanced' | 'scripts'
   >('basic');
   const [showCreateExit, setShowCreateExit] = useState(false);
   const [newExitDirection, setNewExitDirection] = useState('NORTH');
@@ -188,10 +202,18 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       }
 
       if (!isNaN(destZoneId) && !isNaN(destRoomId)) {
+        const keywords = newExitKeyword
+          .split(/[\s,]+/)
+          .map(k => k.trim())
+          .filter(k => k);
         onCreateExit({
           direction: newExitDirection,
           toZoneId: destZoneId,
           toRoomId: destRoomId,
+          ...(newExitDescription.trim()
+            ? { description: newExitDescription.trim() }
+            : {}),
+          ...(keywords.length > 0 ? { keywords } : {}),
         });
       }
       setShowCreateExit(false);
@@ -210,12 +232,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
       keyZoneId: exit.keyZoneId ?? null,
       keyId: exit.keyId ?? null,
       flags: exit.flags || [],
+      defaultState: exit.defaultState || 'OPEN',
     });
   };
 
   const handleSaveExitEdit = () => {
     if (editingExitId) {
-      onUpdateExit(editingExitId, editExitData);
+      // Closed / locked are door states (defaultState), not exit flags.
+      onUpdateExit(editingExitId, normalizeExitEdit(editExitData));
       setEditingExitId(null);
       setEditExitData({});
     }
@@ -349,6 +373,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               { key: 'exits', label: 'Exits', icon: '🚪' },
               { key: 'entities', label: 'Entities', icon: '👹' },
               { key: 'advanced', label: 'Advanced', icon: '🔧' },
+              { key: 'scripts', label: 'Scripts', icon: '📜' },
             ].map(tab => (
               <button
                 key={tab.key}
@@ -739,7 +764,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
             {/* Current Exits */}
             <div>
               <div className='flex items-center justify-between mb-3'>
-                <h4 className='text-sm font-medium text-gray-700'>
+                <h4 className='text-sm font-medium text-foreground'>
                   Current Exits
                 </h4>
                 <button
@@ -752,10 +777,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               </div>
 
               {room.exits.length === 0 ? (
-                <div className='text-center py-8 text-gray-500'>
+                <div className='text-center py-8 text-muted-foreground'>
                   <div className='text-2xl mb-2'>🚪</div>
                   <p className='text-sm'>No exits defined</p>
-                  <p className='text-xs text-gray-400 mt-1'>
+                  <p className='text-xs text-muted-foreground mt-1'>
                     Add exits to connect this room to others
                   </p>
                 </div>
@@ -778,7 +803,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                     return (
                       <div
                         key={exit.id || index}
-                        className='p-3 bg-gray-50 rounded-lg border'
+                        className='p-3 bg-muted rounded-lg border border-border'
                       >
                         <div className='flex items-center justify-between mb-2'>
                           <div className='flex items-center gap-2'>
@@ -866,7 +891,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           exit.keyId != null) && (
                           <div className='flex flex-wrap gap-1 mt-2'>
                             {exit.flags?.includes('IS_DOOR') && (
-                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
+                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-foreground px-2 py-0.5 rounded-full border border-input'>
                                 🚪 Door
                               </span>
                             )}
@@ -886,7 +911,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               </span>
                             )}
                             {exit.flags?.includes('HIDDEN') && (
-                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-gray-700 px-2 py-0.5 rounded-full border border-gray-300'>
+                              <span className='inline-flex items-center gap-1 text-xs bg-gray-100 text-foreground px-2 py-0.5 rounded-full border border-input'>
                                 👁️ Hidden
                               </span>
                             )}
@@ -914,10 +939,10 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                         {/* Exit Description */}
                         {exit.description && (
                           <div className='mt-2 p-2 bg-gray-50 rounded border border-gray-200'>
-                            <div className='text-xs font-medium text-gray-500 mb-1'>
+                            <div className='text-xs font-medium text-muted-foreground mb-1'>
                               Description:
                             </div>
-                            <div className='text-xs text-gray-700 italic'>
+                            <div className='text-xs text-foreground italic'>
                               {exit.description}
                             </div>
                           </div>
@@ -925,15 +950,15 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
                         {/* Exit Editing Form */}
                         {editingExitId === exit.id && (
-                          <div className='mt-3 p-3 bg-white border border-blue-200 rounded-lg'>
-                            <h6 className='text-sm font-medium text-gray-700 mb-3'>
+                          <div className='mt-3 p-3 bg-card border border-primary/40 rounded-lg'>
+                            <h6 className='text-sm font-medium text-foreground mb-3'>
                               Edit Exit Properties
                             </h6>
 
                             <div className='space-y-3'>
                               {/* Description */}
                               <div>
-                                <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                <label className='block text-xs font-medium text-foreground mb-1'>
                                   Description
                                 </label>
                                 <input
@@ -946,13 +971,13 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                     })
                                   }
                                   placeholder='e.g., A wooden door leads north'
-                                  className='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
+                                  className='w-full px-2 py-1 text-sm border border-input rounded bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500'
                                 />
                               </div>
 
                               {/* Keywords */}
                               <div>
-                                <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                <label className='block text-xs font-medium text-foreground mb-1'>
                                   Keywords (comma-separated)
                                 </label>
                                 <input
@@ -970,63 +995,78 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                     })
                                   }
                                   placeholder='e.g., door, gate, entrance'
-                                  className='w-full px-2 py-1 text-sm border border-gray-300 rounded focus:outline-none focus:ring-1 focus:ring-blue-500'
+                                  className='w-full px-2 py-1 text-sm border border-input rounded bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500'
                                 />
                               </div>
 
                               {/* Exit Flags */}
                               <div className='space-y-2'>
-                                <label className='block text-xs font-medium text-gray-700 mb-1'>
+                                <label className='block text-xs font-medium text-foreground mb-1'>
                                   Exit Flags
                                 </label>
 
-                                {[
-                                  'IS_DOOR',
-                                  'CLOSED',
-                                  'LOCKED',
-                                  'PICKPROOF',
-                                  'HIDDEN',
-                                ].map(flag => (
+                                {EXIT_FLAG_OPTIONS.map(({ value, label }) => (
                                   <div
-                                    key={flag}
+                                    key={value}
                                     className='flex items-center gap-2'
                                   >
                                     <input
                                       type='checkbox'
-                                      id={`${flag}-${exit.id}`}
+                                      id={`${value}-${exit.id}`}
                                       checked={(
                                         editExitData.flags || []
-                                      ).includes(flag)}
+                                      ).includes(value)}
                                       onChange={e => {
                                         const currentFlags =
                                           editExitData.flags || [];
                                         setEditExitData({
                                           ...editExitData,
                                           flags: e.target.checked
-                                            ? [...currentFlags, flag]
+                                            ? [...currentFlags, value]
                                             : currentFlags.filter(
-                                                f => f !== flag
+                                                f => f !== value
                                               ),
                                         });
                                       }}
-                                      className='rounded border-gray-300 text-blue-600 focus:ring-blue-500'
+                                      className='rounded border-input text-blue-600 focus:ring-blue-500'
                                     />
                                     <label
-                                      htmlFor={`${flag}-${exit.id}`}
-                                      className='text-xs text-gray-700'
+                                      htmlFor={`${value}-${exit.id}`}
+                                      className='text-xs text-foreground'
                                     >
-                                      {flag === 'IS_DOOR'
-                                        ? '🚪 Door'
-                                        : flag === 'CLOSED'
-                                          ? '🚧 Closed'
-                                          : flag === 'LOCKED'
-                                            ? '🔒 Locked'
-                                            : flag === 'PICKPROOF'
-                                              ? '🛡️ Pickproof'
-                                              : '👁️ Hidden'}
+                                      {label}
                                     </label>
                                   </div>
                                 ))}
+                              </div>
+
+                              {/* Door state (closed / locked are states, not flags) */}
+                              <div>
+                                <label
+                                  htmlFor={`state-${exit.id}`}
+                                  className='block text-xs font-medium text-foreground mb-1'
+                                >
+                                  Default state
+                                </label>
+                                <select
+                                  id={`state-${exit.id}`}
+                                  value={editExitData.defaultState ?? 'OPEN'}
+                                  onChange={e =>
+                                    setEditExitData({
+                                      ...editExitData,
+                                      defaultState: e.target.value,
+                                    })
+                                  }
+                                  className='w-full px-2 py-1 text-sm border border-input rounded bg-background text-foreground focus:outline-none focus:ring-1 focus:ring-blue-500'
+                                >
+                                  <option value='OPEN'>Open</option>
+                                  <option value='CLOSED'>
+                                    Closed (makes it a door)
+                                  </option>
+                                  <option value='LOCKED'>
+                                    Locked (makes it a door)
+                                  </option>
+                                </select>
                               </div>
                             </div>
 
@@ -1039,7 +1079,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               </button>
                               <button
                                 onClick={handleCancelExitEdit}
-                                className='px-2 py-1 text-xs border border-gray-300 rounded hover:bg-gray-50 transition-colors'
+                                className='px-2 py-1 text-xs border border-input rounded hover:bg-muted transition-colors'
                               >
                                 Cancel
                               </button>
@@ -1056,20 +1096,20 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
             {/* Create Exit Form */}
             {showCreateExit && (
               <div className='border-t pt-4'>
-                <h5 className='text-sm font-medium text-gray-700 mb-3'>
+                <h5 className='text-sm font-medium text-foreground mb-3'>
                   Create New Exit
                 </h5>
 
                 <div className='space-y-3'>
                   {/* Direction */}
                   <div>
-                    <label className='block text-xs font-medium text-gray-700 mb-1'>
+                    <label className='block text-xs font-medium text-foreground mb-1'>
                       Direction
                     </label>
                     <select
                       value={newExitDirection}
                       onChange={e => setNewExitDirection(e.target.value)}
-                      className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      className='w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                     >
                       {directionOptions.map(direction => (
                         <option key={direction.value} value={direction.value}>
@@ -1081,7 +1121,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
                   {/* Destination */}
                   <div>
-                    <label className='block text-xs font-medium text-gray-700 mb-1'>
+                    <label className='block text-xs font-medium text-foreground mb-1'>
                       Destination Zone & Room
                     </label>
                     <div className='flex gap-2'>
@@ -1100,7 +1140,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                                 : roomId
                           );
                         }}
-                        className='w-24 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        className='w-24 px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                         title='Zone ID'
                       />
                       <input
@@ -1118,11 +1158,11 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             roomId ? `${zoneId}:${roomId}` : ''
                           );
                         }}
-                        className='flex-1 px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        className='flex-1 px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                         title='Room ID'
                       />
                     </div>
-                    <p className='text-xs text-gray-500 mt-1'>
+                    <p className='text-xs text-muted-foreground mt-1'>
                       💡 Enter zone:room (e.g., {room.zoneId}:25 for same zone,
                       30:43 for different zone)
                     </p>
@@ -1131,7 +1171,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                   {/* Quick select from current zone */}
                   {availableRooms.length > 0 && (
                     <div>
-                      <label className='block text-xs font-medium text-gray-700 mb-1'>
+                      <label className='block text-xs font-medium text-foreground mb-1'>
                         Or select from current zone:
                       </label>
                       <select
@@ -1141,7 +1181,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                             : newExitDestination
                         }
                         onChange={e => setNewExitDestination(e.target.value)}
-                        className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                        className='w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                       >
                         <option value=''>Select from current zone...</option>
                         {availableRooms.map(r => (
@@ -1155,7 +1195,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
 
                   {/* Description (optional) */}
                   <div>
-                    <label className='block text-xs font-medium text-gray-700 mb-1'>
+                    <label className='block text-xs font-medium text-foreground mb-1'>
                       Exit Description (Optional)
                     </label>
                     <input
@@ -1163,13 +1203,13 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                       value={newExitDescription}
                       onChange={e => setNewExitDescription(e.target.value)}
                       placeholder='e.g., A wooden door leads north'
-                      className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      className='w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
 
                   {/* Keyword (optional) */}
                   <div>
-                    <label className='block text-xs font-medium text-gray-700 mb-1'>
+                    <label className='block text-xs font-medium text-foreground mb-1'>
                       Keywords (Optional)
                     </label>
                     <input
@@ -1177,7 +1217,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                       value={newExitKeyword}
                       onChange={e => setNewExitKeyword(e.target.value)}
                       placeholder='e.g., door gate'
-                      className='w-full px-3 py-2 text-sm border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
+                      className='w-full px-3 py-2 text-sm border border-input rounded-md bg-background text-foreground focus:outline-none focus:ring-2 focus:ring-blue-500'
                     />
                   </div>
                 </div>
@@ -1194,7 +1234,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                   </button>
                   <button
                     onClick={() => setShowCreateExit(false)}
-                    className='px-3 py-2 text-sm border border-gray-300 rounded-md hover:bg-gray-50 transition-colors'
+                    className='px-3 py-2 text-sm border border-input rounded-md hover:bg-muted transition-colors'
                   >
                     Cancel
                   </button>
@@ -1202,6 +1242,15 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
               </div>
             )}
           </div>
+        )}
+
+        {viewMode === 'edit' && activeTab === 'scripts' && (
+          <TriggerManager
+            entityType='WORLD'
+            entityZoneId={room.zoneId}
+            entityId={room.id}
+            entityName={`Room ${room.zoneId}:${room.id}`}
+          />
         )}
 
         {viewMode === 'edit' && activeTab === 'entities' && (
@@ -1251,14 +1300,14 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                           <div className='flex gap-1'>
                             {mob.race && (
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}
+                                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white/60 text-gray-700'}`}
                               >
                                 {mob.race}
                               </span>
                             )}
                             {mob.mobClass && (
                               <span
-                                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}
+                                className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white/60 text-gray-700'}`}
                               >
                                 {mob.mobClass}
                               </span>
@@ -1338,7 +1387,7 @@ export const PropertyPanel: React.FC<PropertyPanelProps> = ({
                               {obj.keywords.map((keyword, idx) => (
                                 <span
                                   key={idx}
-                                  className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white bg-opacity-60 text-gray-700'}`}
+                                  className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 text-gray-300' : 'bg-white/60 text-gray-700'}`}
                                 >
                                   {keyword}
                                 </span>

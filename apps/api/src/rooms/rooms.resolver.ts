@@ -16,7 +16,13 @@ import {
   ResolveField,
   Resolver,
 } from '@nestjs/graphql';
-import { Direction, ExitFlag, ExitState, type Users } from '@muditor/db';
+import {
+  Direction,
+  ExitFlag,
+  ExitState,
+  Sector,
+  type Users,
+} from '@muditor/db';
 // Import from barrel to ensure mapper files are included in program graph for tooling
 import { mapRoom } from '../common/mappers';
 import { ObjectSummaryDto } from '../mobs/mob-reset.dto';
@@ -161,12 +167,16 @@ export class RoomsResolver {
     })
     lightweight?: boolean,
     @CurrentUser() user?: Users | null,
-    @Info() info?: GraphQLResolveInfo
+    @Info() info?: GraphQLResolveInfo,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('sector', { type: () => Sector, nullable: true }) sector?: Sector
   ): Promise<RoomDto[]> {
     const params: {
       skip?: number;
       take?: number;
       zoneId?: number;
+      search?: string;
+      sector?: Sector;
       lightweight?: boolean;
       hideGodZones: boolean;
       plan?: RoomLoadPlan;
@@ -186,6 +196,8 @@ export class RoomsResolver {
     if (skip !== undefined) params.skip = clampSkip(skip);
     params.take = clampTake(take, cap);
     if (zoneId !== undefined) params.zoneId = zoneId;
+    if (search?.trim()) params.search = search.trim().slice(0, 100);
+    if (sector) params.sector = sector;
     if (lightweight !== undefined) params.lightweight = lightweight;
     const rooms = await this.roomsService.findAll(params);
     if (rooms.length >= MAX_BULK_PAGE_SIZE) {
@@ -235,9 +247,14 @@ export class RoomsResolver {
   @UseGuards(OptionalJwtAuthGuard)
   async count(
     @Args('zoneId', { type: () => Int, nullable: true }) zoneId?: number,
-    @CurrentUser() user?: Users | null
+    @CurrentUser() user?: Users | null,
+    @Args('search', { type: () => String, nullable: true }) search?: string,
+    @Args('sector', { type: () => Sector, nullable: true }) sector?: Sector
   ): Promise<number> {
-    return this.roomsService.count(zoneId, hidesGodZones(user ?? null));
+    return this.roomsService.count(zoneId, hidesGodZones(user ?? null), {
+      ...(search?.trim() && { search: search.trim().slice(0, 100) }),
+      ...(sector && { sector }),
+    });
   }
 
   @Mutation(() => RoomDto)

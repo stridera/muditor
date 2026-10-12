@@ -196,7 +196,7 @@ describe('Rooms god zone visibility', () => {
     });
     expect(roomsService.findOne).toHaveBeenLastCalledWith(12, 4, true);
     expect(roomsService.findByZone).toHaveBeenLastCalledWith(12, false, true);
-    expect(roomsService.count).toHaveBeenLastCalledWith(undefined, true);
+    expect(roomsService.count).toHaveBeenLastCalledWith(undefined, true, {});
 
     const imm = user(UserRole.IMMORTAL);
     await resolver.findAll(undefined, undefined, undefined, true, imm);
@@ -208,7 +208,7 @@ describe('Rooms god zone visibility', () => {
     });
     expect(roomsService.findOne).toHaveBeenLastCalledWith(12, 4, false);
     expect(roomsService.findByZone).toHaveBeenLastCalledWith(12, false, false);
-    expect(roomsService.count).toHaveBeenLastCalledWith(undefined, false);
+    expect(roomsService.count).toHaveBeenLastCalledWith(undefined, false, {});
   });
 
   it('room queries use optional auth', () => {

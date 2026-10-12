@@ -88,8 +88,8 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
   data,
   selected,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const style = getRarityStyle(data.rarity, isDark);
   const typeIcon = getObjectTypeIcon(data.type);
   const [isHovered, setIsHovered] = useState(false);
@@ -191,7 +191,7 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
                 </div>
                 {data.rarity && (
                   <span
-                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`px-1.5 py-0.5 rounded text-xs font-medium capitalize ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     {data.rarity}
                   </span>
@@ -205,14 +205,14 @@ export const ObjectNode: React.FC<NodeProps<ObjectData>> = ({
               <div className='flex flex-wrap gap-1 mb-2'>
                 {data.material && (
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     {data.material}
                   </span>
                 )}
                 {data.level !== undefined && data.level !== null && (
                   <span
-                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700 bg-opacity-80' : 'bg-white bg-opacity-60'}`}
+                    className={`text-xs px-2 py-0.5 rounded-full ${isDark ? 'bg-gray-700/80' : 'bg-white/60'}`}
                   >
                     Lvl {data.level}
                   </span>

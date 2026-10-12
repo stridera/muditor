@@ -164,3 +164,11 @@ export function parseKeywords(text: string): string[] {
 export function formatKeywords(keywords: string[]): string {
   return keywords.join(', ');
 }
+
+/** Quest names are required; markup-only or whitespace-only names do not count. */
+export function validateQuestName(
+  name: string,
+  strip: (text: string) => string = text => text
+): string | null {
+  return strip(name).trim().length > 0 ? null : 'Quest name is required.';
+}

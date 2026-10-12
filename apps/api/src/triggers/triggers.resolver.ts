@@ -128,7 +128,9 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto)
   // The trigger's own zone must be writable too, not only the target entity's.
-  @RequireZoneWrite({ keys: ['triggerZoneId', 'mobZoneId', 'objectZoneId'] })
+  @RequireZoneWrite({
+    keys: ['triggerZoneId', 'mobZoneId', 'objectZoneId', 'roomZoneId'],
+  })
   async attachTrigger(
     @Args('input') input: AttachTriggerInput,
     @CurrentUser() user: Users
@@ -139,9 +141,11 @@ export class TriggersResolver {
 
   @Mutation(() => TriggerDto, {
     description:
-      'Detach a trigger from ONE mob (mobZoneId+mobId) or ONE object (objectZoneId+objectId)',
+      'Detach a trigger from ONE mob (mobZoneId+mobId), ONE object (objectZoneId+objectId) or ONE room (roomZoneId+roomId)',
   })
-  @RequireZoneWrite({ keys: ['zoneId', 'mobZoneId', 'objectZoneId'] })
+  @RequireZoneWrite({
+    keys: ['zoneId', 'mobZoneId', 'objectZoneId', 'roomZoneId'],
+  })
   async detachTrigger(
     @Args('zoneId', { type: () => Int }) zoneId: number,
     @Args('id', { type: () => Int }) id: number,
@@ -153,12 +157,16 @@ export class TriggersResolver {
     objectZoneId: number | undefined,
     @Args('objectId', { type: () => Int, nullable: true })
     objectId: number | undefined,
+    @Args('roomZoneId', { type: () => Int, nullable: true })
+    roomZoneId: number | undefined,
+    @Args('roomId', { type: () => Int, nullable: true })
+    roomId: number | undefined,
     @CurrentUser() user: Users
   ) {
     const trigger = await this.triggersService.detachFromEntity(
       zoneId,
       id,
-      { mobZoneId, mobId, objectZoneId, objectId },
+      { mobZoneId, mobId, objectZoneId, objectId, roomZoneId, roomId },
       user.id
     );
     return trigger;

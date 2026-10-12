@@ -232,8 +232,8 @@ const RoomNodeComponent: React.FC<NodeProps<RoomData>> = ({
   data,
   selected,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   // Use pre-computed constant styles instead of recalculating
   const sectorStyles = isDark ? SECTOR_STYLES_DARK : SECTOR_STYLES_LIGHT;
 
@@ -499,9 +499,9 @@ const RoomNodeComponent: React.FC<NodeProps<RoomData>> = ({
                   className={`px-1.5 py-0.5 rounded text-xs font-bold ${
                     isCurrentFloor
                       ? zLevel > 0
-                        ? 'bg-blue-500 bg-opacity-80 text-white'
-                        : 'bg-red-500 bg-opacity-80 text-white'
-                      : 'bg-gray-400 bg-opacity-60 text-gray-100'
+                        ? 'bg-blue-500/80 text-white'
+                        : 'bg-red-500/80 text-white'
+                      : 'bg-gray-400/60 text-gray-100'
                   }`}
                 >
                   Z{zLevel > 0 ? '+' : ''}
@@ -539,19 +539,19 @@ const RoomNodeComponent: React.FC<NodeProps<RoomData>> = ({
           {/* Entity indicators */}
           <div className='flex gap-2'>
             {mobCount > 0 && (
-              <div className='flex items-center gap-1 bg-red-500 bg-opacity-20 px-2 py-1 rounded-full'>
+              <div className='flex items-center gap-1 bg-red-500/20 px-2 py-1 rounded-full'>
                 <span className='text-xs'>👹</span>
                 <span className='text-xs font-medium'>{mobCount}</span>
               </div>
             )}
             {objectCount > 0 && (
-              <div className='flex items-center gap-1 bg-blue-500 bg-opacity-20 px-2 py-1 rounded-full'>
+              <div className='flex items-center gap-1 bg-blue-500/20 px-2 py-1 rounded-full'>
                 <span className='text-xs'>📦</span>
                 <span className='text-xs font-medium'>{objectCount}</span>
               </div>
             )}
             {shopCount > 0 && (
-              <div className='flex items-center gap-1 bg-green-500 bg-opacity-20 px-2 py-1 rounded-full'>
+              <div className='flex items-center gap-1 bg-green-500/20 px-2 py-1 rounded-full'>
                 <span className='text-xs'>🏪</span>
                 <span className='text-xs font-medium'>{shopCount}</span>
               </div>

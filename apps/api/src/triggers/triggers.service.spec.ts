@@ -1,3 +1,4 @@
+import { ScriptType } from '@muditor/db';
 import { BadRequestException } from '@nestjs/common';
 import { TriggersService } from './triggers.service';
 
@@ -105,5 +106,61 @@ describe('TriggersService.attachToEntity', () => {
       } as never)
     ).rejects.toBeInstanceOf(BadRequestException);
     expect(prisma.triggers.update).not.toHaveBeenCalled();
+  });
+});
+
+describe('TriggersService room attachments', () => {
+  const setup = () => {
+    const prisma = {
+      roomTriggers: {
+        upsert: jest.fn().mockResolvedValue({}),
+        deleteMany: jest.fn().mockResolvedValue({ count: 1 }),
+      },
+      triggers: { update: jest.fn().mockResolvedValue({ id: 5 }) },
+    };
+    const service = new TriggersService(
+      prisma as unknown as ConstructorParameters<typeof TriggersService>[0]
+    );
+    return { service, prisma };
+  };
+
+  it('attaches a WORLD trigger to one room', async () => {
+    const { service, prisma } = setup();
+    await service.attachToEntity({
+      triggerZoneId: 30,
+      triggerId: 5,
+      attachType: ScriptType.WORLD,
+      roomZoneId: 31,
+      roomId: 0,
+    });
+    expect(prisma.roomTriggers.upsert).toHaveBeenCalledWith(
+      expect.objectContaining({
+        create: {
+          roomZoneId: 31,
+          roomId: 0,
+          triggerZoneId: 30,
+          triggerId: 5,
+        },
+      })
+    );
+  });
+
+  it('requires a room key for WORLD triggers', async () => {
+    const { service } = setup();
+    await expect(
+      service.attachToEntity({
+        triggerZoneId: 30,
+        triggerId: 5,
+        attachType: ScriptType.WORLD,
+      })
+    ).rejects.toBeInstanceOf(BadRequestException);
+  });
+
+  it('detaches from exactly one room', async () => {
+    const { service, prisma } = setup();
+    await service.detachFromEntity(30, 5, { roomZoneId: 31, roomId: 2 });
+    expect(prisma.roomTriggers.deleteMany).toHaveBeenCalledWith({
+      where: { triggerZoneId: 30, triggerId: 5, roomZoneId: 31, roomId: 2 },
+    });
   });
 });

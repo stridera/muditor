@@ -116,9 +116,19 @@ function ZonePicker() {
 
   return (
     <div className='relative' ref={dropdownRef}>
-      <button
+      {/* A div, not a button: it contains the clear-zone button, and a button
+          nested in a button is invalid HTML (hydration error). */}
+      <div
+        role='button'
+        tabIndex={0}
         onClick={() => setOpen(!open)}
-        className={`flex items-center gap-1.5 px-2 py-1 rounded-md text-sm transition-colors ${
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            e.preventDefault();
+            setOpen(!open);
+          }
+        }}
+        className={`flex cursor-pointer items-center gap-1.5 px-2 py-1 rounded-md text-sm transition-colors ${
           isInZoneContext
             ? 'text-primary font-medium hover:bg-primary/10'
             : 'text-muted-foreground hover:text-foreground hover:bg-accent'
@@ -144,7 +154,7 @@ function ZonePicker() {
             <ChevronDown className='h-3 w-3' />
           </>
         )}
-      </button>
+      </div>
 
       {open && (
         <div className='absolute top-full left-0 mt-1 w-72 bg-popover border border-border rounded-lg shadow-lg z-50 overflow-hidden animate-fade-in'>

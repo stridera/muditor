@@ -31,7 +31,7 @@ interface RoomExitResult {
   hitPoints: number | null;
 }
 
-import { ExitState, Sector } from '@muditor/db';
+import { ExitState, Prisma, Sector } from '@muditor/db';
 
 interface RoomServiceResultBase {
   id: number;
@@ -239,11 +239,18 @@ export class RoomsService {
     zoneId?: number;
     lightweight?: boolean;
     hideGodZones?: boolean;
+    /** Case-insensitive match on name, description or exact room id. */
+    search?: string;
+    sector?: Sector;
     /** Relations the caller will read; omitted = load everything. */
     plan?: RoomLoadPlan;
   }): Promise<RoomServiceResult[]> {
-    const { skip, take, zoneId, hideGodZones, plan } = params || {};
-    const lightweight = params?.lightweight || plan?.lightweight;
+    const { skip, take, zoneId, hideGodZones, plan, search, sector } =
+      params || {};
+    const filtered = Boolean(search?.trim()) || sector !== undefined;
+    // The raw lightweight loader has no filter support; filtered listings use
+    // the Prisma path (the plan still limits the relations that load).
+    const lightweight = !filtered && (params?.lightweight || plan?.lightweight);
     if (lightweight) {
       const clauses: string[] = [];
       if (zoneId !== undefined) clauses.push(`r.zone_id = ${zoneId}`);
@@ -345,17 +352,16 @@ export class RoomsService {
     }
     const query: {
       include: typeof RoomsService.prototype.includeFull;
-      orderBy: { id: 'asc' };
-      where?: { zoneId?: number; zones?: { isGodZone: false } };
+      orderBy: Array<{ zoneId?: 'asc'; id?: 'asc' }>;
+      where?: Prisma.RoomWhereInput;
       skip?: number;
       take?: number;
-    } = { include: this.includeFor(plan), orderBy: { id: 'asc' } };
-    if (zoneId !== undefined || hideGodZones) {
-      query.where = {
-        ...(zoneId !== undefined && { zoneId }),
-        ...(hideGodZones && { zones: { isGodZone: false } }),
-      };
-    }
+    } = {
+      include: this.includeFor(plan),
+      orderBy: [{ zoneId: 'asc' }, { id: 'asc' }],
+    };
+    const where = this.listWhere({ zoneId, hideGodZones, search, sector });
+    if (Object.keys(where).length > 0) query.where = where;
     if (skip !== undefined) query.skip = skip;
     if (take !== undefined) query.take = take;
     const rooms = await this.db.room.findMany(query);
@@ -403,13 +409,38 @@ export class RoomsService {
     return this.findMany({ zoneId, lightweight, hideGodZones });
   }
 
-  async count(zoneId?: number, hideGodZones = false): Promise<number> {
+  async count(
+    zoneId?: number,
+    hideGodZones = false,
+    filter: { search?: string; sector?: Sector } = {}
+  ): Promise<number> {
     return this.db.room.count({
-      where: {
-        ...(zoneId !== undefined && { zoneId }),
-        ...(hideGodZones && { zones: { isGodZone: false } }),
-      },
+      where: this.listWhere({ zoneId, hideGodZones, ...filter }),
     });
+  }
+
+  /** Shared WHERE for the paged room list and its count. */
+  private listWhere(opts: {
+    zoneId?: number | undefined;
+    hideGodZones?: boolean | undefined;
+    search?: string | undefined;
+    sector?: Sector | undefined;
+  }): Prisma.RoomWhereInput {
+    const term = opts.search?.trim();
+    const or: Prisma.RoomWhereInput[] = [];
+    if (term) {
+      or.push(
+        { name: { contains: term, mode: 'insensitive' } },
+        { plainRoomDescription: { contains: term, mode: 'insensitive' } }
+      );
+      if (/^\d{1,9}$/.test(term)) or.push({ id: Number(term) });
+    }
+    return {
+      ...(opts.zoneId !== undefined && { zoneId: opts.zoneId }),
+      ...(opts.hideGodZones && { zones: { isGodZone: false } }),
+      ...(opts.sector !== undefined && { sector: opts.sector }),
+      ...(or.length > 0 && { OR: or }),
+    };
   }
 
   async create(data: CreateRoomInput): Promise<RoomServiceResult> {

@@ -47,8 +47,8 @@ export const EntityPalette: React.FC<EntityPaletteProps> = ({
   onObjectDragStart,
   zoneId,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const [activeTab, setActiveTab] = useState<'mobs' | 'objects'>('mobs');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('');

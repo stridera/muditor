@@ -35,7 +35,10 @@ import {
   Search,
   Trash2,
 } from 'lucide-react';
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
+import { toast } from 'sonner';
+import { useListState } from '@/hooks/use-list-state';
+import { extractErrorMessage } from '@/lib/error-utils';
 
 // GraphQL queries
 const GET_TRIGGERS = gql(`
@@ -189,6 +192,10 @@ function SortIcon({
 }
 
 function ScriptsPageContent() {
+  const list = useListState();
+  // Zone for a NEW script: starts from the selected zone and can be changed
+  // while creating. Scripts used to be saved to zone 1 regardless.
+  const [newScriptZone, setNewScriptZone] = useState('');
   const [searchTerm, setSearchTerm] = useState('');
   const [filterType, setFilterType] = useState<string>('all');
   const [filterReview, setFilterReview] = useState<string>('all');
@@ -288,6 +295,7 @@ function ScriptsPageContent() {
   }, [isEditing, handleCancel]);
 
   const handleNewScript = () => {
+    setNewScriptZone(list.zone != null ? String(list.zone) : '');
     setSelectedTrigger(null);
     setIsCreating(true);
     setIsEditing(true);
@@ -303,10 +311,15 @@ function ScriptsPageContent() {
     try {
       const flagsArray = script.flags ?? [];
       if (isCreating) {
+        const zoneId = parseInt(newScriptZone, 10);
+        if (!Number.isInteger(zoneId) || zoneId < 0) {
+          toast.error('Choose the zone this script belongs to.');
+          return;
+        }
         await createTrigger({
           variables: {
             input: {
-              zoneId: script.zoneId || 1,
+              zoneId,
               name: script.name || 'New Script',
               attachType:
                 (script.attachType as 'MOB' | 'OBJECT' | 'WORLD') || 'MOB',
@@ -344,6 +357,7 @@ function ScriptsPageContent() {
       setIsCreating(false);
     } catch (err) {
       console.error('Failed to save script:', err);
+      toast.error(`Could not save the script: ${extractErrorMessage(err)}`);
     }
   };
 
@@ -392,7 +406,20 @@ function ScriptsPageContent() {
                 </span>
               )}
             </h1>
-            <div className='space-x-2'>
+            <div className='flex items-center gap-2'>
+              {isCreating && (
+                <label className='flex items-center gap-2 text-sm text-muted-foreground'>
+                  Zone
+                  <Input
+                    type='number'
+                    min={0}
+                    aria-label='Zone for the new script'
+                    value={newScriptZone}
+                    onChange={e => setNewScriptZone(e.target.value)}
+                    className='w-24'
+                  />
+                </label>
+              )}
               <Button variant='outline' onClick={handleCancel}>
                 Cancel
               </Button>
@@ -692,7 +719,11 @@ function ScriptsPageContent() {
 export default function ScriptsPage() {
   return (
     <PermissionGuard requireCoder={true}>
-      <ScriptsPageContent />
+      <Suspense
+        fallback={<div className='p-6 text-muted-foreground'>Loading...</div>}
+      >
+        <ScriptsPageContent />
+      </Suspense>
     </PermissionGuard>
   );
 }

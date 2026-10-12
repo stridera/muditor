@@ -1,5 +1,6 @@
 import {
   buildUpdateRoomExitInput,
+  normalizeExitEdit,
   updateExitInPlace,
   type ExitLike,
 } from '../exit-update';
@@ -134,5 +135,27 @@ describe('updateExitInPlace', () => {
     });
     expect(result).toEqual({ ok: false, error: 'offline' });
     expect(state.get()[0]!.exits).toEqual([lockedDoor]);
+  });
+});
+
+describe('normalizeExitEdit', () => {
+  it('drops CLOSED / LOCKED from the flags (they are not ExitFlag values)', () => {
+    const out = normalizeExitEdit({
+      flags: ['IS_DOOR', 'CLOSED', 'LOCKED', 'PICKPROOF'],
+      defaultState: 'CLOSED',
+    });
+    expect(out.flags).toEqual(['IS_DOOR', 'PICKPROOF']);
+    expect(out.defaultState).toBe('CLOSED');
+  });
+
+  it('makes a closed or locked exit a door', () => {
+    expect(
+      normalizeExitEdit({ flags: [], defaultState: 'LOCKED' }).flags
+    ).toEqual(['IS_DOOR']);
+  });
+
+  it('keeps an open exit as it is', () => {
+    const out = normalizeExitEdit({ flags: ['HIDDEN'] });
+    expect(out).toEqual({ flags: ['HIDDEN'], defaultState: 'OPEN' });
   });
 });

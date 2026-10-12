@@ -278,6 +278,14 @@ export class TriggersService {
       );
     }
     if (
+      data.attachType === ScriptType.WORLD &&
+      (data.roomId == null || data.roomZoneId == null)
+    ) {
+      throw new BadRequestException(
+        'Attaching to a room requires roomZoneId and roomId'
+      );
+    }
+    if (
       data.mobId != null &&
       data.mobZoneId != null &&
       data.attachType === ScriptType.MOB
@@ -321,6 +329,28 @@ export class TriggersService {
         },
         update: {},
       });
+    } else if (
+      data.roomId != null &&
+      data.roomZoneId != null &&
+      data.attachType === ScriptType.WORLD
+    ) {
+      await this.prisma.roomTriggers.upsert({
+        where: {
+          roomZoneId_roomId_triggerZoneId_triggerId: {
+            roomZoneId: data.roomZoneId,
+            roomId: data.roomId,
+            triggerZoneId: data.triggerZoneId,
+            triggerId: data.triggerId,
+          },
+        },
+        create: {
+          roomZoneId: data.roomZoneId,
+          roomId: data.roomId,
+          triggerZoneId: data.triggerZoneId,
+          triggerId: data.triggerId,
+        },
+        update: {},
+      });
     }
 
     // Optionally bump attachType + updatedBy on the trigger row
@@ -354,15 +384,19 @@ export class TriggersService {
       mobId?: number | null | undefined;
       objectZoneId?: number | null | undefined;
       objectId?: number | null | undefined;
+      roomZoneId?: number | null | undefined;
+      roomId?: number | null | undefined;
     },
     userId?: string
   ) {
-    const { mobZoneId, mobId, objectZoneId, objectId } = entity;
+    const { mobZoneId, mobId, objectZoneId, objectId, roomZoneId, roomId } =
+      entity;
     const hasMob = mobZoneId != null && mobId != null;
     const hasObject = objectZoneId != null && objectId != null;
-    if (hasMob === hasObject) {
+    const hasRoom = roomZoneId != null && roomId != null;
+    if ([hasMob, hasObject, hasRoom].filter(Boolean).length !== 1) {
       throw new BadRequestException(
-        'Specify exactly one entity to detach from: mobZoneId+mobId or objectZoneId+objectId'
+        'Specify exactly one entity to detach from: mobZoneId+mobId, objectZoneId+objectId or roomZoneId+roomId'
       );
     }
 
@@ -373,6 +407,10 @@ export class TriggersService {
     } else if (objectZoneId != null && objectId != null) {
       await this.prisma.objectTriggers.deleteMany({
         where: { triggerZoneId: zoneId, triggerId: id, objectZoneId, objectId },
+      });
+    } else if (roomZoneId != null && roomId != null) {
+      await this.prisma.roomTriggers.deleteMany({
+        where: { triggerZoneId: zoneId, triggerId: id, roomZoneId, roomId },
       });
     }
 
@@ -471,9 +509,12 @@ export class TriggersService {
           },
         };
       case ScriptType.WORLD:
+        // Room scripts: linked to one room through RoomTriggers
         return {
           attachType: ScriptType.WORLD,
-          zoneId,
+          roomTriggers: {
+            some: { roomZoneId: zoneId, roomId: entityId },
+          },
         };
       default:
         throw new Error(`Unknown attachment type: ${attachType}`);

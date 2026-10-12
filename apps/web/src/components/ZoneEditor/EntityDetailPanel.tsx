@@ -86,8 +86,8 @@ export const EntityDetailPanel: React.FC<EntityDetailPanelProps> = ({
   onJumpToMob,
   onRemove,
 }) => {
-  const { theme } = useTheme();
-  const isDark = theme === 'dark';
+  const { resolvedTheme } = useTheme();
+  const isDark = resolvedTheme === 'dark';
   const base = isDark ? 'bg-gray-800 text-gray-100' : 'bg-white text-gray-900';
   const border = isDark ? 'border-gray-700' : 'border-gray-200';
 

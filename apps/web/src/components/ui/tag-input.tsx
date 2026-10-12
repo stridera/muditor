@@ -122,6 +122,9 @@ export function TagInput({
         value={inputValue}
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
+        // Text left in the box counts: commit it when focus leaves so a
+        // submit click does not see "Keywords are required".
+        onBlur={() => addTag(inputValue)}
         placeholder={tags.length === 0 ? placeholder : ''}
         className='flex-1 min-w-[120px] outline-none text-sm bg-transparent'
       />

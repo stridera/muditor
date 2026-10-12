@@ -1,5 +1,6 @@
 import {
   ApolloClient,
+  ApolloLink,
   CombinedGraphQLErrors,
   InMemoryCache,
   createHttpLink,
@@ -8,9 +9,10 @@ import {
 import { setContext } from '@apollo/client/link/context';
 import { ErrorLink } from '@apollo/client/link/error';
 import { GraphQLWsLink } from '@apollo/client/link/subscriptions';
-import { getMainDefinition } from '@apollo/client/utilities';
+import { Observable, getMainDefinition } from '@apollo/client/utilities';
 import { createClient } from 'graphql-ws';
 import { currentRoute, reportClientError } from './client-error-reporter';
+import { friendlyGraphQLMessage } from './error-utils';
 
 const graphqlUrl =
   process.env.NEXT_PUBLIC_GRAPHQL_URL || 'http://localhost:3001/graphql';
@@ -57,6 +59,32 @@ const errorLink = new ErrorLink(({ error, operation }) => {
   });
 });
 
+// Rewrite raw GraphQL / validation text into builder-friendly messages for
+// every form at once. Sits outside errorLink, so the server log still gets
+// the original text.
+const friendlyErrorLink = new ApolloLink(
+  (operation, forward) =>
+    new Observable(subscriber => {
+      const subscription = forward(operation).subscribe({
+        next: result =>
+          subscriber.next(
+            result.errors?.length
+              ? {
+                  ...result,
+                  errors: result.errors.map(err => ({
+                    ...err,
+                    message: friendlyGraphQLMessage(err.message),
+                  })),
+                }
+              : result
+          ),
+        error: err => subscriber.error(err),
+        complete: () => subscriber.complete(),
+      });
+      return () => subscription.unsubscribe();
+    })
+);
+
 // WebSocket link for GraphQL subscriptions
 const wsLink =
   typeof window !== 'undefined'
@@ -82,9 +110,9 @@ const splitLink = wsLink
         );
       },
       wsLink,
-      errorLink.concat(authLink).concat(httpLink)
+      friendlyErrorLink.concat(errorLink).concat(authLink).concat(httpLink)
     )
-  : errorLink.concat(authLink).concat(httpLink);
+  : friendlyErrorLink.concat(errorLink).concat(authLink).concat(httpLink);
 
 // Configure cache with composite keys for entities that use (zoneId, id)
 const cache = new InMemoryCache({

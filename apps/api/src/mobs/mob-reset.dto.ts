@@ -8,6 +8,18 @@ import {
   registerEnumType,
 } from '@nestjs/graphql';
 import { Prisma, WearFlag } from '@muditor/db';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsInt,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  Min,
+  ValidateNested,
+} from 'class-validator';
 import GraphQLJSON from 'graphql-type-json';
 
 // Register WearFlag enum for GraphQL
@@ -190,92 +202,150 @@ export class MobResetDto {
 @InputType()
 export class CreateMobResetEquipmentInput {
   @Field(() => Int)
+  @IsInt()
   objectZoneId: number;
 
   @Field(() => Int)
+  @IsInt()
   objectId: number;
 
   @Field(() => WearFlag, { nullable: true })
+  @IsOptional()
+  @IsEnum(WearFlag)
   wearLocation?: WearFlag;
 
   @Field(() => Int, { defaultValue: 1 })
+  @IsInt()
+  @Min(1, { message: 'maxInstances must be at least 1' })
   maxInstances: number = 1;
 
   @Field(() => Float, { defaultValue: 1.0 })
+  @IsNumber()
+  @Min(0, { message: 'probability must be between 0 and 1' })
+  @Max(1, { message: 'probability must be between 0 and 1' })
   probability: number = 1.0;
 }
 
 @InputType()
 export class CreateMobResetInput {
   @Field(() => Int)
+  @IsInt()
   zoneId: number;
 
   @Field(() => Int)
+  @IsInt()
   mobZoneId: number;
 
   @Field(() => Int)
+  @IsInt()
   mobId: number;
 
   @Field(() => Int)
+  @IsInt()
   roomZoneId: number;
 
   @Field(() => Int)
+  @IsInt()
   roomId: number;
 
   @Field(() => Int, { defaultValue: 1 })
+  @IsInt()
+  @Min(1, { message: 'maxInstances must be at least 1' })
   maxInstances: number = 1;
 
   @Field(() => Float, { defaultValue: 1.0 })
+  @IsNumber()
+  @Min(0, { message: 'probability must be between 0 and 1' })
+  @Max(1, { message: 'probability must be between 0 and 1' })
   probability: number = 1.0;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   comment?: string;
 
   @Field(() => [CreateMobResetEquipmentInput], {
     nullable: true,
     defaultValue: [],
   })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMobResetEquipmentInput)
   equipment?: CreateMobResetEquipmentInput[];
 }
 
 @InputType()
 export class UpdateMobResetEquipmentInput {
   @Field(() => ID, { nullable: true })
+  @IsOptional()
+  @Type(() => Number) // GraphQL ID arrives as a string
+  @IsInt()
   id?: number;
 
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
   objectZoneId?: number;
 
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
   objectId?: number;
 
   @Field(() => WearFlag, { nullable: true })
+  @IsOptional()
+  @IsEnum(WearFlag)
   wearLocation?: WearFlag;
 
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1, { message: 'maxInstances must be at least 1' })
   maxInstances?: number;
 
   @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'probability must be between 0 and 1' })
+  @Max(1, { message: 'probability must be between 0 and 1' })
   probability?: number;
 }
 
 @InputType()
 export class UpdateMobResetInput {
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
+  @Min(1, { message: 'maxInstances must be at least 1' })
   maxInstances?: number;
 
   @Field(() => Float, { nullable: true })
+  @IsOptional()
+  @IsNumber()
+  @Min(0, { message: 'probability must be between 0 and 1' })
+  @Max(1, { message: 'probability must be between 0 and 1' })
   probability?: number;
 
   @Field({ nullable: true })
+  @IsOptional()
+  @IsString()
   comment?: string;
 
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
   roomZoneId?: number;
 
   @Field(() => Int, { nullable: true })
+  @IsOptional()
+  @IsInt()
   roomId?: number;
 
   @Field(() => [UpdateMobResetEquipmentInput], { nullable: true })
+  @IsOptional()
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => UpdateMobResetEquipmentInput)
   equipment?: UpdateMobResetEquipmentInput[];
 }

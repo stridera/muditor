@@ -7,6 +7,7 @@ import {
   objectiveTypePatch,
   parseKeywords,
   type PhaseFormData,
+  validateQuestName,
 } from '../quest-form';
 
 const phase = (id: number, order: number): PhaseFormData => ({
@@ -106,5 +107,23 @@ describe('keyword helpers', () => {
     expect(parseKeywords(' yes, sure ,, ok ')).toEqual(['yes', 'sure', 'ok']);
     expect(formatKeywords(['yes', 'sure'])).toBe('yes, sure');
     expect(parseKeywords('')).toEqual([]);
+  });
+});
+
+describe('validateQuestName', () => {
+  it('rejects empty and whitespace-only names', () => {
+    expect(validateQuestName('')).toBe('Quest name is required.');
+    expect(validateQuestName('   ')).toBe('Quest name is required.');
+  });
+
+  it('rejects names that are only markup when a stripper is supplied', () => {
+    const strip = (t: string) => t.replace(/<[^>]*>/g, '');
+    expect(validateQuestName('<red></>', strip)).toBe(
+      'Quest name is required.'
+    );
+  });
+
+  it('accepts a real name', () => {
+    expect(validateQuestName('The Lost Artifact')).toBeNull();
   });
 });

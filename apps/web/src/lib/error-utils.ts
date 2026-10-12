@@ -31,11 +31,86 @@ interface ApolloErrorLike {
   stack?: string;
 }
 
+/** `roomDescription` / `room_description` -> `Room description`. */
+function humanizeField(field: string): string {
+  const words = field
+    .replace(/_/g, ' ')
+    .replace(/([a-z0-9])([A-Z])/g, '$1 $2')
+    .toLowerCase()
+    .trim();
+  return words.charAt(0).toUpperCase() + words.slice(1);
+}
+
+const SERVER_PHRASES: Array<[RegExp, (m: RegExpMatchArray) => string]> = [
+  // Missing required field in a mutation payload
+  [
+    /Field "([^"]+)" of required type "[^"]*" was not provided/,
+    m => `${humanizeField(m[1] ?? '')} is required.`,
+  ],
+  // Required variable (usually an id taken from the URL) is missing
+  [
+    /Variable "\$[^"]*" of (?:non-null|required) type "[^"]*" must not be null/,
+    () =>
+      'This page needs a valid id in its link. Check the address and try again.',
+  ],
+  [
+    /Variable "\$[^"]*" of required type "[^"]*" was not provided/,
+    () =>
+      'This page needs a valid id in its link. Check the address and try again.',
+  ],
+  // Wrong type for a field of the payload
+  [
+    /Variable "\$[^"]*" got invalid value [\s\S]*? at "[^".]*\.([^"]+)"/,
+    m => `${humanizeField(m[1] ?? '')} has an invalid value.`,
+  ],
+  [
+    /Cannot return null for non-nullable field Query\.(\w+)/,
+    m =>
+      `That ${humanizeField(m[1] ?? 'item').toLowerCase()} could not be found.`,
+  ],
+  [
+    /^Forbidden resource$/i,
+    () =>
+      "You don't have write access here. Ask an admin to grant you access to this zone.",
+  ],
+  [/^Unauthorized$/i, () => 'Your session has expired. Please log in again.'],
+  // class-validator (Nest ValidationPipe)
+  [
+    /^(\w+) should not be empty$/,
+    m => `${humanizeField(m[1] ?? '')} is required.`,
+  ],
+  [
+    /^(\w+) must be a string$/,
+    m => `${humanizeField(m[1] ?? '')} must be text.`,
+  ],
+  [
+    /^property (\w+) should not exist$/,
+    m => `The field "${m[1]}" is not accepted here.`,
+  ],
+];
+
+/**
+ * Rewrite raw GraphQL / Nest validation text into something a builder can act
+ * on. Unknown messages pass through unchanged. Multi-line messages (several
+ * errors joined by newlines) are rewritten line by line.
+ */
+export function friendlyGraphQLMessage(message: string): string {
+  if (!message) return message;
+  const lines = message.split('\n').map(line => {
+    for (const [pattern, render] of SERVER_PHRASES) {
+      const match = line.trim().match(pattern);
+      if (match) return render(match);
+    }
+    return line;
+  });
+  return lines.join('\n');
+}
+
 export function extractErrorMessage(error: unknown): string {
   const e = error as ApolloErrorLike | undefined;
   // GraphQL errors
   if (e?.graphQLErrors && e.graphQLErrors.length > 0 && e.graphQLErrors[0]) {
-    return e.graphQLErrors[0].message;
+    return friendlyGraphQLMessage(e.graphQLErrors[0].message);
   }
 
   // Network errors
@@ -45,7 +120,7 @@ export function extractErrorMessage(error: unknown): string {
 
   // Standard error
   if (typeof e?.message === 'string') {
-    return e.message;
+    return friendlyGraphQLMessage(e.message);
   }
 
   // Fallback

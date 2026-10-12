@@ -179,3 +179,32 @@ export async function updateExitInPlace<
     };
   }
 }
+
+/**
+ * Flags the exit editor may offer. CLOSED and LOCKED are ExitState values
+ * (`defaultState`), not ExitFlag values: sending them as flags is rejected by
+ * the API's enum validation.
+ */
+export const EXIT_FLAG_VALUES = [
+  'IS_DOOR',
+  'PICKPROOF',
+  'HIDDEN',
+  'BASHABLE',
+  'MAGICPROOF',
+] as const;
+
+/**
+ * Normalise the exit editor's draft before saving: only real ExitFlag values
+ * are sent, and a closed or locked exit is necessarily a door.
+ */
+export function normalizeExitEdit<
+  T extends { flags?: string[]; defaultState?: string },
+>(edit: T): T & { flags: string[]; defaultState: string } {
+  const defaultState = edit.defaultState ?? 'OPEN';
+  const known = new Set<string>(EXIT_FLAG_VALUES);
+  const flags = (edit.flags ?? []).filter(f => known.has(f));
+  if (defaultState !== 'OPEN' && !flags.includes('IS_DOOR')) {
+    flags.push('IS_DOOR');
+  }
+  return { ...edit, flags, defaultState };
+}

@@ -1,13 +1,18 @@
 'use client';
 
 import { PermissionGuard } from '@/components/auth/permission-guard';
-import { CreateRoomDialog } from '@/components/rooms/CreateRoomDialog';
+import {
+  CreateRoomDialog,
+  SECTOR_OPTIONS,
+} from '@/components/rooms/CreateRoomDialog';
 import { Button } from '@/components/ui/button';
 import { FlagBadge } from '@/components/ui/flag-badge';
 import { SectorBadge } from '@/components/ui/sector-badge';
 import { useListState } from '@/hooks/use-list-state';
 import { usePermissions } from '@/hooks/use-permissions';
-import { stripMarkup } from '@/utils/xmlLiteParser';
+import { extractErrorMessage } from '@/lib/error-utils';
+import { gql } from '@apollo/client';
+import { useApolloClient, useQuery } from '@apollo/client/react';
 import { ChevronDown, Plus } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -27,7 +32,7 @@ interface RoomExit {
 
 interface RoomExtraDescription {
   id: string;
-  keyword: string;
+  keywords: string[];
   description: string;
 }
 
@@ -65,211 +70,178 @@ function RoomsPageContent() {
   );
 }
 
+const ROOMS_PAGE_SIZE = 50;
+const SEARCH_DEBOUNCE_MS = 300;
+
+// Filtering, searching and paging all happen on the server: with ~10k rooms a
+// client-side filter over one page would silently miss most of them.
+const ROOMS_PAGE_QUERY = gql`
+  query RoomsPage(
+    $zoneId: Int
+    $search: String
+    $sector: Sector
+    $skip: Int
+    $take: Int
+  ) {
+    rooms(
+      zoneId: $zoneId
+      search: $search
+      sector: $sector
+      skip: $skip
+      take: $take
+    ) {
+      id
+      zoneId
+      name
+      roomDescription
+      sector
+      isPeaceful
+      isDeathTrap
+    }
+    roomsCount(zoneId: $zoneId, search: $search, sector: $sector)
+  }
+`;
+
+const ROOM_DETAILS_QUERY = gql`
+  query RoomDetails($zoneId: Int!, $id: Int!) {
+    room(zoneId: $zoneId, id: $id) {
+      id
+      name
+      roomDescription
+      sector
+      zoneId
+      baseLightLevel
+      capacity
+      entryRestriction
+      isPeaceful
+      allowsMagic
+      allowsRecall
+      allowsSummon
+      allowsTeleport
+      isDeathTrap
+      exits {
+        id
+        direction
+        description
+        keywords
+        keyZoneId
+        keyId
+        toZoneId
+        toRoomId
+        flags
+        defaultState
+        hitPoints
+      }
+      extraDescs {
+        id
+        keywords
+        description
+      }
+      createdAt
+      updatedAt
+      createdBy
+      updatedBy
+      layoutX
+      layoutY
+      layoutZ
+    }
+  }
+`;
+
+const roomKey = (room: { zoneId: number; id: number }) =>
+  `${room.zoneId}-${room.id}`;
+
 function RoomsContent() {
   const router = useRouter();
+  const apolloClient = useApolloClient();
   const { isBuilder } = usePermissions();
   const [createOpen, setCreateOpen] = useState(false);
   const list = useListState();
   const selectedZone = list.zone;
 
-  const [rooms, setRooms] = useState<Room[]>([]);
-  const [roomsCount, setRoomsCount] = useState(0);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   // Local state keeps typing responsive; it is mirrored into the URL below.
   const [searchTerm, setSearchTerm] = useState(() => list.get('q') ?? '');
+  const [debouncedSearch, setDebouncedSearch] = useState(searchTerm);
   const [selectedSector, setSelectedSector] = useState(
     () => list.get('sector') ?? 'all'
   );
-  const [expandedRooms, setExpandedRooms] = useState<Set<number>>(new Set());
-  const [loadingDetails, setLoadingDetails] = useState<Set<number>>(new Set());
+  const [expandedRooms, setExpandedRooms] = useState<Set<string>>(new Set());
+  const [loadingDetails, setLoadingDetails] = useState<Set<string>>(new Set());
+  const [details, setDetails] = useState<Record<string, Partial<Room>>>({});
 
   // Mirror search text and sector into the URL (deep links, back-navigation).
   const { set: setListParams } = list;
   useEffect(() => {
-    setListParams({
-      q: searchTerm,
-      sector: selectedSector === 'all' ? null : selectedSector,
-    });
+    const timer = setTimeout(() => {
+      setDebouncedSearch(searchTerm);
+      setListParams({
+        q: searchTerm,
+        sector: selectedSector === 'all' ? null : selectedSector,
+      });
+    }, SEARCH_DEBOUNCE_MS);
+    return () => clearTimeout(timer);
   }, [searchTerm, selectedSector, setListParams]);
 
-  useEffect(() => {
-    const fetchRooms = async () => {
-      try {
-        const query = selectedZone
-          ? `
-              query GetRoomsByZone($zoneId: Int!) {
-                roomsByZone(zoneId: $zoneId) {
-                  id
-                  name
-                  roomDescription
-                }
-                roomsCount(zoneId: $zoneId)
-              }
-            `
-          : `
-              query GetRooms($take: Int) {
-                rooms(take: $take) {
-                  id
-                  name
-                  roomDescription
-                  sector
-                  zoneId
-                  isPeaceful
-                  isDeathTrap
-                }
-                roomsCount
-              }
-            `;
+  const page = list.page;
+  const { loading, error, data } = useQuery<{
+    rooms: Room[];
+    roomsCount: number;
+  }>(ROOMS_PAGE_QUERY, {
+    variables: {
+      zoneId: selectedZone ?? null,
+      search: debouncedSearch.trim() || null,
+      sector: selectedSector === 'all' ? null : selectedSector,
+      skip: (page - 1) * ROOMS_PAGE_SIZE,
+      take: ROOMS_PAGE_SIZE,
+    },
+    fetchPolicy: 'cache-and-network',
+  });
 
-        const variables = selectedZone
-          ? { zoneId: selectedZone }
-          : { take: 100 };
+  const roomsCount = data?.roomsCount ?? 0;
+  const totalPages = Math.max(1, Math.ceil(roomsCount / ROOMS_PAGE_SIZE));
+  const filteredRooms: Room[] = useMemo(
+    () =>
+      (data?.rooms ?? []).map(room => ({
+        ...room,
+        ...details[roomKey(room)],
+      })),
+    [data, details]
+  );
 
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:3001/graphql',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ query, variables }),
-          }
-        );
-
-        const data = await response.json();
-        if (data.errors) {
-          throw new Error(data.errors[0].message);
-        }
-
-        setRooms(data.data.rooms || data.data.roomsByZone || []);
-        setRoomsCount(data.data.roomsCount || 0);
-      } catch (err) {
-        setError(err instanceof Error ? err.message : 'Failed to fetch rooms');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchRooms();
-  }, [selectedZone]);
-
-  const toggleRoomExpanded = async (roomId: number) => {
-    if (expandedRooms.has(roomId)) {
-      setExpandedRooms(new Set([...expandedRooms].filter(id => id !== roomId)));
+  const toggleRoomExpanded = async (target: Room) => {
+    const key = roomKey(target);
+    if (expandedRooms.has(key)) {
+      setExpandedRooms(new Set([...expandedRooms].filter(k => k !== key)));
       return;
     }
+    setExpandedRooms(new Set(expandedRooms).add(key));
 
-    // Add to expanded set
-    setExpandedRooms(new Set(expandedRooms).add(roomId));
-
-    // Load detailed data if not already loaded
-    const room = rooms.find(r => r.id === roomId);
-    if (room && !room.exits) {
-      setLoadingDetails(new Set(loadingDetails).add(roomId));
-      try {
-        const getRoomQuery = `
-          query GetRoom($id: Int!) {
-            room(id: $id) {
-              id
-              name
-              roomDescription
-              sector
-              zoneId
-              baseLightLevel
-              capacity
-              entryRestriction
-              isPeaceful
-              allowsMagic
-              allowsRecall
-              allowsSummon
-              allowsTeleport
-              isDeathTrap
-              exits {
-                id
-                direction
-                description
-                keywords
-                key
-                toZoneId
-                toRoomId
-                flags
-                defaultState
-                hitPoints
-              }
-              extraDescs {
-                id
-                keyword
-                description
-              }
-              createdAt
-              updatedAt
-              createdBy
-              updatedBy
-              layoutX
-              layoutY
-              layoutZ
-            }
-          }
-        `;
-
-        const response = await fetch(
-          process.env.NEXT_PUBLIC_GRAPHQL_URL ||
-            'http://localhost:3001/graphql',
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              query: getRoomQuery,
-              variables: { id: roomId },
-            }),
-          }
-        );
-
-        const result = await response.json();
-        if (result.errors) {
-          /* LoggingService.error('Error loading room details:', result.errors[0].message); */
-        } else if (result.data.room) {
-          /* LoggingService.debug('Room data received:', result.data.room); */
-          // Update the room in the list with detailed data
-          setRooms(prevRooms =>
-            prevRooms.map(r =>
-              r.id === roomId ? { ...r, ...result.data.room } : r
-            )
-          );
-        }
-      } catch {
-        /* LoggingService.error('Error loading room details'); */
-      } finally {
-        setLoadingDetails(
-          new Set([...loadingDetails].filter(id => id !== roomId))
-        );
+    // Load detailed data once per room
+    if (details[key]) return;
+    setLoadingDetails(prev => new Set(prev).add(key));
+    try {
+      const result = await apolloClient.query<{ room: Room | null }>({
+        query: ROOM_DETAILS_QUERY,
+        variables: { zoneId: target.zoneId, id: target.id },
+      });
+      if (result.data?.room) {
+        const loaded = result.data.room;
+        setDetails(prev => ({ ...prev, [key]: loaded }));
       }
+    } catch {
+      /* the summary row stays usable without details */
+    } finally {
+      setLoadingDetails(prev => {
+        const next = new Set(prev);
+        next.delete(key);
+        return next;
+      });
     }
   };
 
-  const filteredRooms = useMemo(() => {
-    return rooms.filter(room => {
-      const matchesSearch =
-        stripMarkup(room.name)
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase()) ||
-        room.id.toString().includes(searchTerm) ||
-        stripMarkup(room.roomDescription)
-          .toLowerCase()
-          .includes(searchTerm.toLowerCase());
-      const matchesSector =
-        selectedSector === 'all' || room.sector === selectedSector;
+  const sectorOptions: readonly string[] = SECTOR_OPTIONS;
 
-      return matchesSearch && matchesSector;
-    });
-  }, [rooms, searchTerm, selectedSector]);
-
-  const sectorOptions = useMemo(() => {
-    const sectors = Array.from(new Set(rooms.map(room => room.sector)));
-    return sectors.sort();
-  }, [rooms]);
-
-  if (loading) {
+  if (loading && !data) {
     return (
       <div className='animate-pulse'>
         <div className='h-8 bg-muted rounded w-1/4 mb-6'></div>
@@ -290,14 +262,16 @@ function RoomsContent() {
     );
   }
 
-  if (error) {
+  if (error && !data) {
     return (
       <div
         className='bg-red-50 border border-red-200 rounded-md p-4'
         data-testid='error-message'
       >
         <h3 className='text-red-800 font-medium'>Error loading rooms</h3>
-        <p className='text-red-600 text-sm mt-1'>{error}</p>
+        <p className='text-red-600 text-sm mt-1'>
+          {extractErrorMessage(error)}
+        </p>
       </div>
     );
   }
@@ -310,7 +284,9 @@ function RoomsContent() {
             {selectedZone ? `Zone ${selectedZone} Rooms` : 'Rooms'}
           </h1>
           <p className='text-muted-foreground mt-1'>
-            {filteredRooms.length} of {roomsCount} rooms
+            {roomsCount === 0
+              ? '0 rooms'
+              : `${(page - 1) * ROOMS_PAGE_SIZE + 1}-${(page - 1) * ROOMS_PAGE_SIZE + filteredRooms.length} of ${roomsCount} rooms`}
             {selectedZone && ' in this zone'}
           </p>
         </div>
@@ -394,7 +370,7 @@ function RoomsContent() {
             >
               <div
                 className='p-4 cursor-pointer'
-                onClick={() => toggleRoomExpanded(room.id)}
+                onClick={() => toggleRoomExpanded(room)}
               >
                 <div className='flex items-start justify-between'>
                   <div className='flex-1'>
@@ -407,7 +383,7 @@ function RoomsContent() {
                       </span>
                       <ChevronDown
                         className={`w-4 h-4 text-muted-foreground transition-transform ${
-                          expandedRooms.has(room.id) ? 'rotate-180' : ''
+                          expandedRooms.has(roomKey(room)) ? 'rotate-180' : ''
                         }`}
                       />
                     </div>
@@ -451,9 +427,9 @@ function RoomsContent() {
               </div>
 
               {/* Expanded Details */}
-              {expandedRooms.has(room.id) && (
+              {expandedRooms.has(roomKey(room)) && (
                 <div className='border-t border-border p-4 bg-muted'>
-                  {loadingDetails.has(room.id) ? (
+                  {loadingDetails.has(roomKey(room)) ? (
                     <div className='text-center py-4'>
                       <div className='inline-flex items-center'>
                         <div className='animate-spin rounded-full h-4 w-4 border-b-2 border-primary mr-2'></div>
@@ -533,7 +509,7 @@ function RoomsContent() {
                                 className='bg-card p-3 rounded border border-border text-sm'
                               >
                                 <div className='font-medium text-foreground'>
-                                  "{desc.keyword}"
+                                  "{desc.keywords.join(', ')}"
                                 </div>
                                 <div className='text-muted-foreground mt-1'>
                                   {desc.description}
@@ -657,6 +633,28 @@ function RoomsContent() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {totalPages > 1 && (
+        <div className='flex items-center justify-between mt-6'>
+          <Button
+            variant='outline'
+            disabled={page <= 1}
+            onClick={() => list.setPage(page - 1)}
+          >
+            Previous
+          </Button>
+          <span className='text-sm text-muted-foreground'>
+            Page {page} of {totalPages}
+          </span>
+          <Button
+            variant='outline'
+            disabled={page >= totalPages}
+            onClick={() => list.setPage(page + 1)}
+          >
+            Next
+          </Button>
         </div>
       )}
     </div>
