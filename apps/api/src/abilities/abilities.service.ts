@@ -1,6 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { Prisma, SpellSphere } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
+import { isRenderableSphereColor } from './sphere-color';
 import {
   CreateAbilityInput,
   UpdateAbilityInput,
@@ -331,11 +332,17 @@ export class AbilitiesService {
 
   async updateSphereColor(sphere: SpellSphere, color: string | null) {
     const trimmed = color?.trim() ?? '';
-    // XML-Lite tag body: colour/modifier words joined by ':' (e.g. "b:cyan", "#FF8800").
-    if (trimmed !== '' && !/^[A-Za-z0-9#:_-]+$/.test(trimmed)) {
-      throw new BadRequestException(`Invalid sphere colour: ${color}`);
-    }
     const value = trimmed === '' ? null : trimmed.toLowerCase();
+    // XML-Lite tag body the game renders: modifier/colour parts joined by ':' (e.g.
+    // "b:cyan", "#ff8800", "c196"). Anything else the game would silently ignore.
+    if (value !== null && !isRenderableSphereColor(value)) {
+      throw new BadRequestException(
+        `Invalid sphere colour: ${color}. Use colour words (black, red, green, yellow, ` +
+          `brown, blue, purple, magenta, cyan, teal, white, orange), modifiers (b, u, i, ` +
+          `s, d, dim, blink, reverse, hide), bg-<colour>, #RRGGBB, bg#RRGGBB, cN or bgcN ` +
+          `(N 0-255), joined by ':'.`
+      );
+    }
     return this.prisma.sphereStyle.upsert({
       where: { sphere },
       create: { sphere, color: value },

@@ -2343,6 +2343,9 @@ type Mutation {
   """Delete a system text entry"""
   deleteSystemText(id: ID!): Boolean!
   deleteTrigger(id: Int!, zoneId: Int!): TriggerDto!
+
+  """Delete a weather line so the game uses its built-in text"""
+  deleteWeatherText(key: WeatherTextKeyInput!): Boolean!
   deleteZone(id: Int!): ZoneDto!
 
   """Deny a pending game login request"""
@@ -2417,6 +2420,14 @@ type Mutation {
   Set the game password (Characters.passwordHash) for all your characters, or one when characterName is given. Must differ from the website password
   """
   setGamePassword(characterName: String, password: String!): Boolean!
+
+  """
+  Set the slot recovery time of a spell circle; null restores the built-in time
+  """
+  setSpellCircleRecoverTime(circle: Int!, recoverSecs: Int): SpellCircleDto!
+
+  """Set the weather flavour line for a climate and daypart"""
+  setWeatherText(data: SetWeatherTextInput!): WeatherTextDto!
   unbanUser(input: UnbanUserInput!): BanRecord!
 
   """Unlink a character from your user account"""
@@ -3056,6 +3067,9 @@ type Query {
   """Get total count of socials"""
   socialsCount: Int!
 
+  """Slot recovery time for every spell circle (1-14)"""
+  spellCircles: [SpellCircleDto!]!
+
   """Get a single spell syllable by ID"""
   spellSyllable(id: ID!): SpellSyllableDto!
 
@@ -3104,6 +3118,9 @@ type Query {
 
   """Get validation report for a specific zone"""
   validateZone(zoneId: Int!): ValidationReportType!
+
+  """Weather flavour lines per climate and time of day"""
+  weatherTexts: [WeatherTextDto!]!
   zone(id: Int!): ZoneDto!
   zones(skip: Int, take: Int): [ZoneDto!]!
   zonesCount: Int!
@@ -3645,6 +3662,13 @@ type ServerStatusType {
   stats: ServerStatsType!
 }
 
+"""Input for setting a weather flavour line"""
+input SetWeatherTextInput {
+  climate: Climate!
+  daypart: String!
+  text: String!
+}
+
 type ShopAcceptDto {
   id: String!
   keywords: String
@@ -3793,6 +3817,17 @@ type SocialDto {
 
   """Message to target"""
   victFound: String
+}
+
+"""Per spell circle tuning (slot recovery time)"""
+type SpellCircleDto {
+  """Spell circle, 1-14"""
+  circle: Int!
+
+  """
+  Base seconds a spent slot of this circle takes to recover (before the caster focus rate; the ability memorization time is added on top). NULL means the built-in value
+  """
+  recoverSecs: Int
 }
 
 enum SpellSphere {
@@ -4911,6 +4946,29 @@ enum WearFlag {
   TWOHAND
   WAIST
   WRIST
+}
+
+"""
+Flavour line of the weather command for one zone climate and time of day
+"""
+type WeatherTextDto {
+  climate: Climate!
+
+  """
+  dawn, day, midday, evening, night or any. The game tries the exact hour band, then its group (day = day+midday; night = night+evening+dawn), then any
+  """
+  daypart: String!
+
+  """
+  XML-Lite text. NULL means the key has no line here and the built-in one is used
+  """
+  text: String
+}
+
+"""Key of a weather flavour line"""
+input WeatherTextKeyInput {
+  climate: Climate!
+  daypart: String!
 }
 
 type ZoneCountsDto {

@@ -27,10 +27,12 @@ import { SettingsModule } from './settings/settings.module';
 import { SocialsModule } from './socials/socials.module';
 import { EffectAurasModule } from './effect-auras/effect-auras.module';
 import { StatusFlagValuesModule } from './status-flag-values/status-flag-values.module';
+import { SpellCirclesModule } from './spell-circles/spell-circles.module';
 import { SpellSyllablesModule } from './spell-syllables/spell-syllables.module';
 import { ReservedNamesModule } from './reserved-names/reserved-names.module';
 import { CreationRecipesModule } from './creation-recipes/creation-recipes.module';
 import { SystemMessagesModule } from './system-messages/system-messages.module';
+import { WeatherTextModule } from './weather-text/weather-text.module';
 import { TriggersModule } from './triggers/triggers.module';
 import { UsersModule } from './users/users.module';
 import { ValidationModule } from './validation/validation.module';
@@ -111,6 +113,8 @@ import { createWsOnConnect, isWsContext, wsContext } from './auth/ws-auth';
     EffectAurasModule,
     StatusFlagValuesModule,
     SpellSyllablesModule,
+    SpellCirclesModule,
+    WeatherTextModule,
     ReservedNamesModule,
     CreationRecipesModule,
     SystemMessagesModule,

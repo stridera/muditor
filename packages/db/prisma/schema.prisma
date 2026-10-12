@@ -249,6 +249,26 @@ model SphereStyle {
   color  String? // XML-Lite tag body without brackets: "red", "b:cyan", "magenta"
 }
 
+/// Flavour line of the `weather` command, per zone climate and time of day. daypart is one of
+/// dawn / day / midday / evening / night / any. The game tries the exact hour band first, then
+/// its group (day = day+midday; night = night+evening+dawn), then "any"; a key with no row (or a
+/// NULL text) falls back to the game's built-in line. Text is XML-Lite.
+model WeatherText {
+  climate Climate
+  daypart String
+  text    String?
+
+  @@id([climate, daypart])
+}
+
+/// Base recovery time of a spent spell slot, per spell circle (1-14). Multiplied by the caster's
+/// focus rate at cast time; Ability.addl_mem_time is added on top. A missing row or NULL falls
+/// back to the game's built-in table.
+model SpellCircle {
+  circle      Int  @id
+  recoverSecs Int? @map("recover_secs")
+}
+
 model AbilityRestrictions {
   id        Int     @id @default(autoincrement())
   abilityId Int     @unique @map("ability_id")

@@ -153,6 +153,37 @@ describe('AbilitiesService sphere styles', () => {
     });
   });
 
+  it('accepts every form the game renders', async () => {
+    const { db, upsert } = makeStyleDb();
+    const service = new AbilitiesService(db);
+    for (const c of ['red', 'b:cyan', '#FF8800', 'C196', 'bg-red:white']) {
+      await service.updateSphereColor('AIR' as never, c);
+    }
+    expect(upsert.mock.calls.map(c => c[0].create.color)).toEqual([
+      'red',
+      'b:cyan',
+      '#ff8800',
+      'c196',
+      'bg-red:white',
+    ]);
+  });
+
+  it.each([
+    'chartreuse',
+    'fire',
+    'b::red',
+    '#ff88',
+    'c256',
+    'bg-',
+    'red green',
+  ])('rejects %s, which the game would ignore', async color => {
+    const { db, upsert } = makeStyleDb();
+    await expect(
+      new AbilitiesService(db).updateSphereColor('AIR' as never, color)
+    ).rejects.toThrow('Invalid sphere colour');
+    expect(upsert).not.toHaveBeenCalled();
+  });
+
   it('rejects colours that are not a tag body', async () => {
     const { db } = makeStyleDb();
     await expect(

@@ -2203,6 +2203,8 @@ export type Mutation = {
   /** Delete a system text entry */
   deleteSystemText: Scalars['Boolean']['output'];
   deleteTrigger: TriggerDto;
+  /** Delete a weather line so the game uses its built-in text */
+  deleteWeatherText: Scalars['Boolean']['output'];
   deleteZone: ZoneDto;
   /** Deny a pending game login request */
   denyGameLogin: Scalars['Boolean']['output'];
@@ -2248,6 +2250,10 @@ export type Mutation = {
   setCharacterOnline: Scalars['Boolean']['output'];
   /** Set the game password (Characters.passwordHash) for all your characters, or one when characterName is given. Must differ from the website password */
   setGamePassword: Scalars['Boolean']['output'];
+  /** Set the slot recovery time of a spell circle; null restores the built-in time */
+  setSpellCircleRecoverTime: SpellCircleDto;
+  /** Set the weather flavour line for a climate and daypart */
+  setWeatherText: WeatherTextDto;
   unbanUser: BanRecord;
   /** Unlink a character from your user account */
   unlinkCharacter: Scalars['Boolean']['output'];
@@ -2907,6 +2913,11 @@ export type MutationDeleteTriggerArgs = {
 };
 
 
+export type MutationDeleteWeatherTextArgs = {
+  key: WeatherTextKeyInput;
+};
+
+
 export type MutationDeleteZoneArgs = {
   id: Scalars['Int']['input'];
 };
@@ -3068,6 +3079,17 @@ export type MutationSetCharacterOnlineArgs = {
 export type MutationSetGamePasswordArgs = {
   characterName?: InputMaybe<Scalars['String']['input']>;
   password: Scalars['String']['input'];
+};
+
+
+export type MutationSetSpellCircleRecoverTimeArgs = {
+  circle: Scalars['Int']['input'];
+  recoverSecs?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type MutationSetWeatherTextArgs = {
+  data: SetWeatherTextInput;
 };
 
 
@@ -3933,6 +3955,8 @@ export type Query = {
   socials: Array<SocialDto>;
   /** Get total count of socials */
   socialsCount: Scalars['Int']['output'];
+  /** Slot recovery time for every spell circle (1-14) */
+  spellCircles: Array<SpellCircleDto>;
   /** Get a single spell syllable by ID */
   spellSyllable: SpellSyllableDto;
   /** Get all spell syllables, in match order */
@@ -3969,6 +3993,8 @@ export type Query = {
   validateAllZones: Array<ValidationReportType>;
   /** Get validation report for a specific zone */
   validateZone: ValidationReportType;
+  /** Weather flavour lines per climate and time of day */
+  weatherTexts: Array<WeatherTextDto>;
   zone: ZoneDto;
   zones: Array<ZoneDto>;
   zonesCount: Scalars['Int']['output'];
@@ -5084,6 +5110,13 @@ export type ServerStatusType = {
   stats: ServerStatsType;
 };
 
+/** Input for setting a weather flavour line */
+export type SetWeatherTextInput = {
+  climate: Climate;
+  daypart: Scalars['String']['input'];
+  text: Scalars['String']['input'];
+};
+
 export type ShopAcceptDto = {
   __typename?: 'ShopAcceptDto';
   id: Scalars['String']['output'];
@@ -5218,6 +5251,15 @@ export type SocialDto = {
   updatedAt: Scalars['DateTime']['output'];
   /** Message to target */
   victFound?: Maybe<Scalars['String']['output']>;
+};
+
+/** Per spell circle tuning (slot recovery time) */
+export type SpellCircleDto = {
+  __typename?: 'SpellCircleDto';
+  /** Spell circle, 1-14 */
+  circle: Scalars['Int']['output'];
+  /** Base seconds a spent slot of this circle takes to recover (before the caster focus rate; the ability memorization time is added on top). NULL means the built-in value */
+  recoverSecs?: Maybe<Scalars['Int']['output']>;
 };
 
 export type SpellSphere =
@@ -6268,6 +6310,22 @@ export type WearFlag =
   | 'TWOHAND'
   | 'WAIST'
   | 'WRIST';
+
+/** Flavour line of the weather command for one zone climate and time of day */
+export type WeatherTextDto = {
+  __typename?: 'WeatherTextDto';
+  climate: Climate;
+  /** dawn, day, midday, evening, night or any. The game tries the exact hour band, then its group (day = day+midday; night = night+evening+dawn), then any */
+  daypart: Scalars['String']['output'];
+  /** XML-Lite text. NULL means the key has no line here and the built-in one is used */
+  text?: Maybe<Scalars['String']['output']>;
+};
+
+/** Key of a weather flavour line */
+export type WeatherTextKeyInput = {
+  climate: Climate;
+  daypart: Scalars['String']['input'];
+};
 
 export type ZoneCountsDto = {
   __typename?: 'ZoneCountsDto';
