@@ -37,7 +37,13 @@ export class StatusFlagValuesService {
     }
     try {
       return await this.db.statusFlagValue.create({
-        data: { flag: data.flag, aiValue: data.aiValue },
+        data: {
+          flag: data.flag,
+          aiValue: data.aiValue,
+          preventsMovement: data.preventsMovement,
+          preventsCasting: data.preventsCasting,
+          preventsSpeaking: data.preventsSpeaking,
+        },
       });
     } catch (e) {
       throw this.mapUniqueViolation(e, data.flag);
@@ -48,7 +54,18 @@ export class StatusFlagValuesService {
     await this.findOne(flag);
     return this.db.statusFlagValue.update({
       where: { flag },
-      data: { aiValue: data.aiValue },
+      data: {
+        aiValue: data.aiValue,
+        ...(data.preventsMovement !== undefined && {
+          preventsMovement: data.preventsMovement,
+        }),
+        ...(data.preventsCasting !== undefined && {
+          preventsCasting: data.preventsCasting,
+        }),
+        ...(data.preventsSpeaking !== undefined && {
+          preventsSpeaking: data.preventsSpeaking,
+        }),
+      },
     });
   }
 

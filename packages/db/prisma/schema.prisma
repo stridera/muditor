@@ -3423,10 +3423,16 @@ model SystemMessage {
 
 /// AI worth of a status flag (the flag names carried by `status` effects), the
 /// legacy `value_spell_effect` table mob_ai reads when deciding whether a
-/// monster wants a piece of gear. Flags without a row are worth 0.
+/// monster wants a piece of gear. Flags without a row are worth 0. The
+/// `prevents*` columns say which actions an effect carrying this flag name
+/// blocks (movement / casting / speaking), on top of the per-effect-type
+/// `prevents*` columns on the effect type table.
 model StatusFlagValue {
-  flag    String @id // status flag name, e.g. "sanctuary"
-  aiValue Int    @default(0) @map("ai_value")
+  flag             String  @id // status flag name, e.g. "sanctuary"
+  aiValue          Int     @default(0) @map("ai_value")
+  preventsMovement Boolean @default(false) @map("prevents_movement")
+  preventsCasting  Boolean @default(false) @map("prevents_casting")
+  preventsSpeaking Boolean @default(false) @map("prevents_speaking")
 
   @@map("StatusFlagValue")
 }

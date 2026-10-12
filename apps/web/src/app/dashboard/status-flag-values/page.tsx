@@ -42,9 +42,21 @@ import { useMemo, useState } from 'react';
 
 type FlagValue = GetStatusFlagValuesQuery['statusFlagValues'][number];
 
-type FormData = { flag: string; aiValue: string };
+type FormData = {
+  flag: string;
+  aiValue: string;
+  preventsMovement: boolean;
+  preventsCasting: boolean;
+  preventsSpeaking: boolean;
+};
 
-const defaultFormData: FormData = { flag: '', aiValue: '0' };
+const defaultFormData: FormData = {
+  flag: '',
+  aiValue: '0',
+  preventsMovement: false,
+  preventsCasting: false,
+  preventsSpeaking: false,
+};
 
 const FLAG_PATTERN = /^[a-z0-9]+(?:_[a-z0-9]+)*$/;
 const MAX_AI_VALUE = 100000;
@@ -141,7 +153,13 @@ export default function StatusFlagValuesPage() {
 
   const openEdit = (row: FlagValue) => {
     setEditing(row);
-    setFormData({ flag: row.flag, aiValue: row.aiValue.toString() });
+    setFormData({
+      flag: row.flag,
+      aiValue: row.aiValue.toString(),
+      preventsMovement: row.preventsMovement,
+      preventsCasting: row.preventsCasting,
+      preventsSpeaking: row.preventsSpeaking,
+    });
     setFormError('');
     setIsFormOpen(true);
   };
@@ -155,13 +173,20 @@ export default function StatusFlagValuesPage() {
     }
     setFormError('');
     const aiValue = Number(formData.aiValue.trim());
+    const prevents = {
+      preventsMovement: formData.preventsMovement,
+      preventsCasting: formData.preventsCasting,
+      preventsSpeaking: formData.preventsSpeaking,
+    };
     if (editing) {
       await updateValue({
-        variables: { flag: editing.flag, data: { aiValue } },
+        variables: { flag: editing.flag, data: { aiValue, ...prevents } },
       });
     } else {
       await createValue({
-        variables: { data: { flag: formData.flag.trim(), aiValue } },
+        variables: {
+          data: { flag: formData.flag.trim(), aiValue, ...prevents },
+        },
       });
     }
   };
@@ -199,8 +224,9 @@ export default function StatusFlagValuesPage() {
           How much mob AI values each status flag when deciding whether it wants
           a piece of gear - {data?.statusFlagValues.length ?? 0} total. Positive
           values are good flags, negative values are harmful ones; flags without
-          a row are worth 0. The game picks up changes on restart, not
-          instantly.
+          a row are worth 0. The Blocks columns list the actions an effect
+          carrying the flag prevents (movement / casting / speaking). The game
+          picks up changes on restart, not instantly.
         </p>
       </div>
 
@@ -243,6 +269,7 @@ export default function StatusFlagValuesPage() {
             <TableRow>
               <TableHead>Flag</TableHead>
               <TableHead className='w-32'>AI value</TableHead>
+              <TableHead className='w-48'>Blocks</TableHead>
               {canEdit && <TableHead className='text-right'>Actions</TableHead>}
             </TableRow>
           </TableHeader>
@@ -250,7 +277,7 @@ export default function StatusFlagValuesPage() {
             {rows.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={canEdit ? 3 : 2}
+                  colSpan={canEdit ? 4 : 3}
                   className='text-center text-muted-foreground py-8'
                 >
                   No status flag values found.
@@ -263,6 +290,15 @@ export default function StatusFlagValuesPage() {
                     {row.flag}
                   </TableCell>
                   <TableCell>{row.aiValue}</TableCell>
+                  <TableCell className='text-xs'>
+                    {[
+                      row.preventsMovement && 'movement',
+                      row.preventsCasting && 'casting',
+                      row.preventsSpeaking && 'speaking',
+                    ]
+                      .filter(Boolean)
+                      .join(', ') || '-'}
+                  </TableCell>
                   {canEdit && (
                     <TableCell className='text-right'>
                       <Button
@@ -349,6 +385,28 @@ export default function StatusFlagValuesPage() {
                 <p className='text-xs text-muted-foreground'>
                   Whole number. Negative for harmful flags.
                 </p>
+              </div>
+
+              <div className='space-y-2'>
+                <Label>Blocks while an effect carries this flag</Label>
+                {(
+                  [
+                    ['preventsMovement', 'Movement'],
+                    ['preventsCasting', 'Casting'],
+                    ['preventsSpeaking', 'Speaking'],
+                  ] as const
+                ).map(([key, label]) => (
+                  <label key={key} className='flex items-center gap-2 text-sm'>
+                    <input
+                      type='checkbox'
+                      checked={formData[key]}
+                      onChange={e =>
+                        setFormData({ ...formData, [key]: e.target.checked })
+                      }
+                    />
+                    {label}
+                  </label>
+                ))}
               </div>
             </div>
 

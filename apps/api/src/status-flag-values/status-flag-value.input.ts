@@ -1,6 +1,8 @@
 import { Field, InputType, Int } from '@nestjs/graphql';
 import {
+  IsBoolean,
   IsInt,
+  IsOptional,
   IsNotEmpty,
   IsString,
   Matches,
@@ -28,6 +30,18 @@ export class CreateStatusFlagValueInput {
   @Min(-MAX_AI_VALUE)
   @Max(MAX_AI_VALUE)
   aiValue: number;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  preventsMovement: boolean;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  preventsCasting: boolean;
+
+  @Field({ defaultValue: false })
+  @IsBoolean()
+  preventsSpeaking: boolean;
 }
 
 @InputType({ description: 'Input for updating a status flag value' })
@@ -37,4 +51,19 @@ export class UpdateStatusFlagValueInput {
   @Min(-MAX_AI_VALUE)
   @Max(MAX_AI_VALUE)
   aiValue: number;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  preventsMovement?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  preventsCasting?: boolean;
+
+  @Field({ nullable: true })
+  @IsOptional()
+  @IsBoolean()
+  preventsSpeaking?: boolean;
 }

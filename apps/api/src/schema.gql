@@ -1297,6 +1297,9 @@ input CreateSpellSyllableInput {
 input CreateStatusFlagValueInput {
   aiValue: Int! = 0
   flag: String!
+  preventsCasting: Boolean! = false
+  preventsMovement: Boolean! = false
+  preventsSpeaking: Boolean! = false
 }
 
 """Input for creating a system message"""
@@ -3838,6 +3841,15 @@ type StatusFlagValueDto {
 
   """Status flag name (e.g., sanctuary)"""
   flag: String!
+
+  """An effect carrying this flag blocks spellcasting"""
+  preventsCasting: Boolean!
+
+  """An effect carrying this flag blocks movement"""
+  preventsMovement: Boolean!
+
+  """An effect carrying this flag blocks speaking"""
+  preventsSpeaking: Boolean!
 }
 
 type Subscription {
@@ -4654,6 +4666,9 @@ input UpdateSpellSyllableInput {
 """Input for updating a status flag value"""
 input UpdateStatusFlagValueInput {
   aiValue: Int!
+  preventsCasting: Boolean
+  preventsMovement: Boolean
+  preventsSpeaking: Boolean
 }
 
 """Input for updating a system message (the key cannot change)"""

@@ -4,6 +4,9 @@ query GetStatusFlagValues {
   statusFlagValues {
     flag
     aiValue
+    preventsMovement
+    preventsCasting
+    preventsSpeaking
   }
 }
 
@@ -11,6 +14,9 @@ mutation CreateStatusFlagValue($data: CreateStatusFlagValueInput!) {
   createStatusFlagValue(data: $data) {
     flag
     aiValue
+    preventsMovement
+    preventsCasting
+    preventsSpeaking
   }
 }
 
@@ -21,6 +27,9 @@ mutation UpdateStatusFlagValue(
   updateStatusFlagValue(flag: $flag, data: $data) {
     flag
     aiValue
+    preventsMovement
+    preventsCasting
+    preventsSpeaking
   }
 }
 
