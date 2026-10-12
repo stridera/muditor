@@ -1941,6 +1941,10 @@ model Zones {
   // public website, world map), grant no exploration achievements, and are
   // never picked as a random teleport destination. HEAD_BUILDER+ only.
   isGodZone        Boolean        @default(false) @map("is_god_zone")
+  // Internal zones are plumbing, not content (the Void, reserved/non-loading item zones):
+  // they grant no exploration credit and stay out of zone listings and achievements.
+  // Unlike god zones they are not hidden from staff tools. HEAD_BUILDER+ only.
+  isInternal       Boolean        @default(false) @map("is_internal")
   // Mobs of this zone lie down to sleep at night (game hours 22-04, outdoor
   // rooms, never mid-fight) and wake at dawn. Off by default; a mob can
   // override it with the SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors.
@@ -1969,6 +1973,7 @@ model Social {
   id                Int      @id @default(autoincrement())
   name              String   @unique // Command name (e.g., "smile", "bow", "hug")
   hide              Boolean  @default(false) // Hide who initiated the action
+  staffOnly         Boolean  @default(false) @map("staff_only") // Players cannot reach it by abbreviation; typed in full it behaves normally
   minVictimPosition Position @default(STANDING) @map("min_victim_position") // Victim must be at least this position
 
   // No argument provided - actor alone

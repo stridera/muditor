@@ -5,6 +5,7 @@ query GetSocials {
     id
     name
     hide
+    staffOnly
     minVictimPosition
     charNoArg
     othersNoArg
@@ -23,6 +24,7 @@ query GetSocial($id: ID!) {
     id
     name
     hide
+    staffOnly
     minVictimPosition
     charNoArg
     othersNoArg
@@ -42,6 +44,7 @@ query SearchSocials($query: String!) {
     id
     name
     hide
+    staffOnly
     minVictimPosition
     charNoArg
     othersNoArg
@@ -53,6 +56,7 @@ mutation CreateSocial($data: CreateSocialInput!) {
     id
     name
     hide
+    staffOnly
     minVictimPosition
   }
 }
@@ -62,6 +66,7 @@ mutation UpdateSocial($id: ID!, $data: UpdateSocialInput!) {
     id
     name
     hide
+    staffOnly
     minVictimPosition
     charNoArg
     othersNoArg

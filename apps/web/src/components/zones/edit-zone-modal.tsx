@@ -20,6 +20,7 @@ interface ZoneData {
   hemisphere: Hemisphere;
   climate: Climate;
   isGodZone: boolean;
+  isInternal: boolean;
   mobsSleepAtNight: boolean;
 }
 
@@ -69,6 +70,7 @@ export function EditZoneModal({
     mobsSleepAtNight: zone.mobsSleepAtNight,
   });
   const [isGodZone, setIsGodZone] = useState(zone.isGodZone);
+  const [isInternal, setIsInternal] = useState(zone.isInternal);
 
   const [updateZone, { loading, error }] = useMutation(UpdateZoneDocument, {
     onCompleted: () => {
@@ -82,7 +84,9 @@ export function EditZoneModal({
     await updateZone({
       variables: {
         id: zone.id,
-        data: canEditGodZone ? { ...formData, isGodZone } : formData,
+        data: canEditGodZone
+          ? { ...formData, isGodZone, isInternal }
+          : formData,
       },
     });
   };
@@ -273,6 +277,32 @@ export function EditZoneModal({
               <span>
                 God zone (hidden from mortals, no achievements, excluded from
                 random teleport)
+                {!canEditGodZone && (
+                  <span className='block text-xs font-normal'>
+                    Only HEAD_BUILDER and above can change this.
+                  </span>
+                )}
+              </span>
+            </label>
+          </div>
+
+          {/* Internal zone (HEAD_BUILDER+, same authority as the god zone flag) */}
+          <div>
+            <label
+              htmlFor='isInternal'
+              className='flex items-start gap-2 text-sm font-medium text-muted-foreground'
+            >
+              <input
+                id='isInternal'
+                type='checkbox'
+                className='mt-1 rounded border-border'
+                checked={isInternal}
+                disabled={!canEditGodZone}
+                onChange={e => setIsInternal(e.target.checked)}
+              />
+              <span>
+                Internal zone (plumbing: no exploration credit, left out of zone
+                lists)
                 {!canEditGodZone && (
                   <span className='block text-xs font-normal'>
                     Only HEAD_BUILDER and above can change this.

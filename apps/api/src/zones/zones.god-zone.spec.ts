@@ -124,6 +124,28 @@ describe('ZonesResolver god zone visibility', () => {
       }
     );
 
+    it.each([UserRole.BUILDER, UserRole.IMMORTAL])(
+      'refuses isInternal for %s',
+      async role => {
+        const { resolver, zonesService } = setup();
+        await expect(
+          resolver.updateZone(12, { isInternal: true }, user(role))
+        ).rejects.toBeInstanceOf(ForbiddenException);
+        expect(zonesService.update).not.toHaveBeenCalled();
+      }
+    );
+
+    it.each([UserRole.HEAD_BUILDER, UserRole.CODER, UserRole.IMPLEMENTOR])(
+      'allows isInternal for %s',
+      async role => {
+        const { resolver, zonesService } = setup();
+        await resolver.updateZone(12, { isInternal: true }, user(role));
+        expect(zonesService.update).toHaveBeenCalledWith(12, {
+          isInternal: true,
+        });
+      }
+    );
+
     it('does not get in the way of ordinary zone edits by a BUILDER', async () => {
       const { resolver, zonesService } = setup();
       await resolver.updateZone(12, { name: 'New' }, user(UserRole.BUILDER));

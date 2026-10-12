@@ -9,6 +9,7 @@ query GetZones {
     lifespan
     resetMode
     isGodZone
+    isInternal
     mobsSleepAtNight
   }
 }
@@ -29,6 +30,7 @@ query GetZone($id: Int!) {
     lifespan
     resetMode
     isGodZone
+    isInternal
     mobsSleepAtNight
     createdAt
     updatedAt
@@ -51,6 +53,7 @@ mutation UpdateZone($id: Int!, $data: UpdateZoneInput!) {
     lifespan
     resetMode
     isGodZone
+    isInternal
     mobsSleepAtNight
   }
 }

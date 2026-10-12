@@ -21,6 +21,13 @@ export class CreateSocialInput {
   @IsBoolean()
   hide: boolean;
 
+  @Field({
+    defaultValue: false,
+    description: 'Players cannot reach it by typing an abbreviation',
+  })
+  @IsBoolean()
+  staffOnly: boolean;
+
   @Field(() => Position, {
     defaultValue: Position.STANDING,
     description: 'Minimum position for the target',
@@ -96,6 +103,14 @@ export class UpdateSocialInput {
   @IsBoolean()
   @IsOptional()
   hide?: boolean;
+
+  @Field({
+    nullable: true,
+    description: 'Players cannot reach it by typing an abbreviation',
+  })
+  @IsBoolean()
+  @IsOptional()
+  staffOnly?: boolean;
 
   @Field(() => Position, {
     nullable: true,

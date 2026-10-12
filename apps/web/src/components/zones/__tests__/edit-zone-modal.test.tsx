@@ -27,6 +27,7 @@ const zone = {
   hemisphere: 'NORTHWEST' as const,
   climate: 'NONE' as const,
   isGodZone: false,
+  isInternal: false,
   mobsSleepAtNight: false,
 };
 
@@ -75,6 +76,43 @@ describe('EditZoneModal god zone checkbox', () => {
     await waitFor(() => expect(mockUpdateZone).toHaveBeenCalled());
     expect(mockUpdateZone.mock.calls[0]![0].variables.data).not.toHaveProperty(
       'isGodZone'
+    );
+  });
+});
+
+describe('EditZoneModal internal zone checkbox', () => {
+  const internalLabel = /Internal zone \(plumbing/;
+  beforeEach(() => mockUpdateZone.mockClear());
+
+  it.each(USER_ROLES)('is enabled only for HEAD_BUILDER+ (%s)', role => {
+    mockRole = role;
+    renderModal();
+    const box = screen.getByLabelText(internalLabel);
+    if (roleAtLeast(role, 'HEAD_BUILDER')) {
+      expect(box).toBeEnabled();
+    } else {
+      expect(box).toBeDisabled();
+    }
+  });
+
+  it('sends isInternal when a HEAD_BUILDER ticks it, never for a BUILDER', async () => {
+    mockRole = 'HEAD_BUILDER';
+    renderModal();
+    fireEvent.click(screen.getByLabelText(internalLabel));
+    fireEvent.click(screen.getByRole('button', { name: 'Save Changes' }));
+    await waitFor(() => expect(mockUpdateZone).toHaveBeenCalledTimes(1));
+    expect(mockUpdateZone.mock.calls[0]![0].variables.data).toMatchObject({
+      isInternal: true,
+    });
+
+    mockRole = 'BUILDER';
+    renderModal();
+    fireEvent.click(
+      screen.getAllByRole('button', { name: 'Save Changes' }).at(-1)!
+    );
+    await waitFor(() => expect(mockUpdateZone).toHaveBeenCalledTimes(2));
+    expect(mockUpdateZone.mock.calls[1]![0].variables.data).not.toHaveProperty(
+      'isInternal'
     );
   });
 });

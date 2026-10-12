@@ -97,6 +97,16 @@ export class ZonesResolver {
         'Only HEAD_BUILDER or above can change the god zone flag'
       );
     }
+    // Same authority for the internal-zone flag: it decides which zones the
+    // game lists and credits for exploration.
+    if (
+      data.isInternal !== undefined &&
+      !roleAtLeast(user.role, UserRole.HEAD_BUILDER)
+    ) {
+      throw new ForbiddenException(
+        'Only HEAD_BUILDER or above can change the internal zone flag'
+      );
+    }
     return this.zonesService.update(id, data);
   }
 

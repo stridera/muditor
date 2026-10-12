@@ -105,6 +105,12 @@ export class ZoneDto {
 
   @Field({
     description:
+      'Internal zone: plumbing (Void, reserved item zones), grants no exploration credit and stays out of zone listings',
+  })
+  isInternal: boolean;
+
+  @Field({
+    description:
       'Mobs of this zone lie down to sleep at night (off by default; per-mob SLEEPS_AT_NIGHT / AWAKE_AT_NIGHT behaviors override it)',
   })
   mobsSleepAtNight: boolean;
@@ -194,6 +200,14 @@ export class UpdateZoneInput {
   @IsOptional()
   @IsBoolean()
   isGodZone?: boolean;
+
+  @Field(() => Boolean, {
+    nullable: true,
+    description: 'Requires HEAD_BUILDER or above (checked by the resolver)',
+  })
+  @IsOptional()
+  @IsBoolean()
+  isInternal?: boolean;
 
   @Field(() => Boolean, {
     nullable: true,

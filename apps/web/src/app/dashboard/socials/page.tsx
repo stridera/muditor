@@ -51,6 +51,7 @@ const GET_SOCIALS = gql`
       id
       name
       hide
+      staffOnly
       minVictimPosition
       charNoArg
       othersNoArg
@@ -71,6 +72,7 @@ const CREATE_SOCIAL = gql`
       id
       name
       hide
+      staffOnly
       minVictimPosition
     }
   }
@@ -82,6 +84,7 @@ const UPDATE_SOCIAL = gql`
       id
       name
       hide
+      staffOnly
       minVictimPosition
       charNoArg
       othersNoArg
@@ -118,6 +121,7 @@ const POSITIONS = [
 type SocialFormData = {
   name: string;
   hide: boolean;
+  staffOnly: boolean;
   minVictimPosition: string;
   charNoArg: string;
   othersNoArg: string;
@@ -132,6 +136,7 @@ type SocialFormData = {
 const defaultFormData: SocialFormData = {
   name: '',
   hide: false,
+  staffOnly: false,
   minVictimPosition: 'STANDING',
   charNoArg: '',
   othersNoArg: '',
@@ -222,6 +227,7 @@ export default function SocialsPage() {
     setFormData({
       name: social.name,
       hide: social.hide,
+      staffOnly: social.staffOnly,
       minVictimPosition: social.minVictimPosition,
       charNoArg: social.charNoArg || '',
       othersNoArg: social.othersNoArg || '',
@@ -248,6 +254,7 @@ export default function SocialsPage() {
         data: {
           name: formData.name.toLowerCase().trim(),
           hide: formData.hide,
+          staffOnly: formData.staffOnly,
           minVictimPosition: formData.minVictimPosition,
           charNoArg: formData.charNoArg || null,
           othersNoArg: formData.othersNoArg || null,
@@ -269,6 +276,7 @@ export default function SocialsPage() {
         id: editingSocial.id,
         data: {
           hide: formData.hide,
+          staffOnly: formData.staffOnly,
           minVictimPosition: formData.minVictimPosition,
           charNoArg: formData.charNoArg || null,
           othersNoArg: formData.othersNoArg || null,
@@ -398,6 +406,11 @@ export default function SocialsPage() {
                   </TableCell>
                   <TableCell>
                     <div className='flex gap-1'>
+                      {social.staffOnly && (
+                        <span className='text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-0.5 rounded'>
+                          Staff only
+                        </span>
+                      )}
                       {social.hide && (
                         <span className='text-xs bg-yellow-100 dark:bg-yellow-900/30 text-yellow-800 dark:text-yellow-300 px-2 py-0.5 rounded'>
                           Hidden
@@ -700,6 +713,19 @@ export default function SocialsPage() {
                     Hide initiator (don&apos;t show who performed the action)
                   </Label>
                 </div>
+
+                <div className='flex items-center space-x-2 mt-3'>
+                  <Checkbox
+                    id='staffOnly'
+                    checked={formData.staffOnly}
+                    onCheckedChange={(checked: boolean) =>
+                      setFormData({ ...formData, staffOnly: checked })
+                    }
+                  />
+                  <Label htmlFor='staffOnly' className='cursor-pointer'>
+                    Staff only (players cannot reach it by abbreviation)
+                  </Label>
+                </div>
               </div>
 
               {/* Messages Section */}
@@ -894,6 +920,19 @@ export default function SocialsPage() {
                   />
                   <Label htmlFor='editHide' className='cursor-pointer'>
                     Hide initiator (don&apos;t show who performed the action)
+                  </Label>
+                </div>
+
+                <div className='flex items-center space-x-2 mt-3'>
+                  <Checkbox
+                    id='editStaffOnly'
+                    checked={formData.staffOnly}
+                    onCheckedChange={(checked: boolean) =>
+                      setFormData({ ...formData, staffOnly: checked })
+                    }
+                  />
+                  <Label htmlFor='editStaffOnly' className='cursor-pointer'>
+                    Staff only (players cannot reach it by abbreviation)
                   </Label>
                 </div>
               </div>

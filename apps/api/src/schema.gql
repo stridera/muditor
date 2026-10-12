@@ -1285,6 +1285,9 @@ input CreateSocialInput {
   """Message to room when no target"""
   othersNoArg: String
 
+  """Players cannot reach it by typing an abbreviation"""
+  staffOnly: Boolean! = false
+
   """Message to target"""
   victFound: String
 }
@@ -3813,6 +3816,11 @@ type SocialDto {
 
   """Message to room when no target"""
   othersNoArg: String
+
+  """
+  Staff only: players cannot reach it by typing an abbreviation (typed in full it behaves normally)
+  """
+  staffOnly: Boolean!
   updatedAt: DateTime!
 
   """Message to target"""
@@ -4698,6 +4706,9 @@ input UpdateSocialInput {
   """Message to room when no target"""
   othersNoArg: String
 
+  """Players cannot reach it by typing an abbreviation"""
+  staffOnly: Boolean
+
   """Message to target"""
   victFound: String
 }
@@ -4762,6 +4773,9 @@ input UpdateZoneInput {
 
   """Requires HEAD_BUILDER or above (checked by the resolver)"""
   isGodZone: Boolean
+
+  """Requires HEAD_BUILDER or above (checked by the resolver)"""
+  isInternal: Boolean
   lifespan: Int
 
   """Mobs of this zone sleep at night (default off)"""
@@ -4989,6 +5003,11 @@ type ZoneDto {
   God zone: hidden from mortals, grants no achievements, never a random teleport destination
   """
   isGodZone: Boolean!
+
+  """
+  Internal zone: plumbing (Void, reserved item zones), grants no exploration credit and stays out of zone listings
+  """
+  isInternal: Boolean!
   lifespan: Int!
 
   """

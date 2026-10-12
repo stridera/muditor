@@ -15,6 +15,12 @@ export class SocialDto {
   @Field({ description: 'Hide who initiated the action' })
   hide: boolean;
 
+  @Field({
+    description:
+      'Staff only: players cannot reach it by typing an abbreviation (typed in full it behaves normally)',
+  })
+  staffOnly: boolean;
+
   @Field(() => Position, { description: 'Minimum position for the target' })
   minVictimPosition: Position;
 

@@ -28,6 +28,7 @@ interface ZoneDetail {
   resetMode: ResetMode;
   hemisphere: Hemisphere;
   isGodZone: boolean;
+  isInternal: boolean;
   mobsSleepAtNight: boolean;
   _count: {
     rooms: number;
@@ -245,6 +246,16 @@ function ZoneDetailContent() {
                 {zone.lifespan} minutes
               </p>
             </div>
+            {zone.isInternal && (
+              <div>
+                <label className='block text-sm font-medium text-muted-foreground'>
+                  Kind
+                </label>
+                <p className='text-foreground font-semibold mt-1'>
+                  Internal zone (no exploration credit)
+                </p>
+              </div>
+            )}
             {zone.isGodZone && (
               <div>
                 <label className='block text-sm font-medium text-muted-foreground'>
@@ -320,6 +331,7 @@ function ZoneDetailContent() {
             hemisphere: zone.hemisphere,
             climate: zone.climate,
             isGodZone: zone.isGodZone,
+            isInternal: zone.isInternal,
             mobsSleepAtNight: zone.mobsSleepAtNight,
           }}
           isOpen={isEditModalOpen}
