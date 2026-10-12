@@ -242,6 +242,13 @@ model AbilitySchool {
   abilities   Ability[]
 }
 
+// Display style for a spell sphere (spells/skills listings, <fire>-style tag aliases).
+// One row per SpellSphere; a missing row or NULL color means the game's built-in default.
+model SphereStyle {
+  sphere SpellSphere @id
+  color  String? // XML-Lite tag body without brackets: "red", "b:cyan", "magenta"
+}
+
 model AbilityRestrictions {
   id        Int     @id @default(autoincrement())
   abilityId Int     @unique @map("ability_id")
@@ -3839,6 +3846,14 @@ model Liquid {
 
   // Optional extended properties
   description String? // Flavor text for examine
+
+  // Legacy CircleMUD identity, used by Lua scripts that compare `val2` of a drink
+  // container (e.g. `object.val2 == 11` for tea). legacyIndex is the position in the
+  // legacy liquid table; legacyCode is the label stored in drink-container object values
+  // ("WHISKY", "DARKALE", "FIREBRT"). New liquids leave both NULL; the game then assigns
+  // them a stable index after the highest legacyIndex.
+  legacyIndex Int?    @map("legacy_index")
+  legacyCode  String? @map("legacy_code")
 
   // Applied effects when consumed (via effect system)
   // Individual drink containers can override via ObjectAbilities

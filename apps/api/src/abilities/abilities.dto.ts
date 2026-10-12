@@ -32,6 +32,16 @@ export class AbilitySchool {
 }
 
 @ObjectType()
+export class SphereStyle {
+  @Field(() => SpellSphere)
+  sphere: SpellSphere;
+
+  // XML-Lite tag body without brackets ("red", "b:cyan"); null = built-in default.
+  @Field(() => String, { nullable: true })
+  color?: string | null;
+}
+
+@ObjectType()
 export class Effect {
   @Field(() => ID)
   id: number;

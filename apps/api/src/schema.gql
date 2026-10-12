@@ -2505,6 +2505,7 @@ type Mutation {
 
   """Update a spell syllable"""
   updateSpellSyllable(data: UpdateSpellSyllableInput!, id: ID!): SpellSyllableDto!
+  updateSphereColor(color: String, sphere: SpellSphere!): SphereStyle!
 
   """Update a status flag AI value"""
   updateStatusFlagValue(data: UpdateStatusFlagValueInput!, flag: String!): StatusFlagValueDto!
@@ -3060,6 +3061,7 @@ type Query {
 
   """Get all spell syllables, in match order"""
   spellSyllables: [SpellSyllableDto!]!
+  sphereStyles: [SphereStyle!]!
 
   """Get a single status flag AI value"""
   statusFlagValue(flag: String!): StatusFlagValueDto!
@@ -3823,6 +3825,11 @@ type SpellSyllableDto {
 
   """Lowercase text to match at the current position of the spell name"""
   syllable: String!
+}
+
+type SphereStyle {
+  color: String
+  sphere: SpellSphere!
 }
 
 type StatRollDto {

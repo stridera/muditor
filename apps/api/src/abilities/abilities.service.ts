@@ -1,5 +1,5 @@
-import { Injectable } from '@nestjs/common';
-import { Prisma } from '@muditor/db';
+import { BadRequestException, Injectable } from '@nestjs/common';
+import { Prisma, SpellSphere } from '@muditor/db';
 import { DatabaseService } from '../database/database.service';
 import {
   CreateAbilityInput,
@@ -316,6 +316,30 @@ export class AbilitiesService {
   async findSchool(id: number) {
     return this.prisma.abilitySchool.findUnique({
       where: { id },
+    });
+  }
+
+  // Sphere styles: one row per SpellSphere, missing rows listed with a null color
+  async findAllSphereStyles() {
+    const rows = await this.prisma.sphereStyle.findMany();
+    const byKey = new Map(rows.map(r => [r.sphere, r.color]));
+    return Object.values(SpellSphere).map(sphere => ({
+      sphere,
+      color: byKey.get(sphere) ?? null,
+    }));
+  }
+
+  async updateSphereColor(sphere: SpellSphere, color: string | null) {
+    const trimmed = color?.trim() ?? '';
+    // XML-Lite tag body: colour/modifier words joined by ':' (e.g. "b:cyan", "#FF8800").
+    if (trimmed !== '' && !/^[A-Za-z0-9#:_-]+$/.test(trimmed)) {
+      throw new BadRequestException(`Invalid sphere colour: ${color}`);
+    }
+    const value = trimmed === '' ? null : trimmed.toLowerCase();
+    return this.prisma.sphereStyle.upsert({
+      where: { sphere },
+      create: { sphere, color: value },
+      update: { color: value },
     });
   }
 

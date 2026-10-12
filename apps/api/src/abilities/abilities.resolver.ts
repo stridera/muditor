@@ -1,6 +1,6 @@
 import { BadRequestException, UseGuards } from '@nestjs/common';
 import { Args, ID, Int, Mutation, Query, Resolver } from '@nestjs/graphql';
-import { UserRole } from '@muditor/db';
+import { SpellSphere, UserRole } from '@muditor/db';
 import { MinimumRole } from '../auth/decorators/minimum-role.decorator';
 import { GraphQLJwtAuthGuard } from '../auth/guards/graphql-jwt-auth.guard';
 import { MinimumRoleGuard } from '../auth/guards/minimum-role.guard';
@@ -11,6 +11,7 @@ import {
   AbilitySchool,
   AbilityTargeting,
   Effect,
+  SphereStyle,
 } from './abilities.dto';
 import {
   CreateAbilityInput,
@@ -199,6 +200,24 @@ export class AbilitiesResolver {
   @MinimumRole(UserRole.IMMORTAL)
   async getAbilitySchool(@Args('id', { type: () => ID }) id: string | number) {
     return this.abilitiesService.findSchool(this.coerceNumericId(id));
+  }
+
+  // Sphere style queries/mutations
+  @Query(() => [SphereStyle], { name: 'sphereStyles' })
+  @MinimumRole(UserRole.IMMORTAL)
+  async getSphereStyles() {
+    return this.abilitiesService.findAllSphereStyles();
+  }
+
+  @Mutation(() => SphereStyle)
+  @UseGuards(MinimumRoleGuard)
+  @MinimumRole('BUILDER')
+  async updateSphereColor(
+    @Args('sphere', { type: () => SpellSphere }) sphere: SpellSphere,
+    @Args('color', { type: () => String, nullable: true })
+    color?: string | null
+  ) {
+    return this.abilitiesService.updateSphereColor(sphere, color ?? null);
   }
 
   // Effects queries

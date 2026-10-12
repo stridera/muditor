@@ -310,6 +310,10 @@ export class DatabaseService implements OnModuleInit, OnModuleDestroy {
     return this.client.abilitySchool;
   }
 
+  get sphereStyle() {
+    return this.client.sphereStyle;
+  }
+
   get abilityTargeting() {
     return this.client.abilityTargeting;
   }

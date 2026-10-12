@@ -2319,6 +2319,7 @@ export type Mutation = {
   updateSocial: SocialDto;
   /** Update a spell syllable */
   updateSpellSyllable: SpellSyllableDto;
+  updateSphereColor: SphereStyle;
   /** Update a status flag AI value */
   updateStatusFlagValue: StatusFlagValueDto;
   /** Update a system message */
@@ -3430,6 +3431,12 @@ export type MutationUpdateSpellSyllableArgs = {
 };
 
 
+export type MutationUpdateSphereColorArgs = {
+  color?: InputMaybe<Scalars['String']['input']>;
+  sphere: SpellSphere;
+};
+
+
 export type MutationUpdateStatusFlagValueArgs = {
   data: UpdateStatusFlagValueInput;
   flag: Scalars['String']['input'];
@@ -3930,6 +3937,7 @@ export type Query = {
   spellSyllable: SpellSyllableDto;
   /** Get all spell syllables, in match order */
   spellSyllables: Array<SpellSyllableDto>;
+  sphereStyles: Array<SphereStyle>;
   /** Get a single status flag AI value */
   statusFlagValue: StatusFlagValueDto;
   /** Get all status flag AI values, ordered by flag */
@@ -5235,6 +5243,12 @@ export type SpellSyllableDto = {
   sortOrder: Scalars['Int']['output'];
   /** Lowercase text to match at the current position of the spell name */
   syllable: Scalars['String']['output'];
+};
+
+export type SphereStyle = {
+  __typename?: 'SphereStyle';
+  color?: Maybe<Scalars['String']['output']>;
+  sphere: SpellSphere;
 };
 
 export type StatRollDto = {

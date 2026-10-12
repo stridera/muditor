@@ -113,3 +113,50 @@ describe('AbilitiesService.update (partial update)', () => {
     });
   });
 });
+
+describe('AbilitiesService sphere styles', () => {
+  const makeStyleDb = () => {
+    const findMany = jest.fn().mockResolvedValue([
+      { sphere: 'FIRE', color: 'red' },
+      { sphere: 'AIR', color: null },
+    ]);
+    const upsert = jest
+      .fn()
+      .mockImplementation(({ create }: { create: unknown }) => create);
+    const db = {
+      sphereStyle: { findMany, upsert },
+    } as unknown as ConstructorParameters<typeof AbilitiesService>[0];
+    return { db, upsert };
+  };
+
+  it('lists every sphere, with null for missing or NULL colours', async () => {
+    const { db } = makeStyleDb();
+    const rows = await new AbilitiesService(db).findAllSphereStyles();
+    expect(rows).toHaveLength(11);
+    expect(rows.find(r => r.sphere === 'FIRE')?.color).toBe('red');
+    expect(rows.find(r => r.sphere === 'AIR')?.color).toBeNull();
+    expect(rows.find(r => r.sphere === 'DEATH')?.color).toBeNull();
+  });
+
+  it('stores a trimmed lowercase tag body and clears on empty', async () => {
+    const { db, upsert } = makeStyleDb();
+    const service = new AbilitiesService(db);
+    await service.updateSphereColor('AIR' as never, ' B:Cyan ');
+    expect(upsert.mock.calls[0]![0].create).toEqual({
+      sphere: 'AIR',
+      color: 'b:cyan',
+    });
+    await service.updateSphereColor('AIR' as never, '');
+    expect(upsert.mock.calls[1]![0].create).toEqual({
+      sphere: 'AIR',
+      color: null,
+    });
+  });
+
+  it('rejects colours that are not a tag body', async () => {
+    const { db } = makeStyleDb();
+    await expect(
+      new AbilitiesService(db).updateSphereColor('AIR' as never, '<red>')
+    ).rejects.toThrow('Invalid sphere colour');
+  });
+});
