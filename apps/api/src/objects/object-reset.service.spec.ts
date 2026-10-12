@@ -185,11 +185,16 @@ describe('ObjectResetService', () => {
     });
   });
 
-  it('delete reports false when the row is gone', async () => {
+  it('delete throws NotFound when the row is gone and rethrows other errors', async () => {
     db.objectResets.delete.mockResolvedValueOnce({});
     expect(await service.delete(7)).toBe(true);
-    db.objectResets.delete.mockRejectedValueOnce(new Error('missing'));
-    expect(await service.delete(7)).toBe(false);
+    db.objectResets.delete.mockRejectedValueOnce(
+      Object.assign(new Error('gone'), { code: 'P2025' })
+    );
+    await expect(service.delete(7)).rejects.toThrow(NotFoundException);
+    const boom = new Error('db down');
+    db.objectResets.delete.mockRejectedValueOnce(boom);
+    await expect(service.delete(7)).rejects.toBe(boom);
   });
 
   describe('addContent', () => {

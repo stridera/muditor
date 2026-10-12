@@ -246,8 +246,8 @@ export class MobResetService {
         where: { id },
       });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Mob reset', id);
     }
   }
 
@@ -257,8 +257,8 @@ export class MobResetService {
         where: { id },
       });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Equipment', id);
     }
   }
 
@@ -318,8 +318,8 @@ export class MobResetService {
         data,
       });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Equipment', equipmentId);
     }
   }
 

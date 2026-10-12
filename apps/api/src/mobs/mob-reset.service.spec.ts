@@ -347,6 +347,51 @@ describe('MobResetService mapping', () => {
     });
   });
 
+  describe('delete / equipment row errors', () => {
+    const gone = () => Object.assign(new Error('gone'), { code: 'P2025' });
+    const equipDb = () =>
+      db.mobResetEquipment as unknown as {
+        update: jest.Mock;
+        delete: jest.Mock;
+      };
+
+    it('delete: true on success, NotFound on P2025, other errors rethrown', async () => {
+      (db.mobResets.delete as jest.Mock).mockResolvedValueOnce({});
+      expect(await service.delete(1)).toBe(true);
+      (db.mobResets.delete as jest.Mock).mockRejectedValueOnce(gone());
+      await expect(service.delete(1)).rejects.toThrow(NotFoundException);
+      const boom = new Error('db down');
+      (db.mobResets.delete as jest.Mock).mockRejectedValueOnce(boom);
+      await expect(service.delete(1)).rejects.toBe(boom);
+    });
+
+    it('deleteEquipment: NotFound on P2025, other errors rethrown', async () => {
+      equipDb().delete.mockResolvedValueOnce({});
+      expect(await service.deleteEquipment(1)).toBe(true);
+      equipDb().delete.mockRejectedValueOnce(gone());
+      await expect(service.deleteEquipment(1)).rejects.toThrow(
+        NotFoundException
+      );
+      const boom = new Error('db down');
+      equipDb().delete.mockRejectedValueOnce(boom);
+      await expect(service.deleteEquipment(1)).rejects.toBe(boom);
+    });
+
+    it('updateEquipment: NotFound on P2025, other errors rethrown', async () => {
+      equipDb().update.mockResolvedValueOnce({});
+      expect(await service.updateEquipment(1, { maxInstances: 2 })).toBe(true);
+      equipDb().update.mockRejectedValueOnce(gone());
+      await expect(
+        service.updateEquipment(1, { maxInstances: 2 })
+      ).rejects.toThrow(NotFoundException);
+      const boom = new Error('db down');
+      equipDb().update.mockRejectedValueOnce(boom);
+      await expect(
+        service.updateEquipment(1, { maxInstances: 2 })
+      ).rejects.toBe(boom);
+    });
+  });
+
   describe('update', () => {
     it('only touches equipment of the reset being updated', async () => {
       const updateMany = jest.fn().mockReturnValue('op');

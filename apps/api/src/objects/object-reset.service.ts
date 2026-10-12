@@ -148,8 +148,8 @@ export class ObjectResetService {
     try {
       await this.prisma.objectResets.delete({ where: { id } });
       return true;
-    } catch {
-      return false;
+    } catch (e) {
+      return rethrowResetRowError(e, 'Object reset', id);
     }
   }
 
