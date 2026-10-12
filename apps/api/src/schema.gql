@@ -545,6 +545,9 @@ type ClassDto {
   name: String!
   plainName: String!
   primaryStat: String
+
+  """Engine-binding tags, e.g. core:monk, core:thief"""
+  tags: [String!]!
   updatedAt: DateTime!
 }
 
@@ -4139,6 +4142,7 @@ input UpdateClassInput {
   hitDice: String
   name: String
   primaryStat: String
+  tags: [String!]
 }
 
 input UpdateClassSkillInput {

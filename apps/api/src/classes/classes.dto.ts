@@ -24,6 +24,11 @@ export class ClassDto {
   @Field(() => Int)
   alignmentBias: number;
 
+  @Field(() => [String], {
+    description: 'Engine-binding tags, e.g. core:monk, core:thief',
+  })
+  tags: string[];
+
   @Field()
   createdAt: Date;
 

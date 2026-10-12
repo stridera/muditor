@@ -516,6 +516,12 @@ model CharacterClass {
   // game server's camp tier computation; legacy has no camp tier.
   campcraftBonus Boolean @default(false) @map("campcraft_bonus")
 
+  // Engine-binding tags, e.g. "core:monk" / "core:thief". The game server binds
+  // class-specific engine features (monk unarmed, thief backstab) by `core:<role>`
+  // tag rather than by display name, so renaming a class here cannot silently
+  // disable the feature. Mirrors Ability.tags.
+  tags String[] @default([])
+
   // Elemental resistances: JSON object { "FIRE": 25, "MENTAL": -25 }
   // Values: -100 (2x damage) to 100 (immune). Stacks multiplicatively with race/gear.
   resistances Json? @default("{}")

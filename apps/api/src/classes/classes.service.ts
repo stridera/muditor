@@ -117,6 +117,9 @@ export class ClassesService {
       ...(data.alignmentBias !== undefined && {
         alignmentBias: data.alignmentBias,
       }),
+      ...(data.tags !== undefined && {
+        tags: data.tags.map(t => t.trim()).filter(t => t.length > 0),
+      }),
     };
     return this.db.characterClass.update({ where: { id }, data: updateData });
   }

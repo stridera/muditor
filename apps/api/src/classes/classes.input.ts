@@ -2,6 +2,7 @@ import { InputType, Field, Int } from '@nestjs/graphql';
 import {
   IsString,
   IsNotEmpty,
+  IsArray,
   IsInt,
   IsOptional,
   Min,
@@ -59,6 +60,13 @@ export class UpdateClassInput {
   @Max(1000)
   @IsOptional()
   alignmentBias?: number;
+
+  /** Engine-binding tags (e.g. `core:monk`); replaces the whole list. */
+  @Field(() => [String], { nullable: true })
+  @IsArray()
+  @IsString({ each: true })
+  @IsOptional()
+  tags?: string[];
 }
 
 @InputType()

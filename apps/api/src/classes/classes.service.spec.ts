@@ -11,6 +11,7 @@ function makeDb() {
     hitDice: '1d8',
     primaryStat: null,
     alignmentBias: 0,
+    tags: [],
   };
   const characterClass = {
     findUnique: jest.fn(async ({ where }: { where: { id?: number } }) =>
@@ -68,5 +69,20 @@ describe('ClassesService.update', () => {
       where: { id: 1 },
       data: { alignmentBias: 100 },
     });
+  });
+
+  it('replaces tags, trimming blanks', async () => {
+    const { db, characterClass } = makeDb();
+    const service = new ClassesService(db);
+
+    const updated = await service.update(1, {
+      tags: [' core:monk ', '', 'x'],
+    });
+
+    expect(characterClass.update).toHaveBeenCalledWith({
+      where: { id: 1 },
+      data: { tags: ['core:monk', 'x'] },
+    });
+    expect(updated).toMatchObject({ tags: ['core:monk', 'x'] });
   });
 });

@@ -87,6 +87,7 @@ type ClassData = {
   hitDice: string;
   primaryStat?: string | null;
   alignmentBias: number;
+  tags: string[];
 };
 
 // Derived type aliases for improved type safety
@@ -112,6 +113,7 @@ export default function ClassesPage() {
     hitDice: '',
     primaryStat: '',
     alignmentBias: 0,
+    tags: '',
   });
   const [isEditing, setIsEditing] = useState(false);
 
@@ -353,6 +355,7 @@ export default function ClassesPage() {
       hitDice: cls.hitDice,
       primaryStat: cls.primaryStat || '',
       alignmentBias: cls.alignmentBias,
+      tags: cls.tags.join(', '),
     });
     setIsEditing(false);
     setActiveTab('details');
@@ -370,6 +373,10 @@ export default function ClassesPage() {
           hitDice: formData.hitDice,
           primaryStat: formData.primaryStat || undefined,
           alignmentBias: formData.alignmentBias,
+          tags: formData.tags
+            .split(',')
+            .map(t => t.trim())
+            .filter(t => t.length > 0),
         },
       },
     });
@@ -548,6 +555,7 @@ export default function ClassesPage() {
                                     primaryStat:
                                       selectedClass.primaryStat || '',
                                     alignmentBias: selectedClass.alignmentBias,
+                                    tags: selectedClass.tags.join(', '),
                                   });
                                 }}
                               >
@@ -642,6 +650,25 @@ export default function ClassesPage() {
                         Added to a killer&apos;s alignment in the kill alignment
                         formula. Positive for good classes, negative for evil
                         ones (e.g. Paladin +100, Necromancer -100).
+                      </p>
+                    </div>
+
+                    <div className='grid gap-2'>
+                      <Label htmlFor='tags'>Tags</Label>
+                      <Input
+                        id='tags'
+                        value={formData.tags}
+                        onChange={e =>
+                          setFormData({ ...formData, tags: e.target.value })
+                        }
+                        disabled={!isEditing}
+                        placeholder='e.g., core:monk'
+                      />
+                      <p className='text-xs text-muted-foreground'>
+                        Comma-separated. <code>core:&lt;role&gt;</code> tags
+                        (core:monk, core:thief) bind engine features to this
+                        class, so renaming it is safe. Keep exactly one class
+                        per role.
                       </p>
                     </div>
 
